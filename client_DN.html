@@ -1,0 +1,2738 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<title>LN Enterprise — Cổng Theo dõi Công trình</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{
+  --ink:#080808;--ink2:#111111;--ink3:#1a1a1a;--ink4:#222222;
+  --border:rgba(201,168,76,0.18);--border2:rgba(201,168,76,0.28);
+  --text:#F0EBE0;--text2:rgba(240,235,224,0.72);--sub:rgba(240,235,224,0.48);--muted:rgba(240,235,224,0.32);--dim:rgba(240,235,224,0.12);
+  --accent:#C9A84C;--accent2:#d4b86a;--accent-bg:rgba(201,168,76,0.10);
+  --green:#22c97a;--green-bg:rgba(34,201,122,.1);
+  --red:#ef4444;--red-bg:rgba(239,68,68,.08);
+  --amber:#ffaa33;--amber-bg:rgba(255,170,51,.1);
+  --blue:#3b82f6;--blue-bg:rgba(59,130,246,.1);
+  --gold:#C9A84C;--cyan:#22d3ee;--purple:#C9A84C;
+  --r:10px;--r-sm:7px;
+  --sans:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;--syne:'Syne',sans-serif;--serif:'Cormorant Garamond',serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--ink2);border-bottom:1px solid var(--border);padding:0 22px;height:56px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
+.tb-logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tb-logobox{background:transparent;color:var(--gold);padding:5px 11px;border-radius:var(--r-sm);border:1px solid rgba(201,168,76,.35);font-family:var(--syne);font-size:12px;font-weight:800;letter-spacing:.06em}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:calc(100vh - 56px);width:100%}
+.sidebar-cn{width:240px;background:var(--ink2);border-right:1px solid var(--border);position:fixed;top:56px;bottom:0;left:0;overflow-y:auto;z-index:20}
+.sidebar-cn::-webkit-scrollbar{width:2px}
+.sidebar-cn::-webkit-scrollbar-thumb{background:var(--border2)}
+.main-cn{margin-left:240px;flex:1;min-width:0;overflow-x:hidden}
+
+/* Sidebar nav */
+.cn-proj-item{padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s;border-bottom:1px solid rgba(201,168,76,.1);border-left:2px solid transparent}
+.cn-proj-item:nth-child(odd){background:rgba(201,168,76,.055)}
+.cn-proj-item:nth-child(even){background:rgba(255,255,255,.025)}
+.cn-proj-item:hover{background:rgba(201,168,76,.12);border-left-color:rgba(201,168,76,.4)}
+.cn-proj-item.active{background:rgba(201,168,76,.16)!important;border-left:2px solid var(--gold);border-right:none}
+.cpi-id{font-family:var(--mono);font-size:9px;color:var(--gold);opacity:.7;margin-bottom:2px;letter-spacing:.04em}
+.cpi-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cn-proj-item.active .cpi-name{color:var(--gold)}
+.cpi-meta{font-size:10px;color:var(--sub);margin-top:2px}
+.cpi-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+/* ── MAIN CONTENT ── */
+.cn-header{padding:16px 24px;border-bottom:1px solid var(--border);background:var(--ink2)}
+.cn-header h1{font-family:var(--serif);font-size:22px;font-weight:600;font-style:italic;color:var(--text);margin-bottom:4px;letter-spacing:-.01em}
+.cn-header p{font-size:12px;color:var(--sub)}
+
+/* KTS profile card — top of main */
+.kts-hero{
+  display:flex;align-items:center;gap:14px;
+  background:var(--ink3);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:12px 16px;
+  margin-top:10px;
+}
+.kts-hero-av{
+  width:48px;height:64px;border-radius:7px;
+  overflow:hidden;flex-shrink:0;
+  border:1.5px solid var(--border2);background:var(--ink);
+}
+.kts-hero-av canvas{width:100%;height:100%;display:block}
+.kts-hero-info{flex:1;min-width:0}
+.kts-hero-name{font-family:var(--serif);font-size:16px;font-weight:600;font-style:italic;color:var(--text);margin-bottom:4px;letter-spacing:-.01em}
+.kts-hero-rows{display:flex;flex-wrap:wrap;gap:8px}
+.kts-hero-pill{display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
+
+.content-cn{padding:20px 24px;display:flex;flex-direction:column;gap:20px}
+
+/* Cards */
+.card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px}
+.ct{font-size:12px;font-weight:700;color:var(--text);letter-spacing:.6px;text-transform:uppercase;border-left:3px solid var(--gold);padding-left:10px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ct i{color:var(--gold);border:none;padding:0}
+
+/* Stage bar */
+.stage-bar-full{display:flex;height:40px;border-radius:var(--r-sm);overflow:hidden;gap:2px;margin-bottom:12px}
+.sbf{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:700}
+
+/* Progress dots */
+.prog-dots{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.prog-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;transition:all .2s}
+.prog-line{flex:1;height:2px;border-radius:99px}
+
+/* Pills */
+.pill{font-size:10px;padding:3px 9px;border-radius:99px;font-weight:700;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.p-green{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,201,122,.2)}
+.p-amber{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(255,170,51,.2)}
+.p-blue {background:var(--blue-bg);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
+.p-gray {background:rgba(90,90,120,.1);color:var(--sub);border:1px solid rgba(90,90,120,.2)}
+.p-red  {background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+
+/* ── FOLDER TABS ── */
+.folder-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px}
+.ft{padding:7px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--ink3);color:var(--sub);transition:all .15s;display:flex;align-items:center;gap:6px;font-family:var(--sans)}
+.ft:hover{background:var(--border);color:var(--text2)}
+.ft.active{background:var(--accent-bg);border-color:rgba(201,168,76,.3);color:var(--accent2)}
+.ft-badge{background:var(--ink4);color:var(--sub);font-size:9px;padding:1px 5px;border-radius:99px;font-family:var(--mono)}
+.ft.active .ft-badge{background:rgba(201,168,76,.2);color:var(--accent2)}
+
+/* ── FILE CARDS ── */
+.files-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.file-card{background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;display:flex;flex-direction:column;gap:8px;transition:all .2s;cursor:pointer}
+.file-card:hover{border-color:var(--accent2);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.file-card.new-doc{border-color:var(--green);animation:docFlash .8s ease}
+@keyframes docFlash{0%{background:rgba(34,201,122,.12)}100%{background:var(--ink3)}}
+.fc-icon{width:40px;height:40px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.fc-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
+.fc-meta{font-size:10px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.fc-status{align-self:flex-start}
+.fc-download{width:100%;padding:7px;background:var(--accent-bg);border:1px solid rgba(201,168,76,.25);color:var(--accent2);border-radius:var(--r-sm);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
+.fc-download:hover{background:var(--accent);color:#fff}
+
+/* File empty state */
+.file-empty{grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)}
+.file-empty i{font-size:32px;color:var(--dim);display:block;margin-bottom:10px}
+
+/* New doc notification badge */
+.new-badge{background:var(--green);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:99px;animation:blink 1.5s infinite}
+
+/* ── ESCROW SUMMARY ── */
+.escrow-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:6px}
+.er-stage{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--sub);width:50px;flex-shrink:0}
+.er-bar-wrap{flex:1;height:5px;background:var(--dim);border-radius:99px;overflow:hidden}
+.er-bar-fill{height:100%;border-radius:99px}
+.er-money{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text);min-width:70px;text-align:right;flex-shrink:0}
+
+/* ── NOTIFICATIONS ── */
+.notif-item{display:flex;gap:9px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;font-size:11px;transition:border-color .3s}
+.notif-item.unread{border-color:rgba(201,168,76,.3);background:rgba(201,168,76,.05)}
+.ni-icon{font-size:14px;flex-shrink:0;width:18px;text-align:center}
+.ni-body{flex:1;color:var(--text2);line-height:1.5}
+.ni-body b{color:var(--text)}
+.ni-ts{font-family:var(--mono);font-size:10px;color:var(--muted);flex-shrink:0}
+
+/* ── REVIEW PANEL C1/C2 ── */
+.review-panel{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px}
+.rp-stage-tabs{display:flex;gap:4px;margin-bottom:14px}
+.rp-tab{padding:6px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--ink3);color:var(--sub);transition:all .15s;font-family:var(--sans);display:flex;align-items:center;gap:6px}
+.rp-tab:hover{background:var(--border2);color:var(--text2)}
+.rp-tab.active{background:var(--accent-bg);border-color:rgba(201,168,76,.3);color:var(--accent2)}
+.rp-tab.done{background:var(--green-bg);border-color:rgba(34,201,122,.25);color:var(--green)}
+.rp-tab.done.active{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+
+/* Sub-tabs: Mặt bằng / Phối cảnh / Tất cả */
+.rp-subtabs{display:flex;gap:3px;margin-bottom:12px;background:var(--ink);border-radius:var(--r-sm);padding:3px;border:1px solid var(--border)}
+.rp-subtab{flex:1;padding:5px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--sub);font-family:var(--sans);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px}
+.rp-subtab:hover{color:var(--text2)}
+.rp-subtab.active{background:var(--ink2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.4)}
+
+/* Annotation viewer modal */
+.annot-modal-bg{position:fixed;inset:0;z-index:200;background:rgba(5,5,14,.92);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeUp .2s ease}
+.annot-modal{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);width:100%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.7)}
+.annot-topbar{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--ink3);flex-shrink:0}
+.annot-canvas-wrap{position:relative;flex:1;overflow:hidden;background:var(--ink);cursor:crosshair;min-height:400px;display:flex;align-items:center;justify-content:center}
+.annot-img{max-width:100%;max-height:100%;user-select:none;pointer-events:none;display:block}
+.annot-sidebar{width:260px;border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;background:var(--ink2)}
+.annot-sidebar-head{padding:10px 12px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.6px;text-transform:uppercase}
+.annot-list{flex:1;overflow-y:auto;padding:8px}
+.annot-list::-webkit-scrollbar{width:2px}
+.annot-list::-webkit-scrollbar-thumb{background:var(--border2)}
+
+/* Pin dots on canvas */
+.pin-dot{position:absolute;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:800;font-family:var(--mono);transform:translate(-50%,-50%);transition:transform .15s,box-shadow .15s;z-index:10;border:2px solid rgba(255,255,255,.25)}
+.pin-dot:hover{transform:translate(-50%,-50%) scale(1.2);box-shadow:0 4px 14px rgba(0,0,0,.5)}
+.pin-dot.pin-cn{background:var(--red);color:#fff;box-shadow:0 2px 8px rgba(239,68,68,.5)}
+.pin-dot.pin-kts{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(201,168,76,.5)}
+.pin-dot.pin-resolved{background:var(--green);color:#fff;box-shadow:0 2px 8px rgba(34,201,122,.4)}
+
+/* Pin number pulse on new pin */
+@keyframes pinPop{0%{transform:translate(-50%,-50%) scale(0)}60%{transform:translate(-50%,-50%) scale(1.3)}100%{transform:translate(-50%,-50%) scale(1)}}
+.pin-dot.new{animation:pinPop .3s ease}
+
+/* Pin note card in sidebar */
+.pin-note{background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 10px;margin-bottom:6px;cursor:pointer;transition:border-color .12s}
+.pin-note:hover{border-color:var(--accent2)}
+.pin-note.active{border-color:var(--red);background:rgba(239,68,68,.05)}
+.pin-note.resolved{border-color:var(--green);background:rgba(34,201,122,.04);opacity:.7}
+.pn-header{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.pn-num{width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--mono)}
+.pn-num.resolved{background:var(--green)}
+.pn-author{font-size:10px;font-weight:700;color:var(--text2)}
+.pn-ts{font-size:9px;color:var(--muted);margin-left:auto;font-family:var(--mono)}
+.pn-text{font-size:11px;color:var(--text2);line-height:1.5}
+.pn-actions{display:flex;gap:5px;margin-top:6px}
+.pn-act{font-size:9px;font-weight:700;padding:2px 7px;border:none;border-radius:4px;cursor:pointer;font-family:var(--sans)}
+
+/* Annotation toolbar */
+.annot-tools{display:flex;align-items:center;gap:6px;padding:6px 14px;border-top:1px solid var(--border);background:var(--ink3);flex-shrink:0;flex-wrap:wrap}
+.at-btn{padding:5px 10px;border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--ink4);color:var(--sub);font-family:var(--sans);display:flex;align-items:center;gap:5px;transition:all .12s}
+.at-btn:hover{background:var(--border);color:var(--text2)}
+.at-btn.active{background:var(--red-bg);border-color:rgba(239,68,68,.3);color:var(--red)}
+.at-input{flex:1;min-width:160px;background:var(--ink);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:var(--r-sm);font-size:11px;font-family:var(--sans);outline:none}
+.at-input:focus{border-color:rgba(239,68,68,.4)}
+.at-send{padding:5px 12px;background:var(--red);border:none;border-radius:var(--r-sm);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)}
+
+/* PA cards grid */
+.pa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:14px}
+.pa-card{background:var(--ink3);border:1.5px solid var(--border);border-radius:var(--r-sm);overflow:hidden;transition:all .2s;cursor:pointer}
+.pa-card:hover{border-color:var(--accent2);box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.pa-card.selected{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(201,168,76,.25)}
+.pa-card.approved{border-color:var(--green)}
+.pa-preview{height:140px;display:flex;align-items:center;justify-content:center;font-size:32px;position:relative;overflow:hidden}
+.pa-badge-new{position:absolute;top:8px;right:8px;background:var(--green);color:#fff;font-size:8px;font-weight:800;padding:2px 7px;border-radius:99px}
+.pa-badge-ver{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);color:var(--text2);font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;font-family:var(--mono)}
+.pa-body{padding:10px 12px}
+.pa-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pa-meta{font-size:10px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.pa-footer{padding:8px 12px;border-top:1px solid var(--border);display:flex;gap:6px}
+.pa-btn{flex:1;padding:6px 0;border:none;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:4px;transition:all .12s}
+.pa-btn-approve{background:var(--green-bg);border:1px solid rgba(34,201,122,.25);color:var(--green)}
+.pa-btn-approve:hover{background:var(--green);color:#fff}
+.pa-btn-comment{background:var(--ink4);border:1px solid var(--border);color:var(--text2)}
+.pa-btn-comment:hover{background:var(--border2)}
+
+/* Comment thread */
+.comment-thread{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;padding-right:2px}
+.comment-thread::-webkit-scrollbar{width:2px}
+.comment-thread::-webkit-scrollbar-thumb{background:var(--border2)}
+.cm-item{display:flex;gap:8px;animation:fadeUp .2s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.cm-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:2px}
+.cm-bubble{background:var(--ink3);border:1px solid var(--border);border-radius:0 8px 8px 8px;padding:8px 10px;flex:1}
+.cm-bubble.mine{background:var(--accent-bg);border-color:rgba(201,168,76,.2);border-radius:8px 0 8px 8px}
+.cm-author{font-size:10px;font-weight:700;color:var(--sub);margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.cm-text{font-size:12px;color:var(--text2);line-height:1.5}
+.cm-ts{font-size:9px;color:var(--muted);font-family:var(--mono);margin-left:auto}
+
+/* Comment input */
+.cm-input-wrap{display:flex;gap:8px;margin-top:10px;align-items:flex-end}
+.cm-textarea{flex:1;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 10px;font-size:12px;font-family:var(--sans);color:var(--text);resize:none;outline:none;min-height:36px;max-height:100px;transition:border-color .15s;line-height:1.5}
+.cm-textarea:focus{border-color:rgba(201,168,76,.4)}
+.cm-send{padding:8px 14px;background:var(--accent);border:none;border-radius:var(--r-sm);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);white-space:nowrap;flex-shrink:0}
+.cm-send:hover{background:var(--accent2)}
+
+/* Approval bar */
+.approval-bar{background:var(--green-bg);border:1.5px solid rgba(34,201,122,.3);border-radius:var(--r-sm);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-top:10px}
+.revision-bar{background:var(--amber-bg);border:1.5px solid rgba(255,170,51,.25);border-radius:var(--r-sm);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-top:10px}
+
+/* ── STAR RATING ── */
+.rating-block{background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 14px;margin-top:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.rating-block.rated{border-color:rgba(201,168,76,.35);background:rgba(201,168,76,.05)}
+.rating-label{font-size:11px;font-weight:700;color:var(--sub);white-space:nowrap}
+.stars{display:flex;gap:4px;cursor:pointer}
+.star{font-size:22px;color:var(--dim);transition:color .12s,transform .12s;line-height:1;user-select:none;-webkit-tap-highlight-color:transparent}
+.star:hover,.star.hover{color:#f5c842;transform:scale(1.15)}
+.star.filled{color:#f5c842}
+.rating-note{flex:1;min-width:120px;background:var(--ink);border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-size:11px;font-family:var(--sans);color:var(--text);outline:none;resize:none}
+.rating-note:focus{border-color:rgba(201,168,76,.4)}
+.rating-submit{padding:6px 14px;background:var(--gold);border:none;border-radius:6px;color:#000;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.rating-submit:hover{opacity:.85}
+.rating-done{font-size:11px;color:var(--sub);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rating-done b{color:var(--text)}
+
+.hamburger-cn{display:none;background:none;border:none;color:var(--text);font-size:18px;cursor:pointer;padding:4px;flex-shrink:0}
+
+/* ── UPLOAD từ Khách hàng ── */
+.upload-tab-bar{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.utab{flex:1;padding:8px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:none;color:var(--sub);font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:5px;transition:all .12s;border-bottom:2px solid transparent}
+.utab:hover{color:var(--text2)}
+.utab.active{color:var(--text);border-bottom-color:var(--accent2)}
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--r-sm);padding:18px;text-align:center;cursor:pointer;transition:all .15s;background:var(--ink);margin:8px;position:relative;overflow:hidden}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent2);background:var(--accent-bg)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.uploaded-file-list{padding:0 8px 8px;display:flex;flex-direction:column;gap:5px;overflow-y:auto;flex:1}
+.uploaded-file-list::-webkit-scrollbar{width:2px}
+.uf-item{background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;cursor:pointer;transition:border-color .12s}
+.uf-item:hover{border-color:var(--accent2)}
+.uf-thumb{width:100%;height:72px;object-fit:cover;display:block}
+.uf-thumb-placeholder{width:100%;height:72px;display:flex;align-items:center;justify-content:center;background:var(--ink4);font-size:26px}
+.uf-info{padding:5px 8px;display:flex;align-items:center;gap:5px}
+.uf-name{font-size:10px;font-weight:600;color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uf-del{width:18px;height:18px;border-radius:50%;background:var(--red-bg);border:1px solid rgba(239,68,68,.2);color:var(--red);font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.img-viewer-overlay{position:absolute;inset:0;background:rgba(0,0,0,.93);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fadeUp .15s ease;gap:10px}
+.img-viewer-img{max-width:92%;max-height:82%;border-radius:6px;box-shadow:0 8px 40px rgba(0,0,0,.8);object-fit:contain}
+
+/* Upload folder trong review panel chính */
+.cn-upload-folder{background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px}
+.drop-area{border:2px dashed var(--border2);border-radius:var(--r-sm);padding:18px;text-align:center;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.drop-area:hover,.drop-area.drag-over{border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.06)}
+.drop-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.cn-up-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:10px}
+.cn-up-card{background:var(--ink);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;cursor:pointer;transition:all .15s;position:relative}
+.cn-up-card:hover{border-color:var(--accent2);transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.cn-up-thumb{width:100%;height:80px;display:flex;align-items:center;justify-content:center;background:var(--ink4);position:relative;overflow:hidden}
+.cn-up-thumb img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.cn-up-meta{padding:5px 7px}
+.cn-up-name{font-size:10px;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cn-up-ts{font-size:9px;color:var(--muted);font-family:var(--mono)}
+.cn-up-del{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(239,68,68,.9);border:none;color:#fff;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:5}
+.cn-up-card:hover .cn-up-del{display:flex}
+
+/* ── NÚT GỌI / VIDEO CALL ── */
+.call-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;white-space:nowrap}
+.call-btn-phone{background:rgba(34,201,122,.12);border:1.5px solid rgba(34,201,122,.3);color:var(--green)}
+.call-btn-phone:hover{background:var(--green);color:#fff}
+.call-btn-video{background:rgba(59,130,246,.1);border:1.5px solid rgba(59,130,246,.25);color:var(--blue)}
+.call-btn-video:hover{background:var(--blue);color:#fff}
+.call-btn-zalo{background:rgba(3,107,211,.12);border:1.5px solid rgba(3,107,211,.3);color:#037fd3}
+.call-btn-zalo:hover{background:#037fd3;color:#fff}
+
+/* Call modal */
+.call-modal-bg{position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeUp .2s ease}
+.call-modal{background:var(--ink2);border:1px solid var(--border);border-radius:16px;width:320px;padding:24px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.8)}
+.call-avatar{width:72px;height:96px;border-radius:12px;overflow:hidden;margin:0 auto 12px;border:2px solid var(--border2);background:var(--ink)}
+.call-avatar canvas{width:100%;height:100%;display:block}
+.call-pulse{width:80px;height:80px;border-radius:50%;background:rgba(34,201,122,.12);border:2px solid rgba(34,201,122,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;position:relative;animation:callRing 1.5s infinite}
+@keyframes callRing{0%{box-shadow:0 0 0 0 rgba(34,201,122,.4)}70%{box-shadow:0 0 0 16px rgba(34,201,122,0)}100%{box-shadow:0 0 0 0 rgba(34,201,122,0)}}
+
+@media(max-width:768px){
+  /* Sidebar slide-in */
+  .sidebar-cn{transform:translateX(-100%);transition:transform .25s}
+  .sidebar-cn.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.5)}
+  .main-cn{margin-left:0}
+  .hamburger-cn{display:flex}
+
+  /* Topbar */
+  .topbar{padding:0 14px;height:52px;gap:8px}
+
+  /* KTS hero — stack vertically on mobile */
+  .kts-hero{flex-direction:column;gap:10px}
+  .kts-hero-av{width:56px;height:74px;align-self:flex-start}
+  .kts-hero-rows{gap:5px}
+  .kts-hero-pill{font-size:9px;padding:2px 7px}
+
+  /* Files grid */
+  .files-grid{grid-template-columns:1fr 1fr}
+
+  /* Folder tabs — scroll horizontally */
+  .folder-tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .folder-tabs::-webkit-scrollbar{display:none}
+  .ft{flex-shrink:0;font-size:11px;padding:6px 10px}
+
+  /* Zalo popup — full width on mobile */
+  .zalo-popup{width:calc(100vw - 24px);right:12px;bottom:76px;max-height:70vh}
+
+  /* Contact FAB — smaller on mobile */
+  .fab-main{width:46px;height:46px}
+
+  /* Annotation modal — full screen on mobile */
+  .annot-modal{border-radius:0;max-height:100vh;height:100vh}
+  .annot-sidebar{width:220px}
+
+  /* Review panel cards — 2 col */
+  .pa-grid{grid-template-columns:repeat(2,1fr)}
+
+  /* Call modal */
+  .call-modal{padding:18px}
+
+  /* Content padding */
+  .content-cn{padding:14px 14px 80px}
+  .cn-header{padding:14px 16px}
+}
+
+@media(max-width:480px){
+  /* iPhone 7 Plus = 414px — optimize every section */
+
+  /* Topbar: hide long text */
+  .topbar .tb-title-full{display:none}
+
+  /* KTS hero: compact */
+  .kts-hero{padding:10px 12px}
+  .kts-hero-name{font-size:13px}
+
+  /* Files grid: 1 col */
+  .files-grid{grid-template-columns:1fr}
+
+  /* Folder tabs font */
+  .ft{font-size:10px;padding:5px 8px}
+  .ft-badge{font-size:8px}
+
+  /* Progress 4-col → 2×2 */
+  .prog-4col{grid-template-columns:repeat(2,1fr) !important}
+
+  /* PA cards: 1 col */
+  .pa-grid{grid-template-columns:1fr}
+  .pa-preview{height:120px}
+
+  /* CN upload grid */
+  .cn-up-grid{grid-template-columns:repeat(2,1fr)}
+
+  /* Zalo popup full width */
+  .zalo-popup{width:calc(100vw - 16px);right:8px;bottom:70px}
+  .zp-quick{gap:4px}
+  .zp-qtag{font-size:9px;padding:3px 8px}
+
+  /* Annotation modal full screen */
+  .annot-modal{flex-direction:column}
+  .annot-sidebar{width:100%;max-height:200px;border-left:none;border-top:1px solid var(--border)}
+
+  /* Review stage tabs wrap */
+  .rp-stage-tabs{flex-wrap:wrap;gap:5px}
+  .rp-tab{font-size:11px;padding:5px 10px}
+
+  /* Toast: left-aligned, full width feel */
+  #toasts{right:8px;left:8px;align-items:stretch}
+  .toast{max-width:100%}
+
+  /* Content */
+  .content-cn{padding:12px 12px 80px}
+  .cn-header{padding:12px 14px}
+  .card{padding:12px 14px}
+
+  /* FAB bottom spacing */
+  .contact-fab{bottom:16px;right:16px}
+
+  /* Legal zone */
+  .legal-open,.legal-lock{font-size:11px}
+
+  /* Input zoom prevention */
+  input,select,textarea{font-size:16px !important}
+}
+
+/* Safe area for iPhone notch/home bar */
+@supports(padding-bottom: env(safe-area-inset-bottom)){
+  .content-cn{padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+  .contact-fab{bottom:calc(16px + env(safe-area-inset-bottom))}
+  .zalo-popup{bottom:calc(76px + env(safe-area-inset-bottom))}
+}
+
+
+/* Toast */
+#toasts{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:7px;align-items:flex-end}
+.toast{padding:9px 16px;border-radius:var(--r-sm);font-size:12px;font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,.4);transform:translateX(120%);transition:transform .25s ease;max-width:300px;border:1px solid;font-family:var(--sans)}
+.toast.show{transform:translateX(0)}
+.t-green{background:rgba(34,201,122,.12);border-color:rgba(34,201,122,.3);color:#6ee7b7}
+.t-amber{background:rgba(255,170,51,.12);border-color:rgba(255,170,51,.3);color:#fcd34d}
+.t-blue {background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.25);color:#93c5fd}
+
+/* ── ZALO CHAT WIDGET ── */
+/* ── CONTACT SPEED-DIAL FAB ── */
+.contact-fab{
+  position:fixed;bottom:24px;right:24px;z-index:500;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.fab-main{
+  width:54px;height:54px;border-radius:50%;border:none;cursor:pointer;
+  background:#037fd3;
+  color:#fff;font-size:20px;
+  box-shadow:0 4px 20px rgba(3,107,211,.5);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);
+  position:relative;flex-shrink:0;
+}
+.fab-main:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(3,107,211,.7)}
+.fab-main.open{transform:rotate(45deg);background:linear-gradient(135deg,#ef4444,#b91c1c)}
+.zalo-badge{
+  position:absolute;top:-3px;right:-3px;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--red);color:#fff;font-size:9px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--ink);animation:blink 1.5s infinite;
+}
+/* Speed-dial menu */
+.fab-item{
+  display:flex;align-items:center;gap:8px;cursor:pointer;
+}
+.fab-item-label{
+  background:var(--ink2);border:1px solid var(--border);
+  color:var(--text2);font-size:11px;font-weight:700;
+  padding:4px 10px;border-radius:99px;
+  white-space:nowrap;font-family:var(--sans);
+  box-shadow:0 2px 8px rgba(0,0,0,.4);
+}
+
+/* Zalo chat popup */
+.zalo-popup{
+  position:fixed;bottom:88px;right:24px;z-index:499;
+  width:320px;max-height:480px;
+  background:var(--ink2);border:1px solid rgba(3,107,211,.25);
+  border-radius:14px;box-shadow:0 12px 48px rgba(0,0,0,.6);
+  display:flex;flex-direction:column;overflow:hidden;
+  transform:scale(.92) translateY(10px);transform-origin:bottom right;
+  opacity:0;pointer-events:none;transition:all .22s cubic-bezier(.16,1,.3,1);
+}
+.zalo-popup.open{transform:scale(1) translateY(0);opacity:1;pointer-events:auto}
+
+.zp-head{
+  padding:12px 14px;
+  background:linear-gradient(135deg,#037fd3,#0554a0);
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.zp-head-av{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;border:1.5px solid rgba(255,255,255,.3);
+}
+.zp-head-info .zp-name{font-size:13px;font-weight:700;color:#fff}
+.zp-head-info .zp-status{font-size:10px;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:4px}
+.zp-online-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;flex-shrink:0}
+.zp-close{margin-left:auto;background:rgba(255,255,255,.15);border:none;color:#fff;
+  width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+.zp-body{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:180px}
+.zp-body::-webkit-scrollbar{width:2px}
+.zp-body::-webkit-scrollbar-thumb{background:rgba(3,107,211,.3)}
+
+.zp-msg{display:flex;gap:7px;align-items:flex-end}
+.zp-msg.mine{flex-direction:row-reverse}
+.zp-av{width:24px;height:24px;border-radius:50%;background:rgba(3,107,211,.2);
+  display:flex;align-items:center;justify-content:center;font-size:10px;
+  font-weight:700;color:#037fd3;flex-shrink:0}
+.zp-bubble{
+  max-width:75%;padding:8px 11px;border-radius:10px 10px 10px 2px;
+  font-size:12px;line-height:1.5;color:var(--text2);
+  background:var(--ink3);border:1px solid var(--border);
+}
+.zp-msg.mine .zp-bubble{
+  border-radius:10px 10px 2px 10px;
+  background:rgba(3,107,211,.15);border-color:rgba(3,107,211,.25);color:var(--text);
+}
+.zp-ts{font-size:9px;color:var(--muted);margin-top:2px;font-family:var(--mono)}
+
+.zp-quick{padding:8px 12px;border-top:1px solid var(--border);display:flex;gap=6px;flex-wrap:wrap;gap:6px;flex-shrink:0}
+.zp-qtag{
+  padding:4px 10px;background:rgba(3,107,211,.1);border:1px solid rgba(3,107,211,.2);
+  color:#037fd3;border-radius:99px;font-size:10px;font-weight:700;cursor:pointer;
+  transition:all .12s;font-family:var(--sans);
+}
+.zp-qtag:hover{background:#037fd3;color:#fff}
+
+.zp-input-row{padding:8px 10px;border-top:1px solid var(--border);display:flex;gap:7px;align-items:flex-end;flex-shrink:0}
+.zp-input{
+  flex:1;background:var(--ink3);border:1px solid var(--border);
+  border-radius:18px;padding:7px 12px;font-size:12px;
+  font-family:var(--sans);color:var(--text);outline:none;
+  resize:none;line-height:1.4;min-height:34px;max-height:80px;
+  transition:border-color .15s;
+}
+.zp-input:focus{border-color:rgba(3,107,211,.4)}
+.zp-send{
+  width:34px;height:34px;border-radius:50%;border:none;
+  background:#037fd3;color:#fff;cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all .15s;
+}
+.zp-send:hover{background:#0554a0;transform:scale(1.05)}
+
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <button class="hamburger-cn" onclick="const s=document.querySelector('.sidebar-cn');s.classList.toggle('open');document.getElementById('sidebarOverlay').style.display=s.classList.contains('open')?'block':'none'">
+    <i class="fa fa-bars"></i>
+  </button>
+  <div class="tb-logo">
+    <div id="dnTopbarName" style="background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(96,165,250,.12));color:#60a5fa;padding:5px 13px;border-radius:var(--r-sm);border:1.5px solid rgba(96,165,250,.45);font-family:var(--syne);font-size:12px;font-weight:800;letter-spacing:.08em;text-shadow:0 0 12px rgba(96,165,250,.4)">App Làm Nhà Corp.</div>
+    <div class="tb-logobox">LN CLIENT</div>
+    <div style="font-family:var(--syne);font-size:13px;font-weight:700;color:var(--text)">Cổng Theo dõi Công trình</div>
+  </div>
+  <div class="tb-right">
+    <span id="notifBell" style="position:relative;cursor:pointer;padding:6px 8px;background:var(--ink3);border:1px solid var(--border);border-radius:6px;color:var(--sub)" onclick="toggleNotifPanel()">
+      <i class="fa fa-bell"></i>
+      <span id="notifCount" style="position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span>
+    </span>
+    <span style="font-size:11px;font-weight:600;background:var(--green-bg);color:var(--green);border:1px solid rgba(34,201,122,.25);padding:4px 10px;border-radius:99px;display:flex;align-items:center;gap:5px">
+      <span class="live-dot"></span> Live
+    </span>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR: project list -->
+  <nav class="sidebar-cn" id="sidebarCN">
+    <div style="padding:14px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(201,168,76,.06) 0%,transparent 100%)">
+      <div style="font-size:9px;font-weight:700;color:var(--gold);letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px">
+        DANH SÁCH CÔNG TRÌNH
+        <span style="flex:1;height:1px;background:rgba(201,168,76,.25);display:block"></span>
+      </div>
+      <!-- Company info -->
+      <div style="display:flex;align-items:center;gap:10px;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);border-radius:8px;padding:9px 10px;margin-bottom:4px">
+        <div style="width:36px;height:36px;border-radius:8px;background:rgba(59,130,246,.15);border:1.5px solid rgba(59,130,246,.3);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🏢</div>
+        <div style="flex:1;min-width:0">
+          <div id="dnSidebarName" style="font-size:12px;font-weight:700;color:#60a5fa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">App Làm Nhà Corp.</div>
+          <div style="font-size:10px;color:var(--sub);margin-top:1px;display:flex;align-items:center;gap:4px">
+            <i class="fa fa-city" style="font-size:9px;color:var(--blue)"></i> Doanh nghiệp
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="projList"><!-- injected --></div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main-cn">
+    <div id="mainContent"><!-- injected --></div>
+  </div>
+
+</div>
+
+<!-- NOTIF PANEL -->
+<div id="notifPanel" style="display:none;position:fixed;top:60px;right:16px;width:320px;background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px;box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:100">
+  <div style="font-family:var(--syne);font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+    Thông báo mới
+    <span onclick="toggleNotifPanel()" style="cursor:pointer;color:var(--sub);font-size:12px">✕</span>
+  </div>
+  <div id="notifList" style="display:flex;flex-direction:column;gap:7px"></div>
+</div>
+
+<!-- Sidebar overlay for mobile -->
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;z-index:19;background:rgba(0,0,0,.5)"
+  onclick="document.querySelector('.sidebar-cn').classList.remove('open');this.style.display='none'"></div>
+
+
+<div class="contact-fab" id="contactFab">
+  <!-- Speed-dial sub-buttons (hidden by default) -->
+  <!-- Tooltip label -->
+  <div id="fabZaloLabel" style="opacity:0;transform:translateX(12px);transition:all .2s;pointer-events:none;display:flex;align-items:center;gap:8px">
+    <span class="fab-item-label">Chat với KTS qua Zalo</span>
+  </div>
+  <button class="fab-main" id="fabMain" onclick="openZaloOA()" onmouseover="showFabLabel(true)" onmouseout="showFabLabel(false)" aria-label="Chat Zalo với KTS">
+    <svg width="24" height="24" viewBox="0 0 48 48" style="flex-shrink:0"><text x="24" y="33" text-anchor="middle" font-size="28" font-weight="900" fill="white" font-family="Arial,sans-serif">Z</text></svg>
+    <span class="zalo-badge" id="zaloBadge" style="display:none">1</span>
+  </button>
+</div>
+
+<!-- Zalo popup -->
+<div class="zalo-popup" id="zaloPopup">
+  <div class="zp-head">
+    <div class="zp-head-av" id="zpAvatar">👷</div>
+    <div class="zp-head-info">
+      <div class="zp-name" id="zpKtsName">KTS. Trần Lê Minh</div>
+      <div class="zp-status"><span class="zp-online-dot"></span> Đang hoạt động</div>
+    </div>
+    <!-- Call actions in header -->
+    <div style="display:flex;align-items:center;gap:6px;margin-left:auto;margin-right:8px">
+      <button onclick="zpCallAction('voice')" title="Gọi thoại"
+        style="width:30px;height:30px;border-radius:50%;border:none;background:rgba(255,255,255,.15);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:background .15s"
+        onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">
+        <i class="fa fa-phone"></i>
+      </button>
+      <button onclick="zpCallAction('video')" title="Gọi video"
+        style="width:30px;height:30px;border-radius:50%;border:none;background:rgba(255,255,255,.15);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:background .15s"
+        onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">
+        <i class="fa fa-video"></i>
+      </button>
+    </div>
+    <button class="zp-close" onclick="toggleZaloPopup()">✕</button>
+  </div>
+
+  <div class="zp-body" id="zpBody">
+    <!-- Seeded messages, updated by JS -->
+  </div>
+
+  <!-- Quick replies -->
+  <div class="zp-quick" id="zpQuick">
+    <span class="zp-qtag" onclick="zpQuickSend('Cho tôi xem tiến độ hiện tại')">📊 Tiến độ</span>
+    <span class="zp-qtag" onclick="zpQuickSend('Khi nào bản vẽ C3 xong?')">📅 Thời gian</span>
+    <span class="zp-qtag" onclick="zpQuickSend('Tôi muốn sửa phối cảnh ngoại thất')">✏️ Sửa PA</span>
+    <span class="zp-qtag" onclick="zpQuickSend('Vật liệu sử dụng là gì?')">🧱 Vật liệu</span>
+  </div>
+
+  <div class="zp-input-row">
+    <textarea class="zp-input" id="zpInput" rows="1" placeholder="Nhắn tin cho KTS..."
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();zpSend()}"></textarea>
+    <button class="zp-send" onclick="zpSend()">
+      <i class="fa fa-paper-plane" style="font-size:13px"></i>
+    </button>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+/**
+ * ALN REALTIME — Client library
+ * Dùng chung cho kts_dashboard, client_CN, client_DN
+ *
+ * Dùng SharedWorker (nếu hỗ trợ), fallback về BroadcastChannel,
+ * fallback về localStorage events — đảm bảo hoạt động trên mọi trình duyệt.
+ *
+ * Sử dụng:
+ *   ALNRealtime.init({ role:'kts', userId:'kts.minhtran', onMessage: fn })
+ *   ALNRealtime.send({ type:'KTS_DOC_UPLOAD', ... })
+ *   ALNRealtime.disconnect()
+ */
+
+window.ALNRealtime = (() => {
+  let _port = null;       // SharedWorker port
+  let _bc   = null;       // BroadcastChannel fallback
+  let _onMessage = null;
+  let _role = '';
+  let _userId = '';
+  let _connected = false;
+
+  /* ── STORAGE KEY ── */
+  const STORE_KEY = 'aln_msgs';
+  const STORE_MAX = 100;
+
+  function _saveToStorage(msg) {
+    try {
+      const arr = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+      arr.push(msg);
+      if (arr.length > STORE_MAX) arr.splice(0, arr.length - STORE_MAX);
+      localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+    } catch(e) {}
+  }
+
+  function _loadHistory() {
+    try {
+      return JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+    } catch(e) { return []; }
+  }
+
+  function _dispatch(msg) {
+    if (_onMessage && typeof _onMessage === 'function') {
+      try { _onMessage(msg); } catch(e) {}
+    }
+  }
+
+  function init({ role, userId, onMessage, onReady }) {
+    _role = role;
+    _userId = userId;
+    _onMessage = onMessage;
+
+    // Phát lại lịch sử từ localStorage
+    const history = _loadHistory();
+    if (history.length) {
+      setTimeout(() => {
+        history.forEach(m => _dispatch(m));
+      }, 100);
+    }
+
+    // 1. Thử SharedWorker
+    if (typeof SharedWorker !== 'undefined') {
+      try {
+        const worker = new SharedWorker('hub.js');
+        _port = worker.port;
+        _port.onmessage = (e) => {
+          const d = e.data;
+          if (d.type === '_HISTORY') {
+            // Merge worker history với local history
+            d.messages.forEach(m => _dispatch(m));
+            return;
+          }
+          _saveToStorage(d);
+          _dispatch(d);
+        };
+        _port.start();
+        _connected = true;
+        onReady && onReady('SharedWorker');
+        return;
+      } catch(e) {}
+    }
+
+    // 2. Fallback: BroadcastChannel
+    if (typeof BroadcastChannel !== 'undefined') {
+      try {
+        _bc = new BroadcastChannel('aln_realtime_v2');
+        _bc.onmessage = (e) => {
+          _saveToStorage(e.data);
+          _dispatch(e.data);
+        };
+        _connected = true;
+        onReady && onReady('BroadcastChannel');
+        return;
+      } catch(e) {}
+    }
+
+    // 3. Fallback: localStorage polling
+    let _lastLen = _loadHistory().length;
+    setInterval(() => {
+      const arr = _loadHistory();
+      if (arr.length > _lastLen) {
+        arr.slice(_lastLen).forEach(m => _dispatch(m));
+        _lastLen = arr.length;
+      }
+    }, 800);
+    onReady && onReady('localStorage');
+  }
+
+  function send(msg) {
+    const full = { ...msg, _from: _userId, _role: _role, ts: Date.now() };
+
+    _saveToStorage(full);
+
+    if (_port) {
+      try { _port.postMessage(full); return; } catch(e) {}
+    }
+    if (_bc) {
+      try { _bc.postMessage(full); return; } catch(e) {}
+    }
+    // localStorage fallback — dispatch sẽ tự pick up qua polling
+  }
+
+  function disconnect() {
+    if(_bc) _bc.close();
+    _port = null;
+    _bc = null;
+  }
+
+  /* Xoá toàn bộ lịch sử (dùng khi logout) */
+  function clearHistory() {
+    try { localStorage.removeItem(STORE_KEY); } catch(e) {}
+  }
+
+  return { init, send, disconnect, clearHistory, loadHistory: _loadHistory };
+})();
+
+</script>
+<script>
+
+/* ══════════════════
+   DATA
+══════════════════ */
+const PROJECTS_CLIENT = [
+  {id:'ALN-9921',name:'Biệt thự Vườn Tân Cổ Điển',     cn:'Nguyễn Văn Thuận', kts:'KTS. Trần Lê Minh',   stage:'C2',status:'sla_warn', progress:[1,0.4,0,0],total:125000000,escrow:75000000},
+  {id:'ALN-9834',name:'Nhà phố 5 tầng Phú Nhuận',      cn:'Trần Thị Bình',    kts:'KTS. Nguyễn Thị Lan', stage:'C3',status:'dispute',  progress:[1,1,0.6,0],total:160000000,escrow:96000000},
+  {id:'ALN-9756',name:'Villa Địa Trung Hải - Thủ Đức',  cn:'Lê Quang Cường',   kts:'KTS. Vũ Minh Khoa',   stage:'C3',status:'on_track', progress:[1,1,0.9,0],total:240000000,escrow:144000000},
+  {id:'ALN-9702',name:'Nhà cấp 4 mái thái Bình Dương',  cn:'Phạm Văn Đức',     kts:'KTS. Phạm Hoài Nam',  stage:'C1',status:'on_track', progress:[0.8,0,0,0],total:15000000, escrow:4500000},
+  {id:'ALN-9648',name:'Shophouse 4 tầng Quận 7',        cn:'Vũ Thị Lan',       kts:'KTS. Lê Hoàng Nam',   stage:'C2',status:'on_track', progress:[1,0.3,0,0],total:80000000, escrow:32000000},
+  {id:'ALN-9590',name:'Penthouse Landmark 81',           cn:'Đặng Quốc Bảo',    kts:'KTS. Vũ Minh Khoa',   stage:'C4',status:'done',     progress:[1,1,1,1],  total:192000000,escrow:0},
+  {id:'ALN-9521',name:'Nhà phố 3 tầng Gò Vấp',          cn:'Nguyễn T. Hoa',    kts:'KTS. Phạm Hoài Nam',  stage:'C2',status:'sla_warn', progress:[1,0.2,0,0],total:48000000, escrow:14400000},
+  {id:'ALN-9480',name:'Biệt thự Nghỉ dưỡng Đà Lạt',     cn:'Trần Minh Tuấn',   kts:'KTS. Trần Lê Minh',   stage:'C1',status:'on_track', progress:[0.5,0,0,0],total:400000000,escrow:12000000},
+  {id:'ALN-9412',name:'Căn hộ Duplex Bình Thạnh',        cn:'Võ Thị Mai',       kts:'KTS. Nguyễn Thị Lan', stage:'C3',status:'on_track', progress:[1,1,0.4,0],total:88000000, escrow:52800000},
+  {id:'ALN-9350',name:'Nhà phố 2 tầng Tân Phú',          cn:'Bùi Văn Hùng',     kts:'KTS. Lê Hoàng Nam',   stage:'C4',status:'done',     progress:[1,1,1,1],  total:12000000, escrow:0},
+];
+
+/* ════════════════════════════════════════
+   6 THƯ MỤC CHUYÊN MÔN (đồng bộ với kts_dashboard)
+   folder: kien_truc | ket_cau | me | thep | vat_tu | du_toan
+════════════════════════════════════════ */
+const FOLDERS = [
+  { id:'kien_truc', label:'Hồ sơ Kiến trúc',   icon:'fa-drafting-compass', color:'var(--blue)',
+    desc:'MB phương án (C1) · Phối cảnh 3D ngoại thất · Phối cảnh 3D nội thất · MB các tầng · Mặt đứng · Mặt cắt' },
+  { id:'ket_cau',   label:'Hồ sơ Kết cấu',      icon:'fa-building-columns', color:'var(--amber)',
+    desc:'Móng · Cột · Dầm · Sàn · Chi tiết thép' },
+  { id:'me',        label:'Điện nước M&E',       icon:'fa-bolt',             color:'var(--cyan)',
+    desc:'Sơ đồ điện · Cấp thoát nước · PCCC · Điều hòa thông gió' },
+  { id:'thep',      label:'Thống kê Thép',       icon:'fa-table-cells',      color:'var(--green)',
+    desc:'Bảng thống kê thép theo cấu kiện · Tổng hợp khối lượng' },
+  { id:'vat_tu',    label:'Bảng Vật tư',         icon:'fa-boxes-stacked',    color:'var(--purple)',
+    desc:'Danh mục vật liệu · Khối lượng · Đơn vị tính' },
+  { id:'du_toan',   label:'Dự toán Chi phí',     icon:'fa-calculator',       color:'var(--gold)',
+    desc:'Dự toán hạng mục · Đơn giá tham chiếu · Tổng chi phí xây dựng' },
+];
+
+const DOCS = {
+  'ALN-9921': [
+    {id:'D001',name:'Mặt bằng phương án C1',         folder:'kien_truc',kts:'KTS. Trần Lê Minh',  date:'2026-05-10',size:'2.4MB',type:'pdf', status:'approved',isNew:false},
+    {id:'D002',name:'Phối cảnh 3D ngoại thất',       folder:'kien_truc',kts:'KTS. Trần Lê Minh',  date:'2026-05-28',size:'8.1MB',type:'img', status:'pending', isNew:true},
+    {id:'D003',name:'Phối cảnh 3D nội thất',         folder:'kien_truc',kts:'KTS. Trần Lê Minh',  date:'2026-05-29',size:'6.3MB',type:'img', status:'pending', isNew:true},
+  ],
+  'ALN-9834': [
+    {id:'D004',name:'Mặt bằng phương án C1',         folder:'kien_truc',kts:'KTS. Nguyễn Thị Lan',date:'2026-04-15',size:'1.2MB',type:'pdf', status:'approved',isNew:false},
+    {id:'D005',name:'Phối cảnh 3D chính diện',       folder:'kien_truc',kts:'KTS. Nguyễn Thị Lan',date:'2026-04-28',size:'9.5MB',type:'img', status:'approved',isNew:false},
+    {id:'D006',name:'Hồ sơ kiến trúc thi công',      folder:'kien_truc',kts:'KTS. Nguyễn Thị Lan',date:'2026-05-20',size:'12.8MB',type:'pdf',status:'dispute', isNew:true},
+    {id:'D007',name:'Hồ sơ kết cấu móng + sàn',      folder:'ket_cau',  kts:'KTS. Nguyễn Thị Lan',date:'2026-05-20',size:'4.1MB',type:'dwg', status:'dispute', isNew:true},
+    {id:'D016',name:'Thống kê thép toàn công trình', folder:'thep',     kts:'KTS. Nguyễn Thị Lan',date:'2026-05-21',size:'0.9MB',type:'xlsx',status:'dispute', isNew:true},
+  ],
+  'ALN-9756': [
+    {id:'D008',name:'Mặt bằng phương án C1',         folder:'kien_truc',kts:'KTS. Vũ Minh Khoa',  date:'2026-03-12',size:'2.1MB',type:'pdf', status:'approved',isNew:false},
+    {id:'D009',name:'Phối cảnh 3D villa full option',folder:'kien_truc',kts:'KTS. Vũ Minh Khoa',  date:'2026-03-28',size:'15.2MB',type:'img',status:'approved',isNew:false},
+    {id:'D010',name:'Hồ sơ kiến trúc thi công',      folder:'kien_truc',kts:'KTS. Vũ Minh Khoa',  date:'2026-04-10',size:'18.6MB',type:'pdf',status:'approved',isNew:false},
+    {id:'D017',name:'Hồ sơ kết cấu đầy đủ',          folder:'ket_cau',  kts:'KTS. Vũ Minh Khoa',  date:'2026-04-12',size:'22.4MB',type:'pdf',status:'approved',isNew:false},
+    {id:'D018',name:'Sơ đồ điện + nước + PCCC',      folder:'me',       kts:'KTS. Vũ Minh Khoa',  date:'2026-04-15',size:'8.3MB',type:'pdf', status:'approved',isNew:false},
+    {id:'D019',name:'Thống kê thép chi tiết',         folder:'thep',     kts:'KTS. Vũ Minh Khoa',  date:'2026-04-18',size:'1.2MB',type:'xlsx',status:'approved',isNew:false},
+    {id:'D020',name:'Bảng vật tư xây dựng',           folder:'vat_tu',   kts:'KTS. Vũ Minh Khoa',  date:'2026-04-20',size:'0.7MB',type:'xlsx',status:'approved',isNew:false},
+    {id:'D011',name:'Dự toán chi phí toàn công trình',folder:'du_toan',  kts:'KTS. Vũ Minh Khoa',  date:'2026-05-02',size:'0.8MB',type:'xlsx',status:'pending', isNew:true},
+  ],
+  'ALN-9648': [
+    {id:'D012',name:'Mặt bằng phương án C1',         folder:'kien_truc',kts:'KTS. Lê Hoàng Nam',  date:'2026-05-05',size:'1.8MB',type:'pdf', status:'approved',isNew:false},
+    {id:'D013',name:'Phối cảnh 3D góc phố',          folder:'kien_truc',kts:'KTS. Lê Hoàng Nam',  date:'2026-05-22',size:'7.4MB',type:'img', status:'pending', isNew:true},
+  ],
+  'ALN-9590': [
+    {id:'D014',name:'Mặt bằng + phối cảnh hoàn công',folder:'kien_truc',kts:'KTS. Vũ Minh Khoa',  date:'2026-02-10',size:'28.2MB',type:'pdf',status:'approved',isNew:false},
+    {id:'D021',name:'Hồ sơ kết cấu hoàn công',       folder:'ket_cau',  kts:'KTS. Vũ Minh Khoa',  date:'2026-02-10',size:'31.4MB',type:'pdf',status:'approved',isNew:false},
+    {id:'D022',name:'Hồ sơ M&E hoàn công',            folder:'me',       kts:'KTS. Vũ Minh Khoa',  date:'2026-02-10',size:'12.1MB',type:'pdf',status:'approved',isNew:false},
+    {id:'D023',name:'Thống kê thép nghiệm thu',       folder:'thep',     kts:'KTS. Vũ Minh Khoa',  date:'2026-02-12',size:'1.5MB',type:'xlsx',status:'approved',isNew:false},
+    {id:'D024',name:'Bảng vật tư nghiệm thu',         folder:'vat_tu',   kts:'KTS. Vũ Minh Khoa',  date:'2026-02-12',size:'0.9MB',type:'xlsx',status:'approved',isNew:false},
+    {id:'D015',name:'Dự toán nghiệm thu',             folder:'du_toan',  kts:'KTS. Vũ Minh Khoa',  date:'2026-02-15',size:'1.1MB',type:'xlsx',status:'approved',isNew:false},
+  ],
+};
+
+let activeProj = PROJECTS_CLIENT[0].id;
+let activeFolder = 'ALL';
+
+const STATUS_DOT={on_track:'var(--green)',sla_warn:'var(--amber)',dispute:'var(--red)',done:'var(--sub)'};
+const STGCOLS=['var(--green)','var(--amber)','var(--blue)','var(--sub)'];
+const STGPCT=[10,20,60,10];
+const STGNAME={C1:'Ý tưởng 2D',C2:'Phối cảnh 3D',C3:'Hồ sơ KT',C4:'Dự toán & Bảo hành'};
+const ICON={pdf:'fa-file-pdf',img:'fa-file-image',dwg:'fa-file-code',xlsx:'fa-file-excel',zip:'fa-file-zipper'};
+const ICOLOR={pdf:'#ef4444',img:'var(--cyan)',dwg:'var(--amber)',xlsx:'var(--green)',zip:'var(--purple)'};
+function fmtM(v){if(v>=1e9)return(v/1e9).toFixed(1)+'T';if(v>=1e6)return(v/1e6).toFixed(1)+'M';return(v/1e3).toFixed(0)+'K'}
+
+/* ════════════════════════════════════════
+   REVIEW FUNCTIONS
+════════════════════════════════════════ */
+function setReviewStage(projId, stage){
+  if(!_reviewState[projId]) _reviewState[projId] = {stage, subTab:'all'};
+  else _reviewState[projId].stage = stage;
+  renderMain();
+  setTimeout(()=>{const c=document.getElementById('ktsHeroAv');const p2=PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(c&&p2)drawPortrait(c,KP[p2.kts]||{});},30);
+}
+
+function selectPA(projId, stage, paId){
+  // Highlight selected PA card
+  document.querySelectorAll('.pa-card').forEach(c=>c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+}
+
+function approvePA(projId, stage, paId){
+  const rv = (REVIEW_DATA[projId] && REVIEW_DATA[projId][stage]);
+  if(!rv) return;
+  const pa = rv.paList.find(x=>x.id===paId);
+  if(!pa) return;
+  pa.status = 'approved';
+  rv.status = 'approved';
+  rv.approvedAt = new Date().toISOString().slice(0,10);
+  // Add system comment
+  rv.comments.push({
+    id:'auto_'+Date.now(), author:'Hệ thống ALN', role:'cn',
+    text:`✅ Chủ đầu tư đã phê duyệt phương án: "${pa.name}". Sàn ALN ghi nhận và thông báo KTS tiến hành bước tiếp theo.`,
+    ts: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), mine:true
+  });
+  renderMain();
+  setTimeout(()=>{const c=document.getElementById('ktsHeroAv');const p2=PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(c&&p2)drawPortrait(c,KP[p2.kts]||{});},30);
+  showToast(`✅ Đã phê duyệt phương án "${pa.name}"`, 't-green');
+  // Broadcast to kts_dashboard
+  try{const bc=new BroadcastChannel('applamnha_events');bc.postMessage({type:'STAGE_APPROVED',projectId:projId,stage,paName:pa.name});bc.close()}catch(e){}
+}
+
+function focusComment(projId, stage){
+  const ta = document.getElementById(`cmInput_${projId}_${stage}`);
+  if(ta){ta.focus();ta.scrollIntoView({behavior:'smooth',block:'nearest'});}
+}
+
+function sendComment(projId, stage){
+  const ta = document.getElementById(`cmInput_${projId}_${stage}`);
+  const text = (ta ? ta.value.trim() : '');
+  if(!text) return;
+  const rv = (REVIEW_DATA[projId] && REVIEW_DATA[projId][stage]);
+  if(!rv) return;
+  rv.comments.push({
+    id:'cm_'+Date.now(),
+    author: 'Chủ đầu tư (Bạn)',
+    role:'cn', mine:true,
+    text,
+    ts: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})
+  });
+  rv.revisions = Math.min(rv.revisions + 1, rv.maxRevisions);
+  ta.value=''; ta.style.height='auto';
+  // Re-render just the comment thread + input
+  const thread = document.getElementById(`cmThread_${projId}_${stage}`);
+  if(thread){
+    thread.innerHTML = rv.comments.map(cm=>`
+      <div class="cm-item">
+        <div class="cm-avatar" style="background:${cm.role==='kts'?'rgba(201,168,76,.2)':'rgba(34,201,122,.15)'};color:${cm.role==='kts'?'var(--accent2)':'var(--green)'}">
+          ${cm.role==='kts'?'KT':'CN'}
+        </div>
+        <div class="cm-bubble ${cm.mine?'mine':''}">
+          <div class="cm-author">
+            <span>${cm.author}</span>
+            <span class="pill ${cm.role==='kts'?'p-blue':'p-green'}" style="font-size:8px">${cm.role==='kts'?'KTS':'Chủ đầu tư'}</span>
+            <span class="cm-ts">${cm.ts}</span>
+          </div>
+          <div class="cm-text">${cm.text}</div>
+        </div>
+      </div>`).join('');
+    thread.scrollTop = thread.scrollHeight;
+  }
+  showToast('💬 Đã gửi góp ý đến KTS', 't-blue');
+  // Broadcast
+  try{const bc=new BroadcastChannel('applamnha_events');bc.postMessage({type:'REVIEW_COMMENT',projectId:projId,stage,text});bc.close()}catch(e){}
+}
+
+/* ════════════════════════════════════════
+   ANNOTATION MODAL — Pin & Review on drawing
+════════════════════════════════════════ */
+let _annotState = { projId:null, stage:null, paId:null, mode:'view', pendingPin:null };
+
+function openAnnotation(projId, stage, paId){
+  _annotState = { projId, stage, paId, mode:'view', pendingPin:null };
+  _renderAnnotModal();
+}
+
+function _renderAnnotModal(){
+  const {projId, stage, paId} = _annotState;
+  const pa = (REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);
+  if(!pa) return;
+  const pins = pa.pins || [];
+  const openPins = pins.filter(p=>!p.resolved);
+
+  // Build pins sidebar
+  const pinsListHTML = pins.length===0
+    ? `<div style="padding:20px;text-align:center;color:var(--muted);font-size:11px">
+         <i class="fa fa-map-pin" style="font-size:20px;display:block;margin-bottom:8px;color:var(--dim)"></i>
+         Chưa có điểm đánh dấu nào.<br>Click vào bản vẽ để thêm pin.
+       </div>`
+    : pins.map((pin,i)=>`
+        <div class="pin-note ${pin.resolved?'resolved':''}" id="pnote_${pin.id}" onclick="highlightPin('${pin.id}')">
+          <div class="pn-header">
+            <span class="pn-num ${pin.resolved?'resolved':''}">${i+1}</span>
+            <span class="pn-author">${pin.author}</span>
+            <span class="pill ${pin.role==='kts'?'p-blue':'p-red'}" style="font-size:8px">${pin.role==='kts'?'KTS':'KH'}</span>
+            <span class="pn-ts">${pin.ts}</span>
+          </div>
+          <div class="pn-text">${pin.text}</div>
+          ${!pin.resolved?`<div class="pn-actions">
+            <button class="pn-act" style="background:var(--green-bg);color:var(--green);border:1px solid rgba(34,201,122,.2)"
+              onclick="event.stopPropagation();resolvePin('${projId}','${stage}','${paId}','${pin.id}')">
+              <i class="fa fa-check" style="margin-right:3px"></i>Đã xử lý
+            </button>
+            <button class="pn-act" style="background:var(--ink4);color:var(--sub);border:1px solid var(--border)"
+              onclick="event.stopPropagation();replyPin('${pin.id}')">
+              <i class="fa fa-reply" style="margin-right:3px"></i>Trả lời
+            </button>
+          </div>`:'<div style="font-size:9px;color:var(--green);margin-top:4px"><i class="fa fa-circle-check" style="margin-right:3px"></i>Đã xử lý</div>'}
+        </div>`).join('');
+
+  // Build pin dots on canvas
+  const pinDotsHTML = pins.map((pin,i)=>`
+    <div class="pin-dot ${pin.role==='kts'?'pin-kts':'pin-cn'} ${pin.resolved?'pin-resolved':''}"
+      id="pdot_${pin.id}"
+      style="left:${pin.x}%;top:${pin.y}%"
+      onclick="highlightPin('${pin.id}')"
+      title="${pin.text}">
+      ${i+1}
+    </div>`).join('');
+
+  const modeActive = _annotState.mode==='add';
+
+  const modalHTML = `
+  <div class="annot-modal-bg" id="annotBg" onclick="if(event.target===this)closeAnnotation()">
+    <div class="annot-modal">
+
+      <!-- Header -->
+      <div class="annot-topbar">
+        <div style="width:8px;height:8px;border-radius:50%;background:${pa.folder==='mb'?'var(--blue)':'#a855f7'};flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pa.name}</div>
+          <div style="font-size:10px;color:var(--sub)">${pa.kts} · ${pa.version} · ${pa.date}</div>
+        </div>
+        <span class="pill ${pa.status==='approved'?'p-green':'p-amber'}" style="flex-shrink:0;font-size:10px">
+          ${pa.status==='approved'?'✅ Đã duyệt':'⏳ Chờ duyệt'}
+        </span>
+        ${openPins.length>0?`<span class="pill p-red" style="flex-shrink:0;font-size:10px"><i class="fa fa-map-pin" style="font-size:8px"></i> ${openPins.length} chờ xử lý</span>`:''}
+        <button onclick="closeAnnotation()" style="padding:5px 10px;background:var(--ink4);border:1px solid var(--border);color:var(--sub);border-radius:5px;cursor:pointer;font-size:12px;font-family:var(--sans);flex-shrink:0">
+          <i class="fa fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Body: canvas + sidebar -->
+      <div style="display:flex;flex:1;overflow:hidden">
+
+        <!-- Canvas -->
+        <div class="annot-canvas-wrap" id="annotCanvas"
+          style="cursor:${modeActive?'crosshair':'default'}"
+          onclick="${modeActive?`addPinAt(event,'${projId}','${stage}','${paId}')`:''}" >
+          <!-- Drawing placeholder — in production replace with actual image -->
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:${pa.bg};position:relative;min-height:400px">
+            <span style="font-size:90px;filter:drop-shadow(0 4px 20px rgba(0,0,0,.8));user-select:none">${pa.icon}</span>
+            <div style="position:absolute;bottom:12px;left:12px;font-size:10px;color:rgba(255,255,255,.3);font-family:var(--mono)">
+              ${pa.folder==='mb'?'[Mặt bằng — demo placeholder]':'[Phối cảnh 3D — demo placeholder]'} · Click để đánh dấu
+            </div>
+            ${pinDotsHTML}
+          </div>
+        </div>
+
+        <!-- Sidebar: 2 tabs — Pins + Upload KH -->
+        <div class="annot-sidebar">
+          <div class="upload-tab-bar">
+            <button class="utab active" id="utabPins" onclick="switchAnnotTab('pins')">
+              <i class="fa fa-map-pin" style="font-size:10px;color:var(--red)"></i>
+              Pins <span style="font-family:var(--mono);font-size:9px;opacity:.7">${pins.length}</span>
+            </button>
+            <button class="utab" id="utabUpload" onclick="switchAnnotTab('upload')">
+              <i class="fa fa-cloud-arrow-up" style="font-size:10px;color:var(--accent2)"></i>
+              File KH <span style="font-family:var(--mono);font-size:9px;opacity:.7" id="uploadCountBadge">${(pa.cnUploads||[]).length}</span>
+            </button>
+          </div>
+
+          <!-- Tab: Pins -->
+          <div id="sidebarPinsTab" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+            <div class="annot-list" id="annotPinList">${pinsListHTML}</div>
+            <!-- Pin input (shown when pendingPin) -->
+            <div id="pinInputArea" style="padding:8px;border-top:1px solid var(--border);display:none">
+              <div style="font-size:10px;color:var(--red);font-weight:700;margin-bottom:6px">
+                <i class="fa fa-map-pin" style="margin-right:4px"></i>Ghi chú cho điểm này:
+              </div>
+              <textarea id="pinNoteInput" style="width:100%;background:var(--ink);border:1px solid rgba(239,68,68,.4);color:var(--text);padding:7px 9px;border-radius:6px;font-size:11px;font-family:var(--sans);resize:none;outline:none;min-height:60px"
+                placeholder="Mô tả vấn đề hoặc yêu cầu sửa đổi..."></textarea>
+              <div style="display:flex;gap:6px;margin-top:6px">
+                <button onclick="confirmPin('${projId}','${stage}','${paId}')"
+                  style="flex:2;padding:6px;background:var(--red);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)">
+                  <i class="fa fa-map-pin" style="margin-right:3px"></i>Xác nhận Pin
+                </button>
+                <button onclick="cancelPin()"
+                  style="flex:1;padding:6px;background:var(--ink4);border:1px solid var(--border);color:var(--sub);border-radius:5px;font-size:11px;cursor:pointer;font-family:var(--sans)">
+                  Huỷ
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: Upload KH -->
+          <div id="sidebarUploadTab" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+            <div class="upload-zone" id="annotDropZone_${paId}"
+              ondragover="event.preventDefault();this.classList.add('drag-over')"
+              ondragleave="this.classList.remove('drag-over')"
+              ondrop="handleAnnotDrop(event,'${projId}','${stage}','${paId}')">
+              <input type="file" accept="image/*,.pdf" multiple
+                onchange="handleAnnotUpload(event,'${projId}','${stage}','${paId}')">
+              <i class="fa fa-cloud-arrow-up" style="font-size:22px;color:var(--accent2);display:block;margin-bottom:6px"></i>
+              <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:3px">Kéo thả hoặc click</div>
+              <div style="font-size:10px;color:var(--muted)">Ảnh chụp bản vẽ tay, ảnh chú thích, PDF...</div>
+            </div>
+            <div class="uploaded-file-list" id="annotUploadList_${paId}">
+              ${(pa.cnUploads||[]).length===0
+                ? `<div style="text-align:center;padding:16px;color:var(--muted);font-size:11px">Chưa có file nào</div>`
+                : (pa.cnUploads||[]).map((u,i)=>`
+                  <div class="uf-item" onclick="viewUploadedFile('${u.id}','${projId}','${stage}','${paId}')">
+                    ${u.dataUrl&&u.dataUrl.startsWith('data:image')
+                      ? `<img class="uf-thumb" src="${u.dataUrl}" alt="${u.name}">`
+                      : `<div class="uf-thumb-placeholder">${u.type==='pdf'?'📄':'📎'}</div>`}
+                    <div class="uf-info">
+                      <span class="uf-name">${u.name}</span>
+                      <span style="font-size:9px;color:var(--muted);font-family:var(--mono);flex-shrink:0">${u.ts}</span>
+                      <button class="uf-del" onclick="event.stopPropagation();deleteUpload('${projId}','${stage}','${paId}','${u.id}')">✕</button>
+                    </div>
+                  </div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="annot-tools">
+        <button class="at-btn ${modeActive?'active':''}" onclick="toggleAddPinMode()" id="addPinBtn">
+          <i class="fa fa-map-pin"></i> ${modeActive?'Đang chọn vị trí...':'Thêm Pin'}
+        </button>
+        <span style="font-size:11px;color:var(--muted)">${modeActive?'👆 Click vào bản vẽ để đặt điểm':'Chọn "Thêm Pin" rồi click vào vị trí cần góp ý'}</span>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          ${pa.status!=='approved'?`
+          <button onclick="approvePA('${projId}','${stage}','${paId}');closeAnnotation()"
+            style="padding:5px 14px;background:var(--green-bg);border:1px solid rgba(34,201,122,.25);color:var(--green);border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)">
+            <i class="fa fa-circle-check" style="margin-right:4px"></i>Duyệt phương án này
+          </button>`:''}
+        </div>
+      </div>
+
+    </div>
+  </div>`;
+
+  // Remove existing modal if any
+  const existing = document.getElementById('annotBg');
+  if(existing) existing.remove();
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function closeAnnotation(){
+  const el = document.getElementById('annotBg');
+  if(el) el.remove();
+  _annotState = { projId:null, stage:null, paId:null, mode:'view', pendingPin:null };
+}
+
+function toggleAddPinMode(){
+  _annotState.mode = _annotState.mode==='add' ? 'view' : 'add';
+  _renderAnnotModal();
+}
+
+function addPinAt(event, projId, stage, paId){
+  const wrap = document.getElementById('annotCanvas');
+  if(!wrap) return;
+  const rect = wrap.getBoundingClientRect();
+  const x = Math.round((event.clientX - rect.left) / rect.width * 100);
+  const y = Math.round((event.clientY - rect.top)  / rect.height * 100);
+  _annotState.pendingPin = {x, y};
+  // Show input area
+  const area = document.getElementById('pinInputArea');
+  if(area){ area.style.display='block'; document.getElementById('pinNoteInput').focus(); }
+  // Show pending dot
+  const existing = document.getElementById('pendingDot');
+  if(existing) existing.remove();
+  const dot = document.createElement('div');
+  dot.id = 'pendingDot';
+  dot.style.cssText = `position:absolute;left:${x}%;top:${y}%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:rgba(239,68,68,.5);border:2px dashed var(--red);z-index:20;pointer-events:none;animation:pinPop .3s ease`;
+  const canvas = wrap.querySelector('div');
+  if(canvas) canvas.appendChild(dot);
+}
+
+function confirmPin(projId, stage, paId){
+  const note = (document.getElementById('pinNoteInput') ? document.getElementById('pinNoteInput').value.trim() : '');
+  if(!note){ document.getElementById('pinNoteInput').style.borderColor='var(--red)'; return; }
+  const pin = _annotState.pendingPin;
+  if(!pin) return;
+  const pa = (REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);
+  if(!pa) return;
+  if(!pa.pins) pa.pins = [];
+  const newPin = {
+    id: 'pin_'+Date.now(),
+    x: pin.x, y: pin.y,
+    text: note,
+    author: 'Chủ đầu tư',
+    role: 'cn',
+    ts: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}),
+    resolved: false
+  };
+  pa.pins.push(newPin);
+  _annotState.pendingPin = null;
+  _annotState.mode = 'view';
+  showToast(`📍 Đã thêm pin #${pa.pins.length} — KTS sẽ nhận thông báo`, 't-amber');
+  // Broadcast
+  try{const bc=new BroadcastChannel('applamnha_events');bc.postMessage({type:'PIN_ADDED',projectId:projId,stage,paId,pinText:note});bc.close()}catch(e){}
+  _renderAnnotModal();
+}
+
+function cancelPin(){
+  _annotState.pendingPin = null;
+  const area = document.getElementById('pinInputArea');
+  if(area) area.style.display='none';
+  const dot = document.getElementById('pendingDot');
+  if(dot) dot.remove();
+}
+
+function resolvePin(projId, stage, paId, pinId){
+  const pa = (REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);
+  const pin = (pa && pa.pins) ? pa.pins.find(function(x){return x.id===pinId;}) : null;
+  if(pin){ pin.resolved=true; }
+  showToast('✅ Pin đã được đánh dấu xử lý xong', 't-green');
+  _renderAnnotModal();
+  // Also re-render main to update pin counts on cards
+  renderMain();
+  setTimeout(()=>{const cv=document.getElementById('ktsHeroAv');if(cv){const p2=PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(p2)drawPortrait(cv,KP[p2.kts]||{});}},30);
+}
+
+function highlightPin(pinId){
+  document.querySelectorAll('.pin-note').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.pin-dot').forEach(el=>el.style.transform='translate(-50%,-50%)');
+  const note = document.getElementById(`pnote_${pinId}`);
+  const dot  = document.getElementById(`pdot_${pinId}`);
+  if(note){ note.classList.add('active'); note.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+  if(dot)  dot.style.transform='translate(-50%,-50%) scale(1.4)';
+}
+
+function replyPin(pinId){
+  const ta = document.getElementById('pinNoteInput');
+  const area = document.getElementById('pinInputArea');
+  if(ta && area){
+    area.style.display='block';
+    ta.placeholder=`Trả lời pin #${pinId}...`;
+    ta.focus();
+  }
+}
+
+function setReviewSubTab(projId, subTab){
+  if(!_reviewState[projId]) _reviewState[projId]={stage:'C1',subTab};
+  _reviewState[projId].subTab = subTab;
+  renderMain();
+  setTimeout(()=>{const cv=document.getElementById('ktsHeroAv');if(cv){const p2=PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(p2)drawPortrait(cv,KP[p2.kts]||{});}},30);
+}
+
+// ESC to close annotation
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAnnotation(); });
+
+
+/* ════════════════════════════════════════
+   UPLOAD FUNCTIONS — Khách hàng gửi file/ảnh
+════════════════════════════════════════ */
+function switchAnnotTab(tab){
+  const pins=document.getElementById('sidebarPinsTab'),upload=document.getElementById('sidebarUploadTab');
+  const tp=document.getElementById('utabPins'),tu=document.getElementById('utabUpload');
+  if(!pins||!upload)return;
+  if(tab==='pins'){pins.style.display='flex';upload.style.display='none';tp.classList.add('active');tu.classList.remove('active');}
+  else{pins.style.display='none';upload.style.display='flex';tu.classList.add('active');tp.classList.remove('active');}
+}
+function handleAnnotUpload(event,projId,stage,paId){
+  const files=Array.from(event.target.files);if(!files.length)return;
+  _processFiles(files,projId,stage,paId,'modal');event.target.value='';
+}
+function handleAnnotDrop(event,projId,stage,paId){
+  event.preventDefault();event.currentTarget.classList.remove('drag-over');
+  const files=Array.from(event.dataTransfer.files);if(!files.length)return;
+  _processFiles(files,projId,stage,paId,'panel');
+}
+function _processFiles(files,projId,stage,paId,source){
+  const pa=(REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);if(!pa)return;
+  if(!pa.cnUploads)pa.cnUploads=[];
+  let loaded=0;
+  files.forEach(file=>{
+    const ext=file.name.split('.').pop().toLowerCase();
+    const isImg=['jpg','jpeg','png','gif','webp','bmp'].includes(ext);
+    const reader=new FileReader();
+    const finish=(dataUrl)=>{
+      pa.cnUploads.unshift({id:'up_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+        name:file.name,size:(file.size/1024).toFixed(0)+'KB',type:isImg?'image':ext,
+        dataUrl:isImg?dataUrl:null,
+        ts:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})});
+      if(++loaded===files.length){
+        showToast(`📤 Đã tải lên ${loaded} file — KTS nhận thông báo ngay!`,'t-green');
+        try{const bc=new BroadcastChannel('applamnha_events');bc.postMessage({type:'CN_FILE_UPLOADED',projectId:projId,stage,paId,count:loaded});bc.close();}catch(e){}
+        if(source==='modal')_renderAnnotModal();
+        else{renderMain();setTimeout(()=>_redrawHero(projId),30);}
+      }
+    };
+    if(isImg){reader.onload=e=>finish(e.target.result);reader.readAsDataURL(file);}
+    else finish(null);
+  });
+}
+function _redrawHero(projId){
+  const cv=document.getElementById('ktsHeroAv');const p2=PROJECTS_CLIENT.find(x=>x.id===projId);
+  const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};
+  if(cv&&p2)drawPortrait(cv,KP[p2.kts]||{});
+}
+function viewUploadedFile(uploadId,projId,stage,paId){
+  const pa=(REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);
+  const up=(pa && pa.cnUploads) ? pa.cnUploads.find(function(x){return x.id===uploadId;}) : null;if(!up||!up.dataUrl)return;
+  const canvas=document.getElementById('annotCanvas');if(!canvas)return;
+  const existing=canvas.querySelector('.img-viewer-overlay');if(existing)existing.remove();
+  const v=document.createElement('div');v.className='img-viewer-overlay';
+  v.innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:7px 14px;background:rgba(0,0,0,.5);border-radius:7px;margin-bottom:8px">
+    <span style="font-size:12px;font-weight:700;color:#fff">${up.name}</span>
+    <span style="font-size:10px;color:rgba(255,255,255,.4)">${up.ts}·${up.size}</span>
+  </div>
+  <img class="img-viewer-img" src="${up.dataUrl}" alt="${up.name}">
+  <button onclick="this.parentElement.remove()" style="margin-top:10px;padding:5px 14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:5px;cursor:pointer;font-size:12px;font-family:var(--sans)">✕ Đóng</button>`;
+  canvas.appendChild(v);
+}
+function viewCNUpload(uploadId,projId,stage,paId){
+  _annotState={projId,stage,paId,mode:'view',pendingPin:null};
+  _renderAnnotModal();setTimeout(()=>viewUploadedFile(uploadId,projId,stage,paId),50);
+}
+function deleteUpload(projId,stage,paId,uploadId){
+  const pa=(REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);
+  if(pa && pa.cnUploads)pa.cnUploads=pa.cnUploads.filter(x=>x.id!==uploadId);
+  _renderAnnotModal();
+}
+function deleteCNUpload(projId,stage,paId,uploadId){
+  const pa=(REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);
+  if(pa && pa.cnUploads)pa.cnUploads=pa.cnUploads.filter(x=>x.id!==uploadId);
+  renderMain();setTimeout(()=>_redrawHero(projId),30);
+}
+
+/* ════════════════════════════════════════
+   CALL MODAL — Gọi điện / Video / Zalo
+════════════════════════════════════════ */
+const KTS_CONTACTS = {
+  'KTS. Trần Lê Minh':   {phone:'0901-234-567', virtualNum:'028-7300-0101', zalo:'0901234567', email:'minhtran@kts.vn'},
+  'KTS. Nguyễn Thị Lan': {phone:'0912-345-678', virtualNum:'028-7300-0102', zalo:'0912345678', email:'lannguyen@kts.vn'},
+  'KTS. Phạm Hoài Nam':  {phone:'0923-456-789', virtualNum:'028-7300-0103', zalo:'0923456789', email:'nampham@kts.vn'},
+  'KTS. Lê Hoàng Nam':   {phone:'0934-567-890', virtualNum:'028-7300-0104', zalo:'0934567890', email:'namle@kts.vn'},
+  'KTS. Vũ Minh Khoa':   {phone:'0945-678-901', virtualNum:'028-7300-0105', zalo:'0945678901', email:'khoavu@kts.vn'},
+};
+const KTS_PORTRAITS_CALL = {
+  'KTS. Trần Lê Minh':   {skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},
+  'KTS. Nguyễn Thị Lan': {skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},
+  'KTS. Phạm Hoài Nam':  {skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},
+  'KTS. Lê Hoàng Nam':   {skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},
+  'KTS. Vũ Minh Khoa':   {skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'},
+};
+
+function openCallModal(type, projId, ktsName){
+  // If called from topbar without context, get from active project
+  if(!ktsName){
+    const p = PROJECTS_CLIENT.find(x=>x.id===activeProj);
+    ktsName = (p ? p.kts : null) || 'KTS. Trần Lê Minh';
+    projId  = (p ? p.id : null);
+  }
+  const contact = KTS_CONTACTS[ktsName] || {phone:'—', zalo:'—', email:'—'};
+  const typeLabel = 'Liên hệ KTS qua Zalo OA';
+  const typeIcon  = {phone:'fa-phone', video:'fa-video', zalo:'fa-comment-dots'}[type];
+  const typeColor = {phone:'var(--green)', video:'var(--blue)', zalo:'#037fd3'}[type];
+
+  const existing = document.getElementById('callModalBg');
+  if(existing) existing.remove();
+
+  const el = document.createElement('div');
+  el.id = 'callModalBg';
+  el.className = 'call-modal-bg';
+  el.onclick = e => { if(e.target===el) closeCallModal(); };
+  el.innerHTML = `
+    <div class="call-modal">
+      <!-- KTS portrait -->
+      <div class="call-avatar">
+        <canvas id="callAvatarCanvas" width="144" height="192"></canvas>
+      </div>
+      <div style="font-family:var(--syne);font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px">${ktsName}</div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:16px">${projId||''}</div>
+
+      <!-- Call type indicator -->
+      <div class="call-pulse" style="background:${typeColor}14;border-color:${typeColor}40">
+        <i class="fa ${typeIcon}" style="font-size:28px;color:${typeColor}"></i>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">${typeLabel}</div>
+
+      ${type==='phone'||type==='video' ? `
+      <!-- Privacy shield notice -->
+      <div style="background:rgba(34,201,122,.07);border:1px solid rgba(34,201,122,.2);border-radius:8px;padding:8px 12px;margin:12px 0 8px;display:flex;gap:8px;font-size:11px;color:var(--color-text-secondary,#9ca3af)">
+        <i class="fa fa-shield-halved" style="color:#22c97a;flex-shrink:0;margin-top:1px"></i>
+        <span>Số điện thoại thật của <b style="color:var(--text2)">${ktsName.replace('KTS. ','')}</b> được bảo mật. Cuộc gọi qua số ảo sàn ALN — tự động ghi âm &amp; lưu vào hồ sơ dự án.</span>
+      </div>
+      <!-- Virtual number display -->
+      <div style="background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
+        <div style="flex:1">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:2px;letter-spacing:.5px;text-transform:uppercase">Số ảo sàn ALN</div>
+          <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);letter-spacing:1px">${contact.virtualNum}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Proxy → KTS (số thật được ẩn)</div>
+        </div>
+        <button onclick="navigator.(clipboard ? clipboard.writeText : null)('${contact.virtualNum}').then(()=>showToast('📋 Đã copy số ảo','t-green'))"
+          style="padding:4px 10px;background:var(--ink4);border:1px solid var(--border);color:var(--sub);border-radius:5px;cursor:pointer;font-size:10px;font-family:var(--sans)">
+          Copy
+        </button>
+      </div>
+      <a href="tel:${contact.virtualNum.replace(/[^0-9]/g,'')}"
+        style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:${typeColor};border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);text-decoration:none;margin-bottom:8px">
+        <i class="fa ${typeIcon}"></i> Gọi qua số ảo
+      </a>` : `
+      <!-- Zalo OA -->
+      <div style="background:rgba(3,107,211,.07);border:1px solid rgba(3,107,211,.2);border-radius:8px;padding:8px 12px;margin:12px 0 8px;display:flex;gap:8px;font-size:11px;color:var(--color-text-secondary,#9ca3af)">
+        <i class="fa fa-shield-halved" style="color:#037fd3;flex-shrink:0;margin-top:1px"></i>
+        <span>Chat qua <b style="color:#037fd3">Zalo Official Account của sàn ALN</b> — toàn bộ nội dung được lưu vào hồ sơ dự án. Không dùng Zalo cá nhân của KTS.</span>
+      </div>
+      <div style="background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:12px;font-size:12px;color:var(--text2)">
+        Zalo OA: <b style="color:var(--text);font-family:var(--mono)">@ALN-Sàn-Thiết-Kế</b>
+      </div>
+      <a href="https://zalo.me/alnsanthietke" target="_blank"
+        style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:#037fd3;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);text-decoration:none;margin-bottom:8px">
+        <i class="fa fa-comment-dots"></i> Mở Zalo OA sàn ALN
+      </a>`}
+
+      <!-- Email + Close -->
+      <div style="display:flex;gap:6px;margin-top:4px">
+        <a href="mailto:${contact.email}"
+          style="flex:1;padding:8px;background:var(--ink3);border:1px solid var(--border);color:var(--text2);border-radius:var(--r-sm);font-size:11px;font-weight:600;font-family:var(--sans);text-decoration:none;display:flex;align-items:center;justify-content:center;gap:5px">
+          <i class="fa fa-envelope"></i> Email KTS
+        </a>
+        <button onclick="closeCallModal()"
+          style="flex:1;padding:8px;background:var(--ink3);border:1px solid var(--border);color:var(--sub);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)">
+          Đóng
+        </button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(el);
+  // Draw portrait
+  setTimeout(()=>{
+    const cv = document.getElementById('callAvatarCanvas');
+    if(cv) drawPortrait(cv, KTS_PORTRAITS_CALL[ktsName]||{});
+  }, 30);
+}
+
+function closeCallModal(){
+  (function(){var _e=document.getElementById('callModalBg');if(_e)_e.remove();})();
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeCallModal(); closeAnnotation(); }});
+
+function renderSidebar(){
+  document.getElementById('projList').innerHTML=PROJECTS_CLIENT.map(p=>`
+    <div class="cn-proj-item ${activeProj===p.id?'active':''}" onclick="selectProj('${p.id}')">
+      <span class="cpi-dot" style="background:${STATUS_DOT[p.status]}"></span>
+      <div style="min-width:0">
+        <div class="cpi-id">${p.id}</div>
+        <div class="cpi-name">${p.name}</div>
+        <div class="cpi-meta">${p.stage} · ${p.kts.replace('KTS. ','')}</div>
+      </div>
+      ${(DOCS[p.id]||[]).filter(d=>d.isNew).length>0?`<span class="new-badge">${(DOCS[p.id]||[]).filter(d=>d.isNew).length}</span>`:''}
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════════
+   REVIEW DATA — Phương án C1/C2 mỗi dự án
+════════════════════════════════════════ */
+const REVIEW_DATA = {
+  'ALN-9921': {
+    C1: {
+      status: 'approved', // approved | pending | revision
+      submittedAt: '2026-05-10',
+      approvedAt: '2026-05-12',
+      revisions: 1,
+      maxRevisions: 2,
+      paList: [
+        { id:'PA_C1_1', name:'MB Phương án A — Hướng Đông', folder:'mb', version:'v1.0',
+          icon:'📐', bg:'linear-gradient(135deg,#0e1418,#0a1020)',
+          desc:'Mặt bằng tổng thể hướng Đông-Nam. Tối ưu ánh sáng tự nhiên.',
+          kts:'KTS. Trần Lê Minh', date:'2026-05-10', status:'approved', pins:[
+            {id:'pin1',x:62,y:38,text:'Cổng vào chính — đề xuất dịch sang trái 1.2m cho xe ra vào dễ hơn',author:'Nguyễn Văn Thuận',role:'cn',ts:'11/05 14:32',resolved:true},
+            {id:'pin2',x:35,y:55,text:'Phòng khách quá hẹp, cần mở rộng thêm ~2m²',author:'Nguyễn Văn Thuận',role:'cn',ts:'11/05 15:00',resolved:true},
+          ] },
+        { id:'PA_C1_2', name:'MB Phương án B — Hướng Tây', folder:'mb', version:'v1.0',
+          icon:'📏', bg:'linear-gradient(135deg,#181418,#100e14)',
+          desc:'Phương án thay thế — hướng Tây, phù hợp với địa hình lô góc.',
+          kts:'KTS. Trần Lê Minh', date:'2026-05-10', status:'rejected', pins:[] },
+      ],
+      comments: [
+        { id:'c1', author:'KTS. Trần Lê Minh', role:'kts', text:'Đã hoàn thiện phương án mặt bằng tổng thể theo yêu cầu. Hướng nhà chính Đông-Nam, tối ưu ánh sáng tự nhiên.', ts:'10/05 09:15', mine:false },
+        { id:'c2', author:'Nguyễn Văn Thuận',   role:'cn',  text:'Đồng ý phương án A. Tuy nhiên cần điều chỉnh vị trí cổng vào cho phù hợp với mặt đường.', ts:'11/05 14:32', mine:true },
+        { id:'c3', author:'KTS. Trần Lê Minh', role:'kts', text:'Đã cập nhật vị trí cổng vào. Xin phê duyệt để tiến hành Chặng 2.', ts:'12/05 08:20', mine:false },
+        { id:'c4', author:'Nguyễn Văn Thuận',   role:'cn',  text:'✅ Đã phê duyệt. Tiến hành Chặng 2!', ts:'12/05 10:05', mine:true },
+      ]
+    },
+    C2: {
+      status: 'pending',
+      submittedAt: '2026-05-28',
+      approvedAt: null,
+      revisions: 0,
+      maxRevisions: 3,
+      paList: [
+        { id:'PA_C2_1', name:'3D Phối cảnh ngoại thất — Góc chính', folder:'pc_ngoai', version:'v1.0',
+          icon:'🏛️', bg:'linear-gradient(135deg,#1a1a2e,#0e0e1a)',
+          desc:'View từ cổng chính. Phong cách tân cổ điển với cột đá tự nhiên.',
+          kts:'KTS. Trần Lê Minh', date:'2026-05-28', status:'pending', isNew:true, pins:[
+            {id:'pin5',x:48,y:42,text:'Màu sắc cột đá quá sáng, cần tone trầm hơn theo mẫu đã thống nhất',author:'Nguyễn Văn Thuận',role:'cn',ts:'29/05 10:00',resolved:false},
+          ] },
+        { id:'PA_C2_2', name:'3D Phối cảnh ngoại thất — Góc vườn', folder:'pc_ngoai', version:'v1.0',
+          icon:'🌿', bg:'linear-gradient(135deg,#0e1a14,#0a120e)',
+          desc:'View từ khu vườn phía sau. Bể bơi và sân vườn kết hợp.',
+          kts:'KTS. Trần Lê Minh', date:'2026-05-28', status:'pending', isNew:true, pins:[] },
+        { id:'PA_C2_3', name:'3D Phối cảnh nội thất — Phòng khách', folder:'pc_noi', version:'v1.0',
+          icon:'🛋️', bg:'linear-gradient(135deg,#1a1410,#120e08)',
+          desc:"Bird's eye view phòng khách + dining. Vật liệu đá marble và gỗ óc chó.",
+          kts:'KTS. Trần Lê Minh', date:'2026-05-29', status:'pending', isNew:true, pins:[] },
+      ],
+      comments: [
+        { id:'c5', author:'KTS. Trần Lê Minh', role:'kts', text:'Đã hoàn thiện 3 góc phối cảnh theo yêu cầu. Chất liệu đá marble nhập khẩu Italy, gỗ óc chó tự nhiên.', ts:'28/05 16:00', mine:false },
+      ]
+    }
+  },
+
+  'ALN-9648': {
+    C1: {
+      status: 'approved',
+      submittedAt: '2026-05-05', approvedAt: '2026-05-07',
+      revisions: 0, maxRevisions: 2,
+      paList: [
+        { id:'PA_C1_ALN9648', name:'Phương án Shophouse góc phố', version:'v1.0',
+          icon:'🏪', bg:'linear-gradient(135deg,#1a1420,#0e0a14)',
+          desc:'Mặt tiền shophouse 2 tầng. Phong cách hiện đại minimal.',
+          kts:'KTS. Lê Hoàng Nam', date:'2026-05-05', status:'approved' },
+      ],
+      comments: [
+        { id:'c10', author:'KTS. Lê Hoàng Nam', role:'kts', text:'Phương án MB shophouse theo yêu cầu. Tầng 1 kinh doanh, tầng 2-4 căn hộ.', ts:'05/05 10:00', mine:false },
+        { id:'c11', author:'Vũ Thị Lan', role:'cn', text:'✅ Đồng ý phương án, tiến hành Chặng 2.', ts:'07/05 09:30', mine:true },
+      ]
+    },
+    C2: {
+      status: 'pending',
+      submittedAt: '2026-05-22', approvedAt: null,
+      revisions: 0, maxRevisions: 3,
+      paList: [
+        { id:'PA_C2_ALN9648', name:'3D Phối cảnh shophouse góc phố', version:'v1.0',
+          icon:'🏬', bg:'linear-gradient(135deg,#141a20,#0a0e14)',
+          desc:'Góc nhìn từ đường chính. Mặt tiền kính + nhôm.',
+          kts:'KTS. Lê Hoàng Nam', date:'2026-05-22', status:'pending', isNew:true },
+      ],
+      comments: [
+        { id:'c12', author:'KTS. Lê Hoàng Nam', role:'kts', text:'Phối cảnh 3D ngoại thất đã hoàn thiện. Kính cường lực Low-E + khung nhôm anodized.', ts:'22/05 14:00', mine:false },
+      ]
+    }
+  },
+
+  /* ── 9 DỰ ÁN CÒN LẠI ── */
+  'ALN-9834': {
+    C1: { status:'approved', submittedAt:'2026-04-15', approvedAt:'2026-04-17', revisions:0, maxRevisions:2,
+      paList:[
+        { id:'PA_9834_C1_1', name:'MB Phương án — Hướng Nam', folder:'mb', version:'v1.0',
+          icon:'📐', bg:'linear-gradient(135deg,#0e1820,#08101a)',
+          desc:'Mặt bằng nhà phố 5 tầng, mặt tiền 5m hướng Nam.',
+          kts:'KTS. Nguyễn Thị Lan', date:'2026-04-15', status:'approved', pins:[], cnUploads:[] },
+      ],
+      comments:[
+        {id:'c_9834_1', author:'KTS. Nguyễn Thị Lan', role:'kts', text:'MB tổng thể 5 tầng theo yêu cầu, hướng Nam tối ưu ánh sáng.',ts:'15/04 10:00',mine:false},
+        {id:'c_9834_2', author:'Trần Thị Bình', role:'cn', text:'✅ Đồng ý phương án. Tiến hành C2.',ts:'17/04 09:00',mine:true},
+      ]},
+    C2: { status:'pending', submittedAt:'2026-04-28', approvedAt:null, revisions:1, maxRevisions:3,
+      paList:[
+        { id:'PA_9834_C2_1', name:'3D Phối cảnh ngoại thất — Mặt tiền', folder:'pc_ngoai', version:'v1.1',
+          icon:'🏙️', bg:'linear-gradient(135deg,#14181e,#0c1018)',
+          desc:'View mặt tiền nhà phố 5 tầng. Phong cách hiện đại.',
+          kts:'KTS. Nguyễn Thị Lan', date:'2026-04-28', status:'pending', isNew:false,
+          pins:[{id:'pin_9834_1',x:55,y:45,text:'Màu sơn tường ngoài cần tone ấm hơn, hiện quá lạnh',author:'Trần Thị Bình',role:'cn',ts:'29/04 11:00',resolved:false}], cnUploads:[] },
+        { id:'PA_9834_C2_2', name:'3D Phối cảnh nội thất — Phòng khách', folder:'pc_noi', version:'v1.0',
+          icon:'🛋️', bg:'linear-gradient(135deg,#181418,#100e12)',
+          desc:"Bird's eye view phòng khách tầng 1.",
+          kts:'KTS. Nguyễn Thị Lan', date:'2026-04-28', status:'pending', pins:[], cnUploads:[] },
+      ],
+      comments:[
+        {id:'c_9834_3',author:'KTS. Nguyễn Thị Lan',role:'kts',text:'Đã hoàn thiện phối cảnh 3D theo brief. Chờ CN phê duyệt.',ts:'28/04 16:00',mine:false},
+        {id:'c_9834_4',author:'Trần Thị Bình',role:'cn',text:'Màu sơn ngoài cần điều chỉnh — đã pin trên ảnh.',ts:'29/04 11:05',mine:true},
+      ]}
+  },
+  'ALN-9756': {
+    C1: { status:'approved', submittedAt:'2026-03-12', approvedAt:'2026-03-14', revisions:0, maxRevisions:2,
+      paList:[
+        { id:'PA_9756_C1_1', name:'MB Villa tổng thể — Hướng Đông', folder:'mb', version:'v1.0',
+          icon:'📐', bg:'linear-gradient(135deg,#14200e,#0c1808)',
+          desc:'MB villa 400m², bố trí phòng ngủ master hướng Đông.',
+          kts:'KTS. Vũ Minh Khoa', date:'2026-03-12', status:'approved', pins:[], cnUploads:[] },
+        { id:'PA_9756_C1_2', name:'MB Villa phương án B — Hướng Tây', folder:'mb', version:'v1.0',
+          icon:'📏', bg:'linear-gradient(135deg,#201614,#180e0c)',
+          desc:'Phương án thay thế, hồ bơi phía Tây.',
+          kts:'KTS. Vũ Minh Khoa', date:'2026-03-12', status:'rejected', pins:[], cnUploads:[] },
+      ],
+      comments:[
+        {id:'c_9756_1',author:'KTS. Vũ Minh Khoa',role:'kts',text:'Đề xuất 2 phương án MB. PA A tối ưu hơn về ánh sáng và gió tự nhiên.',ts:'12/03 09:00',mine:false},
+        {id:'c_9756_2',author:'Lê Quang Cường',role:'cn',text:'✅ Chọn PA A hướng Đông. Đồng ý tiến hành C2.',ts:'14/03 10:00',mine:true},
+      ]},
+    C2: { status:'approved', submittedAt:'2026-03-28', approvedAt:'2026-04-01', revisions:1, maxRevisions:3,
+      paList:[
+        { id:'PA_9756_C2_1', name:'3D Phối cảnh ngoại thất — Toàn cảnh', folder:'pc_ngoai', version:'v1.1',
+          icon:'🏡', bg:'linear-gradient(135deg,#101e14,#08140c)',
+          desc:'View toàn cảnh villa từ trên cao. Hồ bơi và sân vườn.',
+          kts:'KTS. Vũ Minh Khoa', date:'2026-03-28', status:'approved', pins:[], cnUploads:[] },
+        { id:'PA_9756_C2_2', name:'3D Phối cảnh ngoại thất — Cổng vào', folder:'pc_ngoai', version:'v1.1',
+          icon:'🌳', bg:'linear-gradient(135deg,#0e1c10,#081408)',
+          desc:'View từ cổng vào. Cây xanh và tiểu cảnh.',
+          kts:'KTS. Vũ Minh Khoa', date:'2026-03-29', status:'approved', pins:[], cnUploads:[] },
+        { id:'PA_9756_C2_3', name:'3D Phối cảnh nội thất — Master Bedroom', folder:'pc_noi', version:'v1.0',
+          icon:'🛏️', bg:'linear-gradient(135deg,#1a1410,#120e08)',
+          desc:'Phòng ngủ master 45m². Gỗ tếch + đá travertine.',
+          kts:'KTS. Vũ Minh Khoa', date:'2026-03-30', status:'approved', pins:[], cnUploads:[] },
+      ],
+      comments:[
+        {id:'c_9756_3',author:'KTS. Vũ Minh Khoa',role:'kts',text:'Đã hoàn thiện 3 góc phối cảnh theo yêu cầu.',ts:'30/03 17:00',mine:false},
+        {id:'c_9756_4',author:'Lê Quang Cường',role:'cn',text:'✅ Đẹp lắm! Duyệt toàn bộ.',ts:'01/04 09:00',mine:true},
+      ]}
+  },
+  'ALN-9702': {
+    C1: { status:'pending', submittedAt:'2026-05-20', approvedAt:null, revisions:0, maxRevisions:2,
+      paList:[
+        { id:'PA_9702_C1_1', name:'MB Nhà cấp 4 — Phương án chính', folder:'mb', version:'v1.0',
+          icon:'🏠', bg:'linear-gradient(135deg,#181410,#100e08)',
+          desc:'MB nhà cấp 4 mái thái 80m². Bố trí 3 phòng ngủ.',
+          kts:'KTS. Phạm Hoài Nam', date:'2026-05-20', status:'pending', isNew:true, pins:[], cnUploads:[] },
+      ],
+      comments:[
+        {id:'c_9702_1',author:'KTS. Phạm Hoài Nam',role:'kts',text:'Đã hoàn thiện MB nhà cấp 4 theo brief. Chờ CN xem xét.',ts:'20/05 14:00',mine:false},
+      ]}
+  },
+  'ALN-9521': {
+    C1: { status:'approved', submittedAt:'2026-05-01', approvedAt:'2026-05-03', revisions:0, maxRevisions:2,
+      paList:[
+        { id:'PA_9521_C1_1', name:'MB Nhà phố 3 tầng — Hướng Bắc', folder:'mb', version:'v1.0',
+          icon:'📐', bg:'linear-gradient(135deg,#101820,#080e18)',
+          desc:'MB nhà phố 3 tầng 4x15m. Cầu thang giữa, tối ưu diện tích.',
+          kts:'KTS. Phạm Hoài Nam', date:'2026-05-01', status:'approved', pins:[], cnUploads:[] },
+      ],
+      comments:[
+        {id:'c_9521_1',author:'KTS. Phạm Hoài Nam',role:'kts',text:'MB tối ưu diện tích 60m²/tầng theo yêu cầu.',ts:'01/05 09:00',mine:false},
+        {id:'c_9521_2',author:'Nguyễn T. Hoa',role:'cn',text:'✅ Duyệt PA. Tiến hành 3D.',ts:'03/05 08:30',mine:true},
+      ]},
+    C2: { status:'pending', submittedAt:'2026-05-18', approvedAt:null, revisions:0, maxRevisions:3,
+      paList:[
+        { id:'PA_9521_C2_1', name:'3D Phối cảnh ngoại thất — Mặt tiền', folder:'pc_ngoai', version:'v1.0',
+          icon:'🏘️', bg:'linear-gradient(135deg,#141820,#0c1018)',
+          desc:'View mặt tiền nhà phố 3 tầng. Phong cách Japandi.',
+          kts:'KTS. Phạm Hoài Nam', date:'2026-05-18', status:'pending', isNew:true, pins:[], cnUploads:[] },
+      ],
+      comments:[
+        {id:'c_9521_3',author:'KTS. Phạm Hoài Nam',role:'kts',text:'Phối cảnh 3D mặt tiền hoàn thiện. Đang chờ phản hồi từ CN.',ts:'18/05 15:00',mine:false},
+      ]}
+  },
+  'ALN-9480': {
+    C1: { status:'pending', submittedAt:'2026-05-25', approvedAt:null, revisions:0, maxRevisions:2,
+      paList:[
+        { id:'PA_9480_C1_1', name:'MB Biệt thự nghỉ dưỡng — Phương án A', folder:'mb', version:'v1.0',
+          icon:'🏔️', bg:'linear-gradient(135deg,#0e1820,#061018)',
+          desc:'MB biệt thự 500m² trên đồi. Tầm nhìn thung lũng.',
+          kts:'KTS. Trần Lê Minh', date:'2026-05-25', status:'pending', isNew:true, pins:[], cnUploads:[] },
+        { id:'PA_9480_C1_2', name:'MB Biệt thự nghỉ dưỡng — Phương án B', folder:'mb', version:'v1.0',
+          icon:'📐', bg:'linear-gradient(135deg,#141e0e,#0c1408)',
+          desc:'Bố cục dọc, hồ bơi vô cực hướng thung lũng.',
+          kts:'KTS. Trần Lê Minh', date:'2026-05-25', status:'pending', isNew:true, pins:[], cnUploads:[] },
+      ],
+      comments:[
+        {id:'c_9480_1',author:'KTS. Trần Lê Minh',role:'kts',text:'Đề xuất 2 phương án MB. PA B có hồ bơi vô cực phù hợp nghỉ dưỡng hơn.',ts:'25/05 11:00',mine:false},
+      ]}
+  },
+  'ALN-9412': {
+    C1: { status:'approved', submittedAt:'2026-04-20', approvedAt:'2026-04-22', revisions:0, maxRevisions:2,
+      paList:[
+        { id:'PA_9412_C1_1', name:'MB Căn hộ Duplex — Tầng 1+2', folder:'mb', version:'v1.0',
+          icon:'🏢', bg:'linear-gradient(135deg,#141420,#0c0c18)',
+          desc:'MB duplex 2 tầng 140m². Open-plan tầng 1, 3PN tầng 2.',
+          kts:'KTS. Nguyễn Thị Lan', date:'2026-04-20', status:'approved', pins:[], cnUploads:[] },
+      ],
+      comments:[
+        {id:'c_9412_1',author:'KTS. Nguyễn Thị Lan',role:'kts',text:'MB duplex open-plan hiện đại. Tầng 1 sinh hoạt, tầng 2 nghỉ ngơi.',ts:'20/04 10:00',mine:false},
+        {id:'c_9412_2',author:'Võ Thị Mai',role:'cn',text:'✅ Đẹp! Đồng ý tiến hành C2.',ts:'22/04 09:00',mine:true},
+      ]},
+    C2: { status:'pending', submittedAt:'2026-05-10', approvedAt:null, revisions:1, maxRevisions:3,
+      paList:[
+        { id:'PA_9412_C2_1', name:'3D Phối cảnh ngoại thất — Ban công', folder:'pc_ngoai', version:'v1.1',
+          icon:'🌆', bg:'linear-gradient(135deg,#10141e,#080c16)',
+          desc:'View từ ban công tầng 2. Skyline Bình Thạnh.',
+          kts:'KTS. Nguyễn Thị Lan', date:'2026-05-10', status:'pending', isNew:true, pins:[], cnUploads:[] },
+        { id:'PA_9412_C2_2', name:'3D Phối cảnh nội thất — Phòng khách', folder:'pc_noi', version:'v1.1',
+          icon:'🛋️', bg:'linear-gradient(135deg,#1a1218,#120a10)',
+          desc:'Living room open-plan. Bếp đảo + phòng ăn.',
+          kts:'KTS. Nguyễn Thị Lan', date:'2026-05-11', status:'pending', isNew:true, pins:[], cnUploads:[] },
+        { id:'PA_9412_C2_3', name:'3D Phối cảnh nội thất — Master Bedroom', folder:'pc_noi', version:'v1.0',
+          icon:'🛏️', bg:'linear-gradient(135deg,#18121a,#100a12)',
+          desc:'Phòng ngủ master 30m² + walk-in closet.',
+          kts:'KTS. Nguyễn Thị Lan', date:'2026-05-12', status:'pending', isNew:true, pins:[], cnUploads:[] },
+      ],
+      comments:[
+        {id:'c_9412_3',author:'KTS. Nguyễn Thị Lan',role:'kts',text:'3 góc phối cảnh đã hoàn thiện theo brief.',ts:'12/05 17:00',mine:false},
+        {id:'c_9412_4',author:'Võ Thị Mai',role:'cn',text:'Ban công đẹp! Nhưng nội thất phòng khách cần ấm hơn.',ts:'13/05 09:00',mine:true},
+      ]}
+  },
+};
+
+/* Active review state */
+const _reviewState = {};
+
+/* Main project view */
+function renderMain(){
+  const p = PROJECTS_CLIENT.find(x=>x.id===activeProj);
+  if(!p){
+    document.getElementById('mainContent').innerHTML=
+      '<div style="padding:40px;text-align:center;color:var(--muted)">Chọn công trình từ danh sách bên trái</div>';
+    return;
+  }
+
+  const docs = DOCS[p.id]||[];
+  const totalDocs = docs.length;
+  const newCount  = docs.filter(d=>d.isNew).length;
+
+  /* Folder counts */
+  const foldCounts = {ALL:totalDocs};
+  FOLDERS.forEach(f=>{ foldCounts[f.id] = docs.filter(d=>d.folder===f.id).length; });
+
+  /* KTS portraits map */
+  const KTS_PORTRAITS = {
+    'KTS. Trần Lê Minh':   {skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e',cchn:'KTS-2021-04821',tier:'VIP Vàng', rating:'4.8',projects:23},
+    'KTS. Nguyễn Thị Lan': {skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e',cchn:'KTS-2022-07663',tier:'VIP Bạc',  rating:'4.9',projects:14},
+    'KTS. Phạm Hoài Nam':  {skin:'#d4a880',shirt:'#5a3818',bg:'#120e08',cchn:'KTS-2021-09312',tier:'Chuẩn',    rating:'4.7',projects:18},
+    'KTS. Lê Hoàng Nam':   {skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410',cchn:'KTS-2023-03201',tier:'VIP Bạc',  rating:'4.8',projects:11},
+    'KTS. Vũ Minh Khoa':   {skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e',cchn:'KTS-2020-11542',tier:'VIP Vàng', rating:'5.0',projects:27},
+  };
+  const ki = KTS_PORTRAITS[p.kts] || {skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e',cchn:'—',tier:'Chuẩn',rating:'4.8',projects:0};
+  const tierStyle = ki.tier.includes('Vàng')
+    ? 'background:linear-gradient(135deg,rgba(184,146,42,.2),rgba(212,169,58,.15));color:#d4a93a;border:1px solid rgba(212,169,58,.25)'
+    : ki.tier.includes('Bạc')
+    ? 'background:rgba(148,163,184,.1);color:#94a3b8;border:1px solid rgba(148,163,184,.25)'
+    : 'background:rgba(255,255,255,.05);color:var(--sub);border:1px solid var(--border)';
+
+  /* Stage bar */
+  const stageBar = ['C1','C2','C3','C4'].map((s,i)=>{
+    const prog=p.progress[i]||0, bc=prog>0?STGCOLS[i]:'var(--dim)';
+    return `<div class="sbf" style="flex:${STGPCT[i]};background:${bc};opacity:${prog>0?1:.4};border-radius:${i===0?'7px 0 0 7px':i===3?'0 7px 7px 0':'0'}">
+      <span style="font-size:11px;font-weight:700;color:${prog>0?'rgba(0,0,0,.8)':'var(--sub)'}">${s}</span>
+      <span style="font-size:9px;opacity:.75;color:${prog>0?'rgba(0,0,0,.6)':'var(--muted)'}">${STGPCT[i]}%</span>
+    </div>`;
+  }).join('');
+
+  /* Folder tabs */
+  const folderTabsHTML =
+    `<button class="ft ${activeFolder==='ALL'?'active':''}" onclick="setFolder('ALL')">
+       <i class="fa fa-folder-open"></i> Tất cả <span class="ft-badge">${totalDocs}</span>
+     </button>`
+    + FOLDERS.map(f=>{
+        const active = activeFolder===f.id;
+        return `<button class="ft ${active?'active':''}" onclick="setFolder('${f.id}')"
+          style="${active?`border-color:${f.color}40;background:${f.color}14;color:${f.color}`:''}">
+          <i class="fa ${f.icon}" style="color:${active?f.color:''}"></i>
+          ${f.label} <span class="ft-badge">${foldCounts[f.id]||0}</span>
+        </button>`;
+      }).join('');
+
+  /* Active docs */
+  const activeDocs = activeFolder==='ALL' ? docs : docs.filter(d=>d.folder===activeFolder);
+  const activeFolderInfo = FOLDERS.find(f=>f.id===activeFolder);
+
+  /* File cards */
+  const docCards = activeDocs.length===0
+    ? `<div class="file-empty">
+         <i class="fa fa-cloud-upload-alt"></i>
+         <p style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px">KTS chưa upload file vào thư mục này</p>
+         <p style="font-size:12px">Bạn sẽ nhận thông báo ngay khi có tài liệu mới</p>
+       </div>`
+    : activeDocs.map(d=>{
+        const fi = FOLDERS.find(f=>f.id===d.folder)||FOLDERS[0];
+        return `<div class="file-card ${d.isNew?'new-doc':''}" onclick="downloadDoc('${d.id}','${d.name}')">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="fc-icon" style="background:rgba(255,255,255,.04);border:1px solid var(--border)">
+              <i class="fa ${ICON[d.type]||'fa-file'}" style="color:${ICOLOR[d.type]||'var(--sub)'};font-size:20px"></i>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="fc-name">${d.name}</div>
+              <div style="font-size:10px;color:var(--muted)">${d.size} · ${d.date}</div>
+            </div>
+            ${d.isNew?`<span style="background:var(--green);color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:99px;flex-shrink:0">MỚI</span>`:''}
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="font-size:10px;color:var(--sub);display:flex;align-items:center;gap:4px">
+              <i class="fa fa-user-tie" style="font-size:9px;color:${fi.color}"></i>${d.kts}
+            </span>
+            <span style="font-size:10px;background:${fi.color}14;border:1px solid ${fi.color}30;color:${fi.color};padding:1px 8px;border-radius:99px;display:inline-flex;align-items:center;gap:4px">
+              <i class="fa ${fi.icon}" style="font-size:9px"></i>${fi.label}
+            </span>
+          </div>
+          <span class="fc-status pill ${d.status==='approved'?'p-green':d.status==='dispute'?'p-red':'p-amber'}">
+            ${d.status==='approved'?'✅ Đã duyệt':d.status==='dispute'?'⚠️ Tranh chấp':'⏳ Chờ duyệt'}
+          </span>
+          <button class="fc-download" onclick="event.stopPropagation();downloadDoc('${d.id}','${d.name}')">
+            <i class="fa fa-download" style="font-size:11px"></i> Tải xuống
+          </button>
+        </div>`;
+      }).join('');
+
+  /* Folder description bar */
+  const folderDescHTML = activeFolderInfo
+    ? `<div style="background:${activeFolderInfo.color}0e;border:1px solid ${activeFolderInfo.color}28;border-radius:var(--r-sm);padding:8px 12px;margin-bottom:12px;font-size:11px;color:var(--text2);display:flex;gap:8px">
+        <i class="fa ${activeFolderInfo.icon}" style="color:${activeFolderInfo.color};flex-shrink:0;margin-top:1px"></i>
+        ${activeFolderInfo.desc}
+       </div>`
+    : `<div style="background:var(--accent-bg);border:1px solid rgba(201,168,76,.15);border-radius:var(--r-sm);padding:8px 12px;margin-bottom:12px;font-size:11px;color:var(--text2);display:flex;gap:8px">
+        <i class="fa fa-circle-info" style="color:var(--accent2);flex-shrink:0;margin-top:1px"></i>
+        KTS upload file từ trang kts.applamnha.vn → xuất hiện ngay tại đây theo đúng thư mục chuyên môn.
+       </div>`;
+
+  /* Inject HTML */
+  document.getElementById('mainContent').innerHTML = `
+    <div class="cn-header">
+
+      <!-- ══ PROJECT INFO ══ -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
+        <div style="flex:1;min-width:0">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--sub);margin-bottom:3px">${p.id}</div>
+          <h1>${p.name}</h1>
+          <p style="margin-top:7px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span class="pill ${p.status==='on_track'?'p-green':p.status==='sla_warn'?'p-amber':p.status==='dispute'?'p-red':'p-gray'}">
+              ${{on_track:'🟢 Đúng tiến độ',sla_warn:'⏰ Cảnh báo SLA',dispute:'❌ Tranh chấp',done:'✅ Hoàn thành'}[p.status]}
+            </span>
+            ${newCount>0?`<span class="pill p-green"><i class="fa fa-bell" style="font-size:8px"></i> ${newCount} file mới</span>`:''}
+          </p>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:2px">Tổng giá trị HĐ</div>
+          <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--gold)">${fmtM(p.total)}đ</div>
+          <div style="font-size:10px;color:var(--muted)">Escrow giữ: <b style="color:var(--amber)">${fmtM(p.escrow)}đ</b></div>
+        </div>
+      </div>
+
+      <!-- ══ KTS compact row ══ -->
+      <div style="margin-top:10px;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:7px;padding:7px 12px;flex-wrap:wrap">
+        <canvas id="ktsHeroAv" width="48" height="48" style="width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(201,168,76,.3);flex-shrink:0"></canvas>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;font-weight:700;color:var(--text2)">${p.kts}</div>
+          <div style="font-size:9px;color:var(--muted);margin-top:1px;font-family:var(--mono)">${ki.cchn}</div>
+        </div>
+        <span class="pill" style="${tierStyle};font-size:9px"><i class="fa fa-crown" style="font-size:8px"></i> ${ki.tier}</span>
+        <span class="pill p-green" style="font-size:9px"><i class="fa fa-circle-check" style="font-size:8px"></i> Đã xác minh</span>
+        <span class="pill" style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text2);font-size:9px"><i class="fa fa-star" style="color:var(--gold);font-size:8px"></i> ${ki.rating} · ${ki.projects} dự án</span>
+      </div>
+
+    </div><!-- end cn-header -->
+
+    <div class="content-cn">
+
+      <!-- TIẾN ĐỘ — COMPACT -->
+      <div class="card" style="padding:14px 18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="ct" style="margin:0;border:none;padding:0">
+            <i class="fa fa-route" style="color:var(--gold)"></i> Tiến độ thực hiện
+          </div>
+          <!-- Stage progress dots -->
+          <div style="display:flex;align-items:center;gap:6px">
+            ${['C1','C2','C3','C4'].map((s,i)=>{
+              const prog=p.progress[i]||0;
+              const col=prog>=1?STGCOLS[i]:prog>0?STGCOLS[i]:'var(--dim)';
+              const op=prog>0?1:.35;
+              return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                <div style="width:32px;height:32px;border-radius:50%;background:${col};opacity:${op};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${prog>0?'rgba(0,0,0,.75)':'var(--sub)'}">
+                  ${prog>=1?'✓':prog>0?s:s}
+                </div>
+                <div style="font-size:9px;color:${prog>0?'var(--text2)':'var(--muted)'};font-family:var(--mono)">${fmtM(p.total*STGPCT[i]/100)}</div>
+              </div>
+              ${i<3?`<div style="flex:1;height:2px;background:${prog>=1?STGCOLS[i]:'var(--dim)'};min-width:20px;max-width:40px;border-radius:99px;margin-bottom:12px;opacity:${prog>=1?1:.3}"></div>`:''}`;
+            }).join('')}
+          </div>
+        </div>
+        <!-- Single compact bar -->
+        <div style="display:flex;height:8px;border-radius:99px;overflow:hidden;gap:1px;margin-bottom:8px">
+          ${['C1','C2','C3','C4'].map((s,i)=>{
+            const prog=p.progress[i]||0;
+            return `<div style="flex:${STGPCT[i]};background:${prog>0?STGCOLS[i]:'var(--dim)'};opacity:${prog>0?1:.3};border-radius:${i===0?'99px 0 0 99px':i===3?'0 99px 99px 0':'0'}"></div>`;
+          }).join('')}
+        </div>
+        <!-- 4 cols summary -->
+        <div class="prog-4col" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+          ${['C1','C2','C3','C4'].map((s,i)=>{
+            const prog=p.progress[i]||0;
+            const col=STGCOLS[i];
+            return `<div style="background:var(--ink3);border:1px solid ${prog>0?col+'40':'var(--border)'};border-radius:var(--r-sm);padding:8px 10px">
+              <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">
+                <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:${prog>0?col:'var(--sub)'}">${s}</span>
+                <span class="pill ${prog>=1?'p-green':prog>0?'p-amber':'p-gray'}" style="font-size:8px;padding:1px 5px">${prog>=1?'✓':prog>0?'▶':'—'}</span>
+              </div>
+              <div style="font-size:10px;color:var(--sub);margin-bottom:2px">${STGNAME[s]}</div>
+              <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text)">${fmtM(p.total*STGPCT[i]/100)}đ</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- REVIEW PANEL C1/C2 -->
+      ${(()=>{
+        const rv = REVIEW_DATA[p.id];
+        if(!rv) return '';
+        const activeStages = ['C1','C2'].filter(s=>rv[s]);
+        if(!activeStages.length) return '';
+        const defaultStage = activeStages.find(s=>(rv[s] ? rv[s].status : null)==='approved') || activeStages[activeStages.length-1];
+        const rid = (_reviewState[p.id] ? _reviewState[p.id].stage : null) || defaultStage;
+        if(!_reviewState[p.id]) _reviewState[p.id] = {stage:rid, subTab:'all'};
+        const r = rv[rid];
+        if(!r) return '';
+        const subTab = _reviewState[p.id].subTab || 'all';
+
+        /* Stage tabs */
+        const stageTabsHTML = activeStages.map(s=>{
+          const sr=rv[s]; const isDone=sr.status==='approved'; const isAct=rid===s;
+          return `<button class="rp-tab ${isDone?'done':''} ${isAct?'active':''}"
+            onclick="setReviewStage('${p.id}','${s}')">
+            <i class="fa ${isDone?'fa-circle-check':'fa-pencil-ruler'}" style="font-size:10px"></i>
+            ${s} — ${s==='C1'?'Mặt bằng 2D':'Phối cảnh 3D'}
+            ${isDone
+              ? '<span style="font-size:9px">✅</span>'
+              : `<span style="background:rgba(255,255,255,.07);font-size:9px;padding:1px 5px;border-radius:99px;font-family:var(--mono)">${sr.revisions}/${sr.maxRevisions} sửa</span>`}
+          </button>`;
+        }).join('');
+
+        /* 3 thư mục cố định */
+        const FOLDERS_REVIEW = [
+          { id:'mb',       label:'Mặt bằng',            icon:'fa-draw-polygon', color:'var(--blue)',   desc:'MB tổng thể, MB các tầng, MB mái' },
+          { id:'pc_ngoai', label:'Phối cảnh Ngoại thất', icon:'fa-sun',          color:'var(--amber)',  desc:'Phối cảnh ngoại thất, sân vườn, hồ bơi' },
+          { id:'pc_noi',   label:'Phối cảnh Nội thất',   icon:'fa-couch',        color:'var(--purple)', desc:'Phối cảnh nội thất các phòng' },
+        ];
+        const fCount = {
+          all: r.paList.length,
+          mb:       r.paList.filter(pa=>pa.folder==='mb').length,
+          pc_ngoai: r.paList.filter(pa=>pa.folder==='pc_ngoai').length,
+          pc_noi:   r.paList.filter(pa=>pa.folder==='pc_noi').length,
+        };
+
+        /* Folder bar — card style thay vì pill tabs */
+        const subTabsHTML = `
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:14px">
+
+            <!-- Tất cả -->
+            <div onclick="setReviewSubTab('${p.id}','all')"
+              style="padding:10px 12px;border-radius:var(--r-sm);cursor:pointer;transition:all .15s;
+                background:${subTab==='all'?'rgba(201,168,76,.12)':'var(--ink3)'};
+                border:1.5px solid ${subTab==='all'?'rgba(201,168,76,.3)':'var(--border)'};
+                text-align:center">
+              <i class="fa fa-layer-group" style="font-size:16px;color:${subTab==='all'?'var(--accent2)':'var(--sub)'};display:block;margin-bottom:4px"></i>
+              <div style="font-size:10px;font-weight:700;color:${subTab==='all'?'var(--accent2)':'var(--sub)'}">Tất cả</div>
+              <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:${subTab==='all'?'var(--text)':'var(--text2)'}">${fCount.all}</div>
+            </div>
+
+            <!-- 3 thư mục -->
+            ${FOLDERS_REVIEW.map(f=>`
+            <div onclick="setReviewSubTab('${p.id}','${f.id}')"
+              style="padding:10px 12px;border-radius:var(--r-sm);cursor:pointer;transition:all .15s;
+                background:${subTab===f.id?f.color+'14':'var(--ink3)'};
+                border:1.5px solid ${subTab===f.id?f.color+'50':'var(--border)'};
+                text-align:center">
+              <i class="fa ${f.icon}" style="font-size:16px;color:${subTab===f.id?f.color:'var(--sub)'};display:block;margin-bottom:4px"></i>
+              <div style="font-size:10px;font-weight:700;color:${subTab===f.id?f.color:'var(--sub)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${f.label}</div>
+              <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:${subTab===f.id?'var(--text)':'var(--text2)'}">${fCount[f.id]||0}</div>
+            </div>`).join('')}
+          </div>
+
+          <!-- Folder description khi chọn -->
+          ${subTab!=='all' ? `<div style="background:${(FOLDERS_REVIEW.find(f=>f.id===subTab) ? FOLDERS_REVIEW.find(f=>f.id===subTab).color : '')}0d;border:1px solid ${(FOLDERS_REVIEW.find(f=>f.id===subTab) ? FOLDERS_REVIEW.find(f=>f.id===subTab).color : '')}28;border-radius:var(--r-sm);padding:8px 12px;margin-bottom:12px;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:8px">
+            <i class="fa ${(FOLDERS_REVIEW.find(f=>f.id===subTab) ? FOLDERS_REVIEW.find(f=>f.id===subTab).icon : '')}" style="color:${(FOLDERS_REVIEW.find(f=>f.id===subTab) ? FOLDERS_REVIEW.find(f=>f.id===subTab).color : '')};flex-shrink:0"></i>
+            <span><b style="color:var(--text)">${(FOLDERS_REVIEW.find(f=>f.id===subTab) ? FOLDERS_REVIEW.find(f=>f.id===subTab).label : '')}:</b> ${(FOLDERS_REVIEW.find(f=>f.id===subTab) ? FOLDERS_REVIEW.find(f=>f.id===subTab).desc : '')}</span>
+          </div>`:
+          `<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;margin-bottom:12px;font-size:11px;color:var(--muted)">
+            <i class="fa fa-circle-info" style="color:var(--accent2);margin-right:6px"></i>
+            KTS tải file vào đúng thư mục — Khách hàng chọn thư mục để xem và đánh dấu pin từng bản vẽ
+          </div>`}`;
+
+        /* PA cards — filtered by folder */
+        const filteredPAs = subTab==='all' ? r.paList
+          : r.paList.filter(pa=>pa.folder===subTab);
+
+        const paCardsHTML = filteredPAs.length===0
+          ? `<div style="text-align:center;padding:30px;color:var(--muted);font-size:12px;grid-column:1/-1">
+               <i class="fa fa-folder-open" style="font-size:24px;display:block;margin-bottom:8px;color:var(--dim)"></i>
+               KTS chưa upload phương án ${subTab==='mb'?'mặt bằng':'phối cảnh'} nào
+             </div>`
+          : filteredPAs.map(pa=>{
+            const isApproved = pa.status==='approved';
+            const isRejected = pa.status==='rejected';
+            const pinCount = (pa.pins||[]).length;
+            const openPins = (pa.pins||[]).filter(pin=>!pin.resolved).length;
+            const FLABEL = {
+              mb:       {label:'Mặt bằng',            icon:'fa-draw-polygon', color:'var(--blue)'},
+              pc_ngoai: {label:'Phối cảnh Ngoại thất', icon:'fa-sun',          color:'var(--amber)'},
+              pc_noi:   {label:'Phối cảnh Nội thất',   icon:'fa-couch',        color:'var(--purple)'},
+            };
+            const fl = FLABEL[pa.folder] || FLABEL.mb;
+            const typeLabel = `<span style="background:${fl.color}14;color:${fl.color};border:1px solid ${fl.color}30;font-size:9px;font-weight:700;padding:1px 7px;border-radius:99px"><i class="fa ${fl.icon}" style="font-size:8px;margin-right:2px"></i>${fl.label}</span>`;
+            return `<div class="pa-card ${isApproved?'approved':''} ${isRejected?'rejected':''}"
+              style="${isRejected?'opacity:.5;':''}">
+              <div class="pa-preview" style="background:${pa.bg};cursor:pointer" onclick="openAnnotation('${p.id}','${rid}','${pa.id}')">
+                <span style="font-size:48px;filter:drop-shadow(0 2px 12px rgba(0,0,0,.7))">${pa.icon}</span>
+                <span class="pa-badge-ver">${pa.version}</span>
+                ${pa.isNew?'<span class="pa-badge-new">MỚI</span>':''}
+                ${isApproved?'<span style="position:absolute;bottom:8px;right:8px;background:rgba(34,201,122,.9);color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:99px">✅ ĐÃ DUYỆT</span>':''}
+                ${isRejected?'<span style="position:absolute;bottom:8px;right:8px;background:rgba(239,68,68,.8);color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:99px">❌ Không chọn</span>':''}
+                <!-- Pin count badge -->
+                ${pinCount>0?`<span style="position:absolute;top:8px;right:8px;background:${openPins>0?'var(--red)':'var(--green)'};color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:99px;display:flex;align-items:center;gap:3px">
+                  <i class="fa fa-map-pin" style="font-size:8px"></i> ${openPins>0?openPins+' chờ xử lý':pinCount+' đã xong'}
+                </span>`:''}
+                <!-- Annotation hint -->
+                <div style="position:absolute;inset:0;background:rgba(0,0,0,.0);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s"
+                  class="annot-hover-hint" onmouseover="this.style.opacity=1;this.style.background='rgba(0,0,0,.45)'" onmouseout="this.style.opacity=0;this.style.background='rgba(0,0,0,.0)'">
+                  <span style="color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.8)">
+                    <i class="fa fa-expand" style="margin-right:5px"></i>Xem & Đánh dấu
+                  </span>
+                </div>
+              </div>
+              <div class="pa-body">
+                <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">
+                  ${typeLabel}
+                  ${pinCount>0?`<span style="font-size:9px;color:var(--muted);font-family:var(--mono)">${pinCount} pin</span>`:''}
+                </div>
+                <div class="pa-name">${pa.name}</div>
+                <div class="pa-meta">
+                  <span><i class="fa fa-calendar" style="margin-right:3px;font-size:9px"></i>${pa.date}</span>
+                  <span style="color:var(--text2);font-size:11px;margin-top:2px">${pa.desc}</span>
+                </div>
+              </div>
+              <div class="pa-footer">
+                <button class="pa-btn" style="background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);color:var(--accent2)"
+                  onclick="openAnnotation('${p.id}','${rid}','${pa.id}')">
+                  <i class="fa fa-map-pin" style="font-size:10px"></i>
+                  Đánh dấu${pinCount>0?' ('+pinCount+')':''}
+                </button>
+                ${!isApproved&&!isRejected?`
+                <button class="pa-btn pa-btn-approve" onclick="approvePA('${p.id}','${rid}','${pa.id}')">
+                  <i class="fa fa-circle-check" style="font-size:10px"></i> Duyệt
+                </button>`:
+                isApproved?`<span style="flex:1;text-align:center;font-size:10px;font-weight:700;color:var(--green);display:flex;align-items:center;justify-content:center;gap:4px"><i class="fa fa-circle-check"></i> Đã duyệt</span>`:''}
+              </div>
+            </div>`;
+          }).join('');
+
+        /* Comments */
+        const commentsHTML = r.comments.map(cm=>`
+          <div class="cm-item">
+            <div class="cm-avatar" style="background:${cm.role==='kts'?'rgba(201,168,76,.2)':'rgba(34,201,122,.15)'};color:${cm.role==='kts'?'var(--accent2)':'var(--green)'}">
+              ${cm.role==='kts'?'KT':'CN'}
+            </div>
+            <div class="cm-bubble ${cm.mine?'mine':''}">
+              <div class="cm-author">
+                <span>${cm.author}</span>
+                <span class="pill ${cm.role==='kts'?'p-blue':'p-green'}" style="font-size:8px">${cm.role==='kts'?'KTS':'Chủ đầu tư'}</span>
+                <span class="cm-ts">${cm.ts}</span>
+              </div>
+              <div class="cm-text">${cm.text}</div>
+            </div>
+          </div>`).join('');
+
+        const existingRating = (window._stageRatings||{})[`${p.id}_${rid}`];
+        const ratingHTML = r.status==='approved' ? (existingRating
+          ? `<div class="rating-block rated">
+               <div class="rating-label"><i class="fa fa-star" style="color:var(--gold);margin-right:4px"></i>Đánh giá của bạn</div>
+               <div class="rating-done">
+                 <span>${'★'.repeat(existingRating.score)}${'☆'.repeat(5-existingRating.score)}</span>
+                 <b>${['','Chưa hài lòng','Cần cải thiện','Đạt yêu cầu','Tốt','Xuất sắc'][existingRating.score]}</b>
+                 ${existingRating.note?`<span style="color:var(--muted)">· ${existingRating.note}</span>`:''}
+                 <span style="font-size:9px;color:var(--muted);font-family:var(--mono);margin-left:auto">${existingRating.ts}</span>
+               </div>
+             </div>`
+          : `<div class="rating-block" id="ratingBlock_${p.id}_${rid}">
+               <div class="rating-label"><i class="fa fa-star" style="color:var(--gold);margin-right:4px"></i>Chấm điểm KTS — Chặng ${rid}</div>
+               <div class="stars" id="stars_${p.id}_${rid}"
+                 onmouseleave="resetStarHover('${p.id}','${rid}')">
+                 ${[1,2,3,4,5].map(n=>`<span class="star" id="star_${p.id}_${rid}_${n}"
+                   onmouseover="hoverStars('${p.id}','${rid}',${n})"
+                   onclick="selectStar('${p.id}','${rid}',${n})">☆</span>`).join('')}
+               </div>
+               <input class="rating-note" id="ratingNote_${p.id}_${rid}" placeholder="Nhận xét ngắn (không bắt buộc)..." maxlength="120">
+               <button class="rating-submit" onclick="submitRating('${p.id}','${rid}')">Gửi đánh giá</button>
+             </div>`) : '';
+
+        const statusBar = r.status==='approved'
+          ? `<div class="approval-bar"><i class="fa fa-circle-check" style="color:var(--green);font-size:16px;flex-shrink:0"></i>
+               <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--green)">Phương án đã được phê duyệt</div>
+               <div style="font-size:10px;color:var(--sub)">Duyệt lúc ${r.approvedAt} · ${r.revisions} lần sửa</div></div></div>
+             ${ratingHTML}`
+          : `<div class="revision-bar"><i class="fa fa-clock" style="color:var(--amber);font-size:16px;flex-shrink:0"></i>
+               <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--amber)">Chờ phê duyệt từ Chủ đầu tư</div>
+               <div style="font-size:10px;color:var(--sub)">KTS nộp ${r.submittedAt} · Còn ${r.maxRevisions-r.revisions} lần sửa miễn phí</div></div>
+               <span class="pill p-amber" style="flex-shrink:0;font-size:10px">SLA 48h</span></div>`;
+
+        return `
+        <div class="review-panel">
+          <div class="ct" style="margin-bottom:12px">
+            <i class="fa fa-eye" style="color:var(--gold)"></i>
+            Bảng Review Phương án
+            <span style="font-size:10px;color:var(--muted);font-weight:400;margin-left:4px">— Click vào PA để đánh dấu & góp ý trực tiếp trên bản vẽ</span>
+            <span class="pill p-amber" style="margin-left:auto;font-size:10px">Chỉ C1 & C2</span>
+          </div>
+          <div class="rp-stage-tabs">${stageTabsHTML}</div>
+          ${subTabsHTML}
+          <div class="pa-grid" id="paGrid_${p.id}">${paCardsHTML}</div>
+          ${statusBar}
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+            <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+              <i class="fa fa-comments" style="color:var(--accent2)"></i>
+              Trao đổi trực tiếp với KTS
+              <span style="font-family:var(--mono);font-size:9px;background:var(--ink4);padding:1px 6px;border-radius:99px">${r.comments.length} tin nhắn</span>
+            </div>
+            <div class="comment-thread" id="cmThread_${p.id}_${rid}">${commentsHTML}</div>
+            <div class="cm-input-wrap">
+              <textarea class="cm-textarea" id="cmInput_${p.id}_${rid}" rows="1"
+                placeholder="Nhập yêu cầu sửa đổi hoặc góp ý cho KTS..."
+                oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendComment('${p.id}','${rid}')}"></textarea>
+              <button class="cm-send" onclick="sendComment('${p.id}','${rid}')">
+                <i class="fa fa-paper-plane" style="margin-right:4px"></i>Gửi
+              </button>
+            </div>
+          </div>
+
+          <!-- ══ THƯ MỤC TẢI LÊN TỪ KHÁCH HÀNG ══ -->
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+            <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+              <i class="fa fa-folder-arrow-up" style="color:var(--gold)"></i>
+              Tài liệu Khách hàng gửi KTS
+              <span style="font-family:var(--mono);font-size:9px;background:var(--ink4);padding:1px 6px;border-radius:99px" id="cnUploadCount_${p.id}_${rid}">
+                ${(()=>{let tot=0;((rv[rid] ? rv[rid].paList : null)||[]).forEach(pa=>{tot+=(pa.cnUploads||[]).length});return tot})()} file
+              </span>
+              <span style="margin-left:auto;font-size:10px;color:var(--muted)">KTS sẽ nhận thông báo ngay</span>
+            </div>
+
+            <!-- Per-PA upload sections -->
+            ${r.paList.map(pa=>`
+              <div style="background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px;overflow:hidden">
+                <div style="padding:7px 12px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
+                  <span style="font-size:14px">${pa.icon}</span>
+                  <span style="font-size:11px;font-weight:700;color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${pa.name}</span>
+                  <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">${(pa.cnUploads||[]).length} file</span>
+                </div>
+                <!-- Drop zone -->
+                <div class="drop-area" style="margin:8px;padding:12px"
+                  ondragover="event.preventDefault();this.classList.add('drag-over')"
+                  ondragleave="this.classList.remove('drag-over')"
+                  ondrop="handleAnnotDrop(event,'${p.id}','${rid}','${pa.id}')">
+                  <input type="file" accept="image/*,.pdf,.dwg" multiple
+                    onchange="handleAnnotUpload(event,'${p.id}','${rid}','${pa.id}')">
+                  <i class="fa fa-cloud-arrow-up" style="font-size:16px;color:var(--accent2);margin-right:6px"></i>
+                  <span style="font-size:11px;color:var(--text2)">Kéo thả hoặc <b style="color:var(--accent2)">chọn file</b></span>
+                  <span style="font-size:10px;color:var(--muted);display:block;margin-top:2px">Ảnh chú thích tay, PDF scan, DWG...</span>
+                </div>
+                <!-- Uploaded files grid -->
+                <div class="cn-up-grid" id="cnUpGrid_${pa.id}" style="padding:0 8px 8px">
+                  ${(pa.cnUploads||[]).map(u=>`
+                    <div class="cn-up-card" onclick="viewCNUpload('${u.id}','${p.id}','${rid}','${pa.id}')">
+                      <div class="cn-up-thumb">
+                        ${u.dataUrl&&u.dataUrl.startsWith('data:image')
+                          ? `<img src="${u.dataUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">`
+                          : `<span style="font-size:28px">${u.type==='pdf'?'📄':u.type==='dwg'?'📐':'📎'}</span>`}
+                      </div>
+                      <div class="cn-up-meta">
+                        <div class="cn-up-name">${u.name}</div>
+                        <div class="cn-up-ts">${u.ts}</div>
+                      </div>
+                      <button class="cn-up-del" onclick="event.stopPropagation();deleteCNUpload('${p.id}','${rid}','${pa.id}','${u.id}')">✕</button>
+                    </div>`).join('')}
+                </div>
+              </div>`).join('')}
+          </div>
+
+        </div>
+        `;
+      })()}
+
+      <!-- C4 FILE DOWNLOAD -->
+      <div class="card" id="c4Section_${p.id}" style="border-left:3px solid ${(p.progress[3]||0)>=1?'var(--green)':'var(--amber)'}">
+        <div class="ct">
+          <i class="fa fa-folder-arrow-down" style="color:${(p.progress[3]||0)>=1?'var(--green)':'var(--amber)'}"></i>
+          Tài liệu C4 — Dự toán & Bảo hành
+          <span class="pill ${(p.progress[3]||0)>=1?'p-green':'p-amber'}" style="margin-left:auto;font-size:10px">
+            ${(p.progress[3]||0)>=1?'✅ Sẵn sàng tải':'⏳ Chờ nghiệm thu C3'}
+          </span>
+        </div>
+        ${renderC4Section(p)}
+      </div>
+
+      <!-- KHO TÀI LIỆU -->
+      <div class="card">
+        <div class="ct">
+          <i class="fa fa-folder-open"></i> Kho Tài liệu & Bản vẽ
+          <span class="pill p-blue" style="margin-left:auto;font-size:10px">${totalDocs} file</span>
+        </div>
+        ${folderDescHTML}
+        <div class="folder-tabs">${folderTabsHTML}</div>
+        <div class="files-grid">${docCards}</div>
+      </div>
+
+    </div>`;
+
+  /* Draw KTS portrait after DOM ready */
+  setTimeout(()=>{
+    const cv = document.getElementById('ktsHeroAv');
+    if(cv) drawPortrait(cv, ki);
+  }, 30);
+}
+
+function selectProj(id){
+  activeProj=id; activeFolder='ALL';
+  renderSidebar(); renderMain();
+  document.querySelector('.sidebar-cn').classList.remove('open');
+  // Sync Zalo widget to new KTS
+  const p2 = PROJECTS_CLIENT.find(x=>x.id===id);
+  if(p2){ zpKts=p2.kts; if(zpOpen) _zpInit(); }
+}
+
+
+/* C4 Signed URL download */
+
+function renderC4Section(p){
+  const done = (p.progress[3]||0) >= 1;
+  if(!done) return `
+    <div style="text-align:center;padding:24px;color:var(--muted)">
+      <i class="fa fa-lock" style="font-size:28px;display:block;margin-bottom:10px;color:var(--dim)"></i>
+      <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px">Tài liệu C4 chưa mở khoá</div>
+      <div style="font-size:12px;line-height:1.6;max-width:300px;margin:0 auto">Hoàn tất nghiệm thu C3 → Sàn ALN tạo Signed URL → File hoàn công gửi về đây</div>
+      <div style="margin-top:12px;display:flex;justify-content:center;gap:6px;flex-wrap:wrap">
+        <span class="pill p-green" style="font-size:10px">✅ C1</span>
+        <span class="pill p-green" style="font-size:10px">✅ C2</span>
+        <span class="pill ${(p.progress[2]||0)>=1?'p-green':'p-amber'}" style="font-size:10px">${(p.progress[2]||0)>=1?'✅':'⏳'} C3</span>
+        <span class="pill p-gray" style="font-size:10px">🔒 C4</span>
+      </div>
+    </div>`;
+
+  const C4_FILES = [
+    {icon:'fa-file-pdf',   color:'var(--red)',    name:'Hồ sơ Kiến trúc hoàn công',    ext:'pdf',  size:'18.6MB'},
+    {icon:'fa-file-code',  color:'var(--amber)',  name:'Hồ sơ Kết cấu hoàn công',      ext:'dwg',  size:'22.4MB'},
+    {icon:'fa-bolt',       color:'var(--cyan)',   name:'Hồ sơ M&E hoàn công',           ext:'pdf',  size:'12.1MB'},
+    {icon:'fa-table-cells',color:'var(--green)',  name:'Thống kê thép nghiệm thu',      ext:'xlsx', size:'1.5MB'},
+    {icon:'fa-boxes-stacked',color:'var(--purple)','name':'Bảng vật tư nghiệm thu',    ext:'xlsx', size:'0.9MB'},
+    {icon:'fa-calculator', color:'var(--gold)',   name:'Dự toán nghiệm thu',            ext:'xlsx', size:'1.1MB'},
+  ];
+
+  return `
+    <div style="background:var(--green-bg);border:1px solid rgba(34,201,122,.2);border-radius:var(--r-sm);padding:9px 14px;margin-bottom:12px;font-size:12px;color:var(--text2);display:flex;gap:8px;align-items:flex-start">
+      <i class="fa fa-circle-info" style="color:var(--green);flex-shrink:0;margin-top:1px"></i>
+      <span>Link tải có hiệu lực <b style="color:var(--text)">15 phút</b> sau mỗi lần tạo — Signed URL bảo mật của sàn ALN.</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:7px">
+      ${C4_FILES.map(f=>`
+        <div style="display:flex;align-items:center;gap:10px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 12px">
+          <i class="fa ${f.icon}" style="color:${f.color};font-size:18px;flex-shrink:0"></i>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</div>
+            <div style="font-size:10px;color:var(--muted)">${f.size} · .${f.ext}</div>
+          </div>
+          <button onclick="generateSignedUrl('${f.name}','${p.id}')"
+            style="padding:5px 12px;background:var(--accent-bg);border:1px solid rgba(201,168,76,.25);color:var(--accent2);border-radius:var(--r-sm);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:5px;flex-shrink:0">
+            <i class="fa fa-download" style="font-size:10px"></i> Tải
+          </button>
+        </div>`).join('')}
+    </div>
+    <div style="margin-top:10px;padding:9px 12px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);display:flex;align-items:flex-start;gap:8px">
+      <i class="fa fa-shield-halved" style="color:var(--green);flex-shrink:0;margin-top:1px"></i>
+      <div style="font-size:11px;color:var(--sub);line-height:1.5">
+        Quyền sở hữu: <b style="color:var(--text)">Chủ đầu tư</b> sau khi thanh toán 100% HĐ
+        · KTS giữ quyền portfolio (ẩn danh thông tin)
+        · Sàn ALN quyền khai thác phi độc quyền (Điều 16c)
+      </div>
+    </div>`;
+}
+
+function generateSignedUrl(fileName, projectId){
+  showToast(`🔐 Đang tạo Signed URL cho: ${fileName}...`, 't-blue');
+  // Simulate 1.5s processing
+  setTimeout(()=>{
+    const expiry = new Date(Date.now() + 15*60*1000);
+    const ts = expiry.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+    showToast(`✅ Link tải sẵn sàng! Hết hạn lúc ${ts} (15 phút)`, 't-green');
+    // In production: POST /api/c4/signed-url → get real signed URL → window.open(url)
+    // Broadcast to KTS dashboard
+    try{const bc=new BroadcastChannel('applamnha_events');bc.postMessage({type:'C4_DOWNLOADED',projectId,fileName});bc.close()}catch(e){}
+  }, 1500);
+}
+
+function setFolder(f){activeFolder=f;renderMain();
+  setTimeout(()=>{const c=document.getElementById('ktsHeroAv');if(c){const p2=PROJECTS_CLIENT.find(x=>x.id===activeProj);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};drawPortrait(c,KP[(p2 ? p2.kts : null)]||{});}},30);
+}
+
+/* Portrait canvas — đồng bộ với kts_dashboard */
+function drawPortrait(canvas,opts){
+  const ctx=canvas.getContext('2d');const W=canvas.width,H=canvas.height;
+  const{skin='#d8a878',shirt='#2a3a5a',bg='#14141e'}=opts||{};
+  function adj(hex,a){const n=parseInt(hex.slice(1),16);return'#'+[((n>>16)&0xff)+a,((n>>8)&0xff)+a,(n&0xff)+a].map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join('')}
+  const bgG=ctx.createLinearGradient(0,0,0,H);bgG.addColorStop(0,adj(bg,8));bgG.addColorStop(1,bg);
+  ctx.fillStyle=bgG;ctx.fillRect(0,0,W,H);ctx.fillStyle=adj(bg,-6);ctx.fillRect(0,H*.72,W,H*.28);
+  ctx.fillStyle=shirt;ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(W*.12,H*.68);ctx.quadraticCurveTo(W*.28,H*.60,W*.38,H*.58);ctx.lineTo(W*.38,H*.72);ctx.lineTo(W*.62,H*.72);ctx.lineTo(W*.62,H*.58);ctx.quadraticCurveTo(W*.72,H*.60,W*.88,H*.68);ctx.lineTo(W,H);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#f0ece6';ctx.beginPath();ctx.moveTo(W*.38,H*.58);ctx.lineTo(W*.44,H*.72);ctx.lineTo(W*.50,H*.66);ctx.lineTo(W*.56,H*.72);ctx.lineTo(W*.62,H*.58);ctx.quadraticCurveTo(W*.50,H*.55,W*.38,H*.58);ctx.closePath();ctx.fill();
+  ctx.fillStyle=skin;ctx.beginPath();ctx.ellipse(W*.5,H*.59,W*.062,H*.05,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(W*.5,H*.37,W*.2,H*.24,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=adj(skin,-52);ctx.beginPath();ctx.ellipse(W*.5,H*.17,W*.2,H*.155,0,Math.PI,0);ctx.fill();ctx.beginPath();ctx.ellipse(W*.31,H*.35,W*.048,H*.11,-0.15,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(W*.69,H*.35,W*.048,H*.11,0.15,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#251508';[[W*.42,H*.385],[W*.58,H*.385]].forEach(([x,y])=>{ctx.beginPath();ctx.ellipse(x,y,W*.027,H*.013,0,0,Math.PI*2);ctx.fill()});
+  ctx.fillStyle='rgba(255,255,255,.65)';[[W*.432,H*.382],[W*.592,H*.382]].forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,W*.008,0,Math.PI*2);ctx.fill()});
+  ctx.strokeStyle=adj(skin,-45);ctx.lineWidth=Math.max(1,W*.015);ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(W*.38,H*.345);ctx.lineTo(W*.47,H*.35);ctx.stroke();ctx.beginPath();ctx.moveTo(W*.62,H*.345);ctx.lineTo(W*.53,H*.35);ctx.stroke();
+  ctx.strokeStyle=adj(skin,-20);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(W*.49,H*.40);ctx.quadraticCurveTo(W*.47,H*.44,W*.455,H*.44);ctx.stroke();ctx.beginPath();ctx.moveTo(W*.51,H*.40);ctx.quadraticCurveTo(W*.53,H*.44,W*.545,H*.44);ctx.stroke();
+  ctx.strokeStyle=adj(skin,-28);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(W*.44,H*.482);ctx.quadraticCurveTo(W*.50,H*.518,W*.56,H*.482);ctx.stroke();
+  const lg=ctx.createRadialGradient(W*.35,H*.22,0,W*.35,H*.22,W*.75);lg.addColorStop(0,'rgba(255,248,230,.10)');lg.addColorStop(1,'rgba(0,0,0,.07)');ctx.fillStyle=lg;ctx.fillRect(0,0,W,H);
+}
+
+function downloadDoc(id,name){
+  showToast(`📥 Đang tải: ${name}`,'t-blue');
+  // Mark as read
+  Object.values(DOCS).flat().forEach(d=>{if(d.id===id)d.isNew=false});
+  renderSidebar();
+}
+
+/* Notifications */
+const NOTIFS=[
+  {icon:'📁',body:'<b>KTS. Trần Lê Minh</b> vừa upload <b>Phối cảnh 3D ngoại thất</b>',proj:'ALN-9921',ts:'5 phút trước',unread:true},
+  {icon:'⏰',body:'SLA Chặng C2 — <b>KTS. Phạm Hoài Nam</b> còn 8h phản hồi',proj:'ALN-9521',ts:'12 phút trước',unread:true},
+  {icon:'⚠️',body:'Tranh chấp <b>ALN-9834</b> đang chờ Hội đồng Trọng tài phán quyết',proj:'ALN-9834',ts:'30 phút trước',unread:true},
+  {icon:'✅',body:'<b>Giải ngân C1</b> đã hoàn tất — +11,162,500đ về KTS',proj:'ALN-9921',ts:'2 giờ trước',unread:false},
+];
+function renderNotifs(){
+  document.getElementById('notifList').innerHTML=NOTIFS.map(n=>`
+    <div class="notif-item ${n.unread?'unread':''}" onclick="selectProj('${n.proj}');toggleNotifPanel()">
+      <span class="ni-icon">${n.icon}</span>
+      <span class="ni-body">${n.body}</span>
+      <span class="ni-ts">${n.ts}</span>
+    </div>`).join('');
+}
+function toggleNotifPanel(){
+  const p=document.getElementById('notifPanel');
+  const show=p.style.display==='none';
+  p.style.display=show?'block':'none';
+  if(show){
+    NOTIFS.forEach(n=>n.unread=false);
+    document.getElementById('notifCount').style.display='none';
+    renderNotifs();
+  }
+}
+renderNotifs();
+
+
+/* ══════════════════════════════════════
+   ALN REALTIME — Doanh nghiệp
+══════════════════════════════════════ */
+const DN_USER = JSON.parse(sessionStorage.getItem('aln_user') || '{"name":"App Làm Nhà Corp.","userId":"dn.applamnha"}');
+
+ALNRealtime.init({
+  role: 'dn',
+  userId: DN_USER.userId || 'dn.applamnha',
+  onReady: (mode) => { console.log('ALN Realtime (DN):', mode); },
+  onMessage: (d) => {
+    // KTS upload bản vẽ
+    if(d.type==='KTS_DOC_UPLOAD' && d.doc){
+      if(!DOCS[d.projectId]) DOCS[d.projectId]=[];
+      const newDoc={...d.doc, isNew:true, kts:d.ktsName||d.doc.kts||'KTS'};
+      DOCS[d.projectId].unshift(newDoc);
+      _addNotif('📁', `<b>${d.ktsName||'KTS'}</b> vừa upload <b>${d.doc.name}</b>`, d.projectId);
+      renderSidebar();
+      if(activeProj===d.projectId) renderMain();
+      showToast(`📁 File mới từ KTS: ${d.doc.name}`, 't-green');
+    }
+
+    // KTS nộp C3
+    if(d.type==='KTS_C3_SUBMITTED'){
+      _addNotif('📋', `<b>${d.ktsName}</b> vừa nộp Hồ sơ C3 (${d.fileCount} file)`, d.projectId);
+      showToast(`📋 ${d.ktsName} đã nộp Hồ sơ C3!`, 't-amber');
+    }
+
+    // Nhận chat từ KTS hoặc CN
+    if(d.type==='ALN_CHAT' && d._role !== 'dn') {
+      const projId = d.projectId || activeProj;
+      if(!_dnChatMsgs[projId]) _dnChatMsgs[projId] = [];
+      _dnChatMsgs[projId].push({
+        from: d._role,
+        text: d.text,
+        senderName: d.senderName,
+        ts: d.ts || Date.now(),
+        mine: false,
+      });
+      _dnRenderChat(projId);
+      _addNotif('💬', `<b>${d.senderName}</b>: ${d.text.slice(0,50)}`, projId);
+      showToast(`💬 ${d.senderName}: ${d.text.slice(0,40)}${d.text.length>40?'...':''}`, 't-blue');
+    }
+
+    // DOC_UPLOADED admin
+    if(d.type==='DOC_UPLOADED' && d.doc){
+      if(!DOCS[d.projectId]) DOCS[d.projectId]=[];
+      const folder = d.doc.folder || 'kien_truc';
+      const newDoc={id:d.doc.id||('DA'+Date.now()),name:d.doc.name,folder,
+        kts:d.doc.kts||'Admin',date:d.doc.date||new Date().toISOString().slice(0,10),
+        size:d.doc.size||'—',type:d.doc.type||'pdf',status:'pending',isNew:true};
+      DOCS[d.projectId].unshift(newDoc);
+      _addNotif('📁', `<b>Admin</b> đã đăng tải <b>${d.doc.name}</b>`, d.projectId);
+      renderSidebar();
+      if(activeProj===d.projectId) renderMain();
+      showToast(`📁 Tài liệu mới: ${d.doc.name}`, 't-green');
+    }
+
+    if(d.type==='STAGE_APPROVED'){
+      const p=PROJECTS_CLIENT.find(x=>x.id===d.projectId);
+      if(p){ _addNotif('✅',`<b>Giải ngân ${d.stage||''}</b> được duyệt — ${p.name}`,d.projectId); }
+      showToast(`✅ Chặng ${d.stage||''} đã được duyệt giải ngân`,'t-green');
+    }
+    if(d.type==='DISPUTE_OPENED'){
+      const p=PROJECTS_CLIENT.find(x=>x.id===d.projectId);
+      if(p){ _addNotif('⚠️',`<b>Tranh chấp kích hoạt</b> — ${p.name}`,d.projectId); }
+      showToast(`⚠️ Tranh chấp mở: ${d.projectId}`,'t-amber');
+    }
+
+    // Rating
+    if(d.type==='KTS_RATED'){
+      _addNotif('⭐',`<b>${d.projName}</b>: Chặng ${d.stage} được đánh giá ${d.score}/5 sao`, d.projectId);
+    }
+  }
+});
+
+/* ── DN CHAT IN-PAGE (simple inline per project) ── */
+const _dnChatMsgs = {};
+
+function _dnRenderChat(projId) {
+  const wrap = document.getElementById(`dnChat_${projId}`);
+  if(!wrap) return;
+  const msgs = _dnChatMsgs[projId] || [];
+  wrap.innerHTML = msgs.length === 0
+    ? `<div style="text-align:center;color:var(--muted);font-size:11px;padding:16px">— Chưa có tin nhắn —</div>`
+    : msgs.map(m => {
+        const time = new Date(m.ts).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+        return `<div style="display:flex;flex-direction:column;align-items:${m.mine?'flex-end':'flex-start'};gap:2px;margin-bottom:8px">
+          ${!m.mine?`<div style="font-size:9px;color:var(--muted);padding:0 4px">${m.senderName}</div>`:''}
+          <div style="background:${m.mine?'var(--accent-bg)':'var(--ink3)'};border:1px solid ${m.mine?'rgba(201,168,76,.2)':'var(--border)'};padding:7px 11px;border-radius:${m.mine?'10px 2px 10px 10px':'2px 10px 10px 10px'};max-width:80%;font-size:12px;color:var(--text);word-break:break-word">
+            ${m.text}
+            <span style="display:block;font-size:9px;color:var(--muted);margin-top:2px;text-align:${m.mine?'right':'left'}">${time}</span>
+          </div>
+        </div>`;
+      }).join('');
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function dnSendChat(projId) {
+  const inp = document.getElementById(`dnChatInp_${projId}`);
+  const text = (inp ? inp.value.trim() : '');
+  if(!text) return;
+  if(!_dnChatMsgs[projId]) _dnChatMsgs[projId] = [];
+  _dnChatMsgs[projId].push({ from:'dn', text, senderName: DN_USER.name||'Doanh nghiệp', ts: Date.now(), mine: true });
+  _dnRenderChat(projId);
+  inp.value = '';
+  ALNRealtime.send({
+    type: 'ALN_CHAT',
+    projectId: projId,
+    text,
+    senderName: DN_USER.name || 'App Làm Nhà Corp.',
+    senderRole: 'dn',
+  });
+}
+
+/* Hook zpSend trong DN cũng gửi qua ALNRealtime */
+const _origZpSendDN = window.zpSend;
+window.zpSend = function() {
+  const inp = document.getElementById('zpInput');
+  if(!inp) return;
+  const txt = inp.value.trim();
+  if(!txt) return;
+  const DANGER_KEYWORDS = ['zalo riêng','số điện thoại','ngoài sàn','tiền mặt','chuyển khoản trực tiếp','không qua sàn','tài khoản cá nhân','liên hệ riêng','nhắn riêng','giá riêng','phí ngoài','thanh toán ngoài','giao dịch ngoài','hợp đồng riêng'];
+  const matched = DANGER_KEYWORDS.find(kw => txt.toLowerCase().includes(kw));
+  if(matched){ showToast(`⚠️ Tin nhắn bị chặn — vi phạm: "${matched}"`, 't-red'); inp.value=''; return; }
+  const ts = new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+  zpMessages.push({id:'m_'+Date.now(), from:'me', text:txt, ts, read:true});
+  inp.value=''; inp.style.height='auto';
+  _zpRender();
+  ALNRealtime.send({ type:'ALN_CHAT', projectId:activeProj, text:txt, senderName:DN_USER.name||'Doanh nghiệp', senderRole:'dn' });
+};
+
+function _addNotif(icon,body,projId){
+  NOTIFS.unshift({icon,body,proj:projId,ts:'Vừa xong',unread:true});
+  const cnt=NOTIFS.filter(n=>n.unread).length;
+  const el=document.getElementById('notifCount');
+  if(el){el.style.display='flex';el.textContent=cnt;}
+  renderNotifs();
+}
+
+/* Toast */
+function showToast(msg,type='t-blue'){
+  const r=document.getElementById('toasts'),el=document.createElement('div');
+  el.className=`toast ${type}`;el.textContent=msg;r.appendChild(el);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
+  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300)},4000);
+}
+
+/* Click outside notif panel */
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('notifPanel');
+  const bell=document.getElementById('notifBell');
+  if(panel.style.display==='block'&&!panel.contains(e.target)&&!bell.contains(e.target)){
+    panel.style.display='none';
+  }
+});
+
+
+/* ════════════════════════════════════════
+   CONTACT SPEED-DIAL FAB
+════════════════════════════════════════ */
+/* Zalo FAB — kênh liên lạc duy nhất */
+function openZaloOA(){
+  zpOpen = false;
+  toggleZaloPopup();
+  const badge = document.getElementById('zaloBadge');
+  if(badge) badge.style.display = 'none';
+}
+
+function showFabLabel(show){
+  const lbl = document.getElementById('fabZaloLabel');
+  if(lbl){
+    lbl.style.opacity = show ? '1' : '0';
+    lbl.style.transform = show ? 'translateX(0)' : 'translateX(12px)';
+    lbl.style.pointerEvents = show ? 'none' : 'none';
+  }
+}
+
+/* Show badge after 3s */
+setTimeout(()=>{
+  const badge = document.getElementById('zaloBadge');
+  if(badge && !zpOpen) badge.style.display = 'flex';
+}, 3000);
+
+
+const ZP_SEED = {
+  'KTS. Trần Lê Minh':   ['Chào anh/chị! Em đang làm việc trên phương án C2. Anh/chị có góp ý gì không?', 'Em vừa upload 3 góc phối cảnh. Anh/chị vào xem và đánh dấu pin chỗ cần sửa nhé!'],
+  'KTS. Nguyễn Thị Lan': ['Chào anh/chị! Hồ sơ C3 em đang thẩm định lớp 1. Dự kiến nộp trong 2 ngày.'],
+  'KTS. Phạm Hoài Nam':  ['Chào anh/chị! Em đã hoàn thiện MB. Anh/chị xem và phê duyệt để em tiến hành 3D ạ.'],
+  'KTS. Lê Hoàng Nam':   ['Chào anh/chị! Dự án của anh/chị đã hoàn thành. Cần hỗ trợ gì thêm không ạ?'],
+  'KTS. Vũ Minh Khoa':   ['Chào anh/chị! Toàn bộ hồ sơ C3 đã pass auto-scan. Chờ anh/chị xác nhận để giải ngân.'],
+};
+
+let zpOpen = false;
+let zpMessages = [];
+let zpKts = 'KTS. Trần Lê Minh';
+
+function toggleZaloPopup(){
+  zpOpen = !zpOpen;
+  document.getElementById('zaloPopup').classList.toggle('open', zpOpen);
+  if(zpOpen){
+    // Sync KTS to active project
+    const p = PROJECTS_CLIENT.find(x=>x.id===activeProj);
+    if(p) { zpKts = p.kts; _zpInit(); }
+    document.getElementById('zaloBadge').style.display='none';
+    setTimeout(()=>document.getElementById('zpInput').focus(), 200);
+  }
+}
+
+function _zpInit(){
+  document.getElementById('zpKtsName').textContent = zpKts;
+  // Avatar emoji by KTS
+  const avMap = {'KTS. Trần Lê Minh':'👨‍🎨','KTS. Nguyễn Thị Lan':'👩‍🎨','KTS. Phạm Hoài Nam':'👨‍💼','KTS. Lê Hoàng Nam':'👨‍🔧','KTS. Vũ Minh Khoa':'🧑‍💻'};
+  document.getElementById('zpAvatar').textContent = avMap[zpKts]||'👷';
+  // Seed messages
+  zpMessages = (ZP_SEED[zpKts]||[]).map((txt,i)=>({
+    id:'seed_'+i, from:'kts', text:txt,
+    ts: i===0?'09:15':'10:30', read:true
+  }));
+  _zpRender();
+}
+
+function _zpRender(){
+  const body = document.getElementById('zpBody');
+  if(!body) return;
+  body.innerHTML = zpMessages.map(m=>`
+    <div class="zp-msg ${m.from==='me'?'mine':''}">
+      ${m.from==='kts'?`<div class="zp-av">${(document.getElementById('zpAvatar') ? document.getElementById('zpAvatar').textContent : '')||'KT'}</div>`:''}
+      <div>
+        <div class="zp-bubble">${m.text}</div>
+        <div class="zp-ts" style="${m.from==='me'?'text-align:right':''}">${m.ts}</div>
+      </div>
+    </div>`).join('');
+  body.scrollTop = body.scrollHeight;
+}
+
+function zpCallAction(type){
+  toggleZaloPopup(); // close popup first
+  const p = PROJECTS_CLIENT.find(x=>x.id===activeProj);
+  const label = type==='voice' ? 'Gọi thoại Zalo' : 'Gọi video Zalo';
+  const icon  = type==='voice' ? 'fa-phone' : 'fa-video';
+  // Show a confirm toast then open Zalo OA
+  showToast(`📞 Đang kết nối ${label} qua Zalo OA sàn ALN...`, 't-blue');
+  setTimeout(()=>{
+    window.open('https://zalo.me/alnsanthietke', '_blank');
+  }, 800);
+}
+
+function zpSend(){
+  const inp = document.getElementById('zpInput');
+  const txt = (inp ? inp.value.trim() : '');
+  if(!txt) return;
+
+  /* ── NLP SCAN: phát hiện từ khoá nguy hiểm ── */
+  const DANGER_KEYWORDS = [
+    'zalo riêng','số điện thoại','ngoài sàn','tiền mặt','chuyển khoản trực tiếp',
+    'không qua sàn','tài khoản cá nhân','liên hệ riêng','nhắn riêng','giá riêng',
+    'phí ngoài','thanh toán ngoài','giao dịch ngoài','hợp đồng riêng'
+  ];
+  const lower = txt.toLowerCase();
+  const matched = DANGER_KEYWORDS.find(kw => lower.includes(kw));
+  if(matched){
+    showToast(`⚠️ Tin nhắn bị chặn — chứa nội dung vi phạm: "${matched}". Mọi giao dịch phải qua sàn ALN.`, 't-red');
+    inp.value=''; inp.style.height='auto';
+    // Alert broadcast to admin
+    try{const bc=new BroadcastChannel('applamnha_events');bc.postMessage({type:'NLP_ALERT',projectId:activeProj,keyword:matched,msg:txt});bc.close()}catch(e){}
+    return; // block send
+  }
+  const ts = new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+  zpMessages.push({id:'m_'+Date.now(), from:'me', text:txt, ts, read:true});
+  inp.value=''; inp.style.height='auto';
+  _zpRender();
+  // KTS auto-reply after 1.5s
+  setTimeout(()=>{
+    const replies = [
+      'Cảm ơn anh/chị! Em ghi nhận và sẽ xử lý ngay.',
+      'Em hiểu rồi. Em sẽ cập nhật và báo lại anh/chị trong hôm nay.',
+      'Ok anh/chị! Em sẽ upload bản cập nhật lên hệ thống.',
+      'Dạ, em đã thấy pin trên bản vẽ. Em sẽ sửa theo yêu cầu.',
+      'Cảm ơn góp ý của anh/chị! Em sẽ điều chỉnh ngay.',
+    ];
+    const reply = replies[Math.floor(Math.random()*replies.length)];
+    const ts2 = new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+    zpMessages.push({id:'r_'+Date.now(), from:'kts', text:reply, ts:ts2, read:true});
+    _zpRender();
+  }, 1200 + Math.random()*800);
+
+  // Broadcast to kts_dashboard
+  try{const bc=new BroadcastChannel('applamnha_events');bc.postMessage({type:'ZALO_MSG',projectId:activeProj,msg:txt});bc.close()}catch(e){}
+}
+
+function zpQuickSend(txt){
+  document.getElementById('zpInput').value = txt;
+  zpSend();
+}
+
+// Init on first load
+setTimeout(()=>{
+  const p = PROJECTS_CLIENT.find(x=>x.id===activeProj);
+  if(p){ zpKts=p.kts; }
+  _zpInit();
+}, 500);
+
+/* ══════════════════════════════════════
+   STAR RATING — Chấm điểm KTS theo chặng
+══════════════════════════════════════ */
+window._stageRatings = {};
+window._starSelected = {};
+
+function hoverStars(projId, stage, n){
+  for(let i=1;i<=5;i++){
+    const s = document.getElementById(`star_${projId}_${stage}_${i}`);
+    if(!s) continue;
+    s.classList.toggle('hover', i<=n);
+    s.textContent = i<=n ? '★' : '☆';
+  }
+}
+
+function resetStarHover(projId, stage){
+  const selected = window._starSelected[`${projId}_${stage}`] || 0;
+  for(let i=1;i<=5;i++){
+    const s = document.getElementById(`star_${projId}_${stage}_${i}`);
+    if(!s) continue;
+    s.classList.remove('hover');
+    s.classList.toggle('filled', i<=selected);
+    s.textContent = i<=selected ? '★' : '☆';
+  }
+}
+
+function selectStar(projId, stage, n){
+  window._starSelected[`${projId}_${stage}`] = n;
+  for(let i=1;i<=5;i++){
+    const s = document.getElementById(`star_${projId}_${stage}_${i}`);
+    if(!s) continue;
+    s.classList.toggle('filled', i<=n);
+    s.textContent = i<=n ? '★' : '☆';
+  }
+}
+
+function submitRating(projId, stage){
+  const score = window._starSelected[`${projId}_${stage}`] || 0;
+  if(!score){ showToast('⭐ Vui lòng chọn số sao trước khi gửi', 't-amber'); return; }
+  const note = (document.getElementById(`ratingNote_${projId}_${stage}`) ? document.getElementById(`ratingNote_${projId}_${stage}`).value.trim() : '') || '';
+  const ts = new Date().toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const labels = ['','Chưa hài lòng','Cần cải thiện','Đạt yêu cầu','Tốt','Xuất sắc'];
+
+  window._stageRatings[`${projId}_${stage}`] = { score, note, ts };
+  delete window._starSelected[`${projId}_${stage}`];
+
+  const p = PROJECTS_CLIENT.find(x=>x.id===projId);
+  try{
+    const bc = new BroadcastChannel('applamnha_events');
+    bc.postMessage({ type:'KTS_RATED', projectId:projId, stage, score, note, kts:(p ? p.kts : null), projName:(p ? p.name : null) });
+    bc.close();
+  }catch(e){}
+
+  showToast(`⭐ Đã gửi đánh giá ${score}/5 — ${labels[score]} cho Chặng ${stage}`, 't-green');
+
+  if(!_reviewState[projId]) _reviewState[projId] = {stage, subTab:'all'};
+  else _reviewState[projId].stage = stage;
+  renderMain();
+  setTimeout(()=>_redrawHero(projId), 50);
+}
+
+/* Init */
+renderSidebar();
+renderMain();
+
+/* Cập nhật tên DN từ sessionStorage */
+(function(){
+  var u = JSON.parse(sessionStorage.getItem('aln_user') || '{}');
+  var name = u.name || 'App Làm Nhà Corp.';
+  var el1 = document.getElementById('dnSidebarName');
+  var el2 = document.getElementById('dnTopbarName');
+  if(el1) el1.textContent = name;
+  if(el2) el2.textContent = name;
+})();
+
+</script>
+</body>
+</html>
