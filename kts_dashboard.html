@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root {
-  --ink: #141210;
+  --ink: #08080a;
   --ink2: #1c1a18;
   --ink3: #252320;
   --border: rgba(201,168,76,0.18);
@@ -783,6 +783,19 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 <div id="toast"></div>
 
 <script>
+/* ALN USER INIT */
+(function(){
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var u = params.get("u"), r = params.get("r");
+    if(u && r) {
+      var names = {"kts.minhtran":"KTS. Trần Lê Minh","kts.lanthi":"KTS. Nguyễn Thị Lan","kts.khoavu":"KTS. Vũ Minh Khoa","dn.applamnha":"App Làm Nhà Corp.","dn.alnconstruct":"ALN Construct","cn.thuannv":"Nguyễn Văn Thuận","cn.binhtt":"Trần Thị Bình","cn.cuonglq":"Lê Quang Cường"};
+      var ud = JSON.stringify({name:names[u]||u, userId:u, role:r});
+      try{localStorage.setItem("aln_user",ud);}catch(e){}
+      try{sessionStorage.setItem("aln_user",ud);}catch(e){}
+    }
+  } catch(e){}
+})();
 /**
  * ALN REALTIME — Client library
  * Dùng chung cho kts_dashboard, client_CN, client_DN

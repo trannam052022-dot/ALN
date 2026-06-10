@@ -681,6 +681,19 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 <div id="toasts"></div>
 
 <script>
+/* ALN USER INIT */
+(function(){
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var u = params.get("u"), r = params.get("r");
+    if(u && r) {
+      var names = {"kts.minhtran":"KTS. Trần Lê Minh","kts.lanthi":"KTS. Nguyễn Thị Lan","kts.khoavu":"KTS. Vũ Minh Khoa","dn.applamnha":"App Làm Nhà Corp.","dn.alnconstruct":"ALN Construct","cn.thuannv":"Nguyễn Văn Thuận","cn.binhtt":"Trần Thị Bình","cn.cuonglq":"Lê Quang Cường"};
+      var ud = JSON.stringify({name:names[u]||u, userId:u, role:r});
+      try{localStorage.setItem("aln_user",ud);}catch(e){}
+      try{sessionStorage.setItem("aln_user",ud);}catch(e){}
+    }
+  } catch(e){}
+})();
 /**
  * ALN REALTIME — Client library
  * Dùng chung cho kts_dashboard, client_CN, client_DN
