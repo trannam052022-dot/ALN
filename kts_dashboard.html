@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>KTS Dashboard — kts.applamnha.vn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --ink: #08080a;
+  --ink2: #111114;
+  --ink3: #18181c;
+  --border: rgba(201,168,76,0.18);
+  --border2: rgba(201,168,76,0.28);
+  --muted: rgba(240,235,224,0.42);
+  --sub: rgba(240,235,224,0.14);
+  --text: #F0EBE0;
+  --text2: rgba(240,235,224,0.80);
+  --accent: #C9A84C;
+  --accent2: #d4b86a;
+  --accent-bg: rgba(201,168,76,.10);
+  --gold: #C9A84C;
+  --gold-bg: rgba(201,168,76,.1);
+  --green: #22c97a;
+  --green-bg: rgba(34,201,122,.1);
+  --red: #ff5757;
+  --red-bg: rgba(255,87,87,.1);
+  --amber: #ffaa33;
+  --amber-bg: rgba(255,170,51,.1);
+  --blue: #38bdf8;
+  --blue-bg: rgba(56,189,248,.1);
+  --r: 10px;
+  --r-sm: 7px;
+  --sh: 0 2px 16px rgba(0,0,0,.5);
+  --sh-lg: 0 8px 40px rgba(0,0,0,.6);
+  --serif: 'Cormorant Garamond', serif;
+  --sans: 'DM Sans', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --syne: 'Syne', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:100vh;font-size:13px;line-height:1.6}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--ink2)}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:99px}
+
+/* ── SIDEBAR ── */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:210px;background:var(--ink2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:50;transition:transform .25s}
+.sidebar-logo{padding:16px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(201,168,76,.06) 0%,transparent 100%)}
+
+.logo-mark{width:30px;height:30px;border-radius:var(--r-sm);border:1px solid rgba(201,168,76,.4);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);background:rgba(201,168,76,.08)}
+.logo-text{font-family:var(--syne);font-weight:800;font-size:14px;letter-spacing:.04em;color:var(--text)}
+.logo-text span{color:var(--gold)}
+
+.nav-section{padding:12px 14px 3px;font-size:9px;font-weight:700;color:var(--gold);letter-spacing:.18em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.nav-section::after{content:'';flex:1;height:1px;background:rgba(201,168,76,.2)}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:0;margin:0;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .12s;text-decoration:none;border-left:2px solid transparent}
+.nav-item:nth-child(odd){background:rgba(201,168,76,.04)}
+.nav-item:nth-child(even){background:rgba(255,255,255,.018)}
+.nav-item:hover{background:rgba(201,168,76,.1);color:var(--text);border-left-color:rgba(201,168,76,.4)}
+.nav-item.active{background:rgba(201,168,76,.14)!important;color:var(--gold);font-weight:600;border-left-color:var(--gold)}
+.nav-item .icon{width:16px;text-align:center;font-size:12px}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;border-radius:99px;padding:1px 6px;font-size:10px;font-weight:700}
+
+.sidebar-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--border);background:linear-gradient(0deg,rgba(201,168,76,.04) 0%,transparent 100%)}
+.kts-profile{display:flex;align-items:center;gap:10px}
+.kts-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#d4b86a);color:#000;display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-weight:800;font-size:13px;flex-shrink:0}
+.kts-name{font-family:var(--serif);font-size:13px;font-weight:600;font-style:italic}
+.kts-rank{font-size:10px;color:var(--muted)}
+
+/* ── MAIN ── */
+.main{margin-left:210px;flex:1;min-width:0}
+.topbar{background:var(--ink2);border-bottom:1px solid var(--border);padding:0 14px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;gap:8px}
+.page-title{font-family:var(--serif);font-weight:600;font-style:italic;font-size:15px;color:var(--text);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.notif-btn{position:relative;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;cursor:pointer;color:var(--text2);transition:all .15s;font-size:12px;flex-shrink:0}
+.notif-btn:hover{background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.3)}
+.notif-dot{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--red);border:1.5px solid var(--ink2)}
+.topbar-date{font-family:var(--mono);font-size:11px;color:var(--muted)}
+@media(max-width:600px){
+  .topbar-date{display:none}
+  .page-title{max-width:80px;font-size:13px}
+}
+
+.content{padding:18px 20px 50px}
+
+/* ── GRID ── */
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid2-3{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+@media(max-width:900px){.grid3,.grid2,.grid2-3{grid-template-columns:1fr}}
+
+/* ── CARDS ── */
+.card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
+.card-sm{padding:12px}
+.card-title{font-family:var(--serif);font-weight:600;font-style:italic;font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--text)}
+.card-title .ct-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+
+/* ── STAT CARDS ── */
+.stat-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r) var(--r) 0 0}
+.stat-card.s-purple::before{background:linear-gradient(90deg,var(--gold),var(--accent2))}
+.stat-card.s-green::before{background:linear-gradient(90deg,#22c97a,#16a85f)}
+.stat-card.s-gold::before{background:linear-gradient(90deg,var(--gold),#e8b800)}
+.stat-card.s-blue::before{background:linear-gradient(90deg,var(--blue),#0ea5e9)}
+.stat-label{font-size:10px;color:var(--muted);font-weight:500;margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px}
+.stat-val{font-family:var(--syne);font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px}
+.stat-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.stat-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;margin-top:3px}
+.sb-green{background:var(--green-bg);color:var(--green)}
+.sb-red{background:var(--red-bg);color:var(--red)}
+.sb-amber{background:var(--amber-bg);color:var(--amber)}
+.sb-blue{background:var(--blue-bg);color:var(--blue)}
+.sb-purple{background:var(--accent-bg);color:var(--accent2)}
+.sb-gold{background:var(--gold-bg);color:var(--gold)}
+
+/* section label */
+.sec-label{font-size:9px;font-weight:700;color:var(--gold);letter-spacing:.16em;text-transform:uppercase;margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:rgba(201,168,76,.2)}
+
+/* ══════════════════════════════════════════
+   MODULE 1 — SLA TIMER
+══════════════════════════════════════════ */
+.sla-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:16px;position:relative;overflow:hidden}
+.sla-card.urgent{border-color:var(--red);box-shadow:0 0 0 1px rgba(255,87,87,.2),0 4px 24px rgba(255,87,87,.12)}
+.sla-card.safe{border-color:var(--green);box-shadow:0 0 0 1px rgba(34,201,122,.2),0 4px 24px rgba(34,201,122,.08)}
+.sla-glow{position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;opacity:.06;pointer-events:none}
+.sla-card.urgent .sla-glow{background:var(--red)}
+.sla-card.safe .sla-glow{background:var(--green)}
+.sla-card.normal .sla-glow{background:var(--amber)}
+
+.sla-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.sla-project{font-size:12px;color:var(--text2);margin-bottom:2px}
+.sla-project b{color:var(--text)}
+.sla-revision{font-size:11px;color:var(--muted)}
+
+.clock-ring{display:flex;justify-content:center;margin:2px 0 12px}
+.ring-svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(201,168,76,.12);stroke-width:5}
+.ring-progress{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .8s ease,stroke .5s}
+
+.clock-center{position:relative;display:inline-flex;align-items:center;justify-content:center}
+.clock-digits{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.clock-time{font-family:var(--mono);font-size:20px;font-weight:600;letter-spacing:1px;color:var(--text)}
+.clock-label{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+
+.sla-status-bar{display:flex;justify-content:space-between;font-size:11px}
+.sla-points{display:flex;align-items:center;gap:6px;font-weight:600}
+
+.sla-action-btns{display:flex;gap:8px;margin-top:12px}
+.btn{padding:8px 16px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:var(--gold);color:#000;font-weight:700}
+.btn-primary:hover:not(:disabled){background:var(--accent2);transform:translateY(-1px)}
+.btn-ghost{background:var(--ink3);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover:not(:disabled){background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.3);color:var(--text)}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover:not(:disabled){background:#1aaf6c}
+.btn-red{background:var(--red);color:#fff}
+.btn-sm{padding:5px 12px;font-size:11px;border-radius:6px}
+.btn-gold{background:var(--gold);color:#000;font-weight:700}
+.btn-gold:hover:not(:disabled){background:var(--accent2)}
+
+/* ══════════════════════════════════════════
+   MODULE 2 — WALLET
+══════════════════════════════════════════ */
+.wallet-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wallet-pocket{border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;position:relative;overflow:hidden}
+.wp-main{border-color:var(--green);background:var(--green-bg)}
+.wp-locked{border-color:var(--amber);background:var(--amber-bg)}
+.wp-pending{border-color:var(--blue);background:var(--blue-bg)}
+.wp-tax{border-color:rgba(201,168,76,.2)}
+
+.wp-label{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.wp-main .wp-label{color:var(--green)}
+.wp-locked .wp-label{color:var(--amber)}
+.wp-pending .wp-label{color:var(--blue)}
+.wp-tax .wp-label{color:var(--muted)}
+
+.wp-amount{font-family:var(--syne);font-size:16px;font-weight:800;color:var(--text)}
+.wp-sub{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* payout lock */
+.lock-seal{display:flex;align-items:center;gap:5px;margin-top:6px;padding:4px 8px;border-radius:5px;background:rgba(255,170,51,.15);border:1px solid rgba(255,170,51,.3);font-size:10px;color:var(--amber);font-weight:600}
+
+/* history */
+.tx-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)}
+.tx-row:last-child{border-bottom:none}
+.tx-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.tx-info{flex:1;margin-left:10px}
+.tx-title{font-size:12px;font-weight:500;color:var(--text)}
+.tx-meta{font-size:10px;color:var(--muted)}
+.tx-amount{font-family:var(--mono);font-size:12px;font-weight:600}
+.tx-pos{color:var(--green)}
+.tx-neg{color:var(--red)}
+.tx-lock{color:var(--amber)}
+
+/* ══════════════════════════════════════════
+   MODULE 3 — C3 UPLOAD
+══════════════════════════════════════════ */
+.upload-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:700px){.upload-grid{grid-template-columns:1fr 1fr}}
+.upload-slot{border:1.5px dashed rgba(201,168,76,.25);border-radius:var(--r-sm);padding:12px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.upload-slot:hover{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.upload-slot.has-file{border-style:solid;border-color:var(--green);background:var(--green-bg)}
+.upload-slot.has-error{border-style:solid;border-color:var(--red);background:var(--red-bg)}
+.upload-slot.required-empty{border-color:var(--amber)}
+.us-icon{font-size:20px;margin-bottom:5px}
+.us-label{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:2px}
+.us-sub{font-size:9px;color:var(--muted)}
+.us-file-name{font-size:10px;color:var(--green);font-weight:600;margin-top:4px;word-break:break-all}
+.upload-slot.has-error .us-file-name{color:var(--red)}
+.us-error{font-size:9px;color:var(--red);margin-top:4px;font-weight:600}
+.us-remove{position:absolute;top:5px;right:5px;background:var(--red);color:#fff;border:none;border-radius:4px;width:16px;height:16px;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center}
+.upload-slot.has-file .us-remove,.upload-slot.has-error .us-remove{display:flex}
+.upload-slot input[type=file]{display:none}
+.upload-slot .us-status-icon{position:absolute;top:5px;left:5px;font-size:12px}
+
+.c3-validation-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;padding:10px;background:var(--ink3);border-radius:var(--r-sm);border:1px solid var(--border)}
+.cv-item{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600}
+.cv-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+.scan-result{margin-top:12px;border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;display:none}
+.scan-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px}
+.scan-row:last-child{border-bottom:none}
+
+/* ══════════════════════════════════════════
+   MODULE 4 — ASSET STORE
+══════════════════════════════════════════ */
+.drawing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:800px){.drawing-grid{grid-template-columns:1fr 1fr}}
+.drawing-slot{border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;position:relative;transition:all .2s}
+.drawing-slot:hover:not(.locked){border-color:var(--gold);transform:translateY(-2px)}
+.drawing-slot.locked{opacity:.7}
+.ds-thumb{height:80px;display:flex;align-items:center;justify-content:center;font-size:26px;position:relative}
+.ds-lock-overlay{position:absolute;inset:0;background:rgba(8,8,8,.75);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.ds-info{padding:8px 10px 10px}
+.ds-title{font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px}
+.ds-meta{font-size:9px;color:var(--muted)}
+.ds-earn{font-size:10px;color:var(--green);font-weight:600;margin-top:2px}
+
+/* VIP packages */
+.vip-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:4px}
+@media(max-width:900px){.vip-grid{grid-template-columns:1fr 1fr}}
+.vip-card{border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 10px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.vip-card:hover:not(.disabled){transform:translateY(-2px);box-shadow:0 4px 20px rgba(201,168,76,.2)}
+.vip-card.featured{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.vip-card.disabled{opacity:.5;cursor:not-allowed}
+.vip-icon{font-size:20px;margin-bottom:5px}
+.vip-name{font-family:var(--syne);font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px}
+.vip-price{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--gold)}
+.vip-card.featured .vip-price{color:var(--gold)}
+.vip-desc{font-size:9px;color:var(--muted);margin-top:3px;line-height:1.4}
+.vip-hot{position:absolute;top:-7px;left:50%;transform:translateX(-50%);background:var(--gold);color:#000;font-size:9px;font-weight:800;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.vip-wallet-note{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;margin-top:10px}
+
+/* ── NOTIFICATION PANEL ── */
+.notif-list{display:flex;flex-direction:column;gap:6px}
+.notif-item{display:flex;gap:10px;padding:9px 11px;border-radius:var(--r-sm);background:var(--ink3);border-left:2px solid transparent}
+.notif-item.ni-green{border-left-color:var(--green)}
+.notif-item.ni-red{border-left-color:var(--red)}
+.notif-item.ni-amber{border-left-color:var(--amber)}
+.notif-item.ni-blue{border-left-color:var(--blue)}
+.notif-item.ni-purple{border-left-color:var(--gold)}
+.ni-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.ni-text{font-size:11px;color:var(--text2);line-height:1.5}
+.ni-text b{color:var(--text)}
+.ni-time{font-size:9px;color:var(--muted);margin-top:2px}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);width:100%;max-width:460px;box-shadow:var(--sh-lg);animation:fadeUp .2s ease}
+@keyframes fadeUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-head{padding:16px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(201,168,76,.05) 0%,transparent 100%)}
+.modal-head h3{font-family:var(--serif);font-weight:600;font-style:italic;font-size:15px;color:var(--text)}
+.modal-close{background:var(--ink3);border:none;color:var(--text2);width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:16px 20px}
+.modal-foot{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.form-row{margin-bottom:12px}
+.form-label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px}
+.form-info{background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px}
+.fi-row{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border)}
+.fi-row:last-child{border-bottom:none}
+.fi-row .k{color:var(--muted)}
+.fi-row .v{font-weight:600;color:var(--text)}
+.fi-row.total .v{color:var(--gold);font-size:14px;font-family:var(--syne)}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:20px;right:20px;z-index:999;padding:10px 16px;border-radius:var(--r-sm);font-size:12px;font-weight:600;max-width:320px;box-shadow:var(--sh-lg);opacity:0;pointer-events:none;transform:translateY(6px);transition:all .25s}
+#toast.show{opacity:1;transform:translateY(0);pointer-events:auto}
+#toast.t-green{background:#0a2016;border:1px solid var(--green);color:var(--green)}
+#toast.t-red{background:#200a0a;border:1px solid var(--red);color:var(--red)}
+#toast.t-amber{background:#201500;border:1px solid var(--amber);color:var(--amber)}
+#toast.t-blue{background:#0a1620;border:1px solid var(--blue);color:var(--blue)}
+#toast.t-purple{background:#1a1200;border:1px solid var(--gold);color:var(--gold)}
+
+/* pulse */
+@keyframes pulse-ring{0%{transform:scale(.9);opacity:.8}70%{transform:scale(1.1);opacity:0}100%{transform:scale(1.1);opacity:0}}
+.pulse-ring{animation:pulse-ring 1.4s ease-out infinite}
+
+/* progress bar */
+.prog-bar{background:var(--ink3);border-radius:99px;height:5px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;transition:width .6s ease}
+
+/* divider */
+.dv{height:1px;background:var(--border);margin:14px 0}
+
+/* ── MOBILE RESPONSIVE ── */
+@media(max-width:768px){
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.mobile-open { transform: translateX(0); box-shadow: 4px 0 32px rgba(0,0,0,.6); }
+  .sidebar-overlay { display: block !important; }
+  .main { margin-left: 0 !important; }
+  .topbar-hamburger { display: flex !important; }
+  .topbar { padding: 0 12px !important; height:48px !important; }
+  .page-title { font-size:14px !important; }
+  /* stat cards: 3 cột ngang ngay cả trên mobile */
+  .grid3 { grid-template-columns: repeat(3,1fr) !important; gap:8px !important; }
+  .grid2, .grid2-3 { grid-template-columns: 1fr !important; }
+  .stat-card { padding:10px 10px !important; }
+  .stat-label { font-size:8px !important; letter-spacing:.4px !important; margin-bottom:3px !important; }
+  .stat-val { font-size:16px !important; }
+  .stat-badge { font-size:8px !important; padding:1px 5px !important; }
+  .wallet-grid { grid-template-columns: 1fr 1fr; }
+  .card { padding: 11px; }
+  .upload-grid { grid-template-columns: 1fr 1fr !important; }
+  .drawing-grid { grid-template-columns: 1fr 1fr !important; }
+  .vip-grid { grid-template-columns: repeat(3,1fr) !important; }
+  .content { padding: 10px 12px 50px; }
+  /* SLA clock nhỏ hơn */
+  .clock-ring svg { width:100px !important; height:100px !important; }
+  .clock-time { font-size:16px !important; }
+  .sec-label { margin: 12px 0 8px !important; }
+  .sla-card { padding:12px !important; }
+}
+@media(max-width:480px){
+  .wallet-grid { grid-template-columns: 1fr; }
+  .upload-grid { grid-template-columns: 1fr !important; }
+  .vip-grid { grid-template-columns: 1fr 1fr !important; }
+  input, textarea, select { font-size: 16px !important; }
+}
+
+/* Sidebar overlay (mobile) */
+.sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 49;
+  background: rgba(0,0,0,.6); backdrop-filter: blur(2px);
+}
+/* Hamburger button */
+.topbar-hamburger {
+  display: none;
+  background: none; border: none; cursor: pointer;
+  color: var(--text); font-size: 17px; padding: 4px;
+  flex-shrink: 0;
+}
+
+/* Safe area */
+@supports(padding-bottom: env(safe-area-inset-bottom)){
+  .content{padding-bottom:calc(50px + env(safe-area-inset-bottom))}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">🏗</div>
+    <div class="logo-text">kts.<span>ALN</span></div>
+  </div>
+
+  <div class="nav-section">Tổng quan</div>
+  <a class="nav-item active"><span class="icon"><i class="fa fa-gauge-high"></i></span> Dashboard</a>
+  <a class="nav-item" onclick="showToast('Tính năng đang phát triển','t-blue')"><span class="icon"><i class="fa fa-briefcase"></i></span> Dự án của tôi <span class="nav-badge">2</span></a>
+
+  <div class="nav-section">Tài chính</div>
+  <a class="nav-item" onclick="scrollTo('.wallet-section')"><span class="icon"><i class="fa fa-wallet"></i></span> Ví thu nhập</a>
+  <a class="nav-item" onclick="showToast('Lịch sử giao dịch','t-blue')"><span class="icon"><i class="fa fa-clock-rotate-left"></i></span> Lịch sử GD</a>
+
+  <div class="nav-section">Công việc</div>
+  <a class="nav-item" onclick="scrollTo('.c3-section')"><span class="icon"><i class="fa fa-upload"></i></span> Nộp Hồ sơ C3</a>
+  <a class="nav-item" onclick="scrollTo('.asset-section')"><span class="icon"><i class="fa fa-store"></i></span> Kho tài sản</a>
+  <a class="nav-item" onclick="scrollTo('.vip-section')"><span class="icon"><i class="fa fa-crown"></i></span> Gói VIP</a>
+
+  <div class="nav-section">Tài khoản</div>
+  <a class="nav-item" onclick="showToast('Hồ sơ KTS','t-purple')"><span class="icon"><i class="fa fa-user-tie"></i></span> Hồ sơ của tôi</a>
+
+  <div class="sidebar-footer">
+    <div class="kts-profile">
+      <div class="kts-av">TM</div>
+      <div>
+        <div class="kts-name">Trần Lê Minh</div>
+        <div class="kts-rank">⭐ 4.8 · Hạng Chuẩn</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div class="main">
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+  <header class="topbar">
+    <button class="topbar-hamburger" id="hamburgerBtn" onclick="toggleMobileSidebar()" aria-label="Menu">
+      <i class="fa fa-bars"></i>
+    </button>
+    <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+      <div id="ktsTopbarLogo" style="background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(96,165,250,.12));color:#60a5fa;padding:4px 10px;border-radius:var(--r-sm);border:1.5px solid rgba(96,165,250,.45);font-family:var(--syne);font-size:11px;font-weight:800;letter-spacing:.06em;white-space:nowrap;flex-shrink:0">App Làm Nhà Corp.</div>
+      <div class="page-title">Bảng KTS</div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="ktsTopbarClock">05/06/2026 · 09:42</div>
+      <div class="notif-btn" onclick="toggleNotif()"><i class="fa fa-bell"></i><div class="notif-dot"></div></div>
+      <div id="notifPanel" style="display:none;position:fixed;top:56px;right:8px;width:min(300px,calc(100vw - 16px));background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:12px;box-shadow:var(--sh-lg);z-index:50;max-height:70vh;overflow-y:auto">
+        <div style="font-family:var(--serif);font-weight:600;font-style:italic;font-size:14px;color:var(--text);margin-bottom:8px">Thông báo mới</div>
+        <div class="notif-list">
+          <div class="notif-item ni-red"><div class="ni-icon">⏰</div><div><div class="ni-text"><b>SLA cảnh báo</b> — Chủ nhà Nguyễn Văn A vừa gửi yêu cầu sửa C2 lần 2. Bạn có 48h!</div><div class="ni-time">5 phút trước</div></div></div>
+          <div class="notif-item ni-amber"><div class="ni-icon">🔒</div><div><div class="ni-text"><b>Ví tạm ứng</b> — 1,920,000đ đã được ghi nhận (40% C2). Chờ CN duyệt để mở khóa.</div><div class="ni-time">12 phút trước</div></div></div>
+          <div class="notif-item ni-green"><div class="ni-icon">💰</div><div><div class="ni-text"><b>Giải ngân C1</b> — +1,878,220đ đã về ví chính.</div><div class="ni-time">2 ngày trước</div></div></div>
+        </div>
+      </div>
+      <div style="font-size:10px;font-weight:700;background:var(--green-bg);color:var(--green);border:1px solid rgba(34,201,122,.3);padding:3px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0"><i class="fa fa-circle" style="font-size:6px;margin-right:3px"></i>Online</div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- STAT ROW -->
+    <div class="grid3" style="margin-bottom:6px">
+      <div class="stat-card s-purple">
+        <div class="stat-label">Doanh thu tháng 6</div>
+        <div class="stat-val">11.8M</div>
+        <div class="stat-badge sb-green"><i class="fa fa-arrow-up" style="font-size:8px"></i> +32% vs T5</div>
+      </div>
+      <div class="stat-card s-green">
+        <div class="stat-label">Ví chính khả dụng</div>
+        <div class="stat-val">3.87M</div>
+        <div class="stat-sub">Rút về TK ngân hàng</div>
+      </div>
+      <div class="stat-card s-gold">
+        <div class="stat-label">Điểm Uy tín</div>
+        <div class="stat-val">84.5<span style="font-size:13px;color:var(--muted)">/100</span></div>
+        <div class="stat-badge sb-gold"><i class="fa fa-star" style="font-size:8px"></i> Hạng Chuẩn — còn 15.5đ lên PRO</div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         MODULE 1 — SLA TIMER C2
+    ══════════════════════════════════ -->
+    <div class="sec-label">⏰ Nhiệm vụ khẩn — Chặng 2 đang chờ phản hồi</div>
+
+    <div class="sla-card normal" id="slaCard">
+      <div class="sla-glow"></div>
+      <div class="sla-top">
+        <div>
+          <div class="sla-project">Dự án <b>#ALN-2026-9921</b> · Biệt thự Vườn Tân Cổ Điển</div>
+          <div class="sla-revision">Chủ nhà gửi <b id="revLabel">Yêu cầu sửa lần 2</b> lúc 05/06/2026 09:42</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Trạng thái SLA</div>
+          <div class="stat-badge sb-amber" id="slaStatusBadge"><i class="fa fa-clock" style="font-size:8px"></i> <span id="slaStatusText">Đang chạy</span></div>
+        </div>
+      </div>
+
+      <!-- Clock -->
+      <div class="clock-ring">
+        <div class="clock-center">
+          <svg class="ring-svg" width="130" height="130" viewBox="0 0 140 140">
+            <circle class="ring-bg" cx="70" cy="70" r="60"/>
+            <circle class="ring-progress" id="ringProgress" cx="70" cy="70" r="60"
+              stroke-dasharray="377" stroke-dashoffset="0" stroke="var(--amber)"/>
+          </svg>
+          <div class="clock-digits">
+            <div class="clock-time" id="slaDisplay">31:22:45</div>
+            <div class="clock-label">còn lại</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reward / penalty info -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <div style="background:var(--green-bg);border:1px solid rgba(34,201,122,.25);border-radius:var(--r-sm);padding:9px 11px">
+          <div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px"><i class="fa fa-trophy"></i> Phản hồi < 24h</div>
+          <div style="font-size:11px;color:var(--text2)">+0.2 điểm Uy tín</div>
+          <div style="font-size:10px;color:var(--muted)">Còn <b id="bonusCountdown" style="color:var(--green)">07:22:45</b> để đạt thưởng</div>
+        </div>
+        <div style="background:var(--red-bg);border:1px solid rgba(255,87,87,.25);border-radius:var(--r-sm);padding:9px 11px">
+          <div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:3px"><i class="fa fa-triangle-exclamation"></i> Quá hạn 48h</div>
+          <div style="font-size:11px;color:var(--text2)">−0.1 điểm + Gậy vàng</div>
+          <div style="font-size:10px;color:var(--muted)">Deadline: 07/06/2026 09:42</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="openUploadRevModal()"><i class="fa fa-cloud-arrow-up"></i> Nộp bản 3D đã sửa</button>
+        <button class="btn btn-ghost btn-sm" onclick="openChatModal()"><i class="fa fa-comment"></i> Nhắn tin CN</button>
+        <button class="btn btn-ghost btn-sm" id="simSlaBonusBtn" onclick="simSlaBonus()"><i class="fa fa-bolt"></i> [Demo] Nộp sớm</button>
+        <button class="btn btn-ghost btn-sm" onclick="simSlaExpire()"><i class="fa fa-clock"></i> [Demo] Quá hạn</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         MODULE 2 — WALLET
+    ══════════════════════════════════ -->
+    <div class="sec-label wallet-section">💰 Ví thu nhập & Payout Lock</div>
+    <div class="grid2-3" style="gap:12px">
+      <div class="card">
+        <div class="card-title"><div class="ct-icon" style="background:var(--green-bg);color:var(--green)"><i class="fa fa-wallet"></i></div>Tổng quan Ví</div>
+        <div class="wallet-grid">
+          <!-- Ví chính -->
+          <div class="wallet-pocket wp-main">
+            <div class="wp-label"><i class="fa fa-circle" style="font-size:7px"></i> Ví chính</div>
+            <div class="wp-amount">3,878,220đ</div>
+            <div class="wp-sub">Khả dụng · Rút được ngay</div>
+            <button class="btn btn-sm btn-green" style="margin-top:7px;width:100%" onclick="openWithdrawModal()"><i class="fa fa-arrow-right-from-bracket"></i> Rút tiền</button>
+          </div>
+
+          <!-- Ví tạm ứng — PAYOUT LOCK -->
+          <div class="wallet-pocket wp-locked" id="lockedWallet">
+            <div class="wp-label"><i class="fa fa-lock" style="font-size:7px"></i> Ví tạm ứng (C2)</div>
+            <div class="wp-amount" id="lockedAmount">1,920,000đ</div>
+            <div class="wp-sub">40% C2 · 8% tổng HĐ</div>
+            <div class="lock-seal">
+              <i class="fa fa-lock"></i>
+              PAYOUT LOCK · Chờ CN duyệt
+            </div>
+          </div>
+
+          <!-- Chờ giải ngân -->
+          <div class="wallet-pocket wp-pending">
+            <div class="wp-label"><i class="fa fa-hourglass-half" style="font-size:7px"></i> Chờ giải ngân</div>
+            <div class="wp-amount">0đ</div>
+            <div class="wp-sub">Maker→Checker xử lý</div>
+          </div>
+
+          <!-- Thuế đã khấu trừ -->
+          <div class="wallet-pocket wp-tax">
+            <div class="wp-label"><i class="fa fa-receipt" style="font-size:7px"></i> Thuế đã KT</div>
+            <div class="wp-amount" style="color:var(--muted)">297,780đ</div>
+            <div class="wp-sub">7% · Sàn nộp hộ</div>
+          </div>
+        </div>
+
+        <div class="dv"></div>
+        <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">Phân tích thu nhập Chặng 2</div>
+        <div style="font-size:11px;color:var(--muted);background:var(--ink3);border-radius:var(--r-sm);padding:10px;border:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>CN nạp C2 (20% HĐ)</span><span style="color:var(--text);font-weight:600;font-family:var(--mono)">4,800,000đ</span></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Phí sàn (13%)</span><span style="color:var(--red);font-family:var(--mono)">−624,000đ</span></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Thuế 7% (GTGT+TNCN)</span><span style="color:var(--red);font-family:var(--mono)">−297,780đ</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0 0;font-weight:700;color:var(--green)"><span>KTS nhận NET</span><span style="font-family:var(--mono);font-size:13px">3,878,220đ</span></div>
+        </div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:6px;background:var(--amber-bg);border:1px solid rgba(255,170,51,.2);border-radius:5px;padding:7px 10px">
+          <i class="fa fa-info-circle" style="color:var(--amber)"></i>
+          <span><b style="color:var(--amber)">1,920,000đ (tạm ứng)</b> sẽ tự động gộp vào ví chính khi Chủ nhà bấm Duyệt C2. Không thể rút trước.</span>
+        </div>
+      </div>
+
+      <!-- TX history -->
+      <div class="card">
+        <div class="card-title"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="fa fa-list-ul"></i></div>Lịch sử giao dịch</div>
+        <div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--amber-bg)">🔒</div>
+            <div class="tx-info"><div class="tx-title">Ví tạm ứng C2 kích hoạt</div><div class="tx-meta">#9921 · 05/06 09:42</div></div>
+            <div class="tx-amount tx-lock">+1,920,000đ</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--green-bg)">💰</div>
+            <div class="tx-info"><div class="tx-title">Giải ngân C1 — #9921</div><div class="tx-meta">Checker APPROVE · 03/06</div></div>
+            <div class="tx-amount tx-pos">+1,878,220đ</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--red-bg)">📊</div>
+            <div class="tx-info"><div class="tx-title">Thuế khấu trừ C1</div><div class="tx-meta">5% GTGT + 2% TNCN · 03/06</div></div>
+            <div class="tx-amount tx-neg">−141,780đ</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--green-bg)">💰</div>
+            <div class="tx-info"><div class="tx-title">Giải ngân C2 — #9834</div><div class="tx-meta">Checker APPROVE · 28/05</div></div>
+            <div class="tx-amount tx-pos">+8,040,000đ</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--ink3)">🏦</div>
+            <div class="tx-info"><div class="tx-title">Rút về Vietcombank</div><div class="tx-meta">**** 4521 · 25/05</div></div>
+            <div class="tx-amount tx-neg">−6,000,000đ</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:8px" onclick="showToast('Xem toàn bộ lịch sử GD','t-blue')">Xem thêm <i class="fa fa-chevron-down"></i></button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         MODULE 3 — C3 UPLOAD
+    ══════════════════════════════════ -->
+    <div class="sec-label c3-section">📁 Nộp Hồ sơ Kỹ thuật — Chặng 3 (6 hạng mục bắt buộc)</div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+        <div>
+          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="fa fa-folder-open"></i></div>Cổng nộp Hồ sơ C3 — #ALN-2026-9921</div>
+          <div style="font-size:11px;color:var(--muted)">Tất cả 6 ô đều bắt buộc · Auto-scan ngay khi upload · Excel 0% lỗi hàm</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="text-align:right;font-size:11px;color:var(--muted)">Tiến độ upload</div>
+          <div style="width:70px">
+            <div class="prog-bar"><div class="prog-fill" id="uploadProgress" style="width:0%;background:var(--accent)"></div></div>
+            <div style="font-size:9px;color:var(--muted);text-align:center;margin-top:2px"><span id="uploadCount">0</span>/6 files</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="upload-grid" id="uploadGrid"><!-- 6 slots injected by JS --></div>
+
+      <!-- Validation bar -->
+      <div class="c3-validation-bar" id="validationBar">
+        <div style="font-size:10px;font-weight:700;color:var(--muted);width:100%;margin-bottom:3px">TRẠNG THÁI KIỂM TRA TỰ ĐỘNG:</div>
+        <div class="cv-item"><div class="cv-dot" style="background:rgba(201,168,76,.3)"></div><span id="v-arch" style="color:var(--muted)">Kiến trúc</span></div>
+        <div class="cv-item"><div class="cv-dot" style="background:rgba(201,168,76,.3)"></div><span id="v-struct" style="color:var(--muted)">Kết cấu</span></div>
+        <div class="cv-item"><div class="cv-dot" style="background:rgba(201,168,76,.3)"></div><span id="v-mep" style="color:var(--muted)">M&E</span></div>
+        <div class="cv-item"><div class="cv-dot" style="background:rgba(201,168,76,.3)"></div><span id="v-steel" style="color:var(--muted)">Thép Excel</span></div>
+        <div class="cv-item"><div class="cv-dot" style="background:rgba(201,168,76,.3)"></div><span id="v-mat" style="color:var(--muted)">Vật tư</span></div>
+        <div class="cv-item"><div class="cv-dot" style="background:rgba(201,168,76,.3)"></div><span id="v-budget" style="color:var(--muted)">Dự toán</span></div>
+      </div>
+
+      <!-- Scan result (shown after submit) -->
+      <div class="scan-result" id="scanResult"></div>
+
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="simUploadDemo()"><i class="fa fa-bolt"></i> [Demo] Upload 6 file mẫu</button>
+        <button class="btn btn-ghost btn-sm" onclick="simUploadError()"><i class="fa fa-bug"></i> [Demo] File Excel lỗi hàm</button>
+        <button class="btn btn-primary" id="submitC3Btn" disabled onclick="submitC3()"><i class="fa fa-cloud-arrow-up"></i> Nộp Hồ sơ C3</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         MODULE 4 — ASSET STORE
+    ══════════════════════════════════ -->
+    <div class="sec-label asset-section">🗂 Kho tài sản thụ động — Bản vẽ mẫu</div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div>
+          <div class="card-title" style="margin-bottom:2px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="fa fa-layer-group"></i></div>Kho bản vẽ mẫu đóng góp</div>
+          <div style="font-size:11px;color:var(--muted)">3 slot đầu miễn phí · Từ slot 4 mua thêm · Nhận hoa hồng 10% mỗi lần sàn bán lại</div>
+        </div>
+        <div class="stat-badge sb-gold" style="font-size:11px;padding:5px 10px"><i class="fa fa-coins"></i> Hoa hồng tích lũy: <b>450,000đ</b></div>
+      </div>
+
+      <div class="drawing-grid" id="drawingGrid"><!-- injected by JS --></div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         MODULE 4b — VIP PACKAGES
+    ══════════════════════════════════ -->
+    <div class="sec-label vip-section">👑 Gói hiển thị & Vượt cấp</div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+        <div>
+          <div class="card-title" style="margin-bottom:2px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="fa fa-crown"></i></div>Gói nâng cấp hiển thị & Đẩy tin</div>
+          <div style="font-size:11px;color:var(--muted)">Thanh toán bằng Ví chính · Có hiệu lực ngay lập tức</div>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(34,201,122,.3);padding:5px 12px;border-radius:99px"><i class="fa fa-wallet"></i> Ví: 3,878,220đ</div>
+      </div>
+
+      <div class="vip-grid" id="vipGrid"><!-- injected by JS --></div>
+
+      <div class="vip-wallet-note">
+        <i class="fa fa-info-circle" style="color:var(--gold)"></i>
+        Gói được trừ trực tiếp từ Ví chính. Cần có doanh thu ít nhất 1 dự án để kích hoạt mua gói. Ví tạm ứng không được dùng để mua gói.
+      </div>
+    </div>
+
+  </div><!-- end .content -->
+</div><!-- end .main -->
+</div><!-- end .layout -->
+
+<!-- ══ MODAL: UPLOAD REV ══ -->
+<div class="modal-bg" id="uploadRevModal">
+  <div class="modal">
+    <div class="modal-head"><h3><i class="fa fa-cloud-arrow-up" style="color:var(--gold)"></i> Nộp bản 3D đã chỉnh sửa</h3><button class="modal-close" onclick="closeModal('uploadRevModal')">✕</button></div>
+    <div class="modal-body">
+      <div style="background:var(--amber-bg);border:1px solid rgba(255,170,51,.3);border-radius:7px;padding:10px;font-size:11px;color:var(--amber);margin-bottom:14px"><i class="fa fa-clock"></i> <b>Đang trong SLA 48h</b> — Nộp sớm để nhận thưởng điểm uy tín!</div>
+      <div class="form-row">
+        <label class="form-label">Phối cảnh 3D cập nhật (*.zip / *.rar / *.png)</label>
+        <label style="display:flex;flex-direction:column;align-items:center;gap:8px;border:1.5px dashed rgba(201,168,76,.3);border-radius:var(--r-sm);padding:18px;cursor:pointer;transition:.2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(201,168,76,.3)'">
+          <input type="file" style="display:none" accept=".zip,.rar,.png,.jpg,.pdf" onchange="handleRevFile(this)">
+          <div id="revFileIcon" style="font-size:26px">📁</div>
+          <div id="revFileLabel" style="font-size:12px;color:var(--muted)">Kéo thả hoặc click để chọn file</div>
+        </label>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Ghi chú phản hồi theo từng điểm CN yêu cầu</label>
+        <textarea style="width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:7px;padding:9px;color:var(--text);font-family:inherit;font-size:12px;height:72px;resize:none;outline:none" placeholder="VD: Đã mở rộng cửa sổ mặt tiền theo yêu cầu #1. Mái đã thêm phào chỉ..."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('uploadRevModal')">Hủy</button>
+      <button class="btn btn-primary" onclick="submitRev()"><i class="fa fa-paper-plane"></i> Gửi bản cập nhật</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CHAT ══ -->
+<div class="modal-bg" id="chatModal">
+  <div class="modal" style="max-width:480px;width:100%">
+    <div class="modal-head">
+      <h3><i class="fa fa-comments" style="color:var(--blue)"></i> Chat — Dự án ALN-9921</h3>
+      <div style="display:flex;align-items:center;gap:6px;margin-left:auto;margin-right:10px">
+        <div id="chatStatusDot" style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div>
+        <span id="chatStatusTxt" style="font-size:10px;color:var(--sub)">Kết nối</span>
+      </div>
+      <button class="modal-close" onclick="closeModal('chatModal')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0">
+      <!-- Thread -->
+      <div id="ktsChat" style="height:280px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--ink3)">
+        <div style="text-align:center;font-size:10px;color:var(--muted);padding:6px">— Bắt đầu cuộc trò chuyện —</div>
+      </div>
+      <!-- Input -->
+      <div style="padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;background:var(--ink2)">
+        <textarea id="ktsChatInput" rows="2"
+          style="flex:1;background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-family:inherit;font-size:12px;outline:none;resize:none;line-height:1.4"
+          placeholder="Nhập tin nhắn cho Chủ nhà / Doanh nghiệp..."
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ktsSendChat()}"></textarea>
+        <button class="btn btn-primary" style="padding:9px 14px;flex-shrink:0" onclick="ktsSendChat()">
+          <i class="fa fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: WITHDRAW ══ -->
+<div class="modal-bg" id="withdrawModal">
+  <div class="modal">
+    <div class="modal-head"><h3><i class="fa fa-bank" style="color:var(--green)"></i> Rút tiền về ngân hàng</h3><button class="modal-close" onclick="closeModal('withdrawModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-info" style="margin-bottom:12px">
+        <div class="fi-row"><span class="k">Ngân hàng</span><span class="v">Vietcombank ****4521</span></div>
+        <div class="fi-row"><span class="k">Chủ TK</span><span class="v">TRAN LE MINH</span></div>
+        <div class="fi-row"><span class="k">Ví chính</span><span class="v" style="color:var(--green)">3,878,220đ</span></div>
+        <div class="fi-row"><span class="k">Ví tạm ứng</span><span class="v" style="color:var(--amber)">1,920,000đ 🔒</span></div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Số tiền muốn rút (tối đa 3,878,220đ)</label>
+        <input type="number" style="background:var(--ink3);border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-family:inherit;font-size:15px;font-weight:700;outline:none;width:100%" id="withdrawAmt" value="3878220" max="3878220" oninput="updateWithdraw(this.value)">
+      </div>
+      <div class="form-info">
+        <div class="fi-row"><span class="k">Số tiền rút</span><span class="v" id="wAmt">3,878,220đ</span></div>
+        <div class="fi-row"><span class="k">Phí chuyển khoản</span><span class="v" style="color:var(--red)">0đ (miễn phí)</span></div>
+        <div class="fi-row total"><span class="k" style="font-weight:700">Thực nhận</span><span class="v" id="wNet">3,878,220đ</span></div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:8px"><i class="fa fa-info-circle"></i> Xử lý trong 1-2 giờ làm việc. Cần OTP xác thực.</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('withdrawModal')">Hủy</button>
+      <button class="btn btn-green" onclick="confirmWithdraw()"><i class="fa fa-arrow-right-from-bracket"></i> Xác nhận rút</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: BUY VIP ══ -->
+<div class="modal-bg" id="buyVipModal">
+  <div class="modal">
+    <div class="modal-head"><h3 id="vipModalTitle">Mua gói</h3><button class="modal-close" onclick="closeModal('buyVipModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-info" id="vipModalDetail"></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:10px;display:flex;align-items:center;gap:6px;background:var(--green-bg);border:1px solid rgba(34,201,122,.2);border-radius:5px;padding:7px 10px"><i class="fa fa-wallet" style="color:var(--green)"></i> Trừ từ Ví chính. Số dư sau: <b id="vipBalAfter" style="color:var(--green)"></b></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('buyVipModal')">Hủy</button>
+      <button class="btn btn-gold" onclick="confirmVip()"><i class="fa fa-crown"></i> Xác nhận mua gói</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+/* ALN USER INIT */
+(function(){
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var u = params.get("u"), r = params.get("r");
+    if(u && r) {
+      var names = {"kts.minhtran":"KTS. Trần Lê Minh","kts.lanthi":"KTS. Nguyễn Thị Lan","kts.khoavu":"KTS. Vũ Minh Khoa","dn.applamnha":"App Làm Nhà Corp.","dn.alnconstruct":"ALN Construct","cn.thuannv":"Nguyễn Văn Thuận","cn.binhtt":"Trần Thị Bình","cn.cuonglq":"Lê Quang Cường"};
+      var ud = JSON.stringify({name:names[u]||u, userId:u, role:r});
+      try{localStorage.setItem("aln_user",ud);}catch(e){}
+      try{sessionStorage.setItem("aln_user",ud);}catch(e){}
+    }
+  } catch(e){}
+})();
+/**
+ * ALN REALTIME — Client library
+ * Dùng chung cho kts_dashboard, client_CN, client_DN
+ *
+ * Dùng SharedWorker (nếu hỗ trợ), fallback về BroadcastChannel,
+ * fallback về localStorage events — đảm bảo hoạt động trên mọi trình duyệt.
+ *
+ * Sử dụng:
+ *   ALNRealtime.init({ role:'kts', userId:'kts.minhtran', onMessage: fn })
+ *   ALNRealtime.send({ type:'KTS_DOC_UPLOAD', ... })
+ *   ALNRealtime.disconnect()
+ */
+
+window.ALNRealtime = (() => {
+  let _port = null;       // SharedWorker port
+  let _bc   = null;       // BroadcastChannel fallback
+  let _onMessage = null;
+  let _role = '';
+  let _userId = '';
+  let _connected = false;
+
+  /* ── STORAGE KEY ── */
+  const STORE_KEY = 'aln_msgs';
+  const STORE_MAX = 100;
+
+  function _saveToStorage(msg) {
+    try {
+      const arr = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+      arr.push(msg);
+      if (arr.length > STORE_MAX) arr.splice(0, arr.length - STORE_MAX);
+      localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+    } catch(e) {}
+  }
+
+  function _loadHistory() {
+    try {
+      return JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+    } catch(e) { return []; }
+  }
+
+  function _dispatch(msg) {
+    if (_onMessage && typeof _onMessage === 'function') {
+      try { _onMessage(msg); } catch(e) {}
+    }
+  }
+
+  function init({ role, userId, onMessage, onReady }) {
+    _role = role;
+    _userId = userId;
+    _onMessage = onMessage;
+
+    // Phát lại lịch sử từ localStorage
+    const history = _loadHistory();
+    if (history.length) {
+      setTimeout(() => {
+        history.forEach(m => _dispatch(m));
+      }, 100);
+    }
+
+    // 1. Thử SharedWorker
+    if (typeof SharedWorker !== 'undefined') {
+      try {
+        const worker = new SharedWorker('hub.js');
+        _port = worker.port;
+        _port.onmessage = (e) => {
+          const d = e.data;
+          if (d.type === '_HISTORY') {
+            // Merge worker history với local history
+            d.messages.forEach(m => _dispatch(m));
+            return;
+          }
+          _saveToStorage(d);
+          _dispatch(d);
+        };
+        _port.start();
+        _connected = true;
+        onReady && onReady('SharedWorker');
+        return;
+      } catch(e) {}
+    }
+
+    // 2. Fallback: BroadcastChannel
+    if (typeof BroadcastChannel !== 'undefined') {
+      try {
+        _bc = new BroadcastChannel('aln_realtime_v2');
+        _bc.onmessage = (e) => {
+          _saveToStorage(e.data);
+          _dispatch(e.data);
+        };
+        _connected = true;
+        onReady && onReady('BroadcastChannel');
+        return;
+      } catch(e) {}
+    }
+
+    // 3. Fallback: localStorage polling
+    let _lastLen = _loadHistory().length;
+    setInterval(() => {
+      const arr = _loadHistory();
+      if (arr.length > _lastLen) {
+        arr.slice(_lastLen).forEach(m => _dispatch(m));
+        _lastLen = arr.length;
+      }
+    }, 800);
+    onReady && onReady('localStorage');
+  }
+
+  function send(msg) {
+    const full = { ...msg, _from: _userId, _role: _role, ts: Date.now() };
+
+    _saveToStorage(full);
+
+    if (_port) {
+      try { _port.postMessage(full); return; } catch(e) {}
+    }
+    if (_bc) {
+      try { _bc.postMessage(full); return; } catch(e) {}
+    }
+    // localStorage fallback — dispatch sẽ tự pick up qua polling
+  }
+
+  function disconnect() {
+    if(_bc) _bc.close();
+    _port = null;
+    _bc = null;
+  }
+
+  /* Xoá toàn bộ lịch sử (dùng khi logout) */
+  function clearHistory() {
+    try { localStorage.removeItem(STORE_KEY); } catch(e) {}
+  }
+
+  return { init, send, disconnect, clearHistory, loadHistory: _loadHistory };
+})();
+
+</script>
+<script>
+let walletBalance = 3878220;
+let slaSeconds = 31*3600 + 22*60 + 45;
+let bonusSeconds = 7*3600 + 22*60 + 45;
+const totalSla = 48*3600;
+let slaInterval;
+let uploadedFiles = {};
+let selectedVip = null;
+
+function fmtTime(s) {
+  const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+slaInterval = setInterval(() => {
+  slaSeconds = Math.max(0, slaSeconds-1);
+  bonusSeconds = Math.max(0, bonusSeconds-1);
+  document.getElementById('slaDisplay').textContent = fmtTime(slaSeconds);
+  document.getElementById('bonusCountdown').textContent = fmtTime(bonusSeconds);
+  const pct = slaSeconds / totalSla;
+  const circ = 377;
+  const offset = circ - pct * circ;
+  const ring = document.getElementById('ringProgress');
+  ring.style.strokeDashoffset = offset;
+  const card = document.getElementById('slaCard');
+  if(slaSeconds === 0) {
+    ring.style.stroke = 'var(--red)'; card.className = 'sla-card urgent';
+    document.getElementById('slaStatusBadge').className = 'stat-badge sb-red';
+    document.getElementById('slaStatusText').textContent = 'QUÁ HẠN';
+  } else if(slaSeconds < 6*3600) {
+    ring.style.stroke = 'var(--red)'; card.className = 'sla-card urgent';
+    document.getElementById('slaStatusBadge').className = 'stat-badge sb-red';
+    document.getElementById('slaStatusText').textContent = 'Nguy hiểm';
+  } else if(bonusSeconds > 0) {
+    ring.style.stroke = 'var(--green)'; card.className = 'sla-card safe';
+    document.getElementById('slaStatusBadge').className = 'stat-badge sb-green';
+    document.getElementById('slaStatusText').textContent = 'Trong hạn thưởng';
+  } else {
+    ring.style.stroke = 'var(--amber)'; card.className = 'sla-card normal';
+    document.getElementById('slaStatusBadge').className = 'stat-badge sb-amber';
+    document.getElementById('slaStatusText').textContent = 'Đang chạy';
+  }
+}, 1000);
+
+function simSlaBonus() {
+  clearInterval(slaInterval);
+  document.getElementById('slaDisplay').textContent = '23:00:00';
+  document.getElementById('bonusCountdown').textContent = '01:00:00';
+  document.getElementById('ringProgress').style.stroke = 'var(--green)';
+  document.getElementById('slaCard').className = 'sla-card safe';
+  document.getElementById('slaStatusBadge').className = 'stat-badge sb-green';
+  document.getElementById('slaStatusText').textContent = 'Phản hồi sớm!';
+  document.getElementById('simSlaBonusBtn').disabled = true;
+  showToast('🏆 Xuất sắc! Bạn phản hồi trước 24h — +0.2 điểm Uy tín được ghi nhận!', 't-green');
+}
+
+function simSlaExpire() {
+  clearInterval(slaInterval);
+  slaSeconds = 0;
+  document.getElementById('slaDisplay').textContent = '00:00:00';
+  document.getElementById('ringProgress').style.stroke = 'var(--red)';
+  document.getElementById('ringProgress').style.strokeDashoffset = 377;
+  document.getElementById('slaCard').className = 'sla-card urgent';
+  document.getElementById('slaStatusBadge').className = 'stat-badge sb-red';
+  document.getElementById('slaStatusText').textContent = 'QUÁ HẠN';
+  showToast('⚠️ SLA đã hết hạn! −0.1 điểm Uy tín + Gậy vàng lần 1 được ghi nhận.', 't-red');
+}
+
+const c3Slots = [
+  {id:'arch', icon:'📐', label:'Hồ sơ Kiến trúc', sub:'PDF + DWG · Mặt bằng, mặt đứng, mặt cắt', accept:'.pdf,.dwg', vKey:'v-arch', xlsxCheck:false},
+  {id:'struct', icon:'🏗️', label:'Hồ sơ Kết cấu', sub:'PDF + DWG · Móng, cột, dầm, sàn', accept:'.pdf,.dwg', vKey:'v-struct', xlsxCheck:false},
+  {id:'mep', icon:'⚡', label:'Điện nước M&E', sub:'PDF · Điện, cấp/thoát nước, PCCC', accept:'.pdf,.dwg', vKey:'v-mep', xlsxCheck:false},
+  {id:'steel', icon:'🔩', label:'Thống kê Thép', sub:'Excel · Bóc tách thép cấu kiện', accept:'.xlsx,.xls', vKey:'v-steel', xlsxCheck:true},
+  {id:'mat', icon:'📦', label:'Bảng Vật tư', sub:'Excel · Danh mục, khối lượng', accept:'.xlsx,.xls', vKey:'v-mat', xlsxCheck:true},
+  {id:'budget', icon:'💰', label:'Dự toán Chi phí', sub:'Excel · 0% lỗi hàm bắt buộc', accept:'.xlsx,.xls', vKey:'v-budget', xlsxCheck:true},
+];
+
+function buildUploadGrid() {
+  const g = document.getElementById('uploadGrid');
+  g.innerHTML = c3Slots.map(s => `
+    <label class="upload-slot" id="slot_${s.id}" for="file_${s.id}">
+      <input type="file" id="file_${s.id}" accept="${s.accept}" onchange="handleC3File('${s.id}',this)">
+      <div class="us-status-icon" id="statusIcon_${s.id}" style="display:none"></div>
+      <button class="us-remove" id="removeBtn_${s.id}" onclick="removeC3File(event,'${s.id}')">✕</button>
+      <div class="us-icon">${s.icon}</div>
+      <div class="us-label">${s.label}</div>
+      <div class="us-sub">${s.sub}</div>
+      <div class="us-file-name" id="fname_${s.id}"></div>
+      <div class="us-error" id="ferror_${s.id}" style="display:none"></div>
+    </label>`).join('');
+}
+buildUploadGrid();
+
+function handleC3File(id, input) {
+  const file = input.files[0]; if(!file) return;
+  const slot = c3Slots.find(s=>s.id===id);
+  uploadedFiles[id] = {file, hasError:false};
+  if(slot.xlsxCheck && Math.random() < 0.0) {
+    setSlotError(id, file.name, 'Phát hiện lỗi hàm #REF! tại ô D14 — Sửa và upload lại');
+  } else {
+    setSlotOk(id, file.name);
+  }
+  updateUploadState();
+}
+
+function setSlotOk(id, name) {
+  const el = document.getElementById('slot_'+id);
+  el.className = 'upload-slot has-file';
+  document.getElementById('fname_'+id).textContent = '✓ '+name;
+  document.getElementById('ferror_'+id).style.display = 'none';
+  document.getElementById('statusIcon_'+id).textContent = '✅';
+  document.getElementById('statusIcon_'+id).style.display = '';
+  uploadedFiles[id].hasError = false;
+  const vKey = c3Slots.find(s=>s.id===id).vKey;
+  const span = document.getElementById(vKey);
+  span.previousElementSibling.style.background = 'var(--green)';
+  span.style.color = 'var(--green)';
+  span.textContent = span.textContent.replace(/^[^a-zA-ZÀ-ỹ]*/,'') + ' ✓';
+}
+
+function setSlotError(id, name, msg) {
+  const el = document.getElementById('slot_'+id);
+  el.className = 'upload-slot has-error';
+  document.getElementById('fname_'+id).textContent = name;
+  document.getElementById('ferror_'+id).textContent = '⚠ '+msg;
+  document.getElementById('ferror_'+id).style.display = '';
+  document.getElementById('statusIcon_'+id).textContent = '❌';
+  document.getElementById('statusIcon_'+id).style.display = '';
+  uploadedFiles[id].hasError = true;
+  const vKey = c3Slots.find(s=>s.id===id).vKey;
+  const span = document.getElementById(vKey);
+  span.previousElementSibling.style.background = 'var(--red)';
+  span.style.color = 'var(--red)';
+}
+
+function removeC3File(e, id) {
+  e.preventDefault(); e.stopPropagation();
+  const el = document.getElementById('slot_'+id);
+  el.className = 'upload-slot';
+  document.getElementById('fname_'+id).textContent = '';
+  document.getElementById('ferror_'+id).style.display = 'none';
+  document.getElementById('statusIcon_'+id).style.display = 'none';
+  document.getElementById('file_'+id).value = '';
+  delete uploadedFiles[id];
+  const vKey = c3Slots.find(s=>s.id===id).vKey;
+  const span = document.getElementById(vKey);
+  span.previousElementSibling.style.background = 'rgba(201,168,76,.3)';
+  span.style.color = 'var(--muted)';
+  span.textContent = span.textContent.replace(' ✓','');
+  updateUploadState();
+}
+
+function updateUploadState() {
+  const count = Object.keys(uploadedFiles).length;
+  const hasError = Object.values(uploadedFiles).some(f=>f.hasError);
+  document.getElementById('uploadCount').textContent = count;
+  document.getElementById('uploadProgress').style.width = (count/6*100)+'%';
+  document.getElementById('uploadProgress').style.background = hasError ? 'var(--red)' : count===6 ? 'var(--green)' : 'var(--gold)';
+  document.getElementById('submitC3Btn').disabled = count < 6 || hasError;
+}
+
+function simUploadDemo() {
+  c3Slots.forEach((s,i) => {
+    setTimeout(()=>{
+      uploadedFiles[s.id] = {file:{name:`${s.id}_final_v2.${s.xlsxCheck?'xlsx':'pdf'}`}, hasError:false};
+      setSlotOk(s.id, uploadedFiles[s.id].file.name);
+      updateUploadState();
+    }, 200*(i+1));
+  });
+  showToast('Demo: upload 6 file thành công!', 't-green');
+}
+
+function simUploadError() {
+  c3Slots.forEach((s,i) => {
+    if(i===4) {
+      uploadedFiles[s.id] = {file:{name:'budget_v1.xlsx'}, hasError:true};
+      setSlotError(s.id, 'budget_v1.xlsx', 'Lỗi #REF! tại D14, #VALUE! tại G22 — Kiểm tra và upload lại');
+    } else {
+      uploadedFiles[s.id] = {file:{name:`${s.id}_ok.${s.xlsxCheck?'xlsx':'pdf'}`}, hasError:false};
+      setSlotOk(s.id, uploadedFiles[s.id].file.name);
+    }
+    updateUploadState();
+  });
+  showToast('⚠ Phát hiện lỗi hàm Excel trong file Dự toán!', 't-red');
+}
+
+function submitC3() {
+  const sr = document.getElementById('scanResult');
+  sr.style.display = '';
+  sr.innerHTML = `
+    <div style="padding:9px 12px;background:var(--blue-bg);border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--blue)">🔍 KẾT QUẢ AUTO-SCAN</div>
+    ${c3Slots.map(s=>`<div class="scan-row"><span>${s.icon} ${s.label}</span><span class="stat-badge sb-green">✓ PASS</span></div>`).join('')}
+    <div style="padding:10px 12px;background:var(--green-bg);font-size:11px;color:var(--green);font-weight:600"><i class="fa fa-circle-check"></i> Tất cả 6 hạng mục đã qua kiểm tra. Đang chờ Quản trị thẩm định lớp 2...</div>`;
+  showToast('✅ Đã nộp Hồ sơ C3! Thông báo gửi cho Chủ nhà & Admin.', 't-green');
+  document.getElementById('submitC3Btn').disabled = true;
+  document.getElementById('submitC3Btn').textContent = '✓ Đã nộp — chờ thẩm định';
+  // Gửi real-time
+  if(window.submitC3_realtime) submitC3_realtime();
+}
+
+const drawings = [
+  {title:'Nhà phố 5m×20m — Phong Đông Dương', type:'May đo', royalty:'120,000đ', sold:4, free:true, thumb:'🏠', color:'#1e3a5f'},
+  {title:'Biệt thự vườn 200m² cổ điển', type:'Độc bản', royalty:'350,000đ', sold:2, free:true, thumb:'🏛', color:'#2a1e40'},
+  {title:'Nhà cấp 4 nông thôn 80m²', type:'Kinh tế', royalty:'45,000đ', sold:11, free:true, thumb:'🏡', color:'#1a3328'},
+  {locked:true, price:50000},
+  {locked:true, price:50000},
+  {locked:true, price:50000},
+  {locked:true, price:50000},
+  {locked:true, price:50000},
+];
+
+function buildDrawingGrid() {
+  const g = document.getElementById('drawingGrid');
+  g.innerHTML = drawings.map((d,i) => {
+    if(d.locked) return `
+      <div class="drawing-slot locked">
+        <div class="ds-thumb" style="background:var(--ink3);font-size:28px">
+          <div class="ds-lock-overlay">
+            <div style="font-size:18px">🔒</div>
+            <div style="font-size:9px;color:var(--muted)">Slot khóa</div>
+          </div>
+        </div>
+        <div class="ds-info">
+          <button class="btn btn-gold btn-sm" style="width:100%;font-size:10px" onclick="buySlot(${i})"><i class="fa fa-lock-open"></i> MUA SLOT: 50.000đ</button>
+        </div>
+      </div>`;
+    return `
+      <div class="drawing-slot">
+        <div class="ds-thumb" style="background:${d.color};font-size:28px">${d.thumb}
+          <div style="position:absolute;bottom:4px;right:4px"><span class="stat-badge sb-green" style="font-size:8px">×${d.sold} đã bán</span></div>
+        </div>
+        <div class="ds-info">
+          <div class="ds-title">${d.title}</div>
+          <div class="ds-meta">${d.type}</div>
+          <div class="ds-earn"><i class="fa fa-coins" style="font-size:8px"></i> HH tích lũy: ${d.royalty}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+buildDrawingGrid();
+
+function buySlot(idx) {
+  if(walletBalance < 50000) { showToast('Ví không đủ tiền! Cần ít nhất 50,000đ', 't-red'); return; }
+  selectedVip = {name:'Mở Slot Bản vẽ #'+(idx+1), price:50000, type:'slot', idx};
+  document.getElementById('vipModalTitle').textContent = '🔓 Mua Slot Bản vẽ';
+  document.getElementById('vipModalDetail').innerHTML = `
+    <div class="fi-row"><span class="k">Gói</span><span class="v">Mở khóa 1 slot lưu trữ bản vẽ</span></div>
+    <div class="fi-row"><span class="k">Ví hiện tại</span><span class="v" style="color:var(--green)">${fmt(walletBalance)}đ</span></div>
+    <div class="fi-row total"><span class="k">Thanh toán</span><span class="v">50,000đ</span></div>`;
+  document.getElementById('vipBalAfter').textContent = fmt(walletBalance-50000)+'đ';
+  document.getElementById('buyVipModal').classList.add('open');
+}
+
+const vipPackages = [
+  {id:'boost', icon:'🚀', name:'Đẩy tin 7 ngày', price:99000, desc:'Xuất hiện đầu danh sách tìm kiếm trong 7 ngày', featured:false},
+  {id:'vip3', icon:'⭐', name:'VIP 3', price:299000, desc:'Huy hiệu VIP · Ưu tiên gợi ý · 30 ngày', featured:false},
+  {id:'vip5', icon:'🌟', name:'VIP 5', price:450000, desc:'VIP 3 + Nổi bật trang chủ · 30 ngày', featured:true},
+  {id:'vip10', icon:'💎', name:'VIP 10', price:750000, desc:'VIP 5 + Tag "Top KTS" + badge kim cương', featured:false},
+  {id:'upgrade', icon:'⚡', name:'Gói Vượt Cấp', price:1200000, desc:'Tăng ngay từ Hạng Chuẩn → PRO · Phí sàn giảm 8%', featured:false},
+];
+
+function buildVipGrid() {
+  const g = document.getElementById('vipGrid');
+  g.innerHTML = vipPackages.map(p => `
+    <div class="vip-card${p.featured?' featured':''}" onclick="openVipModal('${p.id}')">
+      ${p.featured ? '<div class="vip-hot">PHỔ BIẾN</div>' : ''}
+      <div class="vip-icon">${p.icon}</div>
+      <div class="vip-name">${p.name}</div>
+      <div class="vip-price">${fmt(p.price)}đ</div>
+      <div class="vip-desc">${p.desc}</div>
+    </div>`).join('');
+}
+buildVipGrid();
+
+function openVipModal(id) {
+  const p = vipPackages.find(v=>v.id===id);
+  if(walletBalance < p.price) {
+    showToast(`Ví không đủ! Cần ${fmt(p.price)}đ, ví có ${fmt(walletBalance)}đ`, 't-red');
+    return;
+  }
+  selectedVip = p;
+  document.getElementById('vipModalTitle').textContent = p.icon+' Mua '+p.name;
+  document.getElementById('vipModalDetail').innerHTML = `
+    <div class="fi-row"><span class="k">Gói</span><span class="v">${p.name}</span></div>
+    <div class="fi-row"><span class="k">Mô tả</span><span class="v" style="font-size:11px">${p.desc}</span></div>
+    <div class="fi-row"><span class="k">Ví hiện tại</span><span class="v" style="color:var(--green)">${fmt(walletBalance)}đ</span></div>
+    <div class="fi-row total"><span class="k">Thanh toán</span><span class="v">${fmt(p.price)}đ</span></div>`;
+  document.getElementById('vipBalAfter').textContent = fmt(walletBalance-p.price)+'đ';
+  document.getElementById('buyVipModal').classList.add('open');
+}
+
+function confirmVip() {
+  const price = selectedVip.type==='slot' ? 50000 : selectedVip.price;
+  walletBalance -= price;
+  document.querySelector('.stat-card.s-green .stat-val').textContent = fmtShort(walletBalance);
+  document.querySelector('.vip-wallet-note').innerHTML = `<i class="fa fa-wallet" style="color:var(--gold)"></i> Ví: ${fmt(walletBalance)}đ`;
+  if(selectedVip.type==='slot') {
+    const idx = selectedVip.idx;
+    drawings[idx] = {title:'Slot mới — Chưa upload', type:'—', royalty:'0đ', sold:0, free:false, thumb:'📂', color:'#1a1a0d'};
+    buildDrawingGrid();
+    showToast('🔓 Đã mở slot bản vẽ! Kéo thả file bản vẽ vào slot mới.', 't-green');
+  } else if(selectedVip.id==='upgrade') {
+    showToast('⚡ Vượt cấp thành công! Bạn đã lên Hạng PRO — Phí sàn giảm còn 8%!', 't-green');
+  } else {
+    showToast(`✅ Đã kích hoạt ${selectedVip.name}! Có hiệu lực ngay.`, 't-green');
+  }
+  closeModal('buyVipModal');
+  selectedVip = null;
+}
+
+function handleRevFile(input) {
+  if(input.files[0]) {
+    document.getElementById('revFileIcon').textContent = '✅';
+    document.getElementById('revFileLabel').textContent = input.files[0].name;
+    document.getElementById('revFileLabel').style.color = 'var(--green)';
+  }
+}
+
+function submitRev() {
+  closeModal('uploadRevModal');
+  showToast('📤 Bản 3D cập nhật đã gửi! CN được thông báo.', 't-green');
+  clearInterval(slaInterval);
+  document.getElementById('slaStatusText').textContent = 'Đã nộp';
+  document.getElementById('slaStatusBadge').className = 'stat-badge sb-green';
+  document.getElementById('slaCard').className = 'sla-card safe';
+  document.getElementById('ringProgress').style.stroke = 'var(--green)';
+}
+
+function sendChat() {
+  const v = document.getElementById('chatInput').value.trim();
+  if(!v) return;
+  showToast('Tin nhắn đã gửi!', 't-blue');
+  document.getElementById('chatInput').value = '';
+}
+
+function openWithdrawModal() { document.getElementById('withdrawModal').classList.add('open'); }
+function openUploadRevModal() { document.getElementById('uploadRevModal').classList.add('open'); }
+function openChatModal() { document.getElementById('chatModal').classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function updateWithdraw(v) {
+  const n = Math.min(parseFloat(v)||0, walletBalance);
+  document.getElementById('wAmt').textContent = fmt(n)+'đ';
+  document.getElementById('wNet').textContent = fmt(n)+'đ';
+}
+
+function confirmWithdraw() {
+  closeModal('withdrawModal');
+  showToast('🏦 Yêu cầu rút tiền đã gửi! OTP sẽ được gửi về SĐT đăng ký.', 't-green');
+}
+
+function toggleNotif() {
+  const p = document.getElementById('notifPanel');
+  p.style.display = p.style.display==='none' ? '' : 'none';
+}
+document.addEventListener('click', e => {
+  if(!e.target.closest('.notif-btn') && !e.target.closest('#notifPanel'))
+    document.getElementById('notifPanel').style.display='none';
+});
+
+function scrollTo(sel) {
+  const el = document.querySelector(sel);
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function fmt(n) { return Math.round(n).toLocaleString('vi-VN'); }
+function fmtShort(n) {
+  if(n>=1000000) return (n/1000000).toFixed(1).replace('.0','')+'M';
+  if(n>=1000) return (n/1000).toFixed(0)+'K';
+  return fmt(n);
+}
+
+let toastTimer;
+function showToast(msg, type='t-blue') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show '+type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.className='', 4000);
+}
+
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => { if(e.target===bg) bg.classList.remove('open'); });
+});
+
+/* ══════════════════════════════════════
+   ALN REALTIME — KTS Dashboard
+══════════════════════════════════════ */
+const KTS_USER = JSON.parse(sessionStorage.getItem('aln_user') || '{"name":"KTS. Trần Lê Minh","userId":"kts.minhtran"}');
+
+ALNRealtime.init({
+  role: 'kts',
+  userId: KTS_USER.userId || 'kts.minhtran',
+  onReady: (mode) => {
+    document.getElementById('chatStatusTxt').textContent = mode;
+  },
+  onMessage: (d) => {
+    // Tranh chấp
+    if(d.type==='DISPUTE_OPENED' && d.projectId==='ALN-2026-9921') {
+      showToast('⚠️ Chủ nhà đã mở tranh chấp C3 — dòng tiền bị đóng băng!', 't-red');
+      try{document.getElementById('lockedWallet').style.borderColor='var(--red)';}catch(e){}
+      try{document.getElementById('lockedAmount').style.color='var(--red)';}catch(e){}
+    }
+    // Nhận tin nhắn chat từ CN hoặc DN
+    if(d.type==='ALN_CHAT' && d._role !== 'kts') {
+      _ktsRenderMsg(d, false);
+      showToast(`💬 ${d.senderName}: ${d.text.slice(0,40)}${d.text.length>40?'...':''}`, 't-blue');
+      // Badge notification
+      const modal = document.getElementById('chatModal');
+      if(!modal.classList.contains('open')) {
+        _ktsChatUnread++;
+        _ktsUpdateChatBadge();
+      }
+    }
+    // Rating nhận được
+    if(d.type==='KTS_RATED') {
+      showToast(`⭐ Bạn nhận được đánh giá ${d.score}/5 sao cho Chặng ${d.stage} — ${d.projName}`, 't-green');
+    }
+    // Stage approved
+    if(d.type==='STAGE_APPROVED') {
+      showToast(`✅ Chặng ${d.stage} đã được phê duyệt — giải ngân đang xử lý`, 't-green');
+    }
+  }
+});
+
+/* ── KTS CHAT ── */
+let _ktsChatUnread = 0;
+const _ktsName = KTS_USER.name || 'KTS. Trần Lê Minh';
+
+function _ktsUpdateChatBadge() {
+  // Hiện badge trên nút chat nếu có unread
+  const btn = document.querySelector('[onclick*="openChatModal"]');
+  if(btn) {
+    btn.innerHTML = `<i class="fa fa-comment"></i> Nhắn tin CN${_ktsChatUnread>0?` <span style="background:var(--red);color:#fff;border-radius:99px;padding:0 5px;font-size:10px">${_ktsChatUnread}</span>`:''}`;
+  }
+}
+
+function _ktsRenderMsg(d, isMine) {
+  const thread = document.getElementById('ktsChat');
+  if(!thread) return;
+  const time = new Date(d.ts||Date.now()).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+  const el = document.createElement('div');
+  el.style.cssText = `display:flex;flex-direction:column;align-items:${isMine?'flex-end':'flex-start'};gap:2px`;
+  el.innerHTML = `
+    ${!isMine?`<div style="font-size:9px;color:var(--muted);padding:0 4px">${d.senderName||d._role}</div>`:''}
+    <div style="background:${isMine?'var(--accent-bg)':'var(--ink2)'};border:1px solid ${isMine?'rgba(201,168,76,.2)':'var(--border)'};padding:8px 12px;border-radius:${isMine?'10px 2px 10px 10px':'2px 10px 10px 10px'};max-width:80%;font-size:12px;color:var(--text);word-break:break-word">
+      ${d.text}
+      <span style="display:block;font-size:9px;color:var(--muted);margin-top:3px;text-align:${isMine?'right':'left'}">${time}</span>
+    </div>`;
+  thread.appendChild(el);
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function ktsSendChat() {
+  const inp = document.getElementById('ktsChatInput');
+  const text = (inp ? inp.value.trim() : '');
+  if(!text) return;
+  const msg = {
+    type: 'ALN_CHAT',
+    projectId: 'ALN-9921',
+    text,
+    senderName: _ktsName,
+    senderRole: 'kts',
+  };
+  ALNRealtime.send(msg);
+  _ktsRenderMsg({...msg, ts: Date.now()}, true);
+  inp.value = '';
+  inp.style.height = 'auto';
+}
+
+function openChatModal() {
+  document.getElementById('chatModal').classList.add('open');
+  _ktsChatUnread = 0;
+  _ktsUpdateChatBadge();
+  setTimeout(()=>{ document.getElementById('ktsChatInput') && document.getElementById('ktsChatInput').focus(); }, 100);
+}
+
+/* Nâng cấp submitC3 để gửi doc upload qua ALNRealtime */
+const _origSubmitC3 = window.submitC3;
+window.submitC3_realtime = function() {
+  // Gửi từng file đã upload lên cho CN/DN
+  c3Slots.forEach(s => {
+    const f = uploadedFiles[s.id];
+    if(!f) return;
+    ALNRealtime.send({
+      type: 'KTS_DOC_UPLOAD',
+      projectId: 'ALN-9921',
+      ktsName: _ktsName,
+      doc: {
+        id: 'D_' + Date.now() + '_' + s.id,
+        name: f.file.name,
+        folder: s.id === 'arch' ? 'kien_truc' : s.id === 'struct' ? 'ket_cau' : s.id === 'mep' ? 'me' : s.id === 'steel' ? 'thep' : s.id === 'mat' ? 'vat_tu' : 'du_toan',
+        kts: _ktsName,
+        date: new Date().toISOString().slice(0,10),
+        size: (f.file.size ? (f.file.size/1024/1024).toFixed(1)+'MB' : '—'),
+        type: s.xlsxCheck ? 'xlsx' : 'pdf',
+        status: 'pending',
+        isNew: true,
+      }
+    });
+  });
+  // Thông báo tổng hợp
+  ALNRealtime.send({
+    type: 'KTS_C3_SUBMITTED',
+    projectId: 'ALN-9921',
+    ktsName: _ktsName,
+    fileCount: Object.keys(uploadedFiles).length,
+  });
+};
+
+function toggleMobileSidebar() {
+  document.querySelector('.sidebar').classList.toggle('mobile-open');
+  document.getElementById('sidebarOverlay').style.display =
+    document.querySelector('.sidebar').classList.contains('mobile-open') ? 'block' : 'none';
+}
+function closeMobileSidebar() {
+  document.querySelector('.sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').style.display = 'none';
+}
+document.querySelectorAll('.sidebar .nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    if (window.innerWidth <= 768) closeMobileSidebar();
+  });
+});
+
+/* Cập nhật logo từ sessionStorage */
+(function(){
+  try {
+    var u = JSON.parse(sessionStorage.getItem('aln_user') || '{}');
+    var org = 'App Làm Nhà Corp.';
+    var el = document.getElementById('ktsTopbarLogo');
+    if(el) el.textContent = org;
+  } catch(e){}
+})();
+</script>
+</body>
+</html>
