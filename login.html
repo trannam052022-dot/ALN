@@ -215,6 +215,9 @@ body::after{
 </div>
 
 <script>
+/* Cầu nối Firebase — script module bên dưới sẽ resolve promise này */
+window.ALN_FIREBASE_READY = new Promise(function(res){ window.__ALN_FB_RESOLVE = res; });
+
 /* ════════════════════════════════════
    ACCOUNTS DATABASE
    Trong thực tế sẽ gọi API server.
@@ -224,7 +227,7 @@ const ACCOUNTS = {
   kts: [
     { user:'kts.minhtran',  pw:'aln2026', name:'KTS. Trần Lê Minh',   file:'kts_dashboard.html', badge:'VIP Vàng' },
     { user:'kts.lanthi',    pw:'aln2026', name:'KTS. Nguyễn Thị Lan', file:'kts_dashboard.html', badge:'VIP Bạc' },
-    { user:'kts.khoavu',    pw:'aln2026', name:'KTS. Vũ Minh Kh oa',   file:'kts_dashboard.html', badge:'VIP Vàng' },
+    { user:'kts.khoavu',    pw:'aln2026', name:'KTS. Vũ Minh Khoa',   file:'kts_dashboard.html', badge:'VIP Vàng' },
   ],
   dn: [
     { user:'dn.applamnha',  pw:'aln2026', name:'App Làm Nhà Corp.',    file:'client_DN.html',     badge:'Doanh nghiệp' },
@@ -317,7 +320,23 @@ function showError(msg){
   setTimeout(()=>{ card.style.animation='shake .35s ease'; },10);
 }
 
-function doLogin(){
+/* ════════════════════════════════════
+   FIREBASE LOGIN — thay thế kiểm tra demo
+════════════════════════════════════ */
+const FILE_BY_ROLE = {
+  kts: 'kts_dashboard.html',
+  dn:  'client_DN.html',
+  cn:  'client_CN.html',
+  founder: 'founder_panel.html',
+};
+
+function resetLoginBtn(){
+  const btn = document.getElementById('btnLogin');
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fa fa-right-to-bracket" style="margin-right:6px"></i> Đăng nhập';
+}
+
+async function doLogin(){
   const user = document.getElementById('inputUser').value.trim().toLowerCase();
   const pw   = document.getElementById('inputPw').value;
   hideError();
@@ -329,49 +348,71 @@ function doLogin(){
   btn.disabled = true;
   btn.innerHTML = '<i class="fa fa-circle-notch fa-spin" style="margin-right:6px"></i> Đang kiểm tra...';
 
-  // Simulate network delay
-  setTimeout(()=>{
-    const match = ACCOUNTS[activeRole] && ACCOUNTS[activeRole].find(a=> a.user===user && a.pw===pw);
+  try {
+    // Chờ Firebase SDK sẵn sàng
+    const fb = await window.ALN_FIREBASE_READY;
 
-    if(!match){
-      let found = null;
-      for(const role of ['kts','dn','cn','founder']){
-        const f = ACCOUNTS[role] && ACCOUNTS[role].find(a=> a.user===user && a.pw===pw);
-        if(f){ found = {role, acc:f}; break; }
-      }
-      if(found){
-        showError(`Tài khoản này thuộc vai trò "${ROLE_META[found.role].title}". Vui lòng chọn đúng loại tài khoản.`);
-      } else {
-        showError('Tên đăng nhập hoặc mật khẩu không đúng.');
-      }
-      btn.disabled=false;
-      btn.innerHTML='<i class="fa fa-right-to-bracket" style="margin-right:6px"></i> Đăng nhập';
+    // Đăng nhập: "founder" → "founder@aln.vn"
+    const email = fb.usernameToEmail(user);
+    const cred  = await fb.signInWithEmailAndPassword(fb.auth, email, pw);
+
+    // Lấy hồ sơ & vai trò từ Firestore: users/{uid}
+    const snap = await fb.getDoc(fb.doc(fb.db, 'users', cred.user.uid));
+    if(!snap.exists()){
+      await fb.signOut(fb.auth);
+      showError('Tài khoản chưa được gán vai trò. Vui lòng liên hệ quản trị viên.');
+      resetLoginBtn();
       return;
     }
 
-    // SUCCESS — lưu user (dùng localStorage để hoạt động trên Safari iOS)
+    const profile = snap.data();
+
+    // Kiểm tra đúng tab vai trò đang chọn
+    if(profile.role !== activeRole){
+      await fb.signOut(fb.auth);
+      const roleTitle = (ROLE_META[profile.role] && ROLE_META[profile.role].title) || profile.role;
+      showError(`Tài khoản này thuộc vai trò "${roleTitle}". Vui lòng chọn đúng loại tài khoản.`);
+      resetLoginBtn();
+      return;
+    }
+
+    // ── SUCCESS ──
+    const username = profile.username || user;
     var userData = JSON.stringify({
-      name: match.name,
-      userId: match.user,
-      role: activeRole,
-      badge: match.badge,
+      name:   profile.name || username,
+      userId: username,
+      role:   profile.role,
+      badge:  profile.badge || '',
+      uid:    cred.user.uid,
     });
     try { localStorage.setItem('aln_user', userData); } catch(e){}
     try { sessionStorage.setItem('aln_user', userData); } catch(e){}
 
     var m = ROLE_META[activeRole];
     var overlay = document.getElementById('redirectOverlay');
-    document.getElementById('redirectMsg').textContent = 'Xin chào, ' + match.name;
+    document.getElementById('redirectMsg').textContent = 'Xin chào, ' + (profile.name || username);
     document.getElementById('redirectSub').textContent = 'Đang vào trang ' + m.title + '...';
-    overlay.style.display='flex';
+    overlay.style.display = 'flex';
 
-    // Chuyển trang ngay — thêm ?user= vào URL để Safari không block
     setTimeout(function(){
-      var dest = match.file + '?u=' + encodeURIComponent(match.user) + '&r=' + activeRole;
+      var dest = FILE_BY_ROLE[activeRole] + '?u=' + encodeURIComponent(username) + '&r=' + activeRole;
       window.location.replace(dest);
     }, 800);
 
-  }, 900);
+  } catch(err) {
+    console.error('[ALN Login]', err);
+    const code = err && err.code ? err.code : '';
+    if(code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found' || code === 'auth/invalid-email'){
+      showError('Tên đăng nhập hoặc mật khẩu không đúng.');
+    } else if(code === 'auth/too-many-requests'){
+      showError('Đăng nhập sai quá nhiều lần. Vui lòng thử lại sau ít phút.');
+    } else if(code === 'auth/network-request-failed'){
+      showError('Lỗi kết nối mạng. Vui lòng kiểm tra Internet.');
+    } else {
+      showError('Có lỗi xảy ra: ' + (err.message || 'không xác định'));
+    }
+    resetLoginBtn();
+  }
 }
 
 /* Shake animation */
@@ -382,6 +423,13 @@ document.head.appendChild(styleSheet);
 /* Init */
 renderCardTop();
 renderDemoRow();
+</script>
+
+<!-- ═══ FIREBASE SDK (module) ═══ -->
+<script type="module">
+import { auth, db, usernameToEmail, signInWithEmailAndPassword, signOut, doc, getDoc }
+  from "./firebase-config.js";
+window.__ALN_FB_RESOLVE({ auth, db, usernameToEmail, signInWithEmailAndPassword, signOut, doc, getDoc });
 </script>
 </body>
 </html>
