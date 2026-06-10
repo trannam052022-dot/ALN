@@ -377,6 +377,13 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 </style>
 </head>
 <body>
+<!-- ═══ ALN AUTH VEIL — che trang đến khi xác thực xong ═══ -->
+<div id="alnAuthVeil" style="position:fixed;inset:0;background:#08080a;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+  <div style="width:38px;height:38px;border:3px solid rgba(201,168,76,.2);border-top-color:#C9A84C;border-radius:50%;animation:alnspin .8s linear infinite"></div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:rgba(240,235,224,.7)">Đang xác thực...</div>
+  <style>@keyframes alnspin{to{transform:rotate(360deg)}}</style>
+</div>
+
 <div class="layout">
 
 <!-- ═══════════════ SIDEBAR ═══════════════ -->
@@ -1512,6 +1519,10 @@ onAuthStateChanged(auth, async (user) => {
     });
     try { localStorage.setItem("aln_user", ud); } catch(e){}
     try { sessionStorage.setItem("aln_user", ud); } catch(e){}
+
+    // Xác thực OK → mở màn che
+    const veil = document.getElementById("alnAuthVeil");
+    if (veil) veil.remove();
   } catch(e) {
     console.error("[ALN Guard]", e);
   }
