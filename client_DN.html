@@ -2382,17 +2382,39 @@ ALNRealtime.init({
     // Nhận chat từ KTS hoặc CN
     if(d.type==='ALN_CHAT' && d._role !== 'dn') {
       const projId = d.projectId || activeProj;
-      if(!_dnChatMsgs[projId]) _dnChatMsgs[projId] = [];
-      _dnChatMsgs[projId].push({
-        from: d._role,
-        text: d.text,
-        senderName: d.senderName,
-        ts: d.ts || Date.now(),
-        mine: false,
-      });
-      _dnRenderChat(projId);
-      _addNotif('💬', `<b>${d.senderName}</b>: ${d.text.slice(0,50)}`, projId);
-      showToast(`💬 ${d.senderName}: ${d.text.slice(0,40)}${d.text.length>40?'...':''}`, 't-blue');
+      if(d.channel === 'zalo') {
+        // Kênh Zalo -> popup Zalo
+        zpMessages.push({
+          id: 'm_rt_'+d.ts,
+          from: 'kts',
+          text: d.text,
+          ts: new Date(d.ts||Date.now()).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}),
+          senderName: d.senderName,
+          read: false,
+        });
+        const zp = document.getElementById('zaloPopup');
+        if(zp && zp.classList.contains('open')) {
+          _zpRender();
+        } else {
+          const bdg = document.getElementById('zaloBadge');
+          if(bdg){ bdg.style.display='flex'; bdg.textContent='1'; }
+          _addNotif('💬', `<b>${d.senderName}</b> (Zalo): ${d.text.slice(0,50)}`, projId);
+          showToast(`Z ${d.senderName}: ${d.text.slice(0,40)}${d.text.length>40?'...':''}`, 't-blue');
+        }
+      } else {
+        // Kênh ALN -> hộp chat dự án
+        if(!_dnChatMsgs[projId]) _dnChatMsgs[projId] = [];
+        _dnChatMsgs[projId].push({
+          from: d._role,
+          text: d.text,
+          senderName: d.senderName,
+          ts: d.ts || Date.now(),
+          mine: false,
+        });
+        _dnRenderChat(projId);
+        _addNotif('💬', `<b>${d.senderName}</b>: ${d.text.slice(0,50)}`, projId);
+        showToast(`💬 ${d.senderName}: ${d.text.slice(0,40)}${d.text.length>40?'...':''}`, 't-blue');
+      }
     }
 
     // DOC_UPLOADED admin
@@ -2459,6 +2481,7 @@ function dnSendChat(projId) {
   inp.value = '';
   ALNRealtime.send({
     type: 'ALN_CHAT',
+    channel: 'aln',
     projectId: projId,
     text,
     senderName: DN_USER.name || 'App Làm Nhà Corp.',
@@ -2480,7 +2503,7 @@ window.zpSend = function() {
   zpMessages.push({id:'m_'+Date.now(), from:'me', text:txt, ts, read:true});
   inp.value=''; inp.style.height='auto';
   _zpRender();
-  ALNRealtime.send({ type:'ALN_CHAT', projectId:activeProj, text:txt, senderName:DN_USER.name||'Doanh nghiệp', senderRole:'dn' });
+  ALNRealtime.send({ type:'ALN_CHAT', channel:'zalo', projectId:activeProj, text:txt, senderName:DN_USER.name||'Doanh nghiệp', senderRole:'dn' });
 };
 
 function _addNotif(icon,body,projId){
@@ -2565,11 +2588,12 @@ function _zpInit(){
   // Avatar emoji by KTS
   const avMap = {'KTS. Trần Lê Minh':'👨‍🎨','KTS. Nguyễn Thị Lan':'👩‍🎨','KTS. Phạm Hoài Nam':'👨‍💼','KTS. Lê Hoàng Nam':'👨‍🔧','KTS. Vũ Minh Khoa':'🧑‍💻'};
   document.getElementById('zpAvatar').textContent = avMap[zpKts]||'👷';
-  // Seed messages
+  // Seed messages — GIỮ LẠI tin nhắn realtime đã nhận/gửi, chỉ nạp lại phần demo mở đầu
+  const _rtKept = zpMessages.filter(m => !String(m.id).startsWith('seed_'));
   zpMessages = (ZP_SEED[zpKts]||[]).map((txt,i)=>({
     id:'seed_'+i, from:'kts', text:txt,
     ts: i===0?'09:15':'10:30', read:true
-  }));
+  })).concat(_rtKept);
   _zpRender();
 }
 

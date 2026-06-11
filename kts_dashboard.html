@@ -1330,13 +1330,18 @@ ALNRealtime.init({
     }
     // Nhận tin nhắn chat từ CN hoặc DN
     if(d.type==='ALN_CHAT' && d._role !== 'kts') {
-      _ktsRenderMsg(d, false);
-      showToast(`💬 ${d.senderName}: ${d.text.slice(0,40)}${d.text.length>40?'...':''}`, 't-blue');
-      // Badge notification
-      const modal = document.getElementById('chatModal');
-      if(!modal.classList.contains('open')) {
-        _ktsChatUnread++;
-        _ktsUpdateChatBadge();
+      if(d.channel === 'zalo') {
+        // Kênh Zalo -> popup Zalo của KTS
+        _kzReceive(d);
+      } else {
+        // Kênh ALN -> hộp chat ALN
+        _ktsRenderMsg(d, false);
+        showToast(`💬 ${d.senderName}: ${d.text.slice(0,40)}${d.text.length>40?'...':''}`, 't-blue');
+        const modal = document.getElementById('chatModal');
+        if(!modal.classList.contains('open')) {
+          _ktsChatUnread++;
+          _ktsUpdateChatBadge();
+        }
       }
     }
     // Rating nhận được
@@ -1384,6 +1389,7 @@ function ktsSendChat() {
   if(!text) return;
   const msg = {
     type: 'ALN_CHAT',
+    channel: 'aln',
     projectId: 'ALN-9921',
     text,
     senderName: _ktsName,
@@ -1459,6 +1465,69 @@ document.querySelectorAll('.sidebar .nav-item').forEach(el => {
     if(el) el.textContent = org;
   } catch(e){}
 })();
+</script>
+
+
+<!-- ═══ KTS ZALO POPUP — kênh Zalo với Chủ nhà / DN ═══ -->
+<style>
+#kzFab{position:fixed;bottom:80px;right:20px;z-index:500;width:54px;height:54px;border-radius:50%;border:none;cursor:pointer;background:#0068ff;color:#fff;box-shadow:0 8px 24px rgba(0,104,255,.45);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;font-family:Arial,sans-serif;transition:transform .15s}
+#kzFab:hover{transform:scale(1.06)}
+#kzBadge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;border-radius:99px;min-width:18px;height:18px;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;padding:0 4px}
+#kzPopup{position:fixed;bottom:144px;right:20px;z-index:501;width:320px;background:#111114;border:1px solid rgba(3,107,211,.35);border-radius:14px;box-shadow:0 12px 48px rgba(0,0,0,.6);display:none;flex-direction:column;overflow:hidden}
+#kzPopup.open{display:flex}
+@media(max-width:480px){#kzPopup{width:calc(100vw - 24px);right:12px;max-height:70vh}#kzFab{bottom:74px;right:14px;width:48px;height:48px}}
+</style>
+<button id="kzFab" onclick="toggleKtsZalo()" aria-label="Zalo">Z<span id="kzBadge">1</span></button>
+<div id="kzPopup">
+  <div style="background:linear-gradient(135deg,#0068ff,#0091ff);padding:12px 14px;display:flex;align-items:center;gap:10px">
+    <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:17px">👤</div>
+    <div style="flex:1">
+      <div style="color:#fff;font-weight:700;font-size:13px">Zalo — Chủ nhà / DN</div>
+      <div style="color:rgba(255,255,255,.78);font-size:10px">● Kênh Zalo qua sàn ALN</div>
+    </div>
+    <button onclick="toggleKtsZalo()" style="background:none;border:none;color:#fff;font-size:15px;cursor:pointer">✕</button>
+  </div>
+  <div id="kzBody" style="height:280px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#18181c"></div>
+  <div style="display:flex;gap:8px;padding:10px;border-top:1px solid rgba(255,255,255,.06);background:#111114">
+    <textarea id="kzInput" rows="1" placeholder="Nhắn Zalo cho Chủ nhà / DN..." style="flex:1;background:#18181c;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 10px;font-size:12px;color:#F0EBE0;outline:none;resize:none;font-family:inherit" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();kzSend();}"></textarea>
+    <button onclick="kzSend()" style="background:#0068ff;border:none;border-radius:8px;width:38px;cursor:pointer;color:#fff;flex-shrink:0"><i class="fa fa-paper-plane" style="font-size:12px"></i></button>
+  </div>
+</div>
+<script>
+let _kzUnread = 0;
+let kzMessages = [];
+function toggleKtsZalo(){
+  const p = document.getElementById('kzPopup');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')){ _kzUnread=0; _kzBadge(); _kzRender(); setTimeout(()=>{const i=document.getElementById('kzInput'); if(i) i.focus();},150); }
+}
+function _kzBadge(){ const b=document.getElementById('kzBadge'); if(b){ b.style.display=_kzUnread>0?'flex':'none'; b.textContent=_kzUnread; } }
+function _kzRender(){
+  const body=document.getElementById('kzBody'); if(!body) return;
+  body.innerHTML = kzMessages.map(m=>`
+    <div style="display:flex;flex-direction:column;align-items:${m.mine?'flex-end':'flex-start'};gap:2px">
+      ${!m.mine?`<div style="font-size:9px;color:rgba(240,235,224,.4);padding:0 4px">${m.senderName||''}</div>`:''}
+      <div style="background:${m.mine?'#0068ff':'#111114'};color:${m.mine?'#fff':'#F0EBE0'};border:1px solid ${m.mine?'transparent':'rgba(255,255,255,.08)'};padding:8px 12px;border-radius:${m.mine?'10px 2px 10px 10px':'2px 10px 10px 10px'};max-width:80%;font-size:12px;word-break:break-word">${m.text}
+        <span style="display:block;font-size:9px;opacity:.6;margin-top:3px;text-align:${m.mine?'right':'left'}">${m.ts}</span>
+      </div>
+    </div>`).join('');
+  body.scrollTop = body.scrollHeight;
+}
+function _kzReceive(d){
+  kzMessages.push({ mine:false, text:d.text, senderName:d.senderName||d._from, ts:new Date(d.ts||Date.now()).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}) });
+  const p=document.getElementById('kzPopup');
+  if(p && p.classList.contains('open')) _kzRender();
+  else { _kzUnread++; _kzBadge(); showToast(`Z ${d.senderName||''}: ${String(d.text||'').slice(0,40)}`, 't-blue'); }
+}
+function kzSend(){
+  const inp=document.getElementById('kzInput'); const txt=(inp?inp.value.trim():''); if(!txt) return;
+  const DANGER=['zalo riêng','số điện thoại','ngoài sàn','tiền mặt','chuyển khoản trực tiếp','không qua sàn','tài khoản cá nhân','liên hệ riêng','nhắn riêng','giá riêng','phí ngoài','thanh toán ngoài','giao dịch ngoài','hợp đồng riêng'];
+  const matched=DANGER.find(kw=>txt.toLowerCase().includes(kw));
+  if(matched){ showToast(`⚠️ Tin nhắn bị chặn — vi phạm: "${matched}"`, 't-red'); inp.value=''; try{ALNRealtime.send({type:'NLP_ALERT',projectId:'ALN-9921',keyword:matched,msg:txt})}catch(e){} return; }
+  kzMessages.push({ mine:true, text:txt, ts:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}) });
+  _kzRender(); inp.value='';
+  ALNRealtime.send({ type:'ALN_CHAT', channel:'zalo', projectId:'ALN-9921', text:txt, senderName:_ktsName, senderRole:'kts' });
+}
 </script>
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
