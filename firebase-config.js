@@ -9,7 +9,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
-  collection, addDoc, getDocs, query, where, orderBy, limit,
+  collection, addDoc, getDocs, query, where, orderBy, limit, limitToLast,
   onSnapshot, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -39,6 +39,6 @@ export {
   signInWithEmailAndPassword, createUserWithEmailAndPassword,
   onAuthStateChanged, signOut,
   doc, getDoc, setDoc, updateDoc, deleteDoc,
-  collection, addDoc, getDocs, query, where, orderBy, limit,
+  collection, addDoc, getDocs, query, where, orderBy, limit, limitToLast,
   onSnapshot, serverTimestamp
 };
