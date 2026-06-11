@@ -1695,13 +1695,24 @@ function getFilteredRows() {
   });
 }
 
-function renderTable() {
-  const rows = getFilteredRows();
+let _tblShown = 0;
+const _TBL_PAGE = (window.innerWidth <= 768) ? 15 : 40; // mobile render ít để nhẹ bộ nhớ
+
+function renderTableMore(){ _tblShown += _TBL_PAGE; renderTable(true); }
+
+function renderTable(keepShown) {
+  const allRows = getFilteredRows();
   const tbody = document.getElementById('tableBody');
-  if (!rows.length) {
+  if (!allRows.length) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--mute)">Không có dự án phù hợp</td></tr>`;
     return;
   }
+  if (!keepShown) _tblShown = _TBL_PAGE;
+  const rows = allRows.slice(0, _tblShown);
+  const moreCount = allRows.length - rows.length;
+  const moreRow = moreCount > 0
+    ? `<tr><td colspan="7" style="text-align:center;padding:12px"><button onclick="renderTableMore()" style="background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.4);border-radius:8px;padding:9px 22px;color:#C9A84C;font-weight:700;font-size:12px;cursor:pointer">▾ Xem thêm ${moreCount} dự án</button></td></tr>`
+    : '';
   tbody.innerHTML = rows.map(r => {
     const sm  = STATUS_MAP[r.status] || STATUS_MAP.ok;
     const am  = ACTION_MAP[r.status] || ACTION_MAP.ok;
@@ -2473,7 +2484,7 @@ function renderMgKts(){
         +'<td style="padding:10px 14px;text-align:center;font-size:11px;color:'+(_statusColor[k.status]||'var(--dim)')+'">'+(_statusLabel[k.status]||k.status)+'</td>'
         +'<td style="padding:10px 14px" onclick="event.stopPropagation()">'+_actionBtns('kts',idx)+'</td>'
       +'</tr>';
-    }).join('');
+    }).join('') + moreRow;
 }
 
 function renderMgDn(){
