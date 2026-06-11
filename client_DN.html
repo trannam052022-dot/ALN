@@ -2112,25 +2112,7 @@ function renderMain(){
           ${subTabsHTML}
           <div class="pa-grid" id="paGrid_${p.id}">${paCardsHTML}</div>
           ${statusBar}
-          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
-            <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">
-              <i class="fa fa-comments" style="color:var(--accent2)"></i>
-              Trao đổi trực tiếp với KTS
-              <span style="font-family:var(--mono);font-size:9px;background:var(--ink4);padding:1px 6px;border-radius:99px">${r.comments.length} tin nhắn</span>
-            </div>
-            <div class="comment-thread" id="cmThread_${p.id}_${rid}">${commentsHTML}</div>
-            <div class="cm-input-wrap">
-              <textarea class="cm-textarea" id="cmInput_${p.id}_${rid}" rows="1"
-                placeholder="Nhập yêu cầu sửa đổi hoặc góp ý cho KTS..."
-                oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
-                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendComment('${p.id}','${rid}')}"></textarea>
-              <button class="cm-send" onclick="sendComment('${p.id}','${rid}')">
-                <i class="fa fa-paper-plane" style="margin-right:4px"></i>Gửi
-              </button>
-            </div>
-          </div>
-
-          <!-- ══ THƯ MỤC TẢI LÊN TỪ KHÁCH HÀNG ══ -->
+                    <!-- ══ THƯ MỤC TẢI LÊN TỪ KHÁCH HÀNG ══ -->
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
             <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">
               <i class="fa fa-folder-arrow-up" style="color:var(--gold)"></i>
