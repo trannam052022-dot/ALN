@@ -864,7 +864,7 @@ window.ALNRealtime = (() => {
             snap.forEach(d => {
               const m = d.data();
               _remember(m);
-              if ((m.ts||0) >= cutoff) _dispatch(m);   // phát lại lịch sử gần đây
+              if ((m.ts||0) >= cutoff) _dispatch(Object.assign({}, m, {_replay:true}));   // phát lại lịch sử (âm thầm)
             });
             _flushPending();
             onReady && onReady('Firestore');
@@ -886,7 +886,7 @@ window.ALNRealtime = (() => {
     _mode = 'local';
     const hist = _lsLoad();
     hist.forEach(m=>_remember(m));
-    setTimeout(()=>{ hist.forEach(m=>_dispatch(m)); }, 100);
+    setTimeout(()=>{ hist.forEach(m=>_dispatch(Object.assign({}, m, {_replay:true}))); }, 100);
     if (typeof BroadcastChannel !== 'undefined') {
       try {
         _bc = new BroadcastChannel('aln_realtime_v2');
@@ -1336,7 +1336,7 @@ ALNRealtime.init({
       if(d._role === 'cn') {
         _ktsRenderMsg(d, false);
         const modal = document.getElementById('chatModal');
-        if(!modal.classList.contains('open')) {
+        if(!d._replay && !modal.classList.contains('open')) {
           _ktsChatUnread++;
           _ktsUpdateChatBadge();
         }
@@ -1556,7 +1556,7 @@ function _alnReceive(d){
   alnThreads[t].push({ mine:false, text:d.text, senderName:d.senderName||d._from, ts:new Date(d.ts||Date.now()).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}) });
   const p = document.getElementById('alnPopup');
   if(p && p.classList.contains('open') && _alnThread === t){ _alnRender(); }
-  else {
+  else if(!d._replay) {
     _alnUnreadT[t]++; _alnDots(); _alnBadge();
     try{ showToast(`💬 [${_ALN_LABEL[t]}] ${d.senderName||''}: ${String(d.text||'').slice(0,40)}`, 't-blue'); }catch(e){}
   }

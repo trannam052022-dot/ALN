@@ -1939,6 +1939,7 @@ function confirmOtp() {
 let toastT;
 function toast(msg, type='info') {
   const root = document.getElementById('toasts');
+  while(root.children.length >= 4){ root.firstChild.remove(); }
   const el = document.createElement('div');
   const cls = {ok:'toast-ok',err:'toast-err',warn:'toast-warn',info:'toast-info'}[type]||'toast-info';
   el.className = `toast ${cls}`;
@@ -2019,7 +2020,7 @@ window.ALNRealtime = (() => {
             snap.forEach(d => {
               const m = d.data();
               _remember(m);
-              if ((m.ts||0) >= cutoff) _dispatch(m);   // phát lại lịch sử gần đây
+              if ((m.ts||0) >= cutoff) _dispatch(Object.assign({}, m, {_replay:true}));   // phát lại lịch sử (âm thầm)
             });
             _flushPending();
             onReady && onReady('Firestore');
@@ -2041,7 +2042,7 @@ window.ALNRealtime = (() => {
     _mode = 'local';
     const hist = _lsLoad();
     hist.forEach(m=>_remember(m));
-    setTimeout(()=>{ hist.forEach(m=>_dispatch(m)); }, 100);
+    setTimeout(()=>{ hist.forEach(m=>_dispatch(Object.assign({}, m, {_replay:true}))); }, 100);
     if (typeof BroadcastChannel !== 'undefined') {
       try {
         _bc = new BroadcastChannel('aln_realtime_v2');
@@ -2089,6 +2090,7 @@ window.ALNRealtime = (() => {
     userId: FU.userId || 'founder',
     onReady: function(mode){ console.log('ALN Realtime (Founder):', mode); },
     onMessage: function(d){
+      if (d._replay) return; // tin phát lại lịch sử — nạp âm thầm, không bắn thông báo
       if (d.type === 'DISPUTE_OPENED') toast('🚨 Dispute mới: ' + d.projectId + ' · ' + (d.category||''), 'err');
       if (d.type === 'C3_SUBMITTED' || d.type === 'KTS_C3_SUBMITTED') toast('📁 C3 nộp: ' + (d.projectId||'') + ' · ' + (d.ktsName||''), 'info');
       if (d.type === 'DOC_UPLOADED' && d._role !== 'founder') toast('📁 Tài liệu mới: ' + (d.projectId||''), 'info');
@@ -2973,7 +2975,9 @@ function addDocDN(projectId){
 
 function toast(msg,type){
   const cls={ok:'toast-ok',warn:'toast-warn',err:'toast-err',info:'toast-info'}[type]||'toast-info';
-  const r=document.getElementById('toasts'),el=document.createElement('div');
+  const r=document.getElementById('toasts');
+  while(r.children.length >= 4){ r.firstChild.remove(); }
+  const el=document.createElement('div');
   el.className=`toast ${cls}`;el.textContent=msg;r.appendChild(el);
   requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
   setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300)},4000);
