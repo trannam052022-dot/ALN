@@ -2835,8 +2835,14 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
   try {
-    const snap = await getDoc(doc(db, "users", user.uid));
-    const profile = snap.exists() ? snap.data() : null;
+    // Đọc hồ sơ với 3 lần thử (chống lỗi mạng/kho lưu trữ tạm thời)
+    let snap = null, lastErr = null;
+    for (let i = 0; i < 3; i++) {
+      try { snap = await getDoc(doc(db, "users", user.uid)); lastErr = null; break; }
+      catch (err) { lastErr = err; await new Promise(r => setTimeout(r, 800)); }
+    }
+    if (lastErr) throw lastErr;
+    const profile = (snap && snap.exists()) ? snap.data() : null;
 
     if (!profile) {
       await signOut(auth);
@@ -2872,6 +2878,13 @@ onAuthStateChanged(auth, async (user) => {
     }
   } catch(e) {
     console.error("[ALN Guard]", e);
+    // Không kẹt màn hình xác thực: cho người dùng bấm thử lại
+    const veil = document.getElementById("alnAuthVeil");
+    if (veil) veil.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:14px;font-family:sans-serif">'
+      + '<div style="color:rgba(240,235,224,.85);font-size:14px;text-align:center;padding:0 24px">Không kiểm tra được phiên đăng nhập.<br>Vui lòng kiểm tra mạng và thử lại.</div>'
+      + '<button onclick="location.reload()" style="background:linear-gradient(135deg,#C9A84C,#d4b86a);border:none;border-radius:8px;padding:11px 26px;font-weight:700;font-size:13px;cursor:pointer;color:#000">Thử lại</button>'
+      + '<button onclick="window.location.replace(\'login.html\')" style="background:none;border:1px solid rgba(240,235,224,.25);border-radius:8px;padding:9px 22px;font-size:12px;cursor:pointer;color:rgba(240,235,224,.7)">Về trang đăng nhập</button>'
+      + '</div>';
   }
 });
 

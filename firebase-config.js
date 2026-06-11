@@ -4,7 +4,9 @@
 ════════════════════════════════════════════════ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  getAuth, initializeAuth,
+  indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence, inMemoryPersistence,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword,
   onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
@@ -24,8 +26,18 @@ const firebaseConfig = {
 };
 
 const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getFirestore(app);
+
+/* Persistence đa tầng: nếu kho lưu trữ chính của trình duyệt lỗi
+   (ví dụ sau khi tab bị crash), tự lùi xuống tầng kế tiếp thay vì mất phiên */
+let auth;
+try {
+  auth = initializeAuth(app, {
+    persistence: [indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence, inMemoryPersistence]
+  });
+} catch (e) {
+  auth = getAuth(app);
+}
+const db = getFirestore(app);
 
 /* Quy ước: tên đăng nhập "founder" ⇄ email "founder@aln.vn" */
 const ALN_EMAIL_DOMAIN = "@aln.vn";
