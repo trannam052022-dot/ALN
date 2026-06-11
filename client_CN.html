@@ -593,7 +593,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <div style="display:flex;align-items:center;gap:10px;background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.18);border-radius:8px;padding:9px 10px">
         <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,rgba(201,168,76,.3),rgba(201,168,76,.1));border:1.5px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">👤</div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Nguyễn Văn Thuận</div>
+          <div id="cnProfileName" style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Nguyễn Văn Thuận</div>
           <div style="font-size:10px;color:var(--sub);margin-top:1px;display:flex;align-items:center;gap:4px">
             <i class="fa fa-user-tie" style="font-size:9px;color:var(--gold)"></i> Chủ đầu tư
           </div>
@@ -2144,25 +2144,7 @@ function renderMain(){
           ${subTabsHTML}
           <div class="pa-grid" id="paGrid_${p.id}">${paCardsHTML}</div>
           ${statusBar}
-          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
-            <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">
-              <i class="fa fa-comments" style="color:var(--accent2)"></i>
-              Trao đổi trực tiếp với KTS
-              <span style="font-family:var(--mono);font-size:9px;background:var(--ink4);padding:1px 6px;border-radius:99px">${r.comments.length} tin nhắn</span>
-            </div>
-            <div class="comment-thread" id="cmThread_${p.id}_${rid}">${commentsHTML}</div>
-            <div class="cm-input-wrap">
-              <textarea class="cm-textarea" id="cmInput_${p.id}_${rid}" rows="1"
-                placeholder="Nhập yêu cầu sửa đổi hoặc góp ý cho KTS..."
-                oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
-                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendComment('${p.id}','${rid}')}"></textarea>
-              <button class="cm-send" onclick="sendComment('${p.id}','${rid}')">
-                <i class="fa fa-paper-plane" style="margin-right:4px"></i>Gửi
-              </button>
-            </div>
-          </div>
-
-          <!-- ══ THƯ MỤC TẢI LÊN TỪ KHÁCH HÀNG ══ -->
+                    <!-- ══ THƯ MỤC TẢI LÊN TỪ KHÁCH HÀNG ══ -->
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
             <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">
               <i class="fa fa-folder-arrow-up" style="color:var(--gold)"></i>
@@ -2387,6 +2369,14 @@ renderNotifs();
    ALN REALTIME — Chủ nhà
 ══════════════════════════════════════ */
 const CN_USER = JSON.parse(sessionStorage.getItem('aln_user') || '{"name":"Nguyễn Văn Thuận","userId":"cn.thuannv"}');
+
+/* Cập nhật tên Chủ nhà theo tài khoản đăng nhập */
+(function(){
+  try {
+    var el = document.getElementById('cnProfileName');
+    if (el && CN_USER && CN_USER.name) el.textContent = CN_USER.name;
+  } catch(e){}
+})();
 
 ALNRealtime.init({
   role: 'cn',
