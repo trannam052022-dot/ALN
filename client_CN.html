@@ -879,6 +879,25 @@ const DOCS = {
 };
 
 let activeProj = PROJECTS_CLIENT[0].id;
+
+/* ═══ CÁ NHÂN HÓA DỰ ÁN DEMO THEO CHỦ NHÀ ĐĂNG NHẬP ═══
+   Mỗi chủ nhà thấy công trình mang tên mình (mã dự án giữ chung để
+   liên kết chat/tài liệu với KTS không đổi — sẽ tách hẳn khi lên Firestore) */
+(function(){
+  try {
+    var u = JSON.parse(sessionStorage.getItem('aln_user') || '{}');
+    if (!u || u.role !== 'cn' || !u.name) return;
+    var DEMO_BY_USER = {
+      'cn.thuannv': { name: 'Biệt thự Vườn Tân Cổ Điển' },
+      'cn.binhtt':  { name: 'Nhà phố 4 tầng Hiện đại' },
+      'cn.cuonglq': { name: 'Biệt thự Mái Thái Sân Vườn' }
+    };
+    var p = PROJECTS_CLIENT[0];
+    p.cn = u.name; // chủ đầu tư = người đăng nhập
+    var d = DEMO_BY_USER[u.userId];
+    if (d && d.name) p.name = d.name;
+  } catch(e){}
+})();
 let activeFolder = 'ALL';
 
 const STATUS_DOT={on_track:'var(--green)',sla_warn:'var(--amber)',dispute:'var(--red)',done:'var(--sub)'};
