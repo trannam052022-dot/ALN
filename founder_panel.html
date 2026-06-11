@@ -3003,11 +3003,16 @@ onAuthStateChanged(auth, async (user) => {
     const snap = await getDoc(doc(db, "users", user.uid));
     const profile = snap.exists() ? snap.data() : null;
 
-    if (!profile || profile.role !== REQUIRED_ROLE) {
-      // Sai vai trò → đăng xuất và quay về login
+    if (!profile) {
       await signOut(auth);
       try { localStorage.removeItem("aln_user"); sessionStorage.removeItem("aln_user"); } catch(e){}
       window.location.replace("login.html");
+      return;
+    }
+    if (profile.role !== REQUIRED_ROLE) {
+      // Sai vai trò → chuyển về đúng trang của vai trò đó (KHÔNG đăng xuất)
+      const PAGE_BY_ROLE = { founder:"founder_panel.html", kts:"kts_dashboard.html", dn:"client_DN.html", cn:"client_CN.html" };
+      window.location.replace(PAGE_BY_ROLE[profile.role] || "login.html");
       return;
     }
 
