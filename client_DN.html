@@ -2382,39 +2382,11 @@ ALNRealtime.init({
     // Nhận chat từ KTS hoặc CN
     if(d.type==='ALN_CHAT' && d._role !== 'dn') {
       const projId = d.projectId || activeProj;
-      if(d.channel === 'zalo') {
-        // Kênh Zalo -> popup Zalo
-        zpMessages.push({
-          id: 'm_rt_'+d.ts,
-          from: 'kts',
-          text: d.text,
-          ts: new Date(d.ts||Date.now()).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}),
-          senderName: d.senderName,
-          read: false,
-        });
-        const zp = document.getElementById('zaloPopup');
-        if(zp && zp.classList.contains('open')) {
-          _zpRender();
-        } else {
-          const bdg = document.getElementById('zaloBadge');
-          if(bdg){ bdg.style.display='flex'; bdg.textContent='1'; }
-          _addNotif('💬', `<b>${d.senderName}</b> (Zalo): ${d.text.slice(0,50)}`, projId);
-          showToast(`Z ${d.senderName}: ${d.text.slice(0,40)}${d.text.length>40?'...':''}`, 't-blue');
-        }
-      } else {
-        // Kênh ALN -> hộp chat dự án
-        if(!_dnChatMsgs[projId]) _dnChatMsgs[projId] = [];
-        _dnChatMsgs[projId].push({
-          from: d._role,
-          text: d.text,
-          senderName: d.senderName,
-          ts: d.ts || Date.now(),
-          mine: false,
-        });
-        _dnRenderChat(projId);
-        _addNotif('💬', `<b>${d.senderName}</b>: ${d.text.slice(0,50)}`, projId);
-        showToast(`💬 ${d.senderName}: ${d.text.slice(0,40)}${d.text.length>40?'...':''}`, 't-blue');
-      }
+      // Kênh thống nhất -> hộp nổi + đồng bộ luồng chat dự án
+      _alnReceive(d);
+      if(!_dnChatMsgs[projId]) _dnChatMsgs[projId] = [];
+      _dnChatMsgs[projId].push({ from: d._role, text: d.text, senderName: d.senderName, ts: d.ts || Date.now(), mine: false });
+      _dnRenderChat(projId);
     }
 
     // DOC_UPLOADED admin
@@ -2478,6 +2450,7 @@ function dnSendChat(projId) {
   if(!_dnChatMsgs[projId]) _dnChatMsgs[projId] = [];
   _dnChatMsgs[projId].push({ from:'dn', text, senderName: DN_USER.name||'Doanh nghiệp', ts: Date.now(), mine: true });
   _dnRenderChat(projId);
+  try{ alnMessages.push({ mine:true, text, ts:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}) }); _alnRender(); }catch(e){}
   inp.value = '';
   ALNRealtime.send({
     type: 'ALN_CHAT',
@@ -2749,6 +2722,88 @@ renderMain();
   if(el2) el2.textContent = name;
 })();
 
+</script>
+
+
+<!-- ═══ TRAO ĐỔI QUA SÀN ALN — kênh chat thống nhất ═══ -->
+<style>
+.contact-fab,.zalo-popup{display:none !important}
+#alnFab{position:fixed;bottom:24px;right:24px;z-index:500;width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(201,168,76,.5);cursor:pointer;background:linear-gradient(135deg,#C9A84C,#d4b86a);color:#000;box-shadow:0 8px 24px rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform .15s}
+#alnFab:hover{transform:scale(1.06)}
+#alnBadge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;border-radius:99px;min-width:18px;height:18px;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;padding:0 4px}
+#alnPopup{position:fixed;bottom:92px;right:24px;z-index:501;width:330px;background:#111114;border:1px solid rgba(201,168,76,.35);border-radius:14px;box-shadow:0 12px 48px rgba(0,0,0,.65);display:none;flex-direction:column;overflow:hidden}
+#alnPopup.open{display:flex}
+.aln-call-btn{width:30px;height:30px;border-radius:50%;border:1px solid rgba(201,168,76,.4);background:rgba(201,168,76,.12);color:#C9A84C;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:background .15s}
+.aln-call-btn:hover{background:rgba(201,168,76,.25)}
+@media(max-width:768px){#alnFab{bottom:16px;right:16px;width:48px;height:48px;font-size:17px}#alnPopup{width:calc(100vw - 24px);right:12px;bottom:76px;max-height:65vh}}
+</style>
+<button id="alnFab" onclick="toggleAlnBox()" aria-label="Trao đổi qua sàn ALN"><i class="fa fa-comments"></i><span id="alnBadge">1</span></button>
+<div id="alnPopup">
+  <div style="background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.08));border-bottom:1px solid rgba(201,168,76,.25);padding:12px 14px;display:flex;align-items:center;gap:10px">
+    <div style="width:34px;height:34px;border-radius:9px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#C9A84C;font-family:Arial,sans-serif;flex-shrink:0">ALN</div>
+    <div style="flex:1;min-width:0">
+      <div style="color:#F0EBE0;font-weight:700;font-size:13px">Trao đổi qua sàn ALN</div>
+      <div style="color:rgba(240,235,224,.5);font-size:10px">Kết nối KTS / Chủ nhà · tin nhắn được lưu vết</div>
+    </div>
+    <button class="aln-call-btn" onclick="alnCall('voice')" title="Gọi thoại qua Zalo OA"><i class="fa fa-phone"></i></button>
+    <button class="aln-call-btn" onclick="alnCall('video')" title="Gọi video qua Zalo OA"><i class="fa fa-video"></i></button>
+    <button onclick="toggleAlnBox()" style="background:none;border:none;color:rgba(240,235,224,.6);font-size:15px;cursor:pointer;padding:0 0 0 4px">✕</button>
+  </div>
+  <div id="alnBody" style="height:290px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#18181c"></div>
+  <div style="display:flex;gap:8px;padding:10px;border-top:1px solid rgba(255,255,255,.06);background:#111114">
+    <textarea id="alnInput" rows="1" placeholder="Nhắn tin qua sàn ALN..." style="flex:1;background:#18181c;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 10px;font-size:12px;color:#F0EBE0;outline:none;resize:none;font-family:inherit" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();alnSendMsg();}"></textarea>
+    <button onclick="alnSendMsg()" style="background:linear-gradient(135deg,#C9A84C,#d4b86a);border:none;border-radius:8px;width:38px;cursor:pointer;color:#000;flex-shrink:0"><i class="fa fa-paper-plane" style="font-size:12px"></i></button>
+  </div>
+</div>
+<script>
+let _alnUnread = 0;
+let alnMessages = [];
+function toggleAlnBox(){
+  const p = document.getElementById('alnPopup');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')){ _alnUnread=0; _alnBadge(); _alnRender(); setTimeout(()=>{const i=document.getElementById('alnInput'); if(i) i.focus();},150); }
+}
+function _alnBadge(){ const b=document.getElementById('alnBadge'); if(b){ b.style.display=_alnUnread>0?'flex':'none'; b.textContent=_alnUnread; } }
+function _alnRender(){
+  const body=document.getElementById('alnBody'); if(!body) return;
+  body.innerHTML = alnMessages.map(m=>`
+    <div style="display:flex;flex-direction:column;align-items:${m.mine?'flex-end':'flex-start'};gap:2px">
+      ${!m.mine?`<div style="font-size:9px;color:rgba(240,235,224,.4);padding:0 4px">${m.senderName||''}</div>`:''}
+      <div style="background:${m.mine?'rgba(201,168,76,.15)':'#111114'};color:#F0EBE0;border:1px solid ${m.mine?'rgba(201,168,76,.3)':'rgba(255,255,255,.08)'};padding:8px 12px;border-radius:${m.mine?'10px 2px 10px 10px':'2px 10px 10px 10px'};max-width:80%;font-size:12px;word-break:break-word">${m.text}
+        <span style="display:block;font-size:9px;opacity:.6;margin-top:3px;text-align:${m.mine?'right':'left'}">${m.ts}</span>
+      </div>
+    </div>`).join('');
+  body.scrollTop = body.scrollHeight;
+}
+function _alnReceive(d){
+  alnMessages.push({ mine:false, text:d.text, senderName:d.senderName||d._from, ts:new Date(d.ts||Date.now()).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}) });
+  const p=document.getElementById('alnPopup');
+  if(p && p.classList.contains('open')){ _alnRender(); }
+  else {
+    _alnUnread++; _alnBadge();
+    try{ showToast(`💬 ${d.senderName||''}: ${String(d.text||'').slice(0,40)}`, 't-blue'); }catch(e){}
+    try{ if(typeof _addNotif==='function') _addNotif('💬', `<b>${d.senderName||''}</b>: ${String(d.text||'').slice(0,50)}`, d.projectId||''); }catch(e){}
+  }
+}
+function alnCall(kind){
+  try{ showToast(kind==='voice' ? '📞 Đang kết nối gọi thoại qua Zalo OA sàn ALN...' : '📹 Đang kết nối gọi video qua Zalo OA sàn ALN...', 't-blue'); }catch(e){}
+  setTimeout(()=>{ window.open('https://zalo.me/alnsanthietke','_blank'); }, 600);
+}
+function alnSendMsg(){
+  const inp=document.getElementById('alnInput'); const txt=(inp?inp.value.trim():''); if(!txt) return;
+  const DANGER=['zalo riêng','số điện thoại','ngoài sàn','tiền mặt','chuyển khoản trực tiếp','không qua sàn','tài khoản cá nhân','liên hệ riêng','nhắn riêng','giá riêng','phí ngoài','thanh toán ngoài','giao dịch ngoài','hợp đồng riêng'];
+  const matched=DANGER.find(kw=>txt.toLowerCase().includes(kw));
+  if(matched){ showToast(`⚠️ Tin nhắn bị chặn — vi phạm: "${matched}". Mọi giao dịch phải qua sàn ALN.`, 't-red'); inp.value=''; try{ALNRealtime.send({type:'NLP_ALERT',projectId:activeProj,keyword:matched,msg:txt})}catch(e){} return; }
+  alnMessages.push({ mine:true, text:txt, ts:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}) });
+  _alnRender(); inp.value='';
+  try{
+    const pj = activeProj;
+    if(!_dnChatMsgs[pj]) _dnChatMsgs[pj] = [];
+    _dnChatMsgs[pj].push({ from:'dn', text:txt, senderName:(DN_USER&&DN_USER.name)||'Doanh nghiệp', ts:Date.now(), mine:true });
+    _dnRenderChat(pj);
+  }catch(e){}
+  ALNRealtime.send({ type:'ALN_CHAT', projectId:activeProj, text:txt, senderName:(DN_USER&&DN_USER.name)||'Doanh nghiệp', senderRole:'dn' });
+}
 </script>
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->

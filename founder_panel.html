@@ -2093,7 +2093,7 @@ window.ALNRealtime = (() => {
       if (d.type === 'C3_SUBMITTED' || d.type === 'KTS_C3_SUBMITTED') toast('📁 C3 nộp: ' + (d.projectId||'') + ' · ' + (d.ktsName||''), 'info');
       if (d.type === 'DOC_UPLOADED' && d._role !== 'founder') toast('📁 Tài liệu mới: ' + (d.projectId||''), 'info');
       if (d.type === 'KTS_DOC_UPLOAD') toast('📁 KTS upload: ' + ((d.doc&&d.doc.name)||'') + ' · ' + (d.projectId||''), 'info');
-      if (d.type === 'ALN_CHAT' && d._role !== 'founder') toast('💬 [' + (d.channel==='zalo'?'Zalo':'ALN') + '] ' + (d.senderName||d._from||'') + ': ' + String(d.text||'').slice(0,60), 'info');
+      if (d.type === 'ALN_CHAT' && d._role !== 'founder') toast('💬 ' + (d.senderName||d._from||'') + ': ' + String(d.text||'').slice(0,60), 'info');
       if (d.type === 'STAGE_APPROVED') toast('✅ Chặng ' + (d.stage||'') + ' được duyệt: ' + (d.projectId||''), 'ok');
       if (d.type === 'KTS_RATED') toast('⭐ Đánh giá ' + (d.score||'') + '/5 — ' + (d.projName||d.projectId||''), 'ok');
     }
