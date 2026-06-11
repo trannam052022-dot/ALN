@@ -2827,8 +2827,9 @@ onAuthStateChanged(auth, async (user) => {
       window.location.replace("login.html");
       return;
     }
-    if (profile.role !== REQUIRED_ROLE) {
+    if (profile.role !== REQUIRED_ROLE && profile.role !== "founder") {
       // Sai vai trò → chuyển về đúng trang của vai trò đó (KHÔNG đăng xuất)
+      // (Founder là quản trị viên — được phép xem mọi trang để giám sát)
       const PAGE_BY_ROLE = { founder:"founder_panel.html", kts:"kts_dashboard.html", dn:"client_DN.html", cn:"client_CN.html" };
       window.location.replace(PAGE_BY_ROLE[profile.role] || "login.html");
       return;

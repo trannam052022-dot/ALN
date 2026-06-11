@@ -1278,7 +1278,7 @@ body::after {
     <span style="width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 6px var(--amber)"></span>
     <span style="font-size:11px;font-weight:700;color:var(--amber);font-family:var(--mono)">LIVE — Trang Kiến trúc sư</span>
     <span style="font-size:10px;color:var(--dim)">kts_dashboard.html</span>
-    <button onclick="document.getElementById('iframeKts').src=document.getElementById('iframeKts').src"
+    <button onclick="document.getElementById('iframeKts').src=document.getElementById('iframeKts').dataset.src"
       style="margin-left:auto;padding:4px 10px;background:var(--raised);border:1px solid var(--border);color:var(--sub);border-radius:5px;font-size:10px;cursor:pointer;font-family:var(--sans)">
       <i class="fa fa-rotate-right"></i> Tải lại
     </button>
@@ -1287,7 +1287,7 @@ body::after {
       <i class="fa fa-arrow-up-right-from-square"></i> Mở tab mới
     </a>
   </div>
-  <iframe id="iframeKts" src="kts_dashboard.html"
+  <iframe id="iframeKts" src="about:blank" data-src="kts_dashboard.html"
     style="flex:1;width:100%;border:none;min-height:calc(100vh - 84px)"
     allow="same-origin"></iframe>
 </div>
@@ -1298,7 +1298,7 @@ body::after {
     <span style="width:8px;height:8px;border-radius:50%;background:var(--blue);box-shadow:0 0 6px var(--blue)"></span>
     <span style="font-size:11px;font-weight:700;color:var(--blue);font-family:var(--mono)">LIVE — Trang Doanh nghiệp</span>
     <span style="font-size:10px;color:var(--dim)">client_DN.html</span>
-    <button onclick="document.getElementById('iframeDn').src=document.getElementById('iframeDn').src"
+    <button onclick="document.getElementById('iframeDn').src=document.getElementById('iframeDn').dataset.src"
       style="margin-left:auto;padding:4px 10px;background:var(--raised);border:1px solid var(--border);color:var(--sub);border-radius:5px;font-size:10px;cursor:pointer;font-family:var(--sans)">
       <i class="fa fa-rotate-right"></i> Tải lại
     </button>
@@ -1307,7 +1307,7 @@ body::after {
       <i class="fa fa-arrow-up-right-from-square"></i> Mở tab mới
     </a>
   </div>
-  <iframe id="iframeDn" src="client_DN.html"
+  <iframe id="iframeDn" src="about:blank" data-src="client_DN.html"
     style="flex:1;width:100%;border:none;min-height:calc(100vh - 84px)"
     allow="same-origin"></iframe>
 </div>
@@ -1318,7 +1318,7 @@ body::after {
     <span style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></span>
     <span style="font-size:11px;font-weight:700;color:var(--green);font-family:var(--mono)">LIVE — Trang Chủ nhà</span>
     <span style="font-size:10px;color:var(--dim)">client_CN.html</span>
-    <button onclick="document.getElementById('iframeCn').src=document.getElementById('iframeCn').src"
+    <button onclick="document.getElementById('iframeCn').src=document.getElementById('iframeCn').dataset.src"
       style="margin-left:auto;padding:4px 10px;background:var(--raised);border:1px solid var(--border);color:var(--sub);border-radius:5px;font-size:10px;cursor:pointer;font-family:var(--sans)">
       <i class="fa fa-rotate-right"></i> Tải lại
     </button>
@@ -1327,7 +1327,7 @@ body::after {
       <i class="fa fa-arrow-up-right-from-square"></i> Mở tab mới
     </a>
   </div>
-  <iframe id="iframeCn" src="client_CN.html"
+  <iframe id="iframeCn" src="about:blank" data-src="client_CN.html"
     style="flex:1;width:100%;border:none;min-height:calc(100vh - 84px)"
     allow="same-origin"></iframe>
 </div>
@@ -2145,6 +2145,18 @@ function switchTab(t){
   if(t==='mgKts')  renderMgKts();
   if(t==='mgDn')   renderMgDn();
   if(t==='mgCn')   renderMgCn();
+
+  // LIVE iframes: chỉ tải khi vào tab, rời tab thì giải phóng bộ nhớ
+  var IFR = { liveKts:'iframeKts', liveDn:'iframeDn', liveCn:'iframeCn' };
+  Object.keys(IFR).forEach(function(k){
+    var f = document.getElementById(IFR[k]);
+    if(!f) return;
+    if(k === t){
+      if(f.getAttribute('src') !== f.dataset.src) f.setAttribute('src', f.dataset.src);
+    } else {
+      if(f.getAttribute('src') !== 'about:blank') f.setAttribute('src', 'about:blank');
+    }
+  });
 }
 
 /* ══════════════════════════════════════
