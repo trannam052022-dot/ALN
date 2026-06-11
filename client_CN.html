@@ -894,6 +894,7 @@ let activeProj = PROJECTS_CLIENT[0].id;
     };
     var p = PROJECTS_CLIENT[0];
     p.cn = u.name; // chủ đầu tư = người đăng nhập
+    window.CN_DISPLAY_NAME = u.name; // dùng cho pin/góp ý trên bản vẽ
     var d = DEMO_BY_USER[u.userId];
     if (d && d.name) p.name = d.name;
   } catch(e){}
@@ -958,7 +959,7 @@ function sendComment(projId, stage){
   if(!rv) return;
   rv.comments.push({
     id:'cm_'+Date.now(),
-    author: 'Chủ đầu tư (Bạn)',
+    author: ((window.CN_DISPLAY_NAME||'Chủ đầu tư')+' (Bạn)'),
     role:'cn', mine:true,
     text,
     ts: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})
@@ -1216,7 +1217,7 @@ function confirmPin(projId, stage, paId){
     id: 'pin_'+Date.now(),
     x: pin.x, y: pin.y,
     text: note,
-    author: 'Chủ đầu tư',
+    author: (window.CN_DISPLAY_NAME||'Chủ đầu tư'),
     role: 'cn',
     ts: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}),
     resolved: false
@@ -1226,7 +1227,7 @@ function confirmPin(projId, stage, paId){
   _annotState.mode = 'view';
   showToast(`📍 Đã thêm pin #${pa.pins.length} — KTS sẽ nhận thông báo`, 't-amber');
   // Broadcast
-  try{ALNRealtime.send({type:'PIN_ADDED',projectId:projId,stage,paId,pinText:note})}catch(e){}
+  try{ALNRealtime.send({type:'PIN_ADDED',projectId:projId,stage,paId,pinText:note,paName:(pa&&pa.name)||paId,senderName:(window.CN_DISPLAY_NAME||'Chủ nhà')})}catch(e){}
   _renderAnnotModal();
 }
 
@@ -1498,8 +1499,8 @@ const REVIEW_DATA = {
           icon:'📐', bg:'linear-gradient(135deg,#0e1418,#0a1020)',
           desc:'Mặt bằng tổng thể hướng Đông-Nam. Tối ưu ánh sáng tự nhiên.',
           kts:'KTS. Trần Lê Minh', date:'2026-05-10', status:'approved', pins:[
-            {id:'pin1',x:62,y:38,text:'Cổng vào chính — đề xuất dịch sang trái 1.2m cho xe ra vào dễ hơn',author:'Nguyễn Văn Thuận',role:'cn',ts:'11/05 14:32',resolved:true},
-            {id:'pin2',x:35,y:55,text:'Phòng khách quá hẹp, cần mở rộng thêm ~2m²',author:'Nguyễn Văn Thuận',role:'cn',ts:'11/05 15:00',resolved:true},
+            {id:'pin1',x:62,y:38,text:'Cổng vào chính — đề xuất dịch sang trái 1.2m cho xe ra vào dễ hơn',author:(window.CN_DISPLAY_NAME||'Nguyễn Văn Thuận'),role:'cn',ts:'11/05 14:32',resolved:true},
+            {id:'pin2',x:35,y:55,text:'Phòng khách quá hẹp, cần mở rộng thêm ~2m²',author:(window.CN_DISPLAY_NAME||'Nguyễn Văn Thuận'),role:'cn',ts:'11/05 15:00',resolved:true},
           ] },
         { id:'PA_C1_2', name:'MB Phương án B — Hướng Tây', folder:'mb', version:'v1.0',
           icon:'📏', bg:'linear-gradient(135deg,#181418,#100e14)',
@@ -1508,9 +1509,9 @@ const REVIEW_DATA = {
       ],
       comments: [
         { id:'c1', author:'KTS. Trần Lê Minh', role:'kts', text:'Đã hoàn thiện phương án mặt bằng tổng thể theo yêu cầu. Hướng nhà chính Đông-Nam, tối ưu ánh sáng tự nhiên.', ts:'10/05 09:15', mine:false },
-        { id:'c2', author:'Nguyễn Văn Thuận',   role:'cn',  text:'Đồng ý phương án A. Tuy nhiên cần điều chỉnh vị trí cổng vào cho phù hợp với mặt đường.', ts:'11/05 14:32', mine:true },
+        { id:'c2', author:(window.CN_DISPLAY_NAME||'Nguyễn Văn Thuận'),   role:'cn',  text:'Đồng ý phương án A. Tuy nhiên cần điều chỉnh vị trí cổng vào cho phù hợp với mặt đường.', ts:'11/05 14:32', mine:true },
         { id:'c3', author:'KTS. Trần Lê Minh', role:'kts', text:'Đã cập nhật vị trí cổng vào. Xin phê duyệt để tiến hành Chặng 2.', ts:'12/05 08:20', mine:false },
-        { id:'c4', author:'Nguyễn Văn Thuận',   role:'cn',  text:'✅ Đã phê duyệt. Tiến hành Chặng 2!', ts:'12/05 10:05', mine:true },
+        { id:'c4', author:(window.CN_DISPLAY_NAME||'Nguyễn Văn Thuận'),   role:'cn',  text:'✅ Đã phê duyệt. Tiến hành Chặng 2!', ts:'12/05 10:05', mine:true },
       ]
     },
     C2: {
@@ -1524,7 +1525,7 @@ const REVIEW_DATA = {
           icon:'🏛️', bg:'linear-gradient(135deg,#1a1a2e,#0e0e1a)',
           desc:'View từ cổng chính. Phong cách tân cổ điển với cột đá tự nhiên.',
           kts:'KTS. Trần Lê Minh', date:'2026-05-28', status:'pending', isNew:true, pins:[
-            {id:'pin5',x:48,y:42,text:'Màu sắc cột đá quá sáng, cần tone trầm hơn theo mẫu đã thống nhất',author:'Nguyễn Văn Thuận',role:'cn',ts:'29/05 10:00',resolved:false},
+            {id:'pin5',x:48,y:42,text:'Màu sắc cột đá quá sáng, cần tone trầm hơn theo mẫu đã thống nhất',author:(window.CN_DISPLAY_NAME||'Nguyễn Văn Thuận'),role:'cn',ts:'29/05 10:00',resolved:false},
           ] },
         { id:'PA_C2_2', name:'3D Phối cảnh ngoại thất — Góc vườn', folder:'pc_ngoai', version:'v1.0',
           icon:'🌿', bg:'linear-gradient(135deg,#0e1a14,#0a120e)',

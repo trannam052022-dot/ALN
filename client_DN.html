@@ -1214,7 +1214,7 @@ function confirmPin(projId, stage, paId){
   _annotState.mode = 'view';
   showToast(`📍 Đã thêm pin #${pa.pins.length} — KTS sẽ nhận thông báo`, 't-amber');
   // Broadcast
-  try{ALNRealtime.send({type:'PIN_ADDED',projectId:projId,stage,paId,pinText:note})}catch(e){}
+  try{ALNRealtime.send({type:'PIN_ADDED',projectId:projId,stage,paId,pinText:note,paName:(pa&&pa.name)||paId,senderName:((typeof DN_USER!=='undefined'&&DN_USER.name)||'Doanh nghiệp')})}catch(e){}
   _renderAnnotModal();
 }
 

@@ -1342,6 +1342,16 @@ ALNRealtime.init({
         }
       }
     }
+
+    /* Góp ý PIN trên bản vẽ từ Chủ nhà / DN -> đổ vào đúng luồng hội thoại */
+    if(d.type==='PIN_ADDED' && d._role !== 'kts') {
+      const _pinTxt  = '📍 Góp ý trên bản vẽ ' + (d.paName ? '['+d.paName+']' : '') + ': ' + (d.pinText||'');
+      const _pinFrom = d.senderName || (d._role==='dn' ? 'Doanh nghiệp' : 'Chủ nhà');
+      _alnReceive({ text:_pinTxt, senderName:_pinFrom, _role:(d._role||'cn'), ts:d.ts, projectId:d.projectId, _replay:d._replay });
+      if(d._role !== 'dn'){
+        try{ _ktsRenderMsg({ senderName:_pinFrom, text:_pinTxt, ts:(d.ts||Date.now()) }, false); }catch(e){}
+      }
+    }
     // Rating nhận được
     if(d.type==='KTS_RATED') {
       showToast(`⭐ Bạn nhận được đánh giá ${d.score}/5 sao cho Chặng ${d.stage} — ${d.projName}`, 't-green');
