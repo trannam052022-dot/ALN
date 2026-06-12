@@ -3195,6 +3195,30 @@ onAuthStateChanged(auth, async (user) => {
       } catch(e){ console.warn('[ALN Push]', e); }
     };
     window.alnInitPush();
+
+    // ── CÔNG TẮC GIÁM SÁT PUSH: founder nhận thêm tin chat/pin về thiết bị ──
+    try {
+      const pill = document.createElement('button');
+      pill.id = 'alnMonitorPill';
+      pill.style.cssText = 'position:fixed;bottom:20px;left:20px;z-index:498;background:#111114;border:1.5px solid rgba(240,235,224,.2);border-radius:99px;padding:9px 16px;font-size:11px;font-weight:700;color:rgba(240,235,224,.45);cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.45);font-family:inherit';
+      pill.textContent = '🔔 Giám sát push: ...';
+      pill.title = 'BẬT: mọi tin chat/pin cũng đẩy về thiết bị founder. TẮT: founder chỉ nhận dispute.';
+      document.body.appendChild(pill);
+      const ref = doc(db, 'settings', 'push');
+      let mon = false;
+      try { const s = await getDoc(ref); mon = !!(s.exists() && s.data().founderMonitor); } catch(e){}
+      const paint = () => {
+        pill.textContent = '🔔 Giám sát push: ' + (mon ? 'BẬT' : 'TẮT');
+        pill.style.color = mon ? '#C9A84C' : 'rgba(240,235,224,.45)';
+        pill.style.borderColor = mon ? 'rgba(201,168,76,.5)' : 'rgba(240,235,224,.2)';
+      };
+      paint();
+      pill.onclick = async () => {
+        mon = !mon; paint();
+        try { await setDoc(ref, { founderMonitor: mon, ts: Date.now() }, { merge: true }); }
+        catch(e){ mon = !mon; paint(); try{ toast('Không lưu được cài đặt — kiểm tra mạng/rules', 'err'); }catch(_){} }
+      };
+    } catch(e){}
   } catch(e) {
     console.error("[ALN Guard]", e);
     // Không kẹt màn hình xác thực: cho người dùng bấm thử lại
