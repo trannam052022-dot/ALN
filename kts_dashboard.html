@@ -72,6 +72,17 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .nav-badge{margin-left:auto;background:var(--red);color:#fff;border-radius:99px;padding:1px 6px;font-size:10px;font-weight:700}
 
 .sidebar-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--border);background:linear-gradient(0deg,rgba(201,168,76,.04) 0%,transparent 100%)}
+/* Hồ sơ KTS đầu sidebar — trang trọng */
+.kts-hero{display:flex;align-items:center;gap:11px;margin:4px 12px 12px;padding:12px;border-radius:12px;background:linear-gradient(135deg,rgba(201,168,76,.14),rgba(201,168,76,.05));border:1px solid rgba(201,168,76,.3)}
+.kts-hero-av{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#d4b86a);color:#000;display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-weight:800;font-size:17px;flex-shrink:0;box-shadow:0 4px 14px rgba(201,168,76,.35)}
+.kts-hero-info{min-width:0}
+.kts-hero-name{font-family:var(--serif);font-size:14.5px;font-weight:700;font-style:italic;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kts-hero-badges{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0 3px}
+.khb{font-size:8.5px;font-weight:700;padding:2px 6px;border-radius:99px;letter-spacing:.02em}
+.khb-gold{background:rgba(201,168,76,.18);color:var(--gold);border:1px solid rgba(201,168,76,.4)}
+.khb-rank{background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.35)}
+.khb-verify{background:rgba(74,222,128,.1);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+.kts-hero-meta{font-size:9.5px;color:var(--muted)}
 .kts-profile{display:flex;align-items:center;gap:10px}
 .kts-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#d4b86a);color:#000;display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-weight:800;font-size:13px;flex-shrink:0}
 .kts-name{font-family:var(--serif);font-size:13px;font-weight:600;font-style:italic}
@@ -396,6 +407,20 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="logo-text">kts.<span>ALN</span></div>
   </div>
 
+  <!-- ═══ HỒ SƠ KTS — vị trí trang trọng đầu trang ═══ -->
+  <div class="kts-hero">
+    <div class="kts-hero-av" id="ktsHeroAv">TM</div>
+    <div class="kts-hero-info">
+      <div class="kts-hero-name" id="ktsHeroName">KTS. Trần Lê Minh</div>
+      <div class="kts-hero-badges">
+        <span class="khb khb-gold">⭐ 4.8</span>
+        <span class="khb khb-rank">Hạng Chuẩn</span>
+        <span class="khb khb-verify">✓ Đã xác minh</span>
+      </div>
+      <div class="kts-hero-meta">23 dự án · KTS-2021-04821</div>
+    </div>
+  </div>
+
   <div class="nav-section">Tổng quan</div>
   <a class="nav-item active"><span class="icon"><i class="fa fa-gauge-high"></i></span> Dashboard</a>
   <a class="nav-item" onclick="showToast('Tính năng đang phát triển','t-blue')"><span class="icon"><i class="fa fa-briefcase"></i></span> Dự án của tôi <span class="nav-badge">2</span></a>
@@ -412,15 +437,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   <div class="nav-section">Tài khoản</div>
   <a class="nav-item" onclick="showToast('Hồ sơ KTS','t-purple')"><span class="icon"><i class="fa fa-user-tie"></i></span> Hồ sơ của tôi</a>
 
-  <div class="sidebar-footer">
-    <div class="kts-profile">
-      <div class="kts-av">TM</div>
-      <div>
-        <div class="kts-name">Trần Lê Minh</div>
-        <div class="kts-rank">⭐ 4.8 · Hạng Chuẩn</div>
-      </div>
-    </div>
-  </div>
+
 </nav>
 
 <!-- ═══════════════ MAIN ═══════════════ -->
@@ -1821,6 +1838,19 @@ onAuthStateChanged(auth, async (user) => {
       } catch(e){ console.warn('[ALN Push]', e); }
     };
     window.alnInitPush();
+
+    // Hồ sơ KTS đầu sidebar: tên + avatar theo tài khoản đăng nhập
+    try {
+      const nm = (profile && profile.name) || '';
+      if (nm) {
+        const el = document.getElementById('ktsHeroName');
+        if (el) el.textContent = nm.startsWith('KTS') ? nm : ('KTS. ' + nm.replace(/^KTS\.?\s*/i,''));
+        const parts = nm.replace(/^KTS\.?\s*/i,'').trim().split(/\s+/);
+        const ini = (parts.length >= 2 ? parts[parts.length-2][0] + parts[parts.length-1][0] : (parts[0]||'K')[0]).toUpperCase();
+        const av = document.getElementById('ktsHeroAv');
+        if (av) av.textContent = ini;
+      }
+    } catch(e){}
   } catch(e) {
     console.error("[ALN Guard]", e);
     // Không kẹt màn hình xác thực: cho người dùng bấm thử lại
