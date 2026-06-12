@@ -1684,6 +1684,59 @@ function alnNotify(title, body){
 })();
 </script>
 
+
+<!-- ═══ KTS WORKSPACE TABS — gọn giao diện: mỗi lúc 1 mục ═══ -->
+<script>
+(function(){
+  function initTabs(){
+    var first = document.querySelector('.sec-label.wallet-section');
+    if(!first) return;
+    var cont = first.parentElement;
+    var SKIP = /modal|toast|popup|fab|veil|overlay|aln|chat/i;
+    var MARK = [['wallet-section','wallet'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip']];
+    var groups = { dashboard: [] };
+    var cur = 'dashboard';
+    Array.prototype.forEach.call(cont.children, function(k){
+      if(k.tagName === 'SCRIPT' || k.tagName === 'STYLE' || k.tagName === 'HEADER') return;
+      var idc = (k.id || '') + ' ' + (k.className && k.className.baseVal !== undefined ? '' : (k.className || ''));
+      if(SKIP.test(idc)) return; // không đụng modal/toast/chat nổi
+      if(k.classList && k.classList.contains('sec-label')){
+        for(var i=0;i<MARK.length;i++){ if(k.classList.contains(MARK[i][0])){ cur = MARK[i][1]; } }
+      }
+      (groups[cur] = groups[cur] || []).push(k);
+    });
+
+    window.ktsShowTab = function(name, el){
+      Object.keys(groups).forEach(function(n){
+        groups[n].forEach(function(node){ node.style.display = (n === name) ? '' : 'none'; });
+      });
+      document.querySelectorAll('.sidebar .nav-item').forEach(function(a){ a.classList.remove('active'); });
+      if(el) el.classList.add('active');
+      try{ window.scrollTo({top:0}); var mn=document.querySelector('.main'); if(mn) mn.scrollTop=0; }catch(e){}
+      try{ if(typeof closeMobileSidebar === 'function') closeMobileSidebar(); }catch(e){}
+    };
+
+    // Nối menu trái -> tab (ghi đè scrollTo cũ)
+    var MAPNAV = [['Dashboard','dashboard'],['Ví thu nhập','wallet'],['Hồ sơ C3','c3'],['Kho tài sản','asset'],['Gói VIP','vip']];
+    var navDefault = null;
+    document.querySelectorAll('.sidebar .nav-item').forEach(function(a){
+      var t = a.textContent || '';
+      MAPNAV.forEach(function(p){
+        if(t.indexOf(p[0]) !== -1){
+          a.onclick = function(){ window.ktsShowTab(p[1], a); };
+          if(p[1] === 'dashboard') navDefault = a;
+        }
+      });
+    });
+
+    // Mặc định mở trang: chỉ Dashboard — gọn gàng
+    window.ktsShowTab('dashboard', navDefault);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initTabs);
+  else initTabs();
+})();
+</script>
+
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
 import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limitToLast, onSnapshot, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
