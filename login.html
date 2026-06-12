@@ -115,6 +115,9 @@ body::after{
   .form-body,.card-top{padding-left:16px;padding-right:16px}
 }
 </style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
 
@@ -349,8 +352,11 @@ async function doLogin(){
   btn.innerHTML = '<i class="fa fa-circle-notch fa-spin" style="margin-right:6px"></i> Đang kiểm tra...';
 
   try {
-    // Chờ Firebase SDK sẵn sàng
-    const fb = await window.ALN_FIREBASE_READY;
+    // Chờ Firebase SDK sẵn sàng (tối đa 15 giây — quá hạn sẽ báo lỗi rõ ràng)
+    const fb = await Promise.race([
+      window.ALN_FIREBASE_READY,
+      new Promise((_, rej) => setTimeout(() => rej(new Error('SDK_TIMEOUT')), 15000))
+    ]);
 
     // Đăng nhập: "founder" → "founder@aln.vn"
     const email = fb.usernameToEmail(user);
@@ -408,8 +414,10 @@ async function doLogin(){
       showError('Đăng nhập sai quá nhiều lần. Vui lòng thử lại sau ít phút.');
     } else if(code === 'auth/network-request-failed'){
       showError('Lỗi kết nối mạng. Vui lòng kiểm tra Internet.');
+    } else if(err && err.message === 'SDK_TIMEOUT'){
+      showError('Không tải được hệ thống xác thực (Firebase SDK). Kiểm tra kết nối mạng, hoặc file firebase-config.js trên server bị lỗi/thiếu.');
     } else {
-      showError('Có lỗi xảy ra: ' + (err.message || 'không xác định'));
+      showError('Có lỗi xảy ra [' + (err.code || '?') + ']: ' + (err.message || 'không xác định'));
     }
     resetLoginBtn();
   }

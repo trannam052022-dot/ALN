@@ -548,6 +548,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .zp-send:hover{background:#0554a0;transform:scale(1.05)}
 
 </style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
 <!-- ═══ ALN AUTH VEIL — che trang đến khi xác thực xong ═══ -->
@@ -797,7 +800,7 @@ window.ALNRealtime = (() => {
   function _flushPending(){ while(_pending.length){ _push(_pending.shift()); } }
 
   function send(msg){
-    let full = { ...msg, _from:_userId, _role:_role, ts: Date.now(),
+    let full = { ...msg, _from:_userId, _role:_role, _uid:(window.__ALN_UID||null), ts: Date.now(),
       _cid: 'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,8) };
     try { full = JSON.parse(JSON.stringify(full)); } catch(e){}   // loại bỏ undefined
     _sent.add(full._cid);
@@ -2849,10 +2852,16 @@ function alnEnableNotify(){
     _alnSoundOn = true;
   } catch(e){}
   try {
-    if('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+    if('Notification' in window){
+      if(Notification.permission === 'default'){
+        Notification.requestPermission().then(function(p){
+          if(p === 'granted' && window.alnInitPush) window.alnInitPush();
+        });
+      } else if(Notification.permission === 'granted' && window.alnInitPush){
+        window.alnInitPush();
+      }
+    }
   } catch(e){}
-  try { localStorage.setItem('aln_notify','1'); } catch(e){}
-  var b = document.getElementById('alnNotifyBtn'); if(b) b.remove();
 }
 
 function _alnBeep(){
@@ -2907,22 +2916,10 @@ function alnNotify(title, body){
   if(document.hidden) _alnFlashTitle(title);
 }
 
-/* Nút "Bật chuông" — chỉ hiện khi chưa bật; tự mở khóa lại ở lần chạm đầu nếu đã bật trước đó */
+/* Tự kích hoạt chuông + quyền thông báo ở lần chạm đầu tiên (không cần nút) */
 (function(){
-  var enabled = false;
-  try { enabled = localStorage.getItem('aln_notify') === '1'; } catch(e){}
-  if (!enabled) {
-    try {
-      var b = document.createElement('button');
-      b.id = 'alnNotifyBtn';
-      b.innerHTML = '🔔 Bật chuông báo tin';
-      b.style.cssText = 'position:fixed;top:64px;right:12px;z-index:499;background:linear-gradient(135deg,#C9A84C,#d4b86a);border:none;border-radius:99px;padding:8px 14px;font-size:11px;font-weight:700;color:#000;cursor:pointer;box-shadow:0 6px 18px rgba(201,168,76,.4)';
-      b.onclick = alnEnableNotify;
-      document.body.appendChild(b);
-    } catch(e){}
-  }
   function unlockOnce(){
-    try { if(localStorage.getItem('aln_notify')==='1') alnEnableNotify(); } catch(e){}
+    alnEnableNotify();
     document.removeEventListener('click', unlockOnce);
     document.removeEventListener('touchstart', unlockOnce);
   }
@@ -2933,7 +2930,7 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, collection, addDoc, query, orderBy, limitToLast, onSnapshot } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limitToLast, onSnapshot, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "cn";
 
@@ -2986,6 +2983,34 @@ onAuthStateChanged(auth, async (user) => {
     if (window.__ALN_RT_RESOLVE) {
       window.__ALN_RT_RESOLVE({ db, collection, addDoc, query, orderBy, limitToLast, onSnapshot });
     }
+
+    // ── WEB PUSH (FCM): đăng ký token tự động khi đã có quyền thông báo ──
+    window.__ALN_UID = user.uid;
+    window.alnInitPush = async function(){
+      try {
+        if (!('serviceWorker' in navigator) || !('Notification' in window)) return;
+        if (Notification.permission !== 'granted') return;
+        if (!ALN_VAPID_KEY || ALN_VAPID_KEY.indexOf('DAN_KHOA') === 0) { console.warn('[ALN Push] Chưa dán khóa VAPID'); return; }
+        const ok = await fcmSupported().catch(() => false);
+        if (!ok) return;
+        const reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+        const messaging = getMessaging();
+        const tok = await getToken(messaging, { vapidKey: ALN_VAPID_KEY, serviceWorkerRegistration: reg });
+        if (tok) {
+          await setDoc(doc(db, 'fcmTokens', tok), {
+            token: tok, uid: user.uid, role: profile.role,
+            ua: (navigator.userAgent || '').slice(0, 100), ts: Date.now()
+          });
+          console.log('[ALN Push] Token đã đăng ký');
+        }
+        // Tin đến khi trang đang mở -> chuông tại chỗ
+        onFcmMessage(messaging, (p) => {
+          const dd = (p && p.data) || {};
+          try { alnNotify(dd.title || 'ALN', dd.body || ''); } catch(e){}
+        });
+      } catch(e){ console.warn('[ALN Push]', e); }
+    };
+    window.alnInitPush();
   } catch(e) {
     console.error("[ALN Guard]", e);
     // Không kẹt màn hình xác thực: cho người dùng bấm thử lại

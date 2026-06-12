@@ -10,6 +10,9 @@ import {
   onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
+  getMessaging, getToken, onMessage as onFcmMessage, isSupported as fcmSupported
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+import {
   getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
   collection, addDoc, getDocs, query, where, orderBy, limit, limitToLast,
   onSnapshot, serverTimestamp
@@ -41,6 +44,10 @@ const db = getFirestore(app);
 
 /* Quy ước: tên đăng nhập "founder" ⇄ email "founder@aln.vn" */
 const ALN_EMAIL_DOMAIN = "@aln.vn";
+
+/* KHÓA WEB PUSH (VAPID) — lấy tại Firebase Console:
+   Project settings -> Cloud Messaging -> Web Push certificates -> Generate key pair */
+const ALN_VAPID_KEY = "BI2O01Nr82Q59n9pQSdqgoTuoMHeG-agdjzRo-8yYDqevWmdH9rh65Lhxu0VdNZHGfRGHDu_FQB0UD39eZOXVWo";
 function usernameToEmail(username) {
   username = (username || "").trim().toLowerCase();
   return username.includes("@") ? username : username + ALN_EMAIL_DOMAIN;
@@ -52,5 +59,6 @@ export {
   onAuthStateChanged, signOut,
   doc, getDoc, setDoc, updateDoc, deleteDoc,
   collection, addDoc, getDocs, query, where, orderBy, limit, limitToLast,
-  onSnapshot, serverTimestamp
+  onSnapshot, serverTimestamp,
+  getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY
 };
