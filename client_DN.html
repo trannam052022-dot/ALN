@@ -2960,7 +2960,8 @@ onAuthStateChanged(auth, async (user) => {
         if (!ALN_VAPID_KEY || ALN_VAPID_KEY.indexOf('DAN_KHOA') === 0) { console.warn('[ALN Push] Chưa dán khóa VAPID'); return; }
         const ok = await fcmSupported().catch(() => false);
         if (!ok) return;
-        const reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+        await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+        const reg = await navigator.serviceWorker.ready; // chờ Service Worker ACTIVE rồi mới xin token
         const messaging = getMessaging();
         const tok = await getToken(messaging, { vapidKey: ALN_VAPID_KEY, serviceWorkerRegistration: reg });
         if (tok) {
