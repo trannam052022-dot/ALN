@@ -13,6 +13,9 @@ import {
   getMessaging, getToken, onMessage as onFcmMessage, isSupported as fcmSupported
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 import {
+  getStorage, ref as storageRef, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import {
   getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
   collection, addDoc, getDocs, query, where, orderBy, limit, limitToLast,
   onSnapshot, serverTimestamp
@@ -41,6 +44,7 @@ try {
   auth = getAuth(app);
 }
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 /* Quy ước: tên đăng nhập "founder" ⇄ email "founder@aln.vn" */
 const ALN_EMAIL_DOMAIN = "@aln.vn";
@@ -60,5 +64,6 @@ export {
   doc, getDoc, setDoc, updateDoc, deleteDoc,
   collection, addDoc, getDocs, query, where, orderBy, limit, limitToLast,
   onSnapshot, serverTimestamp,
-  getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY
+  getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY,
+  storage, storageRef, uploadBytes, getDownloadURL
 };

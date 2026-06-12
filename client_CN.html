@@ -1315,6 +1315,20 @@ function _processFiles(files,projId,stage,paId,source){
         name:file.name,size:(file.size/1024).toFixed(0)+'KB',type:isImg?'image':ext,
         dataUrl:isImg?dataUrl:null,
         ts:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})});
+      // ── Đẩy file lên mây + gửi link tải cho KTS ──
+      try{
+        if(window.alnUploadFile){
+          const _safe = file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+          const _path = 'uploads/' + projId + '/' + paId + '/' + Date.now() + '_' + _safe;
+          window.alnUploadFile(file, _path).then(function(url){
+            try{ALNRealtime.send({ type:'ALN_CHAT', audience:['kts'], projectId:projId,
+              text:'📎 Đã gửi tệp [' + ((pa&&pa.name)||paId) + ']: ' + file.name + ' — <a href="' + url + '" target="_blank" style="color:#C9A84C;text-decoration:underline;font-weight:700">Tải về</a>',
+              senderName:(window.CN_DISPLAY_NAME || (typeof CN_USER!=='undefined' && CN_USER.name) || 'Chủ nhà'), senderRole:'cn' });}catch(e){}
+          }).catch(function(err){
+            try{showToast('⚠️ Không đưa được file lên mây: ' + ((err&&err.code)||err), 't-red')}catch(e){}
+          });
+        }
+      }catch(e){}
       if(++loaded===files.length){
         showToast(`📤 Đã tải lên ${loaded} file — KTS nhận thông báo ngay!`,'t-green');
         try{ALNRealtime.send({type:'CN_FILE_UPLOADED',projectId:projId,stage,paId,count:loaded})}catch(e){}
@@ -2996,7 +3010,7 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limitToLast, onSnapshot, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limitToLast, onSnapshot, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY, storage, storageRef, uploadBytes, getDownloadURL } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "cn";
 
@@ -3078,6 +3092,13 @@ onAuthStateChanged(auth, async (user) => {
       } catch(e){ console.warn('[ALN Push]', e); }
     };
     window.alnInitPush();
+
+    // ── ĐẨY FILE LÊN MÂY (Firebase Storage) ──
+    window.alnUploadFile = async function(file, path){
+      const r = storageRef(storage, path);
+      await uploadBytes(r, file);
+      return await getDownloadURL(r);
+    };
   } catch(e) {
     console.error("[ALN Guard]", e);
     // Không kẹt màn hình xác thực: cho người dùng bấm thử lại
