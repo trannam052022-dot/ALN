@@ -2928,6 +2928,72 @@ function alnNotify(title, body){
 })();
 </script>
 
+
+<!-- ═══ CHỦ NHÀ WORKSPACE TABS — gọn màn hình theo tâm lý người dùng ═══ -->
+<script>
+(function(){
+  var TABS = [
+    { id: 'tq', label: '🏠 Tổng quan' },
+    { id: 'pa', label: '📐 Bản vẽ & Hồ sơ' },
+    { id: 'up', label: '📤 Gửi tài liệu' }
+  ];
+  var cur = 'tq';
+
+  function classify(el){
+    var t = (el.textContent || '').slice(0, 500).toLowerCase();
+    if(/tiến độ/.test(t)) return 'tq';
+    if(/tải lên|kéo thả|drop zone|gửi cho kts/.test(t)) return 'up';
+    if(/bàn giao|kho tài liệu/.test(t)) return 'c4';
+    if(/phương án|review|bản vẽ|đánh giá/.test(t)) return 'pa';
+    return 'tq';
+  }
+
+  window.cnApplyTabs = function(){
+    var cont = document.querySelector('.content-cn');
+    if(!cont) return;
+    var bar = document.getElementById('cnTabBar');
+    if(!bar){
+      bar = document.createElement('div');
+      bar.id = 'cnTabBar';
+      bar.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:0;z-index:5;background:linear-gradient(180deg,#0a0a0c 75%,transparent);padding:6px 0 12px';
+      TABS.forEach(function(t){
+        var b = document.createElement('button');
+        b.dataset.tab = t.id;
+        b.textContent = t.label;
+        b.style.cssText = 'flex:1;min-width:118px;padding:11px 8px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#15151a;color:rgba(240,235,224,.6);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s';
+        b.onclick = function(){ cur = t.id; window.cnApplyTabs(); try{window.scrollTo({top:0});}catch(e){} };
+        bar.appendChild(b);
+      });
+    }
+    if(cont.firstElementChild !== bar) cont.insertBefore(bar, cont.firstChild);
+    Array.prototype.forEach.call(cont.children, function(k){
+      if(k === bar) return;
+      var g = k.dataset.alnTab || (k.dataset.alnTab = classify(k));
+      k.style.display = (g === cur) ? '' : 'none';
+    });
+    bar.querySelectorAll('button').forEach(function(b){
+      var on = b.dataset.tab === cur;
+      b.style.background = on ? 'linear-gradient(135deg,rgba(201,168,76,.22),rgba(201,168,76,.08))' : '#15151a';
+      b.style.color = on ? '#C9A84C' : 'rgba(240,235,224,.6)';
+      b.style.borderColor = on ? 'rgba(201,168,76,.55)' : 'rgba(255,255,255,.1)';
+    });
+  };
+
+  // Bọc renderMain: mỗi lần vẽ lại nội dung -> áp tab lại
+  function hook(){
+    var rm = window.renderMain;
+    if(typeof rm === 'function' && !rm.__alnTabbed){
+      var w = function(){ rm.apply(this, arguments); try{ window.cnApplyTabs(); }catch(e){} };
+      w.__alnTabbed = true;
+      window.renderMain = w;
+    }
+    try{ window.cnApplyTabs(); }catch(e){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(hook, 0); });
+  else setTimeout(hook, 0);
+})();
+</script>
+
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
 import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limitToLast, onSnapshot, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
