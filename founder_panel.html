@@ -2102,6 +2102,12 @@ window.ALNRealtime = (() => {
     onReady: function(mode){ console.log('ALN Realtime (Founder):', mode); },
     onMessage: function(d){
       if (d._replay) return; // tin phát lại lịch sử — nạp âm thầm, không bắn thông báo
+      try{
+        if(d.type==='ALN_CHAT' || d.type==='PIN_ADDED' || d.type==='DISPUTE_OPENED'){
+          var _nt = d.type==='DISPUTE_OPENED' ? '🚨 Dispute mới' : 'Tin nhắn từ sàn ALN';
+          alnNotify(_nt, (d.senderName||d._from||'') + ': ' + String(d.text||d.pinText||d.projectId||'').slice(0,60));
+        }
+      }catch(e){}
       if (d.type === 'DISPUTE_OPENED') toast('🚨 Dispute mới: ' + d.projectId + ' · ' + (d.category||''), 'err');
       if (d.type === 'C3_SUBMITTED' || d.type === 'KTS_C3_SUBMITTED') toast('📁 C3 nộp: ' + (d.projectId||'') + ' · ' + (d.ktsName||''), 'info');
       if (d.type === 'DOC_UPLOADED' && d._role !== 'founder') toast('📁 Tài liệu mới: ' + (d.projectId||''), 'info');
@@ -3012,6 +3018,101 @@ function toast(msg,type){
 renderTable();
 
 
+</script>
+
+
+<!-- ═══ ALN NOTIFY — chuông + rung + thông báo hệ thống ═══ -->
+<script>
+let _alnAudioCtx = null, _alnSoundOn = false;
+
+function alnEnableNotify(){
+  /* Gọi trong cử chỉ người dùng: mở khóa âm thanh + xin quyền thông báo */
+  try {
+    if(!_alnAudioCtx) _alnAudioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    if(_alnAudioCtx.state === 'suspended') _alnAudioCtx.resume();
+    _alnSoundOn = true;
+  } catch(e){}
+  try {
+    if('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+  } catch(e){}
+  try { localStorage.setItem('aln_notify','1'); } catch(e){}
+  var b = document.getElementById('alnNotifyBtn'); if(b) b.remove();
+}
+
+function _alnBeep(){
+  if(!_alnSoundOn || !_alnAudioCtx) return;
+  try {
+    var t0 = _alnAudioCtx.currentTime;
+    var o=_alnAudioCtx.createOscillator(), g=_alnAudioCtx.createGain();
+    o.connect(g); g.connect(_alnAudioCtx.destination);
+    o.type='sine'; o.frequency.value=880;
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(0.18,t0+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+0.35);
+    o.start(t0); o.stop(t0+0.4);
+    var o2=_alnAudioCtx.createOscillator(), g2=_alnAudioCtx.createGain();
+    o2.connect(g2); g2.connect(_alnAudioCtx.destination);
+    o2.type='sine'; o2.frequency.value=1175;
+    g2.gain.setValueAtTime(0.0001,t0+0.12);
+    g2.gain.exponentialRampToValueAtTime(0.16,t0+0.13);
+    g2.gain.exponentialRampToValueAtTime(0.0001,t0+0.5);
+    o2.start(t0+0.12); o2.stop(t0+0.55);
+  } catch(e){}
+}
+
+let _alnTitleTimer = null;
+const _alnTitleOrig = document.title;
+function _alnFlashTitle(msg){
+  clearInterval(_alnTitleTimer);
+  var on = false;
+  _alnTitleTimer = setInterval(function(){
+    document.title = on ? _alnTitleOrig : ('💬 ' + msg);
+    on = !on;
+  }, 1200);
+  var stop = function(){
+    clearInterval(_alnTitleTimer);
+    document.title = _alnTitleOrig;
+    document.removeEventListener('visibilitychange', onVis);
+  };
+  var onVis = function(){ if(!document.hidden) stop(); };
+  document.addEventListener('visibilitychange', onVis);
+  setTimeout(stop, 30000);
+}
+
+function alnNotify(title, body){
+  _alnBeep();
+  try { if(navigator.vibrate) navigator.vibrate([180,90,180]); } catch(e){}
+  try {
+    if('Notification' in window && Notification.permission === 'granted' && document.hidden){
+      var n = new Notification(title, { body: body||'', tag: 'aln-msg' });
+      n.onclick = function(){ try{ window.focus(); }catch(e){} try{ n.close(); }catch(e){} };
+    }
+  } catch(e){}
+  if(document.hidden) _alnFlashTitle(title);
+}
+
+/* Nút "Bật chuông" — chỉ hiện khi chưa bật; tự mở khóa lại ở lần chạm đầu nếu đã bật trước đó */
+(function(){
+  var enabled = false;
+  try { enabled = localStorage.getItem('aln_notify') === '1'; } catch(e){}
+  if (!enabled) {
+    try {
+      var b = document.createElement('button');
+      b.id = 'alnNotifyBtn';
+      b.innerHTML = '🔔 Bật chuông báo tin';
+      b.style.cssText = 'position:fixed;top:64px;right:12px;z-index:499;background:linear-gradient(135deg,#C9A84C,#d4b86a);border:none;border-radius:99px;padding:8px 14px;font-size:11px;font-weight:700;color:#000;cursor:pointer;box-shadow:0 6px 18px rgba(201,168,76,.4)';
+      b.onclick = alnEnableNotify;
+      document.body.appendChild(b);
+    } catch(e){}
+  }
+  function unlockOnce(){
+    try { if(localStorage.getItem('aln_notify')==='1') alnEnableNotify(); } catch(e){}
+    document.removeEventListener('click', unlockOnce);
+    document.removeEventListener('touchstart', unlockOnce);
+  }
+  document.addEventListener('click', unlockOnce);
+  document.addEventListener('touchstart', unlockOnce);
+})();
 </script>
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
