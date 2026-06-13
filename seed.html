@@ -306,10 +306,20 @@ onAuthStateChanged(auth, async (user) => {
     $('signout').classList.remove('hidden');
     $('auth-card').classList.add('hidden');
     $('seed-zone').classList.remove('hidden');
-    try{
-      const us = await getDoc(doc(db,'users',user.uid));
-      currentRole = us.exists() ? (us.data().role || null) : null;
-    }catch(_){ currentRole = null; }
+    // Kiểm tra UID cứng founder trước (không cần Firestore read)
+    const FOUNDER_UIDS = ['h4kEguPEyMcwJwl89stc0Q6j2si2'];
+    if(FOUNDER_UIDS.includes(user.uid)){
+      currentRole = 'founder';
+    } else {
+      try{
+        const us = await getDoc(doc(db,'users',user.uid));
+        currentRole = us.exists() ? (us.data().role || null) : null;
+        if(!us.exists()) console.warn('[seed] users/'+user.uid+' không tồn tại');
+      }catch(e){
+        console.error('[seed] Lỗi đọc role:', e.code, e.message);
+        currentRole = null;
+      }
+    }
     const rw = $('role-warn');
     if(currentRole === 'founder'){
       rw.textContent = '';
