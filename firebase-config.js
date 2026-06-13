@@ -1,6 +1,5 @@
 /* ════════════════════════════════════════════════
    ALN PLATFORM — Firebase Config (dùng chung 5 trang)
-   Import qua: import { ... } from "./firebase-config.js"
 ════════════════════════════════════════════════ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
@@ -49,9 +48,9 @@ const storage = getStorage(app);
 /* Quy ước: tên đăng nhập "founder" ⇄ email "founder@aln.vn" */
 const ALN_EMAIL_DOMAIN = "@aln.vn";
 
-/* KHÓA WEB PUSH (VAPID) — lấy tại Firebase Console:
-   Project settings -> Cloud Messaging -> Web Push certificates -> Generate key pair */
+/* KHÓA WEB PUSH (VAPID) */
 const ALN_VAPID_KEY = "BI2O01Nr82Q59n9pQSdqgoTuoMHeG-agdjzRo-8yYDqevWmdH9rh65Lhxu0VdNZHGfRGHDu_FQB0UD39eZOXVWo";
+
 function usernameToEmail(username) {
   username = (username || "").trim().toLowerCase();
   return username.includes("@") ? username : username + ALN_EMAIL_DOMAIN;
