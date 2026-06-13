@@ -2981,11 +2981,13 @@ function alnNotify(title, body){
     }
     if(cont.firstElementChild !== bar) cont.insertBefore(bar, cont.firstChild);
     // Mổ tách các mục đang lồng trong review-panel ra thành khối cấp 1
+    // (nhận diện theo CẤU TRÚC: khối chứa vùng kéo-thả / ô chọn file = mục Gửi tài liệu)
     var rp = cont.querySelector('.review-panel');
     if(rp){
       Array.prototype.slice.call(rp.children).forEach(function(c){
+        if(!c.querySelector) return;
         var t = (c.textContent || '').toLowerCase();
-        if(/tải lên từ khách hàng|kéo thả/.test(t) && /tải lên/.test(t)){
+        if(c.querySelector('[ondrop]') || c.querySelector('input[type="file"]') || c.getAttribute('ondrop')){
           c.dataset.alnTab = 'up';
           cont.appendChild(c);
         } else if(/bàn giao|kho tài liệu/.test(t)){
