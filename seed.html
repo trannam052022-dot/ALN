@@ -114,8 +114,8 @@
   <div class="card" id="auth-card" style="max-width:440px">
     <h2>Đăng nhập (chỉ founder)</h2>
     <div class="field">
-      <label for="email">Email</label>
-      <input id="email" type="email" autocomplete="username" placeholder="founder@aln..." />
+      <label for="email">Username (tự ghép @aln.vn)</label>
+      <input id="email" type="text" autocomplete="username" placeholder="founder.tranlong" />
     </div>
     <div class="field">
       <label for="pw">Mật khẩu</label>
@@ -289,8 +289,9 @@ let currentRole = null;
 /* ---- AUTH ---- */
 $('signin').addEventListener('click', async () => {
   hideBanner();
-  const email = $('email').value.trim(), pw = $('pw').value;
-  if(!email || !pw){ showBanner('err','Nhập email và mật khẩu.'); return; }
+  const raw = $('email').value.trim(), pw = $('pw').value;
+  const email = raw.includes('@') ? raw : raw + '@aln.vn';
+  if(!raw || !pw){ showBanner('err','Nhập username và mật khẩu.'); return; }
   try{
     await signInWithEmailAndPassword(auth, email, pw);
   }catch(e){
