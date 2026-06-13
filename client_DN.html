@@ -2948,6 +2948,20 @@ function alnNotify(title, body){
       });
     }
     if(cont.firstElementChild !== bar) cont.insertBefore(bar, cont.firstChild);
+    // Mổ tách các mục đang lồng trong review-panel ra thành khối cấp 1
+    var rp = cont.querySelector('.review-panel');
+    if(rp){
+      Array.prototype.slice.call(rp.children).forEach(function(c){
+        var t = (c.textContent || '').toLowerCase();
+        if(/tải lên từ khách hàng|kéo thả/.test(t) && /tải lên/.test(t)){
+          c.dataset.alnTab = 'up';
+          cont.appendChild(c);
+        } else if(/bàn giao|kho tài liệu/.test(t)){
+          c.dataset.alnTab = 'c4';
+          cont.appendChild(c);
+        }
+      });
+    }
     Array.prototype.forEach.call(cont.children, function(k){
       if(k === bar) return;
       var g = k.dataset.alnTab || (k.dataset.alnTab = classify(k));
