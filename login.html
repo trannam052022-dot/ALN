@@ -363,6 +363,8 @@ async function doLogin(){
     const cred  = await fb.signInWithEmailAndPassword(fb.auth, email, pw);
 
     // Lấy hồ sơ & vai trò từ Firestore: users/{uid}
+    // Đợi Auth token propagate sang Firestore (tránh race condition)
+    await new Promise(r => setTimeout(r, 600));
     console.log('[ALN Login] UID:', cred.user.uid);
     const snap = await fb.getDoc(fb.doc(fb.db, 'users', cred.user.uid));
     console.log('[ALN Login] snap.exists():', snap.exists(), '| data:', snap.exists() ? JSON.stringify(snap.data()) : 'null');
