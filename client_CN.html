@@ -824,8 +824,8 @@ window.ALNRealtime = (() => {
 // _adaptProject + _startProjectsListen định nghĩa ở cuối file (sau import)
 
 function renderSidebar(){
-  document.getElementById('projList').innerHTML=PROJECTS_CLIENT.map(p=>`
-    <div class="cn-proj-item ${activeProj===p.id?'active':''}" onclick="selectProj('${p.id}')">
+  document.getElementById('projList').innerHTML=window.PROJECTS_CLIENT.map(p=>`
+    <div class="cn-proj-item ${window.activeProj===p.id?'active':''}" onclick="selectProj('${p.id}')">
       <span class="cpi-dot" style="background:${STATUS_DOT[p.status]}"></span>
       <div style="min-width:0">
         <div class="cpi-id">${p.id}</div>
@@ -1083,7 +1083,7 @@ const _reviewState = {};
 
 /* Main project view */
 function renderMain(){
-  const p = PROJECTS_CLIENT.find(x=>x.id===activeProj);
+  const p = window.PROJECTS_CLIENT.find(x=>x.id===window.activeProj);
   if(!p){
     document.getElementById('mainContent').innerHTML=
       '<div style="padding:40px;text-align:center;color:var(--muted)">Chọn công trình từ danh sách bên trái</div>';
@@ -1603,11 +1603,11 @@ function renderMain(){
 }
 
 function selectProj(id){
-  activeProj=id; activeFolder='ALL';
+  window.activeProj=id; activeFolder='ALL';
   renderSidebar(); renderMain();
   document.querySelector('.sidebar-cn').classList.remove('open');
   // Sync Zalo widget to new KTS
-  const p2 = PROJECTS_CLIENT.find(x=>x.id===id);
+  const p2 = window.PROJECTS_CLIENT.find(x=>x.id===id);
   if(p2){ zpKts=p2.kts; if(zpOpen) _zpInit(); }
 }
 
@@ -1681,7 +1681,7 @@ function generateSignedUrl(fileName, projectId){
 }
 
 function setFolder(f){activeFolder=f;renderMain();
-  setTimeout(()=>{const c=document.getElementById('ktsRowAv');if(c){const p2=PROJECTS_CLIENT.find(x=>x.id===activeProj);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};drawPortrait(c,KP[(p2 ? p2.kts : null)]||{});}},30);
+  setTimeout(()=>{const c=document.getElementById('ktsRowAv');if(c){const p2=window.PROJECTS_CLIENT.find(x=>x.id===window.activeProj);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};drawPortrait(c,KP[(p2 ? p2.kts : null)]||{});}},30);
 }
 
 /* Portrait canvas — đồng bộ với kts_dashboard */
@@ -1763,7 +1763,7 @@ ALNRealtime.init({
       DOCS[d.projectId].unshift(newDoc);
       _addNotif('📁', `<b>${d.ktsName||'KTS'}</b> vừa upload <b>${d.doc.name}</b>`, d.projectId);
       renderSidebar();
-      if(activeProj===d.projectId) renderMain();
+      if(window.activeProj===d.projectId) renderMain();
       showToast(`📁 File mới từ KTS: ${d.doc.name}`, 't-green');
       setTimeout(()=>_redrawKtsCanvas(), 50);
     }
@@ -1790,19 +1790,19 @@ ALNRealtime.init({
       DOCS[d.projectId].unshift(newDoc);
       _addNotif('📁', `<b>Admin</b> đã đăng tải <b>${d.doc.name}</b>`, d.projectId);
       renderSidebar();
-      if(activeProj===d.projectId) renderMain();
+      if(window.activeProj===d.projectId) renderMain();
       showToast(`📁 Tài liệu mới: ${d.doc.name}`, 't-green');
     }
 
     // Stage approved
     if(d.type==='STAGE_APPROVED'){
-      const p=PROJECTS_CLIENT.find(x=>x.id===d.projectId);
+      const p=window.PROJECTS_CLIENT.find(x=>x.id===d.projectId);
       if(p){ _addNotif('✅',`<b>Giải ngân ${d.stage||''}</b> được duyệt — ${p.name}`,d.projectId); }
       showToast(`✅ Chặng ${d.stage||''} đã được duyệt giải ngân`,'t-green');
     }
 
     if(d.type==='DISPUTE_OPENED'){
-      const p=PROJECTS_CLIENT.find(x=>x.id===d.projectId);
+      const p=window.PROJECTS_CLIENT.find(x=>x.id===d.projectId);
       if(p){ _addNotif('⚠️',`<b>Tranh chấp kích hoạt</b> — ${p.name}`,d.projectId); }
       showToast(`⚠️ Tranh chấp mở: ${d.projectId}`,'t-amber');
     }
@@ -1823,7 +1823,7 @@ window.zpSend = function() {
   if(matched){
     showToast(`⚠️ Tin nhắn bị chặn — chứa nội dung vi phạm: "${matched}".`, 't-red');
     inp.value=''; inp.style.height='auto';
-    ALNRealtime.send({type:'NLP_ALERT',projectId:activeProj,keyword:matched,msg:txt});
+    ALNRealtime.send({type:'NLP_ALERT',projectId:window.activeProj,keyword:matched,msg:txt});
     return;
   }
 
@@ -1836,7 +1836,7 @@ window.zpSend = function() {
   ALNRealtime.send({
     type: 'ALN_CHAT',
     channel: 'zalo',
-    projectId: activeProj,
+    projectId: window.activeProj,
     text: txt,
     senderName: CN_USER.name || 'Nguyễn Văn Thuận',
     senderRole: 'cn',
@@ -1845,7 +1845,7 @@ window.zpSend = function() {
 
 function _redrawKtsCanvas(){
   const c = document.getElementById('ktsRowAv');
-  if(c){ const p2=PROJECTS_CLIENT.find(x=>x.id===activeProj); const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'}};if(p2&&typeof drawPortrait!=='undefined')drawPortrait(c,KP[p2.kts]||{}); }
+  if(c){ const p2=window.PROJECTS_CLIENT.find(x=>x.id===window.activeProj); const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'}};if(p2&&typeof drawPortrait!=='undefined')drawPortrait(c,KP[p2.kts]||{}); }
 }
 
 function _addNotif(icon,body,projId){
@@ -1918,7 +1918,7 @@ function toggleZaloPopup(){
   document.getElementById('zaloPopup').classList.toggle('open', zpOpen);
   if(zpOpen){
     // Sync KTS to active project
-    const p = PROJECTS_CLIENT.find(x=>x.id===activeProj);
+    const p = window.PROJECTS_CLIENT.find(x=>x.id===window.activeProj);
     if(p) { zpKts = p.kts; _zpInit(); }
     document.getElementById('zaloBadge').style.display='none';
     setTimeout(()=>document.getElementById('zpInput').focus(), 200);
@@ -1955,7 +1955,7 @@ function _zpRender(){
 
 function zpCallAction(type){
   toggleZaloPopup(); // close popup first
-  const p = PROJECTS_CLIENT.find(x=>x.id===activeProj);
+  const p = window.PROJECTS_CLIENT.find(x=>x.id===window.activeProj);
   const label = type==='voice' ? 'Gọi thoại Zalo' : 'Gọi video Zalo';
   const icon  = type==='voice' ? 'ph-phone' : 'ph-video-camera';
   // Show a confirm toast then open Zalo OA
@@ -1982,7 +1982,7 @@ function zpSend(){
     showToast(`⚠️ Tin nhắn bị chặn — chứa nội dung vi phạm: "${matched}". Mọi giao dịch phải qua sàn ALN.`, 't-red');
     inp.value=''; inp.style.height='auto';
     // Alert broadcast to admin
-    try{ALNRealtime.send({type:'NLP_ALERT',projectId:activeProj,keyword:matched,msg:txt})}catch(e){}
+    try{ALNRealtime.send({type:'NLP_ALERT',projectId:window.activeProj,keyword:matched,msg:txt})}catch(e){}
     return; // block send
   }
   const ts = new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
@@ -2005,7 +2005,7 @@ function zpSend(){
   }, 1200 + Math.random()*800);
 
   // Broadcast to kts_dashboard
-  try{ALNRealtime.send({type:'ZALO_MSG',projectId:activeProj,msg:txt})}catch(e){}
+  try{ALNRealtime.send({type:'ZALO_MSG',projectId:window.activeProj,msg:txt})}catch(e){}
 }
 
 function zpQuickSend(txt){
@@ -2015,7 +2015,7 @@ function zpQuickSend(txt){
 
 // Init on first load
 setTimeout(()=>{
-  const p = PROJECTS_CLIENT.find(x=>x.id===activeProj);
+  const p = window.PROJECTS_CLIENT.find(x=>x.id===window.activeProj);
   if(p){ zpKts=p.kts; }
   _zpInit();
 }, 500);
@@ -2068,7 +2068,7 @@ function submitRating(projId, stage){
   delete window._starSelected[`${projId}_${stage}`];
 
   // Broadcast lên KTS dashboard
-  const p = PROJECTS_CLIENT.find(x=>x.id===projId);
+  const p = window.PROJECTS_CLIENT.find(x=>x.id===projId);
   try{ ALNRealtime.send({ type:'KTS_RATED', projectId:projId, stage, score, note, kts:(p ? p.kts : null), projName:(p ? p.name : null) }); }catch(e){}
 
   showToast(`⭐ Đã gửi đánh giá ${score}/5 — ${labels[score]} cho Chặng ${stage}`, 't-green');
@@ -2078,7 +2078,7 @@ function submitRating(projId, stage){
   renderMain();
   setTimeout(()=>{
     const c = document.getElementById('ktsRowAv');
-    if(c){ const p2=PROJECTS_CLIENT.find(x=>x.id===activeProj); const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};drawPortrait(c,KP[(p2 ? p2.kts : null)]||{}); }
+    if(c){ const p2=window.PROJECTS_CLIENT.find(x=>x.id===window.activeProj); const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};drawPortrait(c,KP[(p2 ? p2.kts : null)]||{}); }
   }, 50);
 }
 
@@ -2181,11 +2181,11 @@ function alnSendMsg(){
   const inp=document.getElementById('alnInput'); const txt=(inp?inp.value.trim():''); if(!txt) return;
   const DANGER=['zalo riêng','số điện thoại','ngoài sàn','tiền mặt','chuyển khoản trực tiếp','không qua sàn','tài khoản cá nhân','liên hệ riêng','nhắn riêng','giá riêng','phí ngoài','thanh toán ngoài','giao dịch ngoài','hợp đồng riêng'];
   const matched=DANGER.find(kw=>txt.toLowerCase().includes(kw));
-  if(matched){ showToast(`⚠️ Tin nhắn bị chặn — vi phạm: "${matched}". Mọi giao dịch phải qua sàn ALN.`, 't-red'); inp.value=''; try{ALNRealtime.send({type:'NLP_ALERT',projectId:activeProj,keyword:matched,msg:txt})}catch(e){} return; }
+  if(matched){ showToast(`⚠️ Tin nhắn bị chặn — vi phạm: "${matched}". Mọi giao dịch phải qua sàn ALN.`, 't-red'); inp.value=''; try{ALNRealtime.send({type:'NLP_ALERT',projectId:window.activeProj,keyword:matched,msg:txt})}catch(e){} return; }
   alnMessages.push({ mine:true, text:txt, ts:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}) });
   _alnRender(); inp.value='';
 
-  ALNRealtime.send({ type:'ALN_CHAT', audience:['kts'], projectId:activeProj, text:txt, senderName:(CN_USER&&CN_USER.name)||'Chủ nhà', senderRole:'cn' });
+  ALNRealtime.send({ type:'ALN_CHAT', audience:['kts'], projectId:window.activeProj, text:txt, senderName:(CN_USER&&CN_USER.name)||'Chủ nhà', senderRole:'cn' });
 }
 </script>
 
@@ -2367,7 +2367,7 @@ import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection,
 const REQUIRED_ROLE = "cn";
 
 /* ══ PROJECTS: Firestore realtime ══ */
-let PROJECTS_CLIENT = [];
+window.PROJECTS_CLIENT = window.PROJECTS_CLIENT || [];
 
 function _adaptProject(id, d) {
   const prog = d.progress || {};
@@ -2388,11 +2388,11 @@ function _startProjectsListen(uid) {
     orderBy('updatedAt', 'desc')
   );
   onSnapshot(q, snap => {
-    PROJECTS_CLIENT = snap.docs.map(d => _adaptProject(d.id, d.data()));
-    if (PROJECTS_CLIENT.length > 0) {
-      activeProj = PROJECTS_CLIENT[0].id;
+    window.PROJECTS_CLIENT = snap.docs.map(d => _adaptProject(d.id, d.data()));
+    if (window.PROJECTS_CLIENT.length > 0) {
+      window.activeProj = window.PROJECTS_CLIENT[0].id;
       renderSidebar();
-      selectProj(activeProj);
+      selectProj(window.activeProj);
     } else {
       document.getElementById('projList').innerHTML =
         '<div style="padding:16px;color:var(--sub);font-size:13px">Chưa có dự án nào.</div>';
