@@ -13,7 +13,35 @@ window.KTS_PROJECT_DATA = null;
 <title>KTS Dashboard — kts.applamnha.vn</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/><style>.ph-spin{animation:phspin 1s linear infinite;display:inline-block}@keyframes phspin{to{transform:rotate(360deg)}}</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/><style>.ph-spin{animation:phspin 1s linear infinite;display:inline-block}@keyframes phspin{to{transform:rotate(360deg)}}
+/* ── DỰ ÁN CỦA TÔI ── */
+.proj-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;cursor:pointer;transition:.18s}
+.proj-card:hover{border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.04)}
+.proj-card-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.proj-card-id{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--gold);background:rgba(201,168,76,.12);padding:2px 8px;border-radius:99px}
+.proj-card-name{font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.proj-card-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}
+.proj-progress-bar{display:flex;height:6px;border-radius:99px;overflow:hidden;gap:2px;margin-bottom:8px}
+.proj-meta{display:flex;gap:12px;font-size:11px;color:var(--muted)}
+.proj-detail{display:none;border-top:1px solid var(--border);margin-top:12px;padding-top:12px}
+.proj-detail.open{display:block}
+.proj-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.proj-detail-item{background:var(--ink3);border-radius:8px;padding:10px}
+.proj-detail-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
+.proj-detail-val{font-size:13px;font-weight:600;color:var(--text)}
+
+/* ── HỒ SƠ CỦA TÔI ── */
+.profile-avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px;background:var(--ink2);border-radius:var(--r);border:1px solid var(--border);margin-bottom:12px}
+.profile-avatar-img{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid rgba(201,168,76,.4)}
+.profile-avatar-init{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#d4b86a);color:#000;font-size:28px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:var(--syne)}
+.profile-upload-btn{padding:8px 18px;border-radius:8px;border:1px solid rgba(201,168,76,.4);background:rgba(201,168,76,.08);color:var(--gold);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.profile-upload-btn:hover{background:rgba(201,168,76,.15)}
+.profile-field{margin-bottom:10px}
+.profile-field label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px}
+.profile-field input{width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box}
+.profile-field input:focus{outline:none;border-color:rgba(201,168,76,.5)}
+.profile-save-btn{width:100%;padding:11px;background:linear-gradient(135deg,#C9A84C,#d4b86a);border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer;margin-top:4px}
+</style>
 <style>
 :root {
   --ink: #08080a;
@@ -427,7 +455,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
   <div class="nav-section">Tổng quan</div>
   <a class="nav-item active"><span class="icon"><i class="ph-duotone ph-gauge"></i></span> Dashboard</a>
-  <a class="nav-item" onclick="showToast('Tính năng đang phát triển','t-blue')"><span class="icon"><i class="ph-duotone ph-briefcase"></i></span> Dự án của tôi <span class="nav-badge">2</span></a>
+  <a class="nav-item" onclick="scrollTo('.myproj-section')"><span class="icon"><i class="ph-duotone ph-briefcase"></i></span> Dự án của tôi <span class="nav-badge" id="myProjBadge">0</span></a>
 
   <div class="nav-section">Tài chính</div>
   <a class="nav-item" onclick="scrollTo('.wallet-section')"><span class="icon"><i class="ph-duotone ph-wallet"></i></span> Ví thu nhập</a>
@@ -439,7 +467,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   <a class="nav-item" onclick="scrollTo('.vip-section')"><span class="icon"><i class="ph-duotone ph-crown"></i></span> Gói VIP</a>
 
   <div class="nav-section">Tài khoản</div>
-  <a class="nav-item" onclick="showToast('Hồ sơ KTS','t-purple')"><span class="icon"><i class="ph-duotone ph-user-circle"></i></span> Hồ sơ của tôi</a>
+  <a class="nav-item" onclick="scrollTo('.myprofile-section')"><span class="icon"><i class="ph-duotone ph-user-circle"></i></span> Hồ sơ của tôi</a>
 
 
 </nav>
@@ -716,6 +744,45 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         Gói được trừ trực tiếp từ Ví chính. Cần có doanh thu ít nhất 1 dự án để kích hoạt mua gói. Ví tạm ứng không được dùng để mua gói.
       </div>
     </div>
+
+
+    <!-- ═══ DỰ ÁN CỦA TÔI ═══ -->
+    <div class="sec-label myproj-section"><i class="ph-duotone ph-briefcase" style="font-size:13px"></i> Dự án của tôi</div>
+    <div id="myProjList">
+      <div style="color:var(--muted);font-size:13px;text-align:center;padding:24px">Đang tải...</div>
+    </div>
+
+    <!-- ═══ HỒ SƠ CỦA TÔI ═══ -->
+    <div class="sec-label myprofile-section"><i class="ph-duotone ph-user-circle" style="font-size:13px"></i> Hồ sơ của tôi</div>
+    <div class="profile-avatar-wrap">
+      <div id="profileAvatarWrap">
+        <div class="profile-avatar-init" id="profileAvatarInit">DL</div>
+      </div>
+      <label class="profile-upload-btn" for="profileAvatarInput">
+        <i class="ph-duotone ph-camera"></i> Đổi ảnh đại diện
+      </label>
+      <input type="file" id="profileAvatarInput" accept="image/*" style="display:none" onchange="uploadProfileAvatar(this)">
+      <div id="profileUploadStatus" style="font-size:11px;color:var(--muted)"></div>
+    </div>
+    <div class="profile-field">
+      <label>Họ tên</label>
+      <input type="text" id="profileName" placeholder="KTS. Trần Đại Long">
+    </div>
+    <div class="profile-field">
+      <label>Email liên hệ</label>
+      <input type="email" id="profileEmail" placeholder="email@gmail.com">
+    </div>
+    <div class="profile-field">
+      <label>Số điện thoại</label>
+      <input type="tel" id="profilePhone" placeholder="09xx xxx xxx">
+    </div>
+    <div class="profile-field">
+      <label>Chứng chỉ hành nghề</label>
+      <input type="text" id="profileLicense" placeholder="KTS-2021-xxxxx">
+    </div>
+    <button class="profile-save-btn" onclick="saveProfile()">
+      <i class="ph-duotone ph-floppy-disk"></i> Lưu hồ sơ
+    </button>
 
   </div><!-- end .content -->
 </div><!-- end .main -->
@@ -1714,7 +1781,7 @@ function alnNotify(title, body){
     if(!first) return;
     var cont = first.parentElement;
     var SKIP = /modal|toast|popup|fab|veil|overlay|aln|chat/i;
-    var MARK = [['wallet-section','wallet'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip']];
+    var MARK = [['wallet-section','wallet'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip'],['myproj-section','myproj'],['myprofile-section','myprofile']];
     var groups = { dashboard: [] };
     var cur = 'dashboard';
     Array.prototype.forEach.call(cont.children, function(k){
@@ -1760,7 +1827,7 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, storage, storageRef, uploadBytes, getDownloadURL, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "kts";
 
@@ -1795,9 +1862,161 @@ function _startKtsProjectListen(uid) {
     if (stageEl) stageEl.textContent = 'Chặng ' + (p.stage || 'C1');
 
     console.log('[KTS] Dự án hiện tại:', d.id, p.name);
+    // Render danh sách tất cả dự án
+    const allProjs = snap.docs.map(d2 => ({id:d2.id, ...d2.data()}));
+    renderMyProjects(allProjs);
   }, err => {
     console.error('[KTS] Lỗi load projects:', err.code, err.message);
   });
+}
+
+
+/* ══ DỰ ÁN + HỒ SƠ KTS ══ */
+
+// Render danh sách dự án
+function renderMyProjects(projects) {
+  const wrap = document.getElementById('myProjList');
+  const badge = document.getElementById('myProjBadge');
+  if (badge) badge.textContent = projects.length;
+  if (!projects.length) {
+    wrap.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px">Chưa có dự án nào.</div>';
+    return;
+  }
+  const STATUS_LABEL = {on_track:'Đúng tiến độ',sla_warn:'Cảnh báo SLA',dispute:'Tranh chấp',done:'Hoàn thành'};
+  const STATUS_CLR = {on_track:'color:#22c55e;background:rgba(34,197,94,.12)',sla_warn:'color:#f59e0b;background:rgba(245,158,11,.12)',dispute:'color:#ef4444;background:rgba(239,68,68,.12)',done:'color:#6b7280;background:rgba(107,114,128,.12)'};
+  const SCOLS = ['#22c55e','#f59e0b','#3b82f6','#8b5cf6'];
+  wrap.innerHTML = projects.map((p,idx) => {
+    const prog = p.progress || [0,0,0,0];
+    const pcts = [10,20,60,10];
+    const bar = prog.map((v,i) => `<div style="flex:${pcts[i]};background:${v>0?SCOLS[i]:'#2a2a2a'};opacity:${v>0?1:.4}"></div>`).join('');
+    const stLbl = STATUS_LABEL[p.status] || p.status;
+    const stClr = STATUS_CLR[p.status] || '';
+    return `<div class="proj-card" onclick="toggleProjDetail('pd${idx}')">
+      <div class="proj-card-header">
+        <span class="proj-card-id">${p.id}</span>
+        <span class="proj-card-name">${p.name||''}</span>
+        <span class="proj-card-status" style="${stClr}">${stLbl}</span>
+      </div>
+      <div class="proj-progress-bar">${bar}</div>
+      <div class="proj-meta">
+        <span><i class="ph-duotone ph-map-pin"></i> Chặng ${p.stage||'C1'}</span>
+        <span><i class="ph-duotone ph-user"></i> CN: ${(p.cn&&p.cn.name)||''}</span>
+        <span><i class="ph-duotone ph-buildings"></i> DN: ${(p.dn&&p.dn.name)||'—'}</span>
+      </div>
+      <div class="proj-detail" id="pd${idx}">
+        <div class="proj-detail-grid">
+          <div class="proj-detail-item">
+            <div class="proj-detail-label">Phí thiết kế</div>
+            <div class="proj-detail-val">${fmtM2(p.totalFee||0)}đ</div>
+          </div>
+          <div class="proj-detail-item">
+            <div class="proj-detail-label">Escrow</div>
+            <div class="proj-detail-val">${fmtM2(p.escrowBalance||0)}đ</div>
+          </div>
+          <div class="proj-detail-item">
+            <div class="proj-detail-label">Chủ nhà</div>
+            <div class="proj-detail-val">${(p.cn&&p.cn.name)||'—'}</div>
+          </div>
+          <div class="proj-detail-item">
+            <div class="proj-detail-label">Trạng thái</div>
+            <div class="proj-detail-val" style="${stClr};padding:4px 8px;border-radius:6px;display:inline-block">${stLbl}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleProjDetail(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+
+function fmtM2(v) {
+  if(v>=1e9) return (v/1e9).toFixed(1)+'T';
+  if(v>=1e6) return (v/1e6).toFixed(1)+'M';
+  return (v/1e3).toFixed(0)+'K';
+}
+
+// Cập nhật _startKtsProjectListen để cũng render danh sách
+const _origStartKts = window._startKtsProjectListen || null;
+
+// Upload ảnh đại diện
+async function uploadProfileAvatar(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const status = document.getElementById('profileUploadStatus');
+  status.textContent = 'Đang upload...';
+  try {
+    const uid = window.__ALN_UID;
+    const ext = file.name.split('.').pop();
+    const path = `avatars/${uid}/avatar.${ext}`;
+    const ref = storageRef(storage, path);
+    await uploadBytes(ref, file);
+    const url = await getDownloadURL(ref);
+    // Lưu URL vào Firestore users/{uid}
+    await setDoc(doc(db,'users',uid), {avatarURL: url}, {merge:true});
+    // Hiển thị ảnh mới
+    _showAvatar(url);
+    status.textContent = '✓ Đã cập nhật ảnh';
+    showToast('Đã cập nhật ảnh đại diện','t-green');
+  } catch(e) {
+    status.textContent = 'Lỗi: ' + e.message;
+    showToast('Upload thất bại: ' + e.code,'t-red');
+  }
+}
+
+function _showAvatar(url) {
+  const wrap = document.getElementById('profileAvatarWrap');
+  if (!wrap) return;
+  wrap.innerHTML = url
+    ? `<img class="profile-avatar-img" src="${url}" alt="avatar">`
+    : `<div class="profile-avatar-init" id="profileAvatarInit">${_getInitials()}</div>`;
+  // Cũng cập nhật avatar sidebar
+  const heroAv = document.getElementById('ktsHeroAv');
+  if (heroAv && url) {
+    heroAv.innerHTML = `<img src="${url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+  }
+}
+
+function _getInitials() {
+  const nm = (document.getElementById('profileName')||{}).value || (KTS_USER&&KTS_USER.name) || 'KTS';
+  const parts = nm.replace(/^KTS\.?\s*/i,'').trim().split(/\s+/);
+  return (parts.length>=2 ? parts[parts.length-2][0]+parts[parts.length-1][0] : (parts[0]||'K')[0]).toUpperCase();
+}
+
+// Lưu hồ sơ
+async function saveProfile() {
+  const uid = window.__ALN_UID;
+  if (!uid) { showToast('Chưa đăng nhập','t-red'); return; }
+  const data = {
+    name:    (document.getElementById('profileName')||{}).value || '',
+    email:   (document.getElementById('profileEmail')||{}).value || '',
+    phone:   (document.getElementById('profilePhone')||{}).value || '',
+    license: (document.getElementById('profileLicense')||{}).value || '',
+  };
+  try {
+    await setDoc(doc(db,'users',uid), data, {merge:true});
+    showToast('Đã lưu hồ sơ','t-green');
+    // Cập nhật tên trên sidebar
+    if (data.name) {
+      const el = document.getElementById('ktsHeroName');
+      if (el) el.textContent = data.name.startsWith('KTS') ? data.name : ('KTS. '+data.name.replace(/^KTS\.?\s*/i,''));
+    }
+  } catch(e) {
+    showToast('Lỗi lưu: '+e.code,'t-red');
+  }
+}
+
+// Điền form profile từ Firestore sau khi load
+function _fillProfileForm(profile) {
+  if (!profile) return;
+  const set = (id,v) => { const el=document.getElementById(id); if(el&&v) el.value=v; };
+  set('profileName',    profile.name);
+  set('profileEmail',   profile.email);
+  set('profilePhone',   profile.phone);
+  set('profileLicense', profile.license);
+  if (profile.avatarURL) _showAvatar(profile.avatarURL);
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -1881,6 +2100,8 @@ onAuthStateChanged(auth, async (user) => {
 
     // ── LOAD DỰ ÁN KTS TỪ FIRESTORE ──
     _startKtsProjectListen(user.uid);
+    // Điền form profile
+    _fillProfileForm(profile);
 
     // Hồ sơ KTS đầu sidebar: tên + avatar theo tài khoản đăng nhập
     try {
