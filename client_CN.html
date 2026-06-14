@@ -7,7 +7,7 @@
 <meta name="format-detection" content="telephone=no">
 <title>LN Enterprise — Cổng Theo dõi Công trình</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/><style>.ph-spin{animation:phspin 1s linear infinite;display:inline-block}@keyframes phspin{to{transform:rotate(360deg)}}</style>
 <style>
 :root{
   --ink:#080808;--ink2:#111111;--ink3:#1a1a1a;--ink4:#222222;
@@ -564,7 +564,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 <!-- TOPBAR -->
 <header class="topbar">
   <button class="hamburger-cn" onclick="const s=document.querySelector('.sidebar-cn');s.classList.toggle('open');document.getElementById('sidebarOverlay').style.display=s.classList.contains('open')?'block':'none'">
-    <i class="fa fa-bars"></i>
+    <i class="ph-duotone ph-list"></i>
   </button>
   <div class="tb-logo">
     <div id="cnTopbarLogo" style="background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(96,165,250,.12));color:#60a5fa;padding:5px 13px;border-radius:var(--r-sm);border:1.5px solid rgba(96,165,250,.45);font-family:var(--syne);font-size:12px;font-weight:800;letter-spacing:.08em;text-shadow:0 0 12px rgba(96,165,250,.4)">App Làm Nhà Corp.</div>
@@ -573,7 +573,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   </div>
   <div class="tb-right">
     <span id="notifBell" style="position:relative;cursor:pointer;padding:6px 8px;background:var(--ink3);border:1px solid var(--border);border-radius:6px;color:var(--sub)" onclick="toggleNotifPanel()">
-      <i class="fa fa-bell"></i>
+      <i class="ph-duotone ph-bell"></i>
       <span id="notifCount" style="position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span>
     </span>
 
@@ -598,10 +598,10 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <div style="flex:1;min-width:0">
           <div id="cnProfileName" style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Nguyễn Văn Thuận</div>
           <div style="font-size:10px;color:var(--sub);margin-top:1px;display:flex;align-items:center;gap:4px">
-            <i class="fa fa-user-tie" style="font-size:9px;color:var(--gold)"></i> Chủ đầu tư
+            <i class="ph-duotone ph-user-circle" style="font-size:9px;color:var(--gold)"></i> Chủ đầu tư
           </div>
           <div style="font-size:10px;color:var(--muted);margin-top:1px;display:flex;align-items:center;gap:4px">
-            <i class="fa fa-id-card" style="font-size:9px;color:var(--gold)"></i> ALN-9921
+            <i class="ph-duotone ph-identification-card" style="font-size:9px;color:var(--gold)"></i> ALN-9921
           </div>
         </div>
       </div>
@@ -655,12 +655,12 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <button onclick="zpCallAction('voice')" title="Gọi thoại"
         style="width:30px;height:30px;border-radius:50%;border:none;background:rgba(255,255,255,.15);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:background .15s"
         onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">
-        <i class="fa fa-phone"></i>
+        <i class="ph-duotone ph-phone"></i>
       </button>
       <button onclick="zpCallAction('video')" title="Gọi video"
         style="width:30px;height:30px;border-radius:50%;border:none;background:rgba(255,255,255,.15);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:background .15s"
         onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">
-        <i class="fa fa-video"></i>
+        <i class="ph-duotone ph-video-camera"></i>
       </button>
     </div>
     <button class="zp-close" onclick="toggleZaloPopup()">✕</button>
@@ -683,7 +683,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();zpSend()}"></textarea>
     <button class="zp-send" onclick="zpSend()">
-      <i class="fa fa-paper-plane" style="font-size:13px"></i>
+      <i class="ph-duotone ph-paper-plane-tilt" style="font-size:13px"></i>
     </button>
   </div>
 </div>
@@ -821,26 +821,72 @@ window.ALNRealtime = (() => {
 /* ══════════════════
    DATA
 ══════════════════ */
-const PROJECTS_CLIENT = [
-  {id:'ALN-9921',name:'Biệt thự Vườn Tân Cổ Điển',     cn:'Nguyễn Văn Thuận', kts:'KTS. Trần Lê Minh',   stage:'C2',status:'sla_warn', progress:[1,0.4,0,0],total:125000000,escrow:75000000},
-];
+/* ══ PROJECTS: Firestore realtime (thay PROJECTS_CLIENT tĩnh) ══
+   Query: projects where cn.uid == auth.currentUser.uid
+   Adapter: Firestore format → UI format (giữ nguyên các phần render bên dưới)
+*/
+let PROJECTS_CLIENT = []; // sẽ được điền từ Firestore
+
+function _adaptProject(id, d) {
+  // Chuyển Firestore doc → format UI cũ
+  const prog = d.progress || {};
+  return {
+    id:       id,
+    code:     d.code || id,
+    name:     d.name || '',
+    cn:       d.cn?.name   || '',
+    kts:      d.kts?.name  || '',
+    dn:       d.dn?.name   || '',
+    ktsUid:   d.kts?.uid   || '',
+    cnUid:    d.cn?.uid    || '',
+    stage:    d.stage      || 'C1',
+    status:   d.status     || 'on_track',
+    progress: [prog.C1||0, prog.C2||0, prog.C3||0, prog.C4||0],
+    total:    d.totalFee   || 0,
+    escrow:   d.escrowBalance || 0,
+    _raw:     d  // giữ raw để dùng khi cần
+  };
+}
+
+function _startProjectsListen(uid) {
+  // onSnapshot realtime: tự cập nhật khi Firestore thay đổi
+  const q = query(
+    collection(db, 'projects'),
+    where('cn.uid', '==', uid),
+    orderBy('updatedAt', 'desc')
+  );
+  onSnapshot(q, snap => {
+    PROJECTS_CLIENT = snap.docs.map(d => _adaptProject(d.id, d.data()));
+    if (PROJECTS_CLIENT.length > 0) {
+      activeProj = PROJECTS_CLIENT[0].id;
+      renderSidebar();
+      selectProj(activeProj);
+    } else {
+      // Không có dự án nào
+      document.getElementById('projList').innerHTML =
+        '<div style="padding:16px;color:var(--sub);font-size:13px">Chưa có dự án nào.</div>';
+    }
+  }, err => {
+    console.error('[CN] Lỗi load projects:', err.code, err.message);
+  });
+}
 
 /* ════════════════════════════════════════
    6 THƯ MỤC CHUYÊN MÔN (đồng bộ với kts_dashboard)
    folder: kien_truc | ket_cau | me | thep | vat_tu | du_toan
 ════════════════════════════════════════ */
 const FOLDERS = [
-  { id:'kien_truc', label:'Hồ sơ Kiến trúc',   icon:'fa-drafting-compass', color:'var(--blue)',
+  { id:'kien_truc', label:'Hồ sơ Kiến trúc',   icon:'ph-compass-tool', color:'var(--blue)',
     desc:'MB phương án (C1) · Phối cảnh 3D ngoại thất · Phối cảnh 3D nội thất · MB các tầng · Mặt đứng · Mặt cắt' },
-  { id:'ket_cau',   label:'Hồ sơ Kết cấu',      icon:'fa-building-columns', color:'var(--amber)',
+  { id:'ket_cau',   label:'Hồ sơ Kết cấu',      icon:'ph-wall', color:'var(--amber)',
     desc:'Móng · Cột · Dầm · Sàn · Chi tiết thép' },
-  { id:'me',        label:'Điện nước M&E',       icon:'fa-bolt',             color:'var(--cyan)',
+  { id:'me',        label:'Điện nước M&E',       icon:'ph-lightning',             color:'var(--cyan)',
     desc:'Sơ đồ điện · Cấp thoát nước · PCCC · Điều hòa thông gió' },
-  { id:'thep',      label:'Thống kê Thép',       icon:'fa-table-cells',      color:'var(--green)',
+  { id:'thep',      label:'Thống kê Thép',       icon:'ph-table',      color:'var(--green)',
     desc:'Bảng thống kê thép theo cấu kiện · Tổng hợp khối lượng' },
-  { id:'vat_tu',    label:'Bảng Vật tư',         icon:'fa-boxes-stacked',    color:'var(--purple)',
+  { id:'vat_tu',    label:'Bảng Vật tư',         icon:'ph-stack',    color:'var(--purple)',
     desc:'Danh mục vật liệu · Khối lượng · Đơn vị tính' },
-  { id:'du_toan',   label:'Dự toán Chi phí',     icon:'fa-calculator',       color:'var(--gold)',
+  { id:'du_toan',   label:'Dự toán Chi phí',     icon:'ph-calculator',       color:'var(--gold)',
     desc:'Dự toán hạng mục · Đơn giá tham chiếu · Tổng chi phí xây dựng' },
 ];
 
@@ -908,7 +954,7 @@ const STATUS_DOT={on_track:'var(--green)',sla_warn:'var(--amber)',dispute:'var(-
 const STGCOLS=['var(--green)','var(--amber)','var(--blue)','var(--sub)'];
 const STGPCT=[10,20,60,10];
 const STGNAME={C1:'Ý tưởng 2D',C2:'Phối cảnh 3D',C3:'Hồ sơ KT',C4:'Dự toán & Bảo hành'};
-const ICON={pdf:'fa-file-pdf',img:'fa-file-image',dwg:'fa-file-code',xlsx:'fa-file-excel',zip:'fa-file-zipper'};
+const ICON={pdf:'ph-file-pdf',img:'ph-file-image',dwg:'ph-file-code',xlsx:'ph-file-xls',zip:'ph-file-zip'};
 const ICOLOR={pdf:'#ef4444',img:'var(--cyan)',dwg:'var(--amber)',xlsx:'var(--green)',zip:'var(--purple)'};
 function fmtM(v){if(v>=1e9)return(v/1e9).toFixed(1)+'T';if(v>=1e6)return(v/1e6).toFixed(1)+'M';return(v/1e3).toFixed(0)+'K'}
 
@@ -1013,7 +1059,7 @@ function _renderAnnotModal(){
   // Build pins sidebar
   const pinsListHTML = pins.length===0
     ? `<div style="padding:20px;text-align:center;color:var(--muted);font-size:11px">
-         <i class="fa fa-map-pin" style="font-size:20px;display:block;margin-bottom:8px;color:var(--dim)"></i>
+         <i class="ph-duotone ph-map-pin" style="font-size:20px;display:block;margin-bottom:8px;color:var(--dim)"></i>
          Chưa có điểm đánh dấu nào.<br>Click vào bản vẽ để thêm pin.
        </div>`
     : pins.map((pin,i)=>`
@@ -1028,13 +1074,13 @@ function _renderAnnotModal(){
           ${!pin.resolved?`<div class="pn-actions">
             <button class="pn-act" style="background:var(--green-bg);color:var(--green);border:1px solid rgba(34,201,122,.2)"
               onclick="event.stopPropagation();resolvePin('${projId}','${stage}','${paId}','${pin.id}')">
-              <i class="fa fa-check" style="margin-right:3px"></i>Đã xử lý
+              <i class="ph-duotone ph-check" style="margin-right:3px"></i>Đã xử lý
             </button>
             <button class="pn-act" style="background:var(--ink4);color:var(--sub);border:1px solid var(--border)"
               onclick="event.stopPropagation();replyPin('${pin.id}')">
-              <i class="fa fa-reply" style="margin-right:3px"></i>Trả lời
+              <i class="ph-duotone ph-arrow-bend-up-left" style="margin-right:3px"></i>Trả lời
             </button>
-          </div>`:'<div style="font-size:9px;color:var(--green);margin-top:4px"><i class="fa fa-circle-check" style="margin-right:3px"></i>Đã xử lý</div>'}
+          </div>`:'<div style="font-size:9px;color:var(--green);margin-top:4px"><i class="ph-duotone ph-check-circle" style="margin-right:3px"></i>Đã xử lý</div>'}
         </div>`).join('');
 
   // Build pin dots on canvas
@@ -1063,9 +1109,9 @@ function _renderAnnotModal(){
         <span class="pill ${pa.status==='approved'?'p-green':'p-amber'}" style="flex-shrink:0;font-size:10px">
           ${pa.status==='approved'?'✅ Đã duyệt':'⏳ Chờ duyệt'}
         </span>
-        ${openPins.length>0?`<span class="pill p-red" style="flex-shrink:0;font-size:10px"><i class="fa fa-map-pin" style="font-size:8px"></i> ${openPins.length} chờ xử lý</span>`:''}
+        ${openPins.length>0?`<span class="pill p-red" style="flex-shrink:0;font-size:10px"><i class="ph-duotone ph-map-pin" style="font-size:8px"></i> ${openPins.length} chờ xử lý</span>`:''}
         <button onclick="closeAnnotation()" style="padding:5px 10px;background:var(--ink4);border:1px solid var(--border);color:var(--sub);border-radius:5px;cursor:pointer;font-size:12px;font-family:var(--sans);flex-shrink:0">
-          <i class="fa fa-xmark"></i>
+          <i class="ph-duotone ph-x"></i>
         </button>
       </div>
 
@@ -1090,11 +1136,11 @@ function _renderAnnotModal(){
         <div class="annot-sidebar">
           <div class="upload-tab-bar">
             <button class="utab active" id="utabPins" onclick="switchAnnotTab('pins')">
-              <i class="fa fa-map-pin" style="font-size:10px;color:var(--red)"></i>
+              <i class="ph-duotone ph-map-pin" style="font-size:10px;color:var(--red)"></i>
               Pins <span style="font-family:var(--mono);font-size:9px;opacity:.7">${pins.length}</span>
             </button>
             <button class="utab" id="utabUpload" onclick="switchAnnotTab('upload')">
-              <i class="fa fa-cloud-arrow-up" style="font-size:10px;color:var(--accent2)"></i>
+              <i class="ph-duotone ph-cloud-arrow-up" style="font-size:10px;color:var(--accent2)"></i>
               File KH <span style="font-family:var(--mono);font-size:9px;opacity:.7" id="uploadCountBadge">${(pa.cnUploads||[]).length}</span>
             </button>
           </div>
@@ -1105,14 +1151,14 @@ function _renderAnnotModal(){
             <!-- Pin input (shown when pendingPin) -->
             <div id="pinInputArea" style="padding:8px;border-top:1px solid var(--border);display:none">
               <div style="font-size:10px;color:var(--red);font-weight:700;margin-bottom:6px">
-                <i class="fa fa-map-pin" style="margin-right:4px"></i>Ghi chú cho điểm này:
+                <i class="ph-duotone ph-map-pin" style="margin-right:4px"></i>Ghi chú cho điểm này:
               </div>
               <textarea id="pinNoteInput" style="width:100%;background:var(--ink);border:1px solid rgba(239,68,68,.4);color:var(--text);padding:7px 9px;border-radius:6px;font-size:11px;font-family:var(--sans);resize:none;outline:none;min-height:60px"
                 placeholder="Mô tả vấn đề hoặc yêu cầu sửa đổi..."></textarea>
               <div style="display:flex;gap:6px;margin-top:6px">
                 <button onclick="confirmPin('${projId}','${stage}','${paId}')"
                   style="flex:2;padding:6px;background:var(--red);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)">
-                  <i class="fa fa-map-pin" style="margin-right:3px"></i>Xác nhận Pin
+                  <i class="ph-duotone ph-map-pin" style="margin-right:3px"></i>Xác nhận Pin
                 </button>
                 <button onclick="cancelPin()"
                   style="flex:1;padding:6px;background:var(--ink4);border:1px solid var(--border);color:var(--sub);border-radius:5px;font-size:11px;cursor:pointer;font-family:var(--sans)">
@@ -1130,7 +1176,7 @@ function _renderAnnotModal(){
               ondrop="handleAnnotDrop(event,'${projId}','${stage}','${paId}')">
               <input type="file" accept="image/*,.pdf" multiple
                 onchange="handleAnnotUpload(event,'${projId}','${stage}','${paId}')">
-              <i class="fa fa-cloud-arrow-up" style="font-size:22px;color:var(--accent2);display:block;margin-bottom:6px"></i>
+              <i class="ph-duotone ph-cloud-arrow-up" style="font-size:22px;color:var(--accent2);display:block;margin-bottom:6px"></i>
               <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:3px">Kéo thả hoặc click</div>
               <div style="font-size:10px;color:var(--muted)">Ảnh chụp bản vẽ tay, ảnh chú thích, PDF...</div>
             </div>
@@ -1156,14 +1202,14 @@ function _renderAnnotModal(){
       <!-- Toolbar -->
       <div class="annot-tools">
         <button class="at-btn ${modeActive?'active':''}" onclick="toggleAddPinMode()" id="addPinBtn">
-          <i class="fa fa-map-pin"></i> ${modeActive?'Đang chọn vị trí...':'Thêm Pin'}
+          <i class="ph-duotone ph-map-pin"></i> ${modeActive?'Đang chọn vị trí...':'Thêm Pin'}
         </button>
         <span style="font-size:11px;color:var(--muted)">${modeActive?'👆 Click vào bản vẽ để đặt điểm':'Chọn "Thêm Pin" rồi click vào vị trí cần góp ý'}</span>
         <div style="margin-left:auto;display:flex;gap:6px">
           ${pa.status!=='approved'?`
           <button onclick="approvePA('${projId}','${stage}','${paId}');closeAnnotation()"
             style="padding:5px 14px;background:var(--green-bg);border:1px solid rgba(34,201,122,.25);color:var(--green);border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)">
-            <i class="fa fa-circle-check" style="margin-right:4px"></i>Duyệt phương án này
+            <i class="ph-duotone ph-check-circle" style="margin-right:4px"></i>Duyệt phương án này
           </button>`:''}
         </div>
       </div>
@@ -1401,7 +1447,7 @@ function openCallModal(type, projId, ktsName){
   }
   const contact = KTS_CONTACTS[ktsName] || {phone:'—', zalo:'—', email:'—'};
   const typeLabel = 'Liên hệ KTS qua Zalo OA';
-  const typeIcon  = {phone:'fa-phone', video:'fa-video', zalo:'fa-comment-dots'}[type];
+  const typeIcon  = {phone:'ph-phone', video:'ph-video-camera', zalo:'ph-chat-dots'}[type];
   const typeColor = {phone:'var(--green)', video:'var(--blue)', zalo:'#037fd3'}[type];
 
   const existing = document.getElementById('callModalBg');
@@ -1422,14 +1468,14 @@ function openCallModal(type, projId, ktsName){
 
       <!-- Call type indicator -->
       <div class="call-pulse" style="background:${typeColor}14;border-color:${typeColor}40">
-        <i class="fa ${typeIcon}" style="font-size:28px;color:${typeColor}"></i>
+        <i class="ph-duotone ${typeIcon}" style="font-size:28px;color:${typeColor}"></i>
       </div>
       <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">${typeLabel}</div>
 
       ${type==='phone'||type==='video' ? `
       <!-- Privacy shield notice -->
       <div style="background:rgba(34,201,122,.07);border:1px solid rgba(34,201,122,.2);border-radius:8px;padding:8px 12px;margin:12px 0 8px;display:flex;gap:8px;font-size:11px;color:var(--color-text-secondary,#9ca3af)">
-        <i class="fa fa-shield-halved" style="color:#22c97a;flex-shrink:0;margin-top:1px"></i>
+        <i class="ph-duotone ph-shield-check" style="color:#22c97a;flex-shrink:0;margin-top:1px"></i>
         <span>Số điện thoại thật của <b style="color:var(--text2)">${ktsName.replace('KTS. ','')}</b> được bảo mật. Cuộc gọi qua số ảo sàn ALN — tự động ghi âm &amp; lưu vào hồ sơ dự án.</span>
       </div>
       <!-- Virtual number display -->
@@ -1446,11 +1492,11 @@ function openCallModal(type, projId, ktsName){
       </div>
       <a href="tel:${contact.virtualNum.replace(/[^0-9]/g,'')}"
         style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:${typeColor};border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);text-decoration:none;margin-bottom:8px">
-        <i class="fa ${typeIcon}"></i> Gọi qua số ảo
+        <i class="ph-duotone ${typeIcon}"></i> Gọi qua số ảo
       </a>` : `
       <!-- Zalo OA -->
       <div style="background:rgba(3,107,211,.07);border:1px solid rgba(3,107,211,.2);border-radius:8px;padding:8px 12px;margin:12px 0 8px;display:flex;gap:8px;font-size:11px;color:var(--color-text-secondary,#9ca3af)">
-        <i class="fa fa-shield-halved" style="color:#037fd3;flex-shrink:0;margin-top:1px"></i>
+        <i class="ph-duotone ph-shield-check" style="color:#037fd3;flex-shrink:0;margin-top:1px"></i>
         <span>Chat qua <b style="color:#037fd3">Zalo Official Account của sàn ALN</b> — toàn bộ nội dung được lưu vào hồ sơ dự án. Không dùng Zalo cá nhân của KTS.</span>
       </div>
       <div style="background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:12px;font-size:12px;color:var(--text2)">
@@ -1458,14 +1504,14 @@ function openCallModal(type, projId, ktsName){
       </div>
       <a href="https://zalo.me/alnsanthietke" target="_blank"
         style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:#037fd3;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);text-decoration:none;margin-bottom:8px">
-        <i class="fa fa-comment-dots"></i> Mở Zalo OA sàn ALN
+        <i class="ph-duotone ph-chat-dots"></i> Mở Zalo OA sàn ALN
       </a>`}
 
       <!-- Email + Close -->
       <div style="display:flex;gap:6px;margin-top:4px">
         <a href="mailto:${contact.email}"
           style="flex:1;padding:8px;background:var(--ink3);border:1px solid var(--border);color:var(--text2);border-radius:var(--r-sm);font-size:11px;font-weight:600;font-family:var(--sans);text-decoration:none;display:flex;align-items:center;justify-content:center;gap:5px">
-          <i class="fa fa-envelope"></i> Email KTS
+          <i class="ph-duotone ph-envelope-simple"></i> Email KTS
         </a>
         <button onclick="closeCallModal()"
           style="flex:1;padding:8px;background:var(--ink3);border:1px solid var(--border);color:var(--sub);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)">
@@ -1513,14 +1559,14 @@ const REVIEW_DATA = {
       maxRevisions: 2,
       paList: [
         { id:'PA_C1_1', name:'MB Phương án A — Hướng Đông', folder:'mb', version:'v1.0',
-          icon:'📐', bg:'linear-gradient(135deg,#0e1418,#0a1020)',
+          icon:'<i class="ph-duotone ph-compass-tool"></i>', bg:'linear-gradient(135deg,#0e1418,#0a1020)',
           desc:'Mặt bằng tổng thể hướng Đông-Nam. Tối ưu ánh sáng tự nhiên.',
           kts:'KTS. Trần Lê Minh', date:'2026-05-10', status:'approved', pins:[
             {id:'pin1',x:62,y:38,text:'Cổng vào chính — đề xuất dịch sang trái 1.2m cho xe ra vào dễ hơn',author:(window.CN_DISPLAY_NAME||'Nguyễn Văn Thuận'),role:'cn',ts:'11/05 14:32',resolved:true},
             {id:'pin2',x:35,y:55,text:'Phòng khách quá hẹp, cần mở rộng thêm ~2m²',author:(window.CN_DISPLAY_NAME||'Nguyễn Văn Thuận'),role:'cn',ts:'11/05 15:00',resolved:true},
           ] },
         { id:'PA_C1_2', name:'MB Phương án B — Hướng Tây', folder:'mb', version:'v1.0',
-          icon:'📏', bg:'linear-gradient(135deg,#181418,#100e14)',
+          icon:'<i class="ph-duotone ph-ruler"></i>', bg:'linear-gradient(135deg,#181418,#100e14)',
           desc:'Phương án thay thế — hướng Tây, phù hợp với địa hình lô góc.',
           kts:'KTS. Trần Lê Minh', date:'2026-05-10', status:'rejected', pins:[] },
       ],
@@ -1539,17 +1585,17 @@ const REVIEW_DATA = {
       maxRevisions: 3,
       paList: [
         { id:'PA_C2_1', name:'3D Phối cảnh ngoại thất — Góc chính', folder:'pc_ngoai', version:'v1.0',
-          icon:'🏛️', bg:'linear-gradient(135deg,#1a1a2e,#0e0e1a)',
+          icon:'<i class="ph-duotone ph-bank"></i>', bg:'linear-gradient(135deg,#1a1a2e,#0e0e1a)',
           desc:'View từ cổng chính. Phong cách tân cổ điển với cột đá tự nhiên.',
           kts:'KTS. Trần Lê Minh', date:'2026-05-28', status:'pending', isNew:true, pins:[
             {id:'pin5',x:48,y:42,text:'Màu sắc cột đá quá sáng, cần tone trầm hơn theo mẫu đã thống nhất',author:(window.CN_DISPLAY_NAME||'Nguyễn Văn Thuận'),role:'cn',ts:'29/05 10:00',resolved:false},
           ] },
         { id:'PA_C2_2', name:'3D Phối cảnh ngoại thất — Góc vườn', folder:'pc_ngoai', version:'v1.0',
-          icon:'🌿', bg:'linear-gradient(135deg,#0e1a14,#0a120e)',
+          icon:'<i class="ph-duotone ph-leaf"></i>', bg:'linear-gradient(135deg,#0e1a14,#0a120e)',
           desc:'View từ khu vườn phía sau. Bể bơi và sân vườn kết hợp.',
           kts:'KTS. Trần Lê Minh', date:'2026-05-28', status:'pending', isNew:true, pins:[] },
         { id:'PA_C2_3', name:'3D Phối cảnh nội thất — Phòng khách', folder:'pc_noi', version:'v1.0',
-          icon:'🛋️', bg:'linear-gradient(135deg,#1a1410,#120e08)',
+          icon:'<i class="ph-duotone ph-couch"></i>', bg:'linear-gradient(135deg,#1a1410,#120e08)',
           desc:"Bird's eye view phòng khách + dining. Vật liệu đá marble và gỗ óc chó.",
           kts:'KTS. Trần Lê Minh', date:'2026-05-29', status:'pending', isNew:true, pins:[] },
       ],
@@ -1566,7 +1612,7 @@ const REVIEW_DATA = {
       revisions: 0, maxRevisions: 2,
       paList: [
         { id:'PA_C1_ALN9648', name:'Phương án Shophouse góc phố', version:'v1.0',
-          icon:'🏪', bg:'linear-gradient(135deg,#1a1420,#0e0a14)',
+          icon:'<i class="ph-duotone ph-storefront"></i>', bg:'linear-gradient(135deg,#1a1420,#0e0a14)',
           desc:'Mặt tiền shophouse 2 tầng. Phong cách hiện đại minimal.',
           kts:'KTS. Lê Hoàng Nam', date:'2026-05-05', status:'approved' },
       ],
@@ -1581,7 +1627,7 @@ const REVIEW_DATA = {
       revisions: 0, maxRevisions: 3,
       paList: [
         { id:'PA_C2_ALN9648', name:'3D Phối cảnh shophouse góc phố', version:'v1.0',
-          icon:'🏬', bg:'linear-gradient(135deg,#141a20,#0a0e14)',
+          icon:'<i class="ph-duotone ph-building-apartment"></i>', bg:'linear-gradient(135deg,#141a20,#0a0e14)',
           desc:'Góc nhìn từ đường chính. Mặt tiền kính + nhôm.',
           kts:'KTS. Lê Hoàng Nam', date:'2026-05-22', status:'pending', isNew:true },
       ],
@@ -1596,7 +1642,7 @@ const REVIEW_DATA = {
     C1: { status:'approved', submittedAt:'2026-04-15', approvedAt:'2026-04-17', revisions:0, maxRevisions:2,
       paList:[
         { id:'PA_9834_C1_1', name:'MB Phương án — Hướng Nam', folder:'mb', version:'v1.0',
-          icon:'📐', bg:'linear-gradient(135deg,#0e1820,#08101a)',
+          icon:'<i class="ph-duotone ph-compass-tool"></i>', bg:'linear-gradient(135deg,#0e1820,#08101a)',
           desc:'Mặt bằng nhà phố 5 tầng, mặt tiền 5m hướng Nam.',
           kts:'KTS. Nguyễn Thị Lan', date:'2026-04-15', status:'approved', pins:[], cnUploads:[] },
       ],
@@ -1607,12 +1653,12 @@ const REVIEW_DATA = {
     C2: { status:'pending', submittedAt:'2026-04-28', approvedAt:null, revisions:1, maxRevisions:3,
       paList:[
         { id:'PA_9834_C2_1', name:'3D Phối cảnh ngoại thất — Mặt tiền', folder:'pc_ngoai', version:'v1.1',
-          icon:'🏙️', bg:'linear-gradient(135deg,#14181e,#0c1018)',
+          icon:'<i class="ph-duotone ph-buildings"></i>', bg:'linear-gradient(135deg,#14181e,#0c1018)',
           desc:'View mặt tiền nhà phố 5 tầng. Phong cách hiện đại.',
           kts:'KTS. Nguyễn Thị Lan', date:'2026-04-28', status:'pending', isNew:false,
           pins:[{id:'pin_9834_1',x:55,y:45,text:'Màu sơn tường ngoài cần tone ấm hơn, hiện quá lạnh',author:'Trần Thị Bình',role:'cn',ts:'29/04 11:00',resolved:false}], cnUploads:[] },
         { id:'PA_9834_C2_2', name:'3D Phối cảnh nội thất — Phòng khách', folder:'pc_noi', version:'v1.0',
-          icon:'🛋️', bg:'linear-gradient(135deg,#181418,#100e12)',
+          icon:'<i class="ph-duotone ph-couch"></i>', bg:'linear-gradient(135deg,#181418,#100e12)',
           desc:"Bird's eye view phòng khách tầng 1.",
           kts:'KTS. Nguyễn Thị Lan', date:'2026-04-28', status:'pending', pins:[], cnUploads:[] },
       ],
@@ -1625,11 +1671,11 @@ const REVIEW_DATA = {
     C1: { status:'approved', submittedAt:'2026-03-12', approvedAt:'2026-03-14', revisions:0, maxRevisions:2,
       paList:[
         { id:'PA_9756_C1_1', name:'MB Villa tổng thể — Hướng Đông', folder:'mb', version:'v1.0',
-          icon:'📐', bg:'linear-gradient(135deg,#14200e,#0c1808)',
+          icon:'<i class="ph-duotone ph-compass-tool"></i>', bg:'linear-gradient(135deg,#14200e,#0c1808)',
           desc:'MB villa 400m², bố trí phòng ngủ master hướng Đông.',
           kts:'KTS. Vũ Minh Khoa', date:'2026-03-12', status:'approved', pins:[], cnUploads:[] },
         { id:'PA_9756_C1_2', name:'MB Villa phương án B — Hướng Tây', folder:'mb', version:'v1.0',
-          icon:'📏', bg:'linear-gradient(135deg,#201614,#180e0c)',
+          icon:'<i class="ph-duotone ph-ruler"></i>', bg:'linear-gradient(135deg,#201614,#180e0c)',
           desc:'Phương án thay thế, hồ bơi phía Tây.',
           kts:'KTS. Vũ Minh Khoa', date:'2026-03-12', status:'rejected', pins:[], cnUploads:[] },
       ],
@@ -1640,15 +1686,15 @@ const REVIEW_DATA = {
     C2: { status:'approved', submittedAt:'2026-03-28', approvedAt:'2026-04-01', revisions:1, maxRevisions:3,
       paList:[
         { id:'PA_9756_C2_1', name:'3D Phối cảnh ngoại thất — Toàn cảnh', folder:'pc_ngoai', version:'v1.1',
-          icon:'🏡', bg:'linear-gradient(135deg,#101e14,#08140c)',
+          icon:'<i class="ph-duotone ph-house-line"></i>', bg:'linear-gradient(135deg,#101e14,#08140c)',
           desc:'View toàn cảnh villa từ trên cao. Hồ bơi và sân vườn.',
           kts:'KTS. Vũ Minh Khoa', date:'2026-03-28', status:'approved', pins:[], cnUploads:[] },
         { id:'PA_9756_C2_2', name:'3D Phối cảnh ngoại thất — Cổng vào', folder:'pc_ngoai', version:'v1.1',
-          icon:'🌳', bg:'linear-gradient(135deg,#0e1c10,#081408)',
+          icon:'<i class="ph-duotone ph-tree"></i>', bg:'linear-gradient(135deg,#0e1c10,#081408)',
           desc:'View từ cổng vào. Cây xanh và tiểu cảnh.',
           kts:'KTS. Vũ Minh Khoa', date:'2026-03-29', status:'approved', pins:[], cnUploads:[] },
         { id:'PA_9756_C2_3', name:'3D Phối cảnh nội thất — Master Bedroom', folder:'pc_noi', version:'v1.0',
-          icon:'🛏️', bg:'linear-gradient(135deg,#1a1410,#120e08)',
+          icon:'<i class="ph-duotone ph-bed"></i>', bg:'linear-gradient(135deg,#1a1410,#120e08)',
           desc:'Phòng ngủ master 45m². Gỗ tếch + đá travertine.',
           kts:'KTS. Vũ Minh Khoa', date:'2026-03-30', status:'approved', pins:[], cnUploads:[] },
       ],
@@ -1661,7 +1707,7 @@ const REVIEW_DATA = {
     C1: { status:'pending', submittedAt:'2026-05-20', approvedAt:null, revisions:0, maxRevisions:2,
       paList:[
         { id:'PA_9702_C1_1', name:'MB Nhà cấp 4 — Phương án chính', folder:'mb', version:'v1.0',
-          icon:'🏠', bg:'linear-gradient(135deg,#181410,#100e08)',
+          icon:'<i class="ph-duotone ph-house"></i>', bg:'linear-gradient(135deg,#181410,#100e08)',
           desc:'MB nhà cấp 4 mái thái 80m². Bố trí 3 phòng ngủ.',
           kts:'KTS. Phạm Hoài Nam', date:'2026-05-20', status:'pending', isNew:true, pins:[], cnUploads:[] },
       ],
@@ -1673,7 +1719,7 @@ const REVIEW_DATA = {
     C1: { status:'approved', submittedAt:'2026-05-01', approvedAt:'2026-05-03', revisions:0, maxRevisions:2,
       paList:[
         { id:'PA_9521_C1_1', name:'MB Nhà phố 3 tầng — Hướng Bắc', folder:'mb', version:'v1.0',
-          icon:'📐', bg:'linear-gradient(135deg,#101820,#080e18)',
+          icon:'<i class="ph-duotone ph-compass-tool"></i>', bg:'linear-gradient(135deg,#101820,#080e18)',
           desc:'MB nhà phố 3 tầng 4x15m. Cầu thang giữa, tối ưu diện tích.',
           kts:'KTS. Phạm Hoài Nam', date:'2026-05-01', status:'approved', pins:[], cnUploads:[] },
       ],
@@ -1684,7 +1730,7 @@ const REVIEW_DATA = {
     C2: { status:'pending', submittedAt:'2026-05-18', approvedAt:null, revisions:0, maxRevisions:3,
       paList:[
         { id:'PA_9521_C2_1', name:'3D Phối cảnh ngoại thất — Mặt tiền', folder:'pc_ngoai', version:'v1.0',
-          icon:'🏘️', bg:'linear-gradient(135deg,#141820,#0c1018)',
+          icon:'<i class="ph-duotone ph-house-line"></i>', bg:'linear-gradient(135deg,#141820,#0c1018)',
           desc:'View mặt tiền nhà phố 3 tầng. Phong cách Japandi.',
           kts:'KTS. Phạm Hoài Nam', date:'2026-05-18', status:'pending', isNew:true, pins:[], cnUploads:[] },
       ],
@@ -1696,11 +1742,11 @@ const REVIEW_DATA = {
     C1: { status:'pending', submittedAt:'2026-05-25', approvedAt:null, revisions:0, maxRevisions:2,
       paList:[
         { id:'PA_9480_C1_1', name:'MB Biệt thự nghỉ dưỡng — Phương án A', folder:'mb', version:'v1.0',
-          icon:'🏔️', bg:'linear-gradient(135deg,#0e1820,#061018)',
+          icon:'<i class="ph-duotone ph-mountains"></i>', bg:'linear-gradient(135deg,#0e1820,#061018)',
           desc:'MB biệt thự 500m² trên đồi. Tầm nhìn thung lũng.',
           kts:'KTS. Trần Lê Minh', date:'2026-05-25', status:'pending', isNew:true, pins:[], cnUploads:[] },
         { id:'PA_9480_C1_2', name:'MB Biệt thự nghỉ dưỡng — Phương án B', folder:'mb', version:'v1.0',
-          icon:'📐', bg:'linear-gradient(135deg,#141e0e,#0c1408)',
+          icon:'<i class="ph-duotone ph-compass-tool"></i>', bg:'linear-gradient(135deg,#141e0e,#0c1408)',
           desc:'Bố cục dọc, hồ bơi vô cực hướng thung lũng.',
           kts:'KTS. Trần Lê Minh', date:'2026-05-25', status:'pending', isNew:true, pins:[], cnUploads:[] },
       ],
@@ -1712,7 +1758,7 @@ const REVIEW_DATA = {
     C1: { status:'approved', submittedAt:'2026-04-20', approvedAt:'2026-04-22', revisions:0, maxRevisions:2,
       paList:[
         { id:'PA_9412_C1_1', name:'MB Căn hộ Duplex — Tầng 1+2', folder:'mb', version:'v1.0',
-          icon:'🏢', bg:'linear-gradient(135deg,#141420,#0c0c18)',
+          icon:'<i class="ph-duotone ph-building"></i>', bg:'linear-gradient(135deg,#141420,#0c0c18)',
           desc:'MB duplex 2 tầng 140m². Open-plan tầng 1, 3PN tầng 2.',
           kts:'KTS. Nguyễn Thị Lan', date:'2026-04-20', status:'approved', pins:[], cnUploads:[] },
       ],
@@ -1723,15 +1769,15 @@ const REVIEW_DATA = {
     C2: { status:'pending', submittedAt:'2026-05-10', approvedAt:null, revisions:1, maxRevisions:3,
       paList:[
         { id:'PA_9412_C2_1', name:'3D Phối cảnh ngoại thất — Ban công', folder:'pc_ngoai', version:'v1.1',
-          icon:'🌆', bg:'linear-gradient(135deg,#10141e,#080c16)',
+          icon:'<i class="ph-duotone ph-buildings"></i>', bg:'linear-gradient(135deg,#10141e,#080c16)',
           desc:'View từ ban công tầng 2. Skyline Bình Thạnh.',
           kts:'KTS. Nguyễn Thị Lan', date:'2026-05-10', status:'pending', isNew:true, pins:[], cnUploads:[] },
         { id:'PA_9412_C2_2', name:'3D Phối cảnh nội thất — Phòng khách', folder:'pc_noi', version:'v1.1',
-          icon:'🛋️', bg:'linear-gradient(135deg,#1a1218,#120a10)',
+          icon:'<i class="ph-duotone ph-couch"></i>', bg:'linear-gradient(135deg,#1a1218,#120a10)',
           desc:'Living room open-plan. Bếp đảo + phòng ăn.',
           kts:'KTS. Nguyễn Thị Lan', date:'2026-05-11', status:'pending', isNew:true, pins:[], cnUploads:[] },
         { id:'PA_9412_C2_3', name:'3D Phối cảnh nội thất — Master Bedroom', folder:'pc_noi', version:'v1.0',
-          icon:'🛏️', bg:'linear-gradient(135deg,#18121a,#100a12)',
+          icon:'<i class="ph-duotone ph-bed"></i>', bg:'linear-gradient(135deg,#18121a,#100a12)',
           desc:'Phòng ngủ master 30m² + walk-in closet.',
           kts:'KTS. Nguyễn Thị Lan', date:'2026-05-12', status:'pending', isNew:true, pins:[], cnUploads:[] },
       ],
@@ -1789,13 +1835,13 @@ function renderMain(){
   /* Folder tabs */
   const folderTabsHTML =
     `<button class="ft ${activeFolder==='ALL'?'active':''}" onclick="setFolder('ALL')">
-       <i class="fa fa-folder-open"></i> Tất cả <span class="ft-badge">${totalDocs}</span>
+       <i class="ph-duotone ph-folder-open"></i> Tất cả <span class="ft-badge">${totalDocs}</span>
      </button>`
     + FOLDERS.map(f=>{
         const active = activeFolder===f.id;
         return `<button class="ft ${active?'active':''}" onclick="setFolder('${f.id}')"
           style="${active?`border-color:${f.color}40;background:${f.color}14;color:${f.color}`:''}">
-          <i class="fa ${f.icon}" style="color:${active?f.color:''}"></i>
+          <i class="ph-duotone ${f.icon}" style="color:${active?f.color:''}"></i>
           ${f.label} <span class="ft-badge">${foldCounts[f.id]||0}</span>
         </button>`;
       }).join('');
@@ -1807,7 +1853,7 @@ function renderMain(){
   /* File cards */
   const docCards = activeDocs.length===0
     ? `<div class="file-empty">
-         <i class="fa fa-cloud-upload-alt"></i>
+         <i class="ph-duotone ph-cloud-arrow-up"></i>
          <p style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px">KTS chưa upload file vào thư mục này</p>
          <p style="font-size:12px">Bạn sẽ nhận thông báo ngay khi có tài liệu mới</p>
        </div>`
@@ -1816,7 +1862,7 @@ function renderMain(){
         return `<div class="file-card ${d.isNew?'new-doc':''}" onclick="downloadDoc('${d.id}','${d.name}')">
           <div style="display:flex;align-items:center;gap:10px">
             <div class="fc-icon" style="background:rgba(255,255,255,.04);border:1px solid var(--border)">
-              <i class="fa ${ICON[d.type]||'fa-file'}" style="color:${ICOLOR[d.type]||'var(--sub)'};font-size:20px"></i>
+              <i class="ph-duotone ${ICON[d.type]||'ph-file'}" style="color:${ICOLOR[d.type]||'var(--sub)'};font-size:20px"></i>
             </div>
             <div style="flex:1;min-width:0">
               <div class="fc-name">${d.name}</div>
@@ -1826,17 +1872,17 @@ function renderMain(){
           </div>
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
             <span style="font-size:10px;color:var(--sub);display:flex;align-items:center;gap:4px">
-              <i class="fa fa-user-tie" style="font-size:9px;color:${fi.color}"></i>${d.kts}
+              <i class="ph-duotone ph-user-circle" style="font-size:9px;color:${fi.color}"></i>${d.kts}
             </span>
             <span style="font-size:10px;background:${fi.color}14;border:1px solid ${fi.color}30;color:${fi.color};padding:1px 8px;border-radius:99px;display:inline-flex;align-items:center;gap:4px">
-              <i class="fa ${fi.icon}" style="font-size:9px"></i>${fi.label}
+              <i class="ph-duotone ${fi.icon}" style="font-size:9px"></i>${fi.label}
             </span>
           </div>
           <span class="fc-status pill ${d.status==='approved'?'p-green':d.status==='dispute'?'p-red':'p-amber'}">
             ${d.status==='approved'?'✅ Đã duyệt':d.status==='dispute'?'⚠️ Tranh chấp':'⏳ Chờ duyệt'}
           </span>
           <button class="fc-download" onclick="event.stopPropagation();downloadDoc('${d.id}','${d.name}')">
-            <i class="fa fa-download" style="font-size:11px"></i> Tải xuống
+            <i class="ph-duotone ph-download-simple" style="font-size:11px"></i> Tải xuống
           </button>
         </div>`;
       }).join('');
@@ -1844,11 +1890,11 @@ function renderMain(){
   /* Folder description bar */
   const folderDescHTML = activeFolderInfo
     ? `<div style="background:${activeFolderInfo.color}0e;border:1px solid ${activeFolderInfo.color}28;border-radius:var(--r-sm);padding:8px 12px;margin-bottom:12px;font-size:11px;color:var(--text2);display:flex;gap:8px">
-        <i class="fa ${activeFolderInfo.icon}" style="color:${activeFolderInfo.color};flex-shrink:0;margin-top:1px"></i>
+        <i class="ph-duotone ${activeFolderInfo.icon}" style="color:${activeFolderInfo.color};flex-shrink:0;margin-top:1px"></i>
         ${activeFolderInfo.desc}
        </div>`
     : `<div style="background:var(--accent-bg);border:1px solid rgba(201,168,76,.15);border-radius:var(--r-sm);padding:8px 12px;margin-bottom:12px;font-size:11px;color:var(--text2);display:flex;gap:8px">
-        <i class="fa fa-circle-info" style="color:var(--accent2);flex-shrink:0;margin-top:1px"></i>
+        <i class="ph-duotone ph-info" style="color:var(--accent2);flex-shrink:0;margin-top:1px"></i>
         KTS upload file từ trang kts.applamnha.vn → xuất hiện ngay tại đây theo đúng thư mục chuyên môn.
        </div>`;
 
@@ -1866,7 +1912,7 @@ function renderMain(){
               : `<span style="font-size:22px">👤</span>`}
           </div>
           <div onclick="document.getElementById('cnAvatarInput').click()" style="position:absolute;bottom:0;right:0;width:18px;height:18px;border-radius:50%;background:var(--gold);border:2px solid var(--ink2);display:flex;align-items:center;justify-content:center;cursor:pointer">
-            <i class="fa fa-camera" style="font-size:8px;color:#000"></i>
+            <i class="ph-duotone ph-camera" style="font-size:8px;color:#000"></i>
           </div>
           <input type="file" id="cnAvatarInput" accept="image/*" style="display:none" onchange="
             const f=this.files[0];if(!f)return;
@@ -1884,13 +1930,13 @@ function renderMain(){
           <div class="kts-hero-name">${p.cn}</div>
           <div class="kts-hero-rows" style="margin-top:5px">
             <span class="kts-hero-pill" style="background:rgba(201,168,76,.12);color:var(--gold);border:1px solid rgba(201,168,76,.25)">
-              <i class="fa fa-user-tie" style="font-size:8px"></i> Chủ đầu tư
+              <i class="ph-duotone ph-user-circle" style="font-size:8px"></i> Chủ đầu tư
             </span>
             <span class="kts-hero-pill" style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--accent2);font-family:var(--mono)">
-              <i class="fa fa-hashtag" style="font-size:8px"></i> ${p.id}
+              <i class="ph-duotone ph-hash" style="font-size:8px"></i> ${p.id}
             </span>
             <span class="kts-hero-pill" style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text2)">
-              <i class="fa fa-calendar" style="color:var(--gold);font-size:8px"></i> Đang thi công ${p.stage}
+              <i class="ph-duotone ph-calendar-blank" style="color:var(--gold);font-size:8px"></i> Đang thi công ${p.stage}
             </span>
           </div>
         </div>
@@ -1913,15 +1959,15 @@ function renderMain(){
             <div style="font-size:11px;font-weight:700;color:var(--text2)">${p.kts}</div>
             <div style="font-size:9px;color:var(--muted);margin-top:1px;font-family:var(--mono)">${ki.cchn}</div>
           </div>
-          <span class="pill" style="${tierStyle};font-size:9px"><i class="fa fa-crown" style="font-size:8px"></i> ${ki.tier}</span>
-          <span class="pill p-green" style="font-size:9px"><i class="fa fa-circle-check" style="font-size:8px"></i> Đã xác minh</span>
-          <span class="pill" style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text2);font-size:9px"><i class="fa fa-star" style="color:var(--gold);font-size:8px"></i> ${ki.rating} · ${ki.projects} dự án</span>
+          <span class="pill" style="${tierStyle};font-size:9px"><i class="ph-duotone ph-crown" style="font-size:8px"></i> ${ki.tier}</span>
+          <span class="pill p-green" style="font-size:9px"><i class="ph-duotone ph-check-circle" style="font-size:8px"></i> Đã xác minh</span>
+          <span class="pill" style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text2);font-size:9px"><i class="ph-duotone ph-star" style="color:var(--gold);font-size:8px"></i> ${ki.rating} · ${ki.projects} dự án</span>
         </div>
         <p style="margin-top:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           <span class="pill ${p.status==='on_track'?'p-green':p.status==='sla_warn'?'p-amber':p.status==='dispute'?'p-red':'p-gray'}">
             ${{on_track:'🟢 Đúng tiến độ',sla_warn:'⏰ Cảnh báo SLA',dispute:'❌ Tranh chấp',done:'✅ Hoàn thành'}[p.status]}
           </span>
-          ${newCount>0?`<span class="pill p-green"><i class="fa fa-bell" style="font-size:8px"></i> ${newCount} file mới</span>`:''}
+          ${newCount>0?`<span class="pill p-green"><i class="ph-duotone ph-bell" style="font-size:8px"></i> ${newCount} file mới</span>`:''}
         </p>
       </div>
 
@@ -1933,7 +1979,7 @@ function renderMain(){
       <div class="card" style="padding:14px 18px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <div class="ct" style="margin:0;border:none;padding:0">
-            <i class="fa fa-route" style="color:var(--gold)"></i> Tiến độ thực hiện
+            <i class="ph-duotone ph-path" style="color:var(--gold)"></i> Tiến độ thực hiện
           </div>
           <!-- Stage progress dots -->
           <div style="display:flex;align-items:center;gap:6px">
@@ -1994,7 +2040,7 @@ function renderMain(){
           const sr=rv[s]; const isDone=sr.status==='approved'; const isAct=rid===s;
           return `<button class="rp-tab ${isDone?'done':''} ${isAct?'active':''}"
             onclick="setReviewStage('${p.id}','${s}')">
-            <i class="fa ${isDone?'fa-circle-check':'fa-pencil-ruler'}" style="font-size:10px"></i>
+            <i class="ph-duotone ${isDone?'ph-check-circle':'ph-pencil-ruler'}" style="font-size:10px"></i>
             ${s} — ${s==='C1'?'Mặt bằng 2D':'Phối cảnh 3D'}
             ${isDone
               ? '<span style="font-size:9px">✅</span>'
@@ -2004,9 +2050,9 @@ function renderMain(){
 
         /* 3 thư mục cố định */
         const FOLDERS_REVIEW = [
-          { id:'mb',       label:'Mặt bằng',            icon:'fa-draw-polygon', color:'var(--blue)',   desc:'MB tổng thể, MB các tầng, MB mái' },
-          { id:'pc_ngoai', label:'Phối cảnh Ngoại thất', icon:'fa-sun',          color:'var(--amber)',  desc:'Phối cảnh ngoại thất, sân vườn, hồ bơi' },
-          { id:'pc_noi',   label:'Phối cảnh Nội thất',   icon:'fa-couch',        color:'var(--purple)', desc:'Phối cảnh nội thất các phòng' },
+          { id:'mb',       label:'Mặt bằng',            icon:'ph-polygon', color:'var(--blue)',   desc:'MB tổng thể, MB các tầng, MB mái' },
+          { id:'pc_ngoai', label:'Phối cảnh Ngoại thất', icon:'ph-sun',          color:'var(--amber)',  desc:'Phối cảnh ngoại thất, sân vườn, hồ bơi' },
+          { id:'pc_noi',   label:'Phối cảnh Nội thất',   icon:'ph-couch',        color:'var(--purple)', desc:'Phối cảnh nội thất các phòng' },
         ];
         const fCount = {
           all: r.paList.length,
@@ -2025,7 +2071,7 @@ function renderMain(){
                 background:${subTab==='all'?'rgba(201,168,76,.12)':'var(--ink3)'};
                 border:1.5px solid ${subTab==='all'?'rgba(201,168,76,.3)':'var(--border)'};
                 text-align:center">
-              <i class="fa fa-layer-group" style="font-size:16px;color:${subTab==='all'?'var(--accent2)':'var(--sub)'};display:block;margin-bottom:4px"></i>
+              <i class="ph-duotone ph-stack-simple" style="font-size:16px;color:${subTab==='all'?'var(--accent2)':'var(--sub)'};display:block;margin-bottom:4px"></i>
               <div style="font-size:10px;font-weight:700;color:${subTab==='all'?'var(--accent2)':'var(--sub)'}">Tất cả</div>
               <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:${subTab==='all'?'var(--text)':'var(--text2)'}">${fCount.all}</div>
             </div>
@@ -2037,7 +2083,7 @@ function renderMain(){
                 background:${subTab===f.id?f.color+'14':'var(--ink3)'};
                 border:1.5px solid ${subTab===f.id?f.color+'50':'var(--border)'};
                 text-align:center">
-              <i class="fa ${f.icon}" style="font-size:16px;color:${subTab===f.id?f.color:'var(--sub)'};display:block;margin-bottom:4px"></i>
+              <i class="ph-duotone ${f.icon}" style="font-size:16px;color:${subTab===f.id?f.color:'var(--sub)'};display:block;margin-bottom:4px"></i>
               <div style="font-size:10px;font-weight:700;color:${subTab===f.id?f.color:'var(--sub)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${f.label}</div>
               <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:${subTab===f.id?'var(--text)':'var(--text2)'}">${fCount[f.id]||0}</div>
             </div>`).join('')}
@@ -2045,11 +2091,11 @@ function renderMain(){
 
           <!-- Folder description khi chọn -->
           ${subTab!=='all' ? `<div style="background:${(FOLDERS_REVIEW.find(f=>f.id===subTab) ? FOLDERS_REVIEW.find(f=>f.id===subTab).color : '')}0d;border:1px solid ${(FOLDERS_REVIEW.find(f=>f.id===subTab) ? FOLDERS_REVIEW.find(f=>f.id===subTab).color : '')}28;border-radius:var(--r-sm);padding:8px 12px;margin-bottom:12px;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:8px">
-            <i class="fa ${(FOLDERS_REVIEW.find(f=>f.id===subTab) ? FOLDERS_REVIEW.find(f=>f.id===subTab).icon : '')}" style="color:${(FOLDERS_REVIEW.find(f=>f.id===subTab) ? FOLDERS_REVIEW.find(f=>f.id===subTab).color : '')};flex-shrink:0"></i>
+            <i class="ph-duotone ${(FOLDERS_REVIEW.find(f=>f.id===subTab) ? FOLDERS_REVIEW.find(f=>f.id===subTab).icon : '')}" style="color:${(FOLDERS_REVIEW.find(f=>f.id===subTab) ? FOLDERS_REVIEW.find(f=>f.id===subTab).color : '')};flex-shrink:0"></i>
             <span><b style="color:var(--text)">${(FOLDERS_REVIEW.find(f=>f.id===subTab) ? FOLDERS_REVIEW.find(f=>f.id===subTab).label : '')}:</b> ${(FOLDERS_REVIEW.find(f=>f.id===subTab) ? FOLDERS_REVIEW.find(f=>f.id===subTab).desc : '')}</span>
           </div>`:
           `<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;margin-bottom:12px;font-size:11px;color:var(--muted)">
-            <i class="fa fa-circle-info" style="color:var(--accent2);margin-right:6px"></i>
+            <i class="ph-duotone ph-info" style="color:var(--accent2);margin-right:6px"></i>
             KTS tải file vào đúng thư mục — Khách hàng chọn thư mục để xem và đánh dấu pin từng bản vẽ
           </div>`}`;
 
@@ -2059,7 +2105,7 @@ function renderMain(){
 
         const paCardsHTML = filteredPAs.length===0
           ? `<div style="text-align:center;padding:30px;color:var(--muted);font-size:12px;grid-column:1/-1">
-               <i class="fa fa-folder-open" style="font-size:24px;display:block;margin-bottom:8px;color:var(--dim)"></i>
+               <i class="ph-duotone ph-folder-open" style="font-size:24px;display:block;margin-bottom:8px;color:var(--dim)"></i>
                KTS chưa upload phương án ${subTab==='mb'?'mặt bằng':'phối cảnh'} nào
              </div>`
           : filteredPAs.map(pa=>{
@@ -2068,12 +2114,12 @@ function renderMain(){
             const pinCount = (pa.pins||[]).length;
             const openPins = (pa.pins||[]).filter(pin=>!pin.resolved).length;
             const FLABEL = {
-              mb:       {label:'Mặt bằng',            icon:'fa-draw-polygon', color:'var(--blue)'},
-              pc_ngoai: {label:'Phối cảnh Ngoại thất', icon:'fa-sun',          color:'var(--amber)'},
-              pc_noi:   {label:'Phối cảnh Nội thất',   icon:'fa-couch',        color:'var(--purple)'},
+              mb:       {label:'Mặt bằng',            icon:'ph-polygon', color:'var(--blue)'},
+              pc_ngoai: {label:'Phối cảnh Ngoại thất', icon:'ph-sun',          color:'var(--amber)'},
+              pc_noi:   {label:'Phối cảnh Nội thất',   icon:'ph-couch',        color:'var(--purple)'},
             };
             const fl = FLABEL[pa.folder] || FLABEL.mb;
-            const typeLabel = `<span style="background:${fl.color}14;color:${fl.color};border:1px solid ${fl.color}30;font-size:9px;font-weight:700;padding:1px 7px;border-radius:99px"><i class="fa ${fl.icon}" style="font-size:8px;margin-right:2px"></i>${fl.label}</span>`;
+            const typeLabel = `<span style="background:${fl.color}14;color:${fl.color};border:1px solid ${fl.color}30;font-size:9px;font-weight:700;padding:1px 7px;border-radius:99px"><i class="ph-duotone ${fl.icon}" style="font-size:8px;margin-right:2px"></i>${fl.label}</span>`;
             return `<div class="pa-card ${isApproved?'approved':''} ${isRejected?'rejected':''}"
               style="${isRejected?'opacity:.5;':''}">
               <div class="pa-preview" style="background:${pa.bg};cursor:pointer" onclick="openAnnotation('${p.id}','${rid}','${pa.id}')">
@@ -2084,13 +2130,13 @@ function renderMain(){
                 ${isRejected?'<span style="position:absolute;bottom:8px;right:8px;background:rgba(239,68,68,.8);color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:99px">❌ Không chọn</span>':''}
                 <!-- Pin count badge -->
                 ${pinCount>0?`<span style="position:absolute;top:8px;right:8px;background:${openPins>0?'var(--red)':'var(--green)'};color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:99px;display:flex;align-items:center;gap:3px">
-                  <i class="fa fa-map-pin" style="font-size:8px"></i> ${openPins>0?openPins+' chờ xử lý':pinCount+' đã xong'}
+                  <i class="ph-duotone ph-map-pin" style="font-size:8px"></i> ${openPins>0?openPins+' chờ xử lý':pinCount+' đã xong'}
                 </span>`:''}
                 <!-- Annotation hint -->
                 <div style="position:absolute;inset:0;background:rgba(0,0,0,.0);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s"
                   class="annot-hover-hint" onmouseover="this.style.opacity=1;this.style.background='rgba(0,0,0,.45)'" onmouseout="this.style.opacity=0;this.style.background='rgba(0,0,0,.0)'">
                   <span style="color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.8)">
-                    <i class="fa fa-expand" style="margin-right:5px"></i>Xem & Đánh dấu
+                    <i class="ph-duotone ph-arrows-out" style="margin-right:5px"></i>Xem & Đánh dấu
                   </span>
                 </div>
               </div>
@@ -2101,21 +2147,21 @@ function renderMain(){
                 </div>
                 <div class="pa-name">${pa.name}</div>
                 <div class="pa-meta">
-                  <span><i class="fa fa-calendar" style="margin-right:3px;font-size:9px"></i>${pa.date}</span>
+                  <span><i class="ph-duotone ph-calendar-blank" style="margin-right:3px;font-size:9px"></i>${pa.date}</span>
                   <span style="color:var(--text2);font-size:11px;margin-top:2px">${pa.desc}</span>
                 </div>
               </div>
               <div class="pa-footer">
                 <button class="pa-btn" style="background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);color:var(--accent2)"
                   onclick="openAnnotation('${p.id}','${rid}','${pa.id}')">
-                  <i class="fa fa-map-pin" style="font-size:10px"></i>
+                  <i class="ph-duotone ph-map-pin" style="font-size:10px"></i>
                   Đánh dấu${pinCount>0?' ('+pinCount+')':''}
                 </button>
                 ${!isApproved&&!isRejected?`
                 <button class="pa-btn pa-btn-approve" onclick="approvePA('${p.id}','${rid}','${pa.id}')">
-                  <i class="fa fa-circle-check" style="font-size:10px"></i> Duyệt
+                  <i class="ph-duotone ph-check-circle" style="font-size:10px"></i> Duyệt
                 </button>`:
-                isApproved?`<span style="flex:1;text-align:center;font-size:10px;font-weight:700;color:var(--green);display:flex;align-items:center;justify-content:center;gap:4px"><i class="fa fa-circle-check"></i> Đã duyệt</span>`:''}
+                isApproved?`<span style="flex:1;text-align:center;font-size:10px;font-weight:700;color:var(--green);display:flex;align-items:center;justify-content:center;gap:4px"><i class="ph-duotone ph-check-circle"></i> Đã duyệt</span>`:''}
               </div>
             </div>`;
           }).join('');
@@ -2139,7 +2185,7 @@ function renderMain(){
         const existingRating = (window._stageRatings||{})[`${p.id}_${rid}`];
         const ratingHTML = r.status==='approved' ? (existingRating
           ? `<div class="rating-block rated">
-               <div class="rating-label"><i class="fa fa-star" style="color:var(--gold);margin-right:4px"></i>Đánh giá của bạn</div>
+               <div class="rating-label"><i class="ph-duotone ph-star" style="color:var(--gold);margin-right:4px"></i>Đánh giá của bạn</div>
                <div class="rating-done">
                  <span>${'★'.repeat(existingRating.score)}${'☆'.repeat(5-existingRating.score)}</span>
                  <b>${['','Chưa hài lòng','Cần cải thiện','Đạt yêu cầu','Tốt','Xuất sắc'][existingRating.score]}</b>
@@ -2148,7 +2194,7 @@ function renderMain(){
                </div>
              </div>`
           : `<div class="rating-block" id="ratingBlock_${p.id}_${rid}">
-               <div class="rating-label"><i class="fa fa-star" style="color:var(--gold);margin-right:4px"></i>Chấm điểm KTS — Chặng ${rid}</div>
+               <div class="rating-label"><i class="ph-duotone ph-star" style="color:var(--gold);margin-right:4px"></i>Chấm điểm KTS — Chặng ${rid}</div>
                <div class="stars" id="stars_${p.id}_${rid}"
                  onmouseleave="resetStarHover('${p.id}','${rid}')">
                  ${[1,2,3,4,5].map(n=>`<span class="star" id="star_${p.id}_${rid}_${n}"
@@ -2160,11 +2206,11 @@ function renderMain(){
              </div>`) : '';
 
         const statusBar = r.status==='approved'
-          ? `<div class="approval-bar"><i class="fa fa-circle-check" style="color:var(--green);font-size:16px;flex-shrink:0"></i>
+          ? `<div class="approval-bar"><i class="ph-duotone ph-check-circle" style="color:var(--green);font-size:16px;flex-shrink:0"></i>
                <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--green)">Phương án đã được phê duyệt</div>
                <div style="font-size:10px;color:var(--sub)">Duyệt lúc ${r.approvedAt} · ${r.revisions} lần sửa</div></div></div>
              ${ratingHTML}`
-          : `<div class="revision-bar"><i class="fa fa-clock" style="color:var(--amber);font-size:16px;flex-shrink:0"></i>
+          : `<div class="revision-bar"><i class="ph-duotone ph-clock" style="color:var(--amber);font-size:16px;flex-shrink:0"></i>
                <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--amber)">Chờ phê duyệt từ Chủ đầu tư</div>
                <div style="font-size:10px;color:var(--sub)">KTS nộp ${r.submittedAt} · Còn ${r.maxRevisions-r.revisions} lần sửa miễn phí</div></div>
                <span class="pill p-amber" style="flex-shrink:0;font-size:10px">SLA 48h</span></div>`;
@@ -2172,7 +2218,7 @@ function renderMain(){
         return `
         <div class="review-panel">
           <div class="ct" style="margin-bottom:12px">
-            <i class="fa fa-eye" style="color:var(--gold)"></i>
+            <i class="ph-duotone ph-eye" style="color:var(--gold)"></i>
             Bảng Review Phương án
             <span style="font-size:10px;color:var(--muted);font-weight:400;margin-left:4px">— Click vào PA để đánh dấu & góp ý trực tiếp trên bản vẽ</span>
             <span class="pill p-amber" style="margin-left:auto;font-size:10px">Chỉ C1 & C2</span>
@@ -2184,7 +2230,7 @@ function renderMain(){
                     <!-- ══ THƯ MỤC TẢI LÊN TỪ KHÁCH HÀNG ══ -->
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
             <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">
-              <i class="fa fa-folder-arrow-up" style="color:var(--gold)"></i>
+              <i class="ph-duotone ph-folder-plus" style="color:var(--gold)"></i>
               Tài liệu Khách hàng gửi KTS
               <span style="font-family:var(--mono);font-size:9px;background:var(--ink4);padding:1px 6px;border-radius:99px" id="cnUploadCount_${p.id}_${rid}">
                 ${(()=>{let tot=0;((rv[rid] ? rv[rid].paList : null)||[]).forEach(pa=>{tot+=(pa.cnUploads||[]).length});return tot})()} file
@@ -2207,7 +2253,7 @@ function renderMain(){
                   ondrop="handleAnnotDrop(event,'${p.id}','${rid}','${pa.id}')">
                   <input type="file" accept="image/*,.pdf,.dwg" multiple
                     onchange="handleAnnotUpload(event,'${p.id}','${rid}','${pa.id}')">
-                  <i class="fa fa-cloud-arrow-up" style="font-size:16px;color:var(--accent2);margin-right:6px"></i>
+                  <i class="ph-duotone ph-cloud-arrow-up" style="font-size:16px;color:var(--accent2);margin-right:6px"></i>
                   <span style="font-size:11px;color:var(--text2)">Kéo thả hoặc <b style="color:var(--accent2)">chọn file</b></span>
                   <span style="font-size:10px;color:var(--muted);display:block;margin-top:2px">Ảnh chú thích tay, PDF scan, DWG...</span>
                 </div>
@@ -2237,7 +2283,7 @@ function renderMain(){
       <!-- C4 FILE DOWNLOAD -->
       <div class="card" id="c4Section_${p.id}" style="border-left:3px solid ${(p.progress[3]||0)>=1?'var(--green)':'var(--amber)'}">
         <div class="ct">
-          <i class="fa fa-folder-arrow-down" style="color:${(p.progress[3]||0)>=1?'var(--green)':'var(--amber)'}"></i>
+          <i class="ph-duotone ph-folder-minus" style="color:${(p.progress[3]||0)>=1?'var(--green)':'var(--amber)'}"></i>
           Tài liệu C4 — Dự toán & Bảo hành
           <span class="pill ${(p.progress[3]||0)>=1?'p-green':'p-amber'}" style="margin-left:auto;font-size:10px">
             ${(p.progress[3]||0)>=1?'✅ Sẵn sàng tải':'⏳ Chờ nghiệm thu C3'}
@@ -2249,7 +2295,7 @@ function renderMain(){
       <!-- KHO TÀI LIỆU -->
       <div class="card">
         <div class="ct">
-          <i class="fa fa-folder-open"></i> Kho Tài liệu & Bản vẽ
+          <i class="ph-duotone ph-folder-open"></i> Kho Tài liệu & Bản vẽ
           <span class="pill p-blue" style="margin-left:auto;font-size:10px">${totalDocs} file</span>
         </div>
         ${folderDescHTML}
@@ -2282,7 +2328,7 @@ function renderC4Section(p){
   const done = (p.progress[3]||0) >= 1;
   if(!done) return `
     <div style="text-align:center;padding:24px;color:var(--muted)">
-      <i class="fa fa-lock" style="font-size:28px;display:block;margin-bottom:10px;color:var(--dim)"></i>
+      <i class="ph-duotone ph-lock" style="font-size:28px;display:block;margin-bottom:10px;color:var(--dim)"></i>
       <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px">Tài liệu C4 chưa mở khoá</div>
       <div style="font-size:12px;line-height:1.6;max-width:300px;margin:0 auto">Hoàn tất nghiệm thu C3 → Sàn ALN tạo Signed URL → File hoàn công gửi về đây</div>
       <div style="margin-top:12px;display:flex;justify-content:center;gap:6px;flex-wrap:wrap">
@@ -2294,35 +2340,35 @@ function renderC4Section(p){
     </div>`;
 
   const C4_FILES = [
-    {icon:'fa-file-pdf',   color:'var(--red)',    name:'Hồ sơ Kiến trúc hoàn công',    ext:'pdf',  size:'18.6MB'},
-    {icon:'fa-file-code',  color:'var(--amber)',  name:'Hồ sơ Kết cấu hoàn công',      ext:'dwg',  size:'22.4MB'},
-    {icon:'fa-bolt',       color:'var(--cyan)',   name:'Hồ sơ M&E hoàn công',           ext:'pdf',  size:'12.1MB'},
-    {icon:'fa-table-cells',color:'var(--green)',  name:'Thống kê thép nghiệm thu',      ext:'xlsx', size:'1.5MB'},
-    {icon:'fa-boxes-stacked',color:'var(--purple)','name':'Bảng vật tư nghiệm thu',    ext:'xlsx', size:'0.9MB'},
-    {icon:'fa-calculator', color:'var(--gold)',   name:'Dự toán nghiệm thu',            ext:'xlsx', size:'1.1MB'},
+    {icon:'ph-file-pdf',   color:'var(--red)',    name:'Hồ sơ Kiến trúc hoàn công',    ext:'pdf',  size:'18.6MB'},
+    {icon:'ph-file-code',  color:'var(--amber)',  name:'Hồ sơ Kết cấu hoàn công',      ext:'dwg',  size:'22.4MB'},
+    {icon:'ph-lightning',       color:'var(--cyan)',   name:'Hồ sơ M&E hoàn công',           ext:'pdf',  size:'12.1MB'},
+    {icon:'ph-table',color:'var(--green)',  name:'Thống kê thép nghiệm thu',      ext:'xlsx', size:'1.5MB'},
+    {icon:'ph-stack',color:'var(--purple)','name':'Bảng vật tư nghiệm thu',    ext:'xlsx', size:'0.9MB'},
+    {icon:'ph-calculator', color:'var(--gold)',   name:'Dự toán nghiệm thu',            ext:'xlsx', size:'1.1MB'},
   ];
 
   return `
     <div style="background:var(--green-bg);border:1px solid rgba(34,201,122,.2);border-radius:var(--r-sm);padding:9px 14px;margin-bottom:12px;font-size:12px;color:var(--text2);display:flex;gap:8px;align-items:flex-start">
-      <i class="fa fa-circle-info" style="color:var(--green);flex-shrink:0;margin-top:1px"></i>
+      <i class="ph-duotone ph-info" style="color:var(--green);flex-shrink:0;margin-top:1px"></i>
       <span>Link tải có hiệu lực <b style="color:var(--text)">15 phút</b> sau mỗi lần tạo — Signed URL bảo mật của sàn ALN.</span>
     </div>
     <div style="display:flex;flex-direction:column;gap:7px">
       ${C4_FILES.map(f=>`
         <div style="display:flex;align-items:center;gap:10px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 12px">
-          <i class="fa ${f.icon}" style="color:${f.color};font-size:18px;flex-shrink:0"></i>
+          <i class="ph-duotone ${f.icon}" style="color:${f.color};font-size:18px;flex-shrink:0"></i>
           <div style="flex:1;min-width:0">
             <div style="font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</div>
             <div style="font-size:10px;color:var(--muted)">${f.size} · .${f.ext}</div>
           </div>
           <button onclick="generateSignedUrl('${f.name}','${p.id}')"
             style="padding:5px 12px;background:var(--accent-bg);border:1px solid rgba(201,168,76,.25);color:var(--accent2);border-radius:var(--r-sm);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:5px;flex-shrink:0">
-            <i class="fa fa-download" style="font-size:10px"></i> Tải
+            <i class="ph-duotone ph-download-simple" style="font-size:10px"></i> Tải
           </button>
         </div>`).join('')}
     </div>
     <div style="margin-top:10px;padding:9px 12px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);display:flex;align-items:flex-start;gap:8px">
-      <i class="fa fa-shield-halved" style="color:var(--green);flex-shrink:0;margin-top:1px"></i>
+      <i class="ph-duotone ph-shield-check" style="color:var(--green);flex-shrink:0;margin-top:1px"></i>
       <div style="font-size:11px;color:var(--sub);line-height:1.5">
         Quyền sở hữu: <b style="color:var(--text)">Chủ đầu tư</b> sau khi thanh toán 100% HĐ
         · KTS giữ quyền portfolio (ẩn danh thông tin)
@@ -2377,10 +2423,10 @@ function downloadDoc(id,name){
 
 /* Notifications */
 const NOTIFS=[
-  {icon:'📁',body:'<b>KTS. Trần Lê Minh</b> vừa upload <b>Phối cảnh 3D ngoại thất</b>',proj:'ALN-9921',ts:'5 phút trước',unread:true},
-  {icon:'⏰',body:'SLA Chặng C2 — <b>KTS. Phạm Hoài Nam</b> còn 8h phản hồi',proj:'ALN-9521',ts:'12 phút trước',unread:true},
-  {icon:'⚠️',body:'Tranh chấp <b>ALN-9834</b> đang chờ Hội đồng Trọng tài phán quyết',proj:'ALN-9834',ts:'30 phút trước',unread:true},
-  {icon:'✅',body:'<b>Giải ngân C1</b> đã hoàn tất — +11,162,500đ về KTS',proj:'ALN-9921',ts:'2 giờ trước',unread:false},
+  {icon:'<i class="ph-duotone ph-folder"></i>',body:'<b>KTS. Trần Lê Minh</b> vừa upload <b>Phối cảnh 3D ngoại thất</b>',proj:'ALN-9921',ts:'5 phút trước',unread:true},
+  {icon:'<i class="ph-duotone ph-alarm"></i>',body:'SLA Chặng C2 — <b>KTS. Phạm Hoài Nam</b> còn 8h phản hồi',proj:'ALN-9521',ts:'12 phút trước',unread:true},
+  {icon:'<i class="ph-duotone ph-warning"></i>',body:'Tranh chấp <b>ALN-9834</b> đang chờ Hội đồng Trọng tài phán quyết',proj:'ALN-9834',ts:'30 phút trước',unread:true},
+  {icon:'<i class="ph-duotone ph-check-circle"></i>',body:'<b>Giải ngân C1</b> đã hoàn tất — +11,162,500đ về KTS',proj:'ALN-9921',ts:'2 giờ trước',unread:false},
 ];
 function renderNotifs(){
   document.getElementById('notifList').innerHTML=NOTIFS.map(n=>`
@@ -2621,7 +2667,7 @@ function zpCallAction(type){
   toggleZaloPopup(); // close popup first
   const p = PROJECTS_CLIENT.find(x=>x.id===activeProj);
   const label = type==='voice' ? 'Gọi thoại Zalo' : 'Gọi video Zalo';
-  const icon  = type==='voice' ? 'fa-phone' : 'fa-video';
+  const icon  = type==='voice' ? 'ph-phone' : 'ph-video-camera';
   // Show a confirm toast then open Zalo OA
   showToast(`📞 Đang kết nối ${label} qua Zalo OA sàn ALN...`, 't-blue');
   setTimeout(()=>{
@@ -2785,7 +2831,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .aln-call-btn:hover{background:rgba(201,168,76,.25)}
 @media(max-width:768px){#alnFab{bottom:16px;right:16px;width:48px;height:48px;font-size:17px}#alnPopup{width:calc(100vw - 24px);right:12px;bottom:76px;max-height:65vh}}
 </style>
-<button id="alnFab" onclick="toggleAlnBox()" aria-label="Trao đổi qua sàn ALN"><i class="fa fa-comments"></i><span id="alnBadge">1</span></button>
+<button id="alnFab" onclick="toggleAlnBox()" aria-label="Trao đổi qua sàn ALN"><i class="ph-duotone ph-chats-circle"></i><span id="alnBadge">1</span></button>
 <div id="alnPopup">
   <div style="background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.08));border-bottom:1px solid rgba(201,168,76,.25);padding:12px 14px;display:flex;align-items:center;gap:10px">
     <div style="width:34px;height:34px;border-radius:9px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#C9A84C;font-family:Arial,sans-serif;flex-shrink:0">ALN</div>
@@ -2793,14 +2839,14 @@ html,body{max-width:100%;overflow-x:hidden}
       <div style="color:#F0EBE0;font-weight:700;font-size:13px">Trao đổi qua sàn ALN</div>
       <div style="color:rgba(240,235,224,.5);font-size:10px">Kết nối KTS · tin nhắn được lưu vết</div>
     </div>
-    <button class="aln-call-btn" onclick="alnCall('voice')" title="Gọi thoại qua Zalo OA"><i class="fa fa-phone"></i></button>
-    <button class="aln-call-btn" onclick="alnCall('video')" title="Gọi video qua Zalo OA"><i class="fa fa-video"></i></button>
+    <button class="aln-call-btn" onclick="alnCall('voice')" title="Gọi thoại qua Zalo OA"><i class="ph-duotone ph-phone"></i></button>
+    <button class="aln-call-btn" onclick="alnCall('video')" title="Gọi video qua Zalo OA"><i class="ph-duotone ph-video-camera"></i></button>
     <button onclick="toggleAlnBox()" style="background:none;border:none;color:rgba(240,235,224,.6);font-size:15px;cursor:pointer;padding:0 0 0 4px">✕</button>
   </div>
   <div id="alnBody" style="height:290px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#18181c"></div>
   <div style="display:flex;gap:8px;padding:10px;border-top:1px solid rgba(255,255,255,.06);background:#111114">
     <textarea id="alnInput" rows="1" placeholder="Nhắn tin qua sàn ALN..." style="flex:1;background:#18181c;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 10px;font-size:12px;color:#F0EBE0;outline:none;resize:none;font-family:inherit" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();alnSendMsg();}"></textarea>
-    <button onclick="alnSendMsg()" style="background:linear-gradient(135deg,#C9A84C,#d4b86a);border:none;border-radius:8px;width:38px;cursor:pointer;color:#000;flex-shrink:0"><i class="fa fa-paper-plane" style="font-size:12px"></i></button>
+    <button onclick="alnSendMsg()" style="background:linear-gradient(135deg,#C9A84C,#d4b86a);border:none;border-radius:8px;width:38px;cursor:pointer;color:#000;flex-shrink:0"><i class="ph-duotone ph-paper-plane-tilt" style="font-size:12px"></i></button>
   </div>
 </div>
 <script>
@@ -3026,7 +3072,7 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limitToLast, onSnapshot, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY, storage, storageRef, uploadBytes, getDownloadURL } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY, storage, storageRef, uploadBytes, getDownloadURL } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "cn";
 
@@ -3108,6 +3154,9 @@ onAuthStateChanged(auth, async (user) => {
       } catch(e){ console.warn('[ALN Push]', e); }
     };
     window.alnInitPush();
+
+    // ── LOAD PROJECTS REALTIME TỪ FIRESTORE ──
+    _startProjectsListen(user.uid);
 
     // ── ĐẨY FILE LÊN MÂY (Firebase Storage) ──
     window.alnUploadFile = async function(file, path){
