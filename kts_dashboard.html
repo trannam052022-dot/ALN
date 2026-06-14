@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+<script>
+window.KTS_PROJECT_ID = null; // sẽ được điền từ Firestore
+window.KTS_PROJECT_DATA = null;
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="format-detection" content="telephone=no">
@@ -9,7 +13,7 @@
 <title>KTS Dashboard — kts.applamnha.vn</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/><style>.ph-spin{animation:phspin 1s linear infinite;display:inline-block}@keyframes phspin{to{transform:rotate(360deg)}}</style>
 <style>
 :root {
   --ink: #08080a;
@@ -422,20 +426,20 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   </div>
 
   <div class="nav-section">Tổng quan</div>
-  <a class="nav-item active"><span class="icon"><i class="fa fa-gauge-high"></i></span> Dashboard</a>
-  <a class="nav-item" onclick="showToast('Tính năng đang phát triển','t-blue')"><span class="icon"><i class="fa fa-briefcase"></i></span> Dự án của tôi <span class="nav-badge">2</span></a>
+  <a class="nav-item active"><span class="icon"><i class="ph-duotone ph-gauge"></i></span> Dashboard</a>
+  <a class="nav-item" onclick="showToast('Tính năng đang phát triển','t-blue')"><span class="icon"><i class="ph-duotone ph-briefcase"></i></span> Dự án của tôi <span class="nav-badge">2</span></a>
 
   <div class="nav-section">Tài chính</div>
-  <a class="nav-item" onclick="scrollTo('.wallet-section')"><span class="icon"><i class="fa fa-wallet"></i></span> Ví thu nhập</a>
-  <a class="nav-item" onclick="showToast('Lịch sử giao dịch','t-blue')"><span class="icon"><i class="fa fa-clock-rotate-left"></i></span> Lịch sử GD</a>
+  <a class="nav-item" onclick="scrollTo('.wallet-section')"><span class="icon"><i class="ph-duotone ph-wallet"></i></span> Ví thu nhập</a>
+  <a class="nav-item" onclick="showToast('Lịch sử giao dịch','t-blue')"><span class="icon"><i class="ph-duotone ph-clock-counter-clockwise"></i></span> Lịch sử GD</a>
 
   <div class="nav-section">Công việc</div>
-  <a class="nav-item" onclick="scrollTo('.c3-section')"><span class="icon"><i class="fa fa-upload"></i></span> Nộp Hồ sơ C3</a>
-  <a class="nav-item" onclick="scrollTo('.asset-section')"><span class="icon"><i class="fa fa-store"></i></span> Kho tài sản</a>
-  <a class="nav-item" onclick="scrollTo('.vip-section')"><span class="icon"><i class="fa fa-crown"></i></span> Gói VIP</a>
+  <a class="nav-item" onclick="scrollTo('.c3-section')"><span class="icon"><i class="ph-duotone ph-upload-simple"></i></span> Nộp Hồ sơ C3</a>
+  <a class="nav-item" onclick="scrollTo('.asset-section')"><span class="icon"><i class="ph-duotone ph-storefront"></i></span> Kho tài sản</a>
+  <a class="nav-item" onclick="scrollTo('.vip-section')"><span class="icon"><i class="ph-duotone ph-crown"></i></span> Gói VIP</a>
 
   <div class="nav-section">Tài khoản</div>
-  <a class="nav-item" onclick="showToast('Hồ sơ KTS','t-purple')"><span class="icon"><i class="fa fa-user-tie"></i></span> Hồ sơ của tôi</a>
+  <a class="nav-item" onclick="showToast('Hồ sơ KTS','t-purple')"><span class="icon"><i class="ph-duotone ph-user-circle"></i></span> Hồ sơ của tôi</a>
 
 
 </nav>
@@ -447,7 +451,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
   <header class="topbar">
     <button class="topbar-hamburger" id="hamburgerBtn" onclick="toggleMobileSidebar()" aria-label="Menu">
-      <i class="fa fa-bars"></i>
+      <i class="ph-duotone ph-list"></i>
     </button>
     <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
       <div id="ktsTopbarLogo" style="background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(96,165,250,.12));color:#60a5fa;padding:4px 10px;border-radius:var(--r-sm);border:1.5px solid rgba(96,165,250,.45);font-family:var(--syne);font-size:11px;font-weight:800;letter-spacing:.06em;white-space:nowrap;flex-shrink:0">App Làm Nhà Corp.</div>
@@ -455,7 +459,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     </div>
     <div class="topbar-right">
       <div class="topbar-date" id="ktsTopbarClock">05/06/2026 · 09:42</div>
-      <div class="notif-btn" onclick="toggleNotif()"><i class="fa fa-bell"></i><div class="notif-dot"></div></div>
+      <div class="notif-btn" onclick="toggleNotif()"><i class="ph-duotone ph-bell"></i><div class="notif-dot"></div></div>
       <div id="notifPanel" style="display:none;position:fixed;top:56px;right:8px;width:min(300px,calc(100vw - 16px));background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:12px;box-shadow:var(--sh-lg);z-index:50;max-height:70vh;overflow-y:auto">
         <div style="font-family:var(--serif);font-weight:600;font-style:italic;font-size:14px;color:var(--text);margin-bottom:8px">Thông báo mới</div>
         <div class="notif-list">
@@ -464,7 +468,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           <div class="notif-item ni-green"><div class="ni-icon">💰</div><div><div class="ni-text"><b>Giải ngân C1</b> — +1,878,220đ đã về ví chính.</div><div class="ni-time">2 ngày trước</div></div></div>
         </div>
       </div>
-      <div style="font-size:10px;font-weight:700;background:var(--green-bg);color:var(--green);border:1px solid rgba(34,201,122,.3);padding:3px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0"><i class="fa fa-circle" style="font-size:6px;margin-right:3px"></i>Online</div>
+      <div style="font-size:10px;font-weight:700;background:var(--green-bg);color:var(--green);border:1px solid rgba(34,201,122,.3);padding:3px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0"><i class="ph-duotone ph-circle" style="font-size:6px;margin-right:3px"></i>Online</div>
     </div>
   </header>
 
@@ -475,7 +479,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <div class="stat-card s-purple">
         <div class="stat-label">Doanh thu tháng 6</div>
         <div class="stat-val">11.8M</div>
-        <div class="stat-badge sb-green"><i class="fa fa-arrow-up" style="font-size:8px"></i> +32% vs T5</div>
+        <div class="stat-badge sb-green"><i class="ph-duotone ph-arrow-up" style="font-size:8px"></i> +32% vs T5</div>
       </div>
       <div class="stat-card s-green">
         <div class="stat-label">Ví chính khả dụng</div>
@@ -485,7 +489,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <div class="stat-card s-gold">
         <div class="stat-label">Điểm Uy tín</div>
         <div class="stat-val">84.5<span style="font-size:13px;color:var(--muted)">/100</span></div>
-        <div class="stat-badge sb-gold"><i class="fa fa-star" style="font-size:8px"></i> Hạng Chuẩn — còn 15.5đ lên PRO</div>
+        <div class="stat-badge sb-gold"><i class="ph-duotone ph-star" style="font-size:8px"></i> Hạng Chuẩn — còn 15.5đ lên PRO</div>
       </div>
     </div>
 
@@ -503,7 +507,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Trạng thái SLA</div>
-          <div class="stat-badge sb-amber" id="slaStatusBadge"><i class="fa fa-clock" style="font-size:8px"></i> <span id="slaStatusText">Đang chạy</span></div>
+          <div class="stat-badge sb-amber" id="slaStatusBadge"><i class="ph-duotone ph-clock" style="font-size:8px"></i> <span id="slaStatusText">Đang chạy</span></div>
         </div>
       </div>
 
@@ -525,22 +529,22 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <!-- Reward / penalty info -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
         <div style="background:var(--green-bg);border:1px solid rgba(34,201,122,.25);border-radius:var(--r-sm);padding:9px 11px">
-          <div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px"><i class="fa fa-trophy"></i> Phản hồi < 24h</div>
+          <div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px"><i class="ph-duotone ph-trophy"></i> Phản hồi < 24h</div>
           <div style="font-size:11px;color:var(--text2)">+0.2 điểm Uy tín</div>
           <div style="font-size:10px;color:var(--muted)">Còn <b id="bonusCountdown" style="color:var(--green)">07:22:45</b> để đạt thưởng</div>
         </div>
         <div style="background:var(--red-bg);border:1px solid rgba(255,87,87,.25);border-radius:var(--r-sm);padding:9px 11px">
-          <div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:3px"><i class="fa fa-triangle-exclamation"></i> Quá hạn 48h</div>
+          <div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:3px"><i class="ph-duotone ph-warning"></i> Quá hạn 48h</div>
           <div style="font-size:11px;color:var(--text2)">−0.1 điểm + Gậy vàng</div>
           <div style="font-size:10px;color:var(--muted)">Deadline: 07/06/2026 09:42</div>
         </div>
       </div>
 
       <div style="display:flex;gap:7px;flex-wrap:wrap">
-        <button class="btn btn-primary" onclick="openUploadRevModal()"><i class="fa fa-cloud-arrow-up"></i> Nộp bản 3D đã sửa</button>
-        <button class="btn btn-ghost btn-sm" onclick="openChatModal()"><i class="fa fa-comment"></i> Nhắn tin CN</button>
-        <button class="btn btn-ghost btn-sm" id="simSlaBonusBtn" onclick="simSlaBonus()"><i class="fa fa-bolt"></i> [Demo] Nộp sớm</button>
-        <button class="btn btn-ghost btn-sm" onclick="simSlaExpire()"><i class="fa fa-clock"></i> [Demo] Quá hạn</button>
+        <button class="btn btn-primary" onclick="openUploadRevModal()"><i class="ph-duotone ph-cloud-arrow-up"></i> Nộp bản 3D đã sửa</button>
+        <button class="btn btn-ghost btn-sm" onclick="openChatModal()"><i class="ph-duotone ph-chat"></i> Nhắn tin CN</button>
+        <button class="btn btn-ghost btn-sm" id="simSlaBonusBtn" onclick="simSlaBonus()"><i class="ph-duotone ph-lightning"></i> [Demo] Nộp sớm</button>
+        <button class="btn btn-ghost btn-sm" onclick="simSlaExpire()"><i class="ph-duotone ph-clock"></i> [Demo] Quá hạn</button>
       </div>
     </div>
 
@@ -550,37 +554,37 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="sec-label wallet-section">💰 Ví thu nhập & Payout Lock</div>
     <div class="grid2-3" style="gap:12px">
       <div class="card">
-        <div class="card-title"><div class="ct-icon" style="background:var(--green-bg);color:var(--green)"><i class="fa fa-wallet"></i></div>Tổng quan Ví</div>
+        <div class="card-title"><div class="ct-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-wallet"></i></div>Tổng quan Ví</div>
         <div class="wallet-grid">
           <!-- Ví chính -->
           <div class="wallet-pocket wp-main">
-            <div class="wp-label"><i class="fa fa-circle" style="font-size:7px"></i> Ví chính</div>
+            <div class="wp-label"><i class="ph-duotone ph-circle" style="font-size:7px"></i> Ví chính</div>
             <div class="wp-amount">3,878,220đ</div>
             <div class="wp-sub">Khả dụng · Rút được ngay</div>
-            <button class="btn btn-sm btn-green" style="margin-top:7px;width:100%" onclick="openWithdrawModal()"><i class="fa fa-arrow-right-from-bracket"></i> Rút tiền</button>
+            <button class="btn btn-sm btn-green" style="margin-top:7px;width:100%" onclick="openWithdrawModal()"><i class="ph-duotone ph-sign-out"></i> Rút tiền</button>
           </div>
 
           <!-- Ví tạm ứng — PAYOUT LOCK -->
           <div class="wallet-pocket wp-locked" id="lockedWallet">
-            <div class="wp-label"><i class="fa fa-lock" style="font-size:7px"></i> Ví tạm ứng (C2)</div>
+            <div class="wp-label"><i class="ph-duotone ph-lock" style="font-size:7px"></i> Ví tạm ứng (C2)</div>
             <div class="wp-amount" id="lockedAmount">1,920,000đ</div>
             <div class="wp-sub">40% C2 · 8% tổng HĐ</div>
             <div class="lock-seal">
-              <i class="fa fa-lock"></i>
+              <i class="ph-duotone ph-lock"></i>
               PAYOUT LOCK · Chờ CN duyệt
             </div>
           </div>
 
           <!-- Chờ giải ngân -->
           <div class="wallet-pocket wp-pending">
-            <div class="wp-label"><i class="fa fa-hourglass-half" style="font-size:7px"></i> Chờ giải ngân</div>
+            <div class="wp-label"><i class="ph-duotone ph-hourglass-medium" style="font-size:7px"></i> Chờ giải ngân</div>
             <div class="wp-amount">0đ</div>
             <div class="wp-sub">Maker→Checker xử lý</div>
           </div>
 
           <!-- Thuế đã khấu trừ -->
           <div class="wallet-pocket wp-tax">
-            <div class="wp-label"><i class="fa fa-receipt" style="font-size:7px"></i> Thuế đã KT</div>
+            <div class="wp-label"><i class="ph-duotone ph-receipt" style="font-size:7px"></i> Thuế đã KT</div>
             <div class="wp-amount" style="color:var(--muted)">297,780đ</div>
             <div class="wp-sub">7% · Sàn nộp hộ</div>
           </div>
@@ -595,14 +599,14 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           <div style="display:flex;justify-content:space-between;padding:6px 0 0;font-weight:700;color:var(--green)"><span>KTS nhận NET</span><span style="font-family:var(--mono);font-size:13px">3,878,220đ</span></div>
         </div>
         <div style="margin-top:8px;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:6px;background:var(--amber-bg);border:1px solid rgba(255,170,51,.2);border-radius:5px;padding:7px 10px">
-          <i class="fa fa-info-circle" style="color:var(--amber)"></i>
+          <i class="ph-duotone ph-info" style="color:var(--amber)"></i>
           <span><b style="color:var(--amber)">1,920,000đ (tạm ứng)</b> sẽ tự động gộp vào ví chính khi Chủ nhà bấm Duyệt C2. Không thể rút trước.</span>
         </div>
       </div>
 
       <!-- TX history -->
       <div class="card">
-        <div class="card-title"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="fa fa-list-ul"></i></div>Lịch sử giao dịch</div>
+        <div class="card-title"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-list-bullets"></i></div>Lịch sử giao dịch</div>
         <div>
           <div class="tx-row">
             <div class="tx-icon" style="background:var(--amber-bg)">🔒</div>
@@ -630,7 +634,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
             <div class="tx-amount tx-neg">−6,000,000đ</div>
           </div>
         </div>
-        <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:8px" onclick="showToast('Xem toàn bộ lịch sử GD','t-blue')">Xem thêm <i class="fa fa-chevron-down"></i></button>
+        <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:8px" onclick="showToast('Xem toàn bộ lịch sử GD','t-blue')">Xem thêm <i class="ph-duotone ph-caret-down"></i></button>
       </div>
     </div>
 
@@ -641,7 +645,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
         <div>
-          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="fa fa-folder-open"></i></div>Cổng nộp Hồ sơ C3 — #ALN-2026-9921</div>
+          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-folder-open"></i></div>Cổng nộp Hồ sơ C3 — #ALN-2026-9921</div>
           <div style="font-size:11px;color:var(--muted)">Tất cả 6 ô đều bắt buộc · Auto-scan ngay khi upload · Excel 0% lỗi hàm</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
@@ -670,9 +674,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <div class="scan-result" id="scanResult"></div>
 
       <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm" onclick="simUploadDemo()"><i class="fa fa-bolt"></i> [Demo] Upload 6 file mẫu</button>
-        <button class="btn btn-ghost btn-sm" onclick="simUploadError()"><i class="fa fa-bug"></i> [Demo] File Excel lỗi hàm</button>
-        <button class="btn btn-primary" id="submitC3Btn" disabled onclick="submitC3()"><i class="fa fa-cloud-arrow-up"></i> Nộp Hồ sơ C3</button>
+        <button class="btn btn-ghost btn-sm" onclick="simUploadDemo()"><i class="ph-duotone ph-lightning"></i> [Demo] Upload 6 file mẫu</button>
+        <button class="btn btn-ghost btn-sm" onclick="simUploadError()"><i class="ph-duotone ph-bug"></i> [Demo] File Excel lỗi hàm</button>
+        <button class="btn btn-primary" id="submitC3Btn" disabled onclick="submitC3()"><i class="ph-duotone ph-cloud-arrow-up"></i> Nộp Hồ sơ C3</button>
       </div>
     </div>
 
@@ -683,10 +687,10 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
         <div>
-          <div class="card-title" style="margin-bottom:2px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="fa fa-layer-group"></i></div>Kho bản vẽ mẫu đóng góp</div>
+          <div class="card-title" style="margin-bottom:2px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-stack-simple"></i></div>Kho bản vẽ mẫu đóng góp</div>
           <div style="font-size:11px;color:var(--muted)">3 slot đầu miễn phí · Từ slot 4 mua thêm · Nhận hoa hồng 10% mỗi lần sàn bán lại</div>
         </div>
-        <div class="stat-badge sb-gold" style="font-size:11px;padding:5px 10px"><i class="fa fa-coins"></i> Hoa hồng tích lũy: <b>450,000đ</b></div>
+        <div class="stat-badge sb-gold" style="font-size:11px;padding:5px 10px"><i class="ph-duotone ph-coins"></i> Hoa hồng tích lũy: <b>450,000đ</b></div>
       </div>
 
       <div class="drawing-grid" id="drawingGrid"><!-- injected by JS --></div>
@@ -699,16 +703,16 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
         <div>
-          <div class="card-title" style="margin-bottom:2px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="fa fa-crown"></i></div>Gói nâng cấp hiển thị & Đẩy tin</div>
+          <div class="card-title" style="margin-bottom:2px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-crown"></i></div>Gói nâng cấp hiển thị & Đẩy tin</div>
           <div style="font-size:11px;color:var(--muted)">Thanh toán bằng Ví chính · Có hiệu lực ngay lập tức</div>
         </div>
-        <div style="font-size:12px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(34,201,122,.3);padding:5px 12px;border-radius:99px"><i class="fa fa-wallet"></i> Ví: 3,878,220đ</div>
+        <div style="font-size:12px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(34,201,122,.3);padding:5px 12px;border-radius:99px"><i class="ph-duotone ph-wallet"></i> Ví: 3,878,220đ</div>
       </div>
 
       <div class="vip-grid" id="vipGrid"><!-- injected by JS --></div>
 
       <div class="vip-wallet-note">
-        <i class="fa fa-info-circle" style="color:var(--gold)"></i>
+        <i class="ph-duotone ph-info" style="color:var(--gold)"></i>
         Gói được trừ trực tiếp từ Ví chính. Cần có doanh thu ít nhất 1 dự án để kích hoạt mua gói. Ví tạm ứng không được dùng để mua gói.
       </div>
     </div>
@@ -720,9 +724,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 <!-- ══ MODAL: UPLOAD REV ══ -->
 <div class="modal-bg" id="uploadRevModal">
   <div class="modal">
-    <div class="modal-head"><h3><i class="fa fa-cloud-arrow-up" style="color:var(--gold)"></i> Nộp bản 3D đã chỉnh sửa</h3><button class="modal-close" onclick="closeModal('uploadRevModal')">✕</button></div>
+    <div class="modal-head"><h3><i class="ph-duotone ph-cloud-arrow-up" style="color:var(--gold)"></i> Nộp bản 3D đã chỉnh sửa</h3><button class="modal-close" onclick="closeModal('uploadRevModal')">✕</button></div>
     <div class="modal-body">
-      <div style="background:var(--amber-bg);border:1px solid rgba(255,170,51,.3);border-radius:7px;padding:10px;font-size:11px;color:var(--amber);margin-bottom:14px"><i class="fa fa-clock"></i> <b>Đang trong SLA 48h</b> — Nộp sớm để nhận thưởng điểm uy tín!</div>
+      <div style="background:var(--amber-bg);border:1px solid rgba(255,170,51,.3);border-radius:7px;padding:10px;font-size:11px;color:var(--amber);margin-bottom:14px"><i class="ph-duotone ph-clock"></i> <b>Đang trong SLA 48h</b> — Nộp sớm để nhận thưởng điểm uy tín!</div>
       <div class="form-row">
         <label class="form-label">Phối cảnh 3D cập nhật (*.zip / *.rar / *.png)</label>
         <label style="display:flex;flex-direction:column;align-items:center;gap:8px;border:1.5px dashed rgba(201,168,76,.3);border-radius:var(--r-sm);padding:18px;cursor:pointer;transition:.2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(201,168,76,.3)'">
@@ -738,7 +742,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="closeModal('uploadRevModal')">Hủy</button>
-      <button class="btn btn-primary" onclick="submitRev()"><i class="fa fa-paper-plane"></i> Gửi bản cập nhật</button>
+      <button class="btn btn-primary" onclick="submitRev()"><i class="ph-duotone ph-paper-plane-tilt"></i> Gửi bản cập nhật</button>
     </div>
   </div>
 </div>
@@ -747,7 +751,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 <div class="modal-bg" id="chatModal">
   <div class="modal" style="max-width:480px;width:100%">
     <div class="modal-head">
-      <h3><i class="fa fa-comments" style="color:var(--blue)"></i> Chat — Dự án ALN-9921</h3>
+      <h3><i class="ph-duotone ph-chats-circle" style="color:var(--blue)"></i> Chat — Dự án ALN-9921</h3>
       <div style="display:flex;align-items:center;gap:6px;margin-left:auto;margin-right:10px">
         <div id="chatStatusDot" style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div>
         <span id="chatStatusTxt" style="font-size:10px;color:var(--sub)">Kết nối</span>
@@ -766,7 +770,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           placeholder="Nhập tin nhắn cho Chủ nhà / Doanh nghiệp..."
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ktsSendChat()}"></textarea>
         <button class="btn btn-primary" style="padding:9px 14px;flex-shrink:0" onclick="ktsSendChat()">
-          <i class="fa fa-paper-plane"></i>
+          <i class="ph-duotone ph-paper-plane-tilt"></i>
         </button>
       </div>
     </div>
@@ -776,7 +780,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 <!-- ══ MODAL: WITHDRAW ══ -->
 <div class="modal-bg" id="withdrawModal">
   <div class="modal">
-    <div class="modal-head"><h3><i class="fa fa-bank" style="color:var(--green)"></i> Rút tiền về ngân hàng</h3><button class="modal-close" onclick="closeModal('withdrawModal')">✕</button></div>
+    <div class="modal-head"><h3><i class="ph-duotone ph-bank" style="color:var(--green)"></i> Rút tiền về ngân hàng</h3><button class="modal-close" onclick="closeModal('withdrawModal')">✕</button></div>
     <div class="modal-body">
       <div class="form-info" style="margin-bottom:12px">
         <div class="fi-row"><span class="k">Ngân hàng</span><span class="v">Vietcombank ****4521</span></div>
@@ -793,11 +797,11 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <div class="fi-row"><span class="k">Phí chuyển khoản</span><span class="v" style="color:var(--red)">0đ (miễn phí)</span></div>
         <div class="fi-row total"><span class="k" style="font-weight:700">Thực nhận</span><span class="v" id="wNet">3,878,220đ</span></div>
       </div>
-      <div style="font-size:10px;color:var(--muted);margin-top:8px"><i class="fa fa-info-circle"></i> Xử lý trong 1-2 giờ làm việc. Cần OTP xác thực.</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:8px"><i class="ph-duotone ph-info"></i> Xử lý trong 1-2 giờ làm việc. Cần OTP xác thực.</div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="closeModal('withdrawModal')">Hủy</button>
-      <button class="btn btn-green" onclick="confirmWithdraw()"><i class="fa fa-arrow-right-from-bracket"></i> Xác nhận rút</button>
+      <button class="btn btn-green" onclick="confirmWithdraw()"><i class="ph-duotone ph-sign-out"></i> Xác nhận rút</button>
     </div>
   </div>
 </div>
@@ -808,11 +812,11 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="modal-head"><h3 id="vipModalTitle">Mua gói</h3><button class="modal-close" onclick="closeModal('buyVipModal')">✕</button></div>
     <div class="modal-body">
       <div class="form-info" id="vipModalDetail"></div>
-      <div style="font-size:11px;color:var(--muted);margin-top:10px;display:flex;align-items:center;gap:6px;background:var(--green-bg);border:1px solid rgba(34,201,122,.2);border-radius:5px;padding:7px 10px"><i class="fa fa-wallet" style="color:var(--green)"></i> Trừ từ Ví chính. Số dư sau: <b id="vipBalAfter" style="color:var(--green)"></b></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:10px;display:flex;align-items:center;gap:6px;background:var(--green-bg);border:1px solid rgba(34,201,122,.2);border-radius:5px;padding:7px 10px"><i class="ph-duotone ph-wallet" style="color:var(--green)"></i> Trừ từ Ví chính. Số dư sau: <b id="vipBalAfter" style="color:var(--green)"></b></div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="closeModal('buyVipModal')">Hủy</button>
-      <button class="btn btn-gold" onclick="confirmVip()"><i class="fa fa-crown"></i> Xác nhận mua gói</button>
+      <button class="btn btn-gold" onclick="confirmVip()"><i class="ph-duotone ph-crown"></i> Xác nhận mua gói</button>
     </div>
   </div>
 </div>
@@ -1015,12 +1019,12 @@ function simSlaExpire() {
 }
 
 const c3Slots = [
-  {id:'arch', icon:'📐', label:'Hồ sơ Kiến trúc', sub:'PDF + DWG · Mặt bằng, mặt đứng, mặt cắt', accept:'.pdf,.dwg', vKey:'v-arch', xlsxCheck:false},
-  {id:'struct', icon:'🏗️', label:'Hồ sơ Kết cấu', sub:'PDF + DWG · Móng, cột, dầm, sàn', accept:'.pdf,.dwg', vKey:'v-struct', xlsxCheck:false},
-  {id:'mep', icon:'⚡', label:'Điện nước M&E', sub:'PDF · Điện, cấp/thoát nước, PCCC', accept:'.pdf,.dwg', vKey:'v-mep', xlsxCheck:false},
-  {id:'steel', icon:'🔩', label:'Thống kê Thép', sub:'Excel · Bóc tách thép cấu kiện', accept:'.xlsx,.xls', vKey:'v-steel', xlsxCheck:true},
-  {id:'mat', icon:'📦', label:'Bảng Vật tư', sub:'Excel · Danh mục, khối lượng', accept:'.xlsx,.xls', vKey:'v-mat', xlsxCheck:true},
-  {id:'budget', icon:'💰', label:'Dự toán Chi phí', sub:'Excel · 0% lỗi hàm bắt buộc', accept:'.xlsx,.xls', vKey:'v-budget', xlsxCheck:true},
+  {id:'arch', icon:'<i class="ph-duotone ph-compass-tool"></i>', label:'Hồ sơ Kiến trúc', sub:'PDF + DWG · Mặt bằng, mặt đứng, mặt cắt', accept:'.pdf,.dwg', vKey:'v-arch', xlsxCheck:false},
+  {id:'struct', icon:'<i class="ph-duotone ph-crane"></i>', label:'Hồ sơ Kết cấu', sub:'PDF + DWG · Móng, cột, dầm, sàn', accept:'.pdf,.dwg', vKey:'v-struct', xlsxCheck:false},
+  {id:'mep', icon:'<i class="ph-duotone ph-lightning"></i>', label:'Điện nước M&E', sub:'PDF · Điện, cấp/thoát nước, PCCC', accept:'.pdf,.dwg', vKey:'v-mep', xlsxCheck:false},
+  {id:'steel', icon:'<i class="ph-duotone ph-nut"></i>', label:'Thống kê Thép', sub:'Excel · Bóc tách thép cấu kiện', accept:'.xlsx,.xls', vKey:'v-steel', xlsxCheck:true},
+  {id:'mat', icon:'<i class="ph-duotone ph-package"></i>', label:'Bảng Vật tư', sub:'Excel · Danh mục, khối lượng', accept:'.xlsx,.xls', vKey:'v-mat', xlsxCheck:true},
+  {id:'budget', icon:'<i class="ph-duotone ph-money"></i>', label:'Dự toán Chi phí', sub:'Excel · 0% lỗi hàm bắt buộc', accept:'.xlsx,.xls', vKey:'v-budget', xlsxCheck:true},
 ];
 
 function buildUploadGrid() {
@@ -1138,7 +1142,7 @@ function submitC3() {
   sr.innerHTML = `
     <div style="padding:9px 12px;background:var(--blue-bg);border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--blue)">🔍 KẾT QUẢ AUTO-SCAN</div>
     ${c3Slots.map(s=>`<div class="scan-row"><span>${s.icon} ${s.label}</span><span class="stat-badge sb-green">✓ PASS</span></div>`).join('')}
-    <div style="padding:10px 12px;background:var(--green-bg);font-size:11px;color:var(--green);font-weight:600"><i class="fa fa-circle-check"></i> Tất cả 6 hạng mục đã qua kiểm tra. Đang chờ Quản trị thẩm định lớp 2...</div>`;
+    <div style="padding:10px 12px;background:var(--green-bg);font-size:11px;color:var(--green);font-weight:600"><i class="ph-duotone ph-check-circle"></i> Tất cả 6 hạng mục đã qua kiểm tra. Đang chờ Quản trị thẩm định lớp 2...</div>`;
   showToast('✅ Đã nộp Hồ sơ C3! Thông báo gửi cho Chủ nhà & Admin.', 't-green');
   document.getElementById('submitC3Btn').disabled = true;
   document.getElementById('submitC3Btn').textContent = '✓ Đã nộp — chờ thẩm định';
@@ -1169,7 +1173,7 @@ function buildDrawingGrid() {
           </div>
         </div>
         <div class="ds-info">
-          <button class="btn btn-gold btn-sm" style="width:100%;font-size:10px" onclick="buySlot(${i})"><i class="fa fa-lock-open"></i> MUA SLOT: 50.000đ</button>
+          <button class="btn btn-gold btn-sm" style="width:100%;font-size:10px" onclick="buySlot(${i})"><i class="ph-duotone ph-lock-open"></i> MUA SLOT: 50.000đ</button>
         </div>
       </div>`;
     return `
@@ -1180,7 +1184,7 @@ function buildDrawingGrid() {
         <div class="ds-info">
           <div class="ds-title">${d.title}</div>
           <div class="ds-meta">${d.type}</div>
-          <div class="ds-earn"><i class="fa fa-coins" style="font-size:8px"></i> HH tích lũy: ${d.royalty}</div>
+          <div class="ds-earn"><i class="ph-duotone ph-coins" style="font-size:8px"></i> HH tích lũy: ${d.royalty}</div>
         </div>
       </div>`;
   }).join('');
@@ -1200,11 +1204,11 @@ function buySlot(idx) {
 }
 
 const vipPackages = [
-  {id:'boost', icon:'🚀', name:'Đẩy tin 7 ngày', price:99000, desc:'Xuất hiện đầu danh sách tìm kiếm trong 7 ngày', featured:false},
-  {id:'vip3', icon:'⭐', name:'VIP 3', price:299000, desc:'Huy hiệu VIP · Ưu tiên gợi ý · 30 ngày', featured:false},
-  {id:'vip5', icon:'🌟', name:'VIP 5', price:450000, desc:'VIP 3 + Nổi bật trang chủ · 30 ngày', featured:true},
-  {id:'vip10', icon:'💎', name:'VIP 10', price:750000, desc:'VIP 5 + Tag "Top KTS" + badge kim cương', featured:false},
-  {id:'upgrade', icon:'⚡', name:'Gói Vượt Cấp', price:1200000, desc:'Tăng ngay từ Hạng Chuẩn → PRO · Phí sàn giảm 8%', featured:false},
+  {id:'boost', icon:'<i class="ph-duotone ph-rocket-launch"></i>', name:'Đẩy tin 7 ngày', price:99000, desc:'Xuất hiện đầu danh sách tìm kiếm trong 7 ngày', featured:false},
+  {id:'vip3', icon:'<i class="ph-duotone ph-star"></i>', name:'VIP 3', price:299000, desc:'Huy hiệu VIP · Ưu tiên gợi ý · 30 ngày', featured:false},
+  {id:'vip5', icon:'<i class="ph-duotone ph-sparkle"></i>', name:'VIP 5', price:450000, desc:'VIP 3 + Nổi bật trang chủ · 30 ngày', featured:true},
+  {id:'vip10', icon:'<i class="ph-duotone ph-diamond"></i>', name:'VIP 10', price:750000, desc:'VIP 5 + Tag "Top KTS" + badge kim cương', featured:false},
+  {id:'upgrade', icon:'<i class="ph-duotone ph-lightning"></i>', name:'Gói Vượt Cấp', price:1200000, desc:'Tăng ngay từ Hạng Chuẩn → PRO · Phí sàn giảm 8%', featured:false},
 ];
 
 function buildVipGrid() {
@@ -1241,7 +1245,7 @@ function confirmVip() {
   const price = selectedVip.type==='slot' ? 50000 : selectedVip.price;
   walletBalance -= price;
   document.querySelector('.stat-card.s-green .stat-val').textContent = fmtShort(walletBalance);
-  document.querySelector('.vip-wallet-note').innerHTML = `<i class="fa fa-wallet" style="color:var(--gold)"></i> Ví: ${fmt(walletBalance)}đ`;
+  document.querySelector('.vip-wallet-note').innerHTML = `<i class="ph-duotone ph-wallet" style="color:var(--gold)"></i> Ví: ${fmt(walletBalance)}đ`;
   if(selectedVip.type==='slot') {
     const idx = selectedVip.idx;
     drawings[idx] = {title:'Slot mới — Chưa upload', type:'—', royalty:'0đ', sold:0, free:false, thumb:'📂', color:'#1a1a0d'};
@@ -1391,7 +1395,7 @@ function _ktsUpdateChatBadge() {
   // Hiện badge trên nút chat nếu có unread
   const btn = document.querySelector('[onclick*="openChatModal"]');
   if(btn) {
-    btn.innerHTML = `<i class="fa fa-comment"></i> Nhắn tin CN${_ktsChatUnread>0?` <span style="background:var(--red);color:#fff;border-radius:99px;padding:0 5px;font-size:10px">${_ktsChatUnread}</span>`:''}`;
+    btn.innerHTML = `<i class="ph-duotone ph-chat"></i> Nhắn tin CN${_ktsChatUnread>0?` <span style="background:var(--red);color:#fff;border-radius:99px;padding:0 5px;font-size:10px">${_ktsChatUnread}</span>`:''}`;
   }
 }
 
@@ -1418,7 +1422,7 @@ function ktsSendChat() {
   const msg = {
     type: 'ALN_CHAT',
     audience: ['cn'],
-    projectId: 'ALN-9921',
+    projectId: window.KTS_PROJECT_ID || 'ALN-9921',
     text,
     senderName: _ktsName,
     senderRole: 'kts',
@@ -1447,7 +1451,7 @@ window.submitC3_realtime = function() {
     if(!f) return;
     ALNRealtime.send({
       type: 'KTS_DOC_UPLOAD',
-      projectId: 'ALN-9921',
+      projectId: window.KTS_PROJECT_ID || 'ALN-9921',
       ktsName: _ktsName,
       doc: {
         id: 'D_' + Date.now() + '_' + s.id,
@@ -1465,7 +1469,7 @@ window.submitC3_realtime = function() {
   // Thông báo tổng hợp
   ALNRealtime.send({
     type: 'KTS_C3_SUBMITTED',
-    projectId: 'ALN-9921',
+    projectId: window.KTS_PROJECT_ID || 'ALN-9921',
     ktsName: _ktsName,
     fileCount: Object.keys(uploadedFiles).length,
   });
@@ -1515,7 +1519,7 @@ document.querySelectorAll('.sidebar .nav-item').forEach(el => {
 .aln-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;display:none}
 @media(max-width:768px){#alnFab{bottom:74px;right:14px;width:48px;height:48px;font-size:17px}#alnPopup{width:calc(100vw - 24px);right:12px;bottom:132px;max-height:65vh}}
 </style>
-<button id="alnFab" onclick="toggleAlnBox()" aria-label="Trao đổi qua sàn ALN"><i class="fa fa-comments"></i><span id="alnBadge">1</span></button>
+<button id="alnFab" onclick="toggleAlnBox()" aria-label="Trao đổi qua sàn ALN"><i class="ph-duotone ph-chats-circle"></i><span id="alnBadge">1</span></button>
 <div id="alnPopup">
   <div style="background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.08));border-bottom:1px solid rgba(201,168,76,.25);padding:12px 14px;display:flex;align-items:center;gap:10px">
     <div style="width:34px;height:34px;border-radius:9px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#C9A84C;font-family:Arial,sans-serif;flex-shrink:0">ALN</div>
@@ -1523,8 +1527,8 @@ document.querySelectorAll('.sidebar .nav-item').forEach(el => {
       <div style="color:#F0EBE0;font-weight:700;font-size:13px">Trao đổi qua sàn ALN</div>
       <div id="alnSubTxt" style="color:rgba(240,235,224,.5);font-size:10px">Đang trao đổi với: Chủ nhà</div>
     </div>
-    <button class="aln-call-btn" onclick="alnCall('voice')" title="Gọi thoại qua Zalo OA"><i class="fa fa-phone"></i></button>
-    <button class="aln-call-btn" onclick="alnCall('video')" title="Gọi video qua Zalo OA"><i class="fa fa-video"></i></button>
+    <button class="aln-call-btn" onclick="alnCall('voice')" title="Gọi thoại qua Zalo OA"><i class="ph-duotone ph-phone"></i></button>
+    <button class="aln-call-btn" onclick="alnCall('video')" title="Gọi video qua Zalo OA"><i class="ph-duotone ph-video-camera"></i></button>
     <button onclick="toggleAlnBox()" style="background:none;border:none;color:rgba(240,235,224,.6);font-size:15px;cursor:pointer;padding:0 0 0 4px">✕</button>
   </div>
   <div style="display:flex;background:#111114">
@@ -1534,7 +1538,7 @@ document.querySelectorAll('.sidebar .nav-item').forEach(el => {
   <div id="alnBody" style="height:270px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#18181c"></div>
   <div style="display:flex;gap:8px;padding:10px;border-top:1px solid rgba(255,255,255,.06);background:#111114">
     <textarea id="alnInput" rows="1" placeholder="Nhắn tin cho Chủ nhà..." style="flex:1;background:#18181c;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 10px;font-size:12px;color:#F0EBE0;outline:none;resize:none;font-family:inherit" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();alnSendMsg();}"></textarea>
-    <button onclick="alnSendMsg()" style="background:linear-gradient(135deg,#C9A84C,#d4b86a);border:none;border-radius:8px;width:38px;cursor:pointer;color:#000;flex-shrink:0"><i class="fa fa-paper-plane" style="font-size:12px"></i></button>
+    <button onclick="alnSendMsg()" style="background:linear-gradient(135deg,#C9A84C,#d4b86a);border:none;border-radius:8px;width:38px;cursor:pointer;color:#000;flex-shrink:0"><i class="ph-duotone ph-paper-plane-tilt" style="font-size:12px"></i></button>
   </div>
 </div>
 <script>
@@ -1603,12 +1607,12 @@ function alnSendMsg(){
   const inp = document.getElementById('alnInput'); const txt = (inp?inp.value.trim():''); if(!txt) return;
   const DANGER=['zalo riêng','số điện thoại','ngoài sàn','tiền mặt','chuyển khoản trực tiếp','không qua sàn','tài khoản cá nhân','liên hệ riêng','nhắn riêng','giá riêng','phí ngoài','thanh toán ngoài','giao dịch ngoài','hợp đồng riêng'];
   const matched = DANGER.find(kw=>txt.toLowerCase().includes(kw));
-  if(matched){ showToast(`⚠️ Tin nhắn bị chặn — vi phạm: "${matched}". Mọi giao dịch phải qua sàn ALN.`, 't-red'); inp.value=''; try{ALNRealtime.send({type:'NLP_ALERT',projectId:'ALN-9921',keyword:matched,msg:txt})}catch(e){} return; }
+  if(matched){ showToast(`⚠️ Tin nhắn bị chặn — vi phạm: "${matched}". Mọi giao dịch phải qua sàn ALN.`, 't-red'); inp.value=''; try{ALNRealtime.send({type:'NLP_ALERT',projectId: window.KTS_PROJECT_ID || 'ALN-9921',keyword:matched,msg:txt})}catch(e){} return; }
   alnThreads[_alnThread].push({ mine:true, text:txt, ts:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}) });
   _alnRender(); inp.value='';
   // Đồng bộ luồng Chủ nhà vào modal "Chat — Dự án" cũ
   if(_alnThread === 'cn'){ try{ _ktsRenderMsg({ senderName:_ktsName, text:txt, ts:Date.now() }, true); }catch(e){} }
-  ALNRealtime.send({ type:'ALN_CHAT', audience:[_alnThread], projectId:'ALN-9921', text:txt, senderName:_ktsName, senderRole:'kts' });
+  ALNRealtime.send({ type:'ALN_CHAT', audience:[_alnThread], projectId: window.KTS_PROJECT_ID || 'ALN-9921', text:txt, senderName:_ktsName, senderRole:'kts' });
 }
 </script>
 
@@ -1756,9 +1760,45 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limitToLast, onSnapshot, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "kts";
+
+
+/* ══ KTS PROJECT: Firestore realtime ══ */
+function _startKtsProjectListen(uid) {
+  const q = query(
+    collection(db, 'projects'),
+    where('kts.uid', '==', uid),
+    orderBy('updatedAt', 'desc')
+  );
+  onSnapshot(q, snap => {
+    if (snap.empty) {
+      console.log('[KTS] Chưa có dự án nào được giao');
+      return;
+    }
+    // Lấy dự án đầu tiên (mới nhất)
+    const d = snap.docs[0];
+    window.KTS_PROJECT_ID   = d.id;
+    window.KTS_PROJECT_DATA = d.data();
+    const p = d.data();
+
+    // Cập nhật header chat
+    const chatH = document.querySelector('.aln-chat-header h3');
+    if (chatH) chatH.innerHTML = `<i class="ph-duotone ph-chats-circle" style="color:var(--blue)"></i> Chat — Dự án ${d.id}`;
+
+    // Cập nhật thông tin dự án trên dashboard nếu có element
+    const projEl = document.getElementById('ktsDashProjName');
+    if (projEl) projEl.textContent = p.name || d.id;
+
+    const stageEl = document.getElementById('ktsDashStage');
+    if (stageEl) stageEl.textContent = 'Chặng ' + (p.stage || 'C1');
+
+    console.log('[KTS] Dự án hiện tại:', d.id, p.name);
+  }, err => {
+    console.error('[KTS] Lỗi load projects:', err.code, err.message);
+  });
+}
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -1838,6 +1878,9 @@ onAuthStateChanged(auth, async (user) => {
       } catch(e){ console.warn('[ALN Push]', e); }
     };
     window.alnInitPush();
+
+    // ── LOAD DỰ ÁN KTS TỪ FIRESTORE ──
+    _startKtsProjectListen(user.uid);
 
     // Hồ sơ KTS đầu sidebar: tên + avatar theo tài khoản đăng nhập
     try {
