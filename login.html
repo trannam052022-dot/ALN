@@ -398,13 +398,17 @@ async function doLogin(){
     const profile = snap.data();
 
     // Kiểm tra đúng tab vai trò đang chọn
-    if(profile.role !== activeRole){
+    // Founder được phép đăng nhập từ bất kỳ tab nào
+    const effectiveRole = profile.role;
+    if(effectiveRole !== activeRole && effectiveRole !== 'founder'){
       await fb.signOut(fb.auth);
-      const roleTitle = (ROLE_META[profile.role] && ROLE_META[profile.role].title) || profile.role;
+      const roleTitle = (ROLE_META[effectiveRole] && ROLE_META[effectiveRole].title) || effectiveRole;
       showError(`Tài khoản này thuộc vai trò "${roleTitle}". Vui lòng chọn đúng loại tài khoản.`);
       resetLoginBtn();
       return;
     }
+    // Nếu là founder, dùng role thật để redirect
+    const redirectRole = effectiveRole === 'founder' ? 'founder' : activeRole;
 
     // ── SUCCESS ──
     const username = profile.username || user;
@@ -418,14 +422,14 @@ async function doLogin(){
     try { localStorage.setItem('aln_user', userData); } catch(e){}
     try { sessionStorage.setItem('aln_user', userData); } catch(e){}
 
-    var m = ROLE_META[activeRole];
+    var m = ROLE_META[redirectRole] || ROLE_META[activeRole];
     var overlay = document.getElementById('redirectOverlay');
     document.getElementById('redirectMsg').textContent = 'Xin chào, ' + (profile.name || username);
     document.getElementById('redirectSub').textContent = 'Đang vào trang ' + m.title + '...';
     overlay.style.display = 'flex';
 
     setTimeout(function(){
-      var dest = FILE_BY_ROLE[activeRole] + '?u=' + encodeURIComponent(username) + '&r=' + activeRole;
+      var dest = FILE_BY_ROLE[redirectRole] + '?u=' + encodeURIComponent(username) + '&r=' + redirectRole;
       window.location.replace(dest);
     }, 800);
 
