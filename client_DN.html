@@ -832,7 +832,7 @@ window.ALNRealtime = (() => {
    DATA
 ══════════════════ */
 // _adaptProject + _startProjectsListen định nghĩa ở cuối file (sau import)
-let window.PROJECTS_CLIENT = window.PROJECTS_CLIENT; // alias
+// window.PROJECTS_CLIENT được khai báo trong <head>
 
 const FOLDERS = [
   { id:'kien_truc', label:'Hồ sơ Kiến trúc',   icon:'ph-compass-tool', color:'var(--blue)',
@@ -847,7 +847,6 @@ const FOLDERS = [
     desc:'Danh mục vật liệu · Khối lượng · Đơn vị tính' },
   { id:'du_toan',   label:'Dự toán Chi phí',     icon:'ph-calculator',       color:'var(--gold)',
     desc:'Dự toán hạng mục · Đơn giá tham chiếu · Tổng chi phí xây dựng' },
-];
 ];
 
 const DOCS = {
@@ -904,13 +903,7 @@ const KTS_PORTRAITS_CALL = {
   'KTS. Vũ Minh Khoa':   {skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'},
 };
 
-const KTS_PORTRAITS_CALL = {
-  'KTS. Trần Lê Minh':   {skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},
-  'KTS. Nguyễn Thị Lan': {skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},
-  'KTS. Phạm Hoài Nam':  {skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},
-  'KTS. Lê Hoàng Nam':   {skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},
-  'KTS. Vũ Minh Khoa':   {skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'},
-};
+
 const REVIEW_DATA = {
   'ALN-9921': {
     C1: {
@@ -2437,11 +2430,11 @@ function fmtM(v){if(v>=1e9)return(v/1e9).toFixed(1)+'T';if(v>=1e6)return(v/1e6).
 
 /* ══ PROJECTS DN: Firestore realtime — DN thấy TẤT CẢ dự án ══ */
 function _adaptProject(id, d) {
-  const prog = d.progress || {};
+  var prog = d.progress || {};
   return {
-    id, code: d.code||id, name: d.name||'',
-    cn: d.cn?.name||'', kts: d.kts?.name||'',
-    dn: d.dn?.name||'', ktsUid: d.kts?.uid||'', cnUid: d.cn?.uid||'',
+    id: id, code: d.code||id, name: d.name||'',
+    cn: (d.cn&&d.cn.name)||'', kts: (d.kts&&d.kts.name)||'',
+    dn: (d.dn&&d.dn.name)||'', ktsUid: (d.kts&&d.kts.uid)||'', cnUid: (d.cn&&d.cn.uid)||'',
     stage: d.stage||'C1', status: d.status||'on_track',
     progress: [prog.C1||0, prog.C2||0, prog.C3||0, prog.C4||0],
     total: d.totalFee||0, escrow: d.escrowBalance||0, _raw: d
