@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>ALN — Đăng nhập</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/><style>.ph-spin{animation:phspin 1s linear infinite;display:inline-block}@keyframes phspin{to{transform:rotate(360deg)}}</style>
 <style>
 :root{
   --ink:#08080a;--ink2:#111114;--ink3:#18181c;--ink4:#222228;
@@ -142,22 +142,22 @@ body::after{
   <!-- ROLE SELECTOR -->
   <div class="role-tabs" id="roleTabs">
     <div class="role-tab active" data-role="kts" onclick="switchRole('kts')">
-      <div class="rt-icon">🎨</div>
+      <div class="rt-icon"><i class="ph-duotone ph-palette"></i></div>
       <div class="rt-label">Kiến trúc sư</div>
       <div class="rt-dot"></div>
     </div>
     <div class="role-tab" data-role="dn" onclick="switchRole('dn')">
-      <div class="rt-icon">🏢</div>
+      <div class="rt-icon"><i class="ph-duotone ph-building"></i></div>
       <div class="rt-label">Doanh nghiệp</div>
       <div class="rt-dot"></div>
     </div>
     <div class="role-tab" data-role="cn" onclick="switchRole('cn')">
-      <div class="rt-icon">👤</div>
+      <div class="rt-icon"><i class="ph-duotone ph-user"></i></div>
       <div class="rt-label">Chủ nhà</div>
       <div class="rt-dot"></div>
     </div>
     <div class="role-tab" data-role="founder" onclick="switchRole('founder')">
-      <div class="rt-icon">👑</div>
+      <div class="rt-icon"><i class="ph-duotone ph-crown"></i></div>
       <div class="rt-label">Sáng lập</div>
       <div class="rt-dot"></div>
     </div>
@@ -172,13 +172,13 @@ body::after{
 
       <!-- Error -->
       <div class="msg-error" id="msgError">
-        <i class="fa fa-circle-exclamation"></i>
+        <i class="ph-duotone ph-warning-circle"></i>
         <span id="msgErrorTxt">Tên đăng nhập hoặc mật khẩu không đúng.</span>
       </div>
 
       <!-- Demo accounts -->
       <div>
-        <div class="demo-label"><i class="fa fa-bolt" style="color:var(--gold);font-size:9px"></i> Tài khoản demo — nhấn để điền nhanh</div>
+        <div class="demo-label"><i class="ph-duotone ph-lightning" style="color:var(--gold);font-size:9px"></i> Tài khoản demo — nhấn để điền nhanh</div>
         <div class="demo-row" id="demoRow"><!-- injected --></div>
       </div>
 
@@ -188,7 +188,7 @@ body::after{
       <div class="field">
         <label>Tên đăng nhập</label>
         <div class="field-wrap">
-          <i class="fi fa fa-user"></i>
+          <i class="fi fa ph-user"></i>
           <input type="text" id="inputUser" placeholder="username" autocomplete="username" autocapitalize="none" spellcheck="false">
         </div>
       </div>
@@ -197,14 +197,14 @@ body::after{
       <div class="field field-pw">
         <label>Mật khẩu</label>
         <div class="field-wrap">
-          <i class="fi fa fa-lock"></i>
+          <i class="fi fa ph-lock"></i>
           <input type="password" id="inputPw" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-          <button class="eye" onclick="togglePw()" id="eyeBtn" tabindex="-1"><i class="fa fa-eye" id="eyeIcon"></i></button>
+          <button class="eye" onclick="togglePw()" id="eyeBtn" tabindex="-1"><i class="ph-duotone ph-eye" id="eyeIcon"></i></button>
         </div>
       </div>
 
       <button class="btn-login" id="btnLogin" onclick="doLogin()">
-        <i class="fa fa-right-to-bracket" style="margin-right:6px"></i> Đăng nhập
+        <i class="ph-duotone ph-sign-in" style="margin-right:6px"></i> Đăng nhập
       </button>
 
     </div>
@@ -247,10 +247,10 @@ const ACCOUNTS = {
 };
 
 const ROLE_META = {
-  kts:     { icon:'🎨', title:'Kiến trúc sư',      desc:'Quản lý dự án, bản vẽ & doanh thu',    color:'var(--amber)', bg:'rgba(255,170,51,.1)'  },
-  dn:      { icon:'🏢', title:'Doanh nghiệp',      desc:'Tổng quan danh mục & đội ngũ KTS',     color:'var(--blue)',  bg:'rgba(56,189,248,.1)'  },
-  cn:      { icon:'👤', title:'Chủ nhà',            desc:'Theo dõi công trình & trao đổi KTS',   color:'var(--green)', bg:'rgba(34,201,122,.1)'  },
-  founder: { icon:'👑', title:'Hội đồng Sáng lập', desc:'Toàn quyền quản trị hệ thống ALN',     color:'var(--gold)',  bg:'rgba(201,168,76,.12)' },
+  kts:     { icon:'<i class="ph-duotone ph-palette"></i>', title:'Kiến trúc sư',      desc:'Quản lý dự án, bản vẽ & doanh thu',    color:'var(--amber)', bg:'rgba(255,170,51,.1)'  },
+  dn:      { icon:'<i class="ph-duotone ph-building"></i>', title:'Doanh nghiệp',      desc:'Tổng quan danh mục & đội ngũ KTS',     color:'var(--blue)',  bg:'rgba(56,189,248,.1)'  },
+  cn:      { icon:'<i class="ph-duotone ph-user"></i>', title:'Chủ nhà',            desc:'Theo dõi công trình & trao đổi KTS',   color:'var(--green)', bg:'rgba(34,201,122,.1)'  },
+  founder: { icon:'<i class="ph-duotone ph-crown"></i>', title:'Hội đồng Sáng lập', desc:'Toàn quyền quản trị hệ thống ALN',     color:'var(--gold)',  bg:'rgba(201,168,76,.12)' },
 };
 
 let activeRole = 'kts';
@@ -304,10 +304,10 @@ function togglePw(){
   const ico = document.getElementById('eyeIcon');
   if(inp.type==='password'){
     inp.type='text';
-    ico.className='fa fa-eye-slash';
+    ico.className='fa ph-eye-slash';
   } else {
     inp.type='password';
-    ico.className='fa fa-eye';
+    ico.className='fa ph-eye';
   }
 }
 
@@ -336,7 +336,7 @@ const FILE_BY_ROLE = {
 function resetLoginBtn(){
   const btn = document.getElementById('btnLogin');
   btn.disabled = false;
-  btn.innerHTML = '<i class="fa fa-right-to-bracket" style="margin-right:6px"></i> Đăng nhập';
+  btn.innerHTML = '<i class="ph-duotone ph-sign-in" style="margin-right:6px"></i> Đăng nhập';
 }
 
 async function doLogin(){
@@ -349,7 +349,7 @@ async function doLogin(){
 
   const btn = document.getElementById('btnLogin');
   btn.disabled = true;
-  btn.innerHTML = '<i class="fa fa-circle-notch fa-spin" style="margin-right:6px"></i> Đang kiểm tra...';
+  btn.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin" style="margin-right:6px"></i> Đang kiểm tra...';
 
   try {
     // Chờ Firebase SDK sẵn sàng (tối đa 15 giây — quá hạn sẽ báo lỗi rõ ràng)
@@ -363,7 +363,9 @@ async function doLogin(){
     const cred  = await fb.signInWithEmailAndPassword(fb.auth, email, pw);
 
     // Lấy hồ sơ & vai trò từ Firestore: users/{uid}
+    console.log('[ALN Login] UID:', cred.user.uid);
     const snap = await fb.getDoc(fb.doc(fb.db, 'users', cred.user.uid));
+    console.log('[ALN Login] snap.exists():', snap.exists(), '| data:', snap.exists() ? JSON.stringify(snap.data()) : 'null');
     if(!snap.exists()){
       await fb.signOut(fb.auth);
       showError('Tài khoản chưa được gán vai trò. Vui lòng liên hệ quản trị viên.');
