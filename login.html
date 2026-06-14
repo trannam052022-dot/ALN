@@ -365,7 +365,15 @@ async function doLogin(){
     // Lấy hồ sơ & vai trò từ Firestore: users/{uid}
     // Force refresh token để chắc chắn Firestore nhận được auth
     await cred.user.getIdToken(true);
-    console.log('[ALN Login] UID:', cred.user.uid, '| token refreshed');
+    console.log('[ALN Login] UID:', cred.user.uid);
+    console.log('[ALN Login] fb.db:', fb.db);
+    console.log('[ALN Login] fb.getDoc:', typeof fb.getDoc);
+    console.log('[ALN Login] doc path:', 'users/'+cred.user.uid);
+    // Thử đọc trực tiếp không qua fb wrapper
+    try {
+      const testRef = fb.doc(fb.db, 'users', cred.user.uid);
+      console.log('[ALN Login] ref:', testRef);
+    } catch(refErr) { console.error('[ALN Login] ref error:', refErr); }
     // Thử đọc với retry 3 lần
     let snap = null;
     for (let i = 0; i < 3; i++) {
