@@ -241,8 +241,9 @@ const _TBL_PAGE = (window.innerWidth <= 768) ? 15 : 40; // mobile render ít đ�
 function renderTableMore(){ _tblShown += _TBL_PAGE; renderTable(true); }
 
 function renderTable(keepShown) {
-  const allRows = getFilteredRows();
   const tbody = document.getElementById('tableBody');
+  if (!tbody) return; // guard: tab chưa mở, element chưa tồn tại
+  const allRows = getFilteredRows();
   if (!allRows.length) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--mute)">Không có dự án phù hợp</td></tr>`;
     return;
