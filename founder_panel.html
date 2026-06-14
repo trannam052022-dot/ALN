@@ -504,8 +504,8 @@ function toast(msg, type='info') {
    CLOCK
 ══════════════════════════════════════════ */
 setInterval(()=>{
-  document.getElementById('clock').textContent =
-    new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const _clk = document.getElementById('clock');
+  if(_clk) _clk.textContent = new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 },1000);
 
 /* Keyboard: Escape closes drawer/modal */
@@ -515,7 +515,7 @@ document.addEventListener('keydown', e => {
     else closeDrawer();
   }
 });
-document.getElementById('otpInput').addEventListener('keydown', e => { if(e.key==='Enter') confirmOtp(); });
+{ const _otp = document.getElementById('otpInput'); if(_otp) _otp.addEventListener('keydown', e => { if(e.key==='Enter') confirmOtp(); }); }
 
 
 /* ══════════════════════════════════════════
@@ -1255,6 +1255,7 @@ function toggleStatCard(type){
 }
 
 function renderStats(){
+  if(!document.getElementById('stat-kts-total')){ return; } // guard: element chưa sẵn sàng
   /* Update time */
   document.getElementById('statsUpdateTime').textContent = 'Cập nhật: ' + new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 
@@ -1430,6 +1431,7 @@ let _dnSK='',_dnSD=1;
 function dnSort(k){_dnSK===k?_dnSD*=-1:(_dnSK=k,_dnSD=1);renderDNTable()}
 
 function renderDNTable(reset){
+  if(!document.getElementById('dnTableBody') && !document.querySelector('.dn-table')){ return; } // guard
   if(reset){['dnSearch','dnFilterStage','dnFilterStatus'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''})}
   updateDNKpi();
   const q=(document.getElementById('dnSearch')?.value||'').toLowerCase();
