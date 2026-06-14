@@ -260,9 +260,9 @@ import {
   signInWithEmailAndPassword, onAuthStateChanged, signOut,
   doc, getDoc, collection, query, where, getDocs, serverTimestamp
 } from "./firebase-config.js";
-/* writeBatch + Timestamp chưa export trong firebase-config.js → lấy trực tiếp từ SDK */
+/* writeBatch + Timestamp — lấy từ CÙNG version với firebase-config.js (10.12.0) */
 import { writeBatch, Timestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const $ = id => document.getElementById(id);
 const banner = $('banner');
