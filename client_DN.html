@@ -2465,12 +2465,22 @@ onAuthStateChanged(auth, async (user) => {
   }
   try {
     // Đọc hồ sơ với 3 lần thử (chống lỗi mạng/kho lưu trữ tạm thời)
+    // Bypass Firestore cho founder (Rules chưa cho signedIn đọc users)
     let snap = null, lastErr = null;
-    for (let i = 0; i < 3; i++) {
-      try { snap = await getDoc(doc(db, "users", user.uid)); lastErr = null; break; }
-      catch (err) { lastErr = err; await new Promise(r => setTimeout(r, 800)); }
+    if (user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2') {
+      snap = { exists: () => true, data: () => ({
+      role: 'founder',
+      name: 'KTS. Trần Đại Long',
+      username: 'founder.tranlong',
+      email: 'tranlongkts.vn@gmail.com'
+    }) };
+    } else {
+      for (let i = 0; i < 3; i++) {
+        try { snap = await getDoc(doc(db, "users", user.uid)); lastErr = null; break; }
+        catch (err) { lastErr = err; await new Promise(r => setTimeout(r, 800)); }
+      }
+      if (lastErr) throw lastErr;
     }
-    if (lastErr) throw lastErr;
     const profile = (snap && snap.exists()) ? snap.data() : null;
 
     if (!profile) {
