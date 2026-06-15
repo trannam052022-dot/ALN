@@ -881,7 +881,7 @@ const DOCS = {
   ],
 };
 
-window.activeProj = window.activeProj; var _unused_activeProj = window.PROJECTS_CLIENT[0].id;
+window.activeProj = window.activeProj || null;
 let activeFolder = 'ALL';
 
 const STATUS_DOT={on_track:'var(--green)',sla_warn:'var(--amber)',dispute:'var(--red)',done:'var(--sub)'};
