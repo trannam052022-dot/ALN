@@ -2983,12 +2983,17 @@ function _adaptProject(id, d) {
   };
 }
 
-function _startProjectsListen(uid) {
-  const q = query(
-    collection(db, 'projects'),
-    where('cn.uid', '==', uid),
-    orderBy('updatedAt', 'desc')
-  );
+function _startProjectsListen(uid, isFounder) {
+  const q = isFounder
+    ? query(
+        collection(db, 'projects'),
+        orderBy('updatedAt', 'desc')
+      )
+    : query(
+        collection(db, 'projects'),
+        where('cn.uid', '==', uid),
+        orderBy('updatedAt', 'desc')
+      );
   onSnapshot(q, snap => {
     window.PROJECTS_CLIENT = snap.docs.map(d => _adaptProject(d.id, d.data()));
     if (window.PROJECTS_CLIENT.length > 0) {
@@ -3094,7 +3099,7 @@ onAuthStateChanged(auth, async (user) => {
     window.alnInitPush();
 
     // ── LOAD PROJECTS REALTIME TỪ FIRESTORE ──
-    _startProjectsListen(user.uid);
+    _startProjectsListen(user.uid, user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2');
 
     // ── ĐẨY FILE LÊN MÂY (Firebase Storage) ──
     window.alnUploadFile = async function(file, path){
