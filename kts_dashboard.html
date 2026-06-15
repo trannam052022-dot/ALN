@@ -1863,7 +1863,11 @@ function _startKtsProjectListen(uid) {
 
     console.log('[KTS] Dự án hiện tại:', d.id, p.name);
     // Render danh sách tất cả dự án
-    const allProjs = snap.docs.map(d2 => ({id:d2.id, ...d2.data()}));
+    const allProjs = snap.docs.map(d2 => {
+      const dd = d2.data();
+      const pg = dd.progress || {};
+      return { id:d2.id, ...dd, progress:[pg.C1||0, pg.C2||0, pg.C3||0, pg.C4||0] };
+    });
     renderMyProjects(allProjs);
   }, err => {
     console.error('[KTS] Lỗi load projects:', err.code, err.message);
