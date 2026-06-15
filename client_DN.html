@@ -3102,6 +3102,9 @@ onAuthStateChanged(auth, async (user) => {
     };
     window.alnInitPush();
 
+    // ── LOAD PROJECTS REALTIME TỪ FIRESTORE ──
+    try { _startProjectsListenDN(); } catch(e){ console.error("[DN listen]", e); }
+
     // ── ĐẨY FILE LÊN MÂY (Firebase Storage) ──
     window.alnUploadFile = async function(file, path){
       const r = storageRef(storage, path);
