@@ -2,16 +2,8 @@
 <html lang="vi">
 <head>
 <script>
-// Global sớm — trước mọi script khác
 window.PROJECTS_CLIENT = [];
 window.activeProj = null;
-window.activeFolder = 'ALL';
-const STATUS_DOT = {on_track:'var(--green)',sla_warn:'var(--amber)',dispute:'var(--red)',done:'var(--sub)'};
-const STGCOLS = ['var(--green)','var(--amber)','var(--blue)','var(--sub)'];
-const STGPCT  = [10,20,60,10];
-const STGNAME = {C1:'Ý tưởng 2D',C2:'Phối cảnh 3D',C3:'Hồ sơ KT',C4:'Dự toán & Bảo hành'};
-const ICON    = {pdf:'ph-file-pdf',img:'ph-file-image',dwg:'ph-file-code',xlsx:'ph-file-xls',zip:'ph-file-zip'};
-const ICOLOR  = {pdf:'#ef4444',img:'var(--cyan)',dwg:'var(--amber)',xlsx:'var(--green)',zip:'var(--purple)'};
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -831,9 +823,12 @@ window.ALNRealtime = (() => {
 /* ══════════════════
    DATA
 ══════════════════ */
-// _adaptProject + _startProjectsListen định nghĩa ở cuối file (sau import)
-// window.PROJECTS_CLIENT được khai báo trong <head>
+// window.PROJECTS_CLIENT từ Firestore — dùng window.PROJECTS_CLIENT
 
+/* ════════════════════════════════════════
+   6 THƯ MỤC CHUYÊN MÔN (đồng bộ với kts_dashboard)
+   folder: kien_truc | ket_cau | me | thep | vat_tu | du_toan
+════════════════════════════════════════ */
 const FOLDERS = [
   { id:'kien_truc', label:'Hồ sơ Kiến trúc',   icon:'ph-compass-tool', color:'var(--blue)',
     desc:'MB phương án (C1) · Phối cảnh 3D ngoại thất · Phối cảnh 3D nội thất · MB các tầng · Mặt đứng · Mặt cắt' },
@@ -886,8 +881,482 @@ const DOCS = {
   ],
 };
 
+window.activeProj = window.activeProj; var _unused_activeProj = window.PROJECTS_CLIENT[0].id;
+let activeFolder = 'ALL';
+
+const STATUS_DOT={on_track:'var(--green)',sla_warn:'var(--amber)',dispute:'var(--red)',done:'var(--sub)'};
+const STGCOLS=['var(--green)','var(--amber)','var(--blue)','var(--sub)'];
+const STGPCT=[10,20,60,10];
+const STGNAME={C1:'Ý tưởng 2D',C2:'Phối cảnh 3D',C3:'Hồ sơ KT',C4:'Dự toán & Bảo hành'};
+const ICON={pdf:'ph-file-pdf',img:'ph-file-image',dwg:'ph-file-code',xlsx:'ph-file-xls',zip:'ph-file-zip'};
+const ICOLOR={pdf:'#ef4444',img:'var(--cyan)',dwg:'var(--amber)',xlsx:'var(--green)',zip:'var(--purple)'};
+function fmtM(v){if(v>=1e9)return(v/1e9).toFixed(1)+'T';if(v>=1e6)return(v/1e6).toFixed(1)+'M';return(v/1e3).toFixed(0)+'K'}
+
+/* ════════════════════════════════════════
+   REVIEW FUNCTIONS
+════════════════════════════════════════ */
+function setReviewStage(projId, stage){
+  if(!_reviewState[projId]) _reviewState[projId] = {stage, subTab:'all'};
+  else _reviewState[projId].stage = stage;
+  renderMain();
+  setTimeout(()=>{const c=document.getElementById('ktsHeroAv');const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(c&&p2)drawPortrait(c,KP[p2.kts]||{});},30);
+}
+
+function selectPA(projId, stage, paId){
+  // Highlight selected PA card
+  document.querySelectorAll('.pa-card').forEach(c=>c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+}
+
+function approvePA(projId, stage, paId){
+  const rv = (REVIEW_DATA[projId] && REVIEW_DATA[projId][stage]);
+  if(!rv) return;
+  const pa = rv.paList.find(x=>x.id===paId);
+  if(!pa) return;
+  pa.status = 'approved';
+  rv.status = 'approved';
+  rv.approvedAt = new Date().toISOString().slice(0,10);
+  // Add system comment
+  rv.comments.push({
+    id:'auto_'+Date.now(), author:'Hệ thống ALN', role:'cn',
+    text:`✅ Chủ đầu tư đã phê duyệt phương án: "${pa.name}". Sàn ALN ghi nhận và thông báo KTS tiến hành bước tiếp theo.`,
+    ts: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), mine:true
+  });
+  renderMain();
+  setTimeout(()=>{const c=document.getElementById('ktsHeroAv');const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(c&&p2)drawPortrait(c,KP[p2.kts]||{});},30);
+  showToast(`✅ Đã phê duyệt phương án "${pa.name}"`, 't-green');
+  // Broadcast to kts_dashboard
+  try{ALNRealtime.send({type:'STAGE_APPROVED',projectId:projId,stage,paName:pa.name})}catch(e){}
+}
+
+function focusComment(projId, stage){
+  const ta = document.getElementById(`cmInput_${projId}_${stage}`);
+  if(ta){ta.focus();ta.scrollIntoView({behavior:'smooth',block:'nearest'});}
+}
+
+function sendComment(projId, stage){
+  const ta = document.getElementById(`cmInput_${projId}_${stage}`);
+  const text = (ta ? ta.value.trim() : '');
+  if(!text) return;
+  const rv = (REVIEW_DATA[projId] && REVIEW_DATA[projId][stage]);
+  if(!rv) return;
+  rv.comments.push({
+    id:'cm_'+Date.now(),
+    author: 'Chủ đầu tư (Bạn)',
+    role:'cn', mine:true,
+    text,
+    ts: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})
+  });
+  rv.revisions = Math.min(rv.revisions + 1, rv.maxRevisions);
+  ta.value=''; ta.style.height='auto';
+  // Re-render just the comment thread + input
+  const thread = document.getElementById(`cmThread_${projId}_${stage}`);
+  if(thread){
+    thread.innerHTML = rv.comments.map(cm=>`
+      <div class="cm-item">
+        <div class="cm-avatar" style="background:${cm.role==='kts'?'rgba(201,168,76,.2)':'rgba(34,201,122,.15)'};color:${cm.role==='kts'?'var(--accent2)':'var(--green)'}">
+          ${cm.role==='kts'?'KT':'CN'}
+        </div>
+        <div class="cm-bubble ${cm.mine?'mine':''}">
+          <div class="cm-author">
+            <span>${cm.author}</span>
+            <span class="pill ${cm.role==='kts'?'p-blue':'p-green'}" style="font-size:8px">${cm.role==='kts'?'KTS':'Chủ đầu tư'}</span>
+            <span class="cm-ts">${cm.ts}</span>
+          </div>
+          <div class="cm-text">${cm.text}</div>
+        </div>
+      </div>`).join('');
+    thread.scrollTop = thread.scrollHeight;
+  }
+  showToast('💬 Đã gửi góp ý đến KTS', 't-blue');
+  // Broadcast
+  try{ALNRealtime.send({type:'REVIEW_COMMENT',projectId:projId,stage,text})}catch(e){}
+}
+
+/* ════════════════════════════════════════
+   ANNOTATION MODAL — Pin & Review on drawing
+════════════════════════════════════════ */
 let _annotState = { projId:null, stage:null, paId:null, mode:'view', pendingPin:null };
 
+function openAnnotation(projId, stage, paId){
+  _annotState = { projId, stage, paId, mode:'view', pendingPin:null };
+  _renderAnnotModal();
+}
+
+function _renderAnnotModal(){
+  const {projId, stage, paId} = _annotState;
+  const pa = (REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);
+  if(!pa) return;
+  const pins = pa.pins || [];
+  const openPins = pins.filter(p=>!p.resolved);
+
+  // Build pins sidebar
+  const pinsListHTML = pins.length===0
+    ? `<div style="padding:20px;text-align:center;color:var(--muted);font-size:11px">
+         <i class="ph-duotone ph-map-pin" style="font-size:20px;display:block;margin-bottom:8px;color:var(--dim)"></i>
+         Chưa có điểm đánh dấu nào.<br>Click vào bản vẽ để thêm pin.
+       </div>`
+    : pins.map((pin,i)=>`
+        <div class="pin-note ${pin.resolved?'resolved':''}" id="pnote_${pin.id}" onclick="highlightPin('${pin.id}')">
+          <div class="pn-header">
+            <span class="pn-num ${pin.resolved?'resolved':''}">${i+1}</span>
+            <span class="pn-author">${pin.author}</span>
+            <span class="pill ${pin.role==='kts'?'p-blue':'p-red'}" style="font-size:8px">${pin.role==='kts'?'KTS':'KH'}</span>
+            <span class="pn-ts">${pin.ts}</span>
+          </div>
+          <div class="pn-text">${pin.text}</div>
+          ${!pin.resolved?`<div class="pn-actions">
+            <button class="pn-act" style="background:var(--green-bg);color:var(--green);border:1px solid rgba(34,201,122,.2)"
+              onclick="event.stopPropagation();resolvePin('${projId}','${stage}','${paId}','${pin.id}')">
+              <i class="ph-duotone ph-check" style="margin-right:3px"></i>Đã xử lý
+            </button>
+            <button class="pn-act" style="background:var(--ink4);color:var(--sub);border:1px solid var(--border)"
+              onclick="event.stopPropagation();replyPin('${pin.id}')">
+              <i class="ph-duotone ph-arrow-bend-up-left" style="margin-right:3px"></i>Trả lời
+            </button>
+          </div>`:'<div style="font-size:9px;color:var(--green);margin-top:4px"><i class="ph-duotone ph-check-circle" style="margin-right:3px"></i>Đã xử lý</div>'}
+        </div>`).join('');
+
+  // Build pin dots on canvas
+  const pinDotsHTML = pins.map((pin,i)=>`
+    <div class="pin-dot ${pin.role==='kts'?'pin-kts':'pin-cn'} ${pin.resolved?'pin-resolved':''}"
+      id="pdot_${pin.id}"
+      style="left:${pin.x}%;top:${pin.y}%"
+      onclick="highlightPin('${pin.id}')"
+      title="${pin.text}">
+      ${i+1}
+    </div>`).join('');
+
+  const modeActive = _annotState.mode==='add';
+
+  const modalHTML = `
+  <div class="annot-modal-bg" id="annotBg" onclick="if(event.target===this)closeAnnotation()">
+    <div class="annot-modal">
+
+      <!-- Header -->
+      <div class="annot-topbar">
+        <div style="width:8px;height:8px;border-radius:50%;background:${pa.folder==='mb'?'var(--blue)':'#a855f7'};flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pa.name}</div>
+          <div style="font-size:10px;color:var(--sub)">${pa.kts} · ${pa.version} · ${pa.date}</div>
+        </div>
+        <span class="pill ${pa.status==='approved'?'p-green':'p-amber'}" style="flex-shrink:0;font-size:10px">
+          ${pa.status==='approved'?'✅ Đã duyệt':'⏳ Chờ duyệt'}
+        </span>
+        ${openPins.length>0?`<span class="pill p-red" style="flex-shrink:0;font-size:10px"><i class="ph-duotone ph-map-pin" style="font-size:8px"></i> ${openPins.length} chờ xử lý</span>`:''}
+        <button onclick="closeAnnotation()" style="padding:5px 10px;background:var(--ink4);border:1px solid var(--border);color:var(--sub);border-radius:5px;cursor:pointer;font-size:12px;font-family:var(--sans);flex-shrink:0">
+          <i class="ph-duotone ph-x"></i>
+        </button>
+      </div>
+
+      <!-- Body: canvas + sidebar -->
+      <div style="display:flex;flex:1;overflow:hidden">
+
+        <!-- Canvas -->
+        <div class="annot-canvas-wrap" id="annotCanvas"
+          style="cursor:${modeActive?'crosshair':'default'}"
+          onclick="${modeActive?`addPinAt(event,'${projId}','${stage}','${paId}')`:''}" >
+          <!-- Drawing placeholder — in production replace with actual image -->
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:${pa.bg};position:relative;min-height:400px">
+            <span style="font-size:90px;filter:drop-shadow(0 4px 20px rgba(0,0,0,.8));user-select:none">${pa.icon}</span>
+            <div style="position:absolute;bottom:12px;left:12px;font-size:10px;color:rgba(255,255,255,.3);font-family:var(--mono)">
+              ${pa.folder==='mb'?'[Mặt bằng — demo placeholder]':'[Phối cảnh 3D — demo placeholder]'} · Click để đánh dấu
+            </div>
+            ${pinDotsHTML}
+          </div>
+        </div>
+
+        <!-- Sidebar: 2 tabs — Pins + Upload KH -->
+        <div class="annot-sidebar">
+          <div class="upload-tab-bar">
+            <button class="utab active" id="utabPins" onclick="switchAnnotTab('pins')">
+              <i class="ph-duotone ph-map-pin" style="font-size:10px;color:var(--red)"></i>
+              Pins <span style="font-family:var(--mono);font-size:9px;opacity:.7">${pins.length}</span>
+            </button>
+            <button class="utab" id="utabUpload" onclick="switchAnnotTab('upload')">
+              <i class="ph-duotone ph-cloud-arrow-up" style="font-size:10px;color:var(--accent2)"></i>
+              File KH <span style="font-family:var(--mono);font-size:9px;opacity:.7" id="uploadCountBadge">${(pa.cnUploads||[]).length}</span>
+            </button>
+          </div>
+
+          <!-- Tab: Pins -->
+          <div id="sidebarPinsTab" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+            <div class="annot-list" id="annotPinList">${pinsListHTML}</div>
+            <!-- Pin input (shown when pendingPin) -->
+            <div id="pinInputArea" style="padding:8px;border-top:1px solid var(--border);display:none">
+              <div style="font-size:10px;color:var(--red);font-weight:700;margin-bottom:6px">
+                <i class="ph-duotone ph-map-pin" style="margin-right:4px"></i>Ghi chú cho điểm này:
+              </div>
+              <textarea id="pinNoteInput" style="width:100%;background:var(--ink);border:1px solid rgba(239,68,68,.4);color:var(--text);padding:7px 9px;border-radius:6px;font-size:11px;font-family:var(--sans);resize:none;outline:none;min-height:60px"
+                placeholder="Mô tả vấn đề hoặc yêu cầu sửa đổi..."></textarea>
+              <div style="display:flex;gap:6px;margin-top:6px">
+                <button onclick="confirmPin('${projId}','${stage}','${paId}')"
+                  style="flex:2;padding:6px;background:var(--red);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)">
+                  <i class="ph-duotone ph-map-pin" style="margin-right:3px"></i>Xác nhận Pin
+                </button>
+                <button onclick="cancelPin()"
+                  style="flex:1;padding:6px;background:var(--ink4);border:1px solid var(--border);color:var(--sub);border-radius:5px;font-size:11px;cursor:pointer;font-family:var(--sans)">
+                  Huỷ
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: Upload KH -->
+          <div id="sidebarUploadTab" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+            <div class="upload-zone" id="annotDropZone_${paId}"
+              ondragover="event.preventDefault();this.classList.add('drag-over')"
+              ondragleave="this.classList.remove('drag-over')"
+              ondrop="handleAnnotDrop(event,'${projId}','${stage}','${paId}')">
+              <input type="file" accept="image/*,.pdf" multiple
+                onchange="handleAnnotUpload(event,'${projId}','${stage}','${paId}')">
+              <i class="ph-duotone ph-cloud-arrow-up" style="font-size:22px;color:var(--accent2);display:block;margin-bottom:6px"></i>
+              <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:3px">Kéo thả hoặc click</div>
+              <div style="font-size:10px;color:var(--muted)">Ảnh chụp bản vẽ tay, ảnh chú thích, PDF...</div>
+            </div>
+            <div class="uploaded-file-list" id="annotUploadList_${paId}">
+              ${(pa.cnUploads||[]).length===0
+                ? `<div style="text-align:center;padding:16px;color:var(--muted);font-size:11px">Chưa có file nào</div>`
+                : (pa.cnUploads||[]).map((u,i)=>`
+                  <div class="uf-item" onclick="viewUploadedFile('${u.id}','${projId}','${stage}','${paId}')">
+                    ${u.dataUrl&&u.dataUrl.startsWith('data:image')
+                      ? `<img class="uf-thumb" src="${u.dataUrl}" alt="${u.name}">`
+                      : `<div class="uf-thumb-placeholder">${u.type==='pdf'?'📄':'📎'}</div>`}
+                    <div class="uf-info">
+                      <span class="uf-name">${u.name}</span>
+                      <span style="font-size:9px;color:var(--muted);font-family:var(--mono);flex-shrink:0">${u.ts}</span>
+                      <button class="uf-del" onclick="event.stopPropagation();deleteUpload('${projId}','${stage}','${paId}','${u.id}')">✕</button>
+                    </div>
+                  </div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="annot-tools">
+        <button class="at-btn ${modeActive?'active':''}" onclick="toggleAddPinMode()" id="addPinBtn">
+          <i class="ph-duotone ph-map-pin"></i> ${modeActive?'Đang chọn vị trí...':'Thêm Pin'}
+        </button>
+        <span style="font-size:11px;color:var(--muted)">${modeActive?'👆 Click vào bản vẽ để đặt điểm':'Chọn "Thêm Pin" rồi click vào vị trí cần góp ý'}</span>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          ${pa.status!=='approved'?`
+          <button onclick="approvePA('${projId}','${stage}','${paId}');closeAnnotation()"
+            style="padding:5px 14px;background:var(--green-bg);border:1px solid rgba(34,201,122,.25);color:var(--green);border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)">
+            <i class="ph-duotone ph-check-circle" style="margin-right:4px"></i>Duyệt phương án này
+          </button>`:''}
+        </div>
+      </div>
+
+    </div>
+  </div>`;
+
+  // Remove existing modal if any
+  const existing = document.getElementById('annotBg');
+  if(existing) existing.remove();
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function closeAnnotation(){
+  const el = document.getElementById('annotBg');
+  if(el) el.remove();
+  _annotState = { projId:null, stage:null, paId:null, mode:'view', pendingPin:null };
+}
+
+function toggleAddPinMode(){
+  _annotState.mode = _annotState.mode==='add' ? 'view' : 'add';
+  _renderAnnotModal();
+}
+
+function addPinAt(event, projId, stage, paId){
+  const wrap = document.getElementById('annotCanvas');
+  if(!wrap) return;
+  const rect = wrap.getBoundingClientRect();
+  const x = Math.round((event.clientX - rect.left) / rect.width * 100);
+  const y = Math.round((event.clientY - rect.top)  / rect.height * 100);
+  _annotState.pendingPin = {x, y};
+  // Show input area
+  const area = document.getElementById('pinInputArea');
+  if(area){ area.style.display='block'; document.getElementById('pinNoteInput').focus(); }
+  // Show pending dot
+  const existing = document.getElementById('pendingDot');
+  if(existing) existing.remove();
+  const dot = document.createElement('div');
+  dot.id = 'pendingDot';
+  dot.style.cssText = `position:absolute;left:${x}%;top:${y}%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:rgba(239,68,68,.5);border:2px dashed var(--red);z-index:20;pointer-events:none;animation:pinPop .3s ease`;
+  const canvas = wrap.querySelector('div');
+  if(canvas) canvas.appendChild(dot);
+}
+
+function confirmPin(projId, stage, paId){
+  const note = (document.getElementById('pinNoteInput') ? document.getElementById('pinNoteInput').value.trim() : '');
+  if(!note){ document.getElementById('pinNoteInput').style.borderColor='var(--red)'; return; }
+  const pin = _annotState.pendingPin;
+  if(!pin) return;
+  const pa = (REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);
+  if(!pa) return;
+  if(!pa.pins) pa.pins = [];
+  const newPin = {
+    id: 'pin_'+Date.now(),
+    x: pin.x, y: pin.y,
+    text: note,
+    author: 'Chủ đầu tư',
+    role: 'cn',
+    ts: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}),
+    resolved: false
+  };
+  pa.pins.push(newPin);
+  _annotState.pendingPin = null;
+  _annotState.mode = 'view';
+  showToast(`📍 Đã thêm pin #${pa.pins.length} — KTS sẽ nhận thông báo`, 't-amber');
+  // Broadcast
+  try{ALNRealtime.send({type:'PIN_ADDED',projectId:projId,stage,paId,pinText:note,paName:(pa&&pa.name)||paId,senderName:((typeof DN_USER!=='undefined'&&DN_USER.name)||'Doanh nghiệp')})}catch(e){}
+  _renderAnnotModal();
+}
+
+function cancelPin(){
+  _annotState.pendingPin = null;
+  const area = document.getElementById('pinInputArea');
+  if(area) area.style.display='none';
+  const dot = document.getElementById('pendingDot');
+  if(dot) dot.remove();
+}
+
+function resolvePin(projId, stage, paId, pinId){
+  const pa = (REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);
+  const pin = (pa && pa.pins) ? pa.pins.find(function(x){return x.id===pinId;}) : null;
+  if(pin){ pin.resolved=true; }
+  showToast('✅ Pin đã được đánh dấu xử lý xong', 't-green');
+  _renderAnnotModal();
+  // Also re-render main to update pin counts on cards
+  renderMain();
+  setTimeout(()=>{const cv=document.getElementById('ktsHeroAv');if(cv){const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(p2)drawPortrait(cv,KP[p2.kts]||{});}},30);
+}
+
+function highlightPin(pinId){
+  document.querySelectorAll('.pin-note').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.pin-dot').forEach(el=>el.style.transform='translate(-50%,-50%)');
+  const note = document.getElementById(`pnote_${pinId}`);
+  const dot  = document.getElementById(`pdot_${pinId}`);
+  if(note){ note.classList.add('active'); note.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+  if(dot)  dot.style.transform='translate(-50%,-50%) scale(1.4)';
+}
+
+function replyPin(pinId){
+  const ta = document.getElementById('pinNoteInput');
+  const area = document.getElementById('pinInputArea');
+  if(ta && area){
+    area.style.display='block';
+    ta.placeholder=`Trả lời pin #${pinId}...`;
+    ta.focus();
+  }
+}
+
+function setReviewSubTab(projId, subTab){
+  if(!_reviewState[projId]) _reviewState[projId]={stage:'C1',subTab};
+  _reviewState[projId].subTab = subTab;
+  renderMain();
+  setTimeout(()=>{const cv=document.getElementById('ktsHeroAv');if(cv){const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(p2)drawPortrait(cv,KP[p2.kts]||{});}},30);
+}
+
+// ESC to close annotation
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAnnotation(); });
+
+
+/* ════════════════════════════════════════
+   UPLOAD FUNCTIONS — Khách hàng gửi file/ảnh
+════════════════════════════════════════ */
+function switchAnnotTab(tab){
+  const pins=document.getElementById('sidebarPinsTab'),upload=document.getElementById('sidebarUploadTab');
+  const tp=document.getElementById('utabPins'),tu=document.getElementById('utabUpload');
+  if(!pins||!upload)return;
+  if(tab==='pins'){pins.style.display='flex';upload.style.display='none';tp.classList.add('active');tu.classList.remove('active');}
+  else{pins.style.display='none';upload.style.display='flex';tu.classList.add('active');tp.classList.remove('active');}
+}
+function handleAnnotUpload(event,projId,stage,paId){
+  const files=Array.from(event.target.files);if(!files.length)return;
+  _processFiles(files,projId,stage,paId,'modal');event.target.value='';
+}
+function handleAnnotDrop(event,projId,stage,paId){
+  event.preventDefault();event.currentTarget.classList.remove('drag-over');
+  const files=Array.from(event.dataTransfer.files);if(!files.length)return;
+  _processFiles(files,projId,stage,paId,'panel');
+}
+function _processFiles(files,projId,stage,paId,source){
+  const pa=(REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);if(!pa)return;
+  if(!pa.cnUploads)pa.cnUploads=[];
+  let loaded=0;
+  files.forEach(file=>{
+    const ext=file.name.split('.').pop().toLowerCase();
+    const isImg=['jpg','jpeg','png','gif','webp','bmp'].includes(ext);
+    const reader=new FileReader();
+    const finish=(dataUrl)=>{
+      pa.cnUploads.unshift({id:'up_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+        name:file.name,size:(file.size/1024).toFixed(0)+'KB',type:isImg?'image':ext,
+        dataUrl:isImg?dataUrl:null,
+        ts:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})});
+      // ── Đẩy file lên mây + gửi link tải cho KTS ──
+      try{
+        if(window.alnUploadFile){
+          const _safe = file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+          const _path = 'uploads/' + projId + '/' + paId + '/' + Date.now() + '_' + _safe;
+          window.alnUploadFile(file, _path).then(function(url){
+            try{ALNRealtime.send({ type:'ALN_CHAT', audience:['kts'], projectId:projId,
+              text:'📎 Đã gửi tệp [' + ((pa&&pa.name)||paId) + ']: ' + file.name + ' — <a href="' + url + '" target="_blank" style="color:#C9A84C;text-decoration:underline;font-weight:700">Tải về</a>',
+              senderName:((typeof DN_USER!=='undefined' && DN_USER.name) || 'Doanh nghiệp'), senderRole:'dn' });}catch(e){}
+          }).catch(function(err){
+            try{showToast('⚠️ Không đưa được file lên mây: ' + ((err&&err.code)||err), 't-red')}catch(e){}
+          });
+        }
+      }catch(e){}
+      if(++loaded===files.length){
+        showToast(`📤 Đã tải lên ${loaded} file — KTS nhận thông báo ngay!`,'t-green');
+        try{ALNRealtime.send({type:'CN_FILE_UPLOADED',projectId:projId,stage,paId,count:loaded})}catch(e){}
+        if(source==='modal')_renderAnnotModal();
+        else{renderMain();setTimeout(()=>_redrawHero(projId),30);}
+      }
+    };
+    if(isImg){reader.onload=e=>finish(e.target.result);reader.readAsDataURL(file);}
+    else finish(null);
+  });
+}
+function _redrawHero(projId){
+  const cv=document.getElementById('ktsHeroAv');const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);
+  const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};
+  if(cv&&p2)drawPortrait(cv,KP[p2.kts]||{});
+}
+function viewUploadedFile(uploadId,projId,stage,paId){
+  const pa=(REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);
+  const up=(pa && pa.cnUploads) ? pa.cnUploads.find(function(x){return x.id===uploadId;}) : null;if(!up||!up.dataUrl)return;
+  const canvas=document.getElementById('annotCanvas');if(!canvas)return;
+  const existing=canvas.querySelector('.img-viewer-overlay');if(existing)existing.remove();
+  const v=document.createElement('div');v.className='img-viewer-overlay';
+  v.innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:7px 14px;background:rgba(0,0,0,.5);border-radius:7px;margin-bottom:8px">
+    <span style="font-size:12px;font-weight:700;color:#fff">${up.name}</span>
+    <span style="font-size:10px;color:rgba(255,255,255,.4)">${up.ts}·${up.size}</span>
+  </div>
+  <img class="img-viewer-img" src="${up.dataUrl}" alt="${up.name}">
+  <button onclick="this.parentElement.remove()" style="margin-top:10px;padding:5px 14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:5px;cursor:pointer;font-size:12px;font-family:var(--sans)">✕ Đóng</button>`;
+  canvas.appendChild(v);
+}
+function viewCNUpload(uploadId,projId,stage,paId){
+  _annotState={projId,stage,paId,mode:'view',pendingPin:null};
+  _renderAnnotModal();setTimeout(()=>viewUploadedFile(uploadId,projId,stage,paId),50);
+}
+function deleteUpload(projId,stage,paId,uploadId){
+  const pa=(REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);
+  if(pa && pa.cnUploads)pa.cnUploads=pa.cnUploads.filter(x=>x.id!==uploadId);
+  _renderAnnotModal();
+}
+function deleteCNUpload(projId,stage,paId,uploadId){
+  const pa=(REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);
+  if(pa && pa.cnUploads)pa.cnUploads=pa.cnUploads.filter(x=>x.id!==uploadId);
+  renderMain();setTimeout(()=>_redrawHero(projId),30);
+}
+
+/* ════════════════════════════════════════
+   CALL MODAL — Gọi điện / Video / Zalo
+════════════════════════════════════════ */
 const KTS_CONTACTS = {
   'KTS. Trần Lê Minh':   {phone:'0901-234-567', virtualNum:'028-7300-0101', zalo:'0901234567', email:'minhtran@kts.vn'},
   'KTS. Nguyễn Thị Lan': {phone:'0912-345-678', virtualNum:'028-7300-0102', zalo:'0912345678', email:'lannguyen@kts.vn'},
@@ -903,7 +1372,117 @@ const KTS_PORTRAITS_CALL = {
   'KTS. Vũ Minh Khoa':   {skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'},
 };
 
+function openCallModal(type, projId, ktsName){
+  // If called from topbar without context, get from active project
+  if(!ktsName){
+    const p = window.PROJECTS_CLIENT.find(x=>x.id===window.activeProj);
+    ktsName = (p ? p.kts : null) || 'KTS. Trần Lê Minh';
+    projId  = (p ? p.id : null);
+  }
+  const contact = KTS_CONTACTS[ktsName] || {phone:'—', zalo:'—', email:'—'};
+  const typeLabel = 'Liên hệ KTS qua Zalo OA';
+  const typeIcon  = {phone:'ph-phone', video:'ph-video-camera', zalo:'ph-chat-dots'}[type];
+  const typeColor = {phone:'var(--green)', video:'var(--blue)', zalo:'#037fd3'}[type];
 
+  const existing = document.getElementById('callModalBg');
+  if(existing) existing.remove();
+
+  const el = document.createElement('div');
+  el.id = 'callModalBg';
+  el.className = 'call-modal-bg';
+  el.onclick = e => { if(e.target===el) closeCallModal(); };
+  el.innerHTML = `
+    <div class="call-modal">
+      <!-- KTS portrait -->
+      <div class="call-avatar">
+        <canvas id="callAvatarCanvas" width="144" height="192"></canvas>
+      </div>
+      <div style="font-family:var(--syne);font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px">${ktsName}</div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:16px">${projId||''}</div>
+
+      <!-- Call type indicator -->
+      <div class="call-pulse" style="background:${typeColor}14;border-color:${typeColor}40">
+        <i class="ph-duotone ${typeIcon}" style="font-size:28px;color:${typeColor}"></i>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">${typeLabel}</div>
+
+      ${type==='phone'||type==='video' ? `
+      <!-- Privacy shield notice -->
+      <div style="background:rgba(34,201,122,.07);border:1px solid rgba(34,201,122,.2);border-radius:8px;padding:8px 12px;margin:12px 0 8px;display:flex;gap:8px;font-size:11px;color:var(--color-text-secondary,#9ca3af)">
+        <i class="ph-duotone ph-shield-check" style="color:#22c97a;flex-shrink:0;margin-top:1px"></i>
+        <span>Số điện thoại thật của <b style="color:var(--text2)">${ktsName.replace('KTS. ','')}</b> được bảo mật. Cuộc gọi qua số ảo sàn ALN — tự động ghi âm &amp; lưu vào hồ sơ dự án.</span>
+      </div>
+      <!-- Virtual number display -->
+      <div style="background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
+        <div style="flex:1">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:2px;letter-spacing:.5px;text-transform:uppercase">Số ảo sàn ALN</div>
+          <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);letter-spacing:1px">${contact.virtualNum}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Proxy → KTS (số thật được ẩn)</div>
+        </div>
+        <button onclick="navigator.(clipboard ? clipboard.writeText : null)('${contact.virtualNum}').then(()=>showToast('📋 Đã copy số ảo','t-green'))"
+          style="padding:4px 10px;background:var(--ink4);border:1px solid var(--border);color:var(--sub);border-radius:5px;cursor:pointer;font-size:10px;font-family:var(--sans)">
+          Copy
+        </button>
+      </div>
+      <a href="tel:${contact.virtualNum.replace(/[^0-9]/g,'')}"
+        style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:${typeColor};border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);text-decoration:none;margin-bottom:8px">
+        <i class="ph-duotone ${typeIcon}"></i> Gọi qua số ảo
+      </a>` : `
+      <!-- Zalo OA -->
+      <div style="background:rgba(3,107,211,.07);border:1px solid rgba(3,107,211,.2);border-radius:8px;padding:8px 12px;margin:12px 0 8px;display:flex;gap:8px;font-size:11px;color:var(--color-text-secondary,#9ca3af)">
+        <i class="ph-duotone ph-shield-check" style="color:#037fd3;flex-shrink:0;margin-top:1px"></i>
+        <span>Chat qua <b style="color:#037fd3">Zalo Official Account của sàn ALN</b> — toàn bộ nội dung được lưu vào hồ sơ dự án. Không dùng Zalo cá nhân của KTS.</span>
+      </div>
+      <div style="background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:12px;font-size:12px;color:var(--text2)">
+        Zalo OA: <b style="color:var(--text);font-family:var(--mono)">@ALN-Sàn-Thiết-Kế</b>
+      </div>
+      <a href="https://zalo.me/alnsanthietke" target="_blank"
+        style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:#037fd3;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);text-decoration:none;margin-bottom:8px">
+        <i class="ph-duotone ph-chat-dots"></i> Mở Zalo OA sàn ALN
+      </a>`}
+
+      <!-- Email + Close -->
+      <div style="display:flex;gap:6px;margin-top:4px">
+        <a href="mailto:${contact.email}"
+          style="flex:1;padding:8px;background:var(--ink3);border:1px solid var(--border);color:var(--text2);border-radius:var(--r-sm);font-size:11px;font-weight:600;font-family:var(--sans);text-decoration:none;display:flex;align-items:center;justify-content:center;gap:5px">
+          <i class="ph-duotone ph-envelope-simple"></i> Email KTS
+        </a>
+        <button onclick="closeCallModal()"
+          style="flex:1;padding:8px;background:var(--ink3);border:1px solid var(--border);color:var(--sub);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)">
+          Đóng
+        </button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(el);
+  // Draw portrait
+  setTimeout(()=>{
+    const cv = document.getElementById('callAvatarCanvas');
+    if(cv) drawPortrait(cv, KTS_PORTRAITS_CALL[ktsName]||{});
+  }, 30);
+}
+
+function closeCallModal(){
+  (function(){var _e=document.getElementById('callModalBg');if(_e)_e.remove();})();
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeCallModal(); closeAnnotation(); }});
+
+function renderSidebar(){
+  document.getElementById('projList').innerHTML=window.PROJECTS_CLIENT.map(p=>`
+    <div class="cn-proj-item ${window.activeProj===p.id?'active':''}" onclick="selectProj('${p.id}')">
+      <span class="cpi-dot" style="background:${STATUS_DOT[p.status]}"></span>
+      <div style="min-width:0">
+        <div class="cpi-id">${p.id}</div>
+        <div class="cpi-name">${p.name}</div>
+        <div class="cpi-meta">${p.stage} · ${p.kts.replace('KTS. ','')}</div>
+      </div>
+      ${(DOCS[p.id]||[]).filter(d=>d.isNew).length>0?`<span class="new-badge">${(DOCS[p.id]||[]).filter(d=>d.isNew).length}</span>`:''}
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════════
+   REVIEW DATA — Phương án C1/C2 mỗi dự án
+════════════════════════════════════════ */
 const REVIEW_DATA = {
   'ALN-9921': {
     C1: {
@@ -2121,9 +2700,9 @@ function submitRating(projId, stage){
   setTimeout(()=>_redrawHero(projId), 50);
 }
 
-/* Init */
-renderSidebar();
-renderMain();
+/* Init — data từ Firestore listener */
+try{ if(typeof window.renderSidebar==='function') window.renderSidebar(); }catch(e){}
+try{ if(typeof renderMain==='function') renderMain(); }catch(e){}
 
 /* Cập nhật tên DN từ sessionStorage */
 (function(){
@@ -2135,6 +2714,12 @@ renderMain();
   if(el2) el2.textContent = name;
 })();
 
+
+
+/* Đưa hàm UI ra window để script module (Firestore listener) gọi được */
+window.renderSidebar = renderSidebar;
+window.renderMain = renderMain;
+window.selectProj = selectProj;
 </script>
 
 
@@ -2251,6 +2836,7 @@ function alnEnableNotify(){
       if(Notification.permission === 'default'){
         Notification.requestPermission().then(function(p){
           if(p === 'granted' && window.alnInitPush) window.alnInitPush();
+    try { _startProjectsListenDN(); } catch(e){ console.error("[DN listen]",e); }
         });
       } else if(Notification.permission === 'granted' && window.alnInitPush){
         window.alnInitPush();
@@ -2413,48 +2999,24 @@ import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection,
 const REQUIRED_ROLE = "dn";
 
 
-function renderSidebar(){
-  document.getElementById('projList').innerHTML=PROJECTS_CLIENT.map(p=>`
-    <div class="cn-proj-item ${activeProj===p.id?'active':''}" onclick="selectProj('${p.id}')">
-      <span class="cpi-dot" style="background:${STATUS_DOT[p.status]}"></span>
-      <div style="min-width:0">
-        <div class="cpi-id">${p.id}</div>
-        <div class="cpi-name">${p.name}</div>
-        <div class="cpi-meta">${p.stage} · ${p.kts.replace('KTS. ','')}</div>
-      </div>
-      ${(DOCS[p.id]||[]).filter(d=>d.isNew).length>0?`<span class="new-badge">${(DOCS[p.id]||[]).filter(d=>d.isNew).length}</span>`:''}
-    </div>`).join('');
-}
-
-function fmtM(v){if(v>=1e9)return(v/1e9).toFixed(1)+'T';if(v>=1e6)return(v/1e6).toFixed(1)+'M';return(v/1e3).toFixed(0)+'K'}
-
-/* ══ PROJECTS DN: Firestore realtime — DN thấy TẤT CẢ dự án ══ */
-function _adaptProject(id, d) {
+/* ══ PROJECTS DN: Firestore realtime — DN thấy TẤT CẢ ══ */
+function _adaptProjectDN(id, d) {
   var prog = d.progress || {};
-  return {
-    id: id, code: d.code||id, name: d.name||'',
-    cn: (d.cn&&d.cn.name)||'', kts: (d.kts&&d.kts.name)||'',
-    dn: (d.dn&&d.dn.name)||'', ktsUid: (d.kts&&d.kts.uid)||'', cnUid: (d.cn&&d.cn.uid)||'',
-    stage: d.stage||'C1', status: d.status||'on_track',
-    progress: [prog.C1||0, prog.C2||0, prog.C3||0, prog.C4||0],
-    total: d.totalFee||0, escrow: d.escrowBalance||0, _raw: d
-  };
+  return { id:id, code:d.code||id, name:d.name||'', cn:(d.cn&&d.cn.name)||'', kts:(d.kts&&d.kts.name)||'', dn:(d.dn&&d.dn.name)||'', ktsUid:(d.kts&&d.kts.uid)||'', cnUid:(d.cn&&d.cn.uid)||'', stage:d.stage||'C1', status:d.status||'on_track', progress:[prog.C1||0,prog.C2||0,prog.C3||0,prog.C4||0], total:d.totalFee||0, escrow:d.escrowBalance||0, _raw:d };
 }
-
-function _startProjectsListen() {
-  // DN thấy TẤT CẢ dự án, sắp theo ngày cập nhật
-  const q = query(collection(db,'projects'), orderBy('updatedAt','desc'));
-  onSnapshot(q, snap => {
-    window.PROJECTS_CLIENT = snap.docs.map(d => _adaptProject(d.id, d.data()));
+function _startProjectsListenDN() {
+  var q = query(collection(db,'projects'), orderBy('updatedAt','desc'));
+  onSnapshot(q, function(snap){
+    window.PROJECTS_CLIENT = snap.docs.map(function(d){ return _adaptProjectDN(d.id, d.data()); });
     if (window.PROJECTS_CLIENT.length > 0) {
       window.activeProj = window.PROJECTS_CLIENT[0].id;
-      if (typeof renderSidebar === 'function') renderSidebar();
-      if (typeof selectProj  === 'function') selectProj(window.activeProj);
+      try { if(typeof window.renderSidebar==='function') window.renderSidebar(); } catch(e){ console.error('[DN render]',e); }
+      try { if(typeof window.selectProj==='function') window.selectProj(window.activeProj); } catch(e){}
     } else {
-      const el = document.getElementById('projList');
-      if (el) el.innerHTML = '<div style="padding:16px;color:var(--sub);font-size:13px">Chưa có dự án nào.</div>';
+      var el = document.getElementById('projList');
+      if (el) el.innerHTML = '<div style="padding:16px;color:var(--sub);font-size:13px">Chưa có dự án.</div>';
     }
-  }, err => console.error('[DN] Lỗi load projects:', err.code, err.message));
+  }, function(err){ console.error('[DN] Lỗi:', err.code); });
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -2465,15 +3027,9 @@ onAuthStateChanged(auth, async (user) => {
   }
   try {
     // Đọc hồ sơ với 3 lần thử (chống lỗi mạng/kho lưu trữ tạm thời)
-    // Bypass Firestore cho founder (Rules chưa cho signedIn đọc users)
     let snap = null, lastErr = null;
     if (user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2') {
-      snap = { exists: () => true, data: () => ({
-      role: 'founder',
-      name: 'KTS. Trần Đại Long',
-      username: 'founder.tranlong',
-      email: 'tranlongkts.vn@gmail.com'
-    }) };
+      snap = { exists: () => true, data: () => ({ role:'founder', name:'KTS. Trần Đại Long', username:'founder.tranlong' }) };
     } else {
       for (let i = 0; i < 3; i++) {
         try { snap = await getDoc(doc(db, "users", user.uid)); lastErr = null; break; }

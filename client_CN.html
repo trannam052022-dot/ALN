@@ -2690,6 +2690,12 @@ renderMain();
     if(el) el.textContent = org;
   } catch(e){}
 })();
+
+
+/* Đưa hàm UI ra window để script module (Firestore listener) gọi được */
+window.renderSidebar = renderSidebar;
+window.renderMain = renderMain;
+window.selectProj = selectProj;
 </script>
 
 
@@ -2987,8 +2993,8 @@ function _startProjectsListen(uid) {
     window.PROJECTS_CLIENT = snap.docs.map(d => _adaptProject(d.id, d.data()));
     if (window.PROJECTS_CLIENT.length > 0) {
       window.activeProj = window.PROJECTS_CLIENT[0].id;
-      renderSidebar();
-      selectProj(window.activeProj);
+      window.renderSidebar();
+      window.selectProj(window.activeProj);
     } else {
       document.getElementById('projList').innerHTML =
         '<div style="padding:16px;color:var(--sub);font-size:13px">Chưa có dự án nào.</div>';
