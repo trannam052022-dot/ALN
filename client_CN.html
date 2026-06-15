@@ -889,6 +889,7 @@ const DOCS = {
     {id:'D015',name:'Dự toán nghiệm thu',             folder:'du_toan',  kts:'KTS. Vũ Minh Khoa',  date:'2026-02-15',size:'1.1MB',type:'xlsx',status:'approved',isNew:false},
   ],
 };
+window.DOCS = DOCS; // expose để module Firestore cập nhật docs realtime
 let activeFolder = window.activeFolder || 'ALL';
 
 function selectPA(projId, stage, paId){
@@ -2201,6 +2202,7 @@ function renderMain(){
 
 function selectProj(id){
   window.activeProj=id; activeFolder='ALL';
+  if(typeof window._startDocsListen==='function') window._startDocsListen(id);
   renderSidebar(); renderMain();
   document.querySelector('.sidebar-cn').classList.remove('open');
   // Sync Zalo widget to new KTS
@@ -2302,9 +2304,14 @@ function drawPortrait(canvas,opts){
 }
 
 function downloadDoc(id,name){
-  showToast(`📥 Đang tải: ${name}`,'t-blue');
-  // Mark as read
-  Object.values(DOCS).flat().forEach(d=>{if(d.id===id)d.isNew=false});
+  const allDocs = Object.values(DOCS).flat();
+  const found = allDocs.find(d=>d.id===id);
+  if(found && found.downloadURL){
+    window.open(found.downloadURL,'_blank');
+  } else {
+    showToast('📥 '+name+' — chưa có file thực (demo)','t-blue');
+  }
+  allDocs.forEach(d=>{if(d.id===id)d.isNew=false});
   renderSidebar();
 }
 
@@ -2984,6 +2991,43 @@ function _adaptProject(id, d) {
   };
 }
 
+/* ── Lắng nghe documents realtime cho một project ── */
+let _docsUnsub = null;
+function _startDocsListen(projectId) {
+  if (_docsUnsub) { _docsUnsub(); _docsUnsub = null; }
+  _docsUnsub = onSnapshot(
+    collection(db, 'projects', projectId, 'documents'),
+    snap => {
+      if (snap.empty) return; // giữ hardcode nếu chưa có gì trên Firestore
+      const firestoreDocs = snap.docs.map(d => {
+        const data = d.data();
+        return {
+          id:          d.id,
+          name:        data.name        || d.id,
+          fileName:    data.fileName    || '',
+          folder:      data.folder      || 'kien_truc',
+          kts:         data.kts         || '',
+          date:        data.date        || '',
+          size:        data.size        || '—',
+          type:        data.type        || 'pdf',
+          downloadURL: data.downloadURL || '',
+          status:      data.status      || 'pending',
+          isNew:       data.isNew !== false,
+          stage:       data.stage       || '',
+        };
+      });
+      if (window.DOCS) window.DOCS[projectId] = firestoreDocs;
+      if (window.activeProj === projectId) {
+        if (typeof window.renderMain    === 'function') window.renderMain();
+        if (typeof window.renderSidebar === 'function') window.renderSidebar();
+      }
+    },
+    err => console.error('[CN Docs]', err.code, err.message)
+  );
+}
+
+window._startDocsListen = _startDocsListen; // expose để selectProj gọi được khi đổi project
+
 function _startProjectsListen(uid, isFounder) {
   const q = isFounder
     ? query(
@@ -2999,6 +3043,7 @@ function _startProjectsListen(uid, isFounder) {
     window.PROJECTS_CLIENT = snap.docs.map(d => _adaptProject(d.id, d.data()));
     if (window.PROJECTS_CLIENT.length > 0) {
       window.activeProj = window.PROJECTS_CLIENT[0].id;
+      _startDocsListen(window.activeProj); // nạp documents realtime
       window.renderSidebar();
       window.selectProj(window.activeProj);
     } else {
