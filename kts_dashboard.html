@@ -1841,7 +1841,7 @@ function _startKtsProjectListen(uid) {
   );
   onSnapshot(q, snap => {
     if (snap.empty) {
-      console.log('[KTS] Chưa có dự án nào được giao');
+      renderMyProjects([]);
       return;
     }
     // Lấy dự án đầu tiên (mới nhất)
@@ -1935,6 +1935,7 @@ function toggleProjDetail(id) {
   const el = document.getElementById(id);
   if (el) el.classList.toggle('open');
 }
+window.toggleProjDetail = toggleProjDetail;
 
 function fmtM2(v) {
   if(v>=1e9) return (v/1e9).toFixed(1)+'T';
@@ -1945,7 +1946,7 @@ function fmtM2(v) {
 // Cập nhật _startKtsProjectListen để cũng render danh sách
 const _origStartKts = window._startKtsProjectListen || null;
 
-// Upload ảnh đại diện
+// Upload ảnh đại diện — expose ra window để onchange inline gọi được
 async function uploadProfileAvatar(input) {
   const file = input.files[0];
   if (!file) return;
@@ -1989,6 +1990,8 @@ function _getInitials() {
   return (parts.length>=2 ? parts[parts.length-2][0]+parts[parts.length-1][0] : (parts[0]||'K')[0]).toUpperCase();
 }
 
+window.uploadProfileAvatar = uploadProfileAvatar;
+
 // Lưu hồ sơ
 async function saveProfile() {
   const uid = window.__ALN_UID;
@@ -2011,6 +2014,8 @@ async function saveProfile() {
     showToast('Lỗi lưu: '+e.code,'t-red');
   }
 }
+
+window.saveProfile = saveProfile;
 
 // Điền form profile từ Firestore sau khi load
 function _fillProfileForm(profile) {
