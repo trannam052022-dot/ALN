@@ -965,47 +965,17 @@ function _renderAnnotModal(){
   const {projId, stage, paId} = _annotState;
   const pa = (REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);
   if(!pa) return;
-  const pins = pa.pins || [];
-  const openPins = pins.filter(p=>!p.resolved);
 
-  // Build pins sidebar
-  const pinsListHTML = pins.length===0
-    ? `<div style="padding:20px;text-align:center;color:var(--muted);font-size:11px">
-         <i class="ph-duotone ph-map-pin" style="font-size:20px;display:block;margin-bottom:8px;color:var(--dim)"></i>
-         Chưa có điểm đánh dấu nào.<br>Click vào bản vẽ để thêm pin.
-       </div>`
-    : pins.map((pin,i)=>`
-        <div class="pin-note ${pin.resolved?'resolved':''}" id="pnote_${pin.id}" onclick="highlightPin('${pin.id}')">
-          <div class="pn-header">
-            <span class="pn-num ${pin.resolved?'resolved':''}">${i+1}</span>
-            <span class="pn-author">${pin.author}</span>
-            <span class="pill ${pin.role==='kts'?'p-blue':'p-red'}" style="font-size:8px">${pin.role==='kts'?'KTS':'KH'}</span>
-            <span class="pn-ts">${pin.ts}</span>
-          </div>
-          <div class="pn-text">${pin.text}</div>
-          ${!pin.resolved?`<div class="pn-actions">
-            <button class="pn-act" style="background:var(--green-bg);color:var(--green);border:1px solid rgba(34,201,122,.2)"
-              onclick="event.stopPropagation();resolvePin('${projId}','${stage}','${paId}','${pin.id}')">
-              <i class="ph-duotone ph-check" style="margin-right:3px"></i>Đã xử lý
-            </button>
-            <button class="pn-act" style="background:var(--ink4);color:var(--sub);border:1px solid var(--border)"
-              onclick="event.stopPropagation();replyPin('${pin.id}')">
-              <i class="ph-duotone ph-arrow-bend-up-left" style="margin-right:3px"></i>Trả lời
-            </button>
-          </div>`:'<div style="font-size:9px;color:var(--green);margin-top:4px"><i class="ph-duotone ph-check-circle" style="margin-right:3px"></i>Đã xử lý</div>'}
-        </div>`).join('');
-
-  // Build pin dots on canvas
-  const pinDotsHTML = pins.map((pin,i)=>`
-    <div class="pin-dot ${pin.role==='kts'?'pin-kts':'pin-cn'} ${pin.resolved?'pin-resolved':''}"
-      id="pdot_${pin.id}"
-      style="left:${pin.x}%;top:${pin.y}%"
-      onclick="highlightPin('${pin.id}')"
-      title="${pin.text}">
-      ${i+1}
-    </div>`).join('');
-
-  const modeActive = _annotState.mode==='add';
+  // Ảnh phương án: có imageURL/dataUrl thật thì hiện ảnh, chưa có thì placeholder
+  const imgSrc = pa.imageURL || pa.dataUrl || '';
+  const canvasInner = imgSrc
+    ? `<img src="${imgSrc}" style="max-width:100%;max-height:100%;display:block;object-fit:contain" alt="${pa.name}">`
+    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:${pa.bg||'var(--ink)'};position:relative;min-height:400px">
+         <span style="font-size:90px;filter:drop-shadow(0 4px 20px rgba(0,0,0,.8));user-select:none">${pa.icon||'🖼️'}</span>
+         <div style="position:absolute;bottom:12px;left:12px;font-size:10px;color:rgba(255,255,255,.3);font-family:var(--mono)">
+           ${pa.folder==='mb'?'[Mặt bằng — chưa có ảnh]':'[Phối cảnh — chưa có ảnh]'}
+         </div>
+       </div>`;
 
   const modalHTML = `
   <div class="annot-modal-bg" id="annotBg" onclick="if(event.target===this)closeAnnotation()">
@@ -1016,112 +986,34 @@ function _renderAnnotModal(){
         <div style="width:8px;height:8px;border-radius:50%;background:${pa.folder==='mb'?'var(--blue)':'#a855f7'};flex-shrink:0"></div>
         <div style="flex:1;min-width:0">
           <div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pa.name}</div>
-          <div style="font-size:10px;color:var(--sub)">${pa.kts} · ${pa.version} · ${pa.date}</div>
+          <div style="font-size:10px;color:var(--sub)">${pa.kts||''} · ${pa.version||''} · ${pa.date||''}</div>
         </div>
         <span class="pill ${pa.status==='approved'?'p-green':'p-amber'}" style="flex-shrink:0;font-size:10px">
           ${pa.status==='approved'?'✅ Đã duyệt':'⏳ Chờ duyệt'}
         </span>
-        ${openPins.length>0?`<span class="pill p-red" style="flex-shrink:0;font-size:10px"><i class="ph-duotone ph-map-pin" style="font-size:8px"></i> ${openPins.length} chờ xử lý</span>`:''}
         <button onclick="closeAnnotation()" style="padding:5px 10px;background:var(--ink4);border:1px solid var(--border);color:var(--sub);border-radius:5px;cursor:pointer;font-size:12px;font-family:var(--sans);flex-shrink:0">
           <i class="ph-duotone ph-x"></i>
         </button>
       </div>
 
-      <!-- Body: canvas + sidebar -->
+      <!-- Body: chỉ còn ẢNH phương án (đã bỏ pin) -->
       <div style="display:flex;flex:1;overflow:hidden">
-
-        <!-- Canvas -->
-        <div class="annot-canvas-wrap" id="annotCanvas"
-          style="cursor:${modeActive?'crosshair':'default'}"
-          onclick="${modeActive?`addPinAt(event,'${projId}','${stage}','${paId}')`:''}" >
-          <!-- Drawing placeholder — in production replace with actual image -->
-          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:${pa.bg};position:relative;min-height:400px">
-            <span style="font-size:90px;filter:drop-shadow(0 4px 20px rgba(0,0,0,.8));user-select:none">${pa.icon}</span>
-            <div style="position:absolute;bottom:12px;left:12px;font-size:10px;color:rgba(255,255,255,.3);font-family:var(--mono)">
-              ${pa.folder==='mb'?'[Mặt bằng — demo placeholder]':'[Phối cảnh 3D — demo placeholder]'} · Click để đánh dấu
-            </div>
-            ${pinDotsHTML}
-          </div>
-        </div>
-
-        <!-- Sidebar: 2 tabs — Pins + Upload KH -->
-        <div class="annot-sidebar">
-          <div class="upload-tab-bar">
-            <button class="utab active" id="utabPins" onclick="switchAnnotTab('pins')">
-              <i class="ph-duotone ph-map-pin" style="font-size:10px;color:var(--red)"></i>
-              Pins <span style="font-family:var(--mono);font-size:9px;opacity:.7">${pins.length}</span>
-            </button>
-            <button class="utab" id="utabUpload" onclick="switchAnnotTab('upload')">
-              <i class="ph-duotone ph-cloud-arrow-up" style="font-size:10px;color:var(--accent2)"></i>
-              File KH <span style="font-family:var(--mono);font-size:9px;opacity:.7" id="uploadCountBadge">${(pa.cnUploads||[]).length}</span>
-            </button>
-          </div>
-
-          <!-- Tab: Pins -->
-          <div id="sidebarPinsTab" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
-            <div class="annot-list" id="annotPinList">${pinsListHTML}</div>
-            <!-- Pin input (shown when pendingPin) -->
-            <div id="pinInputArea" style="padding:8px;border-top:1px solid var(--border);display:none">
-              <div style="font-size:10px;color:var(--red);font-weight:700;margin-bottom:6px">
-                <i class="ph-duotone ph-map-pin" style="margin-right:4px"></i>Ghi chú cho điểm này:
-              </div>
-              <textarea id="pinNoteInput" style="width:100%;background:var(--ink);border:1px solid rgba(239,68,68,.4);color:var(--text);padding:7px 9px;border-radius:6px;font-size:11px;font-family:var(--sans);resize:none;outline:none;min-height:60px"
-                placeholder="Mô tả vấn đề hoặc yêu cầu sửa đổi..."></textarea>
-              <div style="display:flex;gap:6px;margin-top:6px">
-                <button onclick="confirmPin('${projId}','${stage}','${paId}')"
-                  style="flex:2;padding:6px;background:var(--red);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)">
-                  <i class="ph-duotone ph-map-pin" style="margin-right:3px"></i>Xác nhận Pin
-                </button>
-                <button onclick="cancelPin()"
-                  style="flex:1;padding:6px;background:var(--ink4);border:1px solid var(--border);color:var(--sub);border-radius:5px;font-size:11px;cursor:pointer;font-family:var(--sans)">
-                  Huỷ
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tab: Upload KH -->
-          <div id="sidebarUploadTab" style="display:none;flex-direction:column;flex:1;overflow:hidden">
-            <div class="upload-zone" id="annotDropZone_${paId}"
-              ondragover="event.preventDefault();this.classList.add('drag-over')"
-              ondragleave="this.classList.remove('drag-over')"
-              ondrop="handleAnnotDrop(event,'${projId}','${stage}','${paId}')">
-              <input type="file" accept="image/*,.pdf" multiple
-                onchange="handleAnnotUpload(event,'${projId}','${stage}','${paId}')">
-              <i class="ph-duotone ph-cloud-arrow-up" style="font-size:22px;color:var(--accent2);display:block;margin-bottom:6px"></i>
-              <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:3px">Kéo thả hoặc click</div>
-              <div style="font-size:10px;color:var(--muted)">Ảnh chụp bản vẽ tay, ảnh chú thích, PDF...</div>
-            </div>
-            <div class="uploaded-file-list" id="annotUploadList_${paId}">
-              ${(pa.cnUploads||[]).length===0
-                ? `<div style="text-align:center;padding:16px;color:var(--muted);font-size:11px">Chưa có file nào</div>`
-                : (pa.cnUploads||[]).map((u,i)=>`
-                  <div class="uf-item" onclick="viewUploadedFile('${u.id}','${projId}','${stage}','${paId}')">
-                    ${u.dataUrl&&u.dataUrl.startsWith('data:image')
-                      ? `<img class="uf-thumb" src="${u.dataUrl}" alt="${u.name}">`
-                      : `<div class="uf-thumb-placeholder">${u.type==='pdf'?'📄':'📎'}</div>`}
-                    <div class="uf-info">
-                      <span class="uf-name">${u.name}</span>
-                      <span style="font-size:9px;color:var(--muted);font-family:var(--mono);flex-shrink:0">${u.ts}</span>
-                      <button class="uf-del" onclick="event.stopPropagation();deleteUpload('${projId}','${stage}','${paId}','${u.id}')">✕</button>
-                    </div>
-                  </div>`).join('')}
-            </div>
-          </div>
+        <div class="annot-canvas-wrap" id="annotCanvas" style="cursor:default">
+          ${canvasInner}
         </div>
       </div>
 
-      <!-- Toolbar -->
+      <!-- Toolbar: hướng dẫn trao đổi + nút chốt -->
       <div class="annot-tools">
-        <button class="at-btn ${modeActive?'active':''}" onclick="toggleAddPinMode()" id="addPinBtn">
-          <i class="ph-duotone ph-map-pin"></i> ${modeActive?'Đang chọn vị trí...':'Thêm Pin'}
-        </button>
-        <span style="font-size:11px;color:var(--muted)">${modeActive?'👆 Click vào bản vẽ để đặt điểm':'Chọn "Thêm Pin" rồi click vào vị trí cần góp ý'}</span>
+        <span style="font-size:11px;color:var(--sub)">
+          <i class="ph-duotone ph-chats-circle" style="margin-right:4px;color:var(--accent2)"></i>
+          Trao đổi qua "Nhắn tin qua sàn ALN" hoặc gọi điện cho KTS
+        </span>
         <div style="margin-left:auto;display:flex;gap:6px">
           ${pa.status!=='approved'?`
           <button onclick="approvePA('${projId}','${stage}','${paId}');closeAnnotation()"
             style="padding:5px 14px;background:var(--green-bg);border:1px solid rgba(34,201,122,.25);color:var(--green);border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)">
-            <i class="ph-duotone ph-check-circle" style="margin-right:4px"></i>Duyệt phương án này
+            <i class="ph-duotone ph-check-circle" style="margin-right:4px"></i>Chốt / Duyệt phương án này
           </button>`:''}
         </div>
       </div>
@@ -1129,7 +1021,6 @@ function _renderAnnotModal(){
     </div>
   </div>`;
 
-  // Remove existing modal if any
   const existing = document.getElementById('annotBg');
   if(existing) existing.remove();
   document.body.insertAdjacentHTML('beforeend', modalHTML);
@@ -2014,22 +1905,18 @@ function renderMain(){
                 ${pa.isNew?'<span class="pa-badge-new">MỚI</span>':''}
                 ${isApproved?'<span style="position:absolute;bottom:8px;right:8px;background:rgba(34,201,122,.9);color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:99px">✅ ĐÃ DUYỆT</span>':''}
                 ${isRejected?'<span style="position:absolute;bottom:8px;right:8px;background:rgba(239,68,68,.8);color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:99px">❌ Không chọn</span>':''}
-                <!-- Pin count badge -->
-                ${pinCount>0?`<span style="position:absolute;top:8px;right:8px;background:${openPins>0?'var(--red)':'var(--green)'};color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:99px;display:flex;align-items:center;gap:3px">
-                  <i class="ph-duotone ph-map-pin" style="font-size:8px"></i> ${openPins>0?openPins+' chờ xử lý':pinCount+' đã xong'}
-                </span>`:''}
+                <!-- Pin badge đã bỏ -->
                 <!-- Annotation hint -->
                 <div style="position:absolute;inset:0;background:rgba(0,0,0,.0);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s"
                   class="annot-hover-hint" onmouseover="this.style.opacity=1;this.style.background='rgba(0,0,0,.45)'" onmouseout="this.style.opacity=0;this.style.background='rgba(0,0,0,.0)'">
                   <span style="color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.8)">
-                    <i class="ph-duotone ph-arrows-out" style="margin-right:5px"></i>Xem & Đánh dấu
+                    <i class="ph-duotone ph-arrows-out" style="margin-right:5px"></i>Xem phương án
                   </span>
                 </div>
               </div>
               <div class="pa-body">
                 <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">
                   ${typeLabel}
-                  ${pinCount>0?`<span style="font-size:9px;color:var(--muted);font-family:var(--mono)">${pinCount} pin</span>`:''}
                 </div>
                 <div class="pa-name">${pa.name}</div>
                 <div class="pa-meta">
@@ -2040,8 +1927,8 @@ function renderMain(){
               <div class="pa-footer">
                 <button class="pa-btn" style="background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);color:var(--accent2)"
                   onclick="openAnnotation('${p.id}','${rid}','${pa.id}')">
-                  <i class="ph-duotone ph-map-pin" style="font-size:10px"></i>
-                  Đánh dấu${pinCount>0?' ('+pinCount+')':''}
+                  <i class="ph-duotone ph-arrows-out" style="font-size:10px"></i>
+                  Xem ảnh
                 </button>
                 ${!isApproved&&!isRejected?`
                 <button class="pa-btn pa-btn-approve" onclick="approvePA('${p.id}','${rid}','${pa.id}')">
