@@ -7,7 +7,6 @@ window.activeProj = null;
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="format-detection" content="telephone=no">
 <title>LN Enterprise — Cổng Theo dõi Công trình</title>
@@ -2710,9 +2709,8 @@ try{ if(typeof renderMain==='function') renderMain(); }catch(e){}
   var u = JSON.parse(sessionStorage.getItem('aln_user') || '{}');
   var name = u.name || 'App Làm Nhà Corp.';
   var el1 = document.getElementById('dnSidebarName');
-  var el2 = document.getElementById('dnTopbarName');
   if(el1) el1.textContent = name;
-  if(el2) el2.textContent = name;
+  // Badge thương hiệu trên cùng (dnTopbarName) LUÔN giữ "App Làm Nhà Corp." như các trang khác — không ghi đè theo user
 })();
 
 

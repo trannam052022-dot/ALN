@@ -8,7 +8,6 @@ window.KTS_PROJECT_DATA = null;
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="format-detection" content="telephone=no">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>KTS Dashboard — kts.applamnha.vn</title>
@@ -1025,7 +1024,6 @@ let bonusSeconds = 7*3600 + 22*60 + 45;
 const totalSla = 48*3600;
 let slaInterval;
 let uploadedFiles = {};
-window.uploadedFiles = uploadedFiles; // expose để module Storage/Firestore truy cập
 let selectedVip = null;
 
 function fmtTime(s) {
@@ -1829,7 +1827,7 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, storage, storageRef, uploadBytes, getDownloadURL, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, storage, storageRef, uploadBytes, getDownloadURL, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "kts";
 
@@ -1843,7 +1841,7 @@ function _startKtsProjectListen(uid) {
   );
   onSnapshot(q, snap => {
     if (snap.empty) {
-      renderMyProjects([]);
+      console.log('[KTS] Chưa có dự án nào được giao');
       return;
     }
     // Lấy dự án đầu tiên (mới nhất)
@@ -1937,7 +1935,6 @@ function toggleProjDetail(id) {
   const el = document.getElementById(id);
   if (el) el.classList.toggle('open');
 }
-window.toggleProjDetail = toggleProjDetail;
 
 function fmtM2(v) {
   if(v>=1e9) return (v/1e9).toFixed(1)+'T';
@@ -1948,7 +1945,7 @@ function fmtM2(v) {
 // Cập nhật _startKtsProjectListen để cũng render danh sách
 const _origStartKts = window._startKtsProjectListen || null;
 
-// Upload ảnh đại diện — expose ra window để onchange inline gọi được
+// Upload ảnh đại diện
 async function uploadProfileAvatar(input) {
   const file = input.files[0];
   if (!file) return;
@@ -1992,8 +1989,6 @@ function _getInitials() {
   return (parts.length>=2 ? parts[parts.length-2][0]+parts[parts.length-1][0] : (parts[0]||'K')[0]).toUpperCase();
 }
 
-window.uploadProfileAvatar = uploadProfileAvatar;
-
 // Lưu hồ sơ
 async function saveProfile() {
   const uid = window.__ALN_UID;
@@ -2017,8 +2012,6 @@ async function saveProfile() {
   }
 }
 
-window.saveProfile = saveProfile;
-
 // Điền form profile từ Firestore sau khi load
 function _fillProfileForm(profile) {
   if (!profile) return;
@@ -2029,66 +2022,6 @@ function _fillProfileForm(profile) {
   set('profileLicense', profile.license);
   if (profile.avatarURL) _showAvatar(profile.avatarURL);
 }
-
-/* ══ C3 UPLOAD THẬT — FIREBASE STORAGE + FIRESTORE ══
-   Ghi đè window.submitC3_realtime được định nghĩa trong <script> thường.
-   Module chạy sau nên phiên bản này (có Storage + Firestore) sẽ được dùng.
-══════════════════════════════════════════════════════ */
-window.submitC3_realtime = async function() {
-  const projectId = window.KTS_PROJECT_ID || 'ALN-9921';
-  const ktsData   = JSON.parse(sessionStorage.getItem('aln_user') || '{}');
-  const ktsName   = ktsData.name || 'KTS';
-  const ktsUid    = window.__ALN_UID || '';
-
-  const FOLDER_MAP = { arch:'kien_truc', struct:'ket_cau', mep:'me', steel:'thep', mat:'vat_tu', budget:'du_toan' };
-  const LABEL_MAP  = { arch:'Hồ sơ Kiến trúc', struct:'Hồ sơ Kết cấu', mep:'Điện nước M&E', steel:'Thống kê Thép', mat:'Bảng Vật tư', budget:'Dự toán Chi phí' };
-
-  const btn = document.getElementById('submitC3Btn');
-  const setBtn = (txt, disabled) => { if(btn){ btn.textContent = txt; btn.disabled = disabled; } };
-
-  try {
-    const files   = window.uploadedFiles || {};
-    const entries = Object.entries(files).filter(([, f]) => f.file && !f.hasError);
-    let done = 0;
-    for (const [slotId, fileData] of entries) {
-      setBtn(`⏳ Upload ${done + 1}/${entries.length}...`, true);
-      const file = fileData.file;
-      const ext  = (file.name || '').split('.').pop().toLowerCase();
-      const path = `projects/${projectId}/c3/${slotId}/${Date.now()}_${file.name}`;
-      const ref  = storageRef(storage, path);
-      await uploadBytes(ref, file);
-      const downloadURL = await getDownloadURL(ref);
-      await addDoc(collection(db, 'projects', projectId, 'documents'), {
-        name:       LABEL_MAP[slotId] || file.name,
-        fileName:   file.name,
-        folder:     FOLDER_MAP[slotId] || 'kien_truc',
-        kts:        ktsName,
-        ktsUid,
-        date:       new Date().toISOString().slice(0, 10),
-        size:       file.size ? (file.size / 1024 / 1024).toFixed(1) + 'MB' : '—',
-        type:       ext,
-        downloadURL,
-        status:     'pending',
-        isNew:      true,
-        stage:      'C3',
-        uploadedAt: serverTimestamp(),
-      });
-      done++;
-    }
-    // Đánh dấu project đã cập nhật
-    await setDoc(doc(db, 'projects', projectId), { updatedAt: serverTimestamp() }, { merge: true });
-    // Broadcast realtime cho CN/DN
-    if (window.ALNRealtime) {
-      ALNRealtime.send({ type: 'KTS_C3_SUBMITTED', projectId, ktsName, fileCount: done });
-    }
-    setBtn('✓ Đã nộp — chờ thẩm định', true);
-    if (typeof showToast === 'function') showToast('✅ Đã nộp ' + done + ' file C3 lên Firebase!', 't-green');
-  } catch(e) {
-    console.error('[C3 Upload]', e);
-    setBtn('Nộp Hồ sơ C3', false);
-    if (typeof showToast === 'function') showToast('❌ Upload lỗi: ' + (e.code || e.message), 't-red');
-  }
-};
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
