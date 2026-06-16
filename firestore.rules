@@ -16,6 +16,18 @@ service cloud.firestore {
       allow delete: if isFounder();
     }
 
+    match /fcmTokens/{tokenId} {
+      allow read:   if isFounder() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow create, update: if isFounder() ||
+        (signedIn() && request.resource.data.uid == request.auth.uid);
+      allow delete: if isFounder() || (signedIn() && resource.data.uid == request.auth.uid);
+    }
+
+    match /settings/{docId} {
+      allow read:  if signedIn();
+      allow write: if isFounder();
+    }
+
     match /messages/{docId} {
       allow read:   if signedIn();
       allow create: if signedIn();
