@@ -953,8 +953,6 @@ function sendComment(projId, stage){
       </div>`).join('');
     thread.scrollTop = thread.scrollHeight;
   }
-  // Ghi góp ý lên Firestore (fire-and-forget) — #1a
-  try { window.alnAddCommentCN && window.alnAddCommentCN(projId, stage, text); } catch(e){}
   showToast('💬 Đã gửi góp ý đến KTS', 't-blue');
   // Broadcast
   try{ALNRealtime.send({type:'REVIEW_COMMENT',projectId:projId,stage,text})}catch(e){}
@@ -2966,22 +2964,7 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, where, orderBy, limitToLast, onSnapshot, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY, storage, storageRef, uploadBytes, getDownloadURL } from "./firebase-config.js";
-
-// ── GHI GÓP Ý LÊN FIRESTORE (nối nút gửi góp ý CN — #1a) ──
-window.alnAddCommentCN = async function(projId, stageId, text){
-  const u = auth.currentUser;
-  if(!u || !text) return;
-  try {
-    await addDoc(collection(db, 'projects', projId, 'stages', stageId, 'comments'), {
-      text: text,
-      author: { uid: u.uid, name: (window.CN_DISPLAY_NAME || 'Chủ đầu tư') },
-      role: 'cn',
-      createdAt: serverTimestamp()
-    });
-    console.log('[CN comment] đã ghi lên Firestore');
-  } catch(e){ console.error('[CN comment write]', e); }
-};
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY, storage, storageRef, uploadBytes, getDownloadURL } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "cn";
 
