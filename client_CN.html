@@ -1900,7 +1900,9 @@ function renderMain(){
             return `<div class="pa-card ${isApproved?'approved':''} ${isRejected?'rejected':''}"
               style="${isRejected?'opacity:.5;':''}">
               <div class="pa-preview" style="background:${pa.bg};cursor:pointer" onclick="openAnnotation('${p.id}','${rid}','${pa.id}')">
-                <span style="font-size:48px;filter:drop-shadow(0 2px 12px rgba(0,0,0,.7))">${pa.icon}</span>
+                ${pa.imageURL
+                  ? `<img src="${pa.imageURL}" alt="${pa.name}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`
+                  : `<span style="font-size:48px;filter:drop-shadow(0 2px 12px rgba(0,0,0,.7))">${pa.icon}</span>`}
                 <span class="pa-badge-ver">${pa.version}</span>
                 ${pa.isNew?'<span class="pa-badge-new">MỚI</span>':''}
                 ${isApproved?'<span style="position:absolute;bottom:8px;right:8px;background:rgba(34,201,122,.9);color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:99px">✅ ĐÃ DUYỆT</span>':''}
@@ -2583,6 +2585,19 @@ renderMain();
 window.renderSidebar = renderSidebar;
 window.renderMain = renderMain;
 window.selectProj = selectProj;
+
+/* ═══ Trộn phương án THẬT (Firestore) vào REVIEW_DATA rồi render lại ═══ */
+window.REVIEW_DATA = REVIEW_DATA;
+window.alnApplyRealProposals = function(pid, stage, arr){
+  if(!REVIEW_DATA[pid]) REVIEW_DATA[pid] = {};
+  if(!REVIEW_DATA[pid][stage]){
+    REVIEW_DATA[pid][stage] = { status:'pending', submittedAt:'', approvedAt:null, revisions:0, maxRevisions:3, paList:[], comments:[] };
+  }
+  const node = REVIEW_DATA[pid][stage];
+  const mock = (node.paList || []).filter(pa=>!pa._real);  // giữ nguyên dữ liệu mẫu
+  node.paList = (arr || []).concat(mock);                   // phương án thật lên đầu
+  if(window.activeProj === pid && typeof renderMain === 'function') renderMain();
+};
 </script>
 
 
@@ -3012,6 +3027,47 @@ window.alnLogout = async function(){
   try { localStorage.removeItem("aln_user"); sessionStorage.removeItem("aln_user"); } catch(e){}
   window.location.replace("login.html");
 };
+</script>
+
+<!-- ═══ ALN — ĐỌC PHƯƠNG ÁN THẬT từ Firestore (C1 + C2) ═══ -->
+<script type="module">
+import { db, collection, query, orderBy, onSnapshot } from "./firebase-config.js";
+
+const PID = 'ALN-9921';
+
+function _fmtDate(ca){
+  try{ if(ca && ca.toDate){ const x=ca.toDate();
+    return ('0'+x.getDate()).slice(-2)+'/'+('0'+(x.getMonth()+1)).slice(-2)+'/'+x.getFullYear(); } }catch(e){}
+  return '';
+}
+function _mapPA(id, d){
+  return {
+    id, _real:true,
+    name: d.name || '(không tên)',
+    folder: d.folder || 'pc_ngoai',
+    version: d.version || 'v1.0',
+    desc: d.desc || '',
+    kts: (d.createdBy && d.createdBy.name) || 'KTS',
+    date: _fmtDate(d.createdAt),
+    status: d.status || 'pending',
+    isNew: (d.status || 'pending') === 'pending',
+    imageURL: d.imageURL || '',
+    imagePath: d.imagePath || '',
+    icon: '<i class="ph-duotone ph-image"></i>',
+    bg: 'linear-gradient(135deg,#1a1a2e,#0e0e1a)',
+    pins: []
+  };
+}
+
+['C1','C2'].forEach(stage=>{
+  try{
+    const qy = query(collection(db,'projects',PID,'stages',stage,'proposals'), orderBy('order','desc'));
+    onSnapshot(qy, snap=>{
+      const arr = snap.docs.map(d=>_mapPA(d.id, d.data()));
+      if(typeof window.alnApplyRealProposals === 'function') window.alnApplyRealProposals(PID, stage, arr);
+    }, err=>console.error('[ALN CN proposals]', stage, err));
+  }catch(e){ console.error('[ALN CN proposals init]', stage, e); }
+});
 </script>
 </body>
 </html>
