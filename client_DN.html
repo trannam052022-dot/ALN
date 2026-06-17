@@ -1917,7 +1917,7 @@ function renderMain(){
         </div>
       </div>
 
-      <!-- REVIEW PANEL C1/C2 -->
+      <!-- REVIEW PANEL C1/C2 — phần phương án bị ẩn ở DN do đã bỏ tab 'pa' (KTS↔Chủ nhà). Giữ khối để 'Gửi tài liệu' + 'Kho' vẫn render. -->
       ${(()=>{
         const rv = REVIEW_DATA[p.id];
         if(!rv) return '';
@@ -2721,19 +2721,6 @@ try{ if(typeof renderMain==='function') renderMain(); }catch(e){}
 window.renderSidebar = renderSidebar;
 window.renderMain = renderMain;
 window.selectProj = selectProj;
-
-/* ═══ Trộn phương án THẬT (Firestore) vào REVIEW_DATA rồi render lại ═══ */
-window.REVIEW_DATA = REVIEW_DATA;
-window.alnApplyRealProposals = function(pid, stage, arr){
-  if(!REVIEW_DATA[pid]) REVIEW_DATA[pid] = {};
-  if(!REVIEW_DATA[pid][stage]){
-    REVIEW_DATA[pid][stage] = { status:'pending', submittedAt:'', approvedAt:null, revisions:0, maxRevisions:3, paList:[], comments:[] };
-  }
-  const node = REVIEW_DATA[pid][stage];
-  const mock = (node.paList || []).filter(pa=>!pa._real);
-  node.paList = (arr || []).concat(mock);
-  if(window.activeProj === pid && typeof renderMain === 'function') renderMain();
-};
 </script>
 
 
@@ -2929,7 +2916,6 @@ function alnNotify(title, body){
 (function(){
   var TABS = [
     { id: 'tq', label: '📊 Tổng quan' },
-    { id: 'pa', label: '📐 Phương án & Review' },
     { id: 'up', label: '📤 Gửi tài liệu' },
     { id: 'c4', label: '📦 Bàn giao & Kho' }
   ];
@@ -3160,45 +3146,11 @@ window.alnLogout = async function(){
 };
 </script>
 
-<!-- ═══ ALN — ĐỌC PHƯƠNG ÁN THẬT từ Firestore (C1 + C2) ═══ -->
-<script type="module">
-import { db, collection, query, orderBy, onSnapshot } from "./firebase-config.js";
-
-const PID = 'ALN-9921';
-
-function _fmtDate(ca){
-  try{ if(ca && ca.toDate){ const x=ca.toDate();
-    return ('0'+x.getDate()).slice(-2)+'/'+('0'+(x.getMonth()+1)).slice(-2)+'/'+x.getFullYear(); } }catch(e){}
-  return '';
-}
-function _mapPA(id, d){
-  return {
-    id, _real:true,
-    name: d.name || '(không tên)',
-    folder: d.folder || 'pc_ngoai',
-    version: d.version || 'v1.0',
-    desc: d.desc || '',
-    kts: (d.createdBy && d.createdBy.name) || 'KTS',
-    date: _fmtDate(d.createdAt),
-    status: d.status || 'pending',
-    isNew: (d.status || 'pending') === 'pending',
-    imageURL: d.imageURL || '',
-    imagePath: d.imagePath || '',
-    icon: '<i class="ph-duotone ph-image"></i>',
-    bg: 'linear-gradient(135deg,#1a1a2e,#0e0e1a)',
-    pins: []
-  };
-}
-
-['C1','C2'].forEach(stage=>{
-  try{
-    const qy = query(collection(db,'projects',PID,'stages',stage,'proposals'), orderBy('order','desc'));
-    onSnapshot(qy, snap=>{
-      const arr = snap.docs.map(d=>_mapPA(d.id, d.data()));
-      if(typeof window.alnApplyRealProposals === 'function') window.alnApplyRealProposals(PID, stage, arr);
-    }, err=>console.error('[ALN DN proposals]', stage, err));
-  }catch(e){ console.error('[ALN DN proposals init]', stage, e); }
-});
+<!-- ═══ ALN — (ĐÃ TẮT) DN không đọc phương án thiết kế: việc này là KTS ↔ Chủ nhà ═══ -->
+<script>
+/* Listener phương án đã được gỡ khỏi DN.
+   Phương án/phối cảnh thiết kế chỉ Chủ nhà xem & duyệt.
+   DN tập trung vào hồ sơ thi công (C3) và bàn giao/kho (C4). */
 </script>
 </body>
 </html>
