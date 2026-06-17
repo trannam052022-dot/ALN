@@ -462,6 +462,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   <a class="nav-item" onclick="showToast('Lịch sử giao dịch','t-blue')"><span class="icon"><i class="ph-duotone ph-clock-counter-clockwise"></i></span> Lịch sử GD</a>
 
   <div class="nav-section">Công việc</div>
+  <a class="nav-item" onclick="scrollTo('.proposal-section')"><span class="icon"><i class="ph-duotone ph-image-square"></i></span> Gửi phương án</a>
   <a class="nav-item" onclick="scrollTo('.c3-section')"><span class="icon"><i class="ph-duotone ph-upload-simple"></i></span> Nộp Hồ sơ C3</a>
   <a class="nav-item" onclick="scrollTo('.asset-section')"><span class="icon"><i class="ph-duotone ph-storefront"></i></span> Kho tài sản</a>
   <a class="nav-item" onclick="scrollTo('.vip-section')"><span class="icon"><i class="ph-duotone ph-crown"></i></span> Gói VIP</a>
@@ -663,6 +664,78 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           </div>
         </div>
         <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:8px" onclick="showToast('Xem toàn bộ lịch sử GD','t-blue')">Xem thêm <i class="ph-duotone ph-caret-down"></i></button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         MODULE 2b — GỬI PHƯƠNG ÁN (ảnh) → Storage + Firestore
+    ══════════════════════════════════ -->
+    <style>
+      .pa-lbl{display:block;font-size:10px;font-weight:700;color:var(--muted);margin-bottom:4px;letter-spacing:.04em;text-transform:uppercase}
+      .pa-inp{width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:var(--sans);font-size:13px;box-sizing:border-box}
+      .pa-inp:focus{outline:none;border-color:var(--gold)}
+      .pa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px}
+      .pa-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:1.5px dashed rgba(201,168,76,.35);border-radius:10px;padding:18px;cursor:pointer;transition:all .15s;min-height:90px}
+      .pa-drop:hover{border-color:var(--gold);background:rgba(201,168,76,.05)}
+    </style>
+    <div class="sec-label proposal-section">📐 Gửi phương án thiết kế (ảnh) cho Chủ nhà</div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+        <div>
+          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-image-square"></i></div>Gửi phương án — #ALN-9921</div>
+          <div style="font-size:11px;color:var(--muted)">Chọn chặng · chọn ảnh JPG/PNG · điền tên &amp; mô tả → Chủ nhà xem ảnh rồi chốt qua chat ALN</div>
+        </div>
+      </div>
+
+      <div class="pa-grid">
+        <div>
+          <label class="pa-lbl">Chặng</label>
+          <select id="paStage" class="pa-inp">
+            <option value="C1">C1 — Ý tưởng 2D</option>
+            <option value="C2" selected>C2 — Phối cảnh 3D</option>
+            <option value="C3">C3 — Hồ sơ KT</option>
+            <option value="C4">C4 — Dự toán &amp; BH</option>
+          </select>
+        </div>
+        <div>
+          <label class="pa-lbl">Loại phương án</label>
+          <select id="paFolder" class="pa-inp">
+            <option value="mb">Mặt bằng</option>
+            <option value="pc_ngoai" selected>Phối cảnh ngoại thất</option>
+            <option value="pc_noi">Phối cảnh nội thất</option>
+          </select>
+        </div>
+        <div>
+          <label class="pa-lbl">Tên phương án</label>
+          <input id="paName" class="pa-inp" placeholder="VD: 3D Phối cảnh ngoại thất — Góc chính">
+        </div>
+        <div>
+          <label class="pa-lbl">Phiên bản</label>
+          <input id="paVersion" class="pa-inp" value="v1.0" placeholder="v1.0">
+        </div>
+      </div>
+
+      <div style="margin-bottom:10px">
+        <label class="pa-lbl">Mô tả ngắn</label>
+        <textarea id="paDesc" class="pa-inp" rows="2" placeholder="VD: View từ cổng chính. Phong cách tân cổ điển, cột đá tự nhiên..."></textarea>
+      </div>
+
+      <label class="pa-drop" id="paDrop" for="paFile">
+        <input type="file" id="paFile" accept="image/jpeg,image/png" style="display:none">
+        <div id="paDropHint"><i class="ph-duotone ph-upload-simple" style="font-size:22px;color:var(--gold)"></i><div style="margin-top:6px;font-size:12px;color:var(--muted)">Bấm để chọn ảnh JPG/PNG (tối đa 5MB)</div></div>
+        <img id="paPreview" alt="Xem trước" style="display:none;max-width:100%;max-height:220px;border-radius:8px;object-fit:contain">
+      </label>
+
+      <div id="paStatus" style="font-size:12px;margin:10px 0;min-height:16px;color:var(--muted)"></div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="paSubmitBtn" onclick="alnSubmitProposal()"><i class="ph-duotone ph-paper-plane-tilt"></i> Gửi phương án</button>
+        <button class="btn btn-ghost btn-sm" onclick="alnResetProposalForm()"><i class="ph-duotone ph-arrow-counter-clockwise"></i> Xóa form</button>
+      </div>
+
+      <div style="margin-top:16px">
+        <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Phương án đã gửi (chặng <span id="paListStageLbl">C2</span>)</div>
+        <div id="paSentList" style="display:flex;flex-direction:column;gap:6px"><div style="color:var(--muted);font-size:12px">Đang tải...</div></div>
       </div>
     </div>
 
@@ -1781,7 +1854,7 @@ function alnNotify(title, body){
     if(!first) return;
     var cont = first.parentElement;
     var SKIP = /modal|toast|popup|fab|veil|overlay|aln|chat/i;
-    var MARK = [['wallet-section','wallet'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip'],['myproj-section','myproj'],['myprofile-section','myprofile']];
+    var MARK = [['wallet-section','wallet'],['proposal-section','proposal'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip'],['myproj-section','myproj'],['myprofile-section','myprofile']];
     var groups = { dashboard: [] };
     var cur = 'dashboard';
     Array.prototype.forEach.call(cont.children, function(k){
@@ -1805,7 +1878,7 @@ function alnNotify(title, body){
     };
 
     // Nối menu trái -> tab (ghi đè scrollTo cũ)
-    var MAPNAV = [['Dashboard','dashboard'],['Ví thu nhập','wallet'],['Hồ sơ C3','c3'],['Kho tài sản','asset'],['Gói VIP','vip'],['Dự án của tôi','myproj'],['Hồ sơ của tôi','myprofile']];
+    var MAPNAV = [['Dashboard','dashboard'],['Ví thu nhập','wallet'],['Gửi phương án','proposal'],['Hồ sơ C3','c3'],['Kho tài sản','asset'],['Gói VIP','vip'],['Dự án của tôi','myproj'],['Hồ sơ của tôi','myprofile']];
     var navDefault = null;
     document.querySelectorAll('.sidebar .nav-item').forEach(function(a){
       var t = a.textContent || '';
@@ -2147,6 +2220,124 @@ window.alnLogout = async function(){
   try { localStorage.removeItem("aln_user"); sessionStorage.removeItem("aln_user"); } catch(e){}
   window.location.replace("login.html");
 };
+</script>
+
+<!-- ═══ ALN — GỬI PHƯƠNG ÁN (ảnh) → Storage + Firestore ═══ -->
+<script type="module">
+import { auth, db, storage, storageRef, uploadBytes, getDownloadURL, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "./firebase-config.js";
+
+const PID = 'ALN-9921';
+let _paFile = null;
+let _paUnsub = null;
+
+function ktsUser(){ try{ return JSON.parse(sessionStorage.getItem('aln_user')||'{}'); }catch(e){ return {}; } }
+function paStatus(msg, color){ const el=document.getElementById('paStatus'); if(el){ el.textContent=msg; el.style.color=color||'var(--muted)'; } }
+
+/* Xem trước ảnh khi chọn */
+const _paFileInput = document.getElementById('paFile');
+if(_paFileInput){
+  _paFileInput.addEventListener('change', e=>{
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    if(!/^image\/(jpeg|png)$/.test(f.type)){ paStatus('Chỉ nhận ảnh JPG hoặc PNG.', 'var(--red)'); _paFileInput.value=''; return; }
+    if(f.size > 5*1024*1024){ paStatus('Ảnh quá 5MB — vui lòng chọn ảnh nhỏ hơn.', 'var(--red)'); _paFileInput.value=''; return; }
+    _paFile = f;
+    const prev=document.getElementById('paPreview'), hint=document.getElementById('paDropHint');
+    if(prev){ prev.src=URL.createObjectURL(f); prev.style.display='block'; }
+    if(hint) hint.style.display='none';
+    paStatus('Đã chọn ảnh: '+f.name, 'var(--green)');
+  });
+}
+
+window.alnResetProposalForm = function(){
+  _paFile=null;
+  ['paName','paDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const v=document.getElementById('paVersion'); if(v) v.value='v1.0';
+  const fi=document.getElementById('paFile'); if(fi) fi.value='';
+  const prev=document.getElementById('paPreview'), hint=document.getElementById('paDropHint');
+  if(prev){ prev.style.display='none'; prev.removeAttribute('src'); }
+  if(hint) hint.style.display='';
+  paStatus('', 'var(--muted)');
+};
+
+window.alnSubmitProposal = async function(){
+  const stage =(document.getElementById('paStage') ||{}).value || 'C2';
+  const folder=(document.getElementById('paFolder')||{}).value || 'pc_ngoai';
+  const name  =((document.getElementById('paName')   ||{}).value||'').trim();
+  const version=((document.getElementById('paVersion')||{}).value||'v1.0').trim();
+  const desc  =((document.getElementById('paDesc')   ||{}).value||'').trim();
+  const btn = document.getElementById('paSubmitBtn');
+
+  if(!name){ paStatus('Vui lòng nhập tên phương án.', 'var(--red)'); return; }
+  if(!_paFile){ paStatus('Vui lòng chọn ảnh JPG/PNG.', 'var(--red)'); return; }
+  if(!auth.currentUser){ paStatus('Chưa đăng nhập — tải lại trang rồi thử lại.', 'var(--red)'); return; }
+
+  if(btn) btn.disabled=true;
+  try{
+    paStatus('Đang tải ảnh lên kho ALN...', 'var(--gold)');
+    const ext  = _paFile.type==='image/png' ? 'png' : 'jpg';
+    const safe = name.replace(/[^a-zA-Z0-9]+/g,'_').slice(0,40) || 'pa';
+    const path = `proposals/${PID}/${stage}/${Date.now()}_${safe}.${ext}`;
+    const sref = storageRef(storage, path);
+    await uploadBytes(sref, _paFile);
+    const imageURL = await getDownloadURL(sref);
+
+    paStatus('Đang ghi phương án vào hệ thống...', 'var(--gold)');
+    const u = ktsUser();
+    await addDoc(collection(db,'projects',PID,'stages',stage,'proposals'), {
+      name, desc, version, folder,
+      status: 'pending',
+      imagePath: path,
+      imageURL,
+      order: Date.now(),
+      createdBy: { uid: auth.currentUser.uid, name: u.name || 'KTS' },
+      createdAt: serverTimestamp()
+    });
+
+    paStatus('✅ Đã gửi phương án "'+name+'" tới Chủ nhà.', 'var(--green)');
+    if(typeof showToast==='function') showToast('✅ Đã gửi phương án cho Chủ nhà','t-green');
+    window.alnResetProposalForm();
+  }catch(err){
+    console.error('[ALN proposal]', err);
+    paStatus('❌ Lỗi gửi: '+((err&&err.message)||err)+'. Kiểm tra mạng & Storage rules.', 'var(--red)');
+    if(typeof showToast==='function') showToast('Lỗi gửi phương án — xem mục trạng thái','t-red');
+  }finally{
+    if(btn) btn.disabled=false;
+  }
+};
+
+/* Danh sách phương án đã gửi (theo chặng đang chọn) — cập nhật trực tiếp */
+function paWatch(stage){
+  const box=document.getElementById('paSentList');
+  const lbl=document.getElementById('paListStageLbl'); if(lbl) lbl.textContent=stage;
+  if(!box) return;
+  if(_paUnsub){ try{_paUnsub();}catch(e){} _paUnsub=null; }
+  box.innerHTML='<div style="color:var(--muted);font-size:12px">Đang tải...</div>';
+  try{
+    const qy=query(collection(db,'projects',PID,'stages',stage,'proposals'), orderBy('order','desc'));
+    _paUnsub=onSnapshot(qy, snap=>{
+      if(snap.empty){ box.innerHTML='<div style="color:var(--muted);font-size:12px">Chưa có phương án nào ở chặng này.</div>'; return; }
+      box.innerHTML=snap.docs.map(d=>{
+        const p=d.data();
+        const st = p.status==='approved' ? '<span style="color:var(--green)">● Đã duyệt</span>'
+                 : p.status==='rejected' ? '<span style="color:var(--red)">● Từ chối</span>'
+                 : '<span style="color:var(--amber)">● Chờ duyệt</span>';
+        const thumb = p.imageURL
+          ? '<img src="'+p.imageURL+'" style="width:42px;height:42px;border-radius:6px;object-fit:cover;flex-shrink:0">'
+          : '<div style="width:42px;height:42px;border-radius:6px;background:var(--ink3);display:flex;align-items:center;justify-content:center;flex-shrink:0">🖼</div>';
+        return '<div style="display:flex;align-items:center;gap:8px;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:7px 9px">'
+          + thumb
+          + '<div style="flex:1;min-width:0">'
+          +   '<div style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(p.name||'(không tên)')+'</div>'
+          +   '<div style="font-size:10px;color:var(--muted)">'+(p.version||'')+' · '+st+'</div>'
+          + '</div></div>';
+      }).join('');
+    }, err=>{ console.error('[ALN proposal list]', err); box.innerHTML='<div style="color:var(--red);font-size:12px">Không tải được danh sách (kiểm tra rules/mạng).</div>'; });
+  }catch(e){ console.error(e); }
+}
+
+const _paStageSel=document.getElementById('paStage');
+if(_paStageSel){ _paStageSel.addEventListener('change', ()=>paWatch(_paStageSel.value)); paWatch(_paStageSel.value); }
 </script>
 </body>
 </html>
