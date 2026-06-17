@@ -649,7 +649,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   <div class="zp-head">
     <div class="zp-head-av" id="zpAvatar">👷</div>
     <div class="zp-head-info">
-      <div class="zp-name" id="zpKtsName">KTS. Trần Lê Minh</div>
+      <div class="zp-name" id="zpKtsName">KTS. Trần Đại Long</div>
       <div class="zp-status"><span class="zp-online-dot"></span> Đang hoạt động</div>
     </div>
     <!-- Call actions in header -->
@@ -699,7 +699,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     var params = new URLSearchParams(window.location.search);
     var u = params.get("u"), r = params.get("r");
     if(u && r) {
-      var names = {"kts.minhtran":"KTS. Trần Lê Minh","kts.lanthi":"KTS. Nguyễn Thị Lan","kts.khoavu":"KTS. Vũ Minh Khoa","dn.applamnha":"App Làm Nhà Corp.","dn.alnconstruct":"ALN Construct","cn.thuannv":"Nguyễn Văn Thuận","cn.binhtt":"Trần Thị Bình","cn.cuonglq":"Lê Quang Cường"};
+      var names = {"kts.minhtran":"KTS. Trần Đại Long","kts.lanthi":"KTS. Nguyễn Thị Lan","kts.khoavu":"KTS. Vũ Minh Khoa","dn.applamnha":"App Làm Nhà Corp.","dn.alnconstruct":"ALN Construct","cn.thuannv":"Nguyễn Văn Thuận","cn.binhtt":"Trần Thị Bình","cn.cuonglq":"Lê Quang Cường"};
       var ud = JSON.stringify({name:names[u]||u, userId:u, role:r});
       try{localStorage.setItem("aln_user",ud);}catch(e){}
       try{sessionStorage.setItem("aln_user",ud);}catch(e){}
@@ -846,9 +846,9 @@ const FOLDERS = [
 
 const DOCS = {
   'ALN-9921': [
-    {id:'D001',name:'Mặt bằng phương án C1',         folder:'kien_truc',kts:'KTS. Trần Lê Minh',  date:'2026-05-10',size:'2.4MB',type:'pdf', status:'approved',isNew:false},
-    {id:'D002',name:'Phối cảnh 3D ngoại thất',       folder:'kien_truc',kts:'KTS. Trần Lê Minh',  date:'2026-05-28',size:'8.1MB',type:'img', status:'pending', isNew:true},
-    {id:'D003',name:'Phối cảnh 3D nội thất',         folder:'kien_truc',kts:'KTS. Trần Lê Minh',  date:'2026-05-29',size:'6.3MB',type:'img', status:'pending', isNew:true},
+    {id:'D001',name:'Mặt bằng phương án C1',         folder:'kien_truc',kts:'KTS. Trần Đại Long',  date:'2026-05-10',size:'2.4MB',type:'pdf', status:'approved',isNew:false},
+    {id:'D002',name:'Phối cảnh 3D ngoại thất',       folder:'kien_truc',kts:'KTS. Trần Đại Long',  date:'2026-05-28',size:'8.1MB',type:'img', status:'pending', isNew:true},
+    {id:'D003',name:'Phối cảnh 3D nội thất',         folder:'kien_truc',kts:'KTS. Trần Đại Long',  date:'2026-05-29',size:'6.3MB',type:'img', status:'pending', isNew:true},
   ],
   'ALN-9834': [
     {id:'D004',name:'Mặt bằng phương án C1',         folder:'kien_truc',kts:'KTS. Nguyễn Thị Lan',date:'2026-04-15',size:'1.2MB',type:'pdf', status:'approved',isNew:false},
@@ -899,7 +899,7 @@ function setReviewStage(projId, stage){
   if(!_reviewState[projId]) _reviewState[projId] = {stage, subTab:'all'};
   else _reviewState[projId].stage = stage;
   renderMain();
-  setTimeout(()=>{const c=document.getElementById('ktsHeroAv');const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(c&&p2)drawPortrait(c,KP[p2.kts]||{});},30);
+  setTimeout(()=>{const c=document.getElementById('ktsHeroAv');const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Đại Long':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(c&&p2)drawPortrait(c,KP[p2.kts]||{});},30);
 }
 
 function selectPA(projId, stage, paId){
@@ -923,7 +923,7 @@ function approvePA(projId, stage, paId){
     ts: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), mine:true
   });
   renderMain();
-  setTimeout(()=>{const c=document.getElementById('ktsHeroAv');const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(c&&p2)drawPortrait(c,KP[p2.kts]||{});},30);
+  setTimeout(()=>{const c=document.getElementById('ktsHeroAv');const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Đại Long':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(c&&p2)drawPortrait(c,KP[p2.kts]||{});},30);
   showToast(`✅ Đã phê duyệt phương án "${pa.name}"`, 't-green');
   // Broadcast to kts_dashboard
   try{ALNRealtime.send({type:'STAGE_APPROVED',projectId:projId,stage,paName:pa.name})}catch(e){}
@@ -1230,7 +1230,7 @@ function resolvePin(projId, stage, paId, pinId){
   _renderAnnotModal();
   // Also re-render main to update pin counts on cards
   renderMain();
-  setTimeout(()=>{const cv=document.getElementById('ktsHeroAv');if(cv){const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(p2)drawPortrait(cv,KP[p2.kts]||{});}},30);
+  setTimeout(()=>{const cv=document.getElementById('ktsHeroAv');if(cv){const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Đại Long':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(p2)drawPortrait(cv,KP[p2.kts]||{});}},30);
 }
 
 function highlightPin(pinId){
@@ -1256,7 +1256,7 @@ function setReviewSubTab(projId, subTab){
   if(!_reviewState[projId]) _reviewState[projId]={stage:'C1',subTab};
   _reviewState[projId].subTab = subTab;
   renderMain();
-  setTimeout(()=>{const cv=document.getElementById('ktsHeroAv');if(cv){const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(p2)drawPortrait(cv,KP[p2.kts]||{});}},30);
+  setTimeout(()=>{const cv=document.getElementById('ktsHeroAv');if(cv){const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Đại Long':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(p2)drawPortrait(cv,KP[p2.kts]||{});}},30);
 }
 
 // ESC to close annotation
@@ -1322,7 +1322,7 @@ function _processFiles(files,projId,stage,paId,source){
 }
 function _redrawHero(projId){
   const cv=document.getElementById('ktsHeroAv');const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);
-  const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};
+  const KP={'KTS. Trần Đại Long':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};
   if(cv&&p2)drawPortrait(cv,KP[p2.kts]||{});
 }
 function viewUploadedFile(uploadId,projId,stage,paId){
@@ -1358,14 +1358,14 @@ function deleteCNUpload(projId,stage,paId,uploadId){
    CALL MODAL — Gọi điện / Video / Zalo
 ════════════════════════════════════════ */
 const KTS_CONTACTS = {
-  'KTS. Trần Lê Minh':   {phone:'0901-234-567', virtualNum:'028-7300-0101', zalo:'0901234567', email:'minhtran@kts.vn'},
+  'KTS. Trần Đại Long':   {phone:'0901-234-567', virtualNum:'028-7300-0101', zalo:'0901234567', email:'minhtran@kts.vn'},
   'KTS. Nguyễn Thị Lan': {phone:'0912-345-678', virtualNum:'028-7300-0102', zalo:'0912345678', email:'lannguyen@kts.vn'},
   'KTS. Phạm Hoài Nam':  {phone:'0923-456-789', virtualNum:'028-7300-0103', zalo:'0923456789', email:'nampham@kts.vn'},
   'KTS. Lê Hoàng Nam':   {phone:'0934-567-890', virtualNum:'028-7300-0104', zalo:'0934567890', email:'namle@kts.vn'},
   'KTS. Vũ Minh Khoa':   {phone:'0945-678-901', virtualNum:'028-7300-0105', zalo:'0945678901', email:'khoavu@kts.vn'},
 };
 const KTS_PORTRAITS_CALL = {
-  'KTS. Trần Lê Minh':   {skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},
+  'KTS. Trần Đại Long':   {skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},
   'KTS. Nguyễn Thị Lan': {skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},
   'KTS. Phạm Hoài Nam':  {skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},
   'KTS. Lê Hoàng Nam':   {skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},
@@ -1376,7 +1376,7 @@ function openCallModal(type, projId, ktsName){
   // If called from topbar without context, get from active project
   if(!ktsName){
     const p = window.PROJECTS_CLIENT.find(x=>x.id===window.activeProj);
-    ktsName = (p ? p.kts : null) || 'KTS. Trần Lê Minh';
+    ktsName = (p ? p.kts : null) || 'KTS. Trần Đại Long';
     projId  = (p ? p.id : null);
   }
   const contact = KTS_CONTACTS[ktsName] || {phone:'—', zalo:'—', email:'—'};
@@ -1495,19 +1495,19 @@ const REVIEW_DATA = {
         { id:'PA_C1_1', name:'MB Phương án A — Hướng Đông', folder:'mb', version:'v1.0',
           icon:'<i class="ph-duotone ph-compass-tool"></i>', bg:'linear-gradient(135deg,#0e1418,#0a1020)',
           desc:'Mặt bằng tổng thể hướng Đông-Nam. Tối ưu ánh sáng tự nhiên.',
-          kts:'KTS. Trần Lê Minh', date:'2026-05-10', status:'approved', pins:[
+          kts:'KTS. Trần Đại Long', date:'2026-05-10', status:'approved', pins:[
             {id:'pin1',x:62,y:38,text:'Cổng vào chính — đề xuất dịch sang trái 1.2m cho xe ra vào dễ hơn',author:'Nguyễn Văn Thuận',role:'cn',ts:'11/05 14:32',resolved:true},
             {id:'pin2',x:35,y:55,text:'Phòng khách quá hẹp, cần mở rộng thêm ~2m²',author:'Nguyễn Văn Thuận',role:'cn',ts:'11/05 15:00',resolved:true},
           ] },
         { id:'PA_C1_2', name:'MB Phương án B — Hướng Tây', folder:'mb', version:'v1.0',
           icon:'<i class="ph-duotone ph-ruler"></i>', bg:'linear-gradient(135deg,#181418,#100e14)',
           desc:'Phương án thay thế — hướng Tây, phù hợp với địa hình lô góc.',
-          kts:'KTS. Trần Lê Minh', date:'2026-05-10', status:'rejected', pins:[] },
+          kts:'KTS. Trần Đại Long', date:'2026-05-10', status:'rejected', pins:[] },
       ],
       comments: [
-        { id:'c1', author:'KTS. Trần Lê Minh', role:'kts', text:'Đã hoàn thiện phương án mặt bằng tổng thể theo yêu cầu. Hướng nhà chính Đông-Nam, tối ưu ánh sáng tự nhiên.', ts:'10/05 09:15', mine:false },
+        { id:'c1', author:'KTS. Trần Đại Long', role:'kts', text:'Đã hoàn thiện phương án mặt bằng tổng thể theo yêu cầu. Hướng nhà chính Đông-Nam, tối ưu ánh sáng tự nhiên.', ts:'10/05 09:15', mine:false },
         { id:'c2', author:'Nguyễn Văn Thuận',   role:'cn',  text:'Đồng ý phương án A. Tuy nhiên cần điều chỉnh vị trí cổng vào cho phù hợp với mặt đường.', ts:'11/05 14:32', mine:true },
-        { id:'c3', author:'KTS. Trần Lê Minh', role:'kts', text:'Đã cập nhật vị trí cổng vào. Xin phê duyệt để tiến hành Chặng 2.', ts:'12/05 08:20', mine:false },
+        { id:'c3', author:'KTS. Trần Đại Long', role:'kts', text:'Đã cập nhật vị trí cổng vào. Xin phê duyệt để tiến hành Chặng 2.', ts:'12/05 08:20', mine:false },
         { id:'c4', author:'Nguyễn Văn Thuận',   role:'cn',  text:'✅ Đã phê duyệt. Tiến hành Chặng 2!', ts:'12/05 10:05', mine:true },
       ]
     },
@@ -1521,20 +1521,20 @@ const REVIEW_DATA = {
         { id:'PA_C2_1', name:'3D Phối cảnh ngoại thất — Góc chính', folder:'pc_ngoai', version:'v1.0',
           icon:'<i class="ph-duotone ph-bank"></i>', bg:'linear-gradient(135deg,#1a1a2e,#0e0e1a)',
           desc:'View từ cổng chính. Phong cách tân cổ điển với cột đá tự nhiên.',
-          kts:'KTS. Trần Lê Minh', date:'2026-05-28', status:'pending', isNew:true, pins:[
+          kts:'KTS. Trần Đại Long', date:'2026-05-28', status:'pending', isNew:true, pins:[
             {id:'pin5',x:48,y:42,text:'Màu sắc cột đá quá sáng, cần tone trầm hơn theo mẫu đã thống nhất',author:'Nguyễn Văn Thuận',role:'cn',ts:'29/05 10:00',resolved:false},
           ] },
         { id:'PA_C2_2', name:'3D Phối cảnh ngoại thất — Góc vườn', folder:'pc_ngoai', version:'v1.0',
           icon:'<i class="ph-duotone ph-leaf"></i>', bg:'linear-gradient(135deg,#0e1a14,#0a120e)',
           desc:'View từ khu vườn phía sau. Bể bơi và sân vườn kết hợp.',
-          kts:'KTS. Trần Lê Minh', date:'2026-05-28', status:'pending', isNew:true, pins:[] },
+          kts:'KTS. Trần Đại Long', date:'2026-05-28', status:'pending', isNew:true, pins:[] },
         { id:'PA_C2_3', name:'3D Phối cảnh nội thất — Phòng khách', folder:'pc_noi', version:'v1.0',
           icon:'<i class="ph-duotone ph-couch"></i>', bg:'linear-gradient(135deg,#1a1410,#120e08)',
           desc:"Bird's eye view phòng khách + dining. Vật liệu đá marble và gỗ óc chó.",
-          kts:'KTS. Trần Lê Minh', date:'2026-05-29', status:'pending', isNew:true, pins:[] },
+          kts:'KTS. Trần Đại Long', date:'2026-05-29', status:'pending', isNew:true, pins:[] },
       ],
       comments: [
-        { id:'c5', author:'KTS. Trần Lê Minh', role:'kts', text:'Đã hoàn thiện 3 góc phối cảnh theo yêu cầu. Chất liệu đá marble nhập khẩu Italy, gỗ óc chó tự nhiên.', ts:'28/05 16:00', mine:false },
+        { id:'c5', author:'KTS. Trần Đại Long', role:'kts', text:'Đã hoàn thiện 3 góc phối cảnh theo yêu cầu. Chất liệu đá marble nhập khẩu Italy, gỗ óc chó tự nhiên.', ts:'28/05 16:00', mine:false },
       ]
     }
   },
@@ -1678,14 +1678,14 @@ const REVIEW_DATA = {
         { id:'PA_9480_C1_1', name:'MB Biệt thự nghỉ dưỡng — Phương án A', folder:'mb', version:'v1.0',
           icon:'<i class="ph-duotone ph-mountains"></i>', bg:'linear-gradient(135deg,#0e1820,#061018)',
           desc:'MB biệt thự 500m² trên đồi. Tầm nhìn thung lũng.',
-          kts:'KTS. Trần Lê Minh', date:'2026-05-25', status:'pending', isNew:true, pins:[], cnUploads:[] },
+          kts:'KTS. Trần Đại Long', date:'2026-05-25', status:'pending', isNew:true, pins:[], cnUploads:[] },
         { id:'PA_9480_C1_2', name:'MB Biệt thự nghỉ dưỡng — Phương án B', folder:'mb', version:'v1.0',
           icon:'<i class="ph-duotone ph-compass-tool"></i>', bg:'linear-gradient(135deg,#141e0e,#0c1408)',
           desc:'Bố cục dọc, hồ bơi vô cực hướng thung lũng.',
-          kts:'KTS. Trần Lê Minh', date:'2026-05-25', status:'pending', isNew:true, pins:[], cnUploads:[] },
+          kts:'KTS. Trần Đại Long', date:'2026-05-25', status:'pending', isNew:true, pins:[], cnUploads:[] },
       ],
       comments:[
-        {id:'c_9480_1',author:'KTS. Trần Lê Minh',role:'kts',text:'Đề xuất 2 phương án MB. PA B có hồ bơi vô cực phù hợp nghỉ dưỡng hơn.',ts:'25/05 11:00',mine:false},
+        {id:'c_9480_1',author:'KTS. Trần Đại Long',role:'kts',text:'Đề xuất 2 phương án MB. PA B có hồ bơi vô cực phù hợp nghỉ dưỡng hơn.',ts:'25/05 11:00',mine:false},
       ]}
   },
   'ALN-9412': {
@@ -1744,7 +1744,7 @@ function renderMain(){
 
   /* KTS portraits map */
   const KTS_PORTRAITS = {
-    'KTS. Trần Lê Minh':   {skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e',cchn:'KTS-2021-04821',tier:'VIP Vàng', rating:'4.8',projects:23},
+    'KTS. Trần Đại Long':   {skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e',cchn:'KTS-2021-04821',tier:'VIP Vàng', rating:'4.8',projects:23},
     'KTS. Nguyễn Thị Lan': {skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e',cchn:'KTS-2022-07663',tier:'VIP Bạc',  rating:'4.9',projects:14},
     'KTS. Phạm Hoài Nam':  {skin:'#d4a880',shirt:'#5a3818',bg:'#120e08',cchn:'KTS-2021-09312',tier:'Chuẩn',    rating:'4.7',projects:18},
     'KTS. Lê Hoàng Nam':   {skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410',cchn:'KTS-2023-03201',tier:'VIP Bạc',  rating:'4.8',projects:11},
@@ -2288,7 +2288,7 @@ function generateSignedUrl(fileName, projectId){
 }
 
 function setFolder(f){activeFolder=f;renderMain();
-  setTimeout(()=>{const c=document.getElementById('ktsHeroAv');if(c){const p2=window.PROJECTS_CLIENT.find(x=>x.id===window.activeProj);const KP={'KTS. Trần Lê Minh':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};drawPortrait(c,KP[(p2 ? p2.kts : null)]||{});}},30);
+  setTimeout(()=>{const c=document.getElementById('ktsHeroAv');if(c){const p2=window.PROJECTS_CLIENT.find(x=>x.id===window.activeProj);const KP={'KTS. Trần Đại Long':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};drawPortrait(c,KP[(p2 ? p2.kts : null)]||{});}},30);
 }
 
 /* Portrait canvas — đồng bộ với kts_dashboard */
@@ -2320,7 +2320,7 @@ function downloadDoc(id,name){
 
 /* Notifications */
 const NOTIFS=[
-  {icon:'<i class="ph-duotone ph-folder"></i>',body:'<b>KTS. Trần Lê Minh</b> vừa upload <b>Phối cảnh 3D ngoại thất</b>',proj:'ALN-9921',ts:'5 phút trước',unread:true},
+  {icon:'<i class="ph-duotone ph-folder"></i>',body:'<b>KTS. Trần Đại Long</b> vừa upload <b>Phối cảnh 3D ngoại thất</b>',proj:'ALN-9921',ts:'5 phút trước',unread:true},
   {icon:'<i class="ph-duotone ph-alarm"></i>',body:'SLA Chặng C2 — <b>KTS. Phạm Hoài Nam</b> còn 8h phản hồi',proj:'ALN-9521',ts:'12 phút trước',unread:true},
   {icon:'<i class="ph-duotone ph-warning"></i>',body:'Tranh chấp <b>ALN-9834</b> đang chờ Hội đồng Trọng tài phán quyết',proj:'ALN-9834',ts:'30 phút trước',unread:true},
   {icon:'<i class="ph-duotone ph-check-circle"></i>',body:'<b>Giải ngân C1</b> đã hoàn tất — +11,162,500đ về KTS',proj:'ALN-9921',ts:'2 giờ trước',unread:false},
@@ -2527,7 +2527,7 @@ setTimeout(()=>{
 
 
 const ZP_SEED = {
-  'KTS. Trần Lê Minh':   ['Chào anh/chị! Em đang làm việc trên phương án C2. Anh/chị có góp ý gì không?', 'Em vừa upload 3 góc phối cảnh. Anh/chị vào xem và đánh dấu pin chỗ cần sửa nhé!'],
+  'KTS. Trần Đại Long':   ['Chào anh/chị! Em đang làm việc trên phương án C2. Anh/chị có góp ý gì không?', 'Em vừa upload 3 góc phối cảnh. Anh/chị vào xem và đánh dấu pin chỗ cần sửa nhé!'],
   'KTS. Nguyễn Thị Lan': ['Chào anh/chị! Hồ sơ C3 em đang thẩm định lớp 1. Dự kiến nộp trong 2 ngày.'],
   'KTS. Phạm Hoài Nam':  ['Chào anh/chị! Em đã hoàn thiện MB. Anh/chị xem và phê duyệt để em tiến hành 3D ạ.'],
   'KTS. Lê Hoàng Nam':   ['Chào anh/chị! Dự án của anh/chị đã hoàn thành. Cần hỗ trợ gì thêm không ạ?'],
@@ -2536,7 +2536,7 @@ const ZP_SEED = {
 
 let zpOpen = false;
 let zpMessages = [];
-let zpKts = 'KTS. Trần Lê Minh';
+let zpKts = 'KTS. Trần Đại Long';
 
 function toggleZaloPopup(){
   zpOpen = !zpOpen;
@@ -2553,7 +2553,7 @@ function toggleZaloPopup(){
 function _zpInit(){
   document.getElementById('zpKtsName').textContent = zpKts;
   // Avatar emoji by KTS
-  const avMap = {'KTS. Trần Lê Minh':'👨‍🎨','KTS. Nguyễn Thị Lan':'👩‍🎨','KTS. Phạm Hoài Nam':'👨‍💼','KTS. Lê Hoàng Nam':'👨‍🔧','KTS. Vũ Minh Khoa':'🧑‍💻'};
+  const avMap = {'KTS. Trần Đại Long':'👨‍🎨','KTS. Nguyễn Thị Lan':'👩‍🎨','KTS. Phạm Hoài Nam':'👨‍💼','KTS. Lê Hoàng Nam':'👨‍🔧','KTS. Vũ Minh Khoa':'🧑‍💻'};
   document.getElementById('zpAvatar').textContent = avMap[zpKts]||'👷';
   // Seed messages — GIỮ LẠI tin nhắn realtime đã nhận/gửi, chỉ nạp lại phần demo mở đầu
   const _rtKept = zpMessages.filter(m => !String(m.id).startsWith('seed_'));

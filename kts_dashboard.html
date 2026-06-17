@@ -443,7 +443,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   <div class="kts-hero">
     <div class="kts-hero-av" id="ktsHeroAv">TM</div>
     <div class="kts-hero-info">
-      <div class="kts-hero-name" id="ktsHeroName">KTS. Trần Lê Minh</div>
+      <div class="kts-hero-name" id="ktsHeroName">KTS. Trần Đại Long</div>
       <div class="kts-hero-badges">
         <span class="khb khb-gold">⭐ 4.8</span>
         <span class="khb khb-rank">Hạng Chuẩn</span>
@@ -977,7 +977,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     var params = new URLSearchParams(window.location.search);
     var u = params.get("u"), r = params.get("r");
     if(u && r) {
-      var names = {"kts.minhtran":"KTS. Trần Lê Minh","kts.lanthi":"KTS. Nguyễn Thị Lan","kts.khoavu":"KTS. Vũ Minh Khoa","dn.applamnha":"App Làm Nhà Corp.","dn.alnconstruct":"ALN Construct","cn.thuannv":"Nguyễn Văn Thuận","cn.binhtt":"Trần Thị Bình","cn.cuonglq":"Lê Quang Cường"};
+      var names = {"kts.minhtran":"KTS. Trần Đại Long","kts.lanthi":"KTS. Nguyễn Thị Lan","kts.khoavu":"KTS. Vũ Minh Khoa","dn.applamnha":"App Làm Nhà Corp.","dn.alnconstruct":"ALN Construct","cn.thuannv":"Nguyễn Văn Thuận","cn.binhtt":"Trần Thị Bình","cn.cuonglq":"Lê Quang Cường"};
       var ud = JSON.stringify({name:names[u]||u, userId:u, role:r});
       try{localStorage.setItem("aln_user",ud);}catch(e){}
       try{sessionStorage.setItem("aln_user",ud);}catch(e){}
@@ -1483,7 +1483,7 @@ document.querySelectorAll('.modal-bg').forEach(bg => {
 /* ══════════════════════════════════════
    ALN REALTIME — KTS Dashboard
 ══════════════════════════════════════ */
-const KTS_USER = JSON.parse(sessionStorage.getItem('aln_user') || '{"name":"KTS. Trần Lê Minh","userId":"kts.minhtran"}');
+const KTS_USER = JSON.parse(sessionStorage.getItem('aln_user') || '{"name":"KTS. Trần Đại Long","userId":"kts.minhtran"}');
 
 ALNRealtime.init({
   role: 'kts',
@@ -1535,7 +1535,7 @@ ALNRealtime.init({
 
 /* ── KTS CHAT ── */
 let _ktsChatUnread = 0;
-const _ktsName = KTS_USER.name || 'KTS. Trần Lê Minh';
+const _ktsName = KTS_USER.name || 'KTS. Trần Đại Long';
 
 function _ktsUpdateChatBadge() {
   // Hiện badge trên nút chat nếu có unread
