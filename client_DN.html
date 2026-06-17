@@ -3019,18 +3019,33 @@ function _adaptProjectDN(id, d) {
   return { id:id, code:d.code||id, name:d.name||'', cn:(d.cn&&d.cn.name)||'', kts:(d.kts&&d.kts.name)||'', dn:(d.dn&&d.dn.name)||'', ktsUid:(d.kts&&d.kts.uid)||'', cnUid:(d.cn&&d.cn.uid)||'', stage:d.stage||'C1', status:d.status||'on_track', progress:[prog.C1||0,prog.C2||0,prog.C3||0,prog.C4||0], total:d.totalFee||0, escrow:d.escrowBalance||0, _raw:d };
 }
 function _startProjectsListenDN() {
-  var q = query(collection(db,'projects'), orderBy('updatedAt','desc'));
+  var uid = (auth.currentUser && auth.currentUser.uid) || window.__ALN_UID || null;
+  var isFounder = (uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2');
+  // Founder: xem TẤT CẢ dự án (cần cho iframe giám sát).
+  // DN: CHỈ thấy dự án mình là thành viên (memberUids chứa uid của mình).
+  var q = isFounder
+    ? query(collection(db,'projects'), orderBy('updatedAt','desc'))
+    : query(collection(db,'projects'), where('memberUids','array-contains', uid));
   onSnapshot(q, function(snap){
-    window.PROJECTS_CLIENT = snap.docs.map(function(d){ return _adaptProjectDN(d.id, d.data()); });
+    var arr = snap.docs.map(function(d){ return _adaptProjectDN(d.id, d.data()); });
+    if (!isFounder) {
+      // sắp xếp client-side theo updatedAt giảm dần (tránh phải tạo composite index)
+      arr.sort(function(a,b){
+        var sb = (b._raw && b._raw.updatedAt && b._raw.updatedAt.seconds) || 0;
+        var sa = (a._raw && a._raw.updatedAt && a._raw.updatedAt.seconds) || 0;
+        return sb - sa;
+      });
+    }
+    window.PROJECTS_CLIENT = arr;
     if (window.PROJECTS_CLIENT.length > 0) {
       window.activeProj = window.PROJECTS_CLIENT[0].id;
       try { if(typeof window.renderSidebar==='function') window.renderSidebar(); } catch(e){ console.error('[DN render]',e); }
       try { if(typeof window.selectProj==='function') window.selectProj(window.activeProj); } catch(e){}
     } else {
       var el = document.getElementById('projList');
-      if (el) el.innerHTML = '<div style="padding:16px;color:var(--sub);font-size:13px">Chưa có dự án.</div>';
+      if (el) el.innerHTML = '<div style="padding:16px;color:var(--sub);font-size:13px">Chưa có dự án nào của bạn.</div>';
     }
-  }, function(err){ console.error('[DN] Lỗi:', err.code); });
+  }, function(err){ console.error('[DN] Lỗi:', err.code, err.message); });
 }
 
 onAuthStateChanged(auth, async (user) => {
