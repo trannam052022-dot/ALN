@@ -677,6 +677,12 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       .pa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px}
       .pa-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:1.5px dashed rgba(201,168,76,.35);border-radius:10px;padding:18px;cursor:pointer;transition:all .15s;min-height:90px}
       .pa-drop:hover{border-color:var(--gold);background:rgba(201,168,76,.05)}
+      .pa-drop.dragover{border-color:var(--gold);background:rgba(201,168,76,.12);border-style:solid}
+      .pa-thumb{position:relative;width:96px;height:96px;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--ink3)}
+      .pa-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+      .pa-thumb .pa-x{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center}
+      .pa-thumb .pa-x:hover{background:var(--red)}
+      .pa-thumb .pa-nm{position:absolute;left:0;right:0;bottom:0;font-size:8px;color:#fff;background:rgba(0,0,0,.55);padding:2px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     </style>
     <div class="sec-label proposal-section">📐 Gửi phương án thiết kế (ảnh) cho Chủ nhà</div>
     <div class="card">
@@ -721,10 +727,10 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       </div>
 
       <label class="pa-drop" id="paDrop" for="paFile">
-        <input type="file" id="paFile" accept="image/jpeg,image/png" style="display:none">
-        <div id="paDropHint"><i class="ph-duotone ph-upload-simple" style="font-size:22px;color:var(--gold)"></i><div style="margin-top:6px;font-size:12px;color:var(--muted)">Bấm để chọn ảnh JPG/PNG (tối đa 5MB)</div></div>
-        <img id="paPreview" alt="Xem trước" style="display:none;max-width:100%;max-height:220px;border-radius:8px;object-fit:contain">
+        <input type="file" id="paFile" accept="image/jpeg,image/png" multiple style="display:none">
+        <div id="paDropHint"><i class="ph-duotone ph-images-square" style="font-size:24px;color:var(--gold)"></i><div style="margin-top:6px;font-size:12px;color:var(--muted)"><b>Kéo &amp; thả</b> ảnh vào đây, hoặc <b>bấm để chọn</b><br>JPG/PNG · chọn được <b>nhiều ảnh</b> · tối đa 5MB/ảnh</div></div>
       </label>
+      <div id="paPreviewStrip" style="display:none;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
 
       <div id="paStatus" style="font-size:12px;margin:10px 0;min-height:16px;color:var(--muted)"></div>
 
@@ -2227,36 +2233,88 @@ window.alnLogout = async function(){
 import { auth, db, storage, storageRef, uploadBytes, getDownloadURL, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "./firebase-config.js";
 
 const PID = 'ALN-9921';
-let _paFile = null;
+let _paFiles = [];   // danh sách nhiều ảnh đã chọn
 let _paUnsub = null;
 
 function ktsUser(){ try{ return JSON.parse(sessionStorage.getItem('aln_user')||'{}'); }catch(e){ return {}; } }
 function paStatus(msg, color){ const el=document.getElementById('paStatus'); if(el){ el.textContent=msg; el.style.color=color||'var(--muted)'; } }
+function paBaseName(f){ return (f.name||'pa').replace(/\.[^.]+$/,''); }
 
-/* Xem trước ảnh khi chọn */
+/* Gom ảnh vào danh sách, có kiểm tra JPG/PNG + ≤5MB, bỏ trùng */
+function paAddFiles(fileList){
+  let added=0, skipped=0;
+  Array.prototype.forEach.call(fileList||[], f=>{
+    if(!/^image\/(jpeg|png)$/.test(f.type)){ skipped++; return; }
+    if(f.size > 5*1024*1024){ skipped++; return; }
+    if(_paFiles.some(x=>x.name===f.name && x.size===f.size)) return; // tránh thêm trùng
+    _paFiles.push(f); added++;
+  });
+  paRenderStrip();
+  let msg = _paFiles.length ? ('Đã chọn '+_paFiles.length+' ảnh.') : '';
+  if(skipped) msg += ' ('+skipped+' tệp bị bỏ qua — chỉ nhận JPG/PNG ≤5MB)';
+  paStatus(msg, skipped ? 'var(--amber)' : 'var(--green)');
+}
+
+/* Vẽ dải ảnh xem trước + nút xóa từng ảnh */
+function paRenderStrip(){
+  const strip=document.getElementById('paPreviewStrip');
+  const hint=document.getElementById('paDropHint');
+  if(!strip) return;
+  if(!_paFiles.length){
+    strip.style.display='none'; strip.innerHTML='';
+    if(hint) hint.style.display='';
+    return;
+  }
+  if(hint) hint.style.display='none';
+  strip.style.display='flex';
+  strip.innerHTML = _paFiles.map((f,i)=>{
+    const url=URL.createObjectURL(f);
+    return '<div class="pa-thumb">'
+      + '<img src="'+url+'" alt="">'
+      + '<button type="button" class="pa-x" data-i="'+i+'" title="Bỏ ảnh này">✕</button>'
+      + '<div class="pa-nm">'+f.name+'</div>'
+      + '</div>';
+  }).join('');
+  /* nút ✕ — chặn nổi bọt để không mở lại hộp chọn file */
+  strip.querySelectorAll('.pa-x').forEach(b=>{
+    b.addEventListener('click', ev=>{
+      ev.preventDefault(); ev.stopPropagation();
+      const idx=parseInt(b.getAttribute('data-i'),10);
+      if(idx>=0){ _paFiles.splice(idx,1); paRenderStrip(); paStatus(_paFiles.length?('Còn '+_paFiles.length+' ảnh.'):'', 'var(--muted)'); }
+    });
+  });
+}
+
+/* Chọn ảnh bằng nút */
 const _paFileInput = document.getElementById('paFile');
 if(_paFileInput){
   _paFileInput.addEventListener('change', e=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f) return;
-    if(!/^image\/(jpeg|png)$/.test(f.type)){ paStatus('Chỉ nhận ảnh JPG hoặc PNG.', 'var(--red)'); _paFileInput.value=''; return; }
-    if(f.size > 5*1024*1024){ paStatus('Ảnh quá 5MB — vui lòng chọn ảnh nhỏ hơn.', 'var(--red)'); _paFileInput.value=''; return; }
-    _paFile = f;
-    const prev=document.getElementById('paPreview'), hint=document.getElementById('paDropHint');
-    if(prev){ prev.src=URL.createObjectURL(f); prev.style.display='block'; }
-    if(hint) hint.style.display='none';
-    paStatus('Đã chọn ảnh: '+f.name, 'var(--green)');
+    paAddFiles(e.target.files);
+    _paFileInput.value=''; // cho phép chọn lại cùng tệp lần sau
+  });
+}
+
+/* Kéo & thả ảnh vào vùng paDrop */
+const _paDrop = document.getElementById('paDrop');
+if(_paDrop){
+  ['dragenter','dragover'].forEach(ev=>_paDrop.addEventListener(ev, e=>{
+    e.preventDefault(); e.stopPropagation(); _paDrop.classList.add('dragover');
+  }));
+  ['dragleave','dragend'].forEach(ev=>_paDrop.addEventListener(ev, e=>{
+    e.preventDefault(); e.stopPropagation(); _paDrop.classList.remove('dragover');
+  }));
+  _paDrop.addEventListener('drop', e=>{
+    e.preventDefault(); e.stopPropagation(); _paDrop.classList.remove('dragover');
+    const dt=e.dataTransfer; if(dt && dt.files && dt.files.length) paAddFiles(dt.files);
   });
 }
 
 window.alnResetProposalForm = function(){
-  _paFile=null;
+  _paFiles=[];
   ['paName','paDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   const v=document.getElementById('paVersion'); if(v) v.value='v1.0';
   const fi=document.getElementById('paFile'); if(fi) fi.value='';
-  const prev=document.getElementById('paPreview'), hint=document.getElementById('paDropHint');
-  if(prev){ prev.style.display='none'; prev.removeAttribute('src'); }
-  if(hint) hint.style.display='';
+  paRenderStrip();
   paStatus('', 'var(--muted)');
 };
 
@@ -2268,35 +2326,49 @@ window.alnSubmitProposal = async function(){
   const desc  =((document.getElementById('paDesc')   ||{}).value||'').trim();
   const btn = document.getElementById('paSubmitBtn');
 
-  if(!name){ paStatus('Vui lòng nhập tên phương án.', 'var(--red)'); return; }
-  if(!_paFile){ paStatus('Vui lòng chọn ảnh JPG/PNG.', 'var(--red)'); return; }
+  if(!_paFiles.length){ paStatus('Vui lòng chọn ít nhất 1 ảnh JPG/PNG.', 'var(--red)'); return; }
   if(!auth.currentUser){ paStatus('Chưa đăng nhập — tải lại trang rồi thử lại.', 'var(--red)'); return; }
 
   if(btn) btn.disabled=true;
+  const total=_paFiles.length;
+  let done=0, failed=0;
+  const u = ktsUser();
   try{
-    paStatus('Đang tải ảnh lên kho ALN...', 'var(--gold)');
-    const ext  = _paFile.type==='image/png' ? 'png' : 'jpg';
-    const safe = name.replace(/[^a-zA-Z0-9]+/g,'_').slice(0,40) || 'pa';
-    const path = `proposals/${PID}/${stage}/${Date.now()}_${safe}.${ext}`;
-    const sref = storageRef(storage, path);
-    await uploadBytes(sref, _paFile);
-    const imageURL = await getDownloadURL(sref);
+    for(let i=0;i<_paFiles.length;i++){
+      const f=_paFiles[i];
+      /* mỗi ảnh = 1 phương án. Nhiều ảnh: tên = (tên đã nhập + số) hoặc tên tệp */
+      const nm = name ? (total>1 ? (name+' '+(i+1)) : name) : paBaseName(f);
+      paStatus('Đang gửi '+(i+1)+'/'+total+': '+nm+' ...', 'var(--gold)');
+      try{
+        const ext  = f.type==='image/png' ? 'png' : 'jpg';
+        const safe = nm.replace(/[^a-zA-Z0-9]+/g,'_').slice(0,40) || 'pa';
+        const path = `proposals/${PID}/${stage}/${Date.now()}_${i}_${safe}.${ext}`;
+        const sref = storageRef(storage, path);
+        await uploadBytes(sref, f);
+        const imageURL = await getDownloadURL(sref);
+        await addDoc(collection(db,'projects',PID,'stages',stage,'proposals'), {
+          name: nm, desc, version, folder,
+          status: 'pending',
+          imagePath: path,
+          imageURL,
+          order: Date.now()+i,
+          createdBy: { uid: auth.currentUser.uid, name: u.name || 'KTS' },
+          createdAt: serverTimestamp()
+        });
+        done++;
+      }catch(eOne){
+        console.error('[ALN proposal] ảnh', f.name, eOne); failed++;
+      }
+    }
 
-    paStatus('Đang ghi phương án vào hệ thống...', 'var(--gold)');
-    const u = ktsUser();
-    await addDoc(collection(db,'projects',PID,'stages',stage,'proposals'), {
-      name, desc, version, folder,
-      status: 'pending',
-      imagePath: path,
-      imageURL,
-      order: Date.now(),
-      createdBy: { uid: auth.currentUser.uid, name: u.name || 'KTS' },
-      createdAt: serverTimestamp()
-    });
-
-    paStatus('✅ Đã gửi phương án "'+name+'" tới Chủ nhà.', 'var(--green)');
-    if(typeof showToast==='function') showToast('✅ Đã gửi phương án cho Chủ nhà','t-green');
-    window.alnResetProposalForm();
+    if(failed===0){
+      paStatus('✅ Đã gửi '+done+' phương án tới Chủ nhà.', 'var(--green)');
+      if(typeof showToast==='function') showToast('✅ Đã gửi '+done+' phương án','t-green');
+      window.alnResetProposalForm();
+    }else{
+      paStatus('Đã gửi '+done+'/'+total+' ảnh. '+failed+' ảnh lỗi (kiểm tra mạng & Storage rules).', 'var(--amber)');
+      if(typeof showToast==='function') showToast('Gửi xong '+done+'/'+total+' — '+failed+' lỗi','t-amber');
+    }
   }catch(err){
     console.error('[ALN proposal]', err);
     paStatus('❌ Lỗi gửi: '+((err&&err.message)||err)+'. Kiểm tra mạng & Storage rules.', 'var(--red)');
