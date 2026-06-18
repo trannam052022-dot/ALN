@@ -238,7 +238,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 /* history */
 .tx-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)}
 .tx-row:last-child{border-bottom:none}
-.tx-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.tx-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
 .tx-info{flex:1;margin-left:10px}
 .tx-title{font-size:12px;font-weight:500;color:var(--text)}
 .tx-meta{font-size:10px;color:var(--muted)}
@@ -535,9 +535,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <div id="notifPanel" style="display:none;position:fixed;top:56px;right:8px;width:min(300px,calc(100vw - 16px));background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:12px;box-shadow:var(--sh-lg);z-index:50;max-height:70vh;overflow-y:auto">
         <div style="font-family:var(--serif);font-weight:600;font-style:italic;font-size:14px;color:var(--text);margin-bottom:8px">Thông báo mới</div>
         <div class="notif-list">
-          <div class="notif-item ni-red"><div class="ni-icon">⏰</div><div><div class="ni-text"><b>SLA cảnh báo</b> — Chủ nhà Nguyễn Văn A vừa gửi yêu cầu sửa C2 lần 2. Bạn có 48h!</div><div class="ni-time">5 phút trước</div></div></div>
-          <div class="notif-item ni-amber"><div class="ni-icon">🔒</div><div><div class="ni-text"><b>Ví tạm ứng</b> — 1,920,000đ đã được ghi nhận (40% C2). Chờ CN duyệt để mở khóa.</div><div class="ni-time">12 phút trước</div></div></div>
-          <div class="notif-item ni-green"><div class="ni-icon">💰</div><div><div class="ni-text"><b>Giải ngân C1</b> — +1,878,220đ đã về ví chính.</div><div class="ni-time">2 ngày trước</div></div></div>
+          <div class="notif-item ni-red"><div class="ni-icon"><i class="ph-duotone ph-clock-countdown"></i></div><div><div class="ni-text"><b>SLA cảnh báo</b> — Chủ nhà Nguyễn Văn A vừa gửi yêu cầu sửa C2 lần 2. Bạn có 48h!</div><div class="ni-time">5 phút trước</div></div></div>
+          <div class="notif-item ni-amber"><div class="ni-icon"><i class="ph-duotone ph-lock"></i></div><div><div class="ni-text"><b>Ví tạm ứng</b> — 1,920,000đ đã được ghi nhận (40% C2). Chờ CN duyệt để mở khóa.</div><div class="ni-time">12 phút trước</div></div></div>
+          <div class="notif-item ni-green"><div class="ni-icon"><i class="ph-duotone ph-money"></i></div><div><div class="ni-text"><b>Giải ngân C1</b> — +1,878,220đ đã về ví chính.</div><div class="ni-time">2 ngày trước</div></div></div>
         </div>
       </div>
       <div style="font-size:10px;font-weight:700;background:var(--green-bg);color:var(--green);border:1px solid rgba(34,201,122,.3);padding:3px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0"><i class="ph-duotone ph-circle" style="font-size:6px;margin-right:3px"></i>Online</div>
@@ -868,27 +868,27 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <div class="card-title"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-list-bullets"></i></div>Lịch sử giao dịch</div>
         <div>
           <div class="tx-row">
-            <div class="tx-icon" style="background:var(--amber-bg)">🔒</div>
+            <div class="tx-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ph-duotone ph-lock"></i></div>
             <div class="tx-info"><div class="tx-title">Ví tạm ứng C2 kích hoạt</div><div class="tx-meta">#9921 · 05/06 09:42</div></div>
             <div class="tx-amount tx-lock">+1,920,000đ</div>
           </div>
           <div class="tx-row">
-            <div class="tx-icon" style="background:var(--green-bg)">💰</div>
+            <div class="tx-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-money"></i></div>
             <div class="tx-info"><div class="tx-title">Giải ngân C1 — #9921</div><div class="tx-meta">Checker APPROVE · 03/06</div></div>
             <div class="tx-amount tx-pos">+1,878,220đ</div>
           </div>
           <div class="tx-row">
-            <div class="tx-icon" style="background:var(--red-bg)">📊</div>
+            <div class="tx-icon" style="background:var(--red-bg);color:var(--red)"><i class="ph-duotone ph-receipt"></i></div>
             <div class="tx-info"><div class="tx-title">Thuế khấu trừ C1</div><div class="tx-meta">5% GTGT + 2% TNCN · 03/06</div></div>
             <div class="tx-amount tx-neg">−141,780đ</div>
           </div>
           <div class="tx-row">
-            <div class="tx-icon" style="background:var(--green-bg)">💰</div>
+            <div class="tx-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-money"></i></div>
             <div class="tx-info"><div class="tx-title">Giải ngân C2 — #9834</div><div class="tx-meta">Checker APPROVE · 28/05</div></div>
             <div class="tx-amount tx-pos">+8,040,000đ</div>
           </div>
           <div class="tx-row">
-            <div class="tx-icon" style="background:var(--ink3)">🏦</div>
+            <div class="tx-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-bank"></i></div>
             <div class="tx-info"><div class="tx-title">Rút về Vietcombank</div><div class="tx-meta">**** 4521 · 25/05</div></div>
             <div class="tx-amount tx-neg">−6,000,000đ</div>
           </div>
