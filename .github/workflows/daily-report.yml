@@ -1,0 +1,65 @@
+name: ALN Daily Report
+
+on:
+  schedule:
+    - cron: '0 1 * * *'   # 8:00 SA giờ Việt Nam (UTC+7 = UTC+0 01:00)
+  workflow_dispatch:        # Cho phép chạy tay bất kỳ lúc nào
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 30   # Lấy 30 commit gần nhất
+
+      - name: Báo cáo commit 24h qua
+        run: |
+          echo "================================================"
+          echo "  ALN DAILY REPORT — $(date '+%d/%m/%Y %H:%M') UTC"
+          echo "================================================"
+          echo ""
+          echo "📋 COMMIT 24H QUA:"
+          COMMITS=$(git log --since="24 hours ago" --oneline --no-merges)
+          if [ -z "$COMMITS" ]; then
+            echo "  (không có commit nào)"
+          else
+            echo "$COMMITS"
+          fi
+
+      - name: Files thay đổi hôm nay
+        run: |
+          echo ""
+          echo "📁 FILES THAY ĐỔI:"
+          git log --since="24 hours ago" --name-only --pretty=format: | sort -u | grep -v '^$' || echo "  (không có)"
+
+      - name: Tổng quan dự án
+        run: |
+          echo ""
+          echo "📊 TỔNG QUAN DỰ ÁN:"
+          for f in client_CN.html client_DN.html kts_dashboard.html founder_panel.html login.html firebase-config.js; do
+            if [ -f "$f" ]; then
+              LINES=$(wc -l < "$f")
+              KB=$(( $(wc -c < "$f") / 1024 ))
+              LAST=$(git log -1 --format="%ar" -- "$f" 2>/dev/null || echo "?")
+              printf "  %-32s %4d dòng  %3dKB  (sửa %s)\n" "$f" "$LINES" "$KB" "$LAST"
+            fi
+          done
+
+      - name: Kiểm tra emoji + issues nhanh
+        run: |
+          echo ""
+          echo "🔍 KIỂM TRA NHANH:"
+          EMOJI_COUNT=$(grep -rPo "[\x{1F300}-\x{1F9FF}]|[\x{2600}-\x{26FF}]|✅|❌|⏳|🔒|📄|📤|⚠️" *.html 2>/dev/null | wc -l || echo 0)
+          echo "  Emoji còn sót: $EMOJI_COUNT chỗ"
+
+          DARK_COUNT=$(grep -rn "rgba(255,255,255,\.0[0-9])" *.html 2>/dev/null | wc -l || echo 0)
+          echo "  Dark rgba còn sót: $DARK_COUNT chỗ"
+
+          TOTAL_LINES=$(cat *.html 2>/dev/null | wc -l)
+          echo "  Tổng dòng HTML: $TOTAL_LINES"
+
+          echo ""
+          echo "================================================"
+          echo "  GitHub Pages: https://trannam052022-dot.github.io/ALN/"
+          echo "================================================"

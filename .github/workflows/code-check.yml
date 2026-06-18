@@ -1,0 +1,79 @@
+name: ALN Code Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Kiểm tra emoji còn sót trong UI
+        run: |
+          echo "=== Tìm emoji trong HTML files ==="
+          FILES="client_CN.html client_DN.html kts_dashboard.html founder_panel.html login.html"
+          FOUND=0
+          for f in $FILES; do
+            if [ -f "$f" ]; then
+              LINES=$(grep -nP "[\x{1F300}-\x{1F9FF}]|[\x{2600}-\x{26FF}]|[\x{2700}-\x{27BF}]|✅|❌|⏳|🔒|📄|📐|📎|⚠️|📤" "$f" 2>/dev/null || true)
+              if [ -n "$LINES" ]; then
+                echo "⚠️  $f có emoji:"
+                echo "$LINES"
+                FOUND=1
+              else
+                echo "✓ $f — sạch"
+              fi
+            fi
+          done
+          if [ $FOUND -eq 1 ]; then
+            echo ""
+            echo "::warning::Còn emoji chưa thay bằng Phosphor icons"
+          fi
+
+      - name: Kiểm tra màu hardcode tối (dark theme còn sót)
+        run: |
+          echo "=== Tìm dark inline styles ==="
+          DARK=$(grep -rn "rgba(255,255,255,\.0[0-9])" client_DN.html client_CN.html 2>/dev/null || true)
+          if [ -n "$DARK" ]; then
+            echo "::warning::Tìm thấy near-transparent dark backgrounds:"
+            echo "$DARK"
+          else
+            echo "✓ Không có dark rgba còn sót"
+          fi
+
+      - name: Kiểm tra thẻ HTML đóng đủ không
+        run: |
+          echo "=== Kiểm tra </head></body></html> ==="
+          for f in client_CN.html client_DN.html kts_dashboard.html founder_panel.html login.html; do
+            if [ -f "$f" ]; then
+              MISSING=""
+              grep -q "</head>" "$f" || MISSING="$MISSING </head>"
+              grep -q "</body>" "$f" || MISSING="$MISSING </body>"
+              grep -q "</html>" "$f" || MISSING="$MISSING </html>"
+              if [ -n "$MISSING" ]; then
+                echo "::error::$f thiếu thẻ:$MISSING"
+              else
+                echo "✓ $f — đủ thẻ"
+              fi
+            fi
+          done
+
+      - name: Kích thước file
+        run: |
+          echo "=== File sizes ==="
+          for f in *.html firebase-config.js; do
+            if [ -f "$f" ]; then
+              SIZE=$(wc -l < "$f")
+              BYTES=$(wc -c < "$f")
+              KB=$(( BYTES / 1024 ))
+              if [ $KB -gt 200 ]; then
+                echo "::warning::$f — ${SIZE} dòng / ${KB}KB (lớn, cân nhắc tách)"
+              else
+                echo "✓ $f — ${SIZE} dòng / ${KB}KB"
+              fi
+            fi
+          done
