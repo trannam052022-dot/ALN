@@ -137,7 +137,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid2-3{display:grid;grid-template-columns:2fr 1fr;gap:12px}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.dash-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.dash-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
 @media(max-width:1100px){.dash-2col{grid-template-columns:1fr}}
 @media(max-width:900px){.grid3,.grid2,.grid2-3{grid-template-columns:1fr}.grid4{grid-template-columns:1fr 1fr}}
 
@@ -582,7 +582,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     </div><!-- end LEFT -->
 
     <!-- RIGHT: DỰ ÁN + VÍ NHANH -->
-    <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;flex-direction:column;gap:12px;height:100%">
 
       <!-- Danh sách dự án -->
       <div class="card card-sm">
@@ -596,7 +596,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       </div>
 
       <!-- Ví nhanh -->
-      <div class="card card-sm">
+      <div class="card card-sm" style="flex:1">
         <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
           <span>Ví & Giải ngân</span>
           <i class="ph-duotone ph-wallet" style="color:var(--muted);font-size:14px"></i>
