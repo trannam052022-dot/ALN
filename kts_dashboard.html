@@ -148,21 +148,21 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .card-title .ct-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
 
 /* ── STAT CARDS ── */
-.stat-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden}
-.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r) var(--r) 0 0}
-.stat-card.s-purple::before{background:linear-gradient(90deg,var(--purple),#7c3aed)}
-.stat-card.s-green::before{background:linear-gradient(90deg,#22c97a,#16a85f)}
-.stat-card.s-gold::before{background:linear-gradient(90deg,var(--gold),#e8b800)}
-.stat-card.s-blue::before{background:linear-gradient(90deg,var(--blue),#0ea5e9)}
-.stat-label{font-size:10px;color:var(--muted);font-weight:500;margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px}
-.stat-val{font-family:var(--syne);font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px}
-.stat-sub{font-size:10px;color:var(--muted);margin-top:2px}
-.stat-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;margin-top:3px}
+.stat-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;position:relative;overflow:hidden;box-shadow:var(--sh)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;border-radius:var(--r) 0 0 var(--r)}
+.stat-card.s-purple::before{background:var(--purple)}
+.stat-card.s-green::before{background:var(--green)}
+.stat-card.s-gold::before{background:var(--gold)}
+.stat-card.s-blue::before{background:var(--blue)}
+.stat-label{font-size:10px;color:var(--muted);font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:5px}
+.stat-val{font-family:var(--syne);font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1.1}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:6px}
+.stat-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:99px;font-size:10px;font-weight:700;margin-top:6px}
 .sb-green{background:var(--green-bg);color:var(--green)}
 .sb-red{background:var(--red-bg);color:var(--red)}
 .sb-amber{background:var(--amber-bg);color:var(--amber)}
 .sb-blue{background:var(--blue-bg);color:var(--blue)}
-.sb-purple{background:var(--accent-bg);color:var(--accent2)}
+.sb-purple{background:var(--purple-bg);color:var(--purple)}
 .sb-gold{background:var(--gold-bg);color:var(--gold)}
 
 /* section label */
@@ -173,9 +173,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 /* ══════════════════════════════════════════
    MODULE 1 — SLA TIMER
 ══════════════════════════════════════════ */
-.sla-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:16px;position:relative;overflow:hidden}
-.sla-card.urgent{border-color:var(--red);box-shadow:0 0 0 1px rgba(255,87,87,.2),0 4px 24px rgba(255,87,87,.12)}
-.sla-card.safe{border-color:var(--green);box-shadow:0 0 0 1px rgba(34,201,122,.2),0 4px 24px rgba(34,201,122,.08)}
+.sla-card{background:var(--ink2);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:var(--r);padding:20px;position:relative;overflow:hidden;box-shadow:var(--sh)}
+.sla-card.urgent{border-left-color:var(--red)}
+.sla-card.safe{border-left-color:var(--green)}
 .sla-glow{position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;opacity:.03;pointer-events:none}
 .sla-card.urgent .sla-glow{background:var(--red)}
 .sla-card.safe .sla-glow{background:var(--green)}
@@ -202,10 +202,10 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .sla-action-btns{display:flex;gap:8px;margin-top:12px}
 .btn{padding:8px 16px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
 .btn:disabled{opacity:.4;cursor:not-allowed}
-.btn-primary{background:var(--gold);color:#000;font-weight:700}
-.btn-primary:hover:not(:disabled){background:var(--accent2);transform:translateY(-1px)}
-.btn-ghost{background:var(--ink3);color:var(--text2);border:1px solid var(--border)}
-.btn-ghost:hover:not(:disabled){background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.3);color:var(--text)}
+.btn-primary{background:var(--text);color:#fff;font-weight:600;letter-spacing:.01em}
+.btn-primary:hover:not(:disabled){background:#2d3748;transform:translateY(-1px)}
+.btn-ghost{background:#fff;color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover:not(:disabled){background:var(--ink3);border-color:var(--border2);color:var(--text)}
 .btn-green{background:var(--green);color:#fff}
 .btn-green:hover:not(:disabled){background:#1aaf6c}
 .btn-red{background:var(--red);color:#fff}
@@ -502,26 +502,26 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     </div>
 
     <!-- 4 HERO CARDS -->
-    <div class="grid4" style="margin-bottom:22px">
+    <div class="grid4" style="margin-bottom:24px">
       <div class="stat-card s-purple">
-        <div class="stat-label">Doanh thu <span id="heroMonthLabel">T6</span></div>
+        <div class="stat-label"><i class="ph-duotone ph-chart-bar"></i> Doanh thu <span id="heroMonthLabel">T6</span></div>
         <div class="stat-val" id="heroRevenue">—</div>
         <div class="stat-badge sb-purple" id="heroRevenueBadge"><i class="ph-duotone ph-arrow-up" style="font-size:8px"></i> đang tính</div>
       </div>
       <div class="stat-card s-green">
-        <div class="stat-label">Ví khả dụng</div>
+        <div class="stat-label"><i class="ph-duotone ph-wallet"></i> Ví khả dụng</div>
         <div class="stat-val" id="heroWallet">3.87M</div>
         <div class="stat-sub">Tổng số dư VND</div>
       </div>
       <div class="stat-card s-gold">
-        <div class="stat-label">Điểm uy tín</div>
-        <div class="stat-val">84.5<span style="font-size:13px;color:var(--muted);font-weight:400">/100</span></div>
+        <div class="stat-label"><i class="ph-duotone ph-star"></i> Điểm uy tín</div>
+        <div class="stat-val">84.5<span style="font-size:14px;color:var(--muted);font-weight:400">/100</span></div>
         <div class="stat-sub">Còn 15.5đ lên PRO</div>
       </div>
       <div class="stat-card s-blue">
-        <div class="stat-label">Dự án đang chạy</div>
+        <div class="stat-label"><i class="ph-duotone ph-briefcase"></i> Dự án đang chạy</div>
         <div class="stat-val" id="heroActiveProj">—</div>
-        <div class="stat-badge sb-blue" id="heroProjBadge"><i class="ph-duotone ph-briefcase" style="font-size:8px"></i> đang tải</div>
+        <div class="stat-badge sb-blue" id="heroProjBadge"><i class="ph-duotone ph-arrow-up" style="font-size:8px"></i> đang tải</div>
       </div>
     </div>
 
