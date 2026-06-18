@@ -267,6 +267,10 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .upload-slot.has-file .us-remove,.upload-slot.has-error .us-remove{display:flex}
 .upload-slot input[type=file]{display:none}
 .upload-slot .us-status-icon{position:absolute;top:5px;left:5px;font-size:12px}
+.upload-slot.opt-disabled{opacity:.45;pointer-events:none;border-style:dashed}
+.upload-slot-wrap{position:relative}
+.opt-overlay{position:absolute;inset:0;z-index:2;border-radius:var(--r-sm);background:rgba(18,16,12,.72);display:flex;flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(1px)}
+.opt-toggle-off{position:absolute;top:4px;right:4px;z-index:3;background:rgba(239,68,68,.18);color:var(--red);border:1px solid rgba(239,68,68,.35);border-radius:5px;font-size:9px;font-weight:700;padding:2px 7px;cursor:pointer}
 
 .c3-validation-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;padding:10px;background:var(--ink3);border-radius:var(--r-sm);border:1px solid var(--border)}
 .cv-item{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600}
@@ -781,18 +785,18 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <!-- ══════════════════════════════════
          MODULE 3 — C3 UPLOAD
     ══════════════════════════════════ -->
-    <div class="sec-label c3-section">📁 Nộp Hồ sơ Kỹ thuật — Chặng 3 (6 hạng mục bắt buộc)</div>
+    <div class="sec-label c3-section">📁 Nộp Hồ sơ Kỹ thuật — Chặng 3 (3 bắt buộc · 3 tùy chọn)</div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
         <div>
           <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-folder-open"></i></div>Cổng nộp Hồ sơ C3 — <span id="c3ProjId">#ALN-9921</span></div>
-          <div style="font-size:11px;color:var(--muted)">Tất cả 6 ô đều bắt buộc · Auto-scan ngay khi upload · Excel 0% lỗi hàm</div>
+          <div style="font-size:11px;color:var(--muted)">3 hạng mục bắt buộc · 3 tùy chọn (bật khi cần) · Auto-scan · Excel 0% lỗi hàm</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <div style="text-align:right;font-size:11px;color:var(--muted)">Tiến độ upload</div>
           <div style="width:70px">
             <div class="prog-bar"><div class="prog-fill" id="uploadProgress" style="width:0%;background:var(--accent)"></div></div>
-            <div style="font-size:9px;color:var(--muted);text-align:center;margin-top:2px"><span id="uploadCount">0</span>/6 files</div>
+            <div style="font-size:9px;color:var(--muted);text-align:center;margin-top:2px"><span id="uploadCount">0/3</span> files</div>
           </div>
         </div>
       </div>
@@ -1136,6 +1140,7 @@ let bonusSeconds = 7*3600 + 22*60 + 45;
 const totalSla = 48*3600;
 let slaInterval;
 let uploadedFiles = {};
+const enabledOptional = {steel:false, mat:false, budget:false};
 let selectedVip = null;
 
 function fmtTime(s) {
@@ -1201,26 +1206,53 @@ const c3Slots = [
   {id:'arch', icon:'<i class="ph-duotone ph-compass-tool"></i>', label:'Hồ sơ Kiến trúc', sub:'PDF + DWG · Mặt bằng, mặt đứng, mặt cắt', accept:'.pdf,.dwg', vKey:'v-arch', xlsxCheck:false},
   {id:'struct', icon:'<i class="ph-duotone ph-crane"></i>', label:'Hồ sơ Kết cấu', sub:'PDF + DWG · Móng, cột, dầm, sàn', accept:'.pdf,.dwg', vKey:'v-struct', xlsxCheck:false},
   {id:'mep', icon:'<i class="ph-duotone ph-lightning"></i>', label:'Điện nước M&E', sub:'PDF · Điện, cấp/thoát nước, PCCC', accept:'.pdf,.dwg', vKey:'v-mep', xlsxCheck:false},
-  {id:'steel', icon:'<i class="ph-duotone ph-nut"></i>', label:'Thống kê Thép', sub:'Excel · Bóc tách thép cấu kiện', accept:'.xlsx,.xls', vKey:'v-steel', xlsxCheck:true},
-  {id:'mat', icon:'<i class="ph-duotone ph-package"></i>', label:'Bảng Vật tư', sub:'Excel · Danh mục, khối lượng', accept:'.xlsx,.xls', vKey:'v-mat', xlsxCheck:true},
-  {id:'budget', icon:'<i class="ph-duotone ph-money"></i>', label:'Dự toán Chi phí', sub:'Excel · 0% lỗi hàm bắt buộc', accept:'.xlsx,.xls', vKey:'v-budget', xlsxCheck:true},
+  {id:'steel', icon:'<i class="ph-duotone ph-nut"></i>', label:'Thống kê Thép', sub:'Excel · Bóc tách thép cấu kiện', accept:'.xlsx,.xls', vKey:'v-steel', xlsxCheck:true, optional:true},
+  {id:'mat', icon:'<i class="ph-duotone ph-package"></i>', label:'Bảng Vật tư', sub:'Excel · Danh mục, khối lượng', accept:'.xlsx,.xls', vKey:'v-mat', xlsxCheck:true, optional:true},
+  {id:'budget', icon:'<i class="ph-duotone ph-money"></i>', label:'Dự toán Chi phí', sub:'Excel · 0% lỗi hàm bắt buộc', accept:'.xlsx,.xls', vKey:'v-budget', xlsxCheck:true, optional:true},
 ];
 
 function buildUploadGrid() {
   const g = document.getElementById('uploadGrid');
-  g.innerHTML = c3Slots.map(s => `
-    <label class="upload-slot" id="slot_${s.id}" for="file_${s.id}">
-      <input type="file" id="file_${s.id}" accept="${s.accept}" onchange="handleC3File('${s.id}',this)">
-      <div class="us-status-icon" id="statusIcon_${s.id}" style="display:none"></div>
-      <button class="us-remove" id="removeBtn_${s.id}" onclick="removeC3File(event,'${s.id}')">✕</button>
-      <div class="us-icon">${s.icon}</div>
-      <div class="us-label">${s.label}</div>
-      <div class="us-sub">${s.sub}</div>
-      <div class="us-file-name" id="fname_${s.id}"></div>
-      <div class="us-error" id="ferror_${s.id}" style="display:none"></div>
-    </label>`).join('');
+  g.innerHTML = c3Slots.map(s => {
+    const isOpt = !!s.optional;
+    const overlay = isOpt ? `<div class="opt-overlay" id="optOverlay_${s.id}">
+      <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.1em">Tùy chọn</div>
+      <button onclick="toggleOptional(event,'${s.id}')" style="padding:5px 14px;background:var(--gold);color:#1a1400;border:none;border-radius:6px;font-weight:700;font-size:11px;cursor:pointer">Bật</button>
+    </div>` : '';
+    const toggleBtn = isOpt ? `<button class="opt-toggle-off" id="optToggleOff_${s.id}" onclick="toggleOptional(event,'${s.id}')" style="display:none" title="Tắt hạng mục này">✕ Tắt</button>` : '';
+    return `<div class="upload-slot-wrap" id="wrap_${s.id}" style="position:relative">
+      ${overlay}
+      <label class="upload-slot${isOpt?' opt-disabled':''}" id="slot_${s.id}" for="file_${s.id}">
+        <input type="file" id="file_${s.id}" accept="${s.accept}" onchange="handleC3File('${s.id}',this)"${isOpt?' disabled':''}>
+        <div class="us-status-icon" id="statusIcon_${s.id}" style="display:none"></div>
+        <button class="us-remove" id="removeBtn_${s.id}" onclick="removeC3File(event,'${s.id}')">✕</button>
+        <div class="us-icon">${s.icon}</div>
+        <div class="us-label">${s.label}</div>
+        <div class="us-sub">${s.sub}</div>
+        <div class="us-file-name" id="fname_${s.id}"></div>
+        <div class="us-error" id="ferror_${s.id}" style="display:none"></div>
+      </label>
+      ${toggleBtn}
+    </div>`;
+  }).join('');
 }
 buildUploadGrid();
+
+function toggleOptional(evt, id) {
+  if(evt) evt.preventDefault();
+  enabledOptional[id] = !enabledOptional[id];
+  const on = enabledOptional[id];
+  const overlay = document.getElementById('optOverlay_'+id);
+  const slot = document.getElementById('slot_'+id);
+  const inp = document.getElementById('file_'+id);
+  const offBtn = document.getElementById('optToggleOff_'+id);
+  if(overlay) overlay.style.display = on ? 'none' : '';
+  if(slot) slot.classList.toggle('opt-disabled', !on);
+  if(inp) inp.disabled = !on;
+  if(offBtn) offBtn.style.display = on ? '' : 'none';
+  if(!on) removeC3File(null, id);
+  updateUploadState();
+}
 
 function handleC3File(id, input) {
   const file = input.files[0]; if(!file) return;
@@ -1265,7 +1297,7 @@ function setSlotError(id, name, msg) {
 }
 
 function removeC3File(e, id) {
-  e.preventDefault(); e.stopPropagation();
+  if(e){ e.preventDefault(); e.stopPropagation(); }
   const el = document.getElementById('slot_'+id);
   el.className = 'upload-slot';
   document.getElementById('fname_'+id).textContent = '';
@@ -1282,12 +1314,17 @@ function removeC3File(e, id) {
 }
 
 function updateUploadState() {
-  const count = Object.keys(uploadedFiles).length;
+  const required = c3Slots.filter(s => !s.optional);
+  const optActive = c3Slots.filter(s => s.optional && enabledOptional[s.id]);
+  const needed = required.concat(optActive);
+  const total = needed.length;
+  const filled = needed.filter(s => uploadedFiles[s.id] && !uploadedFiles[s.id].hasError).length;
   const hasError = Object.values(uploadedFiles).some(f=>f.hasError);
-  document.getElementById('uploadCount').textContent = count;
-  document.getElementById('uploadProgress').style.width = (count/6*100)+'%';
-  document.getElementById('uploadProgress').style.background = hasError ? 'var(--red)' : count===6 ? 'var(--green)' : 'var(--gold)';
-  document.getElementById('submitC3Btn').disabled = count < 6 || hasError;
+  const reqFilled = required.every(s => uploadedFiles[s.id] && !uploadedFiles[s.id].hasError);
+  document.getElementById('uploadCount').textContent = filled + '/' + total;
+  document.getElementById('uploadProgress').style.width = (total > 0 ? filled/total*100 : 0)+'%';
+  document.getElementById('uploadProgress').style.background = hasError ? 'var(--red)' : (filled===total&&total>0) ? 'var(--green)' : 'var(--gold)';
+  document.getElementById('submitC3Btn').disabled = !reqFilled || hasError;
 }
 
 function simUploadDemo() {
