@@ -689,7 +689,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
         <div>
-          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-image-square"></i></div>Gửi phương án — #ALN-9921</div>
+          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-image-square"></i></div>Gửi phương án — <span id="paProjTitle">#ALN-9921</span></div>
           <div style="font-size:11px;color:var(--muted)">Chọn chặng · chọn ảnh JPG/PNG · điền tên &amp; mô tả → Chủ nhà xem ảnh rồi chốt qua chat ALN</div>
         </div>
       </div>
@@ -1967,10 +1967,16 @@ function _startKtsProjectListen(uid) {
     window.KTS_PROJECT_ID   = d.id;
     window.KTS_PROJECT_DATA = d.data();
     const p = d.data();
+    const _isCN = !!(p.cn && p.cn.uid);
+    const _displayId = (_isCN ? 'ALN-CN-' : 'ALN-DN-') + d.id.replace(/^ALN-/, '');
+
+    // Cập nhật tiêu đề form gửi phương án
+    const paProjTitle = document.getElementById('paProjTitle');
+    if (paProjTitle) paProjTitle.textContent = '#' + _displayId;
 
     // Cập nhật header chat
     const chatH = document.querySelector('.aln-chat-header h3');
-    if (chatH) chatH.innerHTML = `<i class="ph-duotone ph-chats-circle" style="color:var(--blue)"></i> Chat — Dự án ${d.id}`;
+    if (chatH) chatH.innerHTML = `<i class="ph-duotone ph-chats-circle" style="color:var(--blue)"></i> Chat — Dự án ${_displayId}`;
 
     // Cập nhật thông tin dự án trên dashboard nếu có element
     const projEl = document.getElementById('ktsDashProjName');
@@ -2019,14 +2025,14 @@ function renderMyProjects(projects) {
     const stClr = STATUS_CLR[p.status] || '';
     return `<div class="proj-card" onclick="toggleProjDetail('pd${uid}')">
       <div class="proj-card-header">
-        <span class="proj-card-id">${(p.dn && p.dn.uid ? 'ALN-DN-' : 'ALN-CN-') + p.id.replace(/^ALN-/, '')}</span>
+        <span class="proj-card-id">${(!(p.cn && p.cn.uid) && (p.dn && p.dn.uid) ? 'ALN-DN-' : 'ALN-CN-') + p.id.replace(/^ALN-/, '')}</span>
         <span class="proj-card-name">${p.name||''}</span>
         <span class="proj-card-status" style="${stClr}">${stLbl}</span>
       </div>
       <div class="proj-progress-bar">${bar}</div>
       <div class="proj-meta">
         <span><i class="ph-duotone ph-map-pin"></i> Chặng ${p.stage||'C1'}</span>
-        ${(p.dn && p.dn.uid)
+        ${(!(p.cn && p.cn.uid) && (p.dn && p.dn.uid))
           ? `<span><i class="ph-duotone ph-buildings"></i> ${(p.dn&&p.dn.name)||'—'}</span>`
           : `<span><i class="ph-duotone ph-user"></i> ${(p.cn&&p.cn.name)||''}</span>`}
       </div>
@@ -2053,8 +2059,8 @@ function renderMyProjects(projects) {
     </div>`;
   };
 
-  const cnProjects = projects.filter(p => !(p.dn && p.dn.uid));
-  const dnProjects = projects.filter(p => !!(p.dn && p.dn.uid));
+  const cnProjects = projects.filter(p => !!(p.cn && p.cn.uid));
+  const dnProjects = projects.filter(p => !(p.cn && p.cn.uid) && !!(p.dn && p.dn.uid));
 
   let html = '';
   if (cnProjects.length) {
@@ -2291,7 +2297,6 @@ window.alnLogout = async function(){
 <script type="module">
 import { auth, db, storage, storageRef, uploadBytes, getDownloadURL, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "./firebase-config.js";
 
-const PID = 'ALN-9921';
 let _paFiles = [];   // danh sách nhiều ảnh đã chọn
 let _paUnsub = null;
 
@@ -2385,6 +2390,7 @@ window.alnSubmitProposal = async function(){
   const desc  =((document.getElementById('paDesc')   ||{}).value||'').trim();
   const btn = document.getElementById('paSubmitBtn');
 
+  const PID = window.KTS_PROJECT_ID || 'ALN-9921';
   if(!_paFiles.length){ paStatus('Vui lòng chọn ít nhất 1 ảnh JPG/PNG.', 'var(--red)'); return; }
   if(!auth.currentUser){ paStatus('Chưa đăng nhập — tải lại trang rồi thử lại.', 'var(--red)'); return; }
 
