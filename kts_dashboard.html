@@ -2026,8 +2026,9 @@ function renderMyProjects(projects) {
       <div class="proj-progress-bar">${bar}</div>
       <div class="proj-meta">
         <span><i class="ph-duotone ph-map-pin"></i> Chặng ${p.stage||'C1'}</span>
-        <span><i class="ph-duotone ph-user"></i> CN: ${(p.cn&&p.cn.name)||''}</span>
-        <span><i class="ph-duotone ph-buildings"></i> DN: ${(p.dn&&p.dn.name)||'—'}</span>
+        ${(p.dn && p.dn.uid)
+          ? `<span><i class="ph-duotone ph-buildings"></i> ${(p.dn&&p.dn.name)||'—'}</span>`
+          : `<span><i class="ph-duotone ph-user"></i> ${(p.cn&&p.cn.name)||''}</span>`}
       </div>
       <div class="proj-detail" id="pd${uid}">
         <div class="proj-detail-grid">
