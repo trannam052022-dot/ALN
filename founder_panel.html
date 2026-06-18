@@ -2536,7 +2536,7 @@ function renderMgKts(){
         +'<td style="padding:10px 14px;text-align:center;font-size:11px;color:'+(_statusColor[k.status]||'var(--dim)')+'">'+(_statusLabel[k.status]||k.status)+'</td>'
         +'<td style="padding:10px 14px" onclick="event.stopPropagation()">'+_actionBtns('kts',idx)+'</td>'
       +'</tr>';
-    }).join('') + moreRow;
+    }).join('');
 }
 
 function renderMgDn(){
