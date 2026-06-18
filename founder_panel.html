@@ -1124,6 +1124,7 @@ body::after {
     <option value="C4">C4 — Bảo hành</option>
   </select>
   <div class="tb-actions">
+    <button onclick="openCreateProj()" style="padding:6px 14px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green);border-radius:6px;font-size:12px;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;gap:5px"><i class="ph-duotone ph-plus-circle"></i> Tạo dự án mới</button>
     <button class="btn-refresh" onclick="refreshTable()"><i class="ph-duotone ph-arrow-clockwise"></i> Làm mới</button>
   </div>
 </div>
@@ -1370,6 +1371,63 @@ body::after {
     <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">
       <button onclick="closeAddModal()" style="padding:7px 16px;background:var(--raised);border:1px solid var(--border);color:var(--sub);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:12px">Hủy</button>
       <button onclick="saveAddModal()" style="padding:7px 16px;background:var(--blue);border:none;color:#fff;border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:700">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL TẠO DỰ ÁN MỚI ══ -->
+<div id="createProjModal" onclick="if(event.target===this)closeCreateProj()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:210;align-items:center;justify-content:center">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.7)">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:14px;font-weight:700;color:var(--text1);display:flex;align-items:center;gap:8px"><i class="ph-duotone ph-folder-plus" style="color:var(--green)"></i> Tạo dự án mới</div>
+      <button onclick="closeCreateProj()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:4px">✕</button>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Tên công trình *</label>
+        <input id="cp_name" placeholder="Biệt thự Vườn Tân Cổ Điển..." style="width:100%;background:var(--raised);border:1px solid var(--border);color:var(--text1);padding:9px 12px;border-radius:7px;font-family:var(--sans);font-size:13px;outline:none">
+      </div>
+
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Địa chỉ</label>
+        <input id="cp_addr" placeholder="TP. Hồ Chí Minh" style="width:100%;background:var(--raised);border:1px solid var(--border);color:var(--text1);padding:9px 12px;border-radius:7px;font-family:var(--sans);font-size:13px;outline:none">
+      </div>
+
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Tổng phí thiết kế (VND) *</label>
+        <input id="cp_fee" type="number" placeholder="125000000" min="0" style="width:100%;background:var(--raised);border:1px solid var(--border);color:var(--text1);padding:9px 12px;border-radius:7px;font-family:var(--mono);font-size:13px;outline:none" oninput="cpUpdateFeePreview()">
+        <div id="cp_fee_preview" style="font-size:11px;color:var(--amber);margin-top:4px;font-family:var(--mono)"></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:var(--green);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Chủ nhà (CN) *</label>
+          <select id="cp_cn" style="width:100%;background:var(--raised);border:1px solid var(--green-bd);color:var(--text1);padding:9px 10px;border-radius:7px;font-family:var(--sans);font-size:12px;outline:none">
+            <option value="">— Đang tải...</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:var(--amber);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Kiến trúc sư (KTS) *</label>
+          <select id="cp_kts" style="width:100%;background:var(--raised);border:1px solid var(--amber-bd);color:var(--text1);padding:9px 10px;border-radius:7px;font-family:var(--sans);font-size:12px;outline:none">
+            <option value="">— Đang tải...</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--blue);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Doanh nghiệp (DN) — tuỳ chọn</label>
+        <select id="cp_dn" style="width:100%;background:var(--raised);border:1px solid var(--blue-bd);color:var(--text1);padding:9px 10px;border-radius:7px;font-family:var(--sans);font-size:12px;outline:none">
+          <option value="">— Không chọn</option>
+        </select>
+      </div>
+
+      <div id="cp_err" style="display:none;background:var(--red-bg);border:1px solid var(--red-bd);border-radius:7px;padding:9px 12px;font-size:12px;color:var(--red)"></div>
+
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">
+      <button onclick="closeCreateProj()" style="padding:8px 18px;background:var(--raised);border:1px solid var(--border);color:var(--sub);border-radius:7px;cursor:pointer;font-family:var(--sans);font-size:12px">Hủy</button>
+      <button onclick="saveCreateProj()" id="cp_btn" style="padding:8px 20px;background:var(--green);border:none;color:#000;border-radius:7px;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px"><i class="ph-duotone ph-check"></i> Tạo dự án</button>
     </div>
   </div>
 </div>
@@ -2691,6 +2749,98 @@ function renderPending(){
   }).join('');
 }
 
+/* ── TẠO DỰ ÁN MỚI ── */
+function cpUpdateFeePreview(){
+  var v = parseInt(document.getElementById('cp_fee').value, 10);
+  var el = document.getElementById('cp_fee_preview');
+  if(!el) return;
+  el.textContent = v > 0 ? _fmtM(v) + ' triệu đồng' : '';
+}
+
+function _cpPopulateSelect(id, users, placeholder){
+  var sel = document.getElementById(id);
+  if(!sel) return;
+  sel.innerHTML = '<option value="">' + placeholder + '</option>'
+    + users.map(function(u){
+        return '<option value="' + u.uid + '">' + u.name + ' (' + u.username + ')</option>';
+      }).join('');
+}
+
+async function openCreateProj(){
+  document.getElementById('cp_name').value = '';
+  document.getElementById('cp_addr').value = '';
+  document.getElementById('cp_fee').value  = '';
+  document.getElementById('cp_fee_preview').textContent = '';
+  document.getElementById('cp_err').style.display = 'none';
+  var btn = document.getElementById('cp_btn');
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ph-duotone ph-check"></i> Tạo dự án';
+  document.getElementById('createProjModal').style.display = 'flex';
+
+  try {
+    var fb = window._cpFb;
+    if(!fb){ document.getElementById('cp_err').textContent = 'Firebase chưa sẵn sàng.'; document.getElementById('cp_err').style.display = ''; return; }
+    var users = await fb.loadUsers();
+    _cpPopulateSelect('cp_cn',  users.cn,  '— Chọn Chủ nhà');
+    _cpPopulateSelect('cp_kts', users.kts, '— Chọn KTS');
+    _cpPopulateSelect('cp_dn',  users.dn,  '— Không chọn');
+  } catch(e){
+    document.getElementById('cp_err').textContent = 'Lỗi tải danh sách: ' + (e.message || e.code);
+    document.getElementById('cp_err').style.display = '';
+  }
+}
+
+function closeCreateProj(){
+  document.getElementById('createProjModal').style.display = 'none';
+}
+
+async function saveCreateProj(){
+  var name = document.getElementById('cp_name').value.trim();
+  var addr = document.getElementById('cp_addr').value.trim();
+  var fee  = parseInt(document.getElementById('cp_fee').value, 10) || 0;
+  var cnUid  = document.getElementById('cp_cn').value;
+  var ktsUid = document.getElementById('cp_kts').value;
+  var dnUid  = document.getElementById('cp_dn').value;
+  var errEl  = document.getElementById('cp_err');
+
+  errEl.style.display = 'none';
+  if(!name){ errEl.textContent = 'Vui lòng nhập tên công trình.'; errEl.style.display = ''; return; }
+  if(!fee)  { errEl.textContent = 'Vui lòng nhập tổng phí.'; errEl.style.display = ''; return; }
+  if(!cnUid){ errEl.textContent = 'Vui lòng chọn Chủ nhà.'; errEl.style.display = ''; return; }
+  if(!ktsUid){ errEl.textContent = 'Vui lòng chọn Kiến trúc sư.'; errEl.style.display = ''; return; }
+
+  var btn = document.getElementById('cp_btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin"></i> Đang tạo...';
+
+  try {
+    var fb = window._cpFb;
+    var users = await fb.loadUsers();
+
+    var cnUser  = users.cn.find(function(u){ return u.uid === cnUid; }) || {};
+    var ktsUser = users.kts.find(function(u){ return u.uid === ktsUid; }) || {};
+    var dnUser  = dnUid ? (users.dn.find(function(u){ return u.uid === dnUid; }) || null) : null;
+
+    var pid = await fb.createProject({
+      name:    name,
+      address: addr,
+      totalFee: fee,
+      cn:  { uid: cnUser.uid,  name: cnUser.name,  username: cnUser.username  },
+      kts: { uid: ktsUser.uid, name: ktsUser.name, username: ktsUser.username },
+      dn:  dnUser ? { uid: dnUser.uid, name: dnUser.name, username: dnUser.username } : null,
+    });
+
+    closeCreateProj();
+    if(typeof showToast === 'function') showToast('✅ Đã tạo dự án ' + pid, 'ok');
+    else alert('✅ Đã tạo dự án ' + pid);
+  } catch(e){
+    errEl.textContent = 'Lỗi tạo dự án: ' + (e.message || e.code || e);
+    errEl.style.display = '';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ph-duotone ph-check"></i> Tạo dự án';
+  }
+}
+
 function _updatePendingBadge(){
   var n = (window.PENDING_USERS || []).length;
   var badge = document.getElementById('pendingBadge');
@@ -3245,6 +3395,47 @@ window.founderRejectPending = async function(uid) {
     renderPending(); _updatePendingBadge();
     console.log('[Founder] Từ chối tài khoản', uid);
   } catch(e){ console.error('[Founder rejectPending]', e); alert('Lỗi: '+(e.message||e.code)); }
+};
+
+/* ── CP: load users + create project ── */
+window._cpFb = {
+  loadUsers: async function() {
+    const snap = await getDocs(collection(db, 'users'));
+    const all  = snap.docs.map(d => Object.assign({ uid: d.id }, d.data()));
+    return {
+      cn:  all.filter(u => u.role === 'cn'  && u.status !== 'rejected'),
+      kts: all.filter(u => u.role === 'kts' && u.status === 'active'),
+      dn:  all.filter(u => u.role === 'dn'  && u.status === 'active'),
+    };
+  },
+  createProject: async function(data) {
+    const pid = 'ALN-' + (1000 + Math.floor(Math.random() * 8999));
+    const memberUids = [data.cn.uid, data.kts.uid, data.dn && data.dn.uid].filter(Boolean);
+    const projData = {
+      code: pid,
+      name: data.name,
+      address: data.address || '',
+      cn:  data.cn,
+      kts: data.kts,
+      dn:  data.dn || null,
+      memberUids,
+      stage: 'C1',
+      status: 'on_track',
+      progress: { C1: 0, C2: 0, C3: 0, C4: 0 },
+      totalFee: data.totalFee,
+      escrowBalance: 0,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+    const ref = doc(db, 'projects', pid);
+    await setDoc(ref, projData);
+    const stageBase = { submittedAt: null, approvedAt: null, revisions: 0, maxRevisions: 3 };
+    await setDoc(doc(db, 'projects', pid, 'stages', 'C1'), Object.assign({}, stageBase, { status: 'pending' }));
+    await setDoc(doc(db, 'projects', pid, 'stages', 'C2'), Object.assign({}, stageBase, { status: 'locked' }));
+    await setDoc(doc(db, 'projects', pid, 'stages', 'C3'), Object.assign({}, stageBase, { status: 'locked' }));
+    await setDoc(doc(db, 'projects', pid, 'stages', 'C4'), Object.assign({}, stageBase, { status: 'locked' }));
+    return pid;
+  }
 };
 
 async function _startPendingListen() {
