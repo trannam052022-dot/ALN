@@ -3151,44 +3151,53 @@ window.submitC3 = async function() {
 
   const toUpload = slots.filter(s => files[s.id] && !files[s.id].hasError && files[s.id].file && files[s.id].file.name);
   const total = toUpload.length;
+  if (total === 0) {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-cloud-arrow-up"></i> Nộp Hồ sơ C3'; }
+    if (sr) { sr.style.display = ''; sr.innerHTML = '<div style="font-size:11px;color:var(--amber)"><i class="ph-duotone ph-warning"></i> Chưa có file nào được chọn.</div>'; }
+    return;
+  }
   let done = 0, failed = 0;
-  const u = typeof ktsUser === 'function' ? ktsUser() : {};
-  const today = new Date().toISOString().slice(0, 10);
+  const uploaderUid  = (auth.currentUser && auth.currentUser.uid) || window.__ALN_UID || '';
+  const uploaderName = (window.KTS_USER && window.KTS_USER.name) || (window.KTS_PROJECT_DATA && window.KTS_PROJECT_DATA.kts && window.KTS_PROJECT_DATA.kts.name) || 'KTS';
+  const today = new Date().toLocaleDateString('vi-VN');
 
   for (const slot of toUpload) {
     const f = files[slot.id].file;
     try {
+      if (sr) sr.innerHTML = `<div style="font-size:11px;color:var(--muted)"><i class="ph-duotone ph-spinner-gap ph-spin"></i> Đang upload ${done+1}/${total}: ${slot.label}...</div>`;
       const ref = storageRef(storage, `projects/${pid}/c3/${slot.id}/${Date.now()}_${f.name}`);
       await uploadBytes(ref, f);
       const url = await getDownloadURL(ref);
       await addDoc(collection(db, 'projects', pid, 'documents'), {
-        name: f.name,
+        name:   f.name,
         folder: slot.id,
-        label: slot.label,
+        label:  slot.label,
         url,
-        stage: 'C3',
-        uploader: { uid: (auth.currentUser && auth.currentUser.uid) || u.uid || '', name: u.name || '', role: 'kts' },
-        date: today,
+        stage:  'C3',
+        uploader: { uid: uploaderUid, name: uploaderName, role: 'kts' },
+        date:   today,
       });
       done++;
-      if (sr) sr.innerHTML = `<div style="font-size:11px;color:var(--green)">✅ ${done}/${total}: ${slot.label}</div>`;
     } catch(e) {
       console.error('[C3 upload]', slot.id, e);
       failed++;
-      if (sr) sr.innerHTML = `<div style="font-size:11px;color:var(--red)">❌ Lỗi: ${slot.label} — ${(e&&e.message)||e}</div>`;
+      if (sr) sr.innerHTML = `<div style="font-size:11px;color:var(--red)"><i class="ph-duotone ph-x-circle"></i> Lỗi: ${slot.label} — ${(e&&e.code)||e.message}</div>`;
     }
   }
 
   if (failed === 0) {
-    if (sr) sr.innerHTML = `<div style="padding:9px 12px;background:rgba(34,197,94,.08);border-radius:8px;font-size:11px;color:var(--green);font-weight:600">
-      <i class="ph-duotone ph-check-circle"></i> Đã upload ${done}/${total} tài liệu C3 — chờ thẩm định
+    if (sr) sr.innerHTML = `<div style="padding:10px 14px;background:var(--green-bg);border:1px solid rgba(22,163,74,.2);border-radius:8px;font-size:12px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:8px">
+      <i class="ph-duotone ph-check-circle" style="font-size:18px"></i>
+      <span>Đã upload ${done}/${total} tài liệu C3 thành công — chờ Founder thẩm định</span>
     </div>`;
     if (btn) { btn.innerHTML = '<i class="ph-duotone ph-check-circle"></i> Đã nộp — chờ thẩm định'; }
-    if (typeof showToast === 'function') showToast('✅ Đã nộp Hồ sơ C3! Thông báo gửi cho Chủ nhà & Admin.', 't-green');
-    if (window.submitC3_realtime) window.submitC3_realtime();
+    showToast('Đã nộp Hồ sơ C3 thành công!', 't-green');
     if (typeof window._alnWatchDocs === 'function') window._alnWatchDocs(pid);
   } else {
-    if (sr) sr.innerHTML = `<div style="font-size:11px;color:var(--amber)">⚠ Upload ${done}/${total} — ${failed} tệp lỗi. Kiểm tra mạng & Storage rules rồi thử lại.</div>`;
+    if (sr) sr.innerHTML = `<div style="padding:10px 14px;background:var(--amber-bg);border:1px solid rgba(217,119,6,.2);border-radius:8px;font-size:12px;color:var(--amber);font-weight:600;display:flex;align-items:center;gap:8px">
+      <i class="ph-duotone ph-warning" style="font-size:18px"></i>
+      <span>Upload ${done}/${total} — ${failed} tệp lỗi. Kiểm tra Storage rules rồi thử lại.</span>
+    </div>`;
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-cloud-arrow-up"></i> Nộp Hồ sơ C3'; }
   }
 };
