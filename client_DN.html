@@ -121,13 +121,14 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .p-gray {background:rgba(90,90,120,.1);color:var(--sub);border:1px solid rgba(90,90,120,.2)}
 .p-red  {background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.2)}
 
-/* ── FOLDER TABS ── */
-.folder-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px}
-.ft{padding:7px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--ink3);color:var(--sub);transition:all .15s;display:flex;align-items:center;gap:6px;font-family:var(--sans)}
-.ft:hover{background:var(--border);color:var(--text2)}
-.ft.active{background:var(--accent-bg);border-color:rgba(201,168,76,.3);color:var(--accent2)}
-.ft-badge{background:var(--ink4);color:var(--sub);font-size:9px;padding:1px 5px;border-radius:99px;font-family:var(--mono)}
-.ft.active .ft-badge{background:rgba(201,168,76,.2);color:var(--accent2)}
+/* ── FOLDER GRID ── */
+.folder-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+@media(max-width:700px){.folder-grid{grid-template-columns:repeat(2,1fr)}}
+.folder-card{border:1.5px solid var(--border);border-radius:var(--r-sm);padding:11px 8px;text-align:center;cursor:pointer;transition:all .2s;background:var(--ink2);display:flex;flex-direction:column;align-items:center;gap:3px}
+.folder-card:hover{border-color:var(--border2);box-shadow:var(--sh)}
+.fc-fol-icon{width:32px;height:32px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:2px}
+.fc-fol-label{font-size:10px;font-weight:700;color:var(--text2);line-height:1.3;text-align:center}
+.fc-fol-count{font-size:9px;font-family:var(--mono);padding:1px 7px;border-radius:99px;background:var(--ink4);color:var(--muted);margin-top:1px}
 
 /* ── FILE CARDS ── */
 .files-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
@@ -1798,18 +1799,23 @@ function renderMain(){
     </div>`;
   }).join('');
 
-  /* Folder tabs */
-  const folderTabsHTML =
-    `<button class="ft ${activeFolder==='ALL'?'active':''}" onclick="setFolder('ALL')">
-       <i class="ph-duotone ph-folder-open"></i> Tất cả <span class="ft-badge">${totalDocs}</span>
-     </button>`
+  /* Folder grid cards */
+  const folderGridHTML =
+    `<div class="folder-card" onclick="setFolder('ALL')"
+       style="border-color:${activeFolder==='ALL'?'rgba(212,160,23,.5)':'var(--border)'};background:${activeFolder==='ALL'?'rgba(212,160,23,.07)':'var(--ink2)'}">
+       <div class="fc-fol-icon" style="background:rgba(212,160,23,.12);color:var(--gold)"><i class="ph-duotone ph-folder-open"></i></div>
+       <div class="fc-fol-label" style="color:${activeFolder==='ALL'?'var(--gold)':'var(--text2)'}">Tất cả</div>
+       <span class="fc-fol-count" style="${activeFolder==='ALL'?'background:rgba(212,160,23,.18);color:var(--gold)':''}">${totalDocs}</span>
+     </div>`
     + FOLDERS.map(f=>{
         const active = activeFolder===f.id;
-        return `<button class="ft ${active?'active':''}" onclick="setFolder('${f.id}')"
-          style="${active?`border-color:${f.color}40;background:${f.color}14;color:${f.color}`:''}">
-          <i class="ph-duotone ${f.icon}" style="color:${active?f.color:''}"></i>
-          ${f.label} <span class="ft-badge">${foldCounts[f.id]||0}</span>
-        </button>`;
+        const cnt = foldCounts[f.id]||0;
+        return `<div class="folder-card" onclick="setFolder('${f.id}')"
+          style="border-color:${active?f.color+'99':'var(--border)'};background:${active?f.color+'0d':'var(--ink2)'}">
+          <div class="fc-fol-icon" style="background:${f.color}18;color:${f.color}"><i class="ph-duotone ${f.icon}"></i></div>
+          <div class="fc-fol-label" style="color:${active?f.color:'var(--text2)'}">${f.label}</div>
+          <span class="fc-fol-count" style="${active?'background:'+f.color+'22;color:'+f.color:''}">${cnt}</span>
+        </div>`;
       }).join('');
 
   /* Active docs */
@@ -1827,7 +1833,7 @@ function renderMain(){
         const fi = FOLDERS.find(f=>f.id===d.folder)||FOLDERS[0];
         return `<div class="file-card ${d.isNew?'new-doc':''}" onclick="downloadDoc('${d.id}','${d.name}')">
           <div style="display:flex;align-items:center;gap:10px">
-            <div class="fc-icon" style="background:rgba(255,255,255,.04);border:1px solid var(--border)">
+            <div class="fc-icon" style="background:var(--ink3);border:1px solid var(--border)">
               <i class="ph-duotone ${ICON[d.type]||'ph-file'}" style="color:${ICOLOR[d.type]||'var(--sub)'};font-size:20px"></i>
             </div>
             <div style="flex:1;min-width:0">
@@ -2250,7 +2256,7 @@ function renderMain(){
           <span class="pill p-blue" style="margin-left:auto;font-size:10px">${totalDocs} file</span>
         </div>
         ${folderDescHTML}
-        <div class="folder-tabs">${folderTabsHTML}</div>
+        <div class="folder-grid">${folderGridHTML}</div>
         <div class="files-grid">${docCards}</div>
       </div>
 
