@@ -313,7 +313,17 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .drop-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .cn-up-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:10px}
 .cn-up-card{background:var(--ink);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;cursor:pointer;transition:all .15s;position:relative}
-.cn-up-card:hover{border-color:var(--accent2);transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.cn-up-card:hover{border-color:var(--accent2);transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.1)}
+/* Optional folder overlay */
+.folder-card{position:relative;overflow:hidden}
+.folder-card-opt-overlay{position:absolute;inset:0;border-radius:var(--r-sm);background:rgba(248,250,252,.9);backdrop-filter:blur(1px);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;gap:4px}
+/* Pending upload review */
+.dn-pending-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;padding:0 8px;margin-bottom:4px}
+.dn-pending-card{border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;position:relative;background:var(--ink2)}
+.dn-pending-thumb{width:100%;height:68px;display:flex;align-items:center;justify-content:center;background:var(--ink3);position:relative;overflow:hidden}
+.dn-pending-thumb img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.dn-pending-name{font-size:9px;padding:3px 5px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dn-pending-del{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:rgba(220,38,38,.85);border:none;color:#fff;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5}
 .cn-up-thumb{width:100%;height:80px;display:flex;align-items:center;justify-content:center;background:var(--ink4);position:relative;overflow:hidden}
 .cn-up-thumb img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
 .cn-up-meta{padding:5px 7px}
@@ -864,11 +874,11 @@ const FOLDERS = [
     desc:'Móng · Cột · Dầm · Sàn · Chi tiết thép' },
   { id:'me',        label:'Điện nước M&E',       icon:'ph-lightning',             color:'var(--cyan)',
     desc:'Sơ đồ điện · Cấp thoát nước · PCCC · Điều hòa thông gió' },
-  { id:'thep',      label:'Thống kê Thép',       icon:'ph-table',      color:'var(--green)',
+  { id:'thep',      label:'Thống kê Thép',       icon:'ph-table',      color:'var(--green)',   optional:true,
     desc:'Bảng thống kê thép theo cấu kiện · Tổng hợp khối lượng' },
-  { id:'vat_tu',    label:'Bảng Vật tư',         icon:'ph-stack',    color:'var(--purple)',
+  { id:'vat_tu',    label:'Bảng Vật tư',         icon:'ph-stack',    color:'var(--purple)',  optional:true,
     desc:'Danh mục vật liệu · Khối lượng · Đơn vị tính' },
-  { id:'du_toan',   label:'Dự toán Chi phí',     icon:'ph-calculator',       color:'var(--gold)',
+  { id:'du_toan',   label:'Dự toán Chi phí',     icon:'ph-calculator',       color:'var(--gold)',    optional:true,
     desc:'Dự toán hạng mục · Đơn giá tham chiếu · Tổng chi phí xây dựng' },
 ];
 
@@ -911,6 +921,8 @@ const DOCS = {
 
 window.activeProj = window.activeProj || null;
 let activeFolder = 'ALL';
+window.dnEnabledFolders = window.dnEnabledFolders || {};
+window.dnPending = window.dnPending || {};
 
 const STATUS_DOT={on_track:'var(--green)',sla_warn:'var(--amber)',dispute:'var(--red)',done:'var(--sub)'};
 const STGCOLS=['var(--green)','var(--amber)','var(--blue)','var(--sub)'];
@@ -1311,6 +1323,7 @@ function handleAnnotDrop(event,projId,stage,paId){
   _processFiles(files,projId,stage,paId,'panel');
 }
 function _processFiles(files,projId,stage,paId,source){
+  if(source==='panel'){_stagePending(files,projId,paId);return;}
   const pa=(REVIEW_DATA[projId] && REVIEW_DATA[projId][stage] && REVIEW_DATA[projId][stage].paList).find(x=>x.id===paId);if(!pa)return;
   if(!pa.cnUploads)pa.cnUploads=[];
   let loaded=0;
@@ -1345,6 +1358,80 @@ function _processFiles(files,projId,stage,paId,source){
       }
     };
     if(isImg){reader.onload=e=>finish(e.target.result);reader.readAsDataURL(file);}
+    else finish(null);
+  });
+}
+window.toggleDNFolder = function(id, ev) {
+  if(ev) ev.stopPropagation();
+  window.dnEnabledFolders[id] = !window.dnEnabledFolders[id];
+  if(!window.dnEnabledFolders[id] && activeFolder===id) activeFolder='ALL';
+  renderMain();
+};
+window.removePending = function(paId, idx) {
+  if(!window.dnPending[paId]) return;
+  window.dnPending[paId].splice(idx,1);
+  var pg = document.getElementById('dnPendGrid_'+paId);
+  if(pg) _refreshPendingGrid(paId, pg);
+  var cnt = (window.dnPending[paId]||[]).length;
+  var btn = document.getElementById('dnSendBtn_'+paId);
+  if(btn) { btn.style.display = cnt?'':'none'; if(cnt) btn.innerHTML='<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi cho KTS '+cnt+' file'; }
+};
+function _refreshPendingGrid(paId, pg) {
+  var arr = window.dnPending[paId]||[];
+  if(!arr.length){pg.innerHTML='';return;}
+  pg.innerHTML = arr.map(function(u,i){
+    return '<div class="dn-pending-card">'
+      +'<div class="dn-pending-thumb">'+(u.dataUrl?'<img src="'+u.dataUrl+'">':(u.type==='pdf'?'<i class="ph-duotone ph-file-pdf" style="font-size:22px;color:var(--red)"></i>':u.type==='dwg'?'<i class="ph-duotone ph-blueprint" style="font-size:22px;color:var(--blue)"></i>':'<i class="ph-duotone ph-file" style="font-size:22px;color:var(--muted)"></i>'))+'</div>'
+      +'<div class="dn-pending-name">'+u.name+'</div>'
+      +'<button class="dn-pending-del" onclick="removePending(\''+paId+'\','+i+')">✕</button>'
+      +'</div>';
+  }).join('');
+}
+window.confirmSendFiles = function(projId, rid, paId) {
+  var arr = window.dnPending[paId];
+  if(!arr||!arr.length) return;
+  var stageData = REVIEW_DATA[projId]&&REVIEW_DATA[projId][rid];
+  var pa = (stageData&&stageData.paList||[]).find(function(x){return x.id===paId;});
+  if(!pa) return;
+  if(!pa.cnUploads) pa.cnUploads=[];
+  var cnt = arr.length;
+  arr.forEach(function(u){
+    pa.cnUploads.unshift(u);
+    try{if(window.alnUploadFile&&u._file){
+      var safe=u._file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+      var path='uploads/'+projId+'/'+paId+'/'+Date.now()+'_'+safe;
+      window.alnUploadFile(u._file,path).then(function(url){
+        try{ALNRealtime.send({type:'ALN_CHAT',audience:['kts'],projectId:projId,
+          text:'Đã gửi tệp ['+((pa&&pa.name)||paId)+']: '+u.name+' — <a href="'+url+'" target="_blank" style="color:#d4a017;text-decoration:underline;font-weight:700">Tải về</a>',
+          senderName:((typeof DN_USER!=='undefined'&&DN_USER.name)||'Doanh nghiệp'),senderRole:'dn'});}catch(e){}
+      }).catch(function(err){try{showToast('Upload lỗi: '+((err&&err.code)||err),'t-red');}catch(e){}});
+    }}catch(e){}
+  });
+  window.dnPending[paId]=[];
+  try{ALNRealtime.send({type:'CN_FILE_UPLOADED',projectId:projId,stage:rid,paId:paId,count:cnt});}catch(e){}
+  showToast('Đã gửi '+cnt+' file cho KTS!','t-green');
+  renderMain(); setTimeout(function(){_redrawHero(projId);},30);
+};
+function _stagePending(files, projId, paId) {
+  if(!window.dnPending[paId]) window.dnPending[paId]=[];
+  var loaded=0;
+  files.forEach(function(file){
+    var ext=file.name.split('.').pop().toLowerCase();
+    var isImg=['jpg','jpeg','png','gif','webp','bmp'].indexOf(ext)>=0;
+    var finish=function(dataUrl){
+      window.dnPending[paId].push({id:'up_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+        name:file.name,size:(file.size/1024).toFixed(0)+'KB',type:isImg?'image':ext,
+        dataUrl:isImg?dataUrl:null,_file:file,
+        ts:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})});
+      if(++loaded===files.length){
+        var pg=document.getElementById('dnPendGrid_'+paId);
+        if(pg) _refreshPendingGrid(paId,pg);
+        var cnt=(window.dnPending[paId]||[]).length;
+        var btn=document.getElementById('dnSendBtn_'+paId);
+        if(btn){btn.style.display='';btn.innerHTML='<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi cho KTS '+cnt+' file';}
+      }
+    };
+    if(isImg){var r=new FileReader();r.onload=function(e){finish(e.target.result);};r.readAsDataURL(file);}
     else finish(null);
   });
 }
@@ -1810,8 +1897,19 @@ function renderMain(){
     + FOLDERS.map(f=>{
         const active = activeFolder===f.id;
         const cnt = foldCounts[f.id]||0;
-        return `<div class="folder-card" onclick="setFolder('${f.id}')"
-          style="border-color:${active?f.color+'99':'var(--border)'};background:${active?f.color+'0d':'var(--ink2)'}">
+        const isOpt = !!f.optional;
+        const enabled = !isOpt || !!window.dnEnabledFolders[f.id];
+        const optOverlay = isOpt && !enabled
+          ? `<div class="folder-card-opt-overlay">
+               <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Tùy chọn</div>
+               <button onclick="event.stopPropagation();toggleDNFolder('${f.id}')" style="padding:4px 12px;background:var(--gold);color:#1a1400;border:none;border-radius:6px;font-weight:700;font-size:11px;cursor:pointer;margin-top:4px">Bật</button>
+             </div>`
+          : (isOpt && enabled
+              ? `<button onclick="event.stopPropagation();toggleDNFolder('${f.id}')" title="Tắt" style="position:absolute;top:4px;right:4px;padding:1px 6px;background:var(--ink4);border:1px solid var(--border);border-radius:4px;font-size:8px;color:var(--muted);cursor:pointer;z-index:3">✕</button>`
+              : '');
+        return `<div class="folder-card" onclick="${enabled?"setFolder('"+f.id+"')":''}"
+          style="border-color:${active?f.color+'99':'var(--border)'};background:${active?f.color+'0d':'var(--ink2)'};${!enabled?'cursor:default':''}">
+          ${optOverlay}
           <div class="fc-fol-icon" style="background:${f.color}18;color:${f.color}"><i class="ph-duotone ${f.icon}"></i></div>
           <div class="fc-fol-label" style="color:${active?f.color:'var(--text2)'}">${f.label}</div>
           <span class="fc-fol-count" style="${active?'background:'+f.color+'22;color:'+f.color:''}">${cnt}</span>
@@ -2214,7 +2312,27 @@ function renderMain(){
                   <span style="font-size:11px;color:var(--text2)">Kéo thả hoặc <b style="color:var(--accent2)">chọn file</b></span>
                   <span style="font-size:10px;color:var(--muted);display:block;margin-top:2px">Ảnh chú thích tay, PDF scan, DWG...</span>
                 </div>
-                <!-- Uploaded files grid -->
+                <!-- Pending review grid -->
+                ${(window.dnPending[pa.id]||[]).length>0?`
+                <div style="padding:6px 8px 3px;font-size:10px;font-weight:700;color:var(--amber);display:flex;align-items:center;gap:5px">
+                  <i class="ph-duotone ph-eye"></i> Xem lại trước khi gửi — ${(window.dnPending[pa.id]||[]).length} file
+                </div>`:''}
+                <div class="dn-pending-grid" id="dnPendGrid_${pa.id}">
+                  ${(window.dnPending[pa.id]||[]).map((u,i)=>`
+                    <div class="dn-pending-card">
+                      <div class="dn-pending-thumb">${u.dataUrl?`<img src="${u.dataUrl}">`:u.type==='pdf'?'<i class="ph-duotone ph-file-pdf" style="font-size:22px;color:var(--red)"></i>':'<i class="ph-duotone ph-file" style="font-size:22px;color:var(--muted)"></i>'}</div>
+                      <div class="dn-pending-name">${u.name}</div>
+                      <button class="dn-pending-del" onclick="removePending('${pa.id}',${i})">✕</button>
+                    </div>`).join('')}
+                </div>
+                ${(window.dnPending[pa.id]||[]).length>0?`
+                <div style="padding:0 8px 8px">
+                  <button id="dnSendBtn_${pa.id}" onclick="confirmSendFiles('${p.id}','${rid}','${pa.id}')"
+                    style="width:100%;padding:9px;background:linear-gradient(135deg,var(--green),#22c55e);border:none;border-radius:var(--r-sm);color:#fff;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--sans)">
+                    <i class="ph-duotone ph-paper-plane-tilt"></i> Gửi cho KTS ${(window.dnPending[pa.id]||[]).length} file
+                  </button>
+                </div>`:`<button id="dnSendBtn_${pa.id}" style="display:none"></button>`}
+                <!-- Confirmed uploaded files grid -->
                 <div class="cn-up-grid" id="cnUpGrid_${pa.id}" style="padding:0 8px 8px">
                   ${(pa.cnUploads||[]).map(u=>`
                     <div class="cn-up-card" onclick="viewCNUpload('${u.id}','${p.id}','${rid}','${pa.id}')">
