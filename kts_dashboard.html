@@ -2308,7 +2308,7 @@ let _paFiles = [];   // danh sách nhiều ảnh đã chọn
 let _paUnsub = null;
 
 function ktsUser(){ try{ return JSON.parse(sessionStorage.getItem('aln_user')||'{}'); }catch(e){ return {}; } }
-function paStatus(msg, color){ const el=document.getElementById('paStatus'); if(el){ el.textContent=msg; el.style.color=color||'var(--muted)'; } }
+function paStatus(msg, color){ const el=document.getElementById('paStatus'); if(el){ el.innerHTML=msg; el.style.color=color||'var(--muted)'; } }
 function paBaseName(f){ return (f.name||'pa').replace(/\.[^.]+$/,''); }
 
 /* Gom ảnh vào danh sách, có kiểm tra JPG/PNG + ≤5MB, bỏ trùng */
@@ -2398,19 +2398,42 @@ window.alnSubmitProposal = async function(){
   const btn = document.getElementById('paSubmitBtn');
 
   const PID = window.KTS_PROJECT_ID || 'ALN-9921';
+
+  // Mục 1: bắt buộc nhập tên
+  if(!name){
+    const ni=document.getElementById('paName');
+    if(ni){ ni.style.borderColor='var(--red)'; ni.focus(); }
+    paStatus('⚠️ Vui lòng nhập <b>tên phương án</b> trước khi gửi.','var(--red)'); return;
+  }
+  const ni2=document.getElementById('paName'); if(ni2) ni2.style.borderColor='';
+
   if(!_paFiles.length){ paStatus('Vui lòng chọn ít nhất 1 ảnh JPG/PNG.', 'var(--red)'); return; }
   if(!auth.currentUser){ paStatus('Chưa đăng nhập — tải lại trang rồi thử lại.', 'var(--red)'); return; }
 
-  if(btn) btn.disabled=true;
+  // Mục 9: xác nhận trước khi gửi
   const total=_paFiles.length;
-  let done=0, failed=0;
-  const u = ktsUser();
-  try{
-    for(let i=0;i<_paFiles.length;i++){
-      const f=_paFiles[i];
-      /* mỗi ảnh = 1 phương án. Nhiều ảnh: tên = (tên đã nhập + số) hoặc tên tệp */
-      const nm = name ? (total>1 ? (name+' '+(i+1)) : name) : paBaseName(f);
-      paStatus('Đang gửi '+(i+1)+'/'+total+': '+nm+' ...', 'var(--gold)');
+  const _isCNp = !!(window.KTS_PROJECT_DATA && window.KTS_PROJECT_DATA.cn && window.KTS_PROJECT_DATA.cn.uid);
+  const _dpid = (_isCNp?'ALN-CN-':'ALN-DN-') + PID.replace(/^ALN-/,'');
+  paStatus(`<div style="background:var(--ink3);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:10px 12px">
+    <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">📋 Sắp gửi <b>${total} ảnh</b> · Chặng <b>${stage}</b> · <b>${name}</b></div>
+    <div style="font-size:10px;color:var(--sub);margin-bottom:10px">Dự án ${_dpid} — Chủ nhà &amp; DN nhận ngay sau khi gửi.</div>
+    <div style="display:flex;gap:8px">
+      <button onclick="window._paDoUpload()" style="padding:5px 14px;background:rgba(34,201,122,.12);border:1px solid rgba(34,201,122,.3);color:var(--green);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-check-circle"></i> Xác nhận gửi</button>
+      <button onclick="paStatus('','var(--muted)')" style="padding:5px 12px;background:var(--ink4);border:1px solid var(--border);color:var(--sub);border-radius:6px;font-size:11px;cursor:pointer;font-family:var(--sans)">Hủy</button>
+    </div></div>`,'');
+  // Capture upload closure
+  window._paDoUpload = async function(){
+    paStatus('','');
+    if(btn) btn.disabled=true;
+    let done=0, failed=0;
+    const u = ktsUser();
+    try{
+      for(let i=0;i<_paFiles.length;i++){
+        const f=_paFiles[i];
+        const nm = total>1 ? (name+' '+(i+1)) : name;
+        // Mục 8: progress bar
+        const pct=Math.round((i/total)*100);
+        paStatus(`<div style="display:flex;align-items:center;gap:8px"><span style="color:var(--gold)">Đang gửi ${i+1}/${total}…</span><div style="flex:1;height:4px;background:var(--ink4);border-radius:99px"><div style="width:${pct}%;height:4px;background:var(--gold);border-radius:99px;transition:width .3s"></div></div><span style="font-size:10px;color:var(--muted)">${pct}%</span></div>`,'');
       try{
         const ext  = f.type==='image/png' ? 'png' : 'jpg';
         const safe = nm.replace(/[^a-zA-Z0-9]+/g,'_').slice(0,40) || 'pa';
@@ -2462,7 +2485,8 @@ window.alnSubmitProposal = async function(){
   }finally{
     if(btn) btn.disabled=false;
   }
-};
+  }; // end _paDoUpload
+}; // end alnSubmitProposal
 
 /* Danh sách phương án đã gửi (theo chặng đang chọn) — cập nhật trực tiếp */
 function paWatch(stage){

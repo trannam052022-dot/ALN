@@ -35,7 +35,15 @@ service cloud.firestore {
     }
 
     match /projects/{pid} {
-      allow read:   if signedIn();
+      // Chỉ THÀNH VIÊN của dự án (CN/KTS/DN) hoặc Founder mới đọc được.
+      // Mỗi nhánh khớp với 1 kiểu query: cn.uid (CN), kts.uid (KTS),
+      // dn.uid hoặc memberUids array-contains (DN). Người lạ bị chặn.
+      allow read: if isFounder() || (signedIn() && (
+        request.auth.uid in resource.data.memberUids ||
+        request.auth.uid == resource.data.cn.uid ||
+        request.auth.uid == resource.data.kts.uid ||
+        request.auth.uid == resource.data.dn.uid
+      ));
       allow create: if isFounder();
       allow update: if isFounder() ||
         (signedIn() && request.auth.uid in resource.data.memberUids);
