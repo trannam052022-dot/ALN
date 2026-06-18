@@ -422,22 +422,25 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   .content{padding-bottom:calc(50px + env(safe-area-inset-bottom))}
 }
 
-/* ── QUICK ACTIONS ── */
-.quick-action{display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;padding:10px 6px;border-radius:var(--r);transition:background .12s}
-.quick-action:hover{background:rgba(0,0,0,.04)}
-.qa-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
-.qa-label{font-size:10px;font-weight:600;color:var(--text2);text-align:center;line-height:1.3;white-space:nowrap}
-
 /* ── PROJECT CARDS ── */
-.proj-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);transition:box-shadow .15s;cursor:pointer}
-.proj-card:hover{box-shadow:var(--sh-lg);transform:translateY(-2px)}
-.proj-thumb{height:120px;position:relative;overflow:hidden}
-.proj-thumb-img{width:100%;height:100%;object-fit:cover;display:block}
-.proj-thumb-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px}
+.proj-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);transition:all .18s;cursor:pointer}
+.proj-card:hover{box-shadow:var(--sh-lg);transform:translateY(-3px)}
+.proj-thumb{height:110px;position:relative;overflow:hidden}
+.proj-thumb-inner{width:100%;height:100%;display:flex;align-items:flex-end;padding:10px 12px;position:relative}
+.proj-thumb-inner::before{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 20%,rgba(0,0,0,.55) 100%)}
+.proj-card-title{font-size:13px;font-weight:700;color:#fff;position:relative;z-index:1;text-shadow:0 1px 4px rgba(0,0,0,.4);line-height:1.3}
 .proj-card-body{padding:12px 14px}
-.proj-card-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.proj-card-meta{font-size:11px;color:var(--muted)}
-.proj-card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.proj-card-meta{font-size:11px;color:var(--muted);margin-bottom:10px}
+.proj-card-foot{display:flex;align-items:center;justify-content:space-between}
+.proj-stage-pill{font-size:10px;font-weight:700;color:var(--text2);background:var(--ink3);border:1px solid var(--border);padding:2px 8px;border-radius:99px}
+
+/* ── QUICK ACTIONS ── */
+.qa-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+.quick-action{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;padding:16px 8px;border-radius:10px;transition:all .12s}
+.quick-action:hover{background:var(--ink3)}
+.quick-action:hover .qa-icon{transform:scale(1.08)}
+.qa-icon{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;transition:transform .12s;flex-shrink:0}
+.qa-label{font-size:10px;font-weight:600;color:var(--text2);text-align:center;line-height:1.35;white-space:nowrap}
 
 /* ── PAGE FOOTER ── */
 .page-footer{margin-top:40px;padding:20px 0 10px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
@@ -651,89 +654,96 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <!-- ══════════════════════════════════════════
          SECTION A — DỰ ÁN ĐANG THỰC HIỆN (cards)
     ══════════════════════════════════════════ -->
-    <div class="sec-label no-line" style="justify-content:space-between;margin-top:28px">
-      <span>Dự án đang thực hiện</span>
-      <a onclick="scrollTo('.myproj-section')" style="font-size:11px;color:var(--blue);cursor:pointer;font-weight:500">Xem tất cả →</a>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:32px 0 14px">
+      <div style="font-size:13px;font-weight:600;color:var(--text)">Dự án đang thực hiện</div>
+      <a onclick="scrollTo('.myproj-section')" style="font-size:12px;color:var(--blue);cursor:pointer;font-weight:500;display:flex;align-items:center;gap:4px">Xem tất cả <i class="ph-duotone ph-arrow-right" style="font-size:11px"></i></a>
     </div>
-    <div id="projCards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px">
-      <!-- rendered by JS -->
-      <div style="text-align:center;padding:32px;color:var(--muted);font-size:12px;grid-column:1/-1">Đang tải...</div>
+    <div id="projCards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px">
+      <div style="text-align:center;padding:40px;color:var(--muted);font-size:12px;grid-column:1/-1">Đang tải...</div>
     </div>
 
     <!-- ══════════════════════════════════════════
-         SECTION B — THU NHẬP + THÔNG BÁO (2-col)
+         SECTION B — THU NHẬP + THÔNG BÁO (3:2 col)
     ══════════════════════════════════════════ -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px">
+    <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:32px">
 
       <!-- Biểu đồ thu nhập -->
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-          <div style="font-size:12px;font-weight:600;color:var(--text)">Thu nhập tháng <span id="incomeMonthLabel">6</span></div>
-          <div style="font-size:11px;color:var(--muted);background:var(--ink3);border:1px solid var(--border);border-radius:6px;padding:3px 9px;cursor:pointer">Tháng 6 ▾</div>
+      <div class="card" style="padding:20px 24px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Thu nhập tháng <span id="incomeMonthLabel">6</span></div>
+            <div style="display:flex;align-items:baseline;gap:6px">
+              <div style="font-family:var(--syne);font-size:32px;font-weight:800;color:var(--text);letter-spacing:-.5px" id="incomeTotalLabel">11.8M</div>
+              <div style="font-size:12px;color:var(--muted);font-weight:500">VND</div>
+            </div>
+            <div style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--green);background:var(--green-bg);padding:3px 10px;border-radius:99px;margin-top:8px">
+              <i class="ph-duotone ph-trend-up" style="font-size:12px"></i> +32% so với tháng trước
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--text2);background:var(--ink3);border:1px solid var(--border);border-radius:7px;padding:5px 12px;cursor:pointer;white-space:nowrap">Tháng 6 ▾</div>
         </div>
-        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">
-          <div style="font-family:var(--syne);font-size:28px;font-weight:800;color:var(--text)" id="incomeTotalLabel">11.8M</div>
-          <div style="font-size:11px;color:var(--muted)">VND</div>
+        <!-- Y labels + chart -->
+        <div style="display:flex;gap:10px">
+          <div style="display:flex;flex-direction:column;justify-content:space-between;padding-bottom:18px;text-align:right">
+            <div style="font-size:9px;color:var(--muted)">15M</div>
+            <div style="font-size:9px;color:var(--muted)">10M</div>
+            <div style="font-size:9px;color:var(--muted)">5M</div>
+            <div style="font-size:9px;color:var(--muted)">0</div>
+          </div>
+          <div style="flex:1;min-width:0">
+            <svg viewBox="0 0 400 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:90px">
+              <defs>
+                <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#7c3aed" stop-opacity=".15"/>
+                  <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <line x1="0" y1="0"  x2="400" y2="0"  stroke="#e2e8f0" stroke-width=".8"/>
+              <line x1="0" y1="30" x2="400" y2="30" stroke="#e2e8f0" stroke-width=".8"/>
+              <line x1="0" y1="60" x2="400" y2="60" stroke="#e2e8f0" stroke-width=".8"/>
+              <line x1="0" y1="72" x2="400" y2="72" stroke="#e2e8f0" stroke-width=".8"/>
+              <path d="M0,72 C40,68 60,64 100,56 S160,46 200,44 S260,36 300,24 S360,8 400,4 L400,72 L0,72Z" fill="url(#cg)"/>
+              <path d="M0,72 C40,68 60,64 100,56 S160,46 200,44 S260,36 300,24 S360,8 400,4" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="400" cy="4" r="4.5" fill="#7c3aed" stroke="#fff" stroke-width="2"/>
+              <text x="0"   y="86" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="sans-serif">01</text>
+              <text x="100" y="86" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="sans-serif">08</text>
+              <text x="200" y="86" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="sans-serif">15</text>
+              <text x="300" y="86" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="sans-serif">22</text>
+              <text x="400" y="86" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="sans-serif">30</text>
+            </svg>
+          </div>
         </div>
-        <div style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--green);background:var(--green-bg);padding:3px 9px;border-radius:99px;margin-bottom:14px">
-          <i class="ph-duotone ph-arrow-up" style="font-size:10px"></i> 32% so với tháng trước
-        </div>
-        <!-- SVG line chart -->
-        <svg viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:80px;overflow:visible">
-          <defs>
-            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="var(--purple)" stop-opacity=".18"/>
-              <stop offset="100%" stop-color="var(--purple)" stop-opacity="0"/>
-            </linearGradient>
-          </defs>
-          <!-- grid lines -->
-          <line x1="0" y1="20" x2="320" y2="20" stroke="var(--border)" stroke-width=".7"/>
-          <line x1="0" y1="40" x2="320" y2="40" stroke="var(--border)" stroke-width=".7"/>
-          <line x1="0" y1="60" x2="320" y2="60" stroke="var(--border)" stroke-width=".7"/>
-          <!-- fill area -->
-          <path d="M0,70 L32,58 L64,52 L96,44 L128,48 L160,36 L192,28 L224,20 L256,14 L288,8 L320,4 L320,80 L0,80 Z" fill="url(#chartGrad)"/>
-          <!-- line -->
-          <polyline points="0,70 32,58 64,52 96,44 128,48 160,36 192,28 224,20 256,14 288,8 320,4" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-          <!-- dot at end -->
-          <circle cx="320" cy="4" r="4" fill="var(--purple)"/>
-          <!-- x-axis labels -->
-          <text x="0"   y="78" font-size="8" fill="var(--muted)" text-anchor="middle">01</text>
-          <text x="80"  y="78" font-size="8" fill="var(--muted)" text-anchor="middle">08</text>
-          <text x="160" y="78" font-size="8" fill="var(--muted)" text-anchor="middle">15</text>
-          <text x="240" y="78" font-size="8" fill="var(--muted)" text-anchor="middle">22</text>
-          <text x="320" y="78" font-size="8" fill="var(--muted)" text-anchor="middle">30</text>
-        </svg>
       </div>
 
       <!-- Thông báo gần đây -->
-      <div class="card">
-        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
-          <span>Thông báo gần đây</span>
-          <i class="ph-duotone ph-bell" style="color:var(--muted);font-size:14px"></i>
+      <div class="card" style="padding:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="font-size:13px;font-weight:600;color:var(--text)">Thông báo</div>
+          <span style="font-size:10px;font-weight:600;color:var(--blue);background:var(--blue-bg);padding:2px 8px;border-radius:99px">3 mới</span>
         </div>
-        <div style="display:flex;flex-direction:column;gap:2px">
-          <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">
-            <div style="width:32px;height:32px;border-radius:8px;background:var(--green-bg);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"><i class="ph-duotone ph-money"></i></div>
+        <div style="display:flex;flex-direction:column">
+          <div style="display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--border)">
+            <div style="width:34px;height:34px;border-radius:10px;background:var(--green-bg);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0"><i class="ph-duotone ph-money"></i></div>
             <div style="flex:1;min-width:0">
               <div style="font-size:12px;font-weight:600;color:var(--text)">Thanh toán từ Chủ nhà</div>
-              <div style="font-size:11px;color:var(--green);font-weight:600">+11.920.000 VND</div>
-              <div style="font-size:10px;color:var(--muted);margin-top:2px">12 phút trước</div>
+              <div style="font-size:12px;color:var(--green);font-weight:700;margin-top:1px">+11.920.000 VND</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:3px">12 phút trước</div>
             </div>
           </div>
-          <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">
-            <div style="width:32px;height:32px;border-radius:8px;background:var(--gold-bg);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"><i class="ph-duotone ph-crown"></i></div>
+          <div style="display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--border)">
+            <div style="width:34px;height:34px;border-radius:10px;background:var(--gold-bg);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0"><i class="ph-duotone ph-crown"></i></div>
             <div style="flex:1;min-width:0">
               <div style="font-size:12px;font-weight:600;color:var(--text)">KTS. Lê Anh lên hạng VIP Gold</div>
-              <div style="font-size:11px;color:var(--muted)">Chúc mừng!</div>
-              <div style="font-size:10px;color:var(--muted);margin-top:2px">25 phút trước</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">Chúc mừng!</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:3px">25 phút trước</div>
             </div>
           </div>
-          <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0">
-            <div style="width:32px;height:32px;border-radius:8px;background:var(--amber-bg);color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"><i class="ph-duotone ph-star"></i></div>
+          <div style="display:flex;gap:11px;align-items:flex-start;padding:11px 0">
+            <div style="width:34px;height:34px;border-radius:10px;background:var(--amber-bg);color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0"><i class="ph-duotone ph-star"></i></div>
             <div style="flex:1;min-width:0">
-              <div style="font-size:12px;font-weight:600;color:var(--text)">Bạn nhận được đánh giá 5 ★</div>
-              <div style="font-size:11px;color:var(--muted)">Từ Chủ nhà Mr. Hoàng</div>
-              <div style="font-size:10px;color:var(--muted);margin-top:2px">30 phút trước</div>
+              <div style="font-size:12px;font-weight:600;color:var(--text)">Đánh giá 5 ★ từ Chủ nhà</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">Mr. Hoàng · Biệt thự Vườn Tân Cổ Điển</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:3px">30 phút trước</div>
             </div>
           </div>
         </div>
@@ -741,18 +751,20 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     </div>
 
     <!-- ══════════════════════════════════════════
-         SECTION C — THAO TÁC NHANH
+         SECTION C — THAO TÁC NHANH (in card)
     ══════════════════════════════════════════ -->
-    <div class="sec-label no-line" style="margin-bottom:12px">Thao tác nhanh</div>
-    <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px;margin-bottom:32px">
-      <div class="quick-action" onclick="scrollTo('.c3-section')"><div class="qa-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-upload-simple"></i></div><div class="qa-label">Nộp hồ sơ</div></div>
-      <div class="quick-action" onclick="scrollTo('.asset-section')"><div class="qa-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ph-duotone ph-storefront"></i></div><div class="qa-label">Kho tài sản</div></div>
-      <div class="quick-action" onclick="scrollTo('.wallet-section')"><div class="qa-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-wallet"></i></div><div class="qa-label">Ví của tôi</div></div>
-      <div class="quick-action" onclick="scrollTo('.vip-section')"><div class="qa-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-crown"></i></div><div class="qa-label">VIP & Ưu đãi</div></div>
-      <div class="quick-action" onclick="showToast('Lịch sử giao dịch','t-blue')"><div class="qa-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-clock-counter-clockwise"></i></div><div class="qa-label">Lịch sử GD</div></div>
-      <div class="quick-action" onclick="showToast('Đánh giá','t-amber')"><div class="qa-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ph-duotone ph-star"></i></div><div class="qa-label">Đánh giá</div></div>
-      <div class="quick-action" onclick="showToast('Hỗ trợ sẽ ra mắt sớm','t-blue')"><div class="qa-icon" style="background:var(--ink3);color:var(--text2)"><i class="ph-duotone ph-headset"></i></div><div class="qa-label">Hỗ trợ</div></div>
-      <div class="quick-action" onclick="showToast('Hướng dẫn sẽ ra mắt sớm','t-blue')"><div class="qa-icon" style="background:var(--ink3);color:var(--text2)"><i class="ph-duotone ph-book-open"></i></div><div class="qa-label">Hướng dẫn</div></div>
+    <div class="card" style="padding:20px 24px;margin-bottom:32px">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:18px">Thao tác nhanh</div>
+      <div class="qa-grid">
+        <div class="quick-action" onclick="scrollTo('.c3-section')"><div class="qa-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-upload-simple"></i></div><div class="qa-label">Nộp hồ sơ</div></div>
+        <div class="quick-action" onclick="scrollTo('.asset-section')"><div class="qa-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ph-duotone ph-storefront"></i></div><div class="qa-label">Kho tài sản</div></div>
+        <div class="quick-action" onclick="scrollTo('.wallet-section')"><div class="qa-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-wallet"></i></div><div class="qa-label">Ví của tôi</div></div>
+        <div class="quick-action" onclick="scrollTo('.vip-section')"><div class="qa-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-crown"></i></div><div class="qa-label">VIP & Ưu đãi</div></div>
+        <div class="quick-action" onclick="showToast('Lịch sử giao dịch','t-blue')"><div class="qa-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-clock-counter-clockwise"></i></div><div class="qa-label">Lịch sử GD</div></div>
+        <div class="quick-action" onclick="showToast('Đánh giá','t-amber')"><div class="qa-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ph-duotone ph-star"></i></div><div class="qa-label">Đánh giá</div></div>
+        <div class="quick-action" onclick="showToast('Hỗ trợ sẽ ra mắt sớm','t-blue')"><div class="qa-icon" style="background:var(--ink3);color:var(--muted)"><i class="ph-duotone ph-headset"></i></div><div class="qa-label">Hỗ trợ</div></div>
+        <div class="quick-action" onclick="showToast('Hướng dẫn sẽ ra mắt sớm','t-blue')"><div class="qa-icon" style="background:var(--ink3);color:var(--muted)"><i class="ph-duotone ph-book-open"></i></div><div class="qa-label">Hướng dẫn</div></div>
+      </div>
     </div>
 
     <!-- ══════════════════════════════════
@@ -2332,13 +2344,19 @@ function renderProjCards(projs) {
     var label = SL[p.status] || p.status;
     var isCN = !!(p.cn && p.cn.uid);
     var did = (isCN ? 'ALN-CN-' : 'ALN-DN-') + (p.id||'').replace(/^ALN-/,'');
+    var prog = p.progress || [0,0,0,0];
+    var earnPct = (prog[0]||0)*0.10 + (prog[1]||0)*0.20 + (prog[2]||0)*0.60 + (prog[3]||0)*0.10;
+    var earnPctDisp = Math.round(earnPct * 100);
     return '<div class="proj-card" onclick="window.switchKtsProject && window.switchKtsProject(\'' + p.id + '\')">'
-      + '<div class="proj-thumb"><div class="proj-thumb-placeholder" style="background:' + GRAD[i % GRAD.length] + '"></div></div>'
+      + '<div class="proj-thumb">'
+        + '<div class="proj-thumb-inner" style="background:' + GRAD[i % GRAD.length] + '">'
+          + '<div class="proj-card-title">' + (p.name || did) + '</div>'
+        + '</div>'
+      + '</div>'
       + '<div class="proj-card-body">'
-        + '<div class="proj-card-name">' + (p.name || did) + '</div>'
-        + '<div class="proj-card-meta">' + did + ' · SLA: ' + (p.updatedAt ? new Date(p.updatedAt.seconds*1000).toLocaleDateString('vi-VN') : '—') + '</div>'
+        + '<div class="proj-card-meta">' + did + ' · Chặng ' + (p.stage||'C1') + '</div>'
         + '<div class="proj-card-foot">'
-          + '<span style="font-size:10px;color:var(--muted)">Chặng ' + (p.stage||'C1') + '</span>'
+          + '<span class="proj-stage-pill">' + earnPctDisp + '% hoàn thành</span>'
           + '<span style="font-size:11px;font-weight:600;color:' + color + '">' + label + '</span>'
         + '</div>'
       + '</div>'
