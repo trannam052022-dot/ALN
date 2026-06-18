@@ -501,17 +501,17 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     </div>
   </div>
 
-  <a class="nav-item active"><span class="icon"><i class="ph-duotone ph-gauge"></i></span> Dashboard</a>
-  <a class="nav-item" onclick="scrollTo('.myproj-section')"><span class="icon"><i class="ph-duotone ph-briefcase"></i></span> Dự án <span class="nav-badge" id="myProjBadge">0</span></a>
-  <a class="nav-item" onclick="scrollTo('.sla-section')"><span class="icon"><i class="ph-duotone ph-clock"></i></span> Nhiệm vụ <span class="nav-badge" id="taskBadge" style="display:none">0</span></a>
-  <a class="nav-item" onclick="scrollTo('.wallet-section')"><span class="icon"><i class="ph-duotone ph-wallet"></i></span> Ví & Thu nhập</a>
-  <a class="nav-item" onclick="scrollTo('.review-section')"><span class="icon"><i class="ph-duotone ph-clipboard-text"></i></span> Bảng Review <span class="nav-badge" id="reviewBadge" style="display:none">0</span></a>
-  <a class="nav-item" onclick="scrollTo('.c3-section')"><span class="icon"><i class="ph-duotone ph-upload-simple"></i></span> Nộp hồ sơ</a>
+  <a class="nav-item active" data-tab="dashboard"><span class="icon"><i class="ph-duotone ph-gauge"></i></span> Dashboard</a>
+  <a class="nav-item" data-tab="myproj"><span class="icon"><i class="ph-duotone ph-briefcase"></i></span> Dự án <span class="nav-badge" id="myProjBadge">0</span></a>
+  <a class="nav-item" data-tab="dashboard"><span class="icon"><i class="ph-duotone ph-clock"></i></span> Nhiệm vụ <span class="nav-badge" id="taskBadge" style="display:none">0</span></a>
+  <a class="nav-item" data-tab="wallet"><span class="icon"><i class="ph-duotone ph-wallet"></i></span> Ví & Thu nhập</a>
+  <a class="nav-item" data-tab="review"><span class="icon"><i class="ph-duotone ph-clipboard-text"></i></span> Bảng Review <span class="nav-badge" id="reviewBadge" style="display:none">0</span></a>
+  <a class="nav-item" data-tab="c3"><span class="icon"><i class="ph-duotone ph-upload-simple"></i></span> Nộp hồ sơ</a>
 
   <div class="nav-sep"></div>
   <div class="nav-section">Cá nhân</div>
-  <a class="nav-item" onclick="scrollTo('.myprofile-section')"><span class="icon"><i class="ph-duotone ph-user-circle"></i></span> Hồ sơ</a>
-  <a class="nav-item" onclick="scrollTo('.myprofile-section')"><span class="icon"><i class="ph-duotone ph-star"></i></span> Uy tín</a>
+  <a class="nav-item" data-tab="myprofile"><span class="icon"><i class="ph-duotone ph-user-circle"></i></span> Hồ sơ</a>
+  <a class="nav-item" data-tab="myprofile"><span class="icon"><i class="ph-duotone ph-star"></i></span> Uy tín</a>
   <a class="nav-item" onclick="showToast('Cài đặt sẽ ra mắt sớm','t-blue')"><span class="icon"><i class="ph-duotone ph-gear"></i></span> Cài đặt</a>
 
 </nav>
@@ -681,7 +681,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
             <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--red)">297K</span>
           </div>
         </div>
-        <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px;justify-content:center;border-color:var(--border)" onclick="scrollTo('.wallet-section')">
+        <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px;justify-content:center;border-color:var(--border)" onclick="window.ktsShowTab('wallet')">
           Xem chi tiết ví →
         </button>
       </div>
@@ -694,7 +694,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     ══════════════════════════════════════════ -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin:32px 0 14px">
       <div style="font-size:13px;font-weight:600;color:var(--text)">Dự án đang thực hiện</div>
-      <a onclick="scrollTo('.myproj-section')" style="font-size:12px;color:var(--blue);cursor:pointer;font-weight:500;display:flex;align-items:center;gap:4px">Xem tất cả <i class="ph-duotone ph-arrow-right" style="font-size:11px"></i></a>
+      <a onclick="window.ktsShowTab('myproj')" style="font-size:12px;color:var(--blue);cursor:pointer;font-weight:500;display:flex;align-items:center;gap:4px">Xem tất cả <i class="ph-duotone ph-arrow-right" style="font-size:11px"></i></a>
     </div>
     <div id="projCards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px">
       <div class="skel-card"><div class="skeleton" style="height:110px;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:60%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:80%"></div></div>
@@ -796,10 +796,10 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="card" style="padding:20px 24px;margin-bottom:32px">
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:18px">Thao tác nhanh</div>
       <div class="qa-grid">
-        <div class="quick-action" onclick="scrollTo('.c3-section')"><div class="qa-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-upload-simple"></i></div><div class="qa-label">Nộp hồ sơ</div></div>
-        <div class="quick-action" onclick="scrollTo('.asset-section')"><div class="qa-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ph-duotone ph-storefront"></i></div><div class="qa-label">Kho tài sản</div></div>
-        <div class="quick-action" onclick="scrollTo('.wallet-section')"><div class="qa-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-wallet"></i></div><div class="qa-label">Ví của tôi</div></div>
-        <div class="quick-action" onclick="scrollTo('.vip-section')"><div class="qa-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-crown"></i></div><div class="qa-label">VIP & Ưu đãi</div></div>
+        <div class="quick-action" onclick="window.ktsShowTab('c3')"><div class="qa-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-upload-simple"></i></div><div class="qa-label">Nộp hồ sơ</div></div>
+        <div class="quick-action" onclick="window.ktsShowTab('asset')"><div class="qa-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ph-duotone ph-storefront"></i></div><div class="qa-label">Kho tài sản</div></div>
+        <div class="quick-action" onclick="window.ktsShowTab('wallet')"><div class="qa-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-wallet"></i></div><div class="qa-label">Ví của tôi</div></div>
+        <div class="quick-action" onclick="window.ktsShowTab('vip')"><div class="qa-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-crown"></i></div><div class="qa-label">VIP & Ưu đãi</div></div>
         <div class="quick-action" onclick="showToast('Lịch sử giao dịch','t-blue')"><div class="qa-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-clock-counter-clockwise"></i></div><div class="qa-label">Lịch sử GD</div></div>
         <div class="quick-action" onclick="showToast('Đánh giá','t-amber')"><div class="qa-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ph-duotone ph-star"></i></div><div class="qa-label">Đánh giá</div></div>
         <div class="quick-action" onclick="showToast('Hỗ trợ sẽ ra mắt sớm','t-blue')"><div class="qa-icon" style="background:var(--ink3);color:var(--muted)"><i class="ph-duotone ph-headset"></i></div><div class="qa-label">Hỗ trợ</div></div>
@@ -2199,17 +2199,12 @@ function alnNotify(title, body){
       try{ if(typeof closeMobileSidebar === 'function') closeMobileSidebar(); }catch(e){}
     };
 
-    // Nối menu trái -> tab (ghi đè scrollTo cũ)
-    var MAPNAV = [['Dashboard','dashboard'],['Ví thu nhập','wallet'],['Gửi phương án','proposal'],['Bảng Review','review'],['Hồ sơ C3','c3'],['Kho tài sản','asset'],['Gói VIP','vip'],['Dự án của tôi','myproj'],['Hồ sơ của tôi','myprofile']];
+    // Nối menu trái -> tab qua data-tab attribute
     var navDefault = null;
-    document.querySelectorAll('.sidebar .nav-item').forEach(function(a){
-      var t = a.textContent || '';
-      MAPNAV.forEach(function(p){
-        if(t.indexOf(p[0]) !== -1){
-          a.onclick = function(){ window.ktsShowTab(p[1], a); };
-          if(p[1] === 'dashboard') navDefault = a;
-        }
-      });
+    document.querySelectorAll('.sidebar .nav-item[data-tab]').forEach(function(a){
+      var tab = a.getAttribute('data-tab');
+      a.onclick = function(){ window.ktsShowTab(tab, a); };
+      if(tab === 'dashboard' && !navDefault) navDefault = a;
     });
 
     // Mặc định mở trang: chỉ Dashboard — gọn gàng
@@ -2341,7 +2336,7 @@ function renderDashProjList(projs) {
     + '</div>';
   }).join('');
   if (projs.length > 5) {
-    el.innerHTML += '<div style="font-size:11px;color:var(--muted);text-align:center;padding:8px 0;cursor:pointer;border-top:1px solid var(--border)" onclick="scrollTo(\'.myproj-section\')">+ ' + (projs.length-5) + ' dự án khác →</div>';
+    el.innerHTML += '<div style="font-size:11px;color:var(--muted);text-align:center;padding:8px 0;cursor:pointer;border-top:1px solid var(--border)" onclick="window.ktsShowTab(\'myproj\')">+ ' + (projs.length-5) + ' dự án khác →</div>';
   }
   // Hero card counts
   var active = projs.filter(function(p){ return p.status !== 'done'; }).length;
