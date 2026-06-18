@@ -1992,7 +1992,7 @@ function _startKtsProjectListen(uid) {
     const stageEl = document.getElementById('ktsDashStage');
     if (stageEl) stageEl.textContent = 'Chặng ' + (p.stage || 'C1');
 
-    console.log('[KTS] Dự án hiện tại:', d.id, p.name);
+    console.log('[KTS] Dự án hiện tại:', _displayId, p.name);
     // Render danh sách tất cả dự án
     const allProjs = snap.docs.map(d2 => {
       const dd = d2.data();
