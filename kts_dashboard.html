@@ -118,7 +118,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
 /* ── MAIN ── */
 .main{margin-left:210px;flex:1;min-width:0}
-.topbar{background:var(--ink2);border-bottom:1px solid var(--border);padding:0 14px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;gap:8px}
+.topbar{background:rgba(255,255,255,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(226,232,240,.7);padding:0 14px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;gap:8px}
 .page-title{font-family:var(--serif);font-weight:600;font-style:italic;font-size:15px;color:var(--text);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
 .topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .notif-btn{position:relative;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;cursor:pointer;color:var(--text2);transition:all .15s;font-size:12px;flex-shrink:0}
@@ -449,6 +449,28 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .pf-social{display:flex;gap:8px}
 .pf-social a{width:28px;height:28px;border-radius:7px;background:var(--ink3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text2);cursor:pointer;transition:all .12s}
 .pf-social a:hover{background:var(--blue-bg);color:var(--blue);border-color:var(--blue)}
+
+/* ── SIDEBAR PROFILE CARD ── */
+.sidebar-profile{display:flex;align-items:center;gap:11px;padding:14px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(184,149,46,.06) 0%,transparent 100%)}
+.sidebar-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#b8952e,#d4b86a);color:#fff;font-family:var(--syne);font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px rgba(184,149,46,.35);border:2px solid rgba(201,168,76,.4);overflow:hidden;position:relative}
+.sidebar-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.sidebar-info{flex:1;min-width:0}
+.sidebar-nm{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+.sidebar-rank{font-size:10px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:5px}
+.rank-dot{width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulse-dot 2s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+
+/* ── SPARKLINE in stat-card ── */
+.stat-spark{position:absolute;bottom:14px;right:14px;opacity:.55}
+
+/* ── SKELETON SHIMMER ── */
+@keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+.skeleton{background:linear-gradient(90deg,#f1f5f9 25%,#e8edf2 50%,#f1f5f9 75%);background-size:600px 100%;animation:shimmer 1.4s infinite linear;border-radius:6px}
+.skel-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
+
+/* ── FADE-IN STAGGER for proj-cards ── */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.proj-card-anim{animation:fadeInUp .38s ease both}
 </style>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#f0f4f8">
@@ -471,9 +493,13 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="sidebar-brand-name">ALN Workspace</div>
   </div>
 
-  <!-- hidden element giữ id cho JS -->
-  <div id="ktsHeroAv" style="display:none"></div>
-  <div id="ktsHeroName" style="display:none"></div>
+  <div class="sidebar-profile">
+    <div class="sidebar-av" id="ktsHeroAv">K</div>
+    <div class="sidebar-info">
+      <div class="sidebar-nm" id="ktsHeroName">KTS. —</div>
+      <div class="sidebar-rank"><span class="rank-dot"></span>Chuẩn KTS · 84.5đ</div>
+    </div>
+  </div>
 
   <a class="nav-item active"><span class="icon"><i class="ph-duotone ph-gauge"></i></span> Dashboard</a>
   <a class="nav-item" onclick="scrollTo('.myproj-section')"><span class="icon"><i class="ph-duotone ph-briefcase"></i></span> Dự án <span class="nav-badge" id="myProjBadge">0</span></a>
@@ -535,21 +561,33 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <div class="stat-label"><i class="ph-duotone ph-chart-bar"></i> Doanh thu <span id="heroMonthLabel">T6</span></div>
         <div class="stat-val" id="heroRevenue">—</div>
         <div class="stat-badge sb-purple" id="heroRevenueBadge"><i class="ph-duotone ph-arrow-up" style="font-size:8px"></i> đang tính</div>
+        <svg class="stat-spark" viewBox="0 0 64 24" width="64" height="24" xmlns="http://www.w3.org/2000/svg">
+          <polyline points="0,20 10,16 20,18 30,10 40,12 52,4 64,2" fill="none" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
       <div class="stat-card s-green">
         <div class="stat-label"><i class="ph-duotone ph-wallet"></i> Ví khả dụng</div>
         <div class="stat-val" id="heroWallet">3.87M</div>
         <div class="stat-sub">Tổng số dư VND</div>
+        <svg class="stat-spark" viewBox="0 0 64 24" width="64" height="24" xmlns="http://www.w3.org/2000/svg">
+          <polyline points="0,18 10,14 20,16 30,12 40,8 52,10 64,4" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
       <div class="stat-card s-gold">
         <div class="stat-label"><i class="ph-duotone ph-star"></i> Điểm uy tín</div>
         <div class="stat-val">84.5<span style="font-size:14px;color:var(--muted);font-weight:400">/100</span></div>
         <div class="stat-sub">Còn 15.5đ lên PRO</div>
+        <svg class="stat-spark" viewBox="0 0 64 24" width="64" height="24" xmlns="http://www.w3.org/2000/svg">
+          <polyline points="0,22 10,18 20,14 30,16 40,10 52,6 64,4" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
       <div class="stat-card s-blue">
         <div class="stat-label"><i class="ph-duotone ph-briefcase"></i> Dự án đang chạy</div>
         <div class="stat-val" id="heroActiveProj">—</div>
         <div class="stat-badge sb-blue" id="heroProjBadge"><i class="ph-duotone ph-arrow-up" style="font-size:8px"></i> đang tải</div>
+        <svg class="stat-spark" viewBox="0 0 64 24" width="64" height="24" xmlns="http://www.w3.org/2000/svg">
+          <polyline points="0,20 10,20 20,16 30,16 40,12 52,8 64,8" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
     </div>
 
@@ -659,7 +697,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <a onclick="scrollTo('.myproj-section')" style="font-size:12px;color:var(--blue);cursor:pointer;font-weight:500;display:flex;align-items:center;gap:4px">Xem tất cả <i class="ph-duotone ph-arrow-right" style="font-size:11px"></i></a>
     </div>
     <div id="projCards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px">
-      <div style="text-align:center;padding:40px;color:var(--muted);font-size:12px;grid-column:1/-1">Đang tải...</div>
+      <div class="skel-card"><div class="skeleton" style="height:110px;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:60%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:80%"></div></div>
+      <div class="skel-card"><div class="skeleton" style="height:110px;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:50%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:70%"></div></div>
+      <div class="skel-card"><div class="skeleton" style="height:110px;margin-bottom:12px"></div><div class="skeleton" style="height:11px;width:65%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:75%"></div></div>
     </div>
 
     <!-- ══════════════════════════════════════════
@@ -2347,7 +2387,8 @@ function renderProjCards(projs) {
     var prog = p.progress || [0,0,0,0];
     var earnPct = (prog[0]||0)*0.10 + (prog[1]||0)*0.20 + (prog[2]||0)*0.60 + (prog[3]||0)*0.10;
     var earnPctDisp = Math.round(earnPct * 100);
-    return '<div class="proj-card" onclick="window.switchKtsProject && window.switchKtsProject(\'' + p.id + '\')">'
+    var delay = (i * 80) + 'ms';
+    return '<div class="proj-card proj-card-anim" style="animation-delay:' + delay + '" onclick="window.switchKtsProject && window.switchKtsProject(\'' + p.id + '\')">'
       + '<div class="proj-thumb">'
         + '<div class="proj-thumb-inner" style="background:' + GRAD[i % GRAD.length] + '">'
           + '<div class="proj-card-title">' + (p.name || did) + '</div>'
