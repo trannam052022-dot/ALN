@@ -2259,6 +2259,13 @@ ALNRealtime.init({
       showToast(`📋 ${d.ktsName} đã nộp Hồ sơ C3!`, 't-amber');
     }
 
+    // KTS gửi phương án ảnh → hiện trong Nhắn tin sàn ALN
+    if(d.type==='PROPOSAL_SENT' && Array.isArray(d.audience) && d.audience.includes('cn') && !d._replay) {
+      const _pMsg = d.text || ('📐 KTS vừa gửi phương án chặng ' + (d.stage||'') + '. Xem trong trang dự án.');
+      _alnReceive({ text:_pMsg, senderName:d.senderName||'KTS', _role:'kts', ts:Date.now() });
+      showToast('📐 ' + (d.senderName||'KTS') + ' vừa gửi phương án chặng ' + (d.stage||''), 't-green');
+    }
+
     // Nhận tin nhắn chat từ KTS hoặc DN
     if(d.type==='ALN_CHAT' && d._role !== 'cn' && Array.isArray(d.audience) && d.audience.includes('cn')) {
       // Kênh thống nhất -> hộp Trao đổi qua sàn ALN
