@@ -320,9 +320,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 /* PA upload grid — KTS upload-grid style */
 .dn-pa-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px}
 @media(max-width:560px){.dn-pa-grid{grid-template-columns:1fr}}
-.dn-pa-slot{border:1.5px dashed rgba(212,160,23,.28);border-radius:var(--r-sm);padding:16px 10px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:3px}
-.dn-pa-slot:hover{border-color:var(--gold);background:rgba(212,160,23,.05)}
-.dn-pa-slot.drag-over{border-color:var(--gold);background:rgba(212,160,23,.1)}
+.dn-pa-slot{border:1.5px dashed rgba(212,160,23,.55);border-radius:var(--r-sm);padding:16px 10px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:3px;background:rgba(212,160,23,.02)}
+.dn-pa-slot:hover{border-color:var(--gold);background:rgba(212,160,23,.07);transform:translateY(-1px);box-shadow:var(--sh)}
+.dn-pa-slot.drag-over{border-color:var(--gold);border-style:solid;background:rgba(212,160,23,.12)}
 .dn-pa-slot.has-pending{border-style:solid;border-color:var(--amber);background:rgba(217,119,6,.05)}
 .dn-pa-slot.has-sent{border-style:solid;border-color:var(--green);background:var(--green-bg)}
 .dn-pa-slot input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
@@ -1424,6 +1424,12 @@ window.confirmSendFiles = function(projId, rid, paId) {
   showToast('Đã gửi '+cnt+' file cho KTS!','t-green');
   renderMain(); setTimeout(function(){_redrawHero(projId);},30);
 };
+window._dnUpload = function(ev, paId) {
+  var files = Array.from(ev.target.files);
+  if(!files.length) return;
+  _stagePending(files, null, paId);
+  ev.target.value = '';
+};
 function _stagePending(files, projId, paId) {
   if(!window.dnPending[paId]) window.dnPending[paId]=[];
   var loaded=0;
@@ -2317,7 +2323,7 @@ function renderMain(){
                   ondragover="event.preventDefault();this.classList.add('drag-over')"
                   ondragleave="this.classList.remove('drag-over')"
                   ondrop="handleAnnotDrop(event,'${p.id}','${rid}','${pa.id}')">
-                  <input type="file" accept="image/*,.pdf,.dwg" multiple onchange="handleAnnotUpload(event,'${p.id}','${rid}','${pa.id}')">
+                  <input type="file" accept="image/*,.pdf,.dwg" multiple onchange="_dnUpload(event,'${pa.id}')">
                   ${pendCnt>0?`<span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;font-family:var(--mono);padding:2px 7px;border-radius:99px;background:rgba(217,119,6,.12);color:var(--amber)">${pendCnt} chờ gửi</span>`
                     :sentCnt>0?`<span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;font-family:var(--mono);padding:2px 7px;border-radius:99px;background:var(--green-bg);color:var(--green)">${sentCnt} đã gửi</span>`:''}
                   <div class="dp-icon"><i class="ph-duotone ph-${pendCnt>0?'clock-countdown':sentCnt>0?'check-circle':'cloud-arrow-up'}"></i></div>
