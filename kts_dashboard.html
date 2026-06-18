@@ -95,31 +95,25 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .logo-text{font-family:var(--syne);font-weight:800;font-size:14px;letter-spacing:.04em;color:var(--text)}
 .logo-text span{color:var(--gold)}
 
-.nav-section{padding:12px 14px 3px;font-size:9px;font-weight:700;color:var(--gold);letter-spacing:.18em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
-.nav-section::after{content:'';flex:1;height:1px;background:rgba(201,168,76,.2)}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:0;margin:0;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .12s;text-decoration:none;border-left:2px solid transparent}
-.nav-item:nth-child(odd){background:rgba(201,168,76,.04)}
-.nav-item:nth-child(even){background:rgba(255,255,255,.018)}
-.nav-item:hover{background:rgba(201,168,76,.1);color:var(--text);border-left-color:rgba(201,168,76,.4)}
-.nav-item.active{background:rgba(201,168,76,.14)!important;color:var(--gold);font-weight:600;border-left-color:var(--gold)}
-.nav-item .icon{width:16px;text-align:center;font-size:12px}
-.nav-badge{margin-left:auto;background:var(--red);color:#fff;border-radius:99px;padding:1px 6px;font-size:10px;font-weight:700}
+/* ── SIDEBAR BRAND ── */
+.sidebar-brand{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.sidebar-brand-top{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.sidebar-brand-name{font-size:16px;font-weight:700;color:var(--text);margin-top:4px;letter-spacing:-.3px}
 
-.sidebar-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--border);background:linear-gradient(0deg,rgba(201,168,76,.04) 0%,transparent 100%)}
-/* Hồ sơ KTS đầu sidebar — trang trọng */
-.kts-hero{display:flex;align-items:center;gap:11px;margin:4px 12px 12px;padding:12px;border-radius:12px;background:linear-gradient(135deg,rgba(201,168,76,.14),rgba(201,168,76,.05));border:1px solid rgba(201,168,76,.3)}
-.kts-hero-av{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#d4b86a);color:#000;display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-weight:800;font-size:17px;flex-shrink:0;box-shadow:0 4px 14px rgba(201,168,76,.35)}
-.kts-hero-info{min-width:0}
-.kts-hero-name{font-family:var(--serif);font-size:14.5px;font-weight:700;font-style:italic;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kts-hero-badges{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0 3px}
-.khb{font-size:8.5px;font-weight:700;padding:2px 6px;border-radius:99px;letter-spacing:.02em}
-.khb-gold{background:rgba(201,168,76,.18);color:var(--gold);border:1px solid rgba(201,168,76,.4)}
-.khb-rank{background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.35)}
-.khb-verify{background:rgba(74,222,128,.1);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
-.kts-hero-meta{font-size:9.5px;color:var(--muted)}
+.nav-section{padding:16px 18px 5px;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;margin:1px 0;font-size:13px;font-weight:450;color:var(--text2);cursor:pointer;transition:all .12s;text-decoration:none;border-left:2px solid transparent;background:none}
+.nav-item:hover{background:rgba(0,0,0,.04);color:var(--text)}
+.nav-item.active{background:rgba(37,99,235,.07);color:var(--blue);font-weight:600;border-left-color:var(--blue)}
+.nav-item .icon{width:16px;text-align:center;font-size:13px;opacity:.7}
+.nav-item.active .icon{opacity:1}
+.nav-badge{margin-left:auto;background:var(--text2);color:#fff;border-radius:99px;padding:1px 7px;font-size:10px;font-weight:600}
+.nav-item.active .nav-badge{background:var(--blue)}
+.nav-sep{height:1px;background:var(--border);margin:8px 18px}
+
+.kts-hero{display:none}
 .kts-profile{display:flex;align-items:center;gap:10px}
 .kts-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#d4b86a);color:#000;display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-weight:800;font-size:13px;flex-shrink:0}
-.kts-name{font-family:var(--serif);font-size:13px;font-weight:600;font-style:italic}
+.kts-name{font-family:var(--serif);font-size:13px;font-weight:600;font-style:italic;color:var(--text)}
 .kts-rank{font-size:10px;color:var(--muted)}
 
 /* ── MAIN ── */
@@ -136,7 +130,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   .page-title{max-width:80px;font-size:13px}
 }
 
-.content{padding:18px 20px 50px}
+.content{padding:24px 28px 60px}
 
 /* ── GRID ── */
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
@@ -172,8 +166,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .sb-gold{background:var(--gold-bg);color:var(--gold)}
 
 /* section label */
-.sec-label{font-size:9px;font-weight:700;color:var(--gold);letter-spacing:.16em;text-transform:uppercase;margin:18px 0 10px;display:flex;align-items:center;gap:8px}
-.sec-label::after{content:'';flex:1;height:1px;background:rgba(201,168,76,.2)}
+.sec-label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.04em;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec-label.no-line::after{display:none}
 
 /* ══════════════════════════════════════════
    MODULE 1 — SLA TIMER
@@ -181,7 +176,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .sla-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:16px;position:relative;overflow:hidden}
 .sla-card.urgent{border-color:var(--red);box-shadow:0 0 0 1px rgba(255,87,87,.2),0 4px 24px rgba(255,87,87,.12)}
 .sla-card.safe{border-color:var(--green);box-shadow:0 0 0 1px rgba(34,201,122,.2),0 4px 24px rgba(34,201,122,.08)}
-.sla-glow{position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;opacity:.06;pointer-events:none}
+.sla-glow{position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;opacity:.03;pointer-events:none}
 .sla-card.urgent .sla-glow{background:var(--red)}
 .sla-card.safe .sla-glow{background:var(--green)}
 .sla-card.normal .sla-glow{background:var(--amber)}
@@ -443,43 +438,27 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
 <!-- ═══════════════ SIDEBAR ═══════════════ -->
 <nav class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-mark">🏗</div>
-    <div class="logo-text">kts.<span>ALN</span></div>
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-top">Studio KTS</div>
+    <div class="sidebar-brand-name">ALN Workspace</div>
   </div>
 
-  <!-- ═══ HỒ SƠ KTS — vị trí trang trọng đầu trang ═══ -->
-  <div class="kts-hero">
-    <div class="kts-hero-av" id="ktsHeroAv">TM</div>
-    <div class="kts-hero-info">
-      <div class="kts-hero-name" id="ktsHeroName">KTS. Trần Đại Long</div>
-      <div class="kts-hero-badges">
-        <span class="khb khb-gold">⭐ 4.8</span>
-        <span class="khb khb-rank">Hạng Chuẩn</span>
-        <span class="khb khb-verify">✓ Đã xác minh</span>
-      </div>
-      <div class="kts-hero-meta">23 dự án · KTS-2021-04821</div>
-    </div>
-  </div>
+  <!-- hidden element giữ id cho JS -->
+  <div id="ktsHeroAv" style="display:none"></div>
+  <div id="ktsHeroName" style="display:none"></div>
 
-  <div class="nav-section">Tổng quan</div>
   <a class="nav-item active"><span class="icon"><i class="ph-duotone ph-gauge"></i></span> Dashboard</a>
-  <a class="nav-item" onclick="scrollTo('.myproj-section')"><span class="icon"><i class="ph-duotone ph-briefcase"></i></span> Dự án của tôi <span class="nav-badge" id="myProjBadge">0</span></a>
-
-  <div class="nav-section">Tài chính</div>
-  <a class="nav-item" onclick="scrollTo('.wallet-section')"><span class="icon"><i class="ph-duotone ph-wallet"></i></span> Ví thu nhập</a>
-  <a class="nav-item" onclick="showToast('Lịch sử giao dịch','t-blue')"><span class="icon"><i class="ph-duotone ph-clock-counter-clockwise"></i></span> Lịch sử GD</a>
-
-  <div class="nav-section">Công việc</div>
-  <a class="nav-item" onclick="scrollTo('.proposal-section')"><span class="icon"><i class="ph-duotone ph-image-square"></i></span> Gửi phương án</a>
+  <a class="nav-item" onclick="scrollTo('.myproj-section')"><span class="icon"><i class="ph-duotone ph-briefcase"></i></span> Dự án <span class="nav-badge" id="myProjBadge">0</span></a>
+  <a class="nav-item" onclick="scrollTo('.sla-section')"><span class="icon"><i class="ph-duotone ph-clock"></i></span> Nhiệm vụ <span class="nav-badge" id="taskBadge" style="display:none">0</span></a>
+  <a class="nav-item" onclick="scrollTo('.wallet-section')"><span class="icon"><i class="ph-duotone ph-wallet"></i></span> Ví & Thu nhập</a>
   <a class="nav-item" onclick="scrollTo('.review-section')"><span class="icon"><i class="ph-duotone ph-clipboard-text"></i></span> Bảng Review <span class="nav-badge" id="reviewBadge" style="display:none">0</span></a>
-  <a class="nav-item" onclick="scrollTo('.c3-section')"><span class="icon"><i class="ph-duotone ph-upload-simple"></i></span> Nộp Hồ sơ C3</a>
-  <a class="nav-item" onclick="scrollTo('.asset-section')"><span class="icon"><i class="ph-duotone ph-storefront"></i></span> Kho tài sản</a>
-  <a class="nav-item" onclick="scrollTo('.vip-section')"><span class="icon"><i class="ph-duotone ph-crown"></i></span> Gói VIP</a>
+  <a class="nav-item" onclick="scrollTo('.c3-section')"><span class="icon"><i class="ph-duotone ph-upload-simple"></i></span> Nộp hồ sơ</a>
 
-  <div class="nav-section">Tài khoản</div>
-  <a class="nav-item" onclick="scrollTo('.myprofile-section')"><span class="icon"><i class="ph-duotone ph-user-circle"></i></span> Hồ sơ của tôi</a>
-
+  <div class="nav-sep"></div>
+  <div class="nav-section">Cá nhân</div>
+  <a class="nav-item" onclick="scrollTo('.myprofile-section')"><span class="icon"><i class="ph-duotone ph-user-circle"></i></span> Hồ sơ</a>
+  <a class="nav-item" onclick="scrollTo('.myprofile-section')"><span class="icon"><i class="ph-duotone ph-star"></i></span> Uy tín</a>
+  <a class="nav-item" onclick="showToast('Cài đặt sẽ ra mắt sớm','t-blue')"><span class="icon"><i class="ph-duotone ph-gear"></i></span> Cài đặt</a>
 
 </nav>
 
@@ -514,35 +493,33 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   <div class="content">
 
     <!-- GREETING -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
-      <div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:3px" id="greetingDate">—</div>
-        <div style="font-family:var(--serif);font-size:20px;font-weight:600;font-style:italic;color:var(--text)">Xin chào, <span id="greetingName">KTS</span></div>
+    <div style="margin-bottom:22px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:10px">
+        <span id="greetingDate">—</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(22,163,74,.2);padding:2px 9px;border-radius:99px"><span style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block"></span>Online</span>
       </div>
-      <div id="greetingOnline" style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);background:var(--green-bg);border:1px solid rgba(34,201,122,.2);padding:5px 12px;border-radius:99px">
-        <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span> Online
-      </div>
+      <div style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--text);letter-spacing:-.4px;line-height:1.15" id="greetingName">KTS. Trần Đại Long</div>
     </div>
 
     <!-- 4 HERO CARDS -->
-    <div class="grid4" style="margin-bottom:14px">
+    <div class="grid4" style="margin-bottom:22px">
       <div class="stat-card s-purple">
-        <div class="stat-label"><i class="ph-duotone ph-chart-bar" style="font-size:9px;margin-right:3px"></i>Doanh thu tháng này</div>
+        <div class="stat-label">Doanh thu <span id="heroMonthLabel">T6</span></div>
         <div class="stat-val" id="heroRevenue">—</div>
-        <div class="stat-badge sb-green" id="heroRevenueBadge"><i class="ph-duotone ph-arrow-up" style="font-size:8px"></i> đang tính</div>
+        <div class="stat-badge sb-purple" id="heroRevenueBadge"><i class="ph-duotone ph-arrow-up" style="font-size:8px"></i> đang tính</div>
       </div>
       <div class="stat-card s-green">
-        <div class="stat-label"><i class="ph-duotone ph-wallet" style="font-size:9px;margin-right:3px"></i>Ví chính khả dụng</div>
+        <div class="stat-label">Ví khả dụng</div>
         <div class="stat-val" id="heroWallet">3.87M</div>
-        <div class="stat-sub">Rút về TK ngân hàng</div>
+        <div class="stat-sub">Tổng số dư VND</div>
       </div>
       <div class="stat-card s-gold">
-        <div class="stat-label"><i class="ph-duotone ph-star" style="font-size:9px;margin-right:3px"></i>Điểm Uy tín</div>
-        <div class="stat-val">84.5<span style="font-size:13px;color:var(--muted)">/100</span></div>
-        <div class="stat-badge sb-gold"><i class="ph-duotone ph-star" style="font-size:8px"></i> Hạng Chuẩn · còn 15.5đ lên PRO</div>
+        <div class="stat-label">Điểm uy tín</div>
+        <div class="stat-val">84.5<span style="font-size:13px;color:var(--muted);font-weight:400">/100</span></div>
+        <div class="stat-sub">Còn 15.5đ lên PRO</div>
       </div>
       <div class="stat-card s-blue">
-        <div class="stat-label"><i class="ph-duotone ph-check-circle" style="font-size:9px;margin-right:3px"></i>Dự án đang chạy</div>
+        <div class="stat-label">Dự án đang chạy</div>
         <div class="stat-val" id="heroActiveProj">—</div>
         <div class="stat-badge sb-blue" id="heroProjBadge"><i class="ph-duotone ph-briefcase" style="font-size:8px"></i> đang tải</div>
       </div>
@@ -553,54 +530,53 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     ══════════════════════════════════ -->
     <div class="dash-2col">
     <div><!-- LEFT: SLA -->
-    <div class="sec-label">⏰ Nhiệm vụ khẩn — Chặng đang chờ phản hồi</div>
+    <div class="sec-label no-line sla-section" style="justify-content:space-between">
+      <span>Nhiệm vụ ưu tiên</span>
+      <span style="font-size:10px;font-weight:600;color:var(--amber);background:var(--amber-bg);border:1px solid rgba(217,119,6,.2);padding:2px 9px;border-radius:99px;letter-spacing:0;text-transform:none">1 đang chờ</span>
+    </div>
     <div class="sla-card normal" id="slaCard">
       <div class="sla-glow"></div>
-      <div class="sla-top">
+
+      <!-- Project info row -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
         <div>
-          <div class="sla-project">Dự án <b id="slaProjId">#ALN-9921</b> · <span id="slaProjName">Biệt thự Vườn Tân Cổ Điển</span></div>
-          <div class="sla-revision">Chủ nhà gửi <b id="revLabel">Yêu cầu sửa lần 2</b> lúc 05/06/2026 09:42</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:baseline;gap:6px">
+            <span id="slaProjName">Biệt thự Vườn Tân Cổ Điển</span>
+            <span style="font-size:10px;font-weight:500;color:var(--muted)" id="slaProjId">#ALN-9921</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">Chủ nhà gửi <span id="revLabel">yêu cầu sửa lần 2</span></div>
         </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Trạng thái SLA</div>
-          <div class="stat-badge sb-amber" id="slaStatusBadge"><i class="ph-duotone ph-clock" style="font-size:8px"></i> <span id="slaStatusText">Đang chạy</span></div>
-        </div>
+        <div class="stat-badge sb-amber" id="slaStatusBadge" style="margin-top:2px"><i class="ph-duotone ph-clock" style="font-size:8px"></i> <span id="slaStatusText">Trong hạn</span></div>
       </div>
 
-      <!-- Clock -->
-      <div class="clock-ring">
-        <div class="clock-center">
-          <svg class="ring-svg" width="130" height="130" viewBox="0 0 140 140">
-            <circle class="ring-bg" cx="70" cy="70" r="60"/>
-            <circle class="ring-progress" id="ringProgress" cx="70" cy="70" r="60"
-              stroke-dasharray="377" stroke-dashoffset="0" stroke="var(--amber)"/>
-          </svg>
-          <div class="clock-digits">
-            <div class="clock-time" id="slaDisplay">31:22:45</div>
-            <div class="clock-label">còn lại</div>
-          </div>
-        </div>
+      <!-- Plain large timer (no ring) -->
+      <div style="text-align:center;padding:10px 0 16px">
+        <!-- hidden SVG elements kept for JS compatibility -->
+        <svg style="display:none"><circle id="ringProgress" stroke-dasharray="377" stroke-dashoffset="0"/></svg>
+        <div style="font-family:var(--mono);font-size:40px;font-weight:700;color:var(--text);letter-spacing:2px;line-height:1" id="slaDisplay">31:22:45</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:.06em;text-transform:uppercase">Còn lại</div>
       </div>
 
       <!-- Reward / penalty info -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-        <div style="background:var(--green-bg);border:1px solid rgba(34,201,122,.25);border-radius:var(--r-sm);padding:9px 11px">
-          <div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px"><i class="ph-duotone ph-trophy"></i> Phản hồi < 24h</div>
-          <div style="font-size:11px;color:var(--text2)">+0.2 điểm Uy tín</div>
-          <div style="font-size:10px;color:var(--muted)">Còn <b id="bonusCountdown" style="color:var(--green)">07:22:45</b> để đạt thưởng</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+        <div style="background:var(--green-bg);border:1px solid rgba(22,163,74,.2);border-radius:var(--r-sm);padding:10px 12px">
+          <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:4px">+0.2 uy tín nếu đúng hạn</div>
+          <div style="font-size:10px;color:var(--muted)">Còn <b id="bonusCountdown" style="color:var(--green)">07:22:45</b></div>
         </div>
-        <div style="background:var(--red-bg);border:1px solid rgba(255,87,87,.25);border-radius:var(--r-sm);padding:9px 11px">
-          <div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:3px"><i class="ph-duotone ph-warning"></i> Quá hạn 48h</div>
-          <div style="font-size:11px;color:var(--text2)">−0.1 điểm + Gậy vàng</div>
-          <div style="font-size:10px;color:var(--muted)">Deadline: 07/06/2026 09:42</div>
+        <div style="background:var(--red-bg);border:1px solid rgba(220,38,38,.2);border-radius:var(--r-sm);padding:10px 12px">
+          <div style="font-size:11px;font-weight:600;color:var(--red);margin-bottom:4px">⚠ Quá hạn 48h</div>
+          <div style="font-size:10px;color:var(--muted)">−0.1 điểm + Gậy vàng</div>
         </div>
       </div>
 
-      <div style="display:flex;gap:7px;flex-wrap:wrap">
-        <button class="btn btn-primary" onclick="openUploadRevModal()"><i class="ph-duotone ph-cloud-arrow-up"></i> Nộp bản 3D đã sửa</button>
-        <button class="btn btn-ghost btn-sm" onclick="openChatModal()"><i class="ph-duotone ph-chat"></i> Nhắn tin CN</button>
-        <button class="btn btn-ghost btn-sm" id="simSlaBonusBtn" onclick="simSlaBonus()"><i class="ph-duotone ph-lightning"></i> [Demo] Nộp sớm</button>
-        <button class="btn btn-ghost btn-sm" onclick="simSlaExpire()"><i class="ph-duotone ph-clock"></i> [Demo] Quá hạn</button>
+      <!-- Stacked action buttons -->
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="openUploadRevModal()"><i class="ph-duotone ph-cloud-arrow-up"></i> Nộp bản đã sửa</button>
+        <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="openChatModal()"><i class="ph-duotone ph-chat"></i> Nhắn tin chủ nhà</button>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm" style="flex:1;justify-content:center" id="simSlaBonusBtn" onclick="simSlaBonus()"><i class="ph-duotone ph-lightning"></i> [Demo] Nộp sớm</button>
+          <button class="btn btn-ghost btn-sm" style="flex:1;justify-content:center" onclick="simSlaExpire()"><i class="ph-duotone ph-clock"></i> [Demo] Quá hạn</button>
+        </div>
       </div>
     </div>
     </div><!-- end LEFT -->
@@ -610,41 +586,37 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
       <!-- Danh sách dự án -->
       <div class="card card-sm">
-        <div class="card-title" style="font-size:13px;margin-bottom:10px">
-          <div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-briefcase"></i></div>
-          Dự án đang thực hiện
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+          <span>Dự án đang chạy</span>
+          <i class="ph-duotone ph-briefcase" style="color:var(--muted);font-size:14px"></i>
         </div>
         <div id="dashProjList">
-          <div style="font-size:12px;color:var(--muted);text-align:center;padding:16px 0">Đang tải...</div>
+          <div style="font-size:12px;color:var(--muted);text-align:center;padding:20px 0">Đang tải...</div>
         </div>
       </div>
 
       <!-- Ví nhanh -->
       <div class="card card-sm">
-        <div class="card-title" style="font-size:13px;margin-bottom:10px">
-          <div class="ct-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-wallet"></i></div>
-          Ví & Giải ngân
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+          <span>Ví & Giải ngân</span>
+          <i class="ph-duotone ph-wallet" style="color:var(--muted);font-size:14px"></i>
         </div>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
-            <span style="font-size:11px;color:var(--muted)">Ví chính (khả dụng)</span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--green)">3,878,220đ</span>
+        <div style="display:flex;flex-direction:column">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:12px;color:var(--text2)">Ví chính (khả dụng)</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--green)">3.87M</span>
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
-            <span style="font-size:11px;color:var(--muted)">Ví tạm ứng <span style="color:var(--amber);font-size:9px;font-weight:700">C2</span></span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--amber)">1,920,000đ</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:12px;color:var(--text2)">Chờ giải ngân <span style="color:var(--amber);font-size:10px;font-weight:700;background:var(--amber-bg);padding:1px 5px;border-radius:4px">C3</span></span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--amber)">18.75M</span>
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
-            <span style="font-size:11px;color:var(--muted)">Chờ giải ngân</span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--muted)">0đ</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0">
-            <span style="font-size:11px;color:var(--muted)">Thuế tích lũy</span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--red)">297,780đ</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+            <span style="font-size:12px;color:var(--text2)">Thuế TNCN tích lũy</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--red)">297K</span>
           </div>
         </div>
-        <button class="btn btn-green btn-sm" style="width:100%;margin-top:8px" onclick="scrollTo('.wallet-section')">
-          <i class="ph-duotone ph-sign-out"></i> Rút tiền & Chi tiết
+        <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px;justify-content:center;border-color:var(--border)" onclick="scrollTo('.wallet-section')">
+          Xem chi tiết ví →
         </button>
       </div>
 
@@ -2146,35 +2118,33 @@ function _dayVi(d){ return ['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','T
 function updateGreeting(name) {
   var now = new Date();
   var el = document.getElementById('greetingDate');
-  if (el) el.textContent = _dayVi(now) + ', ' + now.toLocaleDateString('vi-VN');
+  if (el) el.textContent = _dayVi(now) + ', ' + now.toLocaleDateString('vi-VN') + ' — Xin chào trở lại';
   var nameEl = document.getElementById('greetingName');
   if (nameEl) nameEl.textContent = name || 'KTS';
+  var mEl = document.getElementById('heroMonthLabel');
+  if (mEl) mEl.textContent = 'T' + (now.getMonth() + 1);
 }
 
 function renderDashProjList(projs) {
   var el = document.getElementById('dashProjList');
   if (!el) return;
   if (!projs || !projs.length) {
-    el.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px 0">Chưa có dự án nào</div>';
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px 0">Chưa có dự án nào</div>';
     return;
   }
   var SC = {on_track:'var(--green)', sla_warn:'var(--amber)', dispute:'var(--red)', done:'var(--muted)'};
-  var SL = {on_track:'Trong hạn', sla_warn:'Cảnh báo', dispute:'Tranh chấp', done:'Xong'};
-  el.innerHTML = projs.slice(0,5).map(function(p){
+  el.innerHTML = projs.slice(0,5).map(function(p, i){
     var color = SC[p.status] || 'var(--muted)';
-    var isCN = !!(p.cn && p.cn.uid);
-    var did = (isCN ? 'ALN-CN-' : 'ALN-DN-') + (p.id||'').replace(/^ALN-/,'');
-    return '<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="window.switchKtsProject && window.switchKtsProject(\'' + p.id + '\')">'
-      + '<div style="width:7px;height:7px;border-radius:50%;background:' + color + ';flex-shrink:0"></div>'
-      + '<div style="flex:1;min-width:0">'
-        + '<div style="font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (p.name || did) + '</div>'
-        + '<div style="font-size:10px;color:var(--muted);margin-top:1px">' + did + ' · Chặng ' + (p.stage||'C1') + '</div>'
-      + '</div>'
-      + '<span style="font-size:10px;font-weight:700;color:' + color + ';flex-shrink:0">' + (SL[p.status]||p.status) + '</span>'
+    var isLast = i === Math.min(projs.length, 5) - 1;
+    var stage = p.stage || 'C1';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;' + (isLast ? '' : 'border-bottom:1px solid var(--border);') + 'cursor:pointer" onclick="window.switchKtsProject && window.switchKtsProject(\'' + p.id + '\')">'
+      + '<div style="width:6px;height:6px;border-radius:50%;background:' + color + ';flex-shrink:0;margin-top:1px"></div>'
+      + '<div style="flex:1;min-width:0;font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (p.name || p.id) + '</div>'
+      + '<span style="font-size:11px;font-weight:600;color:var(--text2);flex-shrink:0">' + stage + '</span>'
     + '</div>';
   }).join('');
   if (projs.length > 5) {
-    el.innerHTML += '<div style="font-size:11px;color:var(--muted);text-align:center;padding:6px 0;cursor:pointer" onclick="scrollTo(\'.myproj-section\')">+ ' + (projs.length-5) + ' dự án khác</div>';
+    el.innerHTML += '<div style="font-size:11px;color:var(--muted);text-align:center;padding:8px 0;cursor:pointer;border-top:1px solid var(--border)" onclick="scrollTo(\'.myproj-section\')">+ ' + (projs.length-5) + ' dự án khác →</div>';
   }
   // Hero card counts
   var active = projs.filter(function(p){ return p.status !== 'done'; }).length;
