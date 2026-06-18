@@ -2106,10 +2106,10 @@ function renderMyProjects(projects) {
   wrap.innerHTML = html;
 }
 
-function toggleProjDetail(id) {
+window.toggleProjDetail = function(id) {
   const el = document.getElementById(id);
   if (el) el.classList.toggle('open');
-}
+};
 
 function fmtM2(v) {
   if(v>=1e9) return (v/1e9).toFixed(1)+'T';
