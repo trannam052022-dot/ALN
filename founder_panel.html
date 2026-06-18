@@ -1465,6 +1465,30 @@ body::after {
 
 // DN_PROJECTS điền từ Firestore
 
+function _adaptDNtoRow(p) {
+  var STAGE_CLS = {C1:'sb-c1',C2:'sb-c2',C3:'sb-c3',C4:'sb-c4'};
+  var st = p.status||'on_track';
+  var rowSt = st==='sla_warn'?'sla':st==='on_track'?'ok':st;
+  var next = {C1:'C2',C2:'C3',C3:'C4',C4:'C4'}[p.stage]||'C4';
+  var cmds = [];
+  if(p.stage!=='C4'&&st!=='done'){
+    cmds.push({id:'STAGE_APPROVE',label:'DUYỆT CHẶNG '+p.stage+' → '+next,sub:'Chuyển chặng & ghi nhận tiến độ',icon:'<i class="ph-duotone ph-check-circle"></i>',style:'approve'});
+  }
+  cmds.push({id:'REJECT_STAGE',label:'TỪ CHỐI / YÊU CẦU SỬA',sub:'Báo KTS chỉnh sửa và nộp lại',icon:'<i class="ph-duotone ph-x-circle"></i>',style:'cancel'});
+  return {
+    id:p.id, _real:true, _pdata:p,
+    rowClass:st==='dispute'?'row-dispute':st==='sla_warn'?'row-sla':'',
+    cn:p.cn||'—', ktsName:p.kts||'—',
+    invest:p.name||p.id, contract:p.dn||'Dự án CN', floor:'Chặng '+p.stage,
+    stageLabel:p.stage||'C1', stageClass:STAGE_CLS[p.stage]||'sb-c1',
+    stage:p.stage||'C1', status:rowSt,
+    frozen:Math.round((p.escrow||0)/100),
+    finance:{total:Math.round((p.total||0)/100)},
+    aiLog:[{tag:'INFO',text:'Dự án thật từ Firestore · Chặng '+p.stage+' · Trạng thái: '+st}],
+    chat:[], rubric:null, commands:cmds,
+  };
+}
+
 const _DNSM = {on_track:{label:'🟢 Đúng tiến độ',cls:'status-ok'},sla_warn:{label:'⏰ SLA cảnh báo',cls:'status-sla'},dispute:{label:'❌ Tranh chấp',cls:'status-dispute'},done:{label:'✅ Hoàn thành',cls:'status-done'}};
 const _STGC = ['var(--green)','var(--amber)','var(--blue)','var(--sub)'];
 const _STGP = [10,20,60,10];
@@ -1672,7 +1696,8 @@ const ACTION_MAP = {
 };
 
 function getFilteredRows() {
-  return ROWS.filter(r => {
+  var base = (DN_PROJECTS && DN_PROJECTS.length > 0) ? DN_PROJECTS.map(_adaptDNtoRow) : ROWS;
+  return base.filter(r => {
     if (activeFilter === 'DISPUTE'    && r.status !== 'dispute') return false;
     if (activeFilter === 'SLA_BREACH' && r.status !== 'sla')     return false;
     if (activeFilter === 'C3_PENDING' && !(r.stage === 'C3' && r.status === 'pending')) return false;
@@ -1766,7 +1791,8 @@ function refreshTable() {
    DRAWER
 ══════════════════════════════════════════ */
 function openDrawer(id) {
-  const row = ROWS.find(r => r.id === id);
+  var realP = (DN_PROJECTS||[]).find(function(p){ return p.id===id; });
+  var row = realP ? _adaptDNtoRow(realP) : ROWS.find(r => r.id === id);
   if (!row) return;
   currentRow = row;
 
@@ -1926,12 +1952,24 @@ function confirmOtp() {
   };
   toast(msgs[action]||action, action==='CANCEL'?'err':'ok');
 
-  // Update row status in demo
+  // Ghi Firestore nếu là dự án thật
+  var isReal = !!(DN_PROJECTS||[]).find(function(p){ return p.id===projectId; });
+  if (isReal) {
+    if (action === 'STAGE_APPROVE' && currentRow) {
+      if (window.founderApproveStage) window.founderApproveStage(projectId, currentRow.stage);
+    } else if (action === 'REJECT_STAGE' && currentRow) {
+      if (window.founderRejectStage) window.founderRejectStage(projectId, currentRow.stage);
+    }
+  }
+
+  // Update row status in demo (mock rows only)
   const row = ROWS.find(r => r.id === projectId);
   if (row) {
     if (action === 'APPROVE' || action === 'C3_APPROVE') row.status = 'done';
     if (action === 'CANCEL') { row.status = 'done'; row.stageLabel = 'Đã hủy'; }
     renderTable();
+    closeDrawer();
+  } else if (isReal) {
     closeDrawer();
   }
 
@@ -3108,7 +3146,7 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "founder";
 
@@ -3117,6 +3155,31 @@ function _adaptForFounder(id, d) {
   var prog = d.progress || {};
   return { id: id, name: d.name||'', cn: (d.cn&&d.cn.name)||'', kts: (d.kts&&d.kts.name)||'', dn: (d.dn&&d.dn.name)||'', stage: d.stage||'C1', status: d.status||'on_track', progress: [prog.C1||0, prog.C2||0, prog.C3||0, prog.C4||0], escrow: d.escrowBalance||0, total: d.totalFee||0, _raw: d };
 }
+window.founderApproveStage = async function(pid, stage) {
+  const nextStage = {C1:'C2',C2:'C3',C3:'C4',C4:'C4'}[stage]||'C4';
+  try {
+    const upd = { stage: nextStage, status: 'on_track', updatedAt: serverTimestamp() };
+    upd['progress.' + stage] = 1;
+    await updateDoc(doc(db,'projects',pid), upd);
+    try { window.ALNRealtime && window.ALNRealtime.send({type:'STAGE_APPROVED',projectId:pid,stage,nextStage}); } catch(e){}
+    console.log('[Founder] Duyệt chặng', stage, '→', nextStage, pid);
+  } catch(e) {
+    console.error('[Founder approveStage]', e);
+    if(typeof toast==='function') toast('❌ Lỗi ghi Firestore: '+(e.code||e.message), 'err');
+  }
+};
+
+window.founderRejectStage = async function(pid, stage) {
+  try {
+    await updateDoc(doc(db,'projects',pid), { status: 'sla_warn', updatedAt: serverTimestamp() });
+    try { window.ALNRealtime && window.ALNRealtime.send({type:'STAGE_REJECTED',projectId:pid,stage}); } catch(e){}
+    console.log('[Founder] Từ chối chặng', stage, pid);
+  } catch(e) {
+    console.error('[Founder rejectStage]', e);
+    if(typeof toast==='function') toast('❌ Lỗi ghi Firestore: '+(e.code||e.message), 'err');
+  }
+};
+
 function _startFounderListen() {
   var q = query(collection(db,'projects'), orderBy('updatedAt','desc'));
   onSnapshot(q, function(snap){
