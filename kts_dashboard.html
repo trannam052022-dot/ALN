@@ -511,8 +511,8 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   <div class="nav-sep"></div>
   <div class="nav-section">Cá nhân</div>
   <a class="nav-item" data-tab="myprofile"><span class="icon"><i class="ph-duotone ph-user-circle"></i></span> Hồ sơ</a>
-  <a class="nav-item" data-tab="myprofile"><span class="icon"><i class="ph-duotone ph-star"></i></span> Uy tín</a>
-  <a class="nav-item" onclick="showToast('Cài đặt sẽ ra mắt sớm','t-blue')"><span class="icon"><i class="ph-duotone ph-gear"></i></span> Cài đặt</a>
+  <a class="nav-item" data-tab="reputation"><span class="icon"><i class="ph-duotone ph-star"></i></span> Uy tín</a>
+  <a class="nav-item" data-tab="settings"><span class="icon"><i class="ph-duotone ph-gear"></i></span> Cài đặt</a>
 
 </nav>
 
@@ -1124,6 +1124,97 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <button class="profile-save-btn" onclick="saveProfile()">
       <i class="ph-duotone ph-floppy-disk"></i> Lưu hồ sơ
     </button>
+
+    <!-- ═══ UY TÍN ═══ -->
+    <div class="sec-label reputation-section"><i class="ph-duotone ph-seal-check" style="font-size:13px"></i> Uy tín & Xếp hạng</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div class="card" style="padding:20px">
+        <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Điểm uy tín hiện tại</div>
+        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:12px">
+          <div style="font-family:var(--syne);font-size:40px;font-weight:800;color:var(--text);letter-spacing:-1px">84.5</div>
+          <div style="font-size:14px;color:var(--muted)">/100</div>
+        </div>
+        <div style="background:var(--ink3);border-radius:99px;height:8px;overflow:hidden;margin-bottom:8px">
+          <div style="height:100%;width:84.5%;background:linear-gradient(90deg,#d4a017,#e8c44a);border-radius:99px;transition:width .6s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted)">
+          <span>Chuẩn KTS</span><span style="color:var(--gold);font-weight:600">Còn 15.5đ lên PRO ★</span>
+        </div>
+      </div>
+      <div class="card" style="padding:20px">
+        <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Hạng hiện tại</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <div style="width:48px;height:48px;border-radius:12px;background:var(--gold-bg);border:1.5px solid rgba(212,160,23,.3);display:flex;align-items:center;justify-content:center;font-size:22px">⭐</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--text)">Chuẩn KTS</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Hạng 3 / 5 cấp độ</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--green-bg);border:1px solid rgba(22,163,74,.2)"><div style="font-size:9px;color:var(--green);font-weight:700">Mới</div><div style="font-size:9px;color:var(--muted)">0–30đ</div></div>
+          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--blue-bg);border:1px solid rgba(37,99,235,.2)"><div style="font-size:9px;color:var(--blue);font-weight:700">Tiêu Chuẩn</div><div style="font-size:9px;color:var(--muted)">30–60</div></div>
+          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--gold-bg);border:1.5px solid rgba(212,160,23,.4)"><div style="font-size:9px;color:var(--gold);font-weight:700">✓ Chuẩn KTS</div><div style="font-size:9px;color:var(--muted)">60–100</div></div>
+          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--purple-bg);border:1px solid rgba(124,58,237,.2)"><div style="font-size:9px;color:var(--purple);font-weight:700">PRO</div><div style="font-size:9px;color:var(--muted)">100+</div></div>
+          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--ink3);border:1px solid var(--border)"><div style="font-size:9px;color:var(--muted);font-weight:700">VIP Gold</div><div style="font-size:9px;color:var(--muted)">150+</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="padding:20px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:14px">Lịch sử tích điểm gần đây</div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--green-bg);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"><i class="ph-duotone ph-star"></i></div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--text)">Chủ nhà đánh giá 5 sao</div><div style="font-size:11px;color:var(--muted)">Dự án Biệt thự Vườn Tân Cổ Điển · 30 phút trước</div></div>
+          <div style="font-size:13px;font-weight:700;color:var(--green)">+2.5đ</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--green-bg);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"><i class="ph-duotone ph-check-circle"></i></div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--text)">Hoàn thành đúng hạn SLA C2</div><div style="font-size:11px;color:var(--muted)">3 ngày trước</div></div>
+          <div style="font-size:13px;font-weight:700;color:var(--green)">+3.0đ</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--amber-bg);color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"><i class="ph-duotone ph-clock"></i></div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--text)">Nộp hồ sơ trễ 6 giờ</div><div style="font-size:11px;color:var(--muted)">1 tuần trước</div></div>
+          <div style="font-size:13px;font-weight:700;color:var(--red)">-1.0đ</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CÀI ĐẶT ═══ -->
+    <div class="sec-label settings-section"><i class="ph-duotone ph-gear" style="font-size:13px"></i> Cài đặt</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div class="card" style="padding:20px">
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:16px">Thông báo</div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><div style="font-size:12px;font-weight:500;color:var(--text)">Thông báo SLA</div><div style="font-size:11px;color:var(--muted)">Nhắc khi sắp đến hạn</div></div>
+            <label style="position:relative;display:inline-block;width:38px;height:22px;cursor:pointer"><input type="checkbox" checked style="opacity:0;width:0;height:0"><span style="position:absolute;inset:0;background:var(--green);border-radius:99px;transition:.2s"><span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.2s;transform:translateX(16px)"></span></span></label>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><div style="font-size:12px;font-weight:500;color:var(--text)">Thanh toán & Ví</div><div style="font-size:11px;color:var(--muted)">Khi có biến động ví</div></div>
+            <label style="position:relative;display:inline-block;width:38px;height:22px;cursor:pointer"><input type="checkbox" checked style="opacity:0;width:0;height:0"><span style="position:absolute;inset:0;background:var(--green);border-radius:99px;transition:.2s"><span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.2s;transform:translateX(16px)"></span></span></label>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><div style="font-size:12px;font-weight:500;color:var(--text)">Đánh giá từ Chủ nhà</div><div style="font-size:11px;color:var(--muted)">Khi có review mới</div></div>
+            <label style="position:relative;display:inline-block;width:38px;height:22px;cursor:pointer"><input type="checkbox" style="opacity:0;width:0;height:0"><span style="position:absolute;inset:0;background:var(--border2);border-radius:99px;transition:.2s"><span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.2s"></span></span></label>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="padding:20px">
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:16px">Tài khoản</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:11px;color:var(--muted);background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+            <div style="font-weight:600;color:var(--text);margin-bottom:2px">Username</div>
+            <div id="settingUsername" style="font-family:var(--mono);font-size:12px">kts.tranlong</div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+            <div style="font-weight:600;color:var(--text);margin-bottom:2px">Vai trò</div>
+            <div style="font-size:12px;color:var(--blue);font-weight:600">KTS (Kiến trúc sư)</div>
+          </div>
+          <button onclick="if(confirm('Đăng xuất?')) alnLogout()" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--red-bg);background:var(--red-bg);color:var(--red);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px"><i class="ph-duotone ph-sign-out"></i> Đăng xuất</button>
+        </div>
+      </div>
+    </div>
 
     <!-- PAGE FOOTER -->
     <footer class="page-footer">
@@ -2176,7 +2267,7 @@ function alnNotify(title, body){
     if(!first) return;
     var cont = first.parentElement;
     var SKIP = /modal|toast|popup|fab|veil|overlay|aln|chat/i;
-    var MARK = [['wallet-section','wallet'],['proposal-section','proposal'],['review-section','review'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip'],['myproj-section','myproj'],['myprofile-section','myprofile']];
+    var MARK = [['wallet-section','wallet'],['proposal-section','proposal'],['review-section','review'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip'],['myproj-section','myproj'],['myprofile-section','myprofile'],['reputation-section','reputation'],['settings-section','settings']];
     var groups = { dashboard: [] };
     var cur = 'dashboard';
     Array.prototype.forEach.call(cont.children, function(k){
@@ -2674,6 +2765,9 @@ onAuthStateChanged(auth, async (user) => {
     _startKtsProjectListen(user.uid);
     // Điền form profile
     _fillProfileForm(profile);
+    // Điền username vào Cài đặt
+    const suEl = document.getElementById('settingUsername');
+    if (suEl && profile.username) suEl.textContent = profile.username;
 
     // Hồ sơ KTS đầu sidebar: tên + avatar theo tài khoản đăng nhập
     try {
@@ -2685,7 +2779,7 @@ onAuthStateChanged(auth, async (user) => {
         const parts = nm.replace(/^KTS\.?\s*/i,'').trim().split(/\s+/);
         const ini = (parts.length >= 2 ? parts[parts.length-2][0] + parts[parts.length-1][0] : (parts[0]||'K')[0]).toUpperCase();
         const av = document.getElementById('ktsHeroAv');
-        if (av) av.textContent = ini;
+        if (av && !profile.avatarURL) av.textContent = ini;
         if (typeof updateGreeting === 'function') updateGreeting(fullNm);
       }
     } catch(e){}
