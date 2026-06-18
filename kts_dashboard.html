@@ -44,34 +44,34 @@ window.KTS_PROJECT_DATA = null;
 </style>
 <style>
 :root {
-  --ink: #0d1626;
-  --ink2: #112040;
-  --ink3: #1a2d50;
-  --border: rgba(99,150,230,0.18);
-  --border2: rgba(99,150,230,0.30);
-  --muted: rgba(180,205,240,0.45);
-  --sub: rgba(180,205,240,0.12);
-  --text: #e8f0fe;
-  --text2: rgba(220,235,255,0.82);
-  --accent: #C9A84C;
-  --accent2: #d4b86a;
-  --accent-bg: rgba(201,168,76,.10);
-  --gold: #C9A84C;
-  --gold-bg: rgba(201,168,76,.1);
-  --purple: #a78bfa;
-  --purple-bg: rgba(167,139,250,.12);
-  --green: #22c97a;
-  --green-bg: rgba(34,201,122,.1);
-  --red: #ff5757;
-  --red-bg: rgba(255,87,87,.1);
-  --amber: #ffaa33;
-  --amber-bg: rgba(255,170,51,.1);
-  --blue: #60a5fa;
-  --blue-bg: rgba(96,165,250,.12);
+  --ink: #f0f4f8;
+  --ink2: #ffffff;
+  --ink3: #f8fafc;
+  --border: #e2e8f0;
+  --border2: #cbd5e1;
+  --muted: #94a3b8;
+  --sub: rgba(0,0,0,.05);
+  --text: #1e293b;
+  --text2: #475569;
+  --accent: #b8952e;
+  --accent2: #c9a84c;
+  --accent-bg: rgba(201,168,76,.12);
+  --gold: #b8952e;
+  --gold-bg: rgba(184,149,46,.1);
+  --purple: #7c3aed;
+  --purple-bg: rgba(124,58,237,.1);
+  --green: #16a34a;
+  --green-bg: rgba(22,163,74,.1);
+  --red: #dc2626;
+  --red-bg: rgba(220,38,38,.1);
+  --amber: #d97706;
+  --amber-bg: rgba(217,119,6,.1);
+  --blue: #2563eb;
+  --blue-bg: rgba(37,99,235,.1);
   --r: 10px;
   --r-sm: 7px;
-  --sh: 0 2px 12px rgba(0,0,0,.40);
-  --sh-lg: 0 8px 32px rgba(0,0,0,.50);
+  --sh: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --sh-lg: 0 4px 16px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.06);
   --serif: 'Cormorant Garamond', serif;
   --sans: 'DM Sans', sans-serif;
   --mono: 'JetBrains Mono', monospace;
@@ -193,7 +193,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
 .clock-ring{display:flex;justify-content:center;margin:2px 0 12px}
 .ring-svg{transform:rotate(-90deg)}
-.ring-bg{fill:none;stroke:rgba(201,168,76,.12);stroke-width:5}
+.ring-bg{fill:none;stroke:rgba(0,0,0,.08);stroke-width:5}
 .ring-progress{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .8s ease,stroke .5s}
 
 .clock-center{position:relative;display:inline-flex;align-items:center;justify-content:center}
@@ -350,11 +350,11 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 /* ── TOAST ── */
 #toast{position:fixed;bottom:20px;right:20px;z-index:999;padding:10px 16px;border-radius:var(--r-sm);font-size:12px;font-weight:600;max-width:320px;box-shadow:var(--sh-lg);opacity:0;pointer-events:none;transform:translateY(6px);transition:all .25s}
 #toast.show{opacity:1;transform:translateY(0);pointer-events:auto}
-#toast.t-green{background:#0a2016;border:1px solid var(--green);color:var(--green)}
-#toast.t-red{background:#200a0a;border:1px solid var(--red);color:var(--red)}
-#toast.t-amber{background:#201500;border:1px solid var(--amber);color:var(--amber)}
-#toast.t-blue{background:#0a1620;border:1px solid var(--blue);color:var(--blue)}
-#toast.t-purple{background:#1a1200;border:1px solid var(--gold);color:var(--gold)}
+#toast.t-green{background:#f0fdf4;border:1px solid var(--green);color:var(--green)}
+#toast.t-red{background:#fef2f2;border:1px solid var(--red);color:var(--red)}
+#toast.t-amber{background:#fffbeb;border:1px solid var(--amber);color:var(--amber)}
+#toast.t-blue{background:#eff6ff;border:1px solid var(--blue);color:var(--blue)}
+#toast.t-purple{background:#fefce8;border:1px solid var(--gold);color:var(--gold)}
 
 /* pulse */
 @keyframes pulse-ring{0%{transform:scale(.9);opacity:.8}70%{transform:scale(1.1);opacity:0}100%{transform:scale(1.1);opacity:0}}
@@ -382,9 +382,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 @media(max-width:600px){
   .stat-card { padding:10px 10px !important; }
   /* iPhone brightness fix */
-  body { background-color: #0d1626 !important; }
-  .card, .stat-card { background-color: #112040 !important; border-color: rgba(99,150,230,0.18) !important; }
-  .sidebar { background-color: #0b1a36 !important; }
+  body { background-color: #f0f4f8 !important; }
+  .card, .stat-card { background-color: #ffffff !important; border-color: #e2e8f0 !important; }
+  .sidebar { background-color: #ffffff !important; }
 }
   .stat-label { font-size:8px !important; letter-spacing:.4px !important; margin-bottom:3px !important; }
   .stat-val { font-size:16px !important; }
@@ -428,14 +428,14 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 }
 </style>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0d1626">
+<meta name="theme-color" content="#f0f4f8">
 <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
 <!-- ═══ ALN AUTH VEIL — che trang đến khi xác thực xong ═══ -->
-<div id="alnAuthVeil" style="position:fixed;inset:0;background:#0d1626;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
-  <div style="width:38px;height:38px;border:3px solid rgba(201,168,76,.2);border-top-color:#C9A84C;border-radius:50%;animation:alnspin .8s linear infinite"></div>
-  <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:rgba(240,235,224,.7)">Đang xác thực...</div>
+<div id="alnAuthVeil" style="position:fixed;inset:0;background:#f0f4f8;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+  <div style="width:38px;height:38px;border:3px solid rgba(37,99,235,.15);border-top-color:#2563eb;border-radius:50%;animation:alnspin .8s linear infinite"></div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:#64748b">Đang xác thực...</div>
   <style>@keyframes alnspin{to{transform:rotate(360deg)}}</style>
 </div>
 
@@ -2474,7 +2474,7 @@ onAuthStateChanged(auth, async (user) => {
     // Không kẹt màn hình xác thực: cho người dùng bấm thử lại
     const veil = document.getElementById("alnAuthVeil");
     if (veil) veil.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:14px;font-family:sans-serif">'
-      + '<div style="color:rgba(240,235,224,.85);font-size:14px;text-align:center;padding:0 24px">Không kiểm tra được phiên đăng nhập.<br>Vui lòng kiểm tra mạng và thử lại.</div>'
+      + '<div style="color:#475569;font-size:14px;text-align:center;padding:0 24px">Không kiểm tra được phiên đăng nhập.<br>Vui lòng kiểm tra mạng và thử lại.</div>'
       + '<button onclick="location.reload()" style="background:linear-gradient(135deg,#C9A84C,#d4b86a);border:none;border-radius:8px;padding:11px 26px;font-weight:700;font-size:13px;cursor:pointer;color:#000">Thử lại</button>'
       + '<button onclick="window.location.replace(\'login.html\')" style="background:none;border:1px solid rgba(240,235,224,.25);border-radius:8px;padding:9px 22px;font-size:12px;cursor:pointer;color:rgba(240,235,224,.7)">Về trang đăng nhập</button>'
       + '</div>';
