@@ -2644,6 +2644,61 @@ function _watchDocs(pid) {
   } catch(e) { console.error(e); }
 }
 window._alnWatchDocs = _watchDocs;
+
+/* ══ NỘP HỒ SƠ C3 — UPLOAD THẬT LÊN FIREBASE ══ */
+window.submitC3 = async function() {
+  const pid = window.KTS_PROJECT_ID;
+  if (!pid) { if(typeof showToast==='function') showToast('Chưa có dự án — reload trang', 't-red'); return; }
+  const slots = window.c3Slots || [];
+  const files = window.uploadedFiles || {};
+  const btn = document.getElementById('submitC3Btn');
+  const sr  = document.getElementById('scanResult');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph-duotone ph-spinner-gap"></i> Đang upload...'; }
+  if (sr)  { sr.style.display = ''; sr.innerHTML = '<div style="font-size:11px;color:var(--muted)">Đang kiểm tra & upload...</div>'; }
+
+  const toUpload = slots.filter(s => files[s.id] && !files[s.id].hasError && files[s.id].file && files[s.id].file.name);
+  const total = toUpload.length;
+  let done = 0, failed = 0;
+  const u = typeof ktsUser === 'function' ? ktsUser() : {};
+  const today = new Date().toISOString().slice(0, 10);
+
+  for (const slot of toUpload) {
+    const f = files[slot.id].file;
+    try {
+      const ref = storageRef(storage, `projects/${pid}/c3/${slot.id}/${Date.now()}_${f.name}`);
+      await uploadBytes(ref, f);
+      const url = await getDownloadURL(ref);
+      await addDoc(collection(db, 'projects', pid, 'documents'), {
+        name: f.name,
+        folder: slot.id,
+        label: slot.label,
+        url,
+        stage: 'C3',
+        uploader: { uid: (auth.currentUser && auth.currentUser.uid) || u.uid || '', name: u.name || '', role: 'kts' },
+        date: today,
+      });
+      done++;
+      if (sr) sr.innerHTML = `<div style="font-size:11px;color:var(--green)">✅ ${done}/${total}: ${slot.label}</div>`;
+    } catch(e) {
+      console.error('[C3 upload]', slot.id, e);
+      failed++;
+      if (sr) sr.innerHTML = `<div style="font-size:11px;color:var(--red)">❌ Lỗi: ${slot.label} — ${(e&&e.message)||e}</div>`;
+    }
+  }
+
+  if (failed === 0) {
+    if (sr) sr.innerHTML = `<div style="padding:9px 12px;background:rgba(34,197,94,.08);border-radius:8px;font-size:11px;color:var(--green);font-weight:600">
+      <i class="ph-duotone ph-check-circle"></i> Đã upload ${done}/${total} tài liệu C3 — chờ thẩm định
+    </div>`;
+    if (btn) { btn.innerHTML = '<i class="ph-duotone ph-check-circle"></i> Đã nộp — chờ thẩm định'; }
+    if (typeof showToast === 'function') showToast('✅ Đã nộp Hồ sơ C3! Thông báo gửi cho Chủ nhà & Admin.', 't-green');
+    if (window.submitC3_realtime) window.submitC3_realtime();
+    if (typeof window._alnWatchDocs === 'function') window._alnWatchDocs(pid);
+  } else {
+    if (sr) sr.innerHTML = `<div style="font-size:11px;color:var(--amber)">⚠ Upload ${done}/${total} — ${failed} tệp lỗi. Kiểm tra mạng & Storage rules rồi thử lại.</div>`;
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-cloud-arrow-up"></i> Nộp Hồ sơ C3'; }
+  }
+};
 </script>
 </body>
 </html>
