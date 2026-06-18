@@ -615,7 +615,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
             <i class="ph-duotone ph-user-circle" style="font-size:9px;color:var(--gold)"></i> Chủ đầu tư
           </div>
           <div style="font-size:10px;color:var(--muted);margin-top:1px;display:flex;align-items:center;gap:4px">
-            <i class="ph-duotone ph-identification-card" style="font-size:9px;color:var(--gold)"></i> ALN-9921
+            <i class="ph-duotone ph-identification-card" style="font-size:9px;color:var(--gold)"></i> ALN-CN-9921
           </div>
         </div>
       </div>
@@ -1315,7 +1315,7 @@ function renderSidebar(){
     <div class="cn-proj-item ${window.activeProj===p.id?'active':''}" onclick="selectProj('${p.id}')">
       <span class="cpi-dot" style="background:${STATUS_DOT[p.status]}"></span>
       <div style="min-width:0">
-        <div class="cpi-id">${p.id}</div>
+        <div class="cpi-id">${'ALN-CN-' + p.id.replace(/^ALN-/, '')}</div>
         <div class="cpi-name">${p.name}</div>
         <div class="cpi-meta">${p.stage} · ${p.kts.replace('KTS. ','')}</div>
       </div>
@@ -1710,7 +1710,7 @@ function renderMain(){
               <i class="ph-duotone ph-user-circle" style="font-size:8px"></i> Chủ đầu tư
             </span>
             <span class="kts-hero-pill" style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--accent2);font-family:var(--mono)">
-              <i class="ph-duotone ph-hash" style="font-size:8px"></i> ${p.id}
+              <i class="ph-duotone ph-hash" style="font-size:8px"></i> ${'ALN-CN-' + p.id.replace(/^ALN-/, '')}
             </span>
             <span class="kts-hero-pill" style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text2)">
               <i class="ph-duotone ph-calendar-blank" style="color:var(--gold);font-size:8px"></i> Đang thi công ${p.stage}
@@ -1727,7 +1727,7 @@ function renderMain(){
 
       <!-- ══ PROJECT INFO ══ -->
       <div style="margin-top:12px">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--sub);margin-bottom:3px">${p.id}</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--sub);margin-bottom:3px">${'ALN-CN-' + p.id.replace(/^ALN-/, '')}</div>
         <h1>${p.name}</h1>
         <!-- KTS compact row với canvas portrait -->
         <div style="margin-top:7px;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:7px;padding:7px 12px;flex-wrap:wrap">
@@ -2905,6 +2905,10 @@ function _startProjectsListen(uid, isFounder) {
       );
   onSnapshot(q, snap => {
     window.PROJECTS_CLIENT = snap.docs.map(d => _adaptProject(d.id, d.data()));
+    // Khởi động listener phương án Firestore cho mọi dự án
+    window.PROJECTS_CLIENT.forEach(function(p) {
+      if (typeof window._startProposalListeners === 'function') window._startProposalListeners(p.id);
+    });
     if (window.PROJECTS_CLIENT.length > 0) {
       window.activeProj = window.PROJECTS_CLIENT[0].id;
       window.renderSidebar();
@@ -3040,8 +3044,6 @@ window.alnLogout = async function(){
 <script type="module">
 import { db, collection, query, orderBy, onSnapshot } from "./firebase-config.js";
 
-const PID = 'ALN-9921';
-
 function _fmtDate(ca){
   try{ if(ca && ca.toDate){ const x=ca.toDate();
     return ('0'+x.getDate()).slice(-2)+'/'+('0'+(x.getMonth()+1)).slice(-2)+'/'+x.getFullYear(); } }catch(e){}
@@ -3066,15 +3068,24 @@ function _mapPA(id, d){
   };
 }
 
-['C1','C2'].forEach(stage=>{
-  try{
-    const qy = query(collection(db,'projects',PID,'stages',stage,'proposals'), orderBy('order','desc'));
-    onSnapshot(qy, snap=>{
-      const arr = snap.docs.map(d=>_mapPA(d.id, d.data()));
-      if(typeof window.alnApplyRealProposals === 'function') window.alnApplyRealProposals(PID, stage, arr);
-    }, err=>console.error('[ALN CN proposals]', stage, err));
-  }catch(e){ console.error('[ALN CN proposals init]', stage, e); }
-});
+const _propUnsubs = {};
+window._startProposalListeners = function(pid){
+  if (_propUnsubs[pid]) return; // đã lắng nghe
+  _propUnsubs[pid] = [];
+  ['C1','C2'].forEach(stage => {
+    try {
+      const qy = query(collection(db,'projects',pid,'stages',stage,'proposals'), orderBy('order','desc'));
+      const unsub = onSnapshot(qy, snap => {
+        const arr = snap.docs.map(d => _mapPA(d.id, d.data()));
+        if (typeof window.alnApplyRealProposals === 'function') window.alnApplyRealProposals(pid, stage, arr);
+      }, err => console.error('[ALN CN proposals]', pid, stage, err));
+      _propUnsubs[pid].push(unsub);
+    } catch(e) { console.error('[ALN CN proposals init]', pid, stage, e); }
+  });
+};
+
+// Khởi động ngay cho dự án seed (phòng khi module 1 chạy trước khi auth resolve)
+window._startProposalListeners('ALN-9921');
 </script>
 </body>
 </html>

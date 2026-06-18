@@ -2019,7 +2019,7 @@ function renderMyProjects(projects) {
     const stClr = STATUS_CLR[p.status] || '';
     return `<div class="proj-card" onclick="toggleProjDetail('pd${uid}')">
       <div class="proj-card-header">
-        <span class="proj-card-id">${p.id}</span>
+        <span class="proj-card-id">${(p.dn && p.dn.uid ? 'ALN-DN-' : 'ALN-CN-') + p.id.replace(/^ALN-/, '')}</span>
         <span class="proj-card-name">${p.name||''}</span>
         <span class="proj-card-status" style="${stClr}">${stLbl}</span>
       </div>
