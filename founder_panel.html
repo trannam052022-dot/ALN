@@ -831,6 +831,10 @@ body::after {
     style="padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:var(--raised);color:var(--sub)">
     <i class="ph-duotone ph-house-line" style="margin-right:5px"></i>Chủ nhà
   </button>
+  <button id="tabPending" onclick="switchTab('pending')"
+    style="padding:5px 13px;border:1px solid rgba(239,68,68,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(239,68,68,.08);color:#ef4444;display:flex;align-items:center;gap:5px">
+    <i class="ph-duotone ph-user-plus"></i>Duyệt đăng ký<span id="pendingBadge" style="display:none;background:#ef4444;color:#fff;border-radius:99px;font-size:9px;padding:1px 6px;font-weight:700">0</span>
+  </button>
 
   <!-- ── DIVIDER ── -->
   <div style="width:1px;height:20px;background:var(--border);flex-shrink:0"></div>
@@ -1276,6 +1280,22 @@ body::after {
       </tr></thead>
       <tbody id="mgCnBody"></tbody>
     </table>
+  </div>
+</div>
+
+<!-- ══ PANEL: DUYỆT ĐĂNG KÝ ══ -->
+<div id="panelPending" style="display:none;flex-direction:column;flex:1;padding:20px;gap:16px;overflow-y:auto">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:3px">QUẢN TRỊ HỆ THỐNG</div>
+      <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1)">Duyệt Đăng ký Mới</div>
+    </div>
+    <button onclick="renderPending()" style="padding:6px 14px;background:var(--raised);border:1px solid var(--border);border-radius:7px;font-size:11px;font-weight:600;color:var(--sub);cursor:pointer;font-family:var(--sans)">
+      <i class="ph-duotone ph-arrow-clockwise"></i> Tải lại
+    </button>
+  </div>
+  <div id="pendingList" style="display:flex;flex-direction:column;gap:10px">
+    <div style="text-align:center;padding:40px;color:var(--dim);font-size:12px">Đang tải...</div>
   </div>
 </div>
 
@@ -2169,10 +2189,11 @@ window.ALNRealtime = (() => {
 ══════════════════════════════════════════ */
 
 function switchTab(t){
-  var ALL = ['projects','stats','mgKts','mgDn','mgCn','liveKts','liveDn','liveCn'];
+  var ALL = ['projects','stats','mgKts','mgDn','mgCn','pending','liveKts','liveDn','liveCn'];
   var activeStyle  = 'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.15);color:var(--blue);white-space:nowrap';
   var inactiveStyle= 'padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:var(--raised);color:var(--sub);white-space:nowrap';
   var liveStyles = {
+    pending: {active:'padding:5px 13px;border:1px solid rgba(239,68,68,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.18);color:#ef4444;display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(239,68,68,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.08);color:#ef4444;display:flex;align-items:center;gap:5px;white-space:nowrap'},
     liveKts: {active:'padding:5px 13px;border:1px solid rgba(245,158,11,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(245,158,11,.18);color:var(--amber);display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(245,158,11,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(245,158,11,.08);color:var(--amber);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     liveDn:  {active:'padding:5px 13px;border:1px solid rgba(59,130,246,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.2);color:var(--blue);display:flex;align-items:center;gap:5px;white-space:nowrap',   inactive:'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.08);color:var(--blue);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     liveCn:  {active:'padding:5px 13px;border:1px solid rgba(16,185,129,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.2);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap'},
@@ -2192,10 +2213,11 @@ function switchTab(t){
     }
   });
 
-  if(t==='stats')  renderStats();
-  if(t==='mgKts')  renderMgKts();
-  if(t==='mgDn')   renderMgDn();
-  if(t==='mgCn')   renderMgCn();
+  if(t==='stats')   renderStats();
+  if(t==='mgKts')   renderMgKts();
+  if(t==='mgDn')    renderMgDn();
+  if(t==='mgCn')    renderMgCn();
+  if(t==='pending') renderPending();
 
   // LIVE iframes: chỉ tải khi vào tab, rời tab thì giải phóng bộ nhớ
   var IFR = { liveKts:'iframeKts', liveDn:'iframeDn', liveCn:'iframeCn' };
@@ -2633,6 +2655,46 @@ function renderMgCn(){
         +'<td style="padding:10px 14px" onclick="event.stopPropagation()">'+_actionBtns('cn',idx)+'</td>'
       +'</tr>';
     }).join('');
+}
+
+/* ── DUYỆT ĐĂNG KÝ ── */
+var PENDING_USERS = [];
+window.PENDING_USERS = PENDING_USERS;
+
+function renderPending(){
+  var list = document.getElementById('pendingList');
+  if(!list) return;
+  var users = window.PENDING_USERS || [];
+  if(users.length === 0){
+    list.innerHTML = '<div style="text-align:center;padding:48px;color:var(--dim);font-size:13px"><i class="ph-duotone ph-check-circle" style="font-size:32px;display:block;margin-bottom:10px;color:var(--green)"></i>Không có hồ sơ nào đang chờ duyệt</div>';
+    return;
+  }
+  var ROLE_LABEL = {kts:'Kiến trúc sư', dn:'Doanh nghiệp', cn:'Chủ nhà'};
+  var ROLE_COLOR = {kts:'var(--amber)', dn:'var(--blue)', cn:'var(--green)'};
+  list.innerHTML = users.map(function(u){
+    var ts = u.createdAt ? (u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString('vi-VN') : u.createdAt) : '—';
+    return '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">'
+      +'<div style="width:40px;height:40px;border-radius:10px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0"><i class="ph-duotone ph-user-circle"></i></div>'
+      +'<div style="flex:1;min-width:180px">'
+        +'<div style="font-size:13px;font-weight:700;color:var(--text1)">'+u.name+'</div>'
+        +'<div style="font-size:11px;color:var(--sub);margin-top:2px;font-family:var(--mono)">'+u.username+'</div>'
+        +'<div style="margin-top:6px;display:flex;align-items:center;gap:8px">'
+          +'<span style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:'+( ROLE_COLOR[u.role]||'var(--sub)')+';background:rgba(255,255,255,.05);border:1px solid currentColor;opacity:.8;padding:2px 8px;border-radius:99px">'+( ROLE_LABEL[u.role]||u.role)+'</span>'
+          +'<span style="font-size:10px;color:var(--dim)">Đăng ký '+ts+'</span>'
+        +'</div>'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;flex-shrink:0">'
+        +'<button onclick="founderApprovePending(\''+u.uid+'\')" style="padding:7px 16px;background:rgba(34,201,122,.12);border:1px solid rgba(34,201,122,.3);border-radius:7px;color:var(--green);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-check"></i> Duyệt</button>'
+        +'<button onclick="founderRejectPending(\''+u.uid+'\')" style="padding:7px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:7px;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-x"></i> Từ chối</button>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function _updatePendingBadge(){
+  var n = (window.PENDING_USERS || []).length;
+  var badge = document.getElementById('pendingBadge');
+  if(badge){ badge.textContent = n; badge.style.display = n > 0 ? '' : 'none'; }
 }
 
 /* ── MODAL THÊM / SỬA ── */
@@ -3157,7 +3219,7 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "founder";
 
@@ -3166,6 +3228,37 @@ function _adaptForFounder(id, d) {
   var prog = d.progress || {};
   return { id: id, name: d.name||'', cn: (d.cn&&d.cn.name)||'', kts: (d.kts&&d.kts.name)||'', dn: (d.dn&&d.dn.name)||'', stage: d.stage||'C1', status: d.status||'on_track', progress: [prog.C1||0, prog.C2||0, prog.C3||0, prog.C4||0], escrow: d.escrowBalance||0, total: d.totalFee||0, _raw: d };
 }
+window.founderApprovePending = async function(uid) {
+  try {
+    await updateDoc(doc(db,'users',uid), { status:'active' });
+    window.PENDING_USERS = (window.PENDING_USERS||[]).filter(function(u){ return u.uid!==uid; });
+    renderPending(); _updatePendingBadge();
+    console.log('[Founder] Duyệt tài khoản', uid);
+  } catch(e){ console.error('[Founder approvePending]', e); alert('Lỗi: '+(e.message||e.code)); }
+};
+
+window.founderRejectPending = async function(uid) {
+  if(!confirm('Xác nhận từ chối tài khoản này?')) return;
+  try {
+    await updateDoc(doc(db,'users',uid), { status:'rejected' });
+    window.PENDING_USERS = (window.PENDING_USERS||[]).filter(function(u){ return u.uid!==uid; });
+    renderPending(); _updatePendingBadge();
+    console.log('[Founder] Từ chối tài khoản', uid);
+  } catch(e){ console.error('[Founder rejectPending]', e); alert('Lỗi: '+(e.message||e.code)); }
+};
+
+async function _startPendingListen() {
+  try {
+    const q = query(collection(db,'users'), where('status','==','pending'));
+    onSnapshot(q, function(snap) {
+      window.PENDING_USERS = snap.docs.map(function(d){ return Object.assign({uid:d.id}, d.data()); });
+      _updatePendingBadge();
+      var tab = document.querySelector('[id="tabPending"]');
+      if(tab && document.getElementById('panelPending') && document.getElementById('panelPending').style.display!=='none') renderPending();
+    });
+  } catch(e){ console.error('[Founder pending]', e); }
+}
+
 window.founderApproveStage = async function(pid, stage) {
   const nextStage = {C1:'C2',C2:'C3',C3:'C4',C4:'C4'}[stage]||'C4';
   try {
@@ -3257,6 +3350,7 @@ onAuthStateChanged(auth, async (user) => {
 
     // ── LOAD DỰ ÁN TỪ FIRESTORE ──
     try { _startFounderListen(); } catch(e){ console.error('[Founder listen]', e); }
+    try { _startPendingListen(); } catch(e){ console.error('[Founder pending]', e); }
 
     // ── WEB PUSH (FCM): đăng ký token tự động khi đã có quyền thông báo ──
     window.__ALN_UID = user.uid;

@@ -213,6 +213,8 @@ body::after{
   <div class="login-footer">
     <span style="color:var(--muted)">© 2026 ALN Platform — </span>
     <a href="#">Chính sách bảo mật</a>
+    <span style="color:var(--muted)"> · </span>
+    <a href="register.html">Đăng ký tài khoản</a>
   </div>
 
 </div>
@@ -396,6 +398,20 @@ async function doLogin(){
     }
 
     const profile = snap.data();
+
+    // Chặn tài khoản chờ duyệt hoặc bị từ chối
+    if(profile.status === 'pending'){
+      await fb.signOut(fb.auth);
+      showError('Tài khoản đang chờ Founder duyệt. Vui lòng thử lại sau khi được kích hoạt.');
+      resetLoginBtn();
+      return;
+    }
+    if(profile.status === 'rejected'){
+      await fb.signOut(fb.auth);
+      showError('Tài khoản đã bị từ chối. Vui lòng liên hệ quản trị viên.');
+      resetLoginBtn();
+      return;
+    }
 
     // Kiểm tra đúng tab vai trò đang chọn
     // Founder được phép đăng nhập từ bất kỳ tab nào
