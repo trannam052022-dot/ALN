@@ -140,7 +140,10 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid2-3{display:grid;grid-template-columns:2fr 1fr;gap:12px}
-@media(max-width:900px){.grid3,.grid2,.grid2-3{grid-template-columns:1fr}}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.dash-2col{display:grid;grid-template-columns:1fr 360px;gap:14px;align-items:start}
+@media(max-width:1100px){.dash-2col{grid-template-columns:1fr}}
+@media(max-width:900px){.grid3,.grid2,.grid2-3{grid-template-columns:1fr}.grid4{grid-template-columns:1fr 1fr}}
 
 /* ── CARDS ── */
 .card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
@@ -508,30 +511,47 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
   <div class="content">
 
-    <!-- STAT ROW -->
-    <div class="grid3" style="margin-bottom:6px">
+    <!-- GREETING -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:3px" id="greetingDate">—</div>
+        <div style="font-family:var(--serif);font-size:20px;font-weight:600;font-style:italic;color:var(--text)">Xin chào, <span id="greetingName">KTS</span></div>
+      </div>
+      <div id="greetingOnline" style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);background:var(--green-bg);border:1px solid rgba(34,201,122,.2);padding:5px 12px;border-radius:99px">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span> Online
+      </div>
+    </div>
+
+    <!-- 4 HERO CARDS -->
+    <div class="grid4" style="margin-bottom:14px">
       <div class="stat-card s-purple">
-        <div class="stat-label">Doanh thu tháng 6</div>
-        <div class="stat-val">11.8M</div>
-        <div class="stat-badge sb-green"><i class="ph-duotone ph-arrow-up" style="font-size:8px"></i> +32% vs T5</div>
+        <div class="stat-label"><i class="ph-duotone ph-chart-bar" style="font-size:9px;margin-right:3px"></i>Doanh thu tháng này</div>
+        <div class="stat-val" id="heroRevenue">—</div>
+        <div class="stat-badge sb-green" id="heroRevenueBadge"><i class="ph-duotone ph-arrow-up" style="font-size:8px"></i> đang tính</div>
       </div>
       <div class="stat-card s-green">
-        <div class="stat-label">Ví chính khả dụng</div>
-        <div class="stat-val">3.87M</div>
+        <div class="stat-label"><i class="ph-duotone ph-wallet" style="font-size:9px;margin-right:3px"></i>Ví chính khả dụng</div>
+        <div class="stat-val" id="heroWallet">3.87M</div>
         <div class="stat-sub">Rút về TK ngân hàng</div>
       </div>
       <div class="stat-card s-gold">
-        <div class="stat-label">Điểm Uy tín</div>
+        <div class="stat-label"><i class="ph-duotone ph-star" style="font-size:9px;margin-right:3px"></i>Điểm Uy tín</div>
         <div class="stat-val">84.5<span style="font-size:13px;color:var(--muted)">/100</span></div>
-        <div class="stat-badge sb-gold"><i class="ph-duotone ph-star" style="font-size:8px"></i> Hạng Chuẩn — còn 15.5đ lên PRO</div>
+        <div class="stat-badge sb-gold"><i class="ph-duotone ph-star" style="font-size:8px"></i> Hạng Chuẩn · còn 15.5đ lên PRO</div>
+      </div>
+      <div class="stat-card s-blue">
+        <div class="stat-label"><i class="ph-duotone ph-check-circle" style="font-size:9px;margin-right:3px"></i>Dự án đang chạy</div>
+        <div class="stat-val" id="heroActiveProj">—</div>
+        <div class="stat-badge sb-blue" id="heroProjBadge"><i class="ph-duotone ph-briefcase" style="font-size:8px"></i> đang tải</div>
       </div>
     </div>
 
     <!-- ══════════════════════════════════
-         MODULE 1 — SLA TIMER C2
+         DASHBOARD 2-COL: SLA + PROJECTS
     ══════════════════════════════════ -->
-    <div class="sec-label">⏰ Nhiệm vụ khẩn — Chặng 2 đang chờ phản hồi</div>
-
+    <div class="dash-2col">
+    <div><!-- LEFT: SLA -->
+    <div class="sec-label">⏰ Nhiệm vụ khẩn — Chặng đang chờ phản hồi</div>
     <div class="sla-card normal" id="slaCard">
       <div class="sla-glow"></div>
       <div class="sla-top">
@@ -581,6 +601,53 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <button class="btn btn-ghost btn-sm" onclick="simSlaExpire()"><i class="ph-duotone ph-clock"></i> [Demo] Quá hạn</button>
       </div>
     </div>
+    </div><!-- end LEFT -->
+
+    <!-- RIGHT: DỰ ÁN + VÍ NHANH -->
+    <div style="display:flex;flex-direction:column;gap:12px">
+
+      <!-- Danh sách dự án -->
+      <div class="card card-sm">
+        <div class="card-title" style="font-size:13px;margin-bottom:10px">
+          <div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-briefcase"></i></div>
+          Dự án đang thực hiện
+        </div>
+        <div id="dashProjList">
+          <div style="font-size:12px;color:var(--muted);text-align:center;padding:16px 0">Đang tải...</div>
+        </div>
+      </div>
+
+      <!-- Ví nhanh -->
+      <div class="card card-sm">
+        <div class="card-title" style="font-size:13px;margin-bottom:10px">
+          <div class="ct-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-wallet"></i></div>
+          Ví & Giải ngân
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:11px;color:var(--muted)">Ví chính (khả dụng)</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--green)">3,878,220đ</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:11px;color:var(--muted)">Ví tạm ứng <span style="color:var(--amber);font-size:9px;font-weight:700">C2</span></span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--amber)">1,920,000đ</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:11px;color:var(--muted)">Chờ giải ngân</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--muted)">0đ</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0">
+            <span style="font-size:11px;color:var(--muted)">Thuế tích lũy</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--red)">297,780đ</span>
+          </div>
+        </div>
+        <button class="btn btn-green btn-sm" style="width:100%;margin-top:8px" onclick="scrollTo('.wallet-section')">
+          <i class="ph-duotone ph-sign-out"></i> Rút tiền & Chi tiết
+        </button>
+      </div>
+
+    </div><!-- end RIGHT -->
+    </div><!-- end dash-2col -->
 
     <!-- ══════════════════════════════════
          MODULE 2 — WALLET
@@ -2038,6 +2105,7 @@ function _startKtsProjectListen(uid) {
     });
     window._KTS_ALL_PROJECTS = allProjs;
     renderMyProjects(allProjs);
+    if (typeof renderDashProjList === 'function') renderDashProjList(allProjs);
     // Khởi động bảng review (tài liệu + phương án)
     if (typeof window._alnWatchDocs === 'function') window._alnWatchDocs(d.id);
     if (typeof window.rvLoadStage === 'function') window.rvLoadStage('C2');
@@ -2070,6 +2138,62 @@ window.switchKtsProject = function(pid) {
 /* ══ DỰ ÁN + HỒ SƠ KTS ══ */
 
 // Render danh sách dự án — chia 2 nhóm: Chủ nhà / Doanh nghiệp
+/* ── DASHBOARD HERO + GREETING ── */
+function _dayVi(d){ return ['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy'][d.getDay()]; }
+
+function updateGreeting(name) {
+  var now = new Date();
+  var el = document.getElementById('greetingDate');
+  if (el) el.textContent = _dayVi(now) + ', ' + now.toLocaleDateString('vi-VN');
+  var nameEl = document.getElementById('greetingName');
+  if (nameEl) nameEl.textContent = name || 'KTS';
+}
+
+function renderDashProjList(projs) {
+  var el = document.getElementById('dashProjList');
+  if (!el) return;
+  if (!projs || !projs.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px 0">Chưa có dự án nào</div>';
+    return;
+  }
+  var SC = {on_track:'var(--green)', sla_warn:'var(--amber)', dispute:'var(--red)', done:'var(--muted)'};
+  var SL = {on_track:'Trong hạn', sla_warn:'Cảnh báo', dispute:'Tranh chấp', done:'Xong'};
+  el.innerHTML = projs.slice(0,5).map(function(p){
+    var color = SC[p.status] || 'var(--muted)';
+    var isCN = !!(p.cn && p.cn.uid);
+    var did = (isCN ? 'ALN-CN-' : 'ALN-DN-') + (p.id||'').replace(/^ALN-/,'');
+    return '<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="window.switchKtsProject && window.switchKtsProject(\'' + p.id + '\')">'
+      + '<div style="width:7px;height:7px;border-radius:50%;background:' + color + ';flex-shrink:0"></div>'
+      + '<div style="flex:1;min-width:0">'
+        + '<div style="font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (p.name || did) + '</div>'
+        + '<div style="font-size:10px;color:var(--muted);margin-top:1px">' + did + ' · Chặng ' + (p.stage||'C1') + '</div>'
+      + '</div>'
+      + '<span style="font-size:10px;font-weight:700;color:' + color + ';flex-shrink:0">' + (SL[p.status]||p.status) + '</span>'
+    + '</div>';
+  }).join('');
+  if (projs.length > 5) {
+    el.innerHTML += '<div style="font-size:11px;color:var(--muted);text-align:center;padding:6px 0;cursor:pointer" onclick="scrollTo(\'.myproj-section\')">+ ' + (projs.length-5) + ' dự án khác</div>';
+  }
+  // Hero card counts
+  var active = projs.filter(function(p){ return p.status !== 'done'; }).length;
+  var hEl = document.getElementById('heroActiveProj');
+  if (hEl) hEl.textContent = active;
+  var bEl = document.getElementById('heroProjBadge');
+  if (bEl) bEl.innerHTML = '<i class="ph-duotone ph-briefcase" style="font-size:8px"></i> ' + projs.length + ' tổng cộng';
+  // Revenue estimate: sum totalFee * (C1*10% + C2*20% + C3*60% + C4*10%) earned
+  var earned = projs.reduce(function(sum, p){
+    var prog = p.progress || [0,0,0,0];
+    var pct = [0.10,0.20,0.60,0.10];
+    var stage_earned = 0;
+    for (var i=0; i<4; i++) stage_earned += (prog[i]||0) * pct[i];
+    return sum + (p.totalFee||0) * stage_earned;
+  }, 0);
+  var hRev = document.getElementById('heroRevenue');
+  if (hRev) hRev.textContent = earned >= 1000000 ? (earned/1000000).toFixed(1) + 'M' : (earned > 0 ? Math.round(earned/1000) + 'K' : '—');
+  var hRevB = document.getElementById('heroRevenueBadge');
+  if (hRevB && earned > 0) hRevB.innerHTML = '<i class="ph-duotone ph-chart-bar" style="font-size:8px"></i> Doanh thu tích lũy';
+}
+
 function renderMyProjects(projects) {
   const wrap = document.getElementById('myProjList');
   const badge = document.getElementById('myProjBadge');
@@ -2340,6 +2464,7 @@ onAuthStateChanged(auth, async (user) => {
         const ini = (parts.length >= 2 ? parts[parts.length-2][0] + parts[parts.length-1][0] : (parts[0]||'K')[0]).toUpperCase();
         const av = document.getElementById('ktsHeroAv');
         if (av) av.textContent = ini;
+        if (typeof updateGreeting === 'function') updateGreeting(fullNm);
       }
     } catch(e){}
   } catch(e) {
