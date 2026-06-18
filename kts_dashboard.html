@@ -2520,6 +2520,7 @@ function paWatch(stage){
   if(!box) return;
   if(_paUnsub){ try{_paUnsub();}catch(e){} _paUnsub=null; }
   box.innerHTML='<div style="color:var(--muted);font-size:12px">Đang tải...</div>';
+  const PID = window.KTS_PROJECT_ID || 'ALN-9921';
   try{
     const qy=query(collection(db,'projects',PID,'stages',stage,'proposals'), orderBy('order','desc'));
     _paUnsub=onSnapshot(qy, snap=>{
