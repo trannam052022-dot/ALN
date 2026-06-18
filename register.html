@@ -4,111 +4,156 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>ALN — Đăng ký</title>
+<title>ALN — Đăng ký tài khoản</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/>
-<style>.ph-spin{animation:phspin 1s linear infinite;display:inline-block}@keyframes phspin{to{transform:rotate(360deg)}}</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
 :root{
   --ink:#08080a;--ink2:#111114;--ink3:#18181c;--ink4:#222228;
   --border:rgba(201,168,76,0.16);--border2:rgba(201,168,76,0.28);
   --text:#F0EBE0;--text2:rgba(240,235,224,0.7);--sub:rgba(240,235,224,0.44);--muted:rgba(240,235,224,0.28);
   --gold:#C9A84C;--gold2:#d4b86a;--gold-bg:rgba(201,168,76,.08);
-  --green:#22c97a;--red:#ef4444;--amber:#ffaa33;--blue:#38bdf8;
+  --green:#22c97a;--green-bg:rgba(34,201,122,.1);
+  --red:#ef4444;--red-bg:rgba(239,68,68,.08);
+  --amber:#ffaa33;--blue:#38bdf8;
   --r:12px;--r-sm:8px;
   --sans:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;--syne:'Syne',sans-serif;--serif:'Cormorant Garamond',serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:13px;height:100%}
 body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(201,168,76,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
 body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(201,168,76,.07) 0%,transparent 60%);pointer-events:none;z-index:0}
-.page{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh;align-items:center;justify-content:center;padding:24px 16px}
-.brand{text-align:center;margin-bottom:36px}
-.brand-logo{display:inline-flex;align-items:center;gap:10px;margin-bottom:12px}
+
+.page{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh;align-items:center;justify-content:center;padding:32px 16px}
+
+.brand{text-align:center;margin-bottom:28px}
+.brand-logo{display:inline-flex;align-items:center;gap:10px;margin-bottom:10px}
 .brand-box{background:var(--gold-bg);border:1.5px solid rgba(201,168,76,.3);border-radius:10px;padding:7px 14px;font-family:var(--syne);font-size:15px;font-weight:800;letter-spacing:.08em;color:var(--gold)}
-.brand-title{font-family:var(--serif);font-size:28px;font-weight:300;font-style:italic;color:var(--text);line-height:1.2;margin-bottom:6px}
+.brand-title{font-family:var(--serif);font-size:26px;font-weight:300;font-style:italic;color:var(--text);line-height:1.2;margin-bottom:5px}
 .brand-sub{font-size:12px;color:var(--sub)}
-.role-tabs{display:flex;gap:6px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:4px;width:100%;max-width:420px}
-.role-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;border-radius:9px;cursor:pointer;transition:all .18s;border:1.5px solid transparent;user-select:none;-webkit-tap-highlight-color:transparent}
+
+.role-tabs{display:flex;gap:6px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:4px;width:100%;max-width:460px}
+.role-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;border-radius:9px;cursor:pointer;transition:all .18s;border:1.5px solid transparent;user-select:none;-webkit-tap-highlight-color:transparent}
 .role-tab:hover{background:rgba(201,168,76,.06)}
 .role-tab.active{background:var(--gold-bg);border-color:rgba(201,168,76,.3)}
-.role-tab .rt-icon{font-size:18px;line-height:1}
+.role-tab .rt-icon{font-size:20px;line-height:1}
 .role-tab .rt-label{font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.04em;text-align:center;transition:color .18s}
 .role-tab.active .rt-label{color:var(--gold)}
 .role-tab .rt-dot{width:5px;height:5px;border-radius:50%;background:var(--muted);transition:background .18s}
 .role-tab.active .rt-dot{background:var(--gold)}
-.login-card{width:100%;max-width:420px;background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+
+.reg-card{width:100%;max-width:460px;background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5);margin-top:8px}
 .card-top{padding:20px 24px 0}
-.role-label-row{display:flex;align-items:center;gap:8px;margin-bottom:18px}
-.role-icon-big{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.role-label-row{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.role-icon-big{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .role-title{font-family:var(--serif);font-size:17px;font-weight:600;font-style:italic;color:var(--text)}
 .role-desc{font-size:11px;color:var(--sub)}
+
 .form-body{padding:0 24px 24px}
 .field{margin-bottom:14px}
-.field label{display:block;font-size:11px;font-weight:600;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.field label{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
 .field-wrap{position:relative}
 .field-wrap .fi{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12px;pointer-events:none}
 .field input{width:100%;background:var(--ink3);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px 10px 34px;font-size:13px;font-family:var(--sans);color:var(--text);outline:none;transition:border-color .15s;-webkit-appearance:none}
 .field input:focus{border-color:rgba(201,168,76,.45);background:var(--ink4)}
 .field input::placeholder{color:var(--muted)}
+.field-hint{font-size:10px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:4px}
+
+.username-wrap{position:relative}
+.username-wrap input{padding-right:38px}
+.refresh-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:4px;transition:color .15s;display:flex;align-items:center}
+.refresh-btn:hover{color:var(--gold)}
+.username-status{display:flex;align-items:center;gap:5px;font-size:10px;margin-top:4px;min-height:16px;font-family:var(--mono)}
+.username-status.ok{color:var(--green)}
+.username-status.err{color:var(--red)}
+.username-status.checking{color:var(--muted)}
+
 .field-pw .eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:4px;transition:color .15s}
 .field-pw .eye:hover{color:var(--text2)}
-.msg-error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:var(--r-sm);padding:9px 12px;font-size:12px;color:var(--red);display:none;align-items:center;gap:8px;margin-bottom:12px}
-.msg-error.show{display:flex}
-.btn-login{width:100%;padding:13px;background:linear-gradient(135deg,#C9A84C,#d4b86a);border:none;border-radius:var(--r-sm);font-family:var(--syne);font-size:13px;font-weight:700;letter-spacing:.06em;color:#000;cursor:pointer;transition:opacity .15s,transform .1s;margin-top:4px}
-.btn-login:hover{opacity:.9}
-.btn-login:active{transform:scale(.98)}
-.btn-login:disabled{opacity:.5;cursor:not-allowed}
-.redirect-overlay{position:fixed;inset:0;background:var(--ink);z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+
+.pw-strength{display:flex;gap:3px;margin-top:5px}
+.pw-strength span{flex:1;height:3px;border-radius:2px;background:var(--ink4);transition:background .2s}
+.pw-strength.s1 span:nth-child(1){background:var(--red)}
+.pw-strength.s2 span:nth-child(-n+2){background:var(--amber)}
+.pw-strength.s3 span:nth-child(-n+3){background:var(--gold)}
+.pw-strength.s4 span{background:var(--green)}
+
+.msg-box{border-radius:var(--r-sm);padding:10px 12px;font-size:12px;display:none;align-items:center;gap:8px;margin-bottom:14px}
+.msg-box.show{display:flex}
+.msg-error{background:var(--red-bg);border:1px solid rgba(239,68,68,.25);color:var(--red)}
+
+.pending-note{background:rgba(255,170,51,.06);border:1px solid rgba(255,170,51,.2);border-radius:var(--r-sm);padding:10px 12px;font-size:11px;color:rgba(240,235,224,.6);display:flex;align-items:flex-start;gap:8px;margin-bottom:14px;line-height:1.6}
+.pending-note i{font-size:15px;color:var(--amber);flex-shrink:0;margin-top:1px}
+
+.btn-reg{width:100%;padding:13px;background:linear-gradient(135deg,#C9A84C,#d4b86a);border:none;border-radius:var(--r-sm);font-family:var(--syne);font-size:13px;font-weight:700;letter-spacing:.06em;color:#000;cursor:pointer;transition:opacity .15s,transform .1s;margin-top:4px}
+.btn-reg:hover{opacity:.9}
+.btn-reg:active{transform:scale(.98)}
+.btn-reg:disabled{opacity:.45;cursor:not-allowed}
+
+.redirect-overlay{position:fixed;inset:0;background:var(--ink);z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px}
 .redirect-overlay.show{display:flex}
-.redirect-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+.redirect-spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.redirect-msg{font-family:var(--serif);font-size:20px;font-style:italic;color:var(--text2)}
+.redirect-msg{font-family:var(--serif);font-size:22px;font-style:italic;color:var(--text2);text-align:center}
 .redirect-sub{font-size:11px;color:var(--muted);font-family:var(--mono)}
-.pw-bar{height:3px;border-radius:2px;background:var(--ink4);margin-top:6px;overflow:hidden}
-.pw-fill{height:100%;border-radius:2px;transition:width .25s,background .25s}
-.username-prev{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:var(--r-sm);padding:8px 12px;font-size:11px;color:var(--sub);margin-bottom:14px;display:none}
-.username-prev span{color:var(--gold);font-family:var(--mono);font-weight:700}
-@media(max-width:460px){.brand-title{font-size:22px}.form-body,.card-top{padding-left:16px;padding-right:16px}}
+
+.success-overlay{position:fixed;inset:0;background:var(--ink);z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:0}
+.success-overlay.show{display:flex}
+.success-icon{width:72px;height:72px;border-radius:50%;background:rgba(201,168,76,.1);border:2px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--gold);margin-bottom:20px}
+.success-title{font-family:var(--serif);font-size:26px;font-weight:600;font-style:italic;color:var(--text);margin-bottom:8px;text-align:center}
+.success-desc{font-size:12px;color:var(--sub);text-align:center;max-width:340px;line-height:1.7;margin-bottom:20px}
+.success-info{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px 20px;font-size:11px;color:var(--text2);max-width:380px;width:100%;line-height:2;margin-bottom:24px;font-family:var(--mono)}
+.success-info b{color:var(--gold);font-weight:600}
+.btn-back{padding:11px 28px;background:none;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-family:var(--sans);font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s}
+.btn-back:hover{border-color:var(--gold);color:var(--gold)}
+
+.reg-footer{margin-top:20px;text-align:center;font-size:11px;color:var(--muted)}
+.reg-footer a{color:var(--sub);text-decoration:none;transition:color .15s}
+.reg-footer a:hover{color:var(--text2)}
+
+.ph-spin{animation:phspin 1s linear infinite;display:inline-block}
+@keyframes phspin{to{transform:rotate(360deg)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+@media(max-width:500px){
+  .form-body,.card-top{padding-left:16px;padding-right:16px}
+  .brand-title{font-size:22px}
+}
 </style>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0a0a0c">
 </head>
 <body>
 
-<!-- PENDING SCREEN -->
-<div id="pendingScreen" style="display:none;position:fixed;inset:0;background:var(--ink);z-index:1000;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;text-align:center">
-  <div style="width:64px;height:64px;border-radius:50%;background:rgba(201,168,76,.12);border:2px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:28px">⏳</div>
-  <div style="font-family:var(--serif);font-size:24px;font-style:italic;color:var(--text)">Tài khoản đã tạo!</div>
-  <div style="font-size:13px;color:var(--sub);max-width:320px;line-height:1.7">
-    Hồ sơ của bạn đang chờ <strong style="color:var(--gold)">Founder</strong> xét duyệt.<br>
-    Bạn sẽ đăng nhập được ngay khi được kích hoạt.
-  </div>
-  <div style="background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 20px;font-size:12px;color:var(--sub)">
-    Tên đăng nhập: <strong style="color:var(--gold);font-family:var(--mono)" id="pendingUsername"></strong>
-  </div>
-  <a href="login.html" style="margin-top:8px;padding:10px 28px;background:var(--gold-bg);border:1px solid rgba(201,168,76,.3);border-radius:var(--r-sm);font-size:13px;font-weight:600;color:var(--gold);text-decoration:none;transition:background .15s">← Về đăng nhập</a>
-</div>
-
-<!-- REDIRECT OVERLAY (CN) -->
+<!-- REDIRECT (CN active) -->
 <div class="redirect-overlay" id="redirectOverlay">
   <div class="redirect-spinner"></div>
-  <div class="redirect-msg" id="redirectMsg">Đang vào trang...</div>
-  <div class="redirect-sub" id="redirectSub">Xin chờ giây lát</div>
+  <div class="redirect-msg" id="redirectMsg">Chào mừng!</div>
+  <div class="redirect-sub" id="redirectSub">Đang vào trang theo dõi công trình...</div>
+</div>
+
+<!-- SUCCESS PENDING (KTS/DN) -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-icon"><i class="ph-duotone ph-hourglass-medium"></i></div>
+  <div class="success-title">Đăng ký thành công!</div>
+  <div class="success-desc" id="successDesc"></div>
+  <div class="success-info" id="successInfo"></div>
+  <button class="btn-back" onclick="window.location.href='login.html'">
+    <i class="ph-duotone ph-arrow-left" style="margin-right:6px"></i> Về trang đăng nhập
+  </button>
 </div>
 
 <div class="page">
 
-  <!-- BRAND -->
   <div class="brand">
     <div class="brand-logo"><div class="brand-box">ALN</div></div>
     <div class="brand-title">Tạo tài khoản mới</div>
-    <div class="brand-sub">Chọn vai trò và điền thông tin bên dưới</div>
+    <div class="brand-sub">Nền tảng theo dõi công trình xây dựng</div>
   </div>
 
-  <!-- ROLE SELECTOR -->
   <div class="role-tabs" id="roleTabs">
     <div class="role-tab active" data-role="cn" onclick="switchRole('cn')">
       <div class="rt-icon"><i class="ph-duotone ph-user"></i></div>
@@ -121,51 +166,59 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
       <div class="rt-dot"></div>
     </div>
     <div class="role-tab" data-role="dn" onclick="switchRole('dn')">
-      <div class="rt-icon"><i class="ph-duotone ph-building"></i></div>
+      <div class="rt-icon"><i class="ph-duotone ph-buildings"></i></div>
       <div class="rt-label">Doanh nghiệp</div>
       <div class="rt-dot"></div>
     </div>
   </div>
 
-  <!-- REGISTER CARD -->
-  <div class="login-card" style="margin-top:8px">
+  <div class="reg-card">
     <div class="card-top" id="cardTop"></div>
     <div class="form-body">
 
-      <!-- Error -->
-      <div class="msg-error" id="msgError">
-        <i class="ph-duotone ph-warning-circle"></i>
+      <div class="msg-box msg-error" id="msgError">
+        <i class="ph-duotone ph-warning-circle" style="font-size:15px;flex-shrink:0"></i>
         <span id="msgErrorTxt"></span>
       </div>
 
-      <!-- Họ tên -->
+      <div class="pending-note" id="pendingNote" style="display:none">
+        <i class="ph-duotone ph-clock"></i>
+        <span id="pendingNoteText"></span>
+      </div>
+
       <div class="field">
-        <label>Họ và tên</label>
+        <label><i class="ph-duotone ph-user-circle" style="font-size:13px"></i> Họ và tên</label>
         <div class="field-wrap">
           <i class="fi ph-duotone ph-user-circle"></i>
-          <input type="text" id="inputName" placeholder="Nguyễn Văn A" autocomplete="name" oninput="onNameInput()">
+          <input type="text" id="inputName" placeholder="Nhập họ và tên đầy đủ" autocomplete="name" oninput="onNameInput()">
         </div>
       </div>
 
-      <!-- Username preview -->
-      <div class="username-prev" id="usernamePrev">
-        Tên đăng nhập sẽ là: <span id="usernameVal">—</span>
+      <div class="field">
+        <label><i class="ph-duotone ph-at" style="font-size:13px"></i> Tên đăng nhập</label>
+        <div class="username-wrap field-wrap">
+          <i class="fi ph-duotone ph-at"></i>
+          <input type="text" id="inputUser" placeholder="cn.tennguoidung" autocomplete="username" autocapitalize="none" spellcheck="false" oninput="onUsernameInput()" style="padding-right:38px">
+          <button class="refresh-btn" onclick="regenerateUsername()" title="Sinh lại từ tên">
+            <i class="ph-duotone ph-arrows-clockwise"></i>
+          </button>
+        </div>
+        <div class="username-status" id="usernameStatus"></div>
+        <div class="field-hint"><i class="ph-duotone ph-info" style="font-size:10px"></i> Tự sinh từ tên · có thể chỉnh sửa · chỉ dùng a–z, 0–9, dấu chấm</div>
       </div>
 
-      <!-- Mật khẩu -->
       <div class="field field-pw">
-        <label>Mật khẩu</label>
+        <label><i class="ph-duotone ph-lock" style="font-size:13px"></i> Mật khẩu</label>
         <div class="field-wrap">
           <i class="fi ph-duotone ph-lock"></i>
           <input type="password" id="inputPw" placeholder="Tối thiểu 8 ký tự" autocomplete="new-password" oninput="onPwInput()">
           <button class="eye" onclick="togglePw('inputPw','eyeIcon1')" tabindex="-1"><i class="ph-duotone ph-eye" id="eyeIcon1"></i></button>
         </div>
-        <div class="pw-bar"><div class="pw-fill" id="pwFill" style="width:0%"></div></div>
+        <div class="pw-strength" id="pwStrength"><span></span><span></span><span></span><span></span></div>
       </div>
 
-      <!-- Xác nhận -->
       <div class="field field-pw">
-        <label>Xác nhận mật khẩu</label>
+        <label><i class="ph-duotone ph-lock-key" style="font-size:13px"></i> Xác nhận mật khẩu</label>
         <div class="field-wrap">
           <i class="fi ph-duotone ph-lock-key"></i>
           <input type="password" id="inputPw2" placeholder="Nhập lại mật khẩu" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
@@ -173,28 +226,35 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
         </div>
       </div>
 
-      <button class="btn-login" id="btnReg" onclick="doRegister()">
+      <button class="btn-reg" id="btnReg" onclick="doRegister()">
         <i class="ph-duotone ph-user-plus" style="margin-right:6px"></i> Tạo tài khoản
       </button>
-
-      <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--sub)">
-        Đã có tài khoản? <a href="login.html" style="color:var(--gold);text-decoration:none;font-weight:600">Đăng nhập</a>
-      </div>
-
     </div>
+  </div>
+
+  <div class="reg-footer">
+    <span>Đã có tài khoản? </span><a href="login.html">Đăng nhập ngay</a>
+    <span style="color:rgba(240,235,224,.15)"> · </span>
+    <a href="#">Chính sách bảo mật</a>
   </div>
 
 </div>
 
 <script>
-window.ALN_REG_READY = new Promise(function(res){ window.__ALN_REG_RESOLVE = res; });
+window.ALN_FIREBASE_READY = new Promise(function(res){ window.__ALN_FB_RESOLVE = res; });
 
 var activeRole = 'cn';
+var _usernameCheckTimer = null;
+var _usernameValid = false;
 
 var ROLE_META = {
-  cn:  { icon:'<i class="ph-duotone ph-user"></i>',     title:'Chủ nhà',        desc:'Theo dõi công trình & trao đổi với KTS', color:'var(--green)', bg:'rgba(34,201,122,.1)'  },
-  kts: { icon:'<i class="ph-duotone ph-palette"></i>',  title:'Kiến trúc sư',   desc:'Quản lý dự án, bản vẽ & doanh thu',     color:'var(--amber)', bg:'rgba(255,170,51,.1)'  },
-  dn:  { icon:'<i class="ph-duotone ph-building"></i>', title:'Doanh nghiệp',   desc:'Tổng quan danh mục & đội ngũ KTS',      color:'var(--blue)',  bg:'rgba(56,189,248,.1)'  },
+  cn:  { icon:'<i class="ph-duotone ph-user"></i>',       title:'Chủ nhà',       desc:'Theo dõi tiến độ công trình & trao đổi với KTS',  color:'var(--green)', bg:'rgba(34,201,122,.1)',  pending:false },
+  kts: { icon:'<i class="ph-duotone ph-palette"></i>',    title:'Kiến trúc sư',  desc:'Nhận dự án, quản lý bản vẽ & thu nhập trên ALN',  color:'var(--amber)', bg:'rgba(255,170,51,.1)',  pending:true  },
+  dn:  { icon:'<i class="ph-duotone ph-buildings"></i>',  title:'Doanh nghiệp',  desc:'Quản lý danh mục dự án & đội ngũ kiến trúc sư',   color:'var(--blue)',  bg:'rgba(56,189,248,.1)', pending:true  },
+};
+var PENDING_NOTES = {
+  kts: 'Tài khoản KTS sẽ được Founder xem xét trong 24 giờ làm việc. Chuẩn bị thông tin hành nghề để điền sau khi được duyệt.',
+  dn:  'Tài khoản Doanh nghiệp cần Founder xác nhận tư cách pháp nhân. Chuẩn bị giấy tờ đăng ký kinh doanh.',
 };
 
 function switchRole(role){
@@ -202,71 +262,98 @@ function switchRole(role){
   document.querySelectorAll('.role-tab').forEach(function(t){
     t.classList.toggle('active', t.dataset.role === role);
   });
-  renderCardTop();
-  onNameInput();
   hideError();
+  renderCardTop();
+  regenerateUsername();
 }
 
 function renderCardTop(){
   var m = ROLE_META[activeRole];
-  var pending = (activeRole === 'kts' || activeRole === 'dn')
-    ? '<div style="margin-top:6px;font-size:10px;color:var(--amber);display:flex;align-items:center;gap:4px"><i class="ph-duotone ph-clock" style="font-size:10px"></i> KTS/DN chờ Founder duyệt trước khi đăng nhập được</div>'
-    : '<div style="margin-top:6px;font-size:10px;color:var(--green);display:flex;align-items:center;gap:4px"><i class="ph-duotone ph-check-circle" style="font-size:10px"></i> Chủ nhà được kích hoạt ngay sau đăng ký</div>';
-  document.getElementById('cardTop').innerHTML = '<div class="role-label-row">'
-    + '<div class="role-icon-big" style="background:' + m.bg + ';border:1.5px solid ' + m.color + '30"><span>' + m.icon + '</span></div>'
-    + '<div><div class="role-title">Đăng ký — ' + m.title + '</div><div class="role-desc">' + m.desc + '</div>' + pending + '</div>'
-    + '</div>';
+  document.getElementById('cardTop').innerHTML =
+    '<div class="role-label-row">' +
+      '<div class="role-icon-big" style="background:' + m.bg + ';border:1.5px solid ' + m.color + '30">' + m.icon + '</div>' +
+      '<div><div class="role-title">Đăng ký — ' + m.title + '</div>' +
+      '<div class="role-desc">' + m.desc + '</div></div>' +
+    '</div>';
+  var pn = document.getElementById('pendingNote');
+  document.getElementById('pendingNoteText').textContent = PENDING_NOTES[activeRole] || '';
+  pn.style.display = m.pending ? 'flex' : 'none';
 }
 
-/* ── Vietnamese diacritics removal ── */
 function removeDiacritics(str){
-  var map = {
-    'à':'a','á':'a','ả':'a','ã':'a','ạ':'a','ă':'a','ắ':'a','ặ':'a','ằ':'a','ẳ':'a','ẵ':'a','â':'a','ấ':'a','ậ':'a','ầ':'a','ẩ':'a','ẫ':'a',
-    'è':'e','é':'e','ẻ':'e','ẽ':'e','ẹ':'e','ê':'e','ế':'e','ệ':'e','ề':'e','ể':'e','ễ':'e',
-    'ì':'i','í':'i','ỉ':'i','ĩ':'i','ị':'i',
-    'ò':'o','ó':'o','ỏ':'o','õ':'o','ọ':'o','ô':'o','ố':'o','ộ':'o','ồ':'o','ổ':'o','ỗ':'o','ơ':'o','ớ':'o','ợ':'o','ờ':'o','ở':'o','ỡ':'o',
-    'ù':'u','ú':'u','ủ':'u','ũ':'u','ụ':'u','ư':'u','ứ':'u','ự':'u','ừ':'u','ử':'u','ữ':'u',
-    'ỳ':'y','ý':'y','ỷ':'y','ỹ':'y','ỵ':'y','đ':'d',
-    'À':'a','Á':'a','Ả':'a','Ã':'a','Ạ':'a','Ă':'a','Ắ':'a','Ặ':'a','Ằ':'a','Ẳ':'a','Ẵ':'a','Â':'a','Ấ':'a','Ậ':'a','Ầ':'a','Ẩ':'a','Ẫ':'a',
-    'È':'e','É':'e','Ẻ':'e','Ẽ':'e','Ẹ':'e','Ê':'e','Ế':'e','Ệ':'e','Ề':'e','Ể':'e','Ễ':'e',
-    'Ì':'i','Í':'i','Ỉ':'i','Ĩ':'i','Ị':'i',
-    'Ò':'o','Ó':'o','Ỏ':'o','Õ':'o','Ọ':'o','Ô':'o','Ố':'o','Ộ':'o','Ồ':'o','Ổ':'o','Ỗ':'o','Ơ':'o','Ớ':'o','Ợ':'o','Ờ':'o','Ở':'o','Ỡ':'o',
-    'Ù':'u','Ú':'u','Ủ':'u','Ũ':'u','Ụ':'u','Ư':'u','Ứ':'u','Ự':'u','Ừ':'u','Ử':'u','Ữ':'u',
-    'Ỳ':'y','Ý':'y','Ỷ':'y','Ỹ':'y','Ỵ':'y','Đ':'d'
-  };
-  return str.split('').map(function(c){ return map[c] !== undefined ? map[c] : c; }).join('');
+  return str.normalize('NFD')
+    .replace(/[̀-ͯ]/g,'')
+    .replace(/đ/g,'d').replace(/Đ/g,'D')
+    .replace(/[^a-zA-Z0-9]/g,'').toLowerCase();
 }
 
-function makeBaseUsername(name, role){
-  var clean = removeDiacritics(name)
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, '')
-    .trim()
-    .replace(/\s+/g, '.');
-  return role + '.' + clean;
+function nameToUsername(name, role){
+  var clean = removeDiacritics(name);
+  return role + '.' + (clean || 'user');
 }
 
 function onNameInput(){
-  var name = document.getElementById('inputName').value.trim();
-  var prev = document.getElementById('usernamePrev');
-  if(!name){ prev.style.display = 'none'; return; }
-  prev.style.display = 'block';
-  document.getElementById('usernameVal').textContent = makeBaseUsername(name, activeRole);
+  regenerateUsername();
 }
 
-function onPwInput(){
-  var pw = document.getElementById('inputPw').value;
-  var fill = document.getElementById('pwFill');
-  var score = 0;
-  if(pw.length >= 8) score++;
-  if(pw.length >= 12) score++;
-  if(/[A-Z]/.test(pw)) score++;
-  if(/[0-9]/.test(pw)) score++;
-  if(/[^A-Za-z0-9]/.test(pw)) score++;
-  var pct = Math.min(100, score * 20);
-  var color = score <= 1 ? '#ef4444' : score <= 2 ? '#ffaa33' : '#22c97a';
-  fill.style.width = pct + '%';
-  fill.style.background = color;
+function regenerateUsername(){
+  var name = document.getElementById('inputName').value.trim();
+  var base = nameToUsername(name || 'user', activeRole);
+  document.getElementById('inputUser').value = base;
+  scheduleUsernameCheck(base);
+}
+
+function onUsernameInput(){
+  var val = document.getElementById('inputUser').value.trim().toLowerCase();
+  scheduleUsernameCheck(val);
+}
+
+function scheduleUsernameCheck(username){
+  _usernameValid = false;
+  clearTimeout(_usernameCheckTimer);
+  var el = document.getElementById('usernameStatus');
+  el.className = 'username-status checking';
+  el.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin"></i> Đang kiểm tra...';
+  _usernameCheckTimer = setTimeout(function(){ checkUsername(username); }, 700);
+}
+
+async function checkUsername(username){
+  var el = document.getElementById('usernameStatus');
+  if(!username || username.length < 5){
+    el.className = 'username-status err';
+    el.innerHTML = '<i class="ph-duotone ph-x-circle"></i> Tối thiểu 5 ký tự';
+    _usernameValid = false; return;
+  }
+  if(!/^[a-z]{2,4}\.[a-z][a-z0-9]{1,}$/.test(username)){
+    el.className = 'username-status err';
+    el.innerHTML = '<i class="ph-duotone ph-x-circle"></i> Định dạng không hợp lệ (vd: cn.tennguoi)';
+    _usernameValid = false; return;
+  }
+  try {
+    var fb = await window.ALN_FIREBASE_READY;
+    var q = fb.query(fb.collection(fb.db,'users'), fb.where('username','==',username), fb.lim(1));
+    var snap = await fb.getDocs(q);
+    if(snap.empty){
+      el.className = 'username-status ok';
+      el.innerHTML = '<i class="ph-duotone ph-check-circle"></i> Tên đăng nhập hợp lệ';
+      _usernameValid = true;
+    } else {
+      _usernameValid = false;
+      var num = Math.floor(Math.random()*900+10);
+      var sug = username + num;
+      el.className = 'username-status err';
+      el.innerHTML = '<i class="ph-duotone ph-x-circle"></i> Đã tồn tại. Thử: <b style="cursor:pointer;text-decoration:underline;color:var(--gold)" onclick="useSuggest(\'' + sug + '\')">' + sug + '</b>';
+    }
+  } catch(e){
+    el.className = 'username-status checking';
+    el.innerHTML = '<i class="ph-duotone ph-warning"></i> Không kiểm tra được — sẽ thử lại khi đăng ký';
+    _usernameValid = true;
+  }
+}
+
+function useSuggest(u){
+  document.getElementById('inputUser').value = u;
+  scheduleUsernameCheck(u);
 }
 
 function togglePw(inputId, iconId){
@@ -281,16 +368,31 @@ function togglePw(inputId, iconId){
   }
 }
 
-function hideError(){ document.getElementById('msgError').classList.remove('show'); }
+function pwScore(pw){
+  var s = 0;
+  if(pw.length >= 8) s++;
+  if(/[A-Z]/.test(pw)) s++;
+  if(/[0-9]/.test(pw)) s++;
+  if(/[^A-Za-z0-9]/.test(pw)) s++;
+  return s;
+}
+
+function onPwInput(){
+  var pw = document.getElementById('inputPw').value;
+  document.getElementById('pwStrength').className = 'pw-strength' + (pw ? ' s' + pwScore(pw) : '');
+}
+
+function hideError(){
+  document.getElementById('msgError').classList.remove('show');
+}
 function showError(msg){
   var el = document.getElementById('msgError');
   document.getElementById('msgErrorTxt').textContent = msg;
   el.classList.add('show');
-  var card = document.querySelector('.login-card');
+  var card = document.querySelector('.reg-card');
   card.style.animation = 'none';
   setTimeout(function(){ card.style.animation = 'shake .35s ease'; }, 10);
 }
-
 function resetBtn(){
   var btn = document.getElementById('btnReg');
   btn.disabled = false;
@@ -298,87 +400,113 @@ function resetBtn(){
 }
 
 async function doRegister(){
-  var name = document.getElementById('inputName').value.trim();
-  var pw   = document.getElementById('inputPw').value;
-  var pw2  = document.getElementById('inputPw2').value;
   hideError();
+  var name     = document.getElementById('inputName').value.trim();
+  var username = document.getElementById('inputUser').value.trim().toLowerCase();
+  var pw       = document.getElementById('inputPw').value;
+  var pw2      = document.getElementById('inputPw2').value;
 
-  if(!name){ showError('Vui lòng nhập họ và tên.'); return; }
+  if(!name)     { showError('Vui lòng nhập họ và tên.'); return; }
+  if(!username) { showError('Vui lòng nhập tên đăng nhập.'); return; }
+  if(!/^[a-z]{2,4}\.[a-z][a-z0-9]{1,}$/.test(username)){ showError('Tên đăng nhập không hợp lệ. Ví dụ: cn.tenban'); return; }
+  if(!pw)       { showError('Vui lòng nhập mật khẩu.'); return; }
   if(pw.length < 8){ showError('Mật khẩu tối thiểu 8 ký tự.'); return; }
   if(pw !== pw2){ showError('Mật khẩu xác nhận không khớp.'); return; }
+  if(!_usernameValid){ showError('Tên đăng nhập chưa hợp lệ hoặc đã tồn tại. Vui lòng kiểm tra lại.'); return; }
 
   var btn = document.getElementById('btnReg');
   btn.disabled = true;
-  btn.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin" style="margin-right:6px"></i> Đang tạo...';
+  btn.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin" style="margin-right:6px"></i> Đang tạo tài khoản...';
 
   try {
-    var fb = await window.ALN_REG_READY;
-
-    /* Sinh username, kiểm tra trùng */
-    var base = makeBaseUsername(name, activeRole);
-    var username = base;
-    try {
-      for(var suffix = 0; suffix <= 99; suffix++){
-        var candidate = suffix === 0 ? base : base + suffix;
-        var qSnap = await fb.getDocs(fb.query(fb.collection(fb.db,'users'), fb.where('username','==',candidate)));
-        if(qSnap.empty){ username = candidate; break; }
-      }
-    } catch(e){ username = base; }
+    var fb = await Promise.race([
+      window.ALN_FIREBASE_READY,
+      new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('SDK_TIMEOUT')); }, 15000); })
+    ]);
 
     var email = username + '@aln.vn';
-    var cred  = await fb.createUserWithEmailAndPassword(fb.auth, email, pw);
-    var uid   = cred.user.uid;
 
-    var status = (activeRole === 'cn') ? 'active' : 'pending';
+    /* Kiểm tra username lần cuối */
+    var uq   = fb.query(fb.collection(fb.db,'users'), fb.where('username','==',username), fb.lim(1));
+    var usnap = await fb.getDocs(uq);
+    if(!usnap.empty){ showError('Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.'); resetBtn(); return; }
+
+    /* Tạo Firebase Auth */
+    var cred = await fb.createUserWithEmailAndPassword(fb.auth, email, pw);
+    var uid  = cred.user.uid;
+
+    /* Ghi Firestore */
     await fb.setDoc(fb.doc(fb.db,'users',uid), {
-      uid:       uid,
       username:  username,
       name:      name,
       role:      activeRole,
       email:     email,
-      status:    status,
-      createdAt: fb.serverTimestamp()
+      status:    activeRole === 'cn' ? 'active' : 'pending',
+      createdAt: fb.serverTimestamp(),
     });
 
     if(activeRole === 'cn'){
-      var userData = JSON.stringify({ name: name, userId: username, role: 'cn', uid: uid, badge: 'Chủ nhà' });
-      try{ localStorage.setItem('aln_user', userData); }catch(e){}
-      document.getElementById('redirectMsg').textContent = 'Xin chào, ' + name;
-      document.getElementById('redirectSub').textContent  = 'Đang vào trang Chủ nhà...';
-      document.getElementById('redirectOverlay').style.display = 'flex';
+      /* CN: redirect ngay */
+      var ud = JSON.stringify({ name: name, userId: username, role: 'cn', badge: 'Chủ nhà', uid: uid });
+      try { localStorage.setItem('aln_user', ud); } catch(e){}
+      try { sessionStorage.setItem('aln_user', ud); } catch(e){}
+      document.getElementById('redirectMsg').textContent = 'Chào mừng, ' + name + '!';
+      document.getElementById('redirectSub').textContent = 'Đang vào trang Chủ nhà...';
+      document.getElementById('redirectOverlay').classList.add('show');
       setTimeout(function(){
         window.location.replace('client_CN.html?u=' + encodeURIComponent(username) + '&r=cn');
-      }, 800);
+      }, 900);
     } else {
+      /* KTS/DN: sign out + màn hình chờ */
       await fb.signOut(fb.auth);
-      document.getElementById('pendingUsername').textContent = username;
-      document.getElementById('pendingScreen').style.display = 'flex';
+      document.getElementById('successDesc').textContent =
+        activeRole === 'kts'
+          ? 'Hồ sơ KTS của bạn đang chờ Founder xem xét. Bạn sẽ được thông báo trong vòng 24 giờ làm việc.'
+          : 'Tài khoản Doanh nghiệp đang chờ xác nhận tư cách pháp nhân. Vui lòng liên hệ quản trị viên.';
+      document.getElementById('successInfo').innerHTML =
+        '<b>Tên đăng nhập:</b> ' + username + '<br>' +
+        '<b>Vai trò:</b> ' + ROLE_META[activeRole].title + '<br>' +
+        '<b>Trạng thái:</b> Đang chờ Founder xét duyệt';
+      document.getElementById('successOverlay').classList.add('show');
     }
 
   } catch(err){
-    var code = (err && err.code) ? err.code : '';
+    var code = (err && err.code) || '';
     if(code === 'auth/email-already-in-use'){
-      showError('Tên đăng nhập này đã tồn tại. Hệ thống sẽ thử tên khác — thử lại.');
+      showError('Tên đăng nhập đã được dùng. Vui lòng chọn tên khác.');
     } else if(code === 'auth/weak-password'){
-      showError('Mật khẩu quá yếu. Hãy thêm chữ hoa, số hoặc ký tự đặc biệt.');
+      showError('Mật khẩu quá yếu. Vui lòng dùng ít nhất 8 ký tự có chữ hoa và số.');
     } else if(code === 'auth/network-request-failed'){
-      showError('Lỗi kết nối mạng. Vui lòng kiểm tra Internet.');
+      showError('Lỗi kết nối mạng. Vui lòng kiểm tra Internet và thử lại.');
+    } else if(err && err.message === 'SDK_TIMEOUT'){
+      showError('Không tải được hệ thống xác thực. Kiểm tra kết nối mạng.');
     } else {
-      showError('Lỗi [' + (code || '?') + ']: ' + ((err && err.message) || 'không xác định'));
+      showError('Có lỗi xảy ra [' + (code || '?') + ']: ' + ((err && err.message) || ''));
     }
     resetBtn();
   }
 }
 
 renderCardTop();
+regenerateUsername();
 </script>
 
 <script type="module">
-import { auth, db, createUserWithEmailAndPassword, setDoc, doc, signOut,
-         collection, query, where, getDocs, serverTimestamp }
-  from "./firebase-config.js";
-window.__ALN_REG_RESOLVE({ auth, db, createUserWithEmailAndPassword, setDoc, doc, signOut,
-  collection, query, where, getDocs, serverTimestamp });
+import {
+  auth, db, signOut,
+  createUserWithEmailAndPassword,
+  doc, setDoc, collection, getDocs, query, where, limit, serverTimestamp
+} from "./firebase-config.js";
+
+window.__ALN_FB_RESOLVE({
+  auth, db, signOut,
+  createUserWithEmailAndPassword,
+  doc, setDoc,
+  collection, getDocs,
+  query, where,
+  lim: limit,
+  serverTimestamp,
+});
 </script>
 </body>
 </html>
