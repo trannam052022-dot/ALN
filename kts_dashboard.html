@@ -1330,9 +1330,9 @@ function submitC3() {
 }
 
 const drawings = [
-  {title:'Nhà phố 5m×20m — Phong Đông Dương', type:'May đo', royalty:'120,000đ', sold:4, free:true, thumb:'🏠', color:'#1e3a5f'},
-  {title:'Biệt thự vườn 200m² cổ điển', type:'Độc bản', royalty:'350,000đ', sold:2, free:true, thumb:'🏛', color:'#2a1e40'},
-  {title:'Nhà cấp 4 nông thôn 80m²', type:'Kinh tế', royalty:'45,000đ', sold:11, free:true, thumb:'🏡', color:'#1a3328'},
+  {title:'Nhà phố 5m×20m — Phong Đông Dương', type:'May đo', royalty:'120,000đ', sold:4, free:true, icon:'ph-duotone ph-house-line', color:'#1e3a5f'},
+  {title:'Biệt thự vườn 200m² cổ điển', type:'Độc bản', royalty:'350,000đ', sold:2, free:true, icon:'ph-duotone ph-buildings', color:'#2a1e40'},
+  {title:'Nhà cấp 4 nông thôn 80m²', type:'Kinh tế', royalty:'45,000đ', sold:11, free:true, icon:'ph-duotone ph-tree-evergreen', color:'#1a3328'},
   {locked:true, price:50000},
   {locked:true, price:50000},
   {locked:true, price:50000},
@@ -1345,9 +1345,9 @@ function buildDrawingGrid() {
   g.innerHTML = drawings.map((d,i) => {
     if(d.locked) return `
       <div class="drawing-slot locked">
-        <div class="ds-thumb" style="background:var(--ink3);font-size:28px">
+        <div class="ds-thumb" style="background:var(--ink3)">
           <div class="ds-lock-overlay">
-            <div style="font-size:18px">🔒</div>
+            <i class="ph-duotone ph-lock" style="font-size:22px;color:var(--muted)"></i>
             <div style="font-size:9px;color:var(--muted)">Slot khóa</div>
           </div>
         </div>
@@ -1357,8 +1357,11 @@ function buildDrawingGrid() {
       </div>`;
     return `
       <div class="drawing-slot">
-        <div class="ds-thumb" style="background:${d.color};font-size:28px">${d.thumb}
-          <div style="position:absolute;bottom:4px;right:4px"><span class="stat-badge sb-green" style="font-size:8px">×${d.sold} đã bán</span></div>
+        <div class="ds-thumb" style="background:${d.color}">
+          <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center">
+            <i class="${d.icon}" style="font-size:24px;color:rgba(255,255,255,.9)"></i>
+          </div>
+          <div style="position:absolute;bottom:4px;right:4px"><span class="stat-badge sb-green" style="font-size:8px">+${d.sold} đã bán</span></div>
         </div>
         <div class="ds-info">
           <div class="ds-title">${d.title}</div>
