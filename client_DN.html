@@ -2989,9 +2989,9 @@ function alnNotify(title, body){
 <script>
 (function(){
   var TABS = [
-    { id: 'tq', label: 'Tổng quan' },
-    { id: 'up', label: 'Gửi tài liệu' },
-    { id: 'c4', label: 'Bàn giao & Kho' }
+    { id: 'tq', label: 'Tổng quan',      icon: 'ph-chart-bar' },
+    { id: 'up', label: 'Gửi tài liệu',   icon: 'ph-cloud-arrow-up' },
+    { id: 'c4', label: 'Bàn giao & Kho', icon: 'ph-package' }
   ];
   var cur = 'tq';
 
@@ -3011,12 +3011,12 @@ function alnNotify(title, body){
     if(!bar){
       bar = document.createElement('div');
       bar.id = 'cnTabBar';
-      bar.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:0;z-index:5;background:linear-gradient(180deg,#f8fafc 85%,transparent);padding:6px 0 12px';
+      bar.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px;position:sticky;top:0;z-index:5;background:linear-gradient(180deg,#f8fafc 90%,transparent);padding:6px 0 14px';
       TABS.forEach(function(t){
         var b = document.createElement('button');
         b.dataset.tab = t.id;
-        b.textContent = t.label;
-        b.style.cssText = 'flex:1;min-width:118px;padding:11px 8px;border-radius:10px;border:1px solid #e2e8f0;background:#ffffff;color:#475569;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.06)';
+        b.innerHTML = '<div class="cntab-icon-wrap" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;margin:0 auto 5px;transition:background .15s;background:#f1f5f9"><i class="ph-duotone '+t.icon+'" style="transition:color .15s;color:#94a3b8"></i></div><div style="font-size:11px;font-weight:700;line-height:1.2">'+t.label+'</div>';
+        b.style.cssText = 'padding:10px 6px;border-radius:10px;border:1.5px solid #e2e8f0;background:#ffffff;color:#475569;cursor:pointer;font-family:inherit;transition:all .2s;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06)';
         b.onclick = function(){ cur = t.id; window.cnApplyTabs(); try{window.scrollTo({top:0});}catch(e){} };
         bar.appendChild(b);
       });
@@ -3045,9 +3045,13 @@ function alnNotify(title, body){
     });
     bar.querySelectorAll('button').forEach(function(b){
       var on = b.dataset.tab === cur;
-      b.style.background = on ? 'linear-gradient(135deg,rgba(212,160,23,.14),rgba(212,160,23,.05))' : '#ffffff';
+      b.style.background = on ? 'rgba(212,160,23,.07)' : '#ffffff';
       b.style.color = on ? '#d4a017' : '#475569';
       b.style.borderColor = on ? 'rgba(212,160,23,.5)' : '#e2e8f0';
+      var iconWrap = b.querySelector('.cntab-icon-wrap');
+      if(iconWrap) iconWrap.style.background = on ? 'rgba(212,160,23,.16)' : '#f1f5f9';
+      var ico = b.querySelector('i');
+      if(ico) ico.style.color = on ? '#d4a017' : '#94a3b8';
     });
   };
 
