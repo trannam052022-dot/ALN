@@ -2524,8 +2524,16 @@ window.rvLoadStage = function(stage) {
     const q = query(collection(db,'projects',pid,'stages',stage,'proposals'), orderBy('order','asc'));
     _rvUnsub = onSnapshot(q, snap => {
       if (snap.empty) { list.innerHTML = '<div style="color:var(--muted);font-size:12px">Chưa có phương án ở chặng ' + stage + '.</div>'; return; }
-      list.innerHTML = snap.docs.map(d => {
+      const _cleanName = (name, idx) => {
+        if (!name) return 'Phương án #' + (idx+1);
+        if (name.indexOf(' ') >= 0) return name;
+        if (/^\d+_/.test(name)) return 'Phương án #' + (idx+1);
+        if (/^[a-z0-9-]+$/.test(name)) return name.replace(/-/g,' ').replace(/^\w/, c=>c.toUpperCase());
+        return name;
+      };
+      list.innerHTML = snap.docs.map((d, idx) => {
         const p = d.data();
+        const displayName = _cleanName(p.name, idx);
         const st = p.status==='approved' ? '<span style="color:var(--green)">● Đã duyệt</span>'
                  : p.status==='rejected' ? '<span style="color:var(--red)">● Từ chối</span>'
                  : '<span style="color:var(--amber)">● Chờ duyệt</span>';
@@ -2535,7 +2543,7 @@ window.rvLoadStage = function(stage) {
         return `<div style="display:flex;align-items:center;gap:10px;background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px">
           ${thumb}
           <div style="flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name || '(không tên)'}</div>
+            <div style="font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${displayName}</div>
             <div style="font-size:10px;color:var(--muted)">${p.version||''} · Chặng ${stage}</div>
             <div style="font-size:10px;margin-top:2px">${st}</div>
           </div>
@@ -2548,7 +2556,11 @@ window.rvLoadStage = function(stage) {
 function _watchDocs(pid) {
   const list = document.getElementById('rvDocList');
   const projIdEl = document.getElementById('rvProjId');
-  if (projIdEl) projIdEl.textContent = '#' + pid;
+  if (projIdEl) {
+    const _kd = window.KTS_PROJECT_DATA || {};
+    const _isCNrv = !!(_kd.cn && _kd.cn.uid);
+    projIdEl.textContent = '#' + (_isCNrv ? 'ALN-CN-' : 'ALN-DN-') + pid.replace(/^ALN-/, '');
+  }
   if (!list) return;
   if (_rvDocUnsub) { try { _rvDocUnsub(); } catch(e) {} _rvDocUnsub = null; }
   try {
