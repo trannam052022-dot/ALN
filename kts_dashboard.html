@@ -463,7 +463,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
   <div class="nav-section">Công việc</div>
   <a class="nav-item" onclick="scrollTo('.proposal-section')"><span class="icon"><i class="ph-duotone ph-image-square"></i></span> Gửi phương án</a>
-  <a class="nav-item" onclick="scrollTo('.review-section')"><span class="icon"><i class="ph-duotone ph-clipboard-text"></i></span> Bảng Review</a>
+  <a class="nav-item" onclick="scrollTo('.review-section')"><span class="icon"><i class="ph-duotone ph-clipboard-text"></i></span> Bảng Review <span class="nav-badge" id="reviewBadge" style="display:none">0</span></a>
   <a class="nav-item" onclick="scrollTo('.c3-section')"><span class="icon"><i class="ph-duotone ph-upload-simple"></i></span> Nộp Hồ sơ C3</a>
   <a class="nav-item" onclick="scrollTo('.asset-section')"><span class="icon"><i class="ph-duotone ph-storefront"></i></span> Kho tài sản</a>
   <a class="nav-item" onclick="scrollTo('.vip-section')"><span class="icon"><i class="ph-duotone ph-crown"></i></span> Gói VIP</a>
@@ -1999,6 +1999,7 @@ function _startKtsProjectListen(uid) {
       const pg = dd.progress || {};
       return { id:d2.id, ...dd, progress:[pg.C1||0, pg.C2||0, pg.C3||0, pg.C4||0] };
     });
+    window._KTS_ALL_PROJECTS = allProjs;
     renderMyProjects(allProjs);
     // Khởi động bảng review (tài liệu + phương án)
     if (typeof window._alnWatchDocs === 'function') window._alnWatchDocs(d.id);
@@ -2008,6 +2009,26 @@ function _startKtsProjectListen(uid) {
   });
 }
 
+
+window.switchKtsProject = function(pid) {
+  const pr = (window._KTS_ALL_PROJECTS||[]).find(function(p){ return p.id===pid; });
+  if (!pr) return;
+  window.KTS_PROJECT_ID = pid;
+  window.KTS_PROJECT_DATA = pr;
+  const _isCN = !!(pr.cn && pr.cn.uid);
+  const _displayId = (_isCN ? 'ALN-CN-' : 'ALN-DN-') + pid.replace(/^ALN-/, '');
+  const _setTxt = function(id, v){ const el=document.getElementById(id); if(el) el.textContent=v; };
+  _setTxt('paProjTitle', '#' + _displayId);
+  _setTxt('slaProjId', '#' + _displayId);
+  _setTxt('slaProjName', pr.name || pid);
+  _setTxt('c3ProjId', '#' + _displayId);
+  _setTxt('chatModalProjId', _displayId);
+  const chatH = document.querySelector('.aln-chat-header h3');
+  if (chatH) chatH.innerHTML = '<i class="ph-duotone ph-chats-circle" style="color:var(--blue)"></i> Chat — Dự án ' + _displayId;
+  if (typeof window._alnWatchDocs === 'function') window._alnWatchDocs(pid);
+  if (typeof window.rvLoadStage === 'function') window.rvLoadStage('C2');
+  if (typeof showToast === 'function') showToast('Đã chuyển: ' + (pr.name || _displayId), 't-blue');
+};
 
 /* ══ DỰ ÁN + HỒ SƠ KTS ══ */
 
@@ -2062,6 +2083,9 @@ function renderMyProjects(projects) {
             <div class="proj-detail-val" style="${stClr};padding:4px 8px;border-radius:6px;display:inline-block">${stLbl}</div>
           </div>
         </div>
+        <button onclick="window.switchKtsProject('${p.id}')" style="width:100%;margin-top:8px;padding:8px 12px;background:var(--gold);color:#1a1400;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+          <i class="ph-duotone ph-arrow-circle-right"></i> Làm việc trên dự án này
+        </button>
       </div>
     </div>`;
   };
@@ -2273,7 +2297,8 @@ onAuthStateChanged(auth, async (user) => {
       const nm = (profile && profile.name) || '';
       if (nm) {
         const el = document.getElementById('ktsHeroName');
-        if (el) el.textContent = nm.startsWith('KTS') ? nm : ('KTS. ' + nm.replace(/^KTS\.?\s*/i,''));
+        const fullNm = nm.startsWith('KTS') ? nm : ('KTS. ' + nm.replace(/^KTS\.?\s*/i,''));
+        if (el) { el.textContent = fullNm; el.title = fullNm + (profile.license ? ' | GP: ' + profile.license : '') + (profile.phone ? ' | SĐT: ' + profile.phone : ''); }
         const parts = nm.replace(/^KTS\.?\s*/i,'').trim().split(/\s+/);
         const ini = (parts.length >= 2 ? parts[parts.length-2][0] + parts[parts.length-1][0] : (parts[0]||'K')[0]).toUpperCase();
         const av = document.getElementById('ktsHeroAv');
@@ -2551,6 +2576,9 @@ window.rvLoadStage = function(stage) {
     const q = query(collection(db,'projects',pid,'stages',stage,'proposals'), orderBy('order','asc'));
     _rvUnsub = onSnapshot(q, snap => {
       if (snap.empty) { list.innerHTML = '<div style="color:var(--muted);font-size:12px">Chưa có phương án ở chặng ' + stage + '.</div>'; return; }
+      const _pending = snap.docs.filter(d => !d.data().status || d.data().status === 'pending').length;
+      const _badge = document.getElementById('reviewBadge');
+      if (_badge) { if (_pending > 0) { _badge.textContent = _pending; _badge.style.display = ''; } else { _badge.style.display = 'none'; } }
       const _cleanName = (name, idx) => {
         if (!name) return 'Phương án #' + (idx+1);
         if (name.indexOf(' ') >= 0) return name;
