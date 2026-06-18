@@ -3243,6 +3243,9 @@ onAuthStateChanged(auth, async (user) => {
       window.__ALN_RT_RESOLVE({ db, collection, addDoc, query, orderBy, limitToLast, onSnapshot });
     }
 
+    // ── LOAD DỰ ÁN TỪ FIRESTORE ──
+    try { _startFounderListen(); } catch(e){ console.error('[Founder listen]', e); }
+
     // ── WEB PUSH (FCM): đăng ký token tự động khi đã có quyền thông báo ──
     window.__ALN_UID = user.uid;
     window.alnInitPush = async function(){
