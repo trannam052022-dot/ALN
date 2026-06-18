@@ -156,11 +156,6 @@ body::after{
       <div class="rt-label">Chủ nhà</div>
       <div class="rt-dot"></div>
     </div>
-    <div class="role-tab" data-role="founder" onclick="switchRole('founder')">
-      <div class="rt-icon"><i class="ph-duotone ph-crown"></i></div>
-      <div class="rt-label">Sáng lập</div>
-      <div class="rt-dot"></div>
-    </div>
   </div>
 
   <!-- LOGIN CARD -->
@@ -225,6 +220,55 @@ body::after{
     <a href="#">Chính sách bảo mật</a>
   </div>
 
+  <!-- Founder entry — ẩn kín, chỉ hiện khi hover -->
+  <div style="margin-top:32px;opacity:0;transition:opacity .3s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
+    <button onclick="openFounderModal()" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:5px;color:var(--muted);font-size:10px;font-family:var(--mono);padding:4px 8px;border-radius:6px;transition:color .2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">
+      <i class="ph-duotone ph-lock-simple"></i> admin
+    </button>
+  </div>
+
+</div>
+
+<!-- FOUNDER MODAL -->
+<div id="founderModal" style="display:none;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.7);backdrop-filter:blur(6px)">
+  <div style="width:100%;max-width:360px;background:var(--ink2);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7);position:relative">
+    <div style="padding:20px 24px 0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:9px;background:rgba(201,168,76,.12);border:1.5px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--gold)"><i class="ph-duotone ph-crown"></i></div>
+          <div>
+            <div style="font-family:var(--serif);font-size:16px;font-weight:600;font-style:italic;color:var(--text)">Hội đồng Sáng lập</div>
+            <div style="font-size:11px;color:var(--sub)">Cổng quản trị nội bộ — không công khai</div>
+          </div>
+        </div>
+        <button onclick="closeFounderModal()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:4px;line-height:1"><i class="ph-duotone ph-x"></i></button>
+      </div>
+    </div>
+    <div style="padding:0 24px 24px">
+      <div class="msg-error" id="founderError" style="margin-bottom:12px">
+        <i class="ph-duotone ph-warning-circle"></i>
+        <span id="founderErrorTxt"></span>
+      </div>
+      <div class="field">
+        <label>Tên đăng nhập</label>
+        <div class="field-wrap">
+          <i class="fi ph-duotone ph-user" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12px;pointer-events:none"></i>
+          <input type="text" id="founderUser" placeholder="founder.username" autocomplete="username" autocapitalize="none" spellcheck="false" style="width:100%;background:var(--ink3);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px 10px 34px;font-size:13px;font-family:var(--sans);color:var(--text);outline:none;-webkit-appearance:none" onfocus="this.style.borderColor='rgba(201,168,76,.45)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+      </div>
+      <div class="field field-pw" style="margin-bottom:16px">
+        <label>Mật khẩu</label>
+        <div class="field-wrap" style="position:relative">
+          <i class="fi ph-duotone ph-lock" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12px;pointer-events:none"></i>
+          <input type="password" id="founderPw" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doFounderLogin()" style="width:100%;background:var(--ink3);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 34px 10px 34px;font-size:13px;font-family:var(--sans);color:var(--text);outline:none;-webkit-appearance:none" onfocus="this.style.borderColor='rgba(201,168,76,.45)'" onblur="this.style.borderColor='var(--border)'">
+          <button class="eye" onclick="toggleFounderPw()" tabindex="-1" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:4px"><i class="ph-duotone ph-eye" id="founderEye"></i></button>
+        </div>
+      </div>
+      <button id="founderBtn" onclick="doFounderLogin()" style="width:100%;padding:12px;background:linear-gradient(135deg,#C9A84C,#d4b86a);border:none;border-radius:var(--r-sm);font-family:var(--syne);font-size:13px;font-weight:700;letter-spacing:.06em;color:#000;cursor:pointer;transition:opacity .15s">
+        <i class="ph-duotone ph-sign-in" style="margin-right:6px"></i> Vào hệ thống
+      </button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -479,6 +523,78 @@ async function doLogin(){
 const styleSheet = document.createElement('style');
 styleSheet.textContent = `@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}`;
 document.head.appendChild(styleSheet);
+
+/* ── FOUNDER MODAL ── */
+function openFounderModal(){
+  var m = document.getElementById('founderModal');
+  m.style.display = 'flex';
+  setTimeout(function(){ document.getElementById('founderUser').focus(); }, 80);
+}
+function closeFounderModal(){
+  document.getElementById('founderModal').style.display = 'none';
+  document.getElementById('founderUser').value = '';
+  document.getElementById('founderPw').value = '';
+  document.getElementById('founderError').classList.remove('show');
+}
+function toggleFounderPw(){
+  var inp = document.getElementById('founderPw');
+  var ico = document.getElementById('founderEye');
+  if(inp.type === 'password'){ inp.type = 'text'; ico.className = 'ph-duotone ph-eye-slash'; }
+  else { inp.type = 'password'; ico.className = 'ph-duotone ph-eye'; }
+}
+function showFounderError(msg){
+  var el = document.getElementById('founderError');
+  document.getElementById('founderErrorTxt').textContent = msg;
+  el.classList.add('show');
+}
+async function doFounderLogin(){
+  var user = document.getElementById('founderUser').value.trim().toLowerCase();
+  var pw   = document.getElementById('founderPw').value;
+  document.getElementById('founderError').classList.remove('show');
+  if(!user || !pw){ showFounderError('Vui lòng nhập đầy đủ thông tin.'); return; }
+  var btn = document.getElementById('founderBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin" style="margin-right:6px"></i> Đang xác thực...';
+  try {
+    var fb = await Promise.race([
+      window.ALN_FIREBASE_READY,
+      new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('SDK_TIMEOUT')); }, 15000); })
+    ]);
+    var email = fb.usernameToEmail(user);
+    var cred  = await fb.signInWithEmailAndPassword(fb.auth, email, pw);
+    var FOUNDER_UID = 'h4kEguPEyMcwJwl89stc0Q6j2si2';
+    if(cred.user.uid !== FOUNDER_UID){
+      await fb.signOut(fb.auth);
+      showFounderError('Tài khoản không có quyền truy cập cổng này.');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ph-duotone ph-sign-in" style="margin-right:6px"></i> Vào hệ thống';
+      return;
+    }
+    var userData = JSON.stringify({ name:'KTS. Trần Đại Long', userId:user, role:'founder', badge:'Founder', uid:cred.user.uid });
+    try { localStorage.setItem('aln_user', userData); } catch(e){}
+    try { sessionStorage.setItem('aln_user', userData); } catch(e){}
+    var overlay = document.getElementById('redirectOverlay');
+    document.getElementById('redirectMsg').textContent = 'Xin chào, KTS. Trần Đại Long';
+    document.getElementById('redirectSub').textContent = 'Đang vào Cổng Quản trị Sáng lập...';
+    overlay.style.display = 'flex';
+    setTimeout(function(){ window.location.replace('founder_panel.html?u=' + encodeURIComponent(user) + '&r=founder'); }, 900);
+  } catch(err){
+    var code = (err && err.code) || '';
+    if(code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found'){
+      showFounderError('Tên đăng nhập hoặc mật khẩu không đúng.');
+    } else if(err && err.message === 'SDK_TIMEOUT'){
+      showFounderError('Không tải được hệ thống xác thực. Kiểm tra mạng.');
+    } else {
+      showFounderError('Lỗi [' + (code || '?') + ']: ' + ((err && err.message) || ''));
+    }
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ph-duotone ph-sign-in" style="margin-right:6px"></i> Vào hệ thống';
+  }
+}
+/* Đóng modal khi click ngoài */
+document.getElementById('founderModal').addEventListener('click', function(e){
+  if(e.target === this) closeFounderModal();
+});
 
 /* Init */
 renderCardTop();
