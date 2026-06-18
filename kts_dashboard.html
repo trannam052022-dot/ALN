@@ -532,7 +532,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <div class="sla-glow"></div>
       <div class="sla-top">
         <div>
-          <div class="sla-project">Dự án <b>#ALN-2026-9921</b> · Biệt thự Vườn Tân Cổ Điển</div>
+          <div class="sla-project">Dự án <b id="slaProjId">#ALN-9921</b> · <span id="slaProjName">Biệt thự Vườn Tân Cổ Điển</span></div>
           <div class="sla-revision">Chủ nhà gửi <b id="revLabel">Yêu cầu sửa lần 2</b> lúc 05/06/2026 09:42</div>
         </div>
         <div style="text-align:right;flex-shrink:0">
@@ -785,7 +785,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
         <div>
-          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-folder-open"></i></div>Cổng nộp Hồ sơ C3 — #ALN-2026-9921</div>
+          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-folder-open"></i></div>Cổng nộp Hồ sơ C3 — <span id="c3ProjId">#ALN-9921</span></div>
           <div style="font-size:11px;color:var(--muted)">Tất cả 6 ô đều bắt buộc · Auto-scan ngay khi upload · Excel 0% lỗi hàm</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
@@ -930,7 +930,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 <div class="modal-bg" id="chatModal">
   <div class="modal" style="max-width:480px;width:100%">
     <div class="modal-head">
-      <h3><i class="ph-duotone ph-chats-circle" style="color:var(--blue)"></i> Chat — Dự án ALN-9921</h3>
+      <h3><i class="ph-duotone ph-chats-circle" style="color:var(--blue)"></i> Chat — Dự án <span id="chatModalProjId">ALN-9921</span></h3>
       <div style="display:flex;align-items:center;gap:6px;margin-left:auto;margin-right:10px">
         <div id="chatStatusDot" style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div>
         <span id="chatStatusTxt" style="font-size:10px;color:var(--sub)">Kết nối</span>
@@ -1526,7 +1526,7 @@ ALNRealtime.init({
   },
   onMessage: (d) => {
     // Tranh chấp
-    if(d.type==='DISPUTE_OPENED' && d.projectId==='ALN-2026-9921') {
+    if(d.type==='DISPUTE_OPENED' && d.projectId===(window.KTS_PROJECT_ID||'ALN-9921')) {
       showToast('⚠️ Chủ nhà đã mở tranh chấp C3 — dòng tiền bị đóng băng!', 't-red');
       try{document.getElementById('lockedWallet').style.borderColor='var(--red)';}catch(e){}
       try{document.getElementById('lockedAmount').style.color='var(--red)';}catch(e){}
@@ -1970,11 +1970,15 @@ function _startKtsProjectListen(uid) {
     const _isCN = !!(p.cn && p.cn.uid);
     const _displayId = (_isCN ? 'ALN-CN-' : 'ALN-DN-') + d.id.replace(/^ALN-/, '');
 
-    // Cập nhật tiêu đề form gửi phương án
-    const paProjTitle = document.getElementById('paProjTitle');
-    if (paProjTitle) paProjTitle.textContent = '#' + _displayId;
+    // Cập nhật tất cả chỗ hiển thị project ID
+    const _setTxt = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+    _setTxt('paProjTitle',    '#' + _displayId);
+    _setTxt('slaProjId',      '#' + _displayId);
+    _setTxt('slaProjName',    p.name || d.id);
+    _setTxt('c3ProjId',       '#' + _displayId);
+    _setTxt('chatModalProjId', _displayId);
 
-    // Cập nhật header chat
+    // Cập nhật header chat (ALN chat panel)
     const chatH = document.querySelector('.aln-chat-header h3');
     if (chatH) chatH.innerHTML = `<i class="ph-duotone ph-chats-circle" style="color:var(--blue)"></i> Chat — Dự án ${_displayId}`;
 
