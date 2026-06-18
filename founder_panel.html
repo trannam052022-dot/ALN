@@ -3,6 +3,7 @@
 <head>
 <script>
 var DN_PROJECTS = [];
+var _dnLoaded = false;
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1470,13 +1471,15 @@ function _adaptDNtoRow(p) {
   var st = p.status||'on_track';
   var rowSt = st==='sla_warn'?'sla':st==='on_track'?'ok':st;
   var next = {C1:'C2',C2:'C3',C3:'C4',C4:'C4'}[p.stage]||'C4';
+  var _isCN = !!(p._raw && p._raw.cn && p._raw.cn.uid);
+  var _displayId = (_isCN ? 'ALN-CN-' : 'ALN-DN-') + p.id.replace(/^ALN-/,'');
   var cmds = [];
   if(p.stage!=='C4'&&st!=='done'){
     cmds.push({id:'STAGE_APPROVE',label:'DUYỆT CHẶNG '+p.stage+' → '+next,sub:'Chuyển chặng & ghi nhận tiến độ',icon:'<i class="ph-duotone ph-check-circle"></i>',style:'approve'});
   }
   cmds.push({id:'REJECT_STAGE',label:'TỪ CHỐI / YÊU CẦU SỬA',sub:'Báo KTS chỉnh sửa và nộp lại',icon:'<i class="ph-duotone ph-x-circle"></i>',style:'cancel'});
   return {
-    id:p.id, _real:true, _pdata:p,
+    id:_displayId, _firestoreId:p.id, _real:true, _pdata:p,
     rowClass:st==='dispute'?'row-dispute':st==='sla_warn'?'row-sla':'',
     cn:p.cn||'—', ktsName:p.kts||'—',
     invest:p.name||p.id, contract:p.dn||'Dự án CN', floor:'Chặng '+p.stage,
@@ -1696,6 +1699,7 @@ const ACTION_MAP = {
 };
 
 function getFilteredRows() {
+  if (!_dnLoaded) return [];
   var base = (DN_PROJECTS && DN_PROJECTS.length > 0) ? DN_PROJECTS.map(_adaptDNtoRow) : ROWS;
   return base.filter(r => {
     if (activeFilter === 'DISPUTE'    && r.status !== 'dispute') return false;
@@ -1725,7 +1729,9 @@ function renderTable(keepShown) {
   if (!tbody) return;
   const allRows = getFilteredRows();
   if (!allRows.length) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--mute)">Không có dự án phù hợp</td></tr>`;
+    tbody.innerHTML = !_dnLoaded
+      ? `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--mute)"><i class="ph-duotone ph-spinner-gap ph-spin"></i> Đang tải dữ liệu...</td></tr>`
+      : `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--mute)">Không có dự án phù hợp</td></tr>`;
     return;
   }
   if (!keepShown) _tblShown = _TBL_PAGE;
@@ -1791,7 +1797,11 @@ function refreshTable() {
    DRAWER
 ══════════════════════════════════════════ */
 function openDrawer(id) {
-  var realP = (DN_PROJECTS||[]).find(function(p){ return p.id===id; });
+  var realP = (DN_PROJECTS||[]).find(function(p){
+    var _ic = !!(p._raw&&p._raw.cn&&p._raw.cn.uid);
+    var _did = (_ic?'ALN-CN-':'ALN-DN-')+p.id.replace(/^ALN-/,'');
+    return _did===id || p.id===id;
+  });
   var row = realP ? _adaptDNtoRow(realP) : ROWS.find(r => r.id === id);
   if (!row) return;
   currentRow = row;
@@ -1953,12 +1963,13 @@ function confirmOtp() {
   toast(msgs[action]||action, action==='CANCEL'?'err':'ok');
 
   // Ghi Firestore nếu là dự án thật
-  var isReal = !!(DN_PROJECTS||[]).find(function(p){ return p.id===projectId; });
+  var _fsId = (currentRow && currentRow._firestoreId) || projectId;
+  var isReal = !!(DN_PROJECTS||[]).find(function(p){ return p.id===_fsId; });
   if (isReal) {
     if (action === 'STAGE_APPROVE' && currentRow) {
-      if (window.founderApproveStage) window.founderApproveStage(projectId, currentRow.stage);
+      if (window.founderApproveStage) window.founderApproveStage(_fsId, currentRow.stage);
     } else if (action === 'REJECT_STAGE' && currentRow) {
-      if (window.founderRejectStage) window.founderRejectStage(projectId, currentRow.stage);
+      if (window.founderRejectStage) window.founderRejectStage(_fsId, currentRow.stage);
     }
   }
 
@@ -3184,6 +3195,7 @@ function _startFounderListen() {
   var q = query(collection(db,'projects'), orderBy('updatedAt','desc'));
   onSnapshot(q, function(snap){
     DN_PROJECTS = snap.docs.map(function(d){ return _adaptForFounder(d.id, d.data()); });
+    window._dnLoaded = true; _dnLoaded = true;
     try { if(typeof renderStats==='function') renderStats(); } catch(e){}
     try { if(typeof renderTable==='function') renderTable(); } catch(e){}
     console.log('[Founder]', DN_PROJECTS.length, 'dự án');
