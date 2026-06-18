@@ -2538,22 +2538,35 @@ function _getInitials() {
 window.saveProfile = async function saveProfile() {
   const uid = window.__ALN_UID;
   if (!uid) { showToast('Chưa đăng nhập','t-red'); return; }
+  const btn = document.querySelector('.profile-save-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin"></i> Đang lưu...'; }
   const data = {
-    name:    (document.getElementById('profileName')||{}).value || '',
-    email:   (document.getElementById('profileEmail')||{}).value || '',
-    phone:   (document.getElementById('profilePhone')||{}).value || '',
-    license: (document.getElementById('profileLicense')||{}).value || '',
+    name:    (document.getElementById('profileName')||{}).value.trim() || '',
+    email:   (document.getElementById('profileEmail')||{}).value.trim() || '',
+    phone:   (document.getElementById('profilePhone')||{}).value.trim() || '',
+    license: (document.getElementById('profileLicense')||{}).value.trim() || '',
   };
   try {
     await setDoc(doc(db,'users',uid), data, {merge:true});
     showToast('Đã lưu hồ sơ','t-green');
-    // Cập nhật tên trên sidebar
+    // Cập nhật tên khắp trang
     if (data.name) {
-      const el = document.getElementById('ktsHeroName');
-      if (el) el.textContent = data.name.startsWith('KTS') ? data.name : ('KTS. '+data.name.replace(/^KTS\.?\s*/i,''));
+      const fullNm = data.name.startsWith('KTS') ? data.name : ('KTS. ' + data.name.replace(/^KTS\.?\s*/i,''));
+      const nmEl = document.getElementById('ktsHeroName');
+      if (nmEl) nmEl.textContent = fullNm;
+      if (typeof updateGreeting === 'function') updateGreeting(fullNm);
+      // Cập nhật avatar initials
+      const parts = data.name.replace(/^KTS\.?\s*/i,'').trim().split(/\s+/);
+      const ini = (parts.length >= 2 ? parts[parts.length-2][0] + parts[parts.length-1][0] : (parts[0]||'K')[0]).toUpperCase();
+      const av = document.getElementById('ktsHeroAv');
+      if (av && !av.querySelector('img')) av.textContent = ini;
+      const avInit = document.getElementById('profileAvatarInit');
+      if (avInit) avInit.textContent = ini;
     }
   } catch(e) {
-    showToast('Lỗi lưu: '+e.code,'t-red');
+    showToast('Lỗi lưu: ' + (e.code || e.message), 't-red');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-floppy-disk"></i> Lưu hồ sơ'; }
   }
 }
 
