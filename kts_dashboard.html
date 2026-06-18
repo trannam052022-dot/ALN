@@ -44,32 +44,34 @@ window.KTS_PROJECT_DATA = null;
 </style>
 <style>
 :root {
-  --ink: #08080a;
-  --ink2: #111114;
-  --ink3: #18181c;
-  --border: rgba(201,168,76,0.18);
-  --border2: rgba(201,168,76,0.28);
-  --muted: rgba(240,235,224,0.42);
-  --sub: rgba(240,235,224,0.14);
-  --text: #F0EBE0;
-  --text2: rgba(240,235,224,0.80);
+  --ink: #0d1626;
+  --ink2: #112040;
+  --ink3: #1a2d50;
+  --border: rgba(99,150,230,0.18);
+  --border2: rgba(99,150,230,0.30);
+  --muted: rgba(180,205,240,0.45);
+  --sub: rgba(180,205,240,0.12);
+  --text: #e8f0fe;
+  --text2: rgba(220,235,255,0.82);
   --accent: #C9A84C;
   --accent2: #d4b86a;
   --accent-bg: rgba(201,168,76,.10);
   --gold: #C9A84C;
   --gold-bg: rgba(201,168,76,.1);
+  --purple: #a78bfa;
+  --purple-bg: rgba(167,139,250,.12);
   --green: #22c97a;
   --green-bg: rgba(34,201,122,.1);
   --red: #ff5757;
   --red-bg: rgba(255,87,87,.1);
   --amber: #ffaa33;
   --amber-bg: rgba(255,170,51,.1);
-  --blue: #38bdf8;
-  --blue-bg: rgba(56,189,248,.1);
+  --blue: #60a5fa;
+  --blue-bg: rgba(96,165,250,.12);
   --r: 10px;
   --r-sm: 7px;
-  --sh: 0 2px 8px rgba(0,0,0,.25);
-  --sh-lg: 0 8px 24px rgba(0,0,0,.35);
+  --sh: 0 2px 12px rgba(0,0,0,.40);
+  --sh-lg: 0 8px 32px rgba(0,0,0,.50);
   --serif: 'Cormorant Garamond', serif;
   --sans: 'DM Sans', sans-serif;
   --mono: 'JetBrains Mono', monospace;
@@ -154,7 +156,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 /* ── STAT CARDS ── */
 .stat-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r) var(--r) 0 0}
-.stat-card.s-purple::before{background:linear-gradient(90deg,var(--gold),var(--accent2))}
+.stat-card.s-purple::before{background:linear-gradient(90deg,var(--purple),#7c3aed)}
 .stat-card.s-green::before{background:linear-gradient(90deg,#22c97a,#16a85f)}
 .stat-card.s-gold::before{background:linear-gradient(90deg,var(--gold),#e8b800)}
 .stat-card.s-blue::before{background:linear-gradient(90deg,var(--blue),#0ea5e9)}
@@ -380,9 +382,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 @media(max-width:600px){
   .stat-card { padding:10px 10px !important; }
   /* iPhone brightness fix */
-  body { background-color: #08080a !important; }
-  .card, .stat-card { background-color: #111114 !important; border-color: rgba(201,168,76,0.18) !important; }
-  .sidebar { background-color: #0d0d10 !important; }
+  body { background-color: #0d1626 !important; }
+  .card, .stat-card { background-color: #112040 !important; border-color: rgba(99,150,230,0.18) !important; }
+  .sidebar { background-color: #0b1a36 !important; }
 }
   .stat-label { font-size:8px !important; letter-spacing:.4px !important; margin-bottom:3px !important; }
   .stat-val { font-size:16px !important; }
@@ -426,12 +428,12 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 }
 </style>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0a0a0c">
+<meta name="theme-color" content="#0d1626">
 <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
 <!-- ═══ ALN AUTH VEIL — che trang đến khi xác thực xong ═══ -->
-<div id="alnAuthVeil" style="position:fixed;inset:0;background:#08080a;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+<div id="alnAuthVeil" style="position:fixed;inset:0;background:#0d1626;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
   <div style="width:38px;height:38px;border:3px solid rgba(201,168,76,.2);border-top-color:#C9A84C;border-radius:50%;animation:alnspin .8s linear infinite"></div>
   <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:rgba(240,235,224,.7)">Đang xác thực...</div>
   <style>@keyframes alnspin{to{transform:rotate(360deg)}}</style>
