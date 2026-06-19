@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng ký Kiến trúc sư — App Làm Nhà</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+:root{
+  --ink:#f0f4f8;--ink2:#ffffff;--ink3:#f8fafc;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --muted:#94a3b8;--text:#1e293b;--text2:#475569;
+  --gold:#d4a017;--gold-bg:rgba(212,160,23,.11);
+  --green:#16a34a;--green-bg:rgba(22,163,74,.1);
+  --blue:#2563eb;--blue-bg:rgba(37,99,235,.1);
+  --red:#dc2626;--red-bg:rgba(220,38,38,.1);
+  --r:10px;--r-sm:7px;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --sh-lg:0 4px 16px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.06);
+  --serif:'Cormorant Garamond',serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:100vh;font-size:13px;line-height:1.6}
+a{color:var(--gold);text-decoration:none}
+
+/* ── HERO HEADER ── */
+.hero{background:linear-gradient(135deg,#1a1200 0%,#2d1f00 50%,#1a1200 100%);padding:28px 20px 24px;text-align:center}
+.hero-logo{font-family:var(--syne);font-size:11px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:rgba(212,160,23,.7);margin-bottom:8px}
+.hero-title{font-family:var(--serif);font-size:28px;font-weight:600;color:#f5ead0;line-height:1.2;margin-bottom:6px}
+.hero-sub{font-size:12px;color:rgba(245,234,208,.55);max-width:320px;margin:0 auto}
+
+/* ── STEPPER ── */
+.stepper{display:flex;align-items:center;gap:0;padding:20px 20px 0;max-width:480px;margin:0 auto}
+.step-item{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.step-item:not(:last-child)::after{content:'';position:absolute;top:14px;left:calc(50% + 14px);right:calc(-50% + 14px);height:2px;background:var(--border)}
+.step-item.done:not(:last-child)::after{background:var(--gold)}
+.step-circle{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);font-family:var(--mono);z-index:1;transition:.2s}
+.step-item.active .step-circle{border-color:var(--gold);background:var(--gold);color:#000}
+.step-item.done .step-circle{border-color:var(--gold);background:var(--gold-bg);color:var(--gold)}
+.step-label{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:5px;text-align:center;line-height:1.2}
+.step-item.active .step-label{color:var(--text2)}
+
+/* ── MAIN CARD ── */
+.main{max-width:480px;margin:0 auto;padding:16px 16px 40px}
+.card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-top:16px;box-shadow:var(--sh)}
+
+/* ── FORM ELEMENTS ── */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.field label span.req{color:var(--red);margin-left:2px}
+.field input,.field select,.field textarea{width:100%;background:var(--ink3);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--sans);outline:none;transition:.15s;-webkit-appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(212,160,23,.6);background:#fff}
+.field textarea{resize:vertical;min-height:80px}
+.field-hint{font-size:10px;color:var(--muted);margin-top:3px}
+.char-count{font-size:10px;color:var(--muted);text-align:right;margin-top:2px}
+
+/* ── SPECIALTY CHIPS ── */
+.spec-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.spec-chip{display:flex;align-items:center;gap:5px;padding:5px 10px;border:1.5px solid var(--border);border-radius:99px;cursor:pointer;font-size:11px;color:var(--text2);font-weight:500;transition:.15s;background:var(--ink3);user-select:none}
+.spec-chip input{display:none}
+.spec-chip.on{border-color:var(--gold);background:var(--gold-bg);color:var(--gold);font-weight:700}
+
+/* ── FILE UPLOAD ── */
+.upload-zone{border:2px dashed var(--border);border-radius:var(--r);padding:24px 16px;text-align:center;cursor:pointer;transition:.2s;background:var(--ink3);position:relative}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--gold);background:rgba(212,160,23,.04)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.uz-icon{font-size:28px;color:var(--muted);margin-bottom:6px}
+.uz-label{font-size:12px;font-weight:600;color:var(--text2)}
+.uz-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.upload-preview{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.prev-item{display:flex;align-items:center;gap:8px;background:var(--ink3);border:1px solid var(--border);border-radius:7px;padding:7px 10px}
+.prev-icon{font-size:16px;color:var(--gold)}
+.prev-name{flex:1;font-size:11px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prev-size{font-size:10px;color:var(--muted);font-family:var(--mono)}
+.prev-rm{background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:2px;line-height:1;display:flex}
+.prev-rm:hover{color:var(--red)}
+
+/* avatar preview */
+.av-ring{width:80px;height:80px;border-radius:50%;overflow:hidden;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;background:var(--ink3);cursor:pointer;margin:0 auto 8px;position:relative;flex-shrink:0}
+.av-ring img{width:100%;height:100%;object-fit:cover}
+.av-ring .av-init{font-family:var(--syne);font-size:22px;font-weight:800;color:var(--muted)}
+.av-wrap{text-align:center}
+.av-wrap input[type=file]{display:none}
+.av-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1.5px solid var(--border);background:var(--ink3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)}
+.av-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── USERNAME CARD ── */
+.uname-card{background:linear-gradient(135deg,rgba(212,160,23,.06),rgba(212,160,23,.12));border:1.5px solid rgba(212,160,23,.3);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.uname-val{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--gold);flex:1}
+.uname-regen{background:none;border:1.5px solid rgba(212,160,23,.4);border-radius:7px;padding:5px 10px;color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans);white-space:nowrap}
+.uname-regen:hover{background:rgba(212,160,23,.1)}
+
+/* ── AGREE ── */
+.agree-row{display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--ink3);border-radius:8px;border:1.5px solid var(--border)}
+.agree-row input[type=checkbox]{width:16px;height:16px;flex-shrink:0;margin-top:1px;accent-color:var(--gold);cursor:pointer}
+.agree-row span{font-size:11px;color:var(--text2);line-height:1.5}
+
+/* ── BUTTONS ── */
+.btn-row{display:flex;gap:10px;margin-top:20px}
+.btn{flex:1;padding:12px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:6px;transition:.15s}
+.btn-primary{background:linear-gradient(135deg,#d4a017,#e8c44a);color:#000}
+.btn-primary:hover{filter:brightness(1.05)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed;filter:none}
+.btn-ghost{background:var(--ink3);border:1.5px solid var(--border);color:var(--text2)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.ph-spin{animation:phspin 1s linear infinite;display:inline-block}
+@keyframes phspin{to{transform:rotate(360deg)}}
+
+/* ── SUCCESS ── */
+.success-wrap{text-align:center;padding:30px 16px}
+.success-icon{width:64px;height:64px;border-radius:50%;background:var(--green-bg);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px}
+.success-title{font-family:var(--syne);font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px}
+.success-sub{font-size:12px;color:var(--text2);line-height:1.6;max-width:300px;margin:0 auto 20px}
+.success-uname{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--gold);background:var(--gold-bg);border:1.5px solid rgba(212,160,23,.3);border-radius:8px;padding:10px 16px;display:inline-block;margin-bottom:20px}
+.steps-list{text-align:left;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px}
+.steps-list li{font-size:12px;color:var(--text2);padding:4px 0;display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+.steps-list li i{color:var(--gold);flex-shrink:0;margin-top:2px}
+
+/* ── ERROR TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1e293b;color:#f8fafc;font-size:12px;font-weight:500;padding:10px 18px;border-radius:99px;z-index:9999;box-shadow:var(--sh-lg);opacity:0;pointer-events:none;transition:.25s;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+.toast.err{background:#7f1d1d}
+
+@media(max-width:480px){.hero-title{font-size:22px}.stepper{padding:14px 12px 0}.main{padding:12px 12px 40px}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-logo">App Làm Nhà</div>
+  <div class="hero-title">Đăng ký Kiến trúc sư</div>
+  <div class="hero-sub">Tham gia mạng lưới KTS chuyên nghiệp — kết nối với hàng nghìn dự án thực tế</div>
+</div>
+
+<div class="stepper" id="stepper">
+  <div class="step-item active" data-s="1">
+    <div class="step-circle">1</div>
+    <div class="step-label">Thông tin</div>
+  </div>
+  <div class="step-item" data-s="2">
+    <div class="step-circle">2</div>
+    <div class="step-label">Hồ sơ</div>
+  </div>
+  <div class="step-item" data-s="3">
+    <div class="step-circle">3</div>
+    <div class="step-label">Tài khoản</div>
+  </div>
+  <div class="step-item" data-s="4">
+    <div class="step-circle">4</div>
+    <div class="step-label">Hoàn tất</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- STEP 1 -->
+  <div class="card" id="step1">
+    <div class="field">
+      <label>Họ và tên đầy đủ <span class="req">*</span></label>
+      <input type="text" id="f_name" placeholder="VD: Nguyễn Văn An" autocomplete="name">
+    </div>
+    <div class="field">
+      <label>Số điện thoại <span class="req">*</span></label>
+      <input type="tel" id="f_phone" placeholder="0901 234 567" autocomplete="tel">
+    </div>
+    <div class="field">
+      <label>Email liên hệ</label>
+      <input type="email" id="f_email" placeholder="email@example.com" autocomplete="email">
+    </div>
+    <div class="field">
+      <label>Số năm kinh nghiệm <span class="req">*</span></label>
+      <select id="f_years">
+        <option value="">-- Chọn --</option>
+        <option value="<1">Dưới 1 năm</option>
+        <option value="1-3">1 – 3 năm</option>
+        <option value="3-5">3 – 5 năm</option>
+        <option value="5-10">5 – 10 năm</option>
+        <option value=">10">Trên 10 năm</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Chuyên môn <span class="req">*</span></label>
+      <div class="spec-grid" id="specGrid">
+        <label class="spec-chip"><input type="checkbox" value="residential"><i class="ph-duotone ph-house"></i> Nhà ở dân dụng</label>
+        <label class="spec-chip"><input type="checkbox" value="commercial"><i class="ph-duotone ph-buildings"></i> Thương mại</label>
+        <label class="spec-chip"><input type="checkbox" value="interior"><i class="ph-duotone ph-couch"></i> Nội thất</label>
+        <label class="spec-chip"><input type="checkbox" value="landscape"><i class="ph-duotone ph-tree"></i> Cảnh quan</label>
+        <label class="spec-chip"><input type="checkbox" value="urban"><i class="ph-duotone ph-map-trifold"></i> Quy hoạch</label>
+        <label class="spec-chip"><input type="checkbox" value="bim"><i class="ph-duotone ph-cube"></i> BIM / Kiến trúc số</label>
+      </div>
+    </div>
+    <div class="field">
+      <label>Số CCHN KTS <span class="req">*</span></label>
+      <input type="text" id="f_cchn" placeholder="VD: CCHN-HN-12345">
+      <div class="field-hint">Chứng chỉ hành nghề kiến trúc sư do Bộ Xây dựng cấp</div>
+    </div>
+    <div class="field">
+      <label>Giới thiệu bản thân <span class="req">*</span></label>
+      <textarea id="f_bio" rows="4" placeholder="Mô tả kinh nghiệm, phong cách thiết kế, dự án tiêu biểu..." maxlength="500"></textarea>
+      <div class="char-count"><span id="bioCount">0</span>/500</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep(2)">
+        Tiếp theo <i class="ph-duotone ph-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="card" id="step2" style="display:none">
+    <div class="field" style="margin-bottom:20px">
+      <label>Ảnh đại diện</label>
+      <div class="av-wrap">
+        <div class="av-ring" onclick="document.getElementById('f_avatar').click()">
+          <img id="avImg" src="" style="display:none">
+          <span class="av-init" id="avInit">KT</span>
+        </div>
+        <input type="file" id="f_avatar" accept="image/*">
+        <label class="av-btn" for="f_avatar">
+          <i class="ph-duotone ph-camera"></i> Chọn ảnh
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>CV / Hồ sơ năng lực <span class="req">*</span></label>
+      <div class="upload-zone" id="cvZone">
+        <input type="file" id="f_cv" accept=".pdf,.doc,.docx">
+        <div class="uz-icon"><i class="ph-duotone ph-file-doc"></i></div>
+        <div class="uz-label">Kéo thả hoặc nhấn để chọn file</div>
+        <div class="uz-sub">PDF hoặc DOCX · Tối đa 10 MB</div>
+      </div>
+      <div class="upload-preview" id="cvPreview"></div>
+    </div>
+
+    <div class="field">
+      <label>Chứng chỉ / Bằng cấp</label>
+      <div class="upload-zone" id="certZone">
+        <input type="file" id="f_certs" accept=".pdf,image/*" multiple>
+        <div class="uz-icon"><i class="ph-duotone ph-certificate"></i></div>
+        <div class="uz-label">Kéo thả hoặc nhấn để chọn file</div>
+        <div class="uz-sub">PDF hoặc hình ảnh · Nhiều file · Tối đa 10 MB/file</div>
+      </div>
+      <div class="upload-preview" id="certPreview"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goStep(1)"><i class="ph-duotone ph-arrow-left"></i> Quay lại</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Tiếp theo <i class="ph-duotone ph-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="card" id="step3" style="display:none">
+    <div class="field" style="margin-bottom:16px">
+      <label>Tên đăng nhập của bạn</label>
+      <div class="uname-card">
+        <div class="uname-val" id="unameDisplay">kts.an0000</div>
+        <button class="uname-regen" onclick="regenUsername()"><i class="ph-duotone ph-arrows-clockwise"></i> Tạo lại</button>
+      </div>
+      <div class="field-hint" style="margin-top:6px">Dùng để đăng nhập vào hệ thống. Có thể thay đổi sau.</div>
+    </div>
+    <div class="field">
+      <label>Mật khẩu <span class="req">*</span></label>
+      <input type="password" id="f_pw" placeholder="Tối thiểu 8 ký tự" autocomplete="new-password">
+    </div>
+    <div class="field">
+      <label>Xác nhận mật khẩu <span class="req">*</span></label>
+      <input type="password" id="f_pw2" placeholder="Nhập lại mật khẩu" autocomplete="new-password">
+    </div>
+    <div class="agree-row" style="margin-top:4px">
+      <input type="checkbox" id="f_agree">
+      <span>Tôi đồng ý với <a href="#">Điều khoản sử dụng</a> và <a href="#">Chính sách bảo mật</a> của App Làm Nhà</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goStep(2)"><i class="ph-duotone ph-arrow-left"></i> Quay lại</button>
+      <button class="btn btn-primary" id="submitBtn" onclick="submitApply()">
+        <i class="ph-duotone ph-paper-plane-tilt"></i> Gửi hồ sơ
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="card" id="step4" style="display:none">
+    <div class="success-wrap">
+      <div class="success-icon"><i class="ph-duotone ph-check-circle" style="color:var(--green)"></i></div>
+      <div class="success-title">Hồ sơ đã được gửi!</div>
+      <div class="success-sub">Cảm ơn bạn đã đăng ký. Founder sẽ xem xét hồ sơ và liên hệ trong vòng 1–3 ngày làm việc.</div>
+      <div class="success-uname" id="successUname">kts.an0000</div>
+      <ul class="steps-list">
+        <li><i class="ph-duotone ph-clock"></i> Hồ sơ đang chờ xét duyệt</li>
+        <li><i class="ph-duotone ph-phone"></i> Founder sẽ gọi điện xác nhận</li>
+        <li><i class="ph-duotone ph-shield-check"></i> Sau duyệt, tài khoản được kích hoạt đầy đủ</li>
+        <li><i class="ph-duotone ph-sign-in"></i> Đăng nhập tại <a href="login.html">login.html</a> bằng tên đăng nhập trên</li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- .main -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STEP NAV ──
+var currentStep = 1;
+var generatedUsername = '';
+
+function setStep(n) {
+  for (var i = 1; i <= 4; i++) {
+    var card = document.getElementById('step' + i);
+    if (card) card.style.display = (i === n) ? 'block' : 'none';
+  }
+  var items = document.querySelectorAll('.step-item');
+  items.forEach(function(el) {
+    var s = parseInt(el.getAttribute('data-s'));
+    el.classList.remove('active', 'done');
+    if (s === n) el.classList.add('active');
+    else if (s < n) el.classList.add('done');
+  });
+  currentStep = n;
+  window.scrollTo(0, 0);
+}
+
+function goStep(n) {
+  if (n > currentStep && !validateStep(currentStep)) return;
+  setStep(n);
+}
+
+function validateStep(n) {
+  if (n === 1) {
+    var name = document.getElementById('f_name').value.trim();
+    var phone = document.getElementById('f_phone').value.trim();
+    var years = document.getElementById('f_years').value;
+    var cchn = document.getElementById('f_cchn').value.trim();
+    var bio = document.getElementById('f_bio').value.trim();
+    var specs = document.querySelectorAll('#specGrid input:checked');
+    if (!name) { showToast('Vui lòng nhập họ và tên', true); return false; }
+    if (!phone || phone.replace(/\D/g,'').length < 9) { showToast('Số điện thoại chưa hợp lệ', true); return false; }
+    if (!years) { showToast('Vui lòng chọn số năm kinh nghiệm', true); return false; }
+    if (specs.length === 0) { showToast('Vui lòng chọn ít nhất 1 chuyên môn', true); return false; }
+    if (!cchn) { showToast('Vui lòng nhập số CCHN KTS', true); return false; }
+    if (!bio || bio.length < 20) { showToast('Giới thiệu bản thân tối thiểu 20 ký tự', true); return false; }
+    // generate username when moving to step 2
+    var nameVal = document.getElementById('f_name').value.trim();
+    generatedUsername = genUsername(nameVal);
+    document.getElementById('unameDisplay').textContent = generatedUsername;
+    return true;
+  }
+  if (n === 2) {
+    var cvFile = document.getElementById('f_cv').files[0];
+    if (!cvFile) { showToast('Vui lòng đính kèm CV / Hồ sơ năng lực', true); return false; }
+    return true;
+  }
+  if (n === 3) {
+    var pw = document.getElementById('f_pw').value;
+    var pw2 = document.getElementById('f_pw2').value;
+    var agreed = document.getElementById('f_agree').checked;
+    if (pw.length < 8) { showToast('Mật khẩu tối thiểu 8 ký tự', true); return false; }
+    if (pw !== pw2) { showToast('Mật khẩu xác nhận không khớp', true); return false; }
+    if (!agreed) { showToast('Vui lòng đồng ý với điều khoản', true); return false; }
+    return true;
+  }
+  return true;
+}
+
+// ── USERNAME GEN ──
+function removeVietnameseTones(s) {
+  s = s.toLowerCase();
+  s = s.replace(/[àáâãäåăặắầẫẩấạ]/g,'a');
+  s = s.replace(/[èéêẽẹềếệểễ]/g,'e');
+  s = s.replace(/[ìíîĩị]/g,'i');
+  s = s.replace(/[òóôõöọồốộổỗơờớợởỡ]/g,'o');
+  s = s.replace(/[ùúûũụưừứựửữ]/g,'u');
+  s = s.replace(/[ỳýỵỷỹ]/g,'y');
+  s = s.replace(/[đ]/g,'d');
+  s = s.replace(/[^a-z0-9\s]/g,'');
+  return s.trim();
+}
+function genUsername(fullName) {
+  var slug = removeVietnameseTones(fullName);
+  var parts = slug.split(/\s+/).filter(function(p){ return p.length > 0; });
+  var given = parts.length > 0 ? parts[parts.length - 1] : 'kts';
+  var digits = String(Math.floor(1000 + Math.random() * 9000));
+  return 'kts.' + given + digits;
+}
+function regenUsername() {
+  var name = document.getElementById('f_name').value.trim() || 'kts';
+  generatedUsername = genUsername(name);
+  document.getElementById('unameDisplay').textContent = generatedUsername;
+}
+
+// ── BIO COUNTER ──
+document.getElementById('f_bio').addEventListener('input', function() {
+  document.getElementById('bioCount').textContent = this.value.length;
+});
+
+// ── SPEC CHIPS ──
+document.querySelectorAll('.spec-chip').forEach(function(chip) {
+  chip.querySelector('input').addEventListener('change', function() {
+    chip.classList.toggle('on', this.checked);
+  });
+});
+
+// ── AVATAR PREVIEW ──
+document.getElementById('f_avatar').addEventListener('change', function() {
+  var file = this.files[0];
+  if (!file) return;
+  var nameVal = document.getElementById('f_name').value.trim();
+  var init = nameVal ? removeVietnameseTones(nameVal).split(' ').map(function(p){ return p[0]||''; }).join('').toUpperCase().slice(0,2) : 'KT';
+  document.getElementById('avInit').textContent = init;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = document.getElementById('avImg');
+    img.src = e.target.result;
+    img.style.display = 'block';
+    document.getElementById('avInit').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+});
+
+// ── FILE PREVIEW HELPERS ──
+function fmtSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1048576).toFixed(1) + ' MB';
+}
+function fileIcon(name) {
+  var ext = name.split('.').pop().toLowerCase();
+  if (ext === 'pdf') return 'ph-file-pdf';
+  if (['doc','docx'].indexOf(ext) !== -1) return 'ph-file-doc';
+  if (['jpg','jpeg','png','gif','webp'].indexOf(ext) !== -1) return 'ph-image';
+  return 'ph-file';
+}
+
+function renderFilePreview(containerId, files, onRemove) {
+  var el = document.getElementById(containerId);
+  el.innerHTML = '';
+  files.forEach(function(file, i) {
+    var div = document.createElement('div');
+    div.className = 'prev-item';
+    div.innerHTML = '<i class="ph-duotone ' + fileIcon(file.name) + ' prev-icon"></i>'
+      + '<span class="prev-name">' + file.name + '</span>'
+      + '<span class="prev-size">' + fmtSize(file.size) + '</span>'
+      + '<button class="prev-rm" title="Xóa"><i class="ph-duotone ph-x-circle"></i></button>';
+    div.querySelector('.prev-rm').addEventListener('click', function() { onRemove(i); });
+    el.appendChild(div);
+  });
+}
+
+// CV file
+var cvFiles = [];
+document.getElementById('f_cv').addEventListener('change', function() {
+  var f = this.files[0];
+  if (!f) return;
+  if (f.size > 10 * 1024 * 1024) { showToast('File CV vượt quá 10 MB', true); return; }
+  cvFiles = [f];
+  renderFilePreview('cvPreview', cvFiles, function() { cvFiles = []; renderFilePreview('cvPreview', [], function(){}); });
+});
+// CV drag
+(function() {
+  var zone = document.getElementById('cvZone');
+  zone.addEventListener('dragover', function(e) { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', function() { zone.classList.remove('drag'); });
+  zone.addEventListener('drop', function(e) {
+    e.preventDefault(); zone.classList.remove('drag');
+    var f = e.dataTransfer.files[0];
+    if (!f) return;
+    if (f.size > 10 * 1024 * 1024) { showToast('File CV vượt quá 10 MB', true); return; }
+    cvFiles = [f];
+    renderFilePreview('cvPreview', cvFiles, function() { cvFiles = []; renderFilePreview('cvPreview', [], function(){}); });
+  });
+})();
+
+// Cert files
+var certFiles = [];
+document.getElementById('f_certs').addEventListener('change', function() {
+  var added = Array.prototype.slice.call(this.files);
+  added.forEach(function(f) {
+    if (f.size > 10 * 1024 * 1024) { showToast(f.name + ' vượt quá 10 MB, bỏ qua', true); return; }
+    certFiles.push(f);
+  });
+  renderCerts();
+});
+function renderCerts() {
+  renderFilePreview('certPreview', certFiles, function(i) {
+    certFiles.splice(i, 1);
+    renderCerts();
+  });
+}
+(function() {
+  var zone = document.getElementById('certZone');
+  zone.addEventListener('dragover', function(e) { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', function() { zone.classList.remove('drag'); });
+  zone.addEventListener('drop', function(e) {
+    e.preventDefault(); zone.classList.remove('drag');
+    Array.prototype.forEach.call(e.dataTransfer.files, function(f) {
+      if (f.size > 10 * 1024 * 1024) { showToast(f.name + ' vượt quá 10 MB, bỏ qua', true); return; }
+      certFiles.push(f);
+    });
+    renderCerts();
+  });
+})();
+
+// ── TOAST ──
+var _toastTimer = null;
+function showToast(msg, isErr) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isErr ? ' err' : '');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function() { el.className = 'toast'; }, 3000);
+}
+
+// ── SUBMIT ──
+function submitApply() {
+  if (!validateStep(3)) return;
+  window._doSubmit();
+}
+</script>
+
+<script type="module">
+import {
+  auth, db, createUserWithEmailAndPassword, setDoc, doc, serverTimestamp,
+  storage, storageRef, uploadBytes, getDownloadURL
+} from './firebase-config.js';
+
+async function uploadFile(path, file) {
+  var ref = storageRef(storage, path);
+  var snap = await uploadBytes(ref, file);
+  return await getDownloadURL(snap.ref);
+}
+
+window._doSubmit = async function() {
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph-duotone ph-spinner ph-spin"></i> Đang gửi…';
+
+  try {
+    var name    = document.getElementById('f_name').value.trim();
+    var phone   = document.getElementById('f_phone').value.trim();
+    var email   = document.getElementById('f_email').value.trim();
+    var years   = document.getElementById('f_years').value;
+    var cchn    = document.getElementById('f_cchn').value.trim();
+    var bio     = document.getElementById('f_bio').value.trim();
+    var uname   = window.generatedUsername || document.getElementById('unameDisplay').textContent;
+    var pw      = document.getElementById('f_pw').value;
+
+    var specEls = document.querySelectorAll('#specGrid input:checked');
+    var specs   = Array.from(specEls).map(function(el){ return el.value; });
+
+    var loginEmail = uname + '@aln.vn';
+
+    // 1. Tạo tài khoản Firebase Auth
+    var cred = await createUserWithEmailAndPassword(auth, loginEmail, pw);
+    var uid  = cred.user.uid;
+
+    // 2. Upload files
+    var cvFile = window.cvFiles && window.cvFiles[0];
+    var avatarFile = document.getElementById('f_avatar').files[0];
+    var certFileList = window.certFiles || [];
+
+    var avatarUrl = '';
+    var cvUrl = '';
+    var certUrls = [];
+
+    if (avatarFile) {
+      avatarUrl = await uploadFile('kts-profiles/' + uid + '/avatar.' + (avatarFile.name.split('.').pop() || 'jpg'), avatarFile);
+    }
+    if (cvFile) {
+      cvUrl = await uploadFile('kts-profiles/' + uid + '/cv.' + (cvFile.name.split('.').pop() || 'pdf'), cvFile);
+    }
+    for (var i = 0; i < certFileList.length; i++) {
+      var ext = certFileList[i].name.split('.').pop() || 'pdf';
+      var url = await uploadFile('kts-profiles/' + uid + '/cert_' + i + '.' + ext, certFileList[i]);
+      certUrls.push(url);
+    }
+
+    // 3. Ghi Firestore
+    await setDoc(doc(db, 'users', uid), {
+      username:    uname,
+      name:        name,
+      role:        'kts',
+      email:       email || loginEmail,
+      status:      'pending',
+      createdAt:   serverTimestamp()
+    });
+
+    await setDoc(doc(db, 'ktsApplications', uid), {
+      uid:         uid,
+      name:        name,
+      phone:       phone,
+      email:       email || '',
+      years:       years,
+      specialties: specs,
+      cchn:        cchn,
+      bio:         bio,
+      avatarUrl:   avatarUrl,
+      cvUrl:       cvUrl,
+      certUrls:    certUrls,
+      username:    uname,
+      status:      'pending',
+      submittedAt: serverTimestamp()
+    });
+
+    // 4. Hiện success
+    document.getElementById('successUname').textContent = uname;
+    window.setStep(4);
+
+  } catch (err) {
+    console.error(err);
+    var msg = 'Có lỗi xảy ra, vui lòng thử lại';
+    if (err.code === 'auth/email-already-in-use') msg = 'Tên đăng nhập đã tồn tại — hãy tạo lại tên khác';
+    if (err.code === 'auth/weak-password')        msg = 'Mật khẩu quá yếu';
+    if (err.code === 'storage/unauthorized')      msg = 'Lỗi quyền upload — vui lòng thử lại';
+    window.showToast(msg, true);
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi hồ sơ';
+  }
+};
+
+
+</script>
+
+</body>
+</html>
