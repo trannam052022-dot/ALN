@@ -3107,6 +3107,17 @@ function _startProjectsListenDN() {
 }
 
 /* ══ PROPOSALS LISTENER: realtime Firestore cho Bảng Review DN ══ */
+/* Debounce renderMain từ Firestore snapshots — batch 8 fires → 1 render */
+var _dnRenderTimer = null;
+function _dnDebounceRender() {
+  clearTimeout(_dnRenderTimer);
+  _dnRenderTimer = setTimeout(function() {
+    if (typeof window.renderMain === 'function') {
+      try { window.renderMain(); } catch(e) {}
+    }
+  }, 80);
+}
+
 /* Load avatar KTS từ Firestore users/{uid}/avatarURL */
 window._dnUserCache = {};
 window._dnLoadKtsAvatar = async function(ktsUid) {
@@ -3176,9 +3187,7 @@ window._dnSubProposals = function(pid) {
           }
         }
       }
-      if (window.activeProj === pid && typeof window.renderMain === 'function') {
-        try { window.renderMain(); } catch(e){}
-      }
+      if (window.activeProj === pid) _dnDebounceRender();
     }, function(err){ console.warn('[DN proposals]', stage, err.code); });
     window._dnPropUnsubs.push(unsub);
 
