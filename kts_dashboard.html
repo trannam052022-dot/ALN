@@ -2462,6 +2462,19 @@ window.switchKtsProject = function(pid) {
 /* ── DASHBOARD HERO + GREETING ── */
 function _dayVi(d){ return ['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy'][d.getDay()]; }
 
+function _updateClock() {
+  var now = new Date();
+  var dd = String(now.getDate()).padStart(2,'0');
+  var mm = String(now.getMonth()+1).padStart(2,'0');
+  var yyyy = now.getFullYear();
+  var hh = String(now.getHours()).padStart(2,'0');
+  var mi = String(now.getMinutes()).padStart(2,'0');
+  var el = document.getElementById('ktsTopbarClock');
+  if (el) el.textContent = dd + '/' + mm + '/' + yyyy + ' · ' + hh + ':' + mi;
+}
+_updateClock();
+setInterval(_updateClock, 60000);
+
 function updateGreeting(name) {
   var now = new Date();
   var el = document.getElementById('greetingDate');
