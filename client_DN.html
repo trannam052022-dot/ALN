@@ -3387,6 +3387,12 @@ onAuthStateChanged(auth, async (user) => {
     const veil = document.getElementById("alnAuthVeil");
     if (veil) veil.remove();
 
+    // Thông báo kích hoạt tài khoản lần đầu
+    if (profile.approvedNotified === false) {
+      setTimeout(function() { showToast('🎉 Tài khoản đã được kích hoạt — Chào mừng!', 't-green'); }, 800);
+      try { await updateDoc(doc(db, 'users', user.uid), { approvedNotified: true }); } catch(e) {}
+    }
+
     // Kích hoạt kênh realtime Firestore cho ALNRealtime
     if (window.__ALN_RT_RESOLVE) {
       window.__ALN_RT_RESOLVE({ db, collection, addDoc, query, orderBy, limitToLast, onSnapshot });

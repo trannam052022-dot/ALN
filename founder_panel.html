@@ -3546,7 +3546,7 @@ function _adaptForFounder(id, d) {
 }
 window.founderApprovePending = async function(uid, role) {
   try {
-    await updateDoc(doc(db,'users',uid), { status:'active' });
+    await updateDoc(doc(db,'users',uid), { status:'active', approvedNotified: false });
     var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : null;
     if(appColl){ try{ await updateDoc(doc(db,appColl,uid), { status:'approved', reviewedAt:serverTimestamp() }); }catch(e){} }
     window.PENDING_USERS = (window.PENDING_USERS||[]).filter(function(u){ return u.uid!==uid; });

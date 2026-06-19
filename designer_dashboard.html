@@ -1023,6 +1023,12 @@ onAuthStateChanged(auth, async function(user) {
   var veil = document.getElementById('desigAuthVeil');
   if (veil) veil.style.display = 'none';
 
+  /* Thông báo kích hoạt tài khoản lần đầu */
+  if (profile.approvedNotified === false) {
+    setTimeout(function() { showToast('🎉 Tài khoản đã được kích hoạt — Chào mừng!', 't-violet'); }, 800);
+    try { await updateDoc(doc(db, 'users', user.uid), { approvedNotified: true }); } catch(e) {}
+  }
+
   /* ── PROJECTS LISTENER ── */
   var isFounder = (user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2');
   var q;
