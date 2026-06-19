@@ -2623,7 +2623,7 @@ function renderMyProjects(projects) {
       <div class="mpl-dot" style="background:${S_DOT[p.status]||'var(--muted)'}"></div>
       <div style="flex:1;min-width:0">
         <div class="mpl-nm">${p.name||'—'}</div>
-        <div class="mpl-sub">${p.id} · ${p.stage||'C1'}</div>
+        <div class="mpl-sub">ALN-DN-${p.CODE||p.code||p.id.replace(/^ALN-/,'')} · ${p.stage||'C1'}</div>
         <div style="font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${client}</div>
       </div>
     </div>`;
@@ -2636,8 +2636,8 @@ function renderMyProjects(projects) {
     if (!list.length) { el.innerHTML = '<div class="mpl-empty">Không tìm thấy</div>'; return; }
     let html = '';
     if (window._mplFilter === 'all') {
-      const cn = list.filter(p => !!(p.cn && p.cn.uid));
       const dn = list.filter(p => !!(p.dn && p.dn.uid));
+      const cn = list.filter(p => !!(p.cn && p.cn.uid) && !(p.dn && p.dn.uid));
       if (cn.length) {
         html += `<div class="mpl-grp" style="color:var(--green)"><i class="ph-duotone ph-house-line"></i> Chủ nhà (${cn.length})</div>`;
         html += cn.map(mplItem).join('');
