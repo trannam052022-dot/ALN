@@ -1967,6 +1967,18 @@ ALNRealtime.init({
         if(_rvSec) _rvSec.scrollIntoView({ behavior:'smooth', block:'start' });
       }
     }
+    // CN gửi tài liệu cho KTS
+    if(d.type==='CN_FILE_UPLOADED' && Array.isArray(d.audience) && d.audience.includes('kts')) {
+      const _cnMsg = `📁 ${d.senderName||'Chủ nhà'} gửi ${d.count||1} tài liệu — dự án ${d.projectId||''} · Xem: Bảng Review → Tài liệu`;
+      showToast(_cnMsg, 't-blue');
+      _alnReceive({ text: _cnMsg, senderName: d.senderName||'Chủ nhà', _role:'cn', ts: Date.now(), _replay: d._replay });
+      if(!d._replay && typeof window._alnWatchDocs === 'function') {
+        window._alnWatchDocs(d.projectId);
+        if(typeof window.rvSwitch === 'function') window.rvSwitch('doc');
+        var _rvSec = document.querySelector('.review-section');
+        if(_rvSec) _rvSec.scrollIntoView({ behavior:'smooth', block:'start' });
+      }
+    }
     // Rating nhận được
     if(d.type==='KTS_RATED') {
       showToast(`⭐ Bạn nhận được đánh giá ${d.score}/5 sao cho Chặng ${d.stage} — ${d.projName}`, 't-green');
