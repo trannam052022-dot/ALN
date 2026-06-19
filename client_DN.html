@@ -1827,7 +1827,7 @@ function renderSidebar(){
     <div class="cn-proj-item proj-item-anim ${window.activeProj===p.id?'active':''}" style="animation-delay:${idx*40}ms" onclick="selectProj('${p.id}')">
       <span class="cpi-dot" style="background:${STATUS_DOT[p.status]};box-shadow:0 0 4px ${STATUS_DOT[p.status]}66"></span>
       <div style="min-width:0;flex:1">
-        <div class="cpi-id">${'ALN-' + p.id.replace(/^ALN-/, '')}</div>
+        <div class="cpi-id">${'ALN-DN-' + p.id.replace(/^ALN-/, '')}</div>
         <div class="cpi-name">${p.name}</div>
         <div class="cpi-meta">${p.stage} · ${p.kts.replace('KTS. ','')}</div>
       </div>

@@ -1963,6 +1963,8 @@ ALNRealtime.init({
       if(!d._replay && typeof window._alnWatchDocs === 'function') {
         window._alnWatchDocs(d.projectId);
         if(typeof window.rvSwitch === 'function') window.rvSwitch('doc');
+        var _rvSec = document.querySelector('.review-section');
+        if(_rvSec) _rvSec.scrollIntoView({ behavior:'smooth', block:'start' });
       }
     }
     // Rating nhận được
