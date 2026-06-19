@@ -2606,7 +2606,7 @@ function renderMyProjects(projects) {
 
   function mplFiltered() {
     let list = window._mplProjects;
-    if (window._mplFilter === 'cn') list = list.filter(p => !!(p.cn && p.cn.uid));
+    if (window._mplFilter === 'cn') list = list.filter(p => !!(p.cn && p.cn.uid) && !(p.dn && p.dn.uid));
     else if (window._mplFilter === 'dn') list = list.filter(p => !!(p.dn && p.dn.uid));
     if (window._mplQ) {
       const q = window._mplQ.toLowerCase();
