@@ -2581,7 +2581,7 @@ function renderMyProjects(projects) {
   };
 
   const cnProjects = projects.filter(p => !!(p.cn && p.cn.uid));
-  const dnProjects = projects.filter(p => !(p.cn && p.cn.uid) && !!(p.dn && p.dn.uid));
+  const dnProjects = projects.filter(p => !!(p.dn && p.dn.uid));
 
   let html = '';
   if (cnProjects.length) {
