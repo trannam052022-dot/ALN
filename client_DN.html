@@ -1852,7 +1852,7 @@ function renderMain(){
 
       <!-- ══ KTS compact row ══ -->
       <div style="margin-top:10px;display:flex;align-items:center;gap:8px;background:var(--ink3);border:1px solid var(--border);border-radius:7px;padding:7px 12px;flex-wrap:wrap;box-shadow:var(--sh)">
-        <canvas id="ktsHeroAv" width="48" height="48" style="width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(201,168,76,.3);flex-shrink:0"></canvas>
+        <div id="ktsHeroAv" style="width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(201,168,76,.45);flex-shrink:0;background:rgba(201,168,76,.14);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--gold);font-family:var(--syne);letter-spacing:-.5px">${(function(){var nm=p.kts.replace(/^KTS\.\s*/,'');var pts=nm.split(' ').filter(Boolean);return (pts[0]||'K')[0].toUpperCase()+(pts[pts.length-1]||'')[0].toUpperCase();}())}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:11px;font-weight:700;color:var(--text2)">${p.kts}</div>
           <div style="font-size:9px;color:var(--muted);margin-top:1px;font-family:var(--mono)">${ki.cchn}</div>
@@ -2227,11 +2227,7 @@ function renderMain(){
 
     </div>`;
 
-  /* Draw KTS portrait after DOM ready */
-  setTimeout(()=>{
-    const cv = document.getElementById('ktsHeroAv');
-    if(cv) drawPortrait(cv, ki);
-  }, 30);
+  /* ktsHeroAv is now a div with initials — no canvas draw needed */
 }
 
 function selectProj(id){
@@ -2401,13 +2397,20 @@ ALNRealtime.init({
       showToast(`📋 ${d.ktsName} đã nộp Hồ sơ C3!`, 't-amber');
     }
 
-    // KTS gửi phương án ảnh → hiện trong Nhắn tin sàn ALN
-    if(d.type==='PROPOSAL_SENT' && Array.isArray(d.audience) && d.audience.includes('dn') && !d._replay) {
-      const _pMsg = d.text || ('📐 KTS vừa gửi phương án chặng ' + (d.stage||'') + '. Xem trong trang dự án.');
-      _alnReceive({ text:_pMsg, senderName:d.senderName||'KTS', _role:'kts', ts:Date.now() });
-      _addNotif('📐', `<b>${d.senderName||'KTS'}</b> vừa gửi ${d.count||1} phương án chặng <b>${d.stage||''}</b> — Bấm để xem`, d.projectId||window.activeProj, 'rv');
-      renderNotifs();
-      showToast('📐 ' + (d.senderName||'KTS') + ' vừa gửi phương án chặng ' + (d.stage||''), 't-green');
+    // KTS gửi phương án ảnh → hiện trong chuông thông báo + chat (nếu live)
+    if(d.type==='PROPOSAL_SENT' && Array.isArray(d.audience) && d.audience.includes('dn')) {
+      const _pCid = d._cid || (d.projectId + '_' + d.stage + '_' + (d.count||0));
+      if(!window._dnSeenProposalNotifs) window._dnSeenProposalNotifs = new Set();
+      if(!window._dnSeenProposalNotifs.has(_pCid)){
+        window._dnSeenProposalNotifs.add(_pCid);
+        _addNotif('<i class="ph-duotone ph-image-square"></i>', `<b>${d.senderName||'KTS'}</b> vừa gửi ${d.count||1} phương án chặng <b>${d.stage||''}</b> — Bấm để xem`, d.projectId||window.activeProj, 'rv');
+        renderNotifs();
+      }
+      if(!d._replay) {
+        const _pMsg = d.text || ('KTS vừa gửi phương án chặng ' + (d.stage||'') + '. Xem trong trang dự án.');
+        _alnReceive({ text:_pMsg, senderName:d.senderName||'KTS', _role:'kts', ts:Date.now() });
+        showToast('KTS ' + (d.senderName||'') + ' vừa gửi phương án chặng ' + (d.stage||''), 't-green');
+      }
     }
 
     // Nhận chat từ KTS hoặc CN
