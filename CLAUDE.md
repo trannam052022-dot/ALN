@@ -4,7 +4,7 @@
 
 ## Tổng quan
 
-Nền tảng theo dõi công trình xây dựng. **Frontend tĩnh** (HTML/JS thuần) host trên **GitHub Pages**, **backend Firebase** (Auth + Firestore + Storage + FCM).
+Nền tảng theo dõi công trình xây dựng. **Frontend tĩnh** (HTML/JS thuần) host trên **GitHub Pages**, **backend Firebase** (Auth + Firestore + Storage + FCM + Cloud Functions).
 
 - GitHub repo: `https://github.com/trannam052022-dot/ALN` (public)
 - GitHub Pages: `https://trannam052022-dot.github.io/ALN/`
@@ -14,14 +14,17 @@ Nền tảng theo dõi công trình xây dựng. **Frontend tĩnh** (HTML/JS thu
 
 | File | Vai trò |
 |------|--------|
-| `login.html` | Đăng nhập (ghép `username + "@aln.vn"` = email ảo) |
+| `login.html` | Đăng nhập — dark luxury, role tabs, 2 nút đăng ký KTS/DN |
 | `client_CN.html` | Trang Chủ nhà (CN) |
 | `client_DN.html` | Trang Doanh nghiệp (DN) |
 | `kts_dashboard.html` | Trang Kiến trúc sư (KTS) |
-| `founder_panel.html` | Trang quản trị founder (xem/giám sát mọi vai) |
+| `founder_panel.html` | Trang quản trị founder — dark luxury, tab Duyệt đăng ký KTS/DN |
+| `kts-apply.html` | Form đăng ký KTS (dark luxury) → ghi `ktsApplications/{uid}` |
+| `dn-studio.html` | Form đăng ký DN (dark luxury) → ghi `dnApplications/{uid}` |
 | `seed.html` | Nạp dữ liệu mẫu lên Firestore |
 | `firebase-config.js` | Khởi tạo Firebase + export hàm dùng chung |
 | `firebase-messaging-sw.js` | Service worker cho web push |
+| `functions/index.js` | Cloud Functions (Node 20, asia-southeast1) |
 | `index.html`, `manifest.json`, `icon-*.png` | PWA |
 
 ## firebase-config.js — exports
@@ -47,7 +50,20 @@ Mỗi `users/{uid}` có: `username, name, role, email`.
 
 ## Dữ liệu mẫu
 
-`projects/ALN-9921` "Biệt thự Vườn Tân Cổ Điển" (stage C2, sla_warn, totalFee 125tr, escrow 75tr, progress C1=1/C2=0.4/C3=0/C4=0) + 4 stages + 3 documents + 1 proposal + 1 pin + 1 comment. `cn.uid` = UID của cn.trannam, `kts.uid` = UID của kts.
+`projects/ALN-9921` "Biệt thự Vườn Tân Cổ Điển" — `stage: 'C2'`, `sla_warn`, `totalFee: 125tr`, `escrow: 75tr`, `progress: {C1:1, C2:0.4, C3:0, C4:0}`, `memberUids: [cn.uid, kts.uid, dn.uid]` + 4 stages + 3 documents + 1 proposal. `cn.uid` = UID cn.trannam, `kts.uid` = UID kts.tranlong.
+
+Khi CN duyệt proposal: `projects/{pid}.stage` tự advance C1→C2→C3→C4, `progress.{stage} = 1`.
+
+## Cloud Functions (functions/index.js)
+
+| Function | Trigger | Tác dụng |
+|----------|---------|---------|
+| `onKtsApply` | `ktsApplications/{uid}` onCreate | Push cho founder |
+| `onDnApply` | `dnApplications/{uid}` onCreate | Push cho founder |
+| `onStageAdvanced` | `projects/{pid}` onUpdate (stage thay đổi) | Push cho KTS |
+| `onDocUploaded` | `projects/{pid}/documents/{id}` onCreate (uploader.role=kts) | Push cho CN + DN |
+
+Deploy: `firebase deploy --only functions`
 
 ## Quy ước làm việc (QUAN TRỌNG)
 
@@ -61,45 +77,67 @@ Mỗi `users/{uid}` có: `username, name, role, email`.
 
 ## Query theo trang
 
-- `client_CN.html`: `where('cn.uid','==',uid) orderBy('updatedAt','desc')` — **trừ founder thì bỏ where, lấy tất cả** (đã sửa, xem bên dưới).
-- `kts_dashboard.html`: `where('kts.uid','==',uid) orderBy('updatedAt','desc')` — **CẦN INDEX**.
+- `client_CN.html`: `where('cn.uid','==',uid) orderBy('updatedAt','desc')` — trừ founder thì bỏ where, lấy tất cả.
+- `kts_dashboard.html`: `where('kts.uid','==',uid) orderBy('updatedAt','desc')`.
 - `client_DN.html`: `orderBy('updatedAt','desc')` (không where → mọi dự án).
-- `founder_panel.html`: `orderBy('updatedAt')` → DN_PROJECTS + renderStats/renderTable.
+- `founder_panel.html`: `orderBy('updatedAt')`.
+
+## Indexes (Firestore)
+
+- `projects`: `cn.uid` ASC + `updatedAt` DESC — ✅ Enabled.
+- `projects`: `kts.uid` ASC + `updatedAt` DESC — ✅ Enabled (deployed 19/06/2026).
+- DN + founder dùng `orderBy` không where → không cần index.
 
 ## Firestore Rules & App Check
 
-- `users` allow read = `if true` (mở tạm để debug).
-- `isFounder()` dùng UID cứng `h4kEguPEyMcwJwl89stc0Q6j2si2` (tránh get() lồng nhau).
-- founder bypass uploader/author check ở documents/pins/comments/proposals.
-- **Nghi App Check chặn** `getDoc(users/{uid})` (trả exists:false dù UID đúng). GIẢI PHÁP TẠM: bypass Firestore cho founder UID cứng trong `login.html` + 4 dashboard (mock snap `role:founder`). → Cần điều tra gốc rễ App Check rồi bỏ bypass, siết Rules lại.
+- `fcmTokens`: create/update = `signedIn()` — cho phép mọi vai lưu token.
+- `projects/{pid}` update: founder hoặc `uid in memberUids` → CN/KTS/DN trong project đều update được (dùng khi advance stage).
+- **App Check bypass còn tồn tại**: founder UID cứng được mock `role:founder` mà không đọc Firestore → cần điều tra và bỏ bypass sau.
 
-## Indexes
+## Các nút GHI đã được nối (Firestore/Storage)
 
-- `projects`: `cn.uid` ASC + `updatedAt` DESC — **Enabled**.
-- `projects`: `kts.uid` ASC + `updatedAt` DESC — **CHƯA TẠO (pending)** → trang KTS lỗi `failed-precondition`. Tạo qua link trong console lỗi hoặc Firebase Console → Firestore → Indexes.
-- DN + founder dùng `orderBy('updatedAt')` không where → không cần index.
+| Trang | Hàm | Đích |
+|-------|-----|------|
+| kts_dashboard | `alnSubmitProposal()` | `projects/{pid}/stages/{s}/proposals` + Storage |
+| kts_dashboard | `window.submitC3` (module) | `projects/{pid}/documents` + Storage |
+| kts_dashboard | `window.submitRev` (module) | `projects/{pid}/documents` + Storage |
+| kts_dashboard | `uploadProfileAvatar()` | Storage `kts-profiles/{uid}/` |
+| client_CN | `_cnFbApprovePA` | proposal `status:approved` + advance `projects/{pid}.stage` |
+| client_CN | `_cnSingleSend` | `projects/{pid}/documents` + Storage |
+| client_DN | `_dnFbApprovePA` | proposal `status:approved` + advance `projects/{pid}.stage` |
+| client_DN | `_dnSingleSend` | `projects/{pid}/documents` + Storage |
+| founder_panel | `founderApprovePending` | `users/{uid}.status:active` + `ktsApplications/{uid}.status:approved` |
 
-## ĐÃ SỬA (phiên 15/06/2026)
+## QUYỀN TỰ ĐỘNG (dành cho phiên autonomous)
 
-- **client_CN.html**: `_startProjectsListen(uid, isFounder)` — nếu là founder thì query bỏ `where('cn.uid'==uid)` → founder xem được TẤT CẢ dự án. Call site truyền cờ `isFounder = (uid === UID founder)`.
-- **client_DN.html**:
-  - Thêm `_startProjectsListenDN()` vào cuối luồng `onAuthStateChanged` (trước đó nó bị nhét nhầm trong callback xin quyền thông báo → list dự án không bao giờ nạp).
-  - Badge thương hiệu trên cùng `dnTopbarName` không còn bị ghi đè bằng tên user → luôn hiện "App Làm Nhà Corp." (giống các trang khác). Thẻ sidebar `dnSidebarName` vẫn theo user.
+Claude được phép tự làm các việc sau mà không cần hỏi:
+- Viết/sửa code HTML/JS/CSS
+- `git add`, `git commit`, `git push`
+- `firebase deploy --only functions` (sau khi đã review code)
+
+Claude PHẢI HỎI trước khi:
+- Thay đổi `firestore.rules` hoặc `storage.rules`
+- Chạy `firebase deploy --only firestore:rules` (ảnh hưởng bảo mật sản xuất)
+- Xoá dữ liệu Firestore
+- Thay đổi cấu trúc `firebase.json` / `firestore.indexes.json`
 
 ## CÒN LẠI (thứ tự ưu tiên)
 
-1. **Tạo index KTS** (`kts.uid` ASC + `updatedAt` DESC) → mở khóa trang KTS. Sau đó test `kts.tranlong`.
-2. Mở Rules cho `fcmTokens`/`settings` (lỗi vàng `[ALN Push] permission-denied` — vô hại, không ảnh hưởng hiển thị).
-3. Điều tra gốc rễ App Check → bỏ bypass founder → siết Rules lại.
-4. Test upload avatar KTS (Firebase Storage).
-5. **Bước 3**: nối các nút GHI — upload tài liệu, gửi góp ý/pin, duyệt chặng.
-6. (Sau) `register.html` đăng ký công khai: 3 vai tự đăng ký, OTP điện thoại (GĐ2), KTS/DN chờ founder duyệt (pending), CN dùng ngay. Username tự sinh từ tên bỏ dấu + số chống trùng, không lộ sđt. Dùng secondary Firebase app để founder tạo user không bị đá ra.
+### P1 — Quan trọng, làm ngay
+1. **UI Founder tạo dự án mới** — `founder_panel.html` cần tab/modal "Tạo dự án": chọn CN (dropdown `users` where `role=cn`), chọn KTS, chọn DN (optional), nhập tên dự án + tổng phí + escrow → `setDoc('projects/{newId}', {..., memberUids:[cn,kts,dn], stage:'C1', progress:{C1:0,C2:0,C3:0,C4:0}})`. ID dự án tự sinh `ALN-` + 4 chữ số ngẫu nhiên.
+2. **Thông báo cho CN khi founder duyệt account** — khi `founderApprovePending(uid, 'cn')` chạy, gọi Cloud Function hoặc ghi doc vào `notifications/{uid}` để CN biết mình đã được kích hoạt.
+
+### P2 — Kỹ thuật
+3. **App Check** — điều tra tại sao `getDoc(users/founderUID)` trả `exists:false`. Nếu App Check chặn, tắt enforcement trên Firebase Console rồi bỏ bypass cứng.
+4. Nâng `functions/package.json` Node lên 22 (Node 20 deprecated 30/04/2026, decommission 30/10/2026).
+
+### P3 — Tương lai
+5. Escrow/payment khi founder confirm chuyển tiền sau khi stage advance.
+6. `register.html` đăng ký công khai CN (dùng ngay), KTS/DN chờ duyệt.
 
 ## Lệnh Git thường dùng
 
 ```bash
-git add -A
-git commit -m "mô tả thay đổi"
-git push
+git add -A && git commit -m "mô tả" && git push
 ```
-GitHub Pages tự build lại sau ~1-2 phút. Kiểm tra ở tab ẩn danh hoặc Ctrl+Shift+R (tránh cache).
+GitHub Pages tự build lại sau ~1-2 phút.
