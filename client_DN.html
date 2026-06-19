@@ -2201,22 +2201,10 @@ function renderMain(){
                 ${pa.isNew?'<span class="pa-badge-new">MỚI</span>':''}
                 ${isApproved?'<span style="position:absolute;bottom:8px;right:8px;background:rgba(34,201,122,.9);color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:99px;display:flex;align-items:center;gap:3px"><i class="ph-duotone ph-check-circle"></i> Đã duyệt</span>':''}
                 ${isRejected?'<span style="position:absolute;bottom:8px;right:8px;background:rgba(239,68,68,.8);color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:99px;display:flex;align-items:center;gap:3px"><i class="ph-duotone ph-x-circle"></i> Không chọn</span>':''}
-                <!-- Pin count badge -->
-                ${pinCount>0?`<span style="position:absolute;top:8px;right:8px;background:${openPins>0?'var(--red)':'var(--green)'};color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:99px;display:flex;align-items:center;gap:3px">
-                  <i class="ph-duotone ph-map-pin" style="font-size:8px"></i> ${openPins>0?openPins+' chờ xử lý':pinCount+' đã xong'}
-                </span>`:''}
-                <!-- Annotation hint -->
-                <div style="position:absolute;inset:0;background:rgba(0,0,0,.0);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s"
-                  class="annot-hover-hint" onmouseover="this.style.opacity=1;this.style.background='rgba(0,0,0,.45)'" onmouseout="this.style.opacity=0;this.style.background='rgba(0,0,0,.0)'">
-                  <span style="color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.8)">
-                    <i class="ph-duotone ph-arrows-out" style="margin-right:5px"></i>Xem & Đánh dấu
-                  </span>
-                </div>
               </div>
               <div class="pa-body">
                 <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">
                   ${typeLabel}
-                  ${pinCount>0?`<span style="font-size:9px;color:var(--muted);font-family:var(--mono)">${pinCount} pin</span>`:''}
                 </div>
                 <div class="pa-name">${pa.name}</div>
                 <div class="pa-meta">
@@ -2225,11 +2213,6 @@ function renderMain(){
                 </div>
               </div>
               <div class="pa-footer">
-                <button class="pa-btn" style="background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);color:var(--accent2)"
-                  onclick="openAnnotation('${p.id}','${rid}','${pa.id}')">
-                  <i class="ph-duotone ph-map-pin" style="font-size:10px"></i>
-                  Đánh dấu${pinCount>0?' ('+pinCount+')':''}
-                </button>
                 ${!isApproved&&!isRejected?`
                 <button class="pa-btn pa-btn-approve" onclick="approvePA('${p.id}','${rid}','${pa.id}')">
                   <i class="ph-duotone ph-check-circle" style="font-size:10px"></i> Duyệt
@@ -2293,7 +2276,6 @@ function renderMain(){
           <div class="ct" style="margin-bottom:12px">
             <i class="ph-duotone ph-eye" style="color:var(--gold)"></i>
             Bảng Review Phương án
-            <span style="font-size:10px;color:var(--muted);font-weight:400;margin-left:4px">— Click vào PA để đánh dấu & góp ý trực tiếp trên bản vẽ</span>
             <span class="pill p-amber" style="margin-left:auto;font-size:10px">Chỉ C1 & C2</span>
           </div>
           <div class="rp-stage-tabs">${stageTabsHTML}</div>
