@@ -1827,7 +1827,7 @@ function renderSidebar(){
     <div class="cn-proj-item proj-item-anim ${window.activeProj===p.id?'active':''}" style="animation-delay:${idx*40}ms" onclick="selectProj('${p.id}')">
       <span class="cpi-dot" style="background:${STATUS_DOT[p.status]};box-shadow:0 0 4px ${STATUS_DOT[p.status]}66"></span>
       <div style="min-width:0;flex:1">
-        <div class="cpi-id">${'ALN-DN-' + p.id.replace(/^ALN-/, '')}</div>
+        <div class="cpi-id">${'ALN-DN-' + p.code}</div>
         <div class="cpi-name">${p.name}</div>
         <div class="cpi-meta">${p.stage} · ${p.kts.replace('KTS. ','')}</div>
       </div>
@@ -1973,7 +1973,7 @@ function renderMain(){
       <!-- ══ PROJECT INFO ══ -->
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
         <div style="flex:1;min-width:0">
-          <div style="font-family:var(--mono);font-size:10px;color:var(--sub);margin-bottom:3px">${'ALN-DN-' + p.id.replace(/^ALN-/, '')}</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--sub);margin-bottom:3px">${'ALN-DN-' + p.code}</div>
           <h1>${p.name}</h1>
           <p style="margin-top:7px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
             <span class="pill ${p.status==='on_track'?'p-green':p.status==='sla_warn'?'p-amber':p.status==='dispute'?'p-red':'p-gray'}">
