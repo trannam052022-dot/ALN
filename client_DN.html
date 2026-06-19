@@ -2250,7 +2250,7 @@ function renderMain(){
 
 function selectProj(id){
   window.activeProj=id; activeFolder='ALL';
-  if (typeof window._dnSubProposals === 'function') window._dnSubProposals(id);
+  window._dnSubPid = null; // reset lazy-load flag khi đổi project
   renderSidebar(); renderMain();
   document.querySelector('.sidebar-cn').classList.remove('open');
   // Sync Zalo widget to new KTS
@@ -3047,6 +3047,13 @@ function alnNotify(title, body){
       var lbl = b.querySelector('.dn-kwc-label');
       if(lbl) lbl.style.color = on ? clr : '#475569';
     });
+    // Lazy subscription: chỉ subscribe proposals khi mở Bảng Review
+    if(cur === 'rv' && window.activeProj && typeof window._dnSubProposals === 'function') {
+      if(window._dnSubPid !== window.activeProj) {
+        window._dnSubPid = window.activeProj;
+        window._dnSubProposals(window.activeProj);
+      }
+    }
   };
 
   // Bọc renderMain: mỗi lần vẽ lại nội dung -> áp tab lại
