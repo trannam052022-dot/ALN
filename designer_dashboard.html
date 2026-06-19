@@ -889,7 +889,7 @@ window.desSubmitC3 = async function() {
   var btn    = document.getElementById('desSubmitC3Btn');
   var sr     = document.getElementById('desC3ScanResult');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph-duotone ph-spinner-gap ph-spin"></i> Đang upload…'; }
-  if (sr)  { sr.style.display = ''; sr.innerHTML = '<div style="font-size:11px;color:var(--muted)">Đang kiểm tra & upload…</div>'; }
+  if (sr)  { sr.style.display = 'block'; sr.innerHTML = '<div style="font-size:11px;color:var(--muted)">Đang kiểm tra & upload…</div>'; }
 
   var toUpload = slots.filter(function(s) { return files[s.id] && !files[s.id].hasError && files[s.id].file; });
   var done = 0, failed = 0;
@@ -1031,13 +1031,17 @@ onAuthStateChanged(auth, async function(user) {
   } else {
     q = query(
       collection(db, 'designProjects'),
-      where('designer.uid', '==', user.uid),
-      orderBy('updatedAt', 'desc')
+      where('designer.uid', '==', user.uid)
     );
   }
 
   onSnapshot(q, function(snap) {
     var projs = snap.docs.map(function(d) { return Object.assign({ id: d.id }, d.data()); });
+    projs.sort(function(a, b) {
+      var ta = a.updatedAt && a.updatedAt.toMillis ? a.updatedAt.toMillis() : 0;
+      var tb = b.updatedAt && b.updatedAt.toMillis ? b.updatedAt.toMillis() : 0;
+      return tb - ta;
+    });
     window.DES_PROJECTS = projs;
 
     /* auto-select first project */
