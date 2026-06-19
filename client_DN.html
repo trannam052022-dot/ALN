@@ -3168,7 +3168,7 @@ const REQUIRED_ROLE = "dn";
 /* ══ PROJECTS DN: Firestore realtime — DN thấy TẤT CẢ ══ */
 function _adaptProjectDN(id, d) {
   var prog = d.progress || {};
-  return { id:id, code:d.code||id, name:d.name||'', cn:(d.cn&&d.cn.name)||'', kts:(d.kts&&d.kts.name)||'', dn:(d.dn&&d.dn.name)||'', ktsUid:(d.kts&&d.kts.uid)||'', cnUid:(d.cn&&d.cn.uid)||'', stage:d.stage||'C1', status:d.status||'on_track', progress:[prog.C1||0,prog.C2||0,prog.C3||0,prog.C4||0], total:d.totalFee||0, escrow:d.escrowBalance||0, _raw:d };
+  return { id:id, code:d.CODE||d.code||id, name:d.name||'', cn:(d.cn&&d.cn.name)||'', kts:(d.kts&&d.kts.name)||'', dn:(d.dn&&d.dn.name)||'', ktsUid:(d.kts&&d.kts.uid)||'', cnUid:(d.cn&&d.cn.uid)||'', stage:d.stage||'C1', status:d.status||'on_track', progress:[prog.C1||0,prog.C2||0,prog.C3||0,prog.C4||0], total:d.totalFee||0, escrow:d.escrowBalance||0, _raw:d };
 }
 function _startProjectsListenDN() {
   var uid = (auth.currentUser && auth.currentUser.uid) || window.__ALN_UID || null;

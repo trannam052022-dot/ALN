@@ -2374,7 +2374,7 @@ function _startKtsProjectListen(uid) {
     window.KTS_PROJECT_ID   = d.id;
     window.KTS_PROJECT_DATA = d.data();
     const p = d.data();
-    const _displayId = 'ALN-DN-' + (p.code || d.id.replace(/^ALN-/, ''));
+    const _displayId = 'ALN-DN-' + (p.CODE || p.code || d.id.replace(/^ALN-/, ''));
 
     // Cập nhật tất cả chỗ hiển thị project ID
     const _setTxt = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
@@ -2409,7 +2409,7 @@ function _startKtsProjectListen(uid) {
     const _rvPicker = document.getElementById('rvProjPicker');
     if (_rvPicker) {
       _rvPicker.innerHTML = allProjs.map(p => {
-        const _shortId = 'DN · ' + (p.code || p.id.replace(/^ALN-/, ''));
+        const _shortId = 'DN · ' + (p.CODE || p.code || p.id.replace(/^ALN-/, ''));
         return `<option value="${p.id}"${p.id === window.KTS_PROJECT_ID ? ' selected' : ''}>${_shortId} — ${p.name || ''}</option>`;
       }).join('');
     }
@@ -2449,7 +2449,7 @@ window.switchKtsProject = function(pid) {
   if (!pr) return;
   window.KTS_PROJECT_ID = pid;
   window.KTS_PROJECT_DATA = pr;
-  const _displayId = 'ALN-DN-' + (pr.code || pid.replace(/^ALN-/, ''));
+  const _displayId = 'ALN-DN-' + (pr.CODE || pr.code || pid.replace(/^ALN-/, ''));
   const _setTxt = function(id, v){ const el=document.getElementById(id); if(el) el.textContent=v; };
   _setTxt('paProjTitle', '#' + _displayId);
   _setTxt('slaProjId', '#' + _displayId);
@@ -2555,7 +2555,7 @@ function renderProjCards(projs) {
     var color = SC[p.status] || 'var(--muted)';
     var label = SL[p.status] || p.status;
     var isCN = !!(p.cn && p.cn.uid);
-    var did = 'ALN-DN-' + (p.code || (p.id||'').replace(/^ALN-/,''));
+    var did = 'ALN-DN-' + (p.CODE || p.code || (p.id||'').replace(/^ALN-/,''));
     var prog = p.progress || [0,0,0,0];
     var earnPct = (prog[0]||0)*0.10 + (prog[1]||0)*0.20 + (prog[2]||0)*0.60 + (prog[3]||0)*0.10;
     var earnPctDisp = Math.round(earnPct * 100);
@@ -3104,7 +3104,7 @@ window.alnSubmitProposal = async function(){
 
   // Mục 9: xác nhận trước khi gửi
   const total=_paFiles.length;
-  const _dpid = 'ALN-DN-' + ((window.KTS_PROJECT_DATA&&window.KTS_PROJECT_DATA.code)||PID.replace(/^ALN-/,''));
+  const _dpid = 'ALN-DN-' + ((window.KTS_PROJECT_DATA&&(window.KTS_PROJECT_DATA.CODE||window.KTS_PROJECT_DATA.code))||PID.replace(/^ALN-/,''));
   paStatus(`<div style="background:var(--ink3);border:1px solid rgba(212,160,23,.3);border-radius:8px;padding:10px 12px">
     <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">📋 Sắp gửi <b>${total} ảnh</b> · Chặng <b>${stage}</b> · <b>${name}</b></div>
     <div style="font-size:10px;color:var(--sub);margin-bottom:10px">Dự án ${_dpid} — Chủ nhà &amp; DN nhận ngay sau khi gửi.</div>
@@ -3308,7 +3308,7 @@ function _watchDocs(pid) {
   const projIdEl = document.getElementById('rvProjId');
   if (projIdEl) {
     const _kd = window.KTS_PROJECT_DATA || {};
-    projIdEl.textContent = '#ALN-DN-' + (_kd.code || pid.replace(/^ALN-/, ''));
+    projIdEl.textContent = '#ALN-DN-' + (_kd.CODE || _kd.code || pid.replace(/^ALN-/, ''));
   }
   if (!list) return;
   if (_rvDocUnsub) { try { _rvDocUnsub(); } catch(e) {} _rvDocUnsub = null; }
