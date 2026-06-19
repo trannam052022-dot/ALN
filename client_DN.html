@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <script>
@@ -977,6 +977,7 @@ function approvePA(projId, stage, paId){
   renderMain();
   setTimeout(()=>{const c=document.getElementById('ktsHeroAv');const p2=window.PROJECTS_CLIENT.find(x=>x.id===projId);const KP={'KTS. Trần Đại Long':{skin:'#d8a878',shirt:'#2a3a5a',bg:'#14141e'},'KTS. Nguyễn Thị Lan':{skin:'#e0b898',shirt:'#1a5040',bg:'#0e181e'},'KTS. Phạm Hoài Nam':{skin:'#d4a880',shirt:'#5a3818',bg:'#120e08'},'KTS. Lê Hoàng Nam':{skin:'#d8c0a0',shirt:'#1e3a2a',bg:'#0c1410'},'KTS. Vũ Minh Khoa':{skin:'#c8a878',shirt:'#3a2a5a',bg:'#10101e'}};if(c&&p2)drawPortrait(c,KP[p2.kts]||{});},30);
   showToast(`✅ Đã phê duyệt phương án "${pa.name}"`, 't-green');
+  if (typeof window._dnFbApprovePA === 'function') window._dnFbApprovePA(projId, stage, paId);
   // Broadcast to kts_dashboard
   try{ALNRealtime.send({type:'STAGE_APPROVED',projectId:projId,stage,paName:pa.name})}catch(e){}
 }
@@ -1689,244 +1690,7 @@ function renderSidebar(){
 /* ════════════════════════════════════════
    REVIEW DATA — Phương án C1/C2 mỗi dự án
 ════════════════════════════════════════ */
-const REVIEW_DATA = {
-  'ALN-9921': {
-    C1: {
-      status: 'approved', // approved | pending | revision
-      submittedAt: '2026-05-10',
-      approvedAt: '2026-05-12',
-      revisions: 1,
-      maxRevisions: 2,
-      paList: [
-        { id:'PA_C1_1', name:'MB Phương án A — Hướng Đông', folder:'mb', version:'v1.0',
-          icon:'<i class="ph-duotone ph-compass-tool"></i>', bg:'linear-gradient(135deg,#0e1418,#0a1020)',
-          desc:'Mặt bằng tổng thể hướng Đông-Nam. Tối ưu ánh sáng tự nhiên.',
-          kts:'KTS. Trần Đại Long', date:'2026-05-10', status:'approved', pins:[
-            {id:'pin1',x:62,y:38,text:'Cổng vào chính — đề xuất dịch sang trái 1.2m cho xe ra vào dễ hơn',author:'Nguyễn Văn Thuận',role:'cn',ts:'11/05 14:32',resolved:true},
-            {id:'pin2',x:35,y:55,text:'Phòng khách quá hẹp, cần mở rộng thêm ~2m²',author:'Nguyễn Văn Thuận',role:'cn',ts:'11/05 15:00',resolved:true},
-          ] },
-        { id:'PA_C1_2', name:'MB Phương án B — Hướng Tây', folder:'mb', version:'v1.0',
-          icon:'<i class="ph-duotone ph-ruler"></i>', bg:'linear-gradient(135deg,#181418,#100e14)',
-          desc:'Phương án thay thế — hướng Tây, phù hợp với địa hình lô góc.',
-          kts:'KTS. Trần Đại Long', date:'2026-05-10', status:'rejected', pins:[] },
-      ],
-      comments: [
-        { id:'c1', author:'KTS. Trần Đại Long', role:'kts', text:'Đã hoàn thiện phương án mặt bằng tổng thể theo yêu cầu. Hướng nhà chính Đông-Nam, tối ưu ánh sáng tự nhiên.', ts:'10/05 09:15', mine:false },
-        { id:'c2', author:'Nguyễn Văn Thuận',   role:'cn',  text:'Đồng ý phương án A. Tuy nhiên cần điều chỉnh vị trí cổng vào cho phù hợp với mặt đường.', ts:'11/05 14:32', mine:true },
-        { id:'c3', author:'KTS. Trần Đại Long', role:'kts', text:'Đã cập nhật vị trí cổng vào. Xin phê duyệt để tiến hành Chặng 2.', ts:'12/05 08:20', mine:false },
-        { id:'c4', author:'Nguyễn Văn Thuận',   role:'cn',  text:'✅ Đã phê duyệt. Tiến hành Chặng 2!', ts:'12/05 10:05', mine:true },
-      ]
-    },
-    C2: {
-      status: 'pending',
-      submittedAt: '2026-05-28',
-      approvedAt: null,
-      revisions: 0,
-      maxRevisions: 3,
-      paList: [
-        { id:'PA_C2_1', name:'3D Phối cảnh ngoại thất — Góc chính', folder:'pc_ngoai', version:'v1.0',
-          icon:'<i class="ph-duotone ph-bank"></i>', bg:'linear-gradient(135deg,#1a1a2e,#0e0e1a)',
-          desc:'View từ cổng chính. Phong cách tân cổ điển với cột đá tự nhiên.',
-          kts:'KTS. Trần Đại Long', date:'2026-05-28', status:'pending', isNew:true, pins:[
-            {id:'pin5',x:48,y:42,text:'Màu sắc cột đá quá sáng, cần tone trầm hơn theo mẫu đã thống nhất',author:'Nguyễn Văn Thuận',role:'cn',ts:'29/05 10:00',resolved:false},
-          ] },
-        { id:'PA_C2_2', name:'3D Phối cảnh ngoại thất — Góc vườn', folder:'pc_ngoai', version:'v1.0',
-          icon:'<i class="ph-duotone ph-leaf"></i>', bg:'linear-gradient(135deg,#0e1a14,#0a120e)',
-          desc:'View từ khu vườn phía sau. Bể bơi và sân vườn kết hợp.',
-          kts:'KTS. Trần Đại Long', date:'2026-05-28', status:'pending', isNew:true, pins:[] },
-        { id:'PA_C2_3', name:'3D Phối cảnh nội thất — Phòng khách', folder:'pc_noi', version:'v1.0',
-          icon:'<i class="ph-duotone ph-couch"></i>', bg:'linear-gradient(135deg,#1a1410,#120e08)',
-          desc:"Bird's eye view phòng khách + dining. Vật liệu đá marble và gỗ óc chó.",
-          kts:'KTS. Trần Đại Long', date:'2026-05-29', status:'pending', isNew:true, pins:[] },
-      ],
-      comments: [
-        { id:'c5', author:'KTS. Trần Đại Long', role:'kts', text:'Đã hoàn thiện 3 góc phối cảnh theo yêu cầu. Chất liệu đá marble nhập khẩu Italy, gỗ óc chó tự nhiên.', ts:'28/05 16:00', mine:false },
-      ]
-    }
-  },
-
-  'ALN-9648': {
-    C1: {
-      status: 'approved',
-      submittedAt: '2026-05-05', approvedAt: '2026-05-07',
-      revisions: 0, maxRevisions: 2,
-      paList: [
-        { id:'PA_C1_ALN9648', name:'Phương án Shophouse góc phố', version:'v1.0',
-          icon:'<i class="ph-duotone ph-storefront"></i>', bg:'linear-gradient(135deg,#1a1420,#0e0a14)',
-          desc:'Mặt tiền shophouse 2 tầng. Phong cách hiện đại minimal.',
-          kts:'KTS. Lê Hoàng Nam', date:'2026-05-05', status:'approved' },
-      ],
-      comments: [
-        { id:'c10', author:'KTS. Lê Hoàng Nam', role:'kts', text:'Phương án MB shophouse theo yêu cầu. Tầng 1 kinh doanh, tầng 2-4 căn hộ.', ts:'05/05 10:00', mine:false },
-        { id:'c11', author:'Vũ Thị Lan', role:'cn', text:'✅ Đồng ý phương án, tiến hành Chặng 2.', ts:'07/05 09:30', mine:true },
-      ]
-    },
-    C2: {
-      status: 'pending',
-      submittedAt: '2026-05-22', approvedAt: null,
-      revisions: 0, maxRevisions: 3,
-      paList: [
-        { id:'PA_C2_ALN9648', name:'3D Phối cảnh shophouse góc phố', version:'v1.0',
-          icon:'<i class="ph-duotone ph-building-apartment"></i>', bg:'linear-gradient(135deg,#141a20,#0a0e14)',
-          desc:'Góc nhìn từ đường chính. Mặt tiền kính + nhôm.',
-          kts:'KTS. Lê Hoàng Nam', date:'2026-05-22', status:'pending', isNew:true },
-      ],
-      comments: [
-        { id:'c12', author:'KTS. Lê Hoàng Nam', role:'kts', text:'Phối cảnh 3D ngoại thất đã hoàn thiện. Kính cường lực Low-E + khung nhôm anodized.', ts:'22/05 14:00', mine:false },
-      ]
-    }
-  },
-
-  /* ── 9 DỰ ÁN CÒN LẠI ── */
-  'ALN-9834': {
-    C1: { status:'approved', submittedAt:'2026-04-15', approvedAt:'2026-04-17', revisions:0, maxRevisions:2,
-      paList:[
-        { id:'PA_9834_C1_1', name:'MB Phương án — Hướng Nam', folder:'mb', version:'v1.0',
-          icon:'<i class="ph-duotone ph-compass-tool"></i>', bg:'linear-gradient(135deg,#0e1820,#08101a)',
-          desc:'Mặt bằng nhà phố 5 tầng, mặt tiền 5m hướng Nam.',
-          kts:'KTS. Nguyễn Thị Lan', date:'2026-04-15', status:'approved', pins:[], cnUploads:[] },
-      ],
-      comments:[
-        {id:'c_9834_1', author:'KTS. Nguyễn Thị Lan', role:'kts', text:'MB tổng thể 5 tầng theo yêu cầu, hướng Nam tối ưu ánh sáng.',ts:'15/04 10:00',mine:false},
-        {id:'c_9834_2', author:'Trần Thị Bình', role:'cn', text:'✅ Đồng ý phương án. Tiến hành C2.',ts:'17/04 09:00',mine:true},
-      ]},
-    C2: { status:'pending', submittedAt:'2026-04-28', approvedAt:null, revisions:1, maxRevisions:3,
-      paList:[
-        { id:'PA_9834_C2_1', name:'3D Phối cảnh ngoại thất — Mặt tiền', folder:'pc_ngoai', version:'v1.1',
-          icon:'<i class="ph-duotone ph-buildings"></i>', bg:'linear-gradient(135deg,#14181e,#0c1018)',
-          desc:'View mặt tiền nhà phố 5 tầng. Phong cách hiện đại.',
-          kts:'KTS. Nguyễn Thị Lan', date:'2026-04-28', status:'pending', isNew:false,
-          pins:[{id:'pin_9834_1',x:55,y:45,text:'Màu sơn tường ngoài cần tone ấm hơn, hiện quá lạnh',author:'Trần Thị Bình',role:'cn',ts:'29/04 11:00',resolved:false}], cnUploads:[] },
-        { id:'PA_9834_C2_2', name:'3D Phối cảnh nội thất — Phòng khách', folder:'pc_noi', version:'v1.0',
-          icon:'<i class="ph-duotone ph-couch"></i>', bg:'linear-gradient(135deg,#181418,#100e12)',
-          desc:"Bird's eye view phòng khách tầng 1.",
-          kts:'KTS. Nguyễn Thị Lan', date:'2026-04-28', status:'pending', pins:[], cnUploads:[] },
-      ],
-      comments:[
-        {id:'c_9834_3',author:'KTS. Nguyễn Thị Lan',role:'kts',text:'Đã hoàn thiện phối cảnh 3D theo brief. Chờ CN phê duyệt.',ts:'28/04 16:00',mine:false},
-        {id:'c_9834_4',author:'Trần Thị Bình',role:'cn',text:'Màu sơn ngoài cần điều chỉnh — đã pin trên ảnh.',ts:'29/04 11:05',mine:true},
-      ]}
-  },
-  'ALN-9756': {
-    C1: { status:'approved', submittedAt:'2026-03-12', approvedAt:'2026-03-14', revisions:0, maxRevisions:2,
-      paList:[
-        { id:'PA_9756_C1_1', name:'MB Villa tổng thể — Hướng Đông', folder:'mb', version:'v1.0',
-          icon:'<i class="ph-duotone ph-compass-tool"></i>', bg:'linear-gradient(135deg,#14200e,#0c1808)',
-          desc:'MB villa 400m², bố trí phòng ngủ master hướng Đông.',
-          kts:'KTS. Vũ Minh Khoa', date:'2026-03-12', status:'approved', pins:[], cnUploads:[] },
-        { id:'PA_9756_C1_2', name:'MB Villa phương án B — Hướng Tây', folder:'mb', version:'v1.0',
-          icon:'<i class="ph-duotone ph-ruler"></i>', bg:'linear-gradient(135deg,#201614,#180e0c)',
-          desc:'Phương án thay thế, hồ bơi phía Tây.',
-          kts:'KTS. Vũ Minh Khoa', date:'2026-03-12', status:'rejected', pins:[], cnUploads:[] },
-      ],
-      comments:[
-        {id:'c_9756_1',author:'KTS. Vũ Minh Khoa',role:'kts',text:'Đề xuất 2 phương án MB. PA A tối ưu hơn về ánh sáng và gió tự nhiên.',ts:'12/03 09:00',mine:false},
-        {id:'c_9756_2',author:'Lê Quang Cường',role:'cn',text:'✅ Chọn PA A hướng Đông. Đồng ý tiến hành C2.',ts:'14/03 10:00',mine:true},
-      ]},
-    C2: { status:'approved', submittedAt:'2026-03-28', approvedAt:'2026-04-01', revisions:1, maxRevisions:3,
-      paList:[
-        { id:'PA_9756_C2_1', name:'3D Phối cảnh ngoại thất — Toàn cảnh', folder:'pc_ngoai', version:'v1.1',
-          icon:'<i class="ph-duotone ph-house-line"></i>', bg:'linear-gradient(135deg,#101e14,#08140c)',
-          desc:'View toàn cảnh villa từ trên cao. Hồ bơi và sân vườn.',
-          kts:'KTS. Vũ Minh Khoa', date:'2026-03-28', status:'approved', pins:[], cnUploads:[] },
-        { id:'PA_9756_C2_2', name:'3D Phối cảnh ngoại thất — Cổng vào', folder:'pc_ngoai', version:'v1.1',
-          icon:'<i class="ph-duotone ph-tree"></i>', bg:'linear-gradient(135deg,#0e1c10,#081408)',
-          desc:'View từ cổng vào. Cây xanh và tiểu cảnh.',
-          kts:'KTS. Vũ Minh Khoa', date:'2026-03-29', status:'approved', pins:[], cnUploads:[] },
-        { id:'PA_9756_C2_3', name:'3D Phối cảnh nội thất — Master Bedroom', folder:'pc_noi', version:'v1.0',
-          icon:'<i class="ph-duotone ph-bed"></i>', bg:'linear-gradient(135deg,#1a1410,#120e08)',
-          desc:'Phòng ngủ master 45m². Gỗ tếch + đá travertine.',
-          kts:'KTS. Vũ Minh Khoa', date:'2026-03-30', status:'approved', pins:[], cnUploads:[] },
-      ],
-      comments:[
-        {id:'c_9756_3',author:'KTS. Vũ Minh Khoa',role:'kts',text:'Đã hoàn thiện 3 góc phối cảnh theo yêu cầu.',ts:'30/03 17:00',mine:false},
-        {id:'c_9756_4',author:'Lê Quang Cường',role:'cn',text:'✅ Đẹp lắm! Duyệt toàn bộ.',ts:'01/04 09:00',mine:true},
-      ]}
-  },
-  'ALN-9702': {
-    C1: { status:'pending', submittedAt:'2026-05-20', approvedAt:null, revisions:0, maxRevisions:2,
-      paList:[
-        { id:'PA_9702_C1_1', name:'MB Nhà cấp 4 — Phương án chính', folder:'mb', version:'v1.0',
-          icon:'<i class="ph-duotone ph-house"></i>', bg:'linear-gradient(135deg,#181410,#100e08)',
-          desc:'MB nhà cấp 4 mái thái 80m². Bố trí 3 phòng ngủ.',
-          kts:'KTS. Phạm Hoài Nam', date:'2026-05-20', status:'pending', isNew:true, pins:[], cnUploads:[] },
-      ],
-      comments:[
-        {id:'c_9702_1',author:'KTS. Phạm Hoài Nam',role:'kts',text:'Đã hoàn thiện MB nhà cấp 4 theo brief. Chờ CN xem xét.',ts:'20/05 14:00',mine:false},
-      ]}
-  },
-  'ALN-9521': {
-    C1: { status:'approved', submittedAt:'2026-05-01', approvedAt:'2026-05-03', revisions:0, maxRevisions:2,
-      paList:[
-        { id:'PA_9521_C1_1', name:'MB Nhà phố 3 tầng — Hướng Bắc', folder:'mb', version:'v1.0',
-          icon:'<i class="ph-duotone ph-compass-tool"></i>', bg:'linear-gradient(135deg,#101820,#080e18)',
-          desc:'MB nhà phố 3 tầng 4x15m. Cầu thang giữa, tối ưu diện tích.',
-          kts:'KTS. Phạm Hoài Nam', date:'2026-05-01', status:'approved', pins:[], cnUploads:[] },
-      ],
-      comments:[
-        {id:'c_9521_1',author:'KTS. Phạm Hoài Nam',role:'kts',text:'MB tối ưu diện tích 60m²/tầng theo yêu cầu.',ts:'01/05 09:00',mine:false},
-        {id:'c_9521_2',author:'Nguyễn T. Hoa',role:'cn',text:'✅ Duyệt PA. Tiến hành 3D.',ts:'03/05 08:30',mine:true},
-      ]},
-    C2: { status:'pending', submittedAt:'2026-05-18', approvedAt:null, revisions:0, maxRevisions:3,
-      paList:[
-        { id:'PA_9521_C2_1', name:'3D Phối cảnh ngoại thất — Mặt tiền', folder:'pc_ngoai', version:'v1.0',
-          icon:'<i class="ph-duotone ph-house-line"></i>', bg:'linear-gradient(135deg,#141820,#0c1018)',
-          desc:'View mặt tiền nhà phố 3 tầng. Phong cách Japandi.',
-          kts:'KTS. Phạm Hoài Nam', date:'2026-05-18', status:'pending', isNew:true, pins:[], cnUploads:[] },
-      ],
-      comments:[
-        {id:'c_9521_3',author:'KTS. Phạm Hoài Nam',role:'kts',text:'Phối cảnh 3D mặt tiền hoàn thiện. Đang chờ phản hồi từ CN.',ts:'18/05 15:00',mine:false},
-      ]}
-  },
-  'ALN-9480': {
-    C1: { status:'pending', submittedAt:'2026-05-25', approvedAt:null, revisions:0, maxRevisions:2,
-      paList:[
-        { id:'PA_9480_C1_1', name:'MB Biệt thự nghỉ dưỡng — Phương án A', folder:'mb', version:'v1.0',
-          icon:'<i class="ph-duotone ph-mountains"></i>', bg:'linear-gradient(135deg,#0e1820,#061018)',
-          desc:'MB biệt thự 500m² trên đồi. Tầm nhìn thung lũng.',
-          kts:'KTS. Trần Đại Long', date:'2026-05-25', status:'pending', isNew:true, pins:[], cnUploads:[] },
-        { id:'PA_9480_C1_2', name:'MB Biệt thự nghỉ dưỡng — Phương án B', folder:'mb', version:'v1.0',
-          icon:'<i class="ph-duotone ph-compass-tool"></i>', bg:'linear-gradient(135deg,#141e0e,#0c1408)',
-          desc:'Bố cục dọc, hồ bơi vô cực hướng thung lũng.',
-          kts:'KTS. Trần Đại Long', date:'2026-05-25', status:'pending', isNew:true, pins:[], cnUploads:[] },
-      ],
-      comments:[
-        {id:'c_9480_1',author:'KTS. Trần Đại Long',role:'kts',text:'Đề xuất 2 phương án MB. PA B có hồ bơi vô cực phù hợp nghỉ dưỡng hơn.',ts:'25/05 11:00',mine:false},
-      ]}
-  },
-  'ALN-9412': {
-    C1: { status:'approved', submittedAt:'2026-04-20', approvedAt:'2026-04-22', revisions:0, maxRevisions:2,
-      paList:[
-        { id:'PA_9412_C1_1', name:'MB Căn hộ Duplex — Tầng 1+2', folder:'mb', version:'v1.0',
-          icon:'<i class="ph-duotone ph-building"></i>', bg:'linear-gradient(135deg,#141420,#0c0c18)',
-          desc:'MB duplex 2 tầng 140m². Open-plan tầng 1, 3PN tầng 2.',
-          kts:'KTS. Nguyễn Thị Lan', date:'2026-04-20', status:'approved', pins:[], cnUploads:[] },
-      ],
-      comments:[
-        {id:'c_9412_1',author:'KTS. Nguyễn Thị Lan',role:'kts',text:'MB duplex open-plan hiện đại. Tầng 1 sinh hoạt, tầng 2 nghỉ ngơi.',ts:'20/04 10:00',mine:false},
-        {id:'c_9412_2',author:'Võ Thị Mai',role:'cn',text:'✅ Đẹp! Đồng ý tiến hành C2.',ts:'22/04 09:00',mine:true},
-      ]},
-    C2: { status:'pending', submittedAt:'2026-05-10', approvedAt:null, revisions:1, maxRevisions:3,
-      paList:[
-        { id:'PA_9412_C2_1', name:'3D Phối cảnh ngoại thất — Ban công', folder:'pc_ngoai', version:'v1.1',
-          icon:'<i class="ph-duotone ph-buildings"></i>', bg:'linear-gradient(135deg,#10141e,#080c16)',
-          desc:'View từ ban công tầng 2. Skyline Bình Thạnh.',
-          kts:'KTS. Nguyễn Thị Lan', date:'2026-05-10', status:'pending', isNew:true, pins:[], cnUploads:[] },
-        { id:'PA_9412_C2_2', name:'3D Phối cảnh nội thất — Phòng khách', folder:'pc_noi', version:'v1.1',
-          icon:'<i class="ph-duotone ph-couch"></i>', bg:'linear-gradient(135deg,#1a1218,#120a10)',
-          desc:'Living room open-plan. Bếp đảo + phòng ăn.',
-          kts:'KTS. Nguyễn Thị Lan', date:'2026-05-11', status:'pending', isNew:true, pins:[], cnUploads:[] },
-        { id:'PA_9412_C2_3', name:'3D Phối cảnh nội thất — Master Bedroom', folder:'pc_noi', version:'v1.0',
-          icon:'<i class="ph-duotone ph-bed"></i>', bg:'linear-gradient(135deg,#18121a,#100a12)',
-          desc:'Phòng ngủ master 30m² + walk-in closet.',
-          kts:'KTS. Nguyễn Thị Lan', date:'2026-05-12', status:'pending', isNew:true, pins:[], cnUploads:[] },
-      ],
-      comments:[
-        {id:'c_9412_3',author:'KTS. Nguyễn Thị Lan',role:'kts',text:'3 góc phối cảnh đã hoàn thiện theo brief.',ts:'12/05 17:00',mine:false},
-        {id:'c_9412_4',author:'Võ Thị Mai',role:'cn',text:'Ban công đẹp! Nhưng nội thất phòng khách cần ấm hơn.',ts:'13/05 09:00',mine:true},
-      ]}
-  },
-};
+var REVIEW_DATA = {};
 
 /* Active review state */
 const _reviewState = {};
@@ -2459,6 +2223,7 @@ function renderMain(){
 
 function selectProj(id){
   window.activeProj=id; activeFolder='ALL';
+  if (typeof window._dnSubProposals === 'function') window._dnSubProposals(id);
   renderSidebar(); renderMain();
   document.querySelector('.sidebar-cn').classList.remove('open');
   // Sync Zalo widget to new KTS
@@ -3263,7 +3028,7 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY, storage, storageRef, uploadBytes, getDownloadURL } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY, storage, storageRef, uploadBytes, getDownloadURL } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "dn";
 
@@ -3302,6 +3067,71 @@ function _startProjectsListenDN() {
     }
   }, function(err){ console.error('[DN] Lỗi:', err.code, err.message); });
 }
+
+/* ══ PROPOSALS LISTENER: realtime Firestore cho Bảng Review DN ══ */
+window._dnPropUnsubs = [];
+window._dnSubProposals = function(pid) {
+  window._dnPropUnsubs.forEach(function(u){ try{ u(); }catch(e){} });
+  window._dnPropUnsubs = [];
+  if (!pid) return;
+  if (!window.REVIEW_DATA) window.REVIEW_DATA = {};
+  if (!window.REVIEW_DATA[pid]) window.REVIEW_DATA[pid] = {};
+  var BG_MAP = {mb:'linear-gradient(135deg,#0e1418,#0a1020)',pc_ngoai:'linear-gradient(135deg,#0a140e,#081008)',pc_noi:'linear-gradient(135deg,#1a1410,#120e08)'};
+  ['C1','C2','C3','C4'].forEach(function(stage) {
+    // Nghe danh sách proposals của chặng này
+    var q = query(collection(db,'projects',pid,'stages',stage,'proposals'), orderBy('order','asc'));
+    var unsub = onSnapshot(q, function(snap) {
+      if (!window.REVIEW_DATA[pid]) window.REVIEW_DATA[pid] = {};
+      if (!window.REVIEW_DATA[pid][stage]) window.REVIEW_DATA[pid][stage] = {status:'pending',submittedAt:'',approvedAt:null,revisions:0,maxRevisions:3,paList:[],comments:[]};
+      window.REVIEW_DATA[pid][stage].paList = snap.docs.map(function(d) {
+        var dd = d.data();
+        var ts = dd.createdAt && dd.createdAt.seconds ? new Date(dd.createdAt.seconds*1000) : null;
+        return {
+          id: d.id,
+          name: dd.name || d.id,
+          version: dd.version || 'v1.0',
+          date: ts ? ts.toISOString().slice(0,10) : '',
+          imageURL: dd.imageURL || '',
+          folder: dd.folder || 'pc_ngoai',
+          status: dd.status || 'pending',
+          desc: dd.desc || '',
+          icon: '',
+          bg: BG_MAP[dd.folder] || BG_MAP.pc_ngoai,
+          isNew: ts ? (Date.now()-ts.getTime() < 48*3600*1000) : false,
+          pins: []
+        };
+      });
+      if (window.activeProj === pid && typeof window.renderMain === 'function') {
+        try { window.renderMain(); } catch(e){}
+      }
+    }, function(err){ console.warn('[DN proposals]', stage, err.code); });
+    window._dnPropUnsubs.push(unsub);
+
+    // Nghe stage document để lấy status/submittedAt
+    var unsubSt = onSnapshot(doc(db,'projects',pid,'stages',stage), function(snap2) {
+      if (!snap2.exists()) return;
+      var sd = snap2.data();
+      if (!window.REVIEW_DATA[pid]) window.REVIEW_DATA[pid] = {};
+      if (!window.REVIEW_DATA[pid][stage]) window.REVIEW_DATA[pid][stage] = {status:'pending',submittedAt:'',approvedAt:null,revisions:0,maxRevisions:3,paList:[],comments:[]};
+      var rv = window.REVIEW_DATA[pid][stage];
+      if (sd.status)       rv.status       = sd.status;
+      if (sd.submittedAt)  rv.submittedAt  = sd.submittedAt;
+      if (sd.approvedAt)   rv.approvedAt   = sd.approvedAt;
+      if (sd.maxRevisions) rv.maxRevisions = sd.maxRevisions;
+    }, function(err){ console.warn('[DN stage doc]', stage, err.code); });
+    window._dnPropUnsubs.push(unsubSt);
+  });
+};
+
+/* Ghi approval lên Firestore */
+window._dnFbApprovePA = async function(projId, stage, paId) {
+  try {
+    await updateDoc(doc(db,'projects',projId,'stages',stage,'proposals',paId), {
+      status: 'approved',
+      approvedAt: serverTimestamp()
+    });
+  } catch(e){ console.error('[DN approvePA Firestore]', e.code, e.message); }
+};
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
