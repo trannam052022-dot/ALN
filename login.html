@@ -420,10 +420,17 @@ async function doLogin(){
     // Lấy hồ sơ & vai trò từ Firestore: users/{uid}
     // Bypass Firestore cho founder — dùng UID cứng
     const FOUNDER_UID = 'h4kEguPEyMcwJwl89stc0Q6j2si2';
+    // Luôn đọc Firestore trước — retry 3 lần
+    await cred.user.getIdToken(true);
     let snap = null;
-    if (cred.user.uid === FOUNDER_UID) {
-      // Founder: tạo mock profile không cần đọc Firestore
-      console.log('[ALN Login] Founder bypass — không cần Firestore read');
+    for (let i = 0; i < 3; i++) {
+      snap = await fb.getDoc(fb.doc(fb.db, 'users', cred.user.uid));
+      if (snap.exists()) break;
+      await new Promise(r => setTimeout(r, 800));
+    }
+    // Lưới an toàn: founder fallback nếu Firestore vẫn không trả document
+    if (cred.user.uid === FOUNDER_UID && (!snap || !snap.exists())) {
+      console.warn('[ALN Login] Founder document miss — dùng profile cứng');
       snap = {
         exists: () => true,
         data: () => ({
@@ -433,14 +440,6 @@ async function doLogin(){
           email: 'tranlongkts.vn@gmail.com'
         })
       };
-    } else {
-      // Các vai khác: đọc Firestore bình thường với retry
-      await cred.user.getIdToken(true);
-      for (let i = 0; i < 3; i++) {
-        snap = await fb.getDoc(fb.doc(fb.db, 'users', cred.user.uid));
-        if (snap.exists()) break;
-        await new Promise(r => setTimeout(r, 800));
-      }
     }
     console.log('[ALN Login] snap.exists():', snap.exists(), '| data:', snap.exists() ? JSON.stringify(snap.data()) : 'null');
     if(!snap.exists()){

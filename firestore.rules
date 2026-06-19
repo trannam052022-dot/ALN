@@ -8,9 +8,8 @@ service cloud.firestore {
     }
     function signedIn() { return request.auth != null; }
 
-    // users — MỞ HOÀN TOÀN ĐỌC để debug login
     match /users/{uid} {
-      allow read:   if true;  // tạm mở — sẽ siết lại sau khi login OK
+      allow read: if signedIn();
       allow create: if signedIn() && request.auth.uid == uid;
       allow update: if isFounder() || request.auth.uid == uid;
       allow delete: if isFounder();
@@ -18,8 +17,7 @@ service cloud.firestore {
 
     match /fcmTokens/{tokenId} {
       allow read:   if isFounder() || (signedIn() && resource.data.uid == request.auth.uid);
-      allow create, update: if isFounder() ||
-        (signedIn() && request.resource.data.uid == request.auth.uid);
+      allow create, update: if signedIn();
       allow delete: if isFounder() || (signedIn() && resource.data.uid == request.auth.uid);
     }
 
