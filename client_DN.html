@@ -935,6 +935,8 @@ window.activeProj = window.activeProj || null;
 let activeFolder = 'ALL';
 window.dnEnabledFolders = window.dnEnabledFolders || {};
 window.dnPending = window.dnPending || {};
+window._dnSinglePending = window._dnSinglePending || {};
+window._dnSentFiles = window._dnSentFiles || {};
 
 const STATUS_DOT={on_track:'var(--green)',sla_warn:'var(--amber)',dispute:'var(--red)',done:'var(--sub)'};
 const STGCOLS=['var(--green)','var(--amber)','var(--blue)','var(--sub)'];
@@ -1516,6 +1518,129 @@ window.confirmSendFiles = function(projId, rid, paId) {
   showToast('Đã gửi '+cnt+' file cho KTS!','t-green');
   renderMain(); setTimeout(function(){_redrawHero(projId);},30);
 };
+
+/* ══ DN SINGLE UPLOAD — 1 vùng thả file gửi KTS ══ */
+function _dnStageSingle(files, pid) {
+  if (!window._dnSinglePending[pid]) window._dnSinglePending[pid] = [];
+  var loaded = 0;
+  files.forEach(function(file) {
+    var ext = file.name.split('.').pop().toLowerCase();
+    var isImg = ['jpg','jpeg','png','gif','webp','bmp'].indexOf(ext) >= 0;
+    var finish = function(dataUrl) {
+      window._dnSinglePending[pid].push({
+        id: 'sp_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+        name: file.name,
+        size: (file.size / 1024).toFixed(0) + 'KB',
+        type: isImg ? 'image' : ext,
+        dataUrl: isImg ? dataUrl : null,
+        _file: file
+      });
+      if (++loaded === files.length) _dnRefreshUploadZone(pid);
+    };
+    if (isImg) { var rd = new FileReader(); rd.onload = function(e){ finish(e.target.result); }; rd.readAsDataURL(file); }
+    else finish(null);
+  });
+}
+function _dnRefreshUploadZone(pid) {
+  var pend = window._dnSinglePending[pid] || [];
+  var pendEl = document.getElementById('dnSPend_' + pid);
+  var btnEl  = document.getElementById('dnSSendBtn_' + pid);
+  if (!pendEl) return;
+  if (!pend.length) {
+    pendEl.innerHTML = '';
+    if (btnEl) btnEl.style.display = 'none';
+    return;
+  }
+  var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:7px;margin-bottom:10px">';
+  pend.forEach(function(u, i) {
+    html += '<div style="position:relative;border:1px solid var(--border);border-radius:7px;overflow:hidden;background:var(--ink3)">'
+      + '<div style="height:52px;display:flex;align-items:center;justify-content:center;background:var(--ink2)">'
+      + (u.dataUrl ? '<img src="' + u.dataUrl + '" style="width:100%;height:100%;object-fit:cover">'
+        : u.type === 'pdf' ? '<i class="ph-duotone ph-file-pdf" style="font-size:20px;color:var(--red)"></i>'
+        : u.type === 'dwg' ? '<i class="ph-duotone ph-pencil-ruler" style="font-size:20px;color:var(--amber)"></i>'
+        : '<i class="ph-duotone ph-file" style="font-size:20px;color:var(--muted)"></i>')
+      + '</div>'
+      + '<div style="padding:3px 5px 3px;font-size:8px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + u.name + '</div>'
+      + '<button onclick="_dnSingleRemove(\'' + pid + '\',' + i + ')" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.55);border:none;border-radius:50%;width:14px;height:14px;color:#fff;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">✕</button>'
+      + '</div>';
+  });
+  html += '</div>';
+  pendEl.innerHTML = html;
+  if (btnEl) {
+    btnEl.style.display = 'flex';
+    btnEl.innerHTML = '<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi ' + pend.length + ' file cho KTS';
+  }
+}
+window._dnSingleUpload = function(ev, pid) {
+  var files = Array.from(ev.target.files);
+  ev.target.value = '';
+  if (!files.length) return;
+  _dnStageSingle(files, pid);
+};
+window._dnSingleDrop = function(ev, pid) {
+  ev.preventDefault();
+  var files = Array.from((ev.dataTransfer && ev.dataTransfer.files) || []);
+  if (!files.length) return;
+  _dnStageSingle(files, pid);
+};
+window._dnSingleRemove = function(pid, idx) {
+  if (window._dnSinglePending[pid]) {
+    window._dnSinglePending[pid].splice(idx, 1);
+    _dnRefreshUploadZone(pid);
+  }
+};
+window._dnSingleSend = function(pid) {
+  var pend = window._dnSinglePending[pid] || [];
+  var toUp = pend.filter(function(u) { return u._file; });
+  if (!toUp.length) return;
+  var btn = document.getElementById('dnSSendBtn_' + pid);
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph-duotone ph-spinner-gap"></i> Đang upload...'; }
+  var today = new Date().toLocaleDateString('vi-VN');
+  var projData = (window.PROJECTS_CLIENT || []).find(function(x) { return x.id === pid; }) || {};
+  var dnName = (typeof DN_USER !== 'undefined' && DN_USER.name) || 'Doanh nghiệp';
+  var dnUid  = window.__ALN_UID || '';
+  var uploads = toUp.map(function(u) {
+    var safe = u._file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    var path = 'uploads/' + pid + '/dn/' + Date.now() + '_' + safe;
+    return window.alnUploadFile(u._file, path).then(function(url) {
+      var ext = u._file.name.split('.').pop().toLowerCase();
+      var isImg = ['jpg','jpeg','png','gif','webp'].indexOf(ext) >= 0;
+      var docData = {
+        name: u._file.name, url: url,
+        type: isImg ? 'image' : ext,
+        folder: 'dn_upload',
+        stage: projData.stage || '',
+        uploader: { uid: dnUid, name: dnName, role: 'dn' },
+        date: today, size: u.size || ''
+      };
+      var saveP = (typeof window._dnSaveDoc === 'function') ? window._dnSaveDoc(pid, docData) : Promise.resolve();
+      return saveP.then(function() {
+        return { ok: true, name: u._file.name, url: url, type: docData.type, size: u.size };
+      });
+    }).catch(function(e) {
+      console.error('[DN upload]', e);
+      return { ok: false, name: u._file.name };
+    });
+  });
+  Promise.all(uploads).then(function(results) {
+    var done   = results.filter(function(r) { return r.ok; });
+    var failed = results.length - done.length;
+    if (!window._dnSentFiles) window._dnSentFiles = {};
+    if (!window._dnSentFiles[pid]) window._dnSentFiles[pid] = [];
+    done.forEach(function(r) {
+      window._dnSentFiles[pid].unshift({ name: r.name, url: r.url, type: r.type, size: r.size, ts: today });
+    });
+    if (done.length > 0) {
+      try { ALNRealtime.send({ type: 'DN_FILE_UPLOADED', audience: ['kts'], projectId: pid, count: done.length, senderName: dnName }); } catch(e) {}
+      showToast('Đã gửi ' + done.length + ' file cho KTS!', 't-green');
+    }
+    if (failed > 0) showToast(failed + ' file lỗi — thử lại', 't-red');
+    window._dnSinglePending[pid] = [];
+    if (btn) btn.disabled = false;
+    if (window.activeProj === pid && typeof window.renderMain === 'function') { try { window.renderMain(); } catch(e) {} }
+  });
+};
+
 window._dnUpload = function(ev, paId) {
   var files = Array.from(ev.target.files);
   if(!files.length) return;
@@ -2132,88 +2257,50 @@ function renderMain(){
           ${subTabsHTML}
           <div id="paGrid_${p.id}" style="margin-bottom:14px">${paCardsHTML}</div>
           ${statusBar}
-                    <!-- ══ TÀI LIỆU KHÁCH HÀNG GỬI KTS — KTS-style grid ══ -->
-          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
-            <!-- sec-label -->
-            <div style="font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.04em;margin:0 0 12px;display:flex;align-items:center;gap:8px">
-              <i class="ph-duotone ph-cloud-arrow-up" style="font-size:13px;color:var(--gold)"></i>
-              Tài liệu Khách hàng gửi KTS
-              <span style="font-family:var(--mono);font-size:9px;background:var(--ink4);padding:1px 6px;border-radius:99px" id="cnUploadCount_${p.id}_${rid}">
-                ${(()=>{let tot=0;(r.paList||[]).forEach(pa=>{tot+=(pa.cnUploads||[]).length});return tot})()} file
-              </span>
-              <span style="flex:1;height:1px;background:var(--border);display:inline-block"></span>
-              <span style="font-size:10px;color:var(--muted);white-space:nowrap">KTS nhận thông báo ngay</span>
-            </div>
-
-            <!-- PA slot grid -->
-            <div class="dn-pa-grid">
-              ${r.paList.map(pa=>{
-                const pendCnt=(window.dnPending[pa.id]||[]).length;
-                const sentCnt=(pa.cnUploads||[]).length;
-                const sc=pendCnt>0?'has-pending':sentCnt>0?'has-sent':'';
-                return `<label class="dn-pa-slot ${sc}"
-                  ondragover="event.preventDefault();this.classList.add('drag-over')"
-                  ondragleave="this.classList.remove('drag-over')"
-                  ondrop="handleAnnotDrop(event,'${p.id}','${rid}','${pa.id}')">
-                  <input type="file" accept="image/*,.pdf,.dwg" multiple onchange="_dnUpload(event,'${pa.id}')">
-                  ${pendCnt>0?`<span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;font-family:var(--mono);padding:2px 7px;border-radius:99px;background:rgba(217,119,6,.12);color:var(--amber)">${pendCnt} chờ gửi</span>`
-                    :sentCnt>0?`<span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;font-family:var(--mono);padding:2px 7px;border-radius:99px;background:var(--green-bg);color:var(--green)">${sentCnt} đã gửi</span>`:''}
-                  <div class="dp-icon"><i class="ph-duotone ph-${pendCnt>0?'clock-countdown':sentCnt>0?'check-circle':'cloud-arrow-up'}"></i></div>
-                  <div class="dp-label">${pa.name}</div>
-                  <div class="dp-sub">Kéo thả hoặc click · Ảnh, PDF, DWG</div>
-                </label>`;
-              }).join('')}
-            </div>
-
-            <!-- Pending review per PA -->
-            ${r.paList.filter(pa=>(window.dnPending[pa.id]||[]).length>0).map(pa=>`
-              <div style="margin-bottom:10px">
-                <div style="font-size:10px;font-weight:700;color:var(--amber);display:flex;align-items:center;gap:5px;margin-bottom:5px">
-                  <i class="ph-duotone ph-eye"></i> Xem lại — <span style="color:var(--text2);font-weight:600">${pa.name}</span>
-                </div>
-                <div class="dn-pending-grid" id="dnPendGrid_${pa.id}">
-                  ${(window.dnPending[pa.id]||[]).map((u,i)=>`
-                    <div class="dn-pending-card">
-                      <div class="dn-pending-thumb">${u.dataUrl?`<img src="${u.dataUrl}">`:u.type==='pdf'?'<i class="ph-duotone ph-file-pdf" style="font-size:22px;color:var(--red)"></i>':'<i class="ph-duotone ph-file" style="font-size:22px;color:var(--muted)"></i>'}</div>
-                      <div class="dn-pending-name">${u.name}</div>
-                      <button class="dn-pending-del" onclick="removePending('${pa.id}',${i})">✕</button>
-                    </div>`).join('')}
-                </div>
-                <button id="dnSendBtn_${pa.id}" onclick="confirmSendFiles('${p.id}','${rid}','${pa.id}')"
-                  style="width:100%;margin-top:6px;padding:9px;background:linear-gradient(135deg,var(--green),#22c55e);border:none;border-radius:var(--r-sm);color:#fff;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--sans)">
-                  <i class="ph-duotone ph-paper-plane-tilt"></i> Gửi cho KTS ${(window.dnPending[pa.id]||[]).length} file
-                </button>
-              </div>`).join('')}
-            ${r.paList.filter(pa=>(window.dnPending[pa.id]||[]).length===0).map(pa=>`<button id="dnSendBtn_${pa.id}" style="display:none"></button>`).join('')}
-
-            <!-- Confirmed sent files per PA -->
-            ${r.paList.filter(pa=>(pa.cnUploads||[]).length>0).map(pa=>`
-              <div style="margin-bottom:8px">
-                <div style="font-size:10px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:5px;margin-bottom:5px">
-                  <i class="ph-duotone ph-check-circle" style="color:var(--green)"></i>
-                  Đã gửi — ${pa.name}
-                  <span style="font-family:var(--mono);font-size:9px;background:var(--green-bg);color:var(--green);padding:1px 6px;border-radius:99px">${(pa.cnUploads||[]).length} file</span>
-                </div>
-                <div class="cn-up-grid" id="cnUpGrid_${pa.id}">
-                  ${(pa.cnUploads||[]).map(u=>`
-                    <div class="cn-up-card" onclick="viewCNUpload('${u.id}','${p.id}','${rid}','${pa.id}')">
-                      <div class="cn-up-thumb">
-                        ${u.dataUrl&&u.dataUrl.startsWith('data:image')
-                          ?`<img src="${u.dataUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">`
-                          :`<i class="ph-duotone ${u.type==='pdf'?'ph-file-pdf':u.type==='dwg'?'ph-blueprint':'ph-file'}" style="font-size:22px;color:${u.type==='pdf'?'var(--red)':u.type==='dwg'?'var(--blue)':'var(--muted)'}"></i>`}
-                      </div>
-                      <div class="cn-up-meta">
-                        <div class="cn-up-name">${u.name}</div>
-                        <div class="cn-up-ts">${u.ts}</div>
-                      </div>
-                      <button class="cn-up-del" onclick="event.stopPropagation();deleteCNUpload('${p.id}','${rid}','${pa.id}','${u.id}')">✕</button>
-                    </div>`).join('')}
-                </div>
-              </div>`).join('')}
-          </div>
-
         </div>
         `;
+      })()}
+
+      <!-- DN UPLOAD ZONE — Gửi tài liệu cho KTS -->
+      ${(function(){
+        var sentFiles = (window._dnSentFiles && window._dnSentFiles[p.id]) || [];
+        var sentListHTML = sentFiles.length === 0
+          ? '<div style="text-align:center;padding:10px 0;font-size:11px;color:var(--muted)"><i class="ph-duotone ph-inbox" style="font-size:20px;display:block;margin-bottom:5px"></i>Chưa có tài liệu nào được gửi</div>'
+          : sentFiles.map(function(f) {
+              var extIcon  = f.type === 'pdf' ? 'ph-file-pdf' : f.type === 'image' ? 'ph-file-image' : f.type === 'dwg' ? 'ph-pencil-ruler' : 'ph-file';
+              var extColor = f.type === 'pdf' ? 'var(--red)' : f.type === 'image' ? 'var(--cyan)' : f.type === 'dwg' ? 'var(--amber)' : 'var(--muted)';
+              return '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:6px">'
+                + '<i class="ph-duotone ' + extIcon + '" style="color:' + extColor + ';font-size:18px;flex-shrink:0"></i>'
+                + '<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + f.name + '</div>'
+                + '<div style="font-size:9px;color:var(--muted)">' + (f.size || '') + ' · ' + (f.ts || '') + '</div></div>'
+                + '<span class="pill p-green" style="font-size:9px;flex-shrink:0"><i class="ph-duotone ph-check-circle"></i> Đã gửi</span>'
+                + (f.url ? '<a href="' + f.url + '" target="_blank" style="flex-shrink:0;color:var(--blue);font-size:14px;text-decoration:none" title="Tải về"><i class="ph-duotone ph-download-simple"></i></a>' : '')
+                + '</div>';
+            }).join('');
+        return '<div class="card" data-aln-tab="c4" id="dnUpCard_' + p.id + '" style="border-left:3px solid var(--blue)">'
+          + '<div class="ct"><i class="ph-duotone ph-cloud-arrow-up" style="color:var(--blue)"></i> Tài liệu bàn giao KTS'
+          + '<span class="pill p-blue" style="margin-left:auto;font-size:10px">Gửi tài liệu</span></div>'
+          + '<div style="font-size:11px;color:var(--muted);margin-bottom:12px">Upload hợp đồng, bản vẽ hoặc tài liệu cần KTS xem xét. KTS nhận thông báo ngay.</div>'
+          + '<label style="display:block;border:2px dashed var(--border);border-radius:var(--r-sm);padding:22px 16px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:12px;position:relative;background:var(--ink3)"'
+          + ' ondragover="event.preventDefault();this.style.borderColor=\'var(--blue)\';this.style.background=\'rgba(37,99,235,.07)\'"'
+          + ' ondragleave="this.style.borderColor=\'var(--border)\';this.style.background=\'var(--ink3)\'"'
+          + ' ondrop="_dnSingleDrop(event,\'' + p.id + '\');this.style.borderColor=\'var(--border)\';this.style.background=\'var(--ink3)\'">'
+          + '<input type="file" accept="image/*,.pdf,.dwg,.xlsx,.zip" multiple'
+          + ' style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%"'
+          + ' onchange="_dnSingleUpload(event,\'' + p.id + '\')">'
+          + '<i class="ph-duotone ph-cloud-arrow-up" style="font-size:26px;color:var(--blue);margin-bottom:6px;display:block"></i>'
+          + '<div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:3px">Kéo thả file vào đây hoặc click để chọn</div>'
+          + '<div style="font-size:11px;color:var(--muted)">Ảnh · PDF · DWG · Excel · ZIP</div>'
+          + '</label>'
+          + '<div id="dnSPend_' + p.id + '"></div>'
+          + '<button id="dnSSendBtn_' + p.id + '" style="display:none;width:100%;margin-bottom:14px;padding:10px 16px;background:linear-gradient(135deg,#2563eb,#3b82f6);border:none;border-radius:var(--r-sm);color:#fff;font-weight:700;font-size:12px;cursor:pointer;align-items:center;justify-content:center;gap:8px;font-family:var(--sans)"'
+          + ' onclick="_dnSingleSend(\'' + p.id + '\')">'
+          + '<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi cho KTS</button>'
+          + '<div style="border-top:1px solid var(--border);padding-top:12px">'
+          + '<div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:5px">'
+          + '<i class="ph-duotone ph-file-arrow-up" style="color:var(--blue)"></i> Đã gửi (' + sentFiles.length + ')</div>'
+          + sentListHTML + '</div>'
+          + '</div>';
       })()}
 
       <!-- C4 FILE DOWNLOAD -->
@@ -3315,6 +3402,10 @@ onAuthStateChanged(auth, async (user) => {
       const r = storageRef(storage, path);
       await uploadBytes(r, file);
       return await getDownloadURL(r);
+    };
+    window._dnSaveDoc = async function(pid, data){
+      await addDoc(collection(db, 'projects', pid, 'documents'),
+        Object.assign({}, data, { createdAt: serverTimestamp() }));
     };
   } catch(e) {
     console.error("[ALN Guard]", e);

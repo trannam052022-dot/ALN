@@ -1955,6 +1955,15 @@ ALNRealtime.init({
         try{ _ktsRenderMsg({ senderName:_pinFrom, text:_pinTxt, ts:(d.ts||Date.now()) }, false); }catch(e){}
       }
     }
+    // DN gửi tài liệu cho KTS
+    if(d.type==='DN_FILE_UPLOADED' && Array.isArray(d.audience) && d.audience.includes('kts')) {
+      const _dnMsg = `📁 ${d.senderName||'Doanh nghiệp'} gửi ${d.count||1} tài liệu — dự án ${d.projectId||''}`;
+      showToast(_dnMsg, 't-blue');
+      _alnReceive({ text: _dnMsg, senderName: d.senderName||'Doanh nghiệp', _role:'dn', ts: Date.now(), _replay: d._replay });
+      if(!d._replay && window.KTS_PROJECT_ID === d.projectId && typeof window._alnWatchDocs === 'function') {
+        window._alnWatchDocs(d.projectId);
+      }
+    }
     // Rating nhận được
     if(d.type==='KTS_RATED') {
       showToast(`⭐ Bạn nhận được đánh giá ${d.score}/5 sao cho Chặng ${d.stage} — ${d.projName}`, 't-green');
