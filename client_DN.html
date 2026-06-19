@@ -1931,7 +1931,11 @@ function renderMain(){
         if(!rv) return '';
         const activeStages = ['C1','C2'].filter(s=>rv[s]);
         if(!activeStages.length) return '';
-        const defaultStage = activeStages.find(s=>(rv[s] ? rv[s].status : null)==='approved') || activeStages[activeStages.length-1];
+        // Ưu tiên: chặng có proposal → chặng đang pending → chặng cuối
+        const defaultStage = activeStages.slice().reverse().find(s=>rv[s]&&rv[s].paList&&rv[s].paList.length>0)
+          || activeStages.find(s=>rv[s]&&rv[s].status==='pending')
+          || activeStages.find(s=>rv[s]&&rv[s].status==='approved')
+          || activeStages[activeStages.length-1];
         const rid = (_reviewState[p.id] ? _reviewState[p.id].stage : null) || defaultStage;
         if(!_reviewState[p.id]) _reviewState[p.id] = {stage:rid, subTab:'all'};
         const r = rv[rid];
@@ -2942,7 +2946,7 @@ function alnNotify(title, body){
 <script>
 (function(){
   var TABS = [
-    { id:'up', label:'Gửi phương án', icon:'ph-paper-plane-tilt', clr:'#d4a017', brd:'rgba(212,160,23,.5)', bg:'rgba(212,160,23,.07)', ibg:'rgba(212,160,23,.15)' },
+    { id:'up', label:'Tổng quan',      icon:'ph-chart-bar',        clr:'#d4a017', brd:'rgba(212,160,23,.5)', bg:'rgba(212,160,23,.07)', ibg:'rgba(212,160,23,.15)' },
     { id:'rv', label:'Bảng Review',   icon:'ph-clipboard-text',   clr:'#2563eb', brd:'rgba(37,99,235,.45)',  bg:'rgba(37,99,235,.07)',  ibg:'rgba(37,99,235,.13)' },
     { id:'c4', label:'Nộp hồ sơ',    icon:'ph-folder-open',      clr:'#16a34a', brd:'rgba(22,163,74,.45)', bg:'rgba(22,163,74,.07)',  ibg:'rgba(22,163,74,.13)' }
   ];
