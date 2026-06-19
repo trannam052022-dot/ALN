@@ -1273,14 +1273,14 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <div class="form-row">
         <label class="form-label">Phối cảnh 3D cập nhật (*.zip / *.rar / *.png)</label>
         <label style="display:flex;flex-direction:column;align-items:center;gap:8px;border:1.5px dashed rgba(212,160,23,.3);border-radius:var(--r-sm);padding:18px;cursor:pointer;transition:.2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(212,160,23,.3)'">
-          <input type="file" style="display:none" accept=".zip,.rar,.png,.jpg,.pdf" onchange="handleRevFile(this)">
+          <input id="revFileInput" type="file" style="display:none" accept=".zip,.rar,.png,.jpg,.pdf" onchange="handleRevFile(this)">
           <div id="revFileIcon" style="font-size:26px">📁</div>
           <div id="revFileLabel" style="font-size:12px;color:var(--muted)">Kéo thả hoặc click để chọn file</div>
         </label>
       </div>
       <div class="form-row">
         <label class="form-label">Ghi chú phản hồi theo từng điểm CN yêu cầu</label>
-        <textarea style="width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:7px;padding:9px;color:var(--text);font-family:inherit;font-size:12px;height:72px;resize:none;outline:none" placeholder="VD: Đã mở rộng cửa sổ mặt tiền theo yêu cầu #1. Mái đã thêm phào chỉ..."></textarea>
+        <textarea id="revNoteInput" style="width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:7px;padding:9px;color:var(--text);font-family:inherit;font-size:12px;height:72px;resize:none;outline:none" placeholder="VD: Đã mở rộng cửa sổ mặt tiền theo yêu cầu #1. Mái đã thêm phào chỉ..."></textarea>
       </div>
     </div>
     <div class="modal-foot">
@@ -1841,6 +1841,7 @@ function confirmVip() {
 
 function handleRevFile(input) {
   if(input.files[0]) {
+    window._ktsRevFile = input.files[0];
     document.getElementById('revFileIcon').textContent = '✅';
     document.getElementById('revFileLabel').textContent = input.files[0].name;
     document.getElementById('revFileLabel').style.color = 'var(--green)';
@@ -3482,6 +3483,64 @@ window.submitC3 = async function() {
       <span>Upload ${done}/${total} — ${failed} tệp lỗi. Kiểm tra Storage rules rồi thử lại.</span>
     </div>`;
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-cloud-arrow-up"></i> Nộp Hồ sơ C3'; }
+  }
+};
+
+/* ══ NỘP BẢN 3D CẬP NHẬT — UPLOAD THẬT LÊN FIREBASE ══ */
+window.submitRev = async function() {
+  const pid = window.KTS_PROJECT_ID;
+  if (!pid) { if(typeof showToast==='function') showToast('Chưa có dự án — reload trang', 't-red'); return; }
+  const f = window._ktsRevFile;
+  if (!f) { if(typeof showToast==='function') showToast('Chưa chọn file — hãy chọn file trước', 't-amber'); return; }
+
+  const submitBtn = document.querySelector('#uploadRevModal .btn-primary');
+  const origLabel = submitBtn ? submitBtn.innerHTML : '';
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="ph-duotone ph-spinner-gap"></i> Đang upload...'; }
+
+  const uploaderUid  = (auth.currentUser && auth.currentUser.uid) || window.__ALN_UID || '';
+  const uploaderName = (window.KTS_USER && window.KTS_USER.name) || (window.KTS_PROJECT_DATA && window.KTS_PROJECT_DATA.kts && window.KTS_PROJECT_DATA.kts.name) || 'KTS';
+  const note = (document.getElementById('revNoteInput') && document.getElementById('revNoteInput').value.trim()) || '';
+
+  try {
+    const ref = storageRef(storage, 'projects/' + pid + '/revisions/' + Date.now() + '_' + f.name);
+    await uploadBytes(ref, f);
+    const url = await getDownloadURL(ref);
+    await addDoc(collection(db, 'projects', pid, 'documents'), {
+      name:     f.name,
+      folder:   'rev_3d',
+      label:    'Bản 3D cập nhật',
+      url,
+      stage:    'REV',
+      note:     note,
+      uploader: { uid: uploaderUid, name: uploaderName, role: 'kts' },
+      date:     new Date().toLocaleDateString('vi-VN'),
+    });
+
+    // Reset file state
+    window._ktsRevFile = null;
+    const inp = document.getElementById('revFileInput');
+    if (inp) inp.value = '';
+    const icon = document.getElementById('revFileIcon');
+    if (icon) icon.textContent = '📁';
+    const lbl = document.getElementById('revFileLabel');
+    if (lbl) { lbl.textContent = 'Kéo thả hoặc click để chọn file'; lbl.style.color = ''; }
+    const noteEl = document.getElementById('revNoteInput');
+    if (noteEl) noteEl.value = '';
+
+    // UI updates (mirror plain-script submitRev)
+    if (typeof closeModal === 'function') closeModal('uploadRevModal');
+    if (typeof showToast === 'function') showToast('Bản 3D cập nhật đã gửi! CN được thông báo.', 't-green');
+    if (typeof clearInterval !== 'undefined' && window.slaInterval) clearInterval(window.slaInterval);
+    var sST = document.getElementById('slaStatusText');  if (sST) sST.textContent = 'Đã nộp';
+    var sSB = document.getElementById('slaStatusBadge'); if (sSB) sSB.className = 'stat-badge sb-green';
+    var sSC = document.getElementById('slaCard');        if (sSC) sSC.className = 'sla-card safe';
+    var sRP = document.getElementById('ringProgress');   if (sRP) sRP.style.stroke = 'var(--green)';
+
+    if (typeof window._alnWatchDocs === 'function') window._alnWatchDocs(pid);
+  } catch(e) {
+    console.error('[REV upload]', e);
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origLabel; }
+    if (typeof showToast === 'function') showToast('Lỗi upload: ' + ((e && e.code) || (e && e.message) || e), 't-red');
   }
 };
 </script>

@@ -3326,11 +3326,16 @@ window._dnSubProposals = function(pid) {
 
 /* Ghi approval lên Firestore */
 window._dnFbApprovePA = async function(projId, stage, paId) {
+  var NEXT = { C1:'C2', C2:'C3', C3:'C4' };
   try {
     await updateDoc(doc(db,'projects',projId,'stages',stage,'proposals',paId), {
-      status: 'approved',
-      approvedAt: serverTimestamp()
+      status: 'approved', approvedAt: serverTimestamp()
     });
+    var progressPatch = {};
+    progressPatch['progress.' + stage] = 1;
+    progressPatch.stage = NEXT[stage] || 'done';
+    progressPatch.updatedAt = serverTimestamp();
+    await updateDoc(doc(db,'projects',projId), progressPatch);
   } catch(e){ console.error('[DN approvePA Firestore]', e.code, e.message); }
 };
 
