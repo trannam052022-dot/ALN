@@ -873,6 +873,10 @@ body::after {
     style="padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px">
     <i class="ph-duotone ph-user-plus"></i>Duyệt đăng ký<span id="pendingBadge" style="display:none;background:var(--gold);color:#08090f;border-radius:99px;font-size:9px;padding:1px 6px;font-weight:800">0</span>
   </button>
+  <button id="tabRecruit" onclick="switchTab('recruit')"
+    style="padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px">
+    <i class="ph-duotone ph-megaphone"></i>Tuyển dụng
+  </button>
 
   <!-- ── DIVIDER ── -->
   <div style="width:1px;height:20px;background:var(--border);flex-shrink:0"></div>
@@ -1418,6 +1422,86 @@ body::after {
   <iframe id="iframeCn" src="about:blank" data-src="client_CN.html"
     style="flex:1;width:100%;border:none;min-height:calc(100vh - 84px)"
     allow="same-origin"></iframe>
+</div>
+
+<!-- ══ PANEL: TUYỂN DỤNG ══ -->
+<div id="panelRecruit" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+  <div style="padding:16px 20px 0;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:3px">TUYỂN DỤNG</div>
+        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1)">Quản lý Bài tuyển dụng</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <a href="recruit.html" target="_blank" style="padding:7px 14px;background:var(--raised);border:1px solid var(--border);color:var(--sub);border-radius:7px;font-size:11px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:5px">
+          <i class="ph-duotone ph-arrow-square-out"></i>Xem trang
+        </a>
+        <button onclick="openRecruitModal()" style="padding:7px 16px;background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(16,185,129,.08));border:1.5px solid rgba(16,185,129,.4);color:var(--green);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);display:inline-flex;align-items:center;gap:6px">
+          <i class="ph-duotone ph-plus"></i>Tạo bài mới
+        </button>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;padding-bottom:12px">
+      <button id="rtabAll" onclick="switchRTab('all',this)" style="padding:5px 14px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid rgba(201,168,76,.35);background:rgba(201,168,76,.1);color:var(--gold);font-family:var(--sans)">Tất cả</button>
+      <button id="rtabDraft" onclick="switchRTab('draft',this)" style="padding:5px 14px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--raised);color:var(--sub);font-family:var(--sans)">Nháp</button>
+      <button id="rtabPublished" onclick="switchRTab('published',this)" style="padding:5px 14px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--raised);color:var(--sub);font-family:var(--sans)">Đã đăng</button>
+    </div>
+  </div>
+  <div id="recruitList" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px">
+    <div style="text-align:center;padding:40px;color:var(--dim);font-family:var(--mono);font-size:12px">
+      <i class="ph-duotone ph-spinner-gap ph-spin" style="font-size:24px;margin-bottom:10px;display:block"></i>Đang tải...
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL TẠO BÀI TUYỂN DỤNG ══ -->
+<div id="recruitModal" onclick="if(event.target===this)closeRecruitModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:210;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:600px;max-width:100%;box-shadow:0 24px 60px rgba(0,0,0,.7)">
+    <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:15px;font-weight:700;color:var(--text1)" id="recruitModalTitle">Tạo bài tuyển dụng</div>
+      <button onclick="closeRecruitModal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:18px;padding:4px">✕</button>
+    </div>
+    <div style="padding:22px;display:flex;flex-direction:column;gap:16px">
+      <!-- Role type -->
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--sub);display:block;margin-bottom:6px;letter-spacing:.08em">VAI TRÒ</label>
+        <div style="display:flex;gap:8px">
+          <button onclick="selectRType('kts',this)" id="rtypeKts" style="padding:7px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);border:1.5px solid rgba(245,158,11,.4);background:rgba(245,158,11,.15);color:var(--amber)"><i class="ph-duotone ph-pencil-ruler" style="margin-right:4px"></i>KTS</button>
+          <button onclick="selectRType('dn',this)" id="rtypeDn" style="padding:7px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);border:1px solid var(--border);background:var(--raised);color:var(--sub)"><i class="ph-duotone ph-buildings" style="margin-right:4px"></i>Doanh nghiệp</button>
+          <button onclick="selectRType('designer',this)" id="rtypeDesigner" style="padding:7px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);border:1px solid var(--border);background:var(--raised);color:var(--sub)"><i class="ph-duotone ph-paint-brush-household" style="margin-right:4px"></i>Designer NT</button>
+        </div>
+      </div>
+      <!-- Template button -->
+      <button onclick="applyRecruitTemplate()" style="padding:8px 14px;background:var(--raised);border:1px dashed rgba(201,168,76,.3);border-radius:7px;color:var(--gold);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:6px;justify-content:center">
+        <i class="ph-duotone ph-magic-wand"></i>Dùng mẫu có sẵn cho vai trò này
+      </button>
+      <!-- Title -->
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--sub);display:block;margin-bottom:6px;letter-spacing:.08em">TIÊU ĐỀ</label>
+        <input id="rTitle" type="text" placeholder="Tuyển KTS thiết kế dân dụng cao cấp..." style="width:100%;background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-size:13px;color:var(--text1);font-family:var(--sans);outline:none">
+      </div>
+      <!-- Body -->
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--sub);display:block;margin-bottom:6px;letter-spacing:.08em">MÔ TẢ VỊ TRÍ</label>
+        <textarea id="rBody" rows="4" placeholder="Mô tả dự án, môi trường làm việc, đặc điểm vị trí..." style="width:100%;background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-size:12.5px;color:var(--text1);font-family:var(--sans);resize:vertical;outline:none;line-height:1.6"></textarea>
+      </div>
+      <!-- Requirements -->
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--sub);display:block;margin-bottom:6px;letter-spacing:.08em">YÊU CẦU <span style="font-weight:400;text-transform:none">(mỗi dòng = 1 yêu cầu)</span></label>
+        <textarea id="rReqs" rows="5" placeholder="Chứng chỉ hành nghề&#10;Tối thiểu 3 năm kinh nghiệm&#10;Portfolio thực tế..." style="width:100%;background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-size:12.5px;color:var(--text1);font-family:var(--sans);resize:vertical;outline:none;line-height:1.6"></textarea>
+      </div>
+      <!-- Benefits -->
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--sub);display:block;margin-bottom:6px;letter-spacing:.08em">QUYỀN LỢI <span style="font-weight:400;text-transform:none">(mỗi dòng = 1 quyền lợi)</span></label>
+        <textarea id="rBenefits" rows="4" placeholder="Thu nhập theo % giá trị công trình&#10;Thanh toán escrow an toàn&#10;Mạng lưới khách hàng VIP..." style="width:100%;background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-size:12.5px;color:var(--text1);font-family:var(--sans);resize:vertical;outline:none;line-height:1.6"></textarea>
+      </div>
+    </div>
+    <div style="padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">
+      <button onclick="closeRecruitModal()" style="padding:8px 18px;background:var(--raised);border:1px solid var(--border);color:var(--sub);border-radius:7px;cursor:pointer;font-family:var(--sans);font-size:12px">Hủy</button>
+      <button onclick="saveRecruitPost('draft')" style="padding:8px 18px;background:var(--raised);border:1px solid var(--border);color:var(--text1);border-radius:7px;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:600"><i class="ph-duotone ph-floppy-disk" style="margin-right:4px"></i>Lưu nháp</button>
+      <button onclick="saveRecruitPost('published')" style="padding:8px 22px;background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(16,185,129,.08));border:1.5px solid rgba(16,185,129,.4);color:var(--green);border-radius:7px;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:700"><i class="ph-duotone ph-megaphone" style="margin-right:4px"></i>Đăng ngay</button>
+    </div>
+  </div>
 </div>
 
 <!-- ══ MODAL THÊM TÀI KHOẢN ══ -->
@@ -2307,11 +2391,12 @@ window.ALNRealtime = (() => {
 ══════════════════════════════════════════ */
 
 function switchTab(t){
-  var ALL = ['projects','stats','mgKts','mgDn','mgCn','pending','liveKts','liveDn','liveCn'];
+  var ALL = ['projects','stats','mgKts','mgDn','mgCn','pending','recruit','liveKts','liveDn','liveCn'];
   var activeStyle  = 'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.15);color:var(--blue);white-space:nowrap';
   var inactiveStyle= 'padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:var(--raised);color:var(--sub);white-space:nowrap';
   var liveStyles = {
     pending: {active:'padding:5px 13px;border:1px solid rgba(239,68,68,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.18);color:#ef4444;display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(239,68,68,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.08);color:#ef4444;display:flex;align-items:center;gap:5px;white-space:nowrap'},
+    recruit: {active:'padding:5px 13px;border:1px solid rgba(16,185,129,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.18);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     liveKts: {active:'padding:5px 13px;border:1px solid rgba(245,158,11,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(245,158,11,.18);color:var(--amber);display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(245,158,11,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(245,158,11,.08);color:var(--amber);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     liveDn:  {active:'padding:5px 13px;border:1px solid rgba(59,130,246,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.2);color:var(--blue);display:flex;align-items:center;gap:5px;white-space:nowrap',   inactive:'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.08);color:var(--blue);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     liveCn:  {active:'padding:5px 13px;border:1px solid rgba(16,185,129,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.2);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap'},
@@ -2336,6 +2421,7 @@ function switchTab(t){
   if(t==='mgDn')    renderMgDn();
   if(t==='mgCn')    renderMgCn();
   if(t==='pending') renderPending();
+  if(t==='recruit') { if(typeof window._recruitRender==='function') window._recruitRender(); }
 
   // LIVE iframes: chỉ tải khi vào tab, rời tab thì giải phóng bộ nhớ
   var IFR = { liveKts:'iframeKts', liveDn:'iframeDn', liveCn:'iframeCn' };
@@ -3440,6 +3526,134 @@ function toast(msg,type){
 ══════════════════════════════════════════ */
 renderTable();
 
+/* ══════════════════════════════════════════
+   TUYỂN DỤNG — plain script UI helpers
+══════════════════════════════════════════ */
+var _rEditId = null;
+var _rType   = 'kts';
+var _rTabFilter = 'all';
+
+var RECRUIT_TEMPLATES = {
+  kts: {
+    title: 'Tuyển Kiến trúc sư Thiết kế Dân dụng – Dự án Cao cấp',
+    body:  'ALN đang tìm kiếm KTS có đam mê sáng tạo, tham gia thiết kế các công trình biệt thự, nhà phố cao cấp cho Chủ nhà. Dự án minh bạch 4 giai đoạn, thanh toán escrow đảm bảo.',
+    reqs:  'Chứng chỉ hành nghề kiến trúc sư\nTối thiểu 3 năm kinh nghiệm thiết kế dân dụng\nPortfolio ≥5 công trình thực tế\nThành thạo SketchUp / Lumion / Revit\nTrách nhiệm, tận tâm với dự án',
+    bens:  'Thu nhập theo % tổng giá trị dự án — cạnh tranh\nThanh toán escrow an toàn, đúng tiến độ\nChủ nhà được founder ALN giới thiệu trực tiếp\nCơ hội mở rộng mạng lưới khách hàng VIP\nHỗ trợ tư vấn pháp lý và hợp đồng'
+  },
+  dn: {
+    title: 'Tìm kiếm Đối tác Doanh nghiệp Thi công – Hợp tác Dài hạn',
+    body:  'ALN hợp tác với Doanh nghiệp xây dựng uy tín để thi công công trình dân dụng cao cấp. Kết nối trực tiếp với Chủ nhà đã xác minh, quản lý tiến độ minh bạch qua hệ thống số.',
+    reqs:  'Pháp nhân đầy đủ (ĐKKD, MST)\nTối thiểu 5 năm kinh nghiệm thi công\nHồ sơ năng lực ≥10 công trình\nĐội kỹ thuật ổn định, có giám sát công trình\nCam kết tiến độ và bảo hành',
+    bens:  'Đối tác dự án được founder giới thiệu trực tiếp\nThanh toán theo tiến độ escrow\nBáo cáo tiến độ số hóa, realtime\nXây dựng uy tín qua đánh giá từ Chủ nhà VIP\nCơ hội hợp tác dài hạn với hệ sinh thái ALN'
+  },
+  designer: {
+    title: 'Tuyển Designer Nội thất – Dự án Nhà ở Cao cấp',
+    body:  'ALN tìm kiếm Designer NT sáng tạo, thiết kế không gian sống đẳng cấp đa phong cách (Modern, Classic, Japandi, Scandinavian…) cho Chủ nhà cao cấp.',
+    reqs:  'Portfolio ≥3 không gian nội thất hoàn chỉnh\nThành thạo AutoCAD, SketchUp, 3DS Max hoặc Revit\nTối thiểu 1 năm kinh nghiệm thực tế\nNhạy cảm thẩm mỹ, cập nhật xu hướng thiết kế\nGiao tiếp tốt, phối hợp KTS và DN',
+    bens:  'Hoa hồng theo giá trị hợp đồng nội thất\nDashboard quản lý dự án riêng biệt\nFounder giới thiệu cho Chủ nhà phù hợp\nTự do sáng tạo phong cách cá nhân\nXây dựng portfolio thương hiệu qua ALN'
+  }
+};
+
+function openRecruitModal(id){
+  _rEditId = id || null;
+  var post = id ? (window._recruitPosts || []).find(function(p){ return p.id === id; }) : null;
+  _rType = post ? post.type : 'kts';
+  document.getElementById('rTitle').value    = post ? (post.title || '') : '';
+  document.getElementById('rBody').value     = post ? (post.body  || '') : '';
+  document.getElementById('rReqs').value     = post ? (post.requirements || []).join('\n') : '';
+  document.getElementById('rBenefits').value = post ? (post.benefits || []).join('\n') : '';
+  document.getElementById('recruitModalTitle').textContent = id ? 'Chỉnh sửa bài tuyển dụng' : 'Tạo bài tuyển dụng';
+  _setRTypeUI();
+  document.getElementById('recruitModal').style.display = 'flex';
+}
+function closeRecruitModal(){ document.getElementById('recruitModal').style.display = 'none'; }
+
+function _setRTypeUI(){
+  var types = ['kts','dn','designer'];
+  var ids   = ['rtypeKts','rtypeDn','rtypeDesigner'];
+  var active = {
+    kts:      'padding:7px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);border:1.5px solid rgba(245,158,11,.4);background:rgba(245,158,11,.15);color:var(--amber)',
+    dn:       'padding:7px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);border:1.5px solid rgba(74,143,255,.4);background:rgba(74,143,255,.15);color:var(--blue)',
+    designer: 'padding:7px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);border:1.5px solid rgba(167,139,250,.4);background:rgba(167,139,250,.15);color:var(--purple)'
+  };
+  var inactive = 'padding:7px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);border:1px solid var(--border);background:var(--raised);color:var(--sub)';
+  types.forEach(function(t, i){
+    document.getElementById(ids[i]).style.cssText = (t === _rType) ? active[t] : inactive;
+  });
+}
+
+function selectRType(type){
+  _rType = type;
+  _setRTypeUI();
+}
+
+function applyRecruitTemplate(){
+  var tpl = RECRUIT_TEMPLATES[_rType];
+  if(!tpl) return;
+  document.getElementById('rTitle').value    = tpl.title;
+  document.getElementById('rBody').value     = tpl.body;
+  document.getElementById('rReqs').value     = tpl.reqs;
+  document.getElementById('rBenefits').value = tpl.bens;
+}
+
+function switchRTab(tab, btn){
+  _rTabFilter = tab;
+  ['rtabAll','rtabDraft','rtabPublished'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    el.style.cssText = 'padding:5px 14px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--raised);color:var(--sub);font-family:var(--sans)';
+  });
+  if(btn){
+    var ac = tab==='all'
+      ? 'padding:5px 14px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid rgba(201,168,76,.35);background:rgba(201,168,76,.1);color:var(--gold);font-family:var(--sans)'
+      : tab==='published'
+      ? 'padding:5px 14px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid rgba(16,185,129,.35);background:rgba(16,185,129,.1);color:var(--green);font-family:var(--sans)'
+      : 'padding:5px 14px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text1);font-family:var(--sans)';
+    btn.style.cssText = ac;
+  }
+  _renderRecruitList();
+}
+
+function _renderRecruitList(){
+  var list = document.getElementById('recruitList');
+  if(!list) return;
+  var posts = window._recruitPosts || [];
+  if(_rTabFilter !== 'all') posts = posts.filter(function(p){ return p.status === _rTabFilter; });
+  if(posts.length === 0){
+    list.innerHTML = '<div style="text-align:center;padding:60px;color:var(--dim);font-family:var(--mono);font-size:12px"><i class="ph-duotone ph-megaphone-slash" style="font-size:28px;margin-bottom:10px;display:block"></i>Chưa có bài tuyển dụng nào</div>';
+    return;
+  }
+  var typeLabel = {kts:'KTS',dn:'Doanh nghiệp',designer:'Designer NT'};
+  var typeColor = {kts:'var(--amber)',dn:'var(--blue)',designer:'var(--purple)'};
+  var typeBorder= {kts:'rgba(245,158,11,.35)',dn:'rgba(74,143,255,.35)',designer:'rgba(167,139,250,.35)'};
+  list.innerHTML = posts.map(function(p){
+    var col = typeColor[p.type] || 'var(--sub)';
+    var brd = typeBorder[p.type] || 'var(--border)';
+    var statusBadge = p.status === 'published'
+      ? '<span style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green);border-radius:99px;font-size:10px;padding:2px 8px;font-family:var(--mono)">● Đã đăng</span>'
+      : '<span style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--sub);border-radius:99px;font-size:10px;padding:2px 8px;font-family:var(--mono)">○ Nháp</span>';
+    return '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid '+col+';border-radius:9px;padding:16px 18px;display:flex;align-items:flex-start;gap:14px">'
+      +'<div style="flex:1;min-width:0">'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+          +'<span style="font-size:10px;font-weight:700;color:'+col+';border:1px solid '+brd+';border-radius:4px;padding:2px 7px;font-family:var(--mono)">'+( typeLabel[p.type]||p.type.toUpperCase() )+'</span>'
+          + statusBadge
+        +'</div>'
+        +'<div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:4px">'+escFounder(p.title||'(không tiêu đề)')+'</div>'
+        +(p.body ? '<div style="font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escFounder(p.body)+'</div>' : '')
+      +'</div>'
+      +'<div style="display:flex;gap:6px;flex-shrink:0;align-items:center">'
+        +(p.status!=='published'
+          ? '<button onclick="window._recruitPublish(\''+p.id+'\')" style="padding:6px 13px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:var(--green);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-megaphone"></i> Đăng</button>'
+          : '<button onclick="window._recruitUnpublish(\''+p.id+'\')" style="padding:6px 13px;background:var(--raised);border:1px solid var(--border);color:var(--sub);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)">Gỡ xuống</button>')
+        +'<button onclick="openRecruitModal(\''+p.id+'\')" style="padding:6px 13px;background:var(--raised);border:1px solid var(--border);color:var(--text2);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-pencil"></i></button>'
+        +'<button onclick="window._recruitDelete(\''+p.id+'\')" style="padding:6px 13px;background:var(--raised);border:1px solid var(--border);color:var(--red);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-trash"></i></button>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function escFounder(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 
 </script>
 
@@ -3535,7 +3749,7 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "founder";
 
@@ -3791,6 +4005,83 @@ window.alnLogout = async function(){
   try { await signOut(auth); } catch(e){}
   try { localStorage.removeItem("aln_user"); sessionStorage.removeItem("aln_user"); } catch(e){}
   window.location.replace("login.html");
+};
+
+/* ══════════════════════════════════════════
+   TUYỂN DỤNG — Firestore CRUD (module scope)
+══════════════════════════════════════════ */
+window._recruitPosts = [];
+
+window._recruitRender = async function(){
+  const list = document.getElementById('recruitList');
+  if(!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--dim);font-family:var(--mono);font-size:12px"><i class="ph-duotone ph-spinner-gap ph-spin" style="font-size:24px;margin-bottom:10px;display:block"></i>Đang tải...</div>';
+  try {
+    const snap = await getDocs(collection(db, 'recruitPosts'));
+    const posts = [];
+    snap.forEach(d => posts.push(Object.assign({ id: d.id }, d.data())));
+    posts.sort((a, b) => {
+      const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+      const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+      return tb - ta;
+    });
+    window._recruitPosts = posts;
+    _renderRecruitList();
+  } catch(e) {
+    list.innerHTML = '<div style="padding:20px;color:var(--red);font-size:12px">Lỗi tải dữ liệu: ' + e.message + '</div>';
+  }
+};
+
+window.saveRecruitPost = async function(status){
+  const title = (document.getElementById('rTitle').value || '').trim();
+  if(!title){ try{ toast('Nhập tiêu đề bài tuyển dụng', 'warn'); }catch(e){} return; }
+  const body  = (document.getElementById('rBody').value || '').trim();
+  const reqs  = (document.getElementById('rReqs').value || '').split('\n').map(s=>s.trim()).filter(Boolean);
+  const bens  = (document.getElementById('rBenefits').value || '').split('\n').map(s=>s.trim()).filter(Boolean);
+  const data  = { type: _rType, title, body, requirements: reqs, benefits: bens, status, updatedAt: serverTimestamp() };
+  try {
+    if(_rEditId){
+      await updateDoc(doc(db, 'recruitPosts', _rEditId), data);
+    } else {
+      data.createdAt = serverTimestamp();
+      await addDoc(collection(db, 'recruitPosts'), data);
+    }
+    closeRecruitModal();
+    try{ toast(status==='published' ? 'Đã đăng bài tuyển dụng' : 'Đã lưu nháp', 'ok'); }catch(e){}
+    window._recruitRender();
+  } catch(e){
+    try{ toast('Lỗi lưu: ' + e.message, 'err'); }catch(_){}
+  }
+};
+
+window._recruitPublish = async function(id){
+  try {
+    await updateDoc(doc(db, 'recruitPosts', id), { status: 'published', updatedAt: serverTimestamp() });
+    const p = (window._recruitPosts||[]).find(x=>x.id===id);
+    if(p) p.status = 'published';
+    _renderRecruitList();
+    try{ toast('Đã đăng bài', 'ok'); }catch(e){}
+  } catch(e){ try{ toast('Lỗi: ' + e.message, 'err'); }catch(_){} }
+};
+
+window._recruitUnpublish = async function(id){
+  try {
+    await updateDoc(doc(db, 'recruitPosts', id), { status: 'draft', updatedAt: serverTimestamp() });
+    const p = (window._recruitPosts||[]).find(x=>x.id===id);
+    if(p) p.status = 'draft';
+    _renderRecruitList();
+    try{ toast('Đã gỡ xuống (còn nháp)', 'ok'); }catch(e){}
+  } catch(e){ try{ toast('Lỗi: ' + e.message, 'err'); }catch(_){} }
+};
+
+window._recruitDelete = async function(id){
+  if(!confirm('Xóa bài tuyển dụng này?')) return;
+  try {
+    await deleteDoc(doc(db, 'recruitPosts', id));
+    window._recruitPosts = (window._recruitPosts||[]).filter(p=>p.id!==id);
+    _renderRecruitList();
+    try{ toast('Đã xóa', 'ok'); }catch(e){}
+  } catch(e){ try{ toast('Lỗi xóa: ' + e.message, 'err'); }catch(_){} }
 };
 </script>
 </body>

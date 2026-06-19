@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALN — Tuyển dụng KTS & Doanh nghiệp</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/>
+<style>
+:root{
+  --bg:#080c14;--surface:#0d1120;--raised:#111828;--card:#151d2e;
+  --border:#1e2840;--mute:#334060;--dim:#556080;--sub:#7a88a8;
+  --text2:#a8b4c8;--text1:#d8e0f0;--white:#eaeefc;
+  --gold:#C9A84C;--gold2:#e8d07a;--gold-bg:rgba(201,168,76,.08);--gold-bd:rgba(201,168,76,.25);
+  --amber:#f59e0b;--amber-bg:rgba(245,158,11,.08);--amber-bd:rgba(245,158,11,.3);
+  --blue:#4a8fff;--blue-bg:rgba(74,143,255,.08);--blue-bd:rgba(74,143,255,.3);
+  --purple:#a78bfa;--purple-bg:rgba(167,139,250,.08);--purple-bd:rgba(167,139,250,.3);
+  --green:#10b981;--green-bg:rgba(16,185,129,.08);--green-bd:rgba(16,185,129,.3);
+  --r:10px;--r-sm:6px;
+  --sans:'DM Sans',sans-serif;--serif:'Cormorant Garamond',serif;--syne:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text1);line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;top:-10%;left:50%;transform:translateX(-50%);width:1000px;height:600px;
+  background:radial-gradient(ellipse,rgba(201,168,76,.06) 0%,transparent 65%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.03) 3px,rgba(0,0,0,.03) 4px)}
+
+/* NAV */
+.topnav{position:sticky;top:0;z-index:80;display:flex;align-items:center;gap:14px;
+  padding:0 28px;height:52px;background:rgba(8,12,20,.9);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(201,168,76,.12)}
+.nav-logo{display:flex;align-items:center;gap:9px}
+.nav-logo-box{width:30px;height:30px;border-radius:7px;background:rgba(201,168,76,.1);
+  border:1.5px solid rgba(201,168,76,.4);display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;color:var(--gold);font-family:var(--syne);letter-spacing:.04em}
+.nav-logo-name{font-family:var(--syne);font-size:13px;font-weight:800;color:var(--gold2);letter-spacing:.06em}
+.nav-tagline{font-size:11px;color:var(--dim);font-family:var(--mono)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nav-link{font-size:12px;color:var(--sub);text-decoration:none;padding:5px 10px;border-radius:var(--r-sm);transition:color .15s}
+.nav-link:hover{color:var(--text1)}
+.nav-login{padding:6px 16px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);
+  color:var(--gold);border-radius:var(--r-sm);font-size:12px;font-weight:600;text-decoration:none;
+  font-family:var(--sans);transition:all .15s;cursor:pointer}
+.nav-login:hover{background:rgba(201,168,76,.18);border-color:rgba(201,168,76,.5)}
+
+/* HERO */
+.hero{position:relative;z-index:1;text-align:center;padding:80px 20px 60px}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.08);
+  border:1px solid rgba(16,185,129,.25);color:var(--green);border-radius:99px;
+  font-size:11px;font-weight:700;padding:4px 14px;margin-bottom:24px;font-family:var(--mono);letter-spacing:.08em}
+.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-family:var(--serif);font-size:clamp(38px,7vw,68px);font-weight:300;line-height:1.1;
+  color:var(--white);margin-bottom:18px}
+.hero h1 .gold{color:var(--gold);font-weight:600}
+.hero-sub{font-size:15px;color:var(--text2);max-width:520px;margin:0 auto 36px;line-height:1.7}
+.hero-stats{display:flex;justify-content:center;gap:40px;margin-bottom:40px;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat span{display:block;font-family:var(--syne);font-size:28px;font-weight:800;color:var(--gold)}
+.hero-stat label{font-size:11px;color:var(--sub);font-family:var(--mono)}
+.hero-cta{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.cta-btn{padding:11px 26px;border-radius:var(--r);font-family:var(--sans);font-size:13px;
+  font-weight:700;text-decoration:none;cursor:pointer;transition:all .18s;border:none;display:inline-flex;align-items:center;gap:7px}
+.cta-kts{background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.08));
+  border:1.5px solid rgba(245,158,11,.4);color:var(--amber)}
+.cta-kts:hover{background:linear-gradient(135deg,rgba(245,158,11,.28),rgba(245,158,11,.14));border-color:rgba(245,158,11,.7)}
+.cta-dn{background:linear-gradient(135deg,rgba(74,143,255,.18),rgba(74,143,255,.08));
+  border:1.5px solid rgba(74,143,255,.4);color:var(--blue)}
+.cta-dn:hover{background:linear-gradient(135deg,rgba(74,143,255,.28),rgba(74,143,255,.14));border-color:rgba(74,143,255,.7)}
+.cta-des{background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167,139,250,.08));
+  border:1.5px solid rgba(167,139,250,.4);color:var(--purple)}
+.cta-des:hover{background:linear-gradient(135deg,rgba(167,139,250,.28),rgba(167,139,250,.14));border-color:rgba(167,139,250,.7)}
+
+/* SECTION */
+.section{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 20px 60px}
+.section-header{text-align:center;margin-bottom:36px}
+.section-label{font-size:10px;font-weight:700;color:var(--dim);letter-spacing:.18em;text-transform:uppercase;
+  font-family:var(--mono);margin-bottom:8px}
+.section-title{font-family:var(--serif);font-size:clamp(26px,4vw,38px);font-weight:300;color:var(--white)}
+.section-title strong{color:var(--gold);font-weight:600}
+
+/* FILTER TABS */
+.filter-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.ftab{padding:6px 16px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;
+  transition:all .15s;border:1px solid var(--border);background:var(--raised);color:var(--sub);font-family:var(--sans)}
+.ftab:hover{color:var(--text1)}
+.ftab.active-all{background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.35);color:var(--gold)}
+.ftab.active-kts{background:var(--amber-bg);border-color:var(--amber-bd);color:var(--amber)}
+.ftab.active-dn{background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue)}
+.ftab.active-des{background:var(--purple-bg);border-color:var(--purple-bd);color:var(--purple)}
+.post-count{font-size:11px;color:var(--dim);font-family:var(--mono)}
+
+/* POST GRID */
+.post-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.post-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:22px;display:flex;flex-direction:column;gap:14px;cursor:pointer;
+  transition:all .2s;position:relative;overflow:hidden}
+.post-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.post-card.type-kts::before{background:linear-gradient(90deg,var(--amber),transparent)}
+.post-card.type-dn::before{background:linear-gradient(90deg,var(--blue),transparent)}
+.post-card.type-designer::before{background:linear-gradient(90deg,var(--purple),transparent)}
+.post-card:hover{transform:translateY(-2px);border-color:var(--mute);box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.post-header{display:flex;align-items:flex-start;gap:10px}
+.post-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0}
+.type-kts .post-icon{background:var(--amber-bg);border:1px solid var(--amber-bd)}
+.type-dn  .post-icon{background:var(--blue-bg);border:1px solid var(--blue-bd)}
+.type-designer .post-icon{background:var(--purple-bg);border:1px solid var(--purple-bd)}
+.post-meta{flex:1}
+.post-type-label{font-size:10px;font-weight:700;letter-spacing:.12em;font-family:var(--mono);margin-bottom:3px}
+.type-kts .post-type-label{color:var(--amber)}
+.type-dn  .post-type-label{color:var(--blue)}
+.type-designer .post-type-label{color:var(--purple)}
+.post-title{font-size:14px;font-weight:700;color:var(--text1);line-height:1.35}
+.post-body{font-size:12px;color:var(--text2);line-height:1.6;flex:1}
+.post-reqs{display:flex;flex-direction:column;gap:5px}
+.req-item{display:flex;align-items:flex-start;gap:7px;font-size:11.5px;color:var(--sub)}
+.req-item::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px}
+.post-footer{border-top:1px solid var(--border);padding-top:14px;display:flex;justify-content:space-between;align-items:center}
+.post-footer-btn{padding:8px 18px;border-radius:var(--r-sm);font-size:12px;font-weight:700;
+  cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;text-decoration:none;display:inline-block}
+.type-kts  .post-footer-btn{background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(245,158,11,.08));border:1.5px solid rgba(245,158,11,.4);color:var(--amber)}
+.type-dn   .post-footer-btn{background:linear-gradient(135deg,rgba(74,143,255,.2),rgba(74,143,255,.08));border:1.5px solid rgba(74,143,255,.4);color:var(--blue)}
+.type-designer .post-footer-btn{background:linear-gradient(135deg,rgba(167,139,250,.2),rgba(167,139,250,.08));border:1.5px solid rgba(167,139,250,.4);color:var(--purple)}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;color:var(--dim)}
+.empty-state i{font-size:36px;margin-bottom:12px;display:block}
+.empty-state p{font-size:13px}
+
+/* WHY SECTION */
+.why-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.why-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;
+  display:flex;flex-direction:column;gap:10px;transition:all .2s}
+.why-card:hover{border-color:rgba(201,168,76,.25)}
+.why-icon{width:40px;height:40px;border-radius:10px;background:var(--gold-bg);border:1px solid var(--gold-bd);
+  display:flex;align-items:center;justify-content:center;font-size:20px}
+.why-title{font-size:13px;font-weight:700;color:var(--text1)}
+.why-desc{font-size:12px;color:var(--sub);line-height:1.6}
+
+/* STEPS */
+.steps{display:flex;gap:0;flex-wrap:wrap;position:relative}
+.step{flex:1;min-width:220px;padding:24px;position:relative}
+.step::after{content:'→';position:absolute;right:-10px;top:50%;transform:translateY(-50%);
+  color:var(--mute);font-size:18px}
+.step:last-child::after{display:none}
+.step-num{width:36px;height:36px;border-radius:50%;background:var(--gold-bg);border:1.5px solid var(--gold-bd);
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;
+  font-weight:700;color:var(--gold);margin-bottom:12px}
+.step-title{font-size:13px;font-weight:700;color:var(--text1);margin-bottom:5px}
+.step-desc{font-size:12px;color:var(--sub);line-height:1.6}
+
+/* CTA BANNER */
+.cta-banner{position:relative;z-index:1;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(201,168,76,.02));
+  border-top:1px solid rgba(201,168,76,.12);border-bottom:1px solid rgba(201,168,76,.12);
+  padding:50px 20px;text-align:center;margin-bottom:20px}
+.cta-banner h2{font-family:var(--serif);font-size:clamp(24px,4vw,38px);font-weight:300;color:var(--white);margin-bottom:12px}
+.cta-banner p{font-size:13px;color:var(--sub);margin-bottom:28px}
+
+/* FOOTER */
+footer{position:relative;z-index:1;text-align:center;padding:28px 20px;
+  border-top:1px solid rgba(255,255,255,.05);font-size:11px;color:var(--mute);font-family:var(--mono)}
+
+/* ─── CHATBOT WIDGET ─── */
+#chatWidget{position:fixed;bottom:22px;right:22px;z-index:200;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+#chatToggle{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#b8922e);
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;
+  box-shadow:0 6px 24px rgba(201,168,76,.4);transition:transform .2s;flex-shrink:0}
+#chatToggle:hover{transform:scale(1.08)}
+#chatBox{display:none;flex-direction:column;background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;width:320px;max-height:460px;box-shadow:0 16px 50px rgba(0,0,0,.6);overflow:hidden}
+#chatBox.open{display:flex}
+.chat-head{padding:14px 16px;background:var(--raised);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.chat-head-left{display:flex;align-items:center;gap:9px}
+.chat-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#b8922e);
+  display:flex;align-items:center;justify-content:center;font-size:14px}
+.chat-head-name{font-size:13px;font-weight:700;color:var(--text1)}
+.chat-head-status{font-size:10px;color:var(--green);font-family:var(--mono)}
+#chatClose{background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:2px}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:200px}
+.msg{max-width:86%;padding:9px 12px;border-radius:10px;font-size:12.5px;line-height:1.55}
+.msg.bot{background:var(--raised);border:1px solid var(--border);color:var(--text1);align-self:flex-start;border-radius:4px 10px 10px 10px}
+.msg.user{background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.08));
+  border:1px solid rgba(201,168,76,.3);color:var(--gold2);align-self:flex-end;border-radius:10px 4px 10px 10px}
+.msg a{color:var(--gold);text-decoration:underline}
+.typing{align-self:flex-start;padding:9px 14px;background:var(--raised);border:1px solid var(--border);
+  border-radius:4px 10px 10px 10px;display:flex;gap:5px;align-items:center}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--sub);animation:blink 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+.chat-quick{padding:8px 12px;display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid var(--border);flex-shrink:0}
+.qbtn{padding:5px 10px;background:var(--raised);border:1px solid var(--border);border-radius:99px;
+  font-size:11px;color:var(--sub);cursor:pointer;font-family:var(--sans);transition:all .12s;white-space:nowrap}
+.qbtn:hover{border-color:var(--gold);color:var(--gold)}
+.chat-input-row{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
+#chatInput{flex:1;background:var(--raised);border:1px solid var(--border);border-radius:7px;
+  padding:7px 11px;font-size:12.5px;color:var(--text1);font-family:var(--sans);outline:none;resize:none}
+#chatInput:focus{border-color:rgba(201,168,76,.4)}
+#chatSend{width:32px;height:32px;border-radius:7px;background:var(--gold);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;transition:all .15s}
+#chatSend:hover{background:var(--gold2)}
+
+@media(max-width:600px){
+  .hero{padding:50px 16px 40px}
+  .hero-stats{gap:24px}
+  .section{padding:0 16px 40px}
+  #chatBox{width:calc(100vw - 36px)}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="nav-logo">
+    <div class="nav-logo-box">ALN</div>
+    <div class="nav-logo-name">ALN</div>
+    <div class="nav-tagline">nền tảng xây dựng</div>
+  </div>
+  <div class="nav-right">
+    <a href="#posts" class="nav-link">Cơ hội</a>
+    <a href="#why" class="nav-link">Lợi ích</a>
+    <a href="#how" class="nav-link">Quy trình</a>
+    <a href="login.html" class="nav-login"><i class="ph-duotone ph-sign-in" style="margin-right:4px"></i>Đăng nhập</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-badge"><i class="ph-duotone ph-circle-wavy-check"></i>Đang tuyển dụng</div>
+  <h1>Xây dựng sự nghiệp<br>cùng nền tảng <span class="gold">ALN</span></h1>
+  <p class="hero-sub">Kết nối Kiến trúc sư, Doanh nghiệp và Chủ nhà — minh bạch theo từng giai đoạn, thanh toán escrow an toàn</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span id="statProjects">—</span><label>dự án đang chạy</label></div>
+    <div class="hero-stat"><span id="statMembers">3</span><label>vai trò chuyên nghiệp</label></div>
+    <div class="hero-stat"><span>C1→C4</span><label>quy trình chuẩn hóa</label></div>
+  </div>
+  <div class="hero-cta">
+    <a href="kts-apply.html" class="cta-btn cta-kts"><i class="ph-duotone ph-pencil-ruler"></i>Đăng ký KTS</a>
+    <a href="dn-studio.html" class="cta-btn cta-dn"><i class="ph-duotone ph-buildings"></i>Đăng ký Doanh nghiệp</a>
+    <a href="designer-apply.html" class="cta-btn cta-des"><i class="ph-duotone ph-paint-brush-household"></i>Đăng ký Designer NT</a>
+  </div>
+</section>
+
+<!-- POSTS SECTION -->
+<div class="section" id="posts">
+  <div class="section-header">
+    <div class="section-label">Cơ hội mở</div>
+    <div class="section-title">Vị trí đang <strong>tuyển dụng</strong></div>
+  </div>
+
+  <div class="filter-row">
+    <div class="filter-tabs">
+      <button class="ftab active-all" onclick="filterPosts('all',this)">Tất cả</button>
+      <button class="ftab" onclick="filterPosts('kts',this)"><i class="ph-duotone ph-pencil-ruler"></i> KTS</button>
+      <button class="ftab" onclick="filterPosts('dn',this)"><i class="ph-duotone ph-buildings"></i> Doanh nghiệp</button>
+      <button class="ftab" onclick="filterPosts('designer',this)"><i class="ph-duotone ph-paint-brush-household"></i> Designer NT</button>
+    </div>
+    <div class="post-count" id="postCount"></div>
+  </div>
+
+  <div class="post-grid" id="postGrid">
+    <!-- loading skeleton -->
+    <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--dim);font-family:var(--mono);font-size:12px">
+      <i class="ph-duotone ph-spinner-gap ph-spin" style="font-size:24px;margin-bottom:10px;display:block"></i>
+      Đang tải...
+    </div>
+  </div>
+</div>
+
+<!-- WHY SECTION -->
+<div class="section" id="why">
+  <div class="section-header">
+    <div class="section-label">Vì sao chọn ALN</div>
+    <div class="section-title">Lợi ích khi <strong>cộng tác</strong></div>
+  </div>
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="why-icon"><i class="ph-duotone ph-lock-key" style="color:var(--gold)"></i></div>
+      <div class="why-title">Thanh toán Escrow an toàn</div>
+      <div class="why-desc">Tiền được giữ trung gian, giải ngân theo từng giai đoạn được duyệt. Cả hai bên đều được bảo vệ.</div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon"><i class="ph-duotone ph-chart-line-up" style="color:var(--gold)"></i></div>
+      <div class="why-title">Thu nhập minh bạch</div>
+      <div class="why-desc">Hoa hồng rõ ràng theo % tổng giá trị công trình, được thỏa thuận từ đầu và ghi vào hệ thống.</div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon"><i class="ph-duotone ph-handshake" style="color:var(--gold)"></i></div>
+      <div class="why-title">Kết nối trực tiếp</div>
+      <div class="why-desc">Founder ALN giới thiệu bạn đến đúng Chủ nhà phù hợp, không qua trung gian ngoài.</div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon"><i class="ph-duotone ph-device-mobile" style="color:var(--gold)"></i></div>
+      <div class="why-title">Quản lý số, realtime</div>
+      <div class="why-desc">Theo dõi tiến độ dự án, tài liệu, đề xuất — tất cả trên một dashboard, không cần email qua lại.</div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon"><i class="ph-duotone ph-users-three" style="color:var(--gold)"></i></div>
+      <div class="why-title">Mạng lưới VIP</div>
+      <div class="why-desc">Xây dựng portfolio và danh tiếng qua các dự án cao cấp, tiếp cận tệp khách hàng chất lượng.</div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon"><i class="ph-duotone ph-bell-ringing" style="color:var(--gold)"></i></div>
+      <div class="why-title">Thông báo tức thì</div>
+      <div class="why-desc">Push notification khi có cập nhật dự án, tài liệu mới, hoặc duyệt giai đoạn — không bỏ lỡ gì.</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section" id="how">
+  <div class="section-header">
+    <div class="section-label">Quy trình</div>
+    <div class="section-title">4 bước <strong>đơn giản</strong></div>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-title">Nộp hồ sơ</div>
+      <div class="step-desc">Điền thông tin, tải portfolio/hồ sơ năng lực qua form đăng ký trực tuyến.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-title">Xét duyệt 24–48h</div>
+      <div class="step-desc">Founder ALN xem xét hồ sơ, phỏng vấn online nếu cần. Thông báo kết quả qua hệ thống.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-title">Kích hoạt tài khoản</div>
+      <div class="step-desc">Sau khi duyệt, bạn nhận thông báo và có thể đăng nhập, hoàn thiện hồ sơ trên dashboard.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-title">Nhận dự án đầu tiên</div>
+      <div class="step-desc">Founder ghép đôi bạn với Chủ nhà phù hợp. Dự án bắt đầu — thu nhập theo từng giai đoạn hoàn thành.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA BANNER -->
+<div class="cta-banner">
+  <h2>Sẵn sàng? Chọn <span style="color:var(--gold)">vai trò</span> của bạn</h2>
+  <p>Hồ sơ được xét duyệt trong 24–48 giờ làm việc</p>
+  <div class="hero-cta">
+    <a href="kts-apply.html" class="cta-btn cta-kts"><i class="ph-duotone ph-pencil-ruler"></i>Tôi là Kiến trúc sư</a>
+    <a href="dn-studio.html" class="cta-btn cta-dn"><i class="ph-duotone ph-buildings"></i>Tôi là Doanh nghiệp</a>
+    <a href="designer-apply.html" class="cta-btn cta-des"><i class="ph-duotone ph-paint-brush-household"></i>Tôi là Designer NT</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  © 2026 ALN Platform — Nền tảng theo dõi công trình xây dựng · <a href="login.html" style="color:var(--dim);text-decoration:none">Đăng nhập</a>
+</footer>
+
+<!-- CHATBOT WIDGET -->
+<div id="chatWidget">
+  <div id="chatBox">
+    <div class="chat-head">
+      <div class="chat-head-left">
+        <div class="chat-avatar">🤖</div>
+        <div>
+          <div class="chat-head-name">Trợ lý ALN</div>
+          <div class="chat-head-status">● Trực tuyến</div>
+        </div>
+      </div>
+      <button id="chatClose" onclick="toggleChat()">✕</button>
+    </div>
+    <div class="chat-msgs" id="chatMsgs"></div>
+    <div class="chat-quick" id="chatQuick">
+      <button class="qbtn" onclick="quickAsk('Đăng ký như thế nào?')">Đăng ký</button>
+      <button class="qbtn" onclick="quickAsk('Thu nhập bao nhiêu?')">Thu nhập</button>
+      <button class="qbtn" onclick="quickAsk('Yêu cầu KTS?')">Yêu cầu KTS</button>
+      <button class="qbtn" onclick="quickAsk('Quy trình dự án?')">Quy trình</button>
+    </div>
+    <div class="chat-input-row">
+      <textarea id="chatInput" rows="1" placeholder="Hỏi về KTS, DN, đăng ký..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea>
+      <button id="chatSend" onclick="sendChat()"><i class="ph-duotone ph-paper-plane-tilt"></i></button>
+    </div>
+  </div>
+  <button id="chatToggle" onclick="toggleChat()" title="Chat với trợ lý ALN">
+    <i class="ph-duotone ph-chats-circle" style="color:#fff" id="chatToggleIcon"></i>
+  </button>
+</div>
+
+<script>
+/* ─── CHATBOT ─── */
+var chatOpen = false;
+var chatBusy = false;
+
+var BOT_RULES = [
+  { kw:['xin chào','hello','chào','hi ','bắt đầu','giới thiệu','bạn là ai'], reply:'Xin chào! Tôi là trợ lý tuyển dụng của <b>ALN</b> — nền tảng kết nối Kiến trúc sư, Doanh nghiệp và Chủ nhà.<br><br>Tôi có thể giúp bạn tìm hiểu về các cơ hội nghề nghiệp, yêu cầu, thu nhập, và hướng dẫn đăng ký. Bạn muốn hỏi về vai trò nào?' },
+  { kw:['kts','kiến trúc sư','architect','thiết kế kiến trúc','kiến trúc'], reply:'<b>Kiến trúc sư (KTS)</b> trên ALN nhận dự án thiết kế công trình cao cấp theo 4 giai đoạn: C1 (Thiết kế cơ sở) → C2 (Triển khai) → C3 (Hồ sơ thi công) → C4 (Giám sát).<br><br>Thu nhập theo % tổng giá trị công trình, thanh toán escrow an toàn sau mỗi giai đoạn được duyệt.<br><br><a href="kts-apply.html">→ Đăng ký KTS ngay</a>' },
+  { kw:['dn','doanh nghiệp','nhà thầu','thi công','xây dựng','contractor','công ty xây'], reply:'<b>Doanh nghiệp thi công</b> trên ALN được founder giới thiệu trực tiếp với Chủ nhà đã xác minh. Hệ thống quản lý tiến độ minh bạch, thanh toán escrow theo giai đoạn.<br><br>Yêu cầu: pháp nhân đầy đủ, ≥5 năm kinh nghiệm, hồ sơ năng lực.<br><br><a href="dn-studio.html">→ Đăng ký Doanh nghiệp</a>' },
+  { kw:['designer','nội thất','interior','thiết kế nội','trang trí','decor'], reply:'<b>Designer Nội thất</b> trên ALN thiết kế không gian sống cho Chủ nhà cao cấp — đa phong cách (Modern, Classic, Japandi, Scandinavian, Tropical…).<br><br>Dashboard riêng, quản lý dự án <code>DES-XXXX</code>, portfolio được xây dựng qua từng công trình.<br><br><a href="designer-apply.html">→ Đăng ký Designer NT</a>' },
+  { kw:['đăng ký','apply','tham gia','join','ứng tuyển','nộp hồ sơ','ứng tuyển'], reply:'Quy trình đăng ký 3 bước đơn giản:<br><br>• Điền thông tin + tải portfolio/hồ sơ<br>• Founder xét duyệt 24–48h<br>• Kích hoạt tài khoản + nhận dự án<br><br><b>Chọn vai trò:</b><br><a href="kts-apply.html">→ Đăng ký KTS</a><br><a href="dn-studio.html">→ Đăng ký Doanh nghiệp</a><br><a href="designer-apply.html">→ Đăng ký Designer NT</a>' },
+  { kw:['thu nhập','lương','tiền','phí','hoa hồng','bao nhiêu','pay','income','kiếm'], reply:'Thu nhập tính theo <b>% tổng giá trị công trình</b>, được thỏa thuận khi ký hợp đồng với Chủ nhà.<br><br>ALN sử dụng <b>escrow</b> — tiền được giữ an toàn và giải ngân theo từng giai đoạn hoàn thành và được duyệt. Không lo bị quỵt tiền.' },
+  { kw:['escrow','bảo đảm','an toàn','an toan','tin tưởng','trust','bảo vệ'], reply:'<b>Escrow ALN</b>: Chủ nhà nạp tiền vào tài khoản trung gian được kiểm soát bởi founder. KTS/DN nhận thanh toán sau khi mỗi giai đoạn được Chủ nhà và founder duyệt.<br><br>Không bên nào có thể đơn phương rút tiền — đảm bảo an toàn 100%.' },
+  { kw:['quy trình','process','giai đoạn','stage','c1','c2','c3','c4','dự án diễn ra'], reply:'Dự án ALN chia <b>4 giai đoạn chuẩn</b>:<br><br>• <b>C1</b> — Thiết kế cơ sở (phương án, mặt bằng)<br>• <b>C2</b> — Triển khai chi tiết (kết cấu, kỹ thuật)<br>• <b>C3</b> — Hồ sơ thi công (bản vẽ đầy đủ)<br>• <b>C4</b> — Giám sát & hoàn công<br><br>Mỗi giai đoạn được Chủ nhà duyệt trước khi chuyển tiếp, escrow giải ngân tương ứng.' },
+  { kw:['yêu cầu','điều kiện','kinh nghiệm','năm','bằng cấp','chứng chỉ','requirement','cần gì','có cần'], reply:'Yêu cầu tối thiểu theo vai trò:<br><br><b>KTS:</b> Chứng chỉ hành nghề, ≥3 năm KN, portfolio ≥5 công trình, thành thạo phần mềm 3D.<br><br><b>Doanh nghiệp:</b> Pháp nhân đầy đủ, ≥5 năm thi công, hồ sơ năng lực ≥10 công trình.<br><br><b>Designer NT:</b> Portfolio ≥3 không gian hoàn chỉnh, ≥1 năm KN thực tế.' },
+  { kw:['chờ duyệt','bao lâu','khi nào','duyệt nhanh','pending','phê duyệt','thời gian'], reply:'Hồ sơ thường được xét duyệt trong <b>24–48 giờ làm việc</b>.<br><br>Sau khi duyệt, bạn sẽ nhận thông báo trực tiếp trên hệ thống và có thể đăng nhập ngay để hoàn thiện hồ sơ.' },
+  { kw:['liên hệ','contact','email','phone','zalo','hỏi thêm','tư vấn thêm'], reply:'Để liên hệ trực tiếp:<br><br>📧 <b>aln.platform@gmail.com</b><br>💬 Zalo OA: ALN Platform<br><br>Chúng tôi phản hồi trong vòng 24 giờ làm việc.' },
+  { kw:['portfolio','hồ sơ năng lực','năng lực','tài liệu','file','upload'], reply:'Khi đăng ký, bạn cần tải lên:<br><br>• <b>KTS:</b> avatar chuyên nghiệp + file portfolio PDF + ảnh công trình<br>• <b>DN:</b> logo + hồ sơ năng lực PDF + ảnh dự án tiêu biểu<br>• <b>Designer:</b> avatar + file portfolio + ảnh không gian đã thực hiện' },
+];
+
+function toggleChat(){
+  chatOpen = !chatOpen;
+  var box = document.getElementById('chatBox');
+  var icon = document.getElementById('chatToggleIcon');
+  box.classList.toggle('open', chatOpen);
+  icon.className = chatOpen ? 'ph-duotone ph-x' : 'ph-duotone ph-chats-circle';
+  if(chatOpen && document.getElementById('chatMsgs').children.length === 0){
+    botSay('Xin chào! 👋 Tôi là trợ lý tuyển dụng của <b>ALN</b>.<br>Tôi có thể giúp bạn tìm hiểu về cơ hội KTS, Doanh nghiệp, Designer — yêu cầu, thu nhập, quy trình đăng ký.<br><br>Bạn muốn hỏi gì?');
+  }
+}
+
+function botSay(html, delay){
+  delay = delay || 0;
+  var msgs = document.getElementById('chatMsgs');
+  var typing = document.createElement('div');
+  typing.className = 'typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(function(){
+    typing.remove();
+    var div = document.createElement('div');
+    div.className = 'msg bot';
+    div.innerHTML = html;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    chatBusy = false;
+  }, delay + 700 + Math.min(html.length * 8, 900));
+}
+
+function userSay(text){
+  var msgs = document.getElementById('chatMsgs');
+  var div = document.createElement('div');
+  div.className = 'msg user';
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function matchBot(text){
+  var t = text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  for(var i=0;i<BOT_RULES.length;i++){
+    var rule = BOT_RULES[i];
+    for(var j=0;j<rule.kw.length;j++){
+      var kw = rule.kw[j].normalize('NFD').replace(/[̀-ͯ]/g,'');
+      if(t.indexOf(kw) !== -1) return rule.reply;
+    }
+  }
+  return null;
+}
+
+function sendChat(){
+  if(chatBusy) return;
+  var inp = document.getElementById('chatInput');
+  var text = inp.value.trim();
+  if(!text) return;
+  inp.value = '';
+  chatBusy = true;
+  userSay(text);
+  var reply = matchBot(text);
+  if(reply){
+    botSay(reply);
+  } else {
+    botSay('Cảm ơn câu hỏi của bạn! 😊 Tôi có thể giúp về:<br><br>• <b>Đăng ký</b> KTS / Doanh nghiệp / Designer<br>• <b>Yêu cầu</b> hồ sơ và điều kiện<br>• <b>Thu nhập</b> và cơ chế escrow<br>• <b>Quy trình</b> dự án 4 giai đoạn<br><br>Bạn hỏi thử một trong các chủ đề trên nhé!');
+  }
+}
+
+function quickAsk(text){
+  document.getElementById('chatInput').value = text;
+  sendChat();
+}
+
+/* ─── POST FILTER ─── */
+var ALL_POSTS = [];
+var activeFilter = 'all';
+
+function filterPosts(type, btn){
+  activeFilter = type;
+  document.querySelectorAll('.ftab').forEach(function(b){ b.className = 'ftab'; });
+  if(btn){
+    var cls = type === 'kts' ? 'active-kts' : type === 'dn' ? 'active-dn' : type === 'designer' ? 'active-des' : 'active-all';
+    btn.className = 'ftab ' + cls;
+  }
+  renderPosts();
+}
+
+function renderPosts(){
+  var grid = document.getElementById('postGrid');
+  var list = activeFilter === 'all' ? ALL_POSTS : ALL_POSTS.filter(function(p){ return p.type === activeFilter; });
+  var cnt = document.getElementById('postCount');
+  cnt.textContent = list.length + ' vị trí';
+
+  if(list.length === 0){
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="ph-duotone ph-megaphone-slash"></i><p>Chưa có bài tuyển dụng nào.<br>Vui lòng liên hệ trực tiếp với chúng tôi.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = list.map(function(p){
+    var icon = p.type === 'kts' ? 'ph-pencil-ruler' : p.type === 'dn' ? 'ph-buildings' : 'ph-paint-brush-household';
+    var label = p.type === 'kts' ? 'KIẾN TRÚC SƯ' : p.type === 'dn' ? 'DOANH NGHIỆP' : 'DESIGNER NT';
+    var link  = p.type === 'kts' ? 'kts-apply.html' : p.type === 'dn' ? 'dn-studio.html' : 'designer-apply.html';
+    var reqs  = (p.requirements || []).slice(0,4).map(function(r){
+      return '<div class="req-item">'+escH(r)+'</div>';
+    }).join('');
+    return '<div class="post-card type-'+p.type+'">'
+      +'<div class="post-header">'
+        +'<div class="post-icon"><i class="ph-duotone '+icon+'"></i></div>'
+        +'<div class="post-meta"><div class="post-type-label">'+label+'</div><div class="post-title">'+escH(p.title)+'</div></div>'
+      +'</div>'
+      +(p.body ? '<div class="post-body">'+escH(p.body)+'</div>' : '')
+      +(reqs ? '<div class="post-reqs">'+reqs+'</div>' : '')
+      +'<div class="post-footer">'
+        +'<a href="'+link+'" class="post-footer-btn"><i class="ph-duotone ph-arrow-right" style="margin-right:5px"></i>Ứng tuyển ngay</a>'
+        +'<span style="font-size:11px;color:var(--dim);font-family:var(--mono)">'+(p.type==='kts'?'KTS':p.type==='dn'?'DN':'Designer NT')+'</span>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function escH(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ─── STATIC FALLBACK POSTS (shown if Firestore has no posts yet) ─── */
+var STATIC_POSTS = [
+  {
+    type:'kts',
+    title:'Tuyển Kiến trúc sư Thiết kế Dân dụng – Dự án Cao cấp',
+    body:'ALN đang tìm kiếm KTS có đam mê sáng tạo, tham gia thiết kế các công trình biệt thự, nhà phố cao cấp cho Chủ nhà. Dự án minh bạch 4 giai đoạn, thanh toán escrow đảm bảo.',
+    requirements:['Chứng chỉ hành nghề kiến trúc sư','Tối thiểu 3 năm kinh nghiệm thiết kế dân dụng','Portfolio ≥5 công trình thực tế','Thành thạo SketchUp / Lumion / Revit']
+  },
+  {
+    type:'dn',
+    title:'Tìm kiếm Đối tác Doanh nghiệp Thi công – Hợp tác Dài hạn',
+    body:'ALN hợp tác với các Doanh nghiệp xây dựng uy tín để thi công công trình dân dụng cao cấp. Kết nối trực tiếp với Chủ nhà đã xác minh, quản lý qua hệ thống số minh bạch.',
+    requirements:['Pháp nhân đầy đủ (ĐKKD, MST)','Tối thiểu 5 năm kinh nghiệm thi công','Hồ sơ năng lực ≥10 công trình','Đội kỹ thuật ổn định, có giám sát công trình']
+  },
+  {
+    type:'designer',
+    title:'Tuyển Designer Nội thất – Dự án Nhà ở Cao cấp',
+    body:'ALN tìm kiếm Designer NT sáng tạo, thiết kế không gian sống đẳng cấp đa phong cách (Modern, Classic, Japandi, Scandinavian…) cho Chủ nhà cao cấp trên toàn quốc.',
+    requirements:['Portfolio ≥3 không gian nội thất hoàn chỉnh','Thành thạo AutoCAD, SketchUp, 3DS Max hoặc Revit','Tối thiểu 1 năm kinh nghiệm thực tế','Nhạy cảm thẩm mỹ, cập nhật xu hướng thiết kế']
+  }
+];
+</script>
+
+<script type="module">
+import { db, collection, query, where, getDocs } from './firebase-config.js';
+
+async function loadPosts(){
+  var grid = document.getElementById('postGrid');
+  try {
+    var q = query(collection(db, 'recruitPosts'), where('status','==','published'));
+    var snap = await getDocs(q);
+    var posts = [];
+    snap.forEach(function(d){ posts.push(Object.assign({id:d.id}, d.data())); });
+    // sort by createdAt desc client-side
+    posts.sort(function(a,b){
+      var ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+      var tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+      return tb - ta;
+    });
+    window.ALL_POSTS = posts.length > 0 ? posts : window.STATIC_POSTS;
+    renderPosts();
+
+    // count live projects for stats
+    try {
+      var psnap = await getDocs(collection(db, 'projects'));
+      var el = document.getElementById('statProjects');
+      if(el) el.textContent = psnap.size;
+    } catch(e){}
+  } catch(e){
+    console.warn('[ALN recruit] Firestore error:', e.message);
+    // Fall back to static posts
+    window.ALL_POSTS = window.STATIC_POSTS;
+    renderPosts();
+  }
+}
+
+loadPosts();
+</script>
+</body>
+</html>
