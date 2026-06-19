@@ -2678,10 +2678,10 @@ function renderMyProjects(projects) {
     const pcts = [10,20,60,10];
     const stLbl = S_LBL[p.status] || p.status;
     const stClr = S_CLR[p.status] || '';
-    const isDN = !!(p.dn && p.dn.uid);
-    const detCode = isDN ? 'ALN-DN-'+(p.CODE||p.code||pid.replace(/^ALN-/,'')) : 'ALN-CN-'+pid.replace(/^ALN-/,'');
-    const bar = prog.map((v,i) => `<div style="flex:${pcts[i]};height:7px;background:${v>0?SCOLS[i]:'rgba(0,0,0,.1)'};border-radius:99px"></div>`).join('');
     const pid = p.id;
+    const isDN = !!(p.dn && p.dn.uid);
+    const detCode = isDN ? 'ALN-DN-'+(p.CODE||p.code||pid.replace(/^ALN-/,'')) : 'ALN-CN-'+(p.CHUNHA||pid.replace(/^ALN-/,''));
+    const bar = prog.map((v,i) => `<div style="flex:${pcts[i]};height:7px;background:${v>0?SCOLS[i]:'rgba(0,0,0,.1)'};border-radius:99px"></div>`).join('');
     const stages = ['C1','C2','C3','C4'].map((c,i) =>
       `<span style="color:${prog[i]>0?SCOLS[i]:'var(--muted)'};font-weight:${prog[i]>0?700:400}">${c}&nbsp;${Math.round((prog[i]||0)*100)}%</span>`
     ).join('&ensp;');
