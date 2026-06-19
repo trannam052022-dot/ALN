@@ -3357,19 +3357,29 @@ function _watchDocs(pid) {
         const isImg = ['JPG','JPEG','PNG','GIF','WEBP'].includes(ext);
         const roleLabel = upRole==='kts' ? 'KTS' : upRole==='dn' ? 'DN' : 'CN';
         const roleColor = upRole==='kts' ? 'var(--gold)' : upRole==='dn' ? 'var(--blue)' : 'var(--green)';
-        const thumb = isImg && dc.url
-          ? `<img src="${dc.url}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0;border:1px solid var(--border)">`
-          : `<div style="width:36px;height:36px;border-radius:8px;background:var(--ink2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;color:${iconColor}"><i class="ph-duotone ${iconClass}"></i></div>`;
+        const dlBtn = dc.url ? `<a href="${dc.url}" target="_blank" style="flex-shrink:0;width:30px;height:30px;border-radius:7px;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none;border:1px solid rgba(37,99,235,.2)" title="Tải về"><i class="ph-duotone ph-download-simple"></i></a>` : '';
+        const meta = `<div style="font-size:10px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:5px"><span style="color:${roleColor};font-weight:700;background:${roleColor}1a;padding:1px 6px;border-radius:4px">${roleLabel}</span><span>${upName}</span><span>·</span><span>${dc.date || ''}</span></div>`;
+        if (isImg && dc.url) {
+          return `<div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;background:var(--ink3);transition:box-shadow .15s" onmouseover="this.style.boxShadow='var(--sh)'" onmouseout="this.style.boxShadow='none'">
+            <div style="width:100%;height:150px;overflow:hidden;background:var(--ink4);cursor:pointer" onclick="window.open('${dc.url}','_blank')">
+              <img src="${dc.url}" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''">
+            </div>
+            <div style="padding:8px 10px;display:flex;align-items:center;gap:8px">
+              <div style="flex:1;min-width:0">
+                <div style="font-size:11px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${dc.name || '(không tên)'}</div>
+                ${meta}
+              </div>
+              ${dlBtn}
+            </div>
+          </div>`;
+        }
         return `<div style="display:flex;align-items:center;gap:10px;background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px;transition:box-shadow .15s" onmouseover="this.style.boxShadow='var(--sh)'" onmouseout="this.style.boxShadow='none'">
-          ${thumb}
+          <div style="width:48px;height:48px;border-radius:8px;background:var(--ink2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;color:${iconColor}"><i class="ph-duotone ${iconClass}"></i></div>
           <div style="flex:1;min-width:0">
             <div style="font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${dc.name || '(không tên)'}</div>
-            <div style="font-size:10px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:6px">
-              <span style="color:${roleColor};font-weight:700;background:${roleColor}1a;padding:1px 6px;border-radius:4px">${roleLabel}</span>
-              <span>${upName}</span><span>·</span><span>${dc.date || ''}</span>
-            </div>
+            ${meta}
           </div>
-          ${dc.url ? `<a href="${dc.url}" target="_blank" style="flex-shrink:0;width:30px;height:30px;border-radius:7px;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none;border:1px solid rgba(37,99,235,.2)" title="Tải về"><i class="ph-duotone ph-download-simple"></i></a>` : ''}
+          ${dlBtn}
         </div>`;
       }).join('');
     }, err => { console.warn('[RV docs]', err); });
