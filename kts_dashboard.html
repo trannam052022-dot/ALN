@@ -2619,7 +2619,7 @@ function renderMyProjects(projects) {
     const isOn = p.id === window._mplActiveId;
     const showCN = asCN !== undefined ? asCN : (window._mplFilter === 'cn');
     const client = showCN ? (p.cn&&p.cn.name)||'—' : (p.dn&&p.dn.name)||'—';
-    const mCode = showCN ? 'ALN-CN-'+p.id.replace(/^ALN-/,'') : 'ALN-DN-'+(p.CODE||p.code||p.id.replace(/^ALN-/,''));
+    const mCode = showCN ? 'ALN-CN-'+(p.CODE||p.code||p.id.replace(/^ALN-/,'')) : 'ALN-DN-'+(p.CODE||p.code||p.id.replace(/^ALN-/,''));
     return `<div class="mpl-item${isOn?' on':''}" data-pid="${p.id}" onclick="window.mplSelect('${p.id}')">
       <div class="mpl-dot" style="background:${S_DOT[p.status]||'var(--muted)'}"></div>
       <div style="flex:1;min-width:0">
