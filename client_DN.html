@@ -1057,9 +1057,17 @@ function openPAReview(projId, rid, paId){
   document.getElementById('paRvName').textContent = pa.name;
   document.getElementById('paRvMeta').innerHTML = (pa.version||'v1.0')+' · <span style="color:'+fl.color+'">'+fl.label+'</span>'+(pa.date?' · '+pa.date:'');
   var wrap = document.getElementById('paRvImgWrap');
-  wrap.innerHTML = pa.imageURL
-    ? '<img src="'+pa.imageURL+'" alt="" style="width:100%;height:auto;display:block">'
-    : '<div style="display:flex;align-items:center;justify-content:center;min-height:160px"><span style="font-size:72px;filter:drop-shadow(0 2px 12px rgba(0,0,0,.5))">'+(pa.icon||'')+'</span></div>';
+  wrap.innerHTML = '';
+  if(pa.imageURL){
+    var _img = document.createElement('img');
+    _img.alt = pa.name || '';
+    _img.style.cssText = 'width:100%;height:auto;display:block;min-height:220px;background:#111';
+    _img.onerror = function(){ this.style.display='none'; wrap.insertAdjacentHTML('beforeend','<div style="padding:30px;text-align:center;color:rgba(255,255,255,.5);font-size:12px">Không tải được ảnh</div>'); };
+    wrap.appendChild(_img);
+    _img.src = pa.imageURL;
+  } else {
+    wrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:160px"><span style="font-size:72px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))">📐</span></div>';
+  }
   var descEl = document.getElementById('paRvDesc');
   if(pa.desc){ descEl.textContent = pa.desc; descEl.style.display=''; } else { descEl.style.display='none'; }
   var footer = document.getElementById('paRvFooter');
@@ -2343,12 +2351,14 @@ const NOTIFS=[
   {icon:'<i class="ph-duotone ph-check-circle"></i>',body:'<b>Giải ngân C1</b> đã hoàn tất — +11,162,500đ về KTS',proj:'ALN-9921',ts:'2 giờ trước',unread:false},
 ];
 function renderNotifs(){
-  document.getElementById('notifList').innerHTML=NOTIFS.map(n=>`
-    <div class="notif-item ${n.unread?'unread':''}" onclick="selectProj('${n.proj}');toggleNotifPanel()">
+  document.getElementById('notifList').innerHTML=NOTIFS.map(n=>{
+    const tabAction = n.tab ? `setTimeout(function(){try{cur='${n.tab}';window.cnApplyTabs();}catch(e){}},180);` : '';
+    return `<div class="notif-item ${n.unread?'unread':''}" onclick="selectProj('${n.proj}');toggleNotifPanel();${tabAction}">
       <span class="ni-icon">${n.icon}</span>
       <span class="ni-body">${n.body}</span>
       <span class="ni-ts">${n.ts}</span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 function toggleNotifPanel(){
   const p=document.getElementById('notifPanel');
@@ -2394,6 +2404,8 @@ ALNRealtime.init({
     if(d.type==='PROPOSAL_SENT' && Array.isArray(d.audience) && d.audience.includes('dn') && !d._replay) {
       const _pMsg = d.text || ('📐 KTS vừa gửi phương án chặng ' + (d.stage||'') + '. Xem trong trang dự án.');
       _alnReceive({ text:_pMsg, senderName:d.senderName||'KTS', _role:'kts', ts:Date.now() });
+      _addNotif('📐', `<b>${d.senderName||'KTS'}</b> vừa gửi ${d.count||1} phương án chặng <b>${d.stage||''}</b> — Bấm để xem`, d.projectId||window.activeProj, 'rv');
+      renderNotifs();
       showToast('📐 ' + (d.senderName||'KTS') + ' vừa gửi phương án chặng ' + (d.stage||''), 't-green');
     }
 
@@ -2497,8 +2509,8 @@ window.zpSend = function() {
   ALNRealtime.send({ type:'ALN_CHAT', channel:'zalo', projectId:window.activeProj, text:txt, senderName:DN_USER.name||'Doanh nghiệp', senderRole:'dn' });
 };
 
-function _addNotif(icon,body,projId){
-  NOTIFS.unshift({icon,body,proj:projId,ts:'Vừa xong',unread:true});
+function _addNotif(icon,body,projId,tab){
+  NOTIFS.unshift({icon,body,proj:projId,ts:'Vừa xong',unread:true,tab:tab||null});
   const cnt=NOTIFS.filter(n=>n.unread).length;
   const el=document.getElementById('notifCount');
   if(el){el.style.display='flex';el.textContent=cnt;}
