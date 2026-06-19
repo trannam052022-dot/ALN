@@ -1852,7 +1852,7 @@ function renderMain(){
 
       <!-- ══ KTS compact row ══ -->
       <div style="margin-top:10px;display:flex;align-items:center;gap:8px;background:var(--ink3);border:1px solid var(--border);border-radius:7px;padding:7px 12px;flex-wrap:wrap;box-shadow:var(--sh)">
-        <div id="ktsHeroAv" style="width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(201,168,76,.45);flex-shrink:0;background:rgba(201,168,76,.14);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--gold);font-family:var(--syne);letter-spacing:-.5px">${(function(){var nm=p.kts.replace(/^KTS\.\s*/,'');var pts=nm.split(' ').filter(Boolean);return (pts[0]||'K')[0].toUpperCase()+(pts[pts.length-1]||'')[0].toUpperCase();}())}</div>
+        <div id="ktsHeroAv" style="width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(201,168,76,.45);flex-shrink:0;background:rgba(201,168,76,.14);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--gold);font-family:var(--syne);letter-spacing:-.5px">${(function(){var nm=(p.kts||'').replace(/^KTS\.\s*/,'');var pts=nm.split(' ').filter(Boolean);if(!pts.length)return 'KT';return pts[0][0].toUpperCase()+(pts.length>1?pts[pts.length-1][0].toUpperCase():'');}())}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:11px;font-weight:700;color:var(--text2)">${p.kts}</div>
           <div style="font-size:9px;color:var(--muted);margin-top:1px;font-family:var(--mono)">${ki.cchn}</div>
@@ -2403,7 +2403,7 @@ ALNRealtime.init({
       if(!window._dnSeenProposalNotifs) window._dnSeenProposalNotifs = new Set();
       if(!window._dnSeenProposalNotifs.has(_pCid)){
         window._dnSeenProposalNotifs.add(_pCid);
-        _addNotif('<i class="ph-duotone ph-image-square"></i>', `<b>${d.senderName||'KTS'}</b> vừa gửi ${d.count||1} phương án chặng <b>${d.stage||''}</b> — Bấm để xem`, d.projectId||window.activeProj, 'rv');
+        _addNotif('<i class="ph-duotone ph-image"></i>', `<b>${d.senderName||'KTS'}</b> vừa gửi ${d.count||1} phương án chặng <b>${d.stage||''}</b> — Bấm để xem`, d.projectId||window.activeProj, 'rv');
         renderNotifs();
       }
       if(!d._replay) {
@@ -3126,6 +3126,21 @@ window._dnSubProposals = function(pid) {
         var url = (d.data().imageURL) || '';
         if (url) window._dnImgMap[d.id] = url;
       });
+      // Thêm notification nếu có proposals pending — dùng Firestore làm nguồn thay vì ALNRealtime
+      var pendingPA = snap.docs.filter(function(d){ return (d.data().status||'pending')==='pending'; });
+      if (pendingPA.length > 0) {
+        if (!window._dnSeenProposalNotifs) window._dnSeenProposalNotifs = new Set();
+        var notifKey = pid + '_' + stage;
+        if (!window._dnSeenProposalNotifs.has(notifKey)) {
+          window._dnSeenProposalNotifs.add(notifKey);
+          var senderName = (pendingPA[0].data().createdBy && pendingPA[0].data().createdBy.name) || 'KTS';
+          if (typeof _addNotif === 'function') {
+            _addNotif('<i class="ph-duotone ph-image"></i>',
+              '<b>' + senderName + '</b> vừa gửi <b>' + pendingPA.length + '</b> phương án chặng <b>' + stage + '</b> — Bấm để xem',
+              pid, 'rv');
+          }
+        }
+      }
       if (window.activeProj === pid && typeof window.renderMain === 'function') {
         try { window.renderMain(); } catch(e){}
       }
