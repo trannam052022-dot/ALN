@@ -1957,11 +1957,12 @@ ALNRealtime.init({
     }
     // DN gửi tài liệu cho KTS
     if(d.type==='DN_FILE_UPLOADED' && Array.isArray(d.audience) && d.audience.includes('kts')) {
-      const _dnMsg = `📁 ${d.senderName||'Doanh nghiệp'} gửi ${d.count||1} tài liệu — dự án ${d.projectId||''}`;
+      const _dnMsg = `📁 ${d.senderName||'Doanh nghiệp'} gửi ${d.count||1} tài liệu — dự án ${d.projectId||''} · Xem: Bảng Review → Tài liệu`;
       showToast(_dnMsg, 't-blue');
       _alnReceive({ text: _dnMsg, senderName: d.senderName||'Doanh nghiệp', _role:'dn', ts: Date.now(), _replay: d._replay });
-      if(!d._replay && window.KTS_PROJECT_ID === d.projectId && typeof window._alnWatchDocs === 'function') {
+      if(!d._replay && typeof window._alnWatchDocs === 'function') {
         window._alnWatchDocs(d.projectId);
+        if(typeof window.rvSwitch === 'function') window.rvSwitch('doc');
       }
     }
     // Rating nhận được
