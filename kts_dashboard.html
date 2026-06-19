@@ -1020,11 +1020,11 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       </div>
       <!-- Tab bar -->
       <div style="display:flex;border-bottom:1px solid var(--border);margin-bottom:12px">
-        <button id="rvTabImg" onclick="rvSwitch('img')" style="background:none;border:none;border-bottom:2px solid var(--gold);padding:7px 14px;font-size:12px;font-weight:600;color:var(--gold);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><i class="ph-duotone ph-image-square"></i> Phương án ảnh</button>
-        <button id="rvTabDoc" onclick="rvSwitch('doc')" style="background:none;border:none;border-bottom:2px solid transparent;padding:7px 14px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><i class="ph-duotone ph-files"></i> Tài liệu</button>
+        <button id="rvTabImg" onclick="rvSwitch('img')" style="background:none;border:none;border-bottom:2px solid transparent;padding:7px 14px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><i class="ph-duotone ph-image-square"></i> Phương án ảnh</button>
+        <button id="rvTabDoc" onclick="rvSwitch('doc')" style="background:none;border:none;border-bottom:2px solid var(--gold);padding:7px 14px;font-size:12px;font-weight:600;color:var(--gold);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><i class="ph-duotone ph-files"></i> Tài liệu</button>
       </div>
       <!-- Panel: phương án ảnh -->
-      <div id="rvPanelImg">
+      <div id="rvPanelImg" style="display:none">
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
           <button class="btn btn-sm btn-ghost" id="rvBtnC1" onclick="rvLoadStage('C1')">C1</button>
           <button class="btn btn-sm btn-primary" id="rvBtnC2" onclick="rvLoadStage('C2')">C2</button>
@@ -1034,7 +1034,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <div id="rvImgList"><div style="color:var(--muted);font-size:12px;padding:8px">Đang tải dữ liệu...</div></div>
       </div>
       <!-- Panel: tài liệu -->
-      <div id="rvPanelDoc" style="display:none">
+      <div id="rvPanelDoc">
         <div id="rvDocList"><div style="color:var(--muted);font-size:12px;padding:8px">Đang tải...</div></div>
       </div>
     </div>
@@ -2374,8 +2374,7 @@ function _startKtsProjectListen(uid) {
     window.KTS_PROJECT_ID   = d.id;
     window.KTS_PROJECT_DATA = d.data();
     const p = d.data();
-    const _isCN = !!(p.cn && p.cn.uid);
-    const _displayId = (_isCN ? 'ALN-CN-' : 'ALN-DN-') + d.id.replace(/^ALN-/, '');
+    const _displayId = 'ALN-DN-' + d.id.replace(/^ALN-/, '');
 
     // Cập nhật tất cả chỗ hiển thị project ID
     const _setTxt = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
@@ -2410,8 +2409,7 @@ function _startKtsProjectListen(uid) {
     const _rvPicker = document.getElementById('rvProjPicker');
     if (_rvPicker) {
       _rvPicker.innerHTML = allProjs.map(p => {
-        const _isDNp = !!(p.dn && p.dn.uid) && !(p.cn && p.cn.uid);
-        const _shortId = (_isDNp ? 'DN · ' : 'CN · ') + p.id.replace(/^ALN-/, '');
+        const _shortId = 'DN · ' + p.id.replace(/^ALN-/, '');
         return `<option value="${p.id}"${p.id === window.KTS_PROJECT_ID ? ' selected' : ''}>${_shortId} — ${p.name || ''}</option>`;
       }).join('');
     }
@@ -2451,8 +2449,7 @@ window.switchKtsProject = function(pid) {
   if (!pr) return;
   window.KTS_PROJECT_ID = pid;
   window.KTS_PROJECT_DATA = pr;
-  const _isCN = !!(pr.cn && pr.cn.uid);
-  const _displayId = (_isCN ? 'ALN-CN-' : 'ALN-DN-') + pid.replace(/^ALN-/, '');
+  const _displayId = 'ALN-DN-' + pid.replace(/^ALN-/, '');
   const _setTxt = function(id, v){ const el=document.getElementById(id); if(el) el.textContent=v; };
   _setTxt('paProjTitle', '#' + _displayId);
   _setTxt('slaProjId', '#' + _displayId);
@@ -3107,8 +3104,7 @@ window.alnSubmitProposal = async function(){
 
   // Mục 9: xác nhận trước khi gửi
   const total=_paFiles.length;
-  const _isCNp = !!(window.KTS_PROJECT_DATA && window.KTS_PROJECT_DATA.cn && window.KTS_PROJECT_DATA.cn.uid);
-  const _dpid = (_isCNp?'ALN-CN-':'ALN-DN-') + PID.replace(/^ALN-/,'');
+  const _dpid = 'ALN-DN-' + PID.replace(/^ALN-/,'');
   paStatus(`<div style="background:var(--ink3);border:1px solid rgba(212,160,23,.3);border-radius:8px;padding:10px 12px">
     <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">📋 Sắp gửi <b>${total} ảnh</b> · Chặng <b>${stage}</b> · <b>${name}</b></div>
     <div style="font-size:10px;color:var(--sub);margin-bottom:10px">Dự án ${_dpid} — Chủ nhà &amp; DN nhận ngay sau khi gửi.</div>
@@ -3312,8 +3308,7 @@ function _watchDocs(pid) {
   const projIdEl = document.getElementById('rvProjId');
   if (projIdEl) {
     const _kd = window.KTS_PROJECT_DATA || {};
-    const _isCNrv = !!(_kd.cn && _kd.cn.uid);
-    projIdEl.textContent = '#' + (_isCNrv ? 'ALN-CN-' : 'ALN-DN-') + pid.replace(/^ALN-/, '');
+    projIdEl.textContent = '#ALN-DN-' + pid.replace(/^ALN-/, '');
   }
   if (!list) return;
   if (_rvDocUnsub) { try { _rvDocUnsub(); } catch(e) {} _rvDocUnsub = null; }
