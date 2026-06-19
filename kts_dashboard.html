@@ -3360,8 +3360,10 @@ function _watchDocs(pid) {
         const dlBtn = dc.url ? `<a href="${dc.url}" target="_blank" style="flex-shrink:0;width:30px;height:30px;border-radius:7px;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none;border:1px solid rgba(37,99,235,.2)" title="Tải về"><i class="ph-duotone ph-download-simple"></i></a>` : '';
         const meta = `<div style="font-size:10px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:5px"><span style="color:${roleColor};font-weight:700;background:${roleColor}1a;padding:1px 6px;border-radius:4px">${roleLabel}</span><span>${upName}</span><span>·</span><span>${dc.date || ''}</span></div>`;
         if (isImg && dc.url) {
+          const _ua = dc.url.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+          const _na = (dc.name||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
           return `<div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;background:var(--ink3);transition:box-shadow .15s" onmouseover="this.style.boxShadow='var(--sh)'" onmouseout="this.style.boxShadow='none'">
-            <div style="width:100%;height:150px;overflow:hidden;background:var(--ink4);cursor:pointer" onclick="window.open('${dc.url}','_blank')">
+            <div style="width:100%;height:150px;overflow:hidden;background:var(--ink4);cursor:zoom-in" data-u="${_ua}" data-n="${_na}" onclick="_showDocImg(this.dataset.u,this.dataset.n)">
               <img src="${dc.url}" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''">
             </div>
             <div style="padding:8px 10px;display:flex;align-items:center;gap:8px">
@@ -3386,6 +3388,46 @@ function _watchDocs(pid) {
   } catch(e) { console.error(e); }
 }
 window._alnWatchDocs = _watchDocs;
+
+window._showDocImg = function(url, name) {
+  var existing = document.getElementById('_docImgLightbox');
+  if (existing) { try { document.body.removeChild(existing); } catch(e2) {} }
+  var ol = document.createElement('div');
+  ol.id = '_docImgLightbox';
+  ol.setAttribute('style', 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;cursor:zoom-out');
+  function closeLb() { try { document.body.removeChild(ol); } catch(e2) {} document.removeEventListener('keydown', onKey); }
+  function onKey(e) { if (e.key === 'Escape') closeLb(); }
+  ol.addEventListener('click', function(e) { if (e.target === ol) closeLb(); });
+  document.addEventListener('keydown', onKey);
+  var wrap = document.createElement('div');
+  wrap.setAttribute('style', 'position:relative;max-width:92vw;max-height:92vh;display:flex;flex-direction:column;align-items:center;gap:10px');
+  var img = document.createElement('img');
+  img.src = url;
+  img.setAttribute('style', 'max-width:100%;max-height:80vh;object-fit:contain;border-radius:10px;box-shadow:0 12px 48px rgba(0,0,0,.6);cursor:default');
+  img.addEventListener('click', function(e) { e.stopPropagation(); });
+  wrap.appendChild(img);
+  var bar = document.createElement('div');
+  bar.setAttribute('style', 'display:flex;align-items:center;gap:10px');
+  var nameEl = document.createElement('span');
+  nameEl.textContent = name || '';
+  nameEl.setAttribute('style', 'font-size:11px;color:rgba(255,255,255,.6);max-width:55vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap');
+  bar.appendChild(nameEl);
+  var dlLink = document.createElement('a');
+  dlLink.href = url;
+  dlLink.target = '_blank';
+  dlLink.innerHTML = '<i class="ph-duotone ph-download-simple"></i> Tải về';
+  dlLink.setAttribute('style', 'color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:5px 12px;font-size:11px;text-decoration:none;display:flex;align-items:center;gap:5px;white-space:nowrap');
+  dlLink.addEventListener('click', function(e) { e.stopPropagation(); });
+  bar.appendChild(dlLink);
+  wrap.appendChild(bar);
+  var closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  closeBtn.setAttribute('style', 'position:absolute;top:-10px;right:-10px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);color:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;font-family:sans-serif;line-height:1');
+  closeBtn.addEventListener('click', function(e) { e.stopPropagation(); closeLb(); });
+  wrap.appendChild(closeBtn);
+  ol.appendChild(wrap);
+  document.body.appendChild(ol);
+};
 
 /* ══ NỘP HỒ SƠ C3 — UPLOAD THẬT LÊN FIREBASE ══ */
 window.submitC3 = async function() {
