@@ -32,6 +32,13 @@ service cloud.firestore {
       allow update, delete: if isFounder();
     }
 
+    match /dnApplications/{uid} {
+      allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow create: if signedIn() && request.auth.uid == uid;
+      allow update: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow delete: if isFounder();
+    }
+
     match /ktsApplications/{uid} {
       allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
       allow create: if signedIn() && request.auth.uid == uid;

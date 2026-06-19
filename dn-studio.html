@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio KTS Trực Tuyến — App Làm Nhà</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+:root{
+  --bg:#080c14;--bg2:#0e1422;--bg3:#141b2e;
+  --card:rgba(14,20,34,.88);
+  --border:rgba(255,255,255,.07);--border-g:rgba(201,168,76,.18);
+  --muted:rgba(228,212,176,.38);--text:#f0e6cc;--text2:rgba(240,230,204,.62);
+  --gold:#C9A84C;--gold2:#e8d07a;--gold-bg:rgba(201,168,76,.08);
+  --green:#3dd68c;--red:#f06060;
+  --r:14px;
+  --mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;
+  --serif:'Cormorant Garamond',serif;--syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);background:var(--bg);color:var(--text);
+  min-height:100vh;font-size:13px;line-height:1.6;
+  background-image:
+    linear-gradient(rgba(201,168,76,.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(201,168,76,.022) 1px,transparent 1px);
+  background-size:56px 56px;
+}
+body::before{
+  content:'';position:fixed;top:-15%;left:50%;transform:translateX(-50%);
+  width:700px;height:500px;
+  background:radial-gradient(ellipse,rgba(201,168,76,.11) 0%,transparent 68%);
+  pointer-events:none;z-index:0;
+}
+a{color:var(--gold);text-decoration:none}
+input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:99px}
+
+.page{max-width:540px;margin:0 auto;padding:0 20px 72px;position:relative;z-index:1}
+
+/* ── HERO ── */
+.hero{padding:52px 0 36px;text-align:center;position:relative}
+.hero-eyebrow{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px}
+.ey-line{flex:1;max-width:64px;height:1px}
+.ey-line-l{background:linear-gradient(90deg,transparent,rgba(201,168,76,.55))}
+.ey-line-r{background:linear-gradient(270deg,transparent,rgba(201,168,76,.55))}
+.ey-text{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);opacity:.8}
+.hero-title{font-family:var(--serif);font-size:38px;font-weight:300;color:var(--text);line-height:1.15;margin-bottom:12px}
+.hero-title em{font-style:italic;font-weight:600;color:var(--gold2)}
+.hero-sub{font-size:12px;color:var(--muted);max-width:340px;margin:0 auto 28px;line-height:1.75}
+
+/* Value props — 3 cards ngang */
+.vp-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 auto}
+.vp-card{background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.14);border-radius:10px;padding:14px 10px;text-align:center}
+.vp-icon{font-size:22px;color:var(--gold);margin-bottom:7px;opacity:.85}
+.vp-title{font-family:var(--syne);font-size:10px;font-weight:700;color:var(--text2);line-height:1.3}
+.vp-sub{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.4}
+
+/* ── STEPPER ── */
+.stepper-wrap{padding:28px 0 0}
+.stepper{display:flex;align-items:flex-start;position:relative}
+.stepper-track{position:absolute;top:14px;left:calc(100% / 8);right:calc(100% / 8);height:1px;background:rgba(255,255,255,.08);z-index:0}
+.stepper-fill{position:absolute;top:14px;left:calc(100% / 8);height:1px;background:linear-gradient(90deg,var(--gold),rgba(201,168,76,.45));z-index:1;width:0%;transition:width .4s ease}
+.step-item{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;z-index:2}
+.step-circle{width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:600;color:var(--muted);transition:all .25s}
+.step-item.active .step-circle{border-color:var(--gold);background:rgba(201,168,76,.14);color:var(--gold);box-shadow:0 0 14px rgba(201,168,76,.35)}
+.step-item.done .step-circle{border-color:rgba(201,168,76,.35);background:rgba(201,168,76,.07);color:rgba(201,168,76,.65)}
+.step-label{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:7px;text-align:center;line-height:1.2}
+.step-item.active .step-label,.step-item.done .step-label{color:rgba(201,168,76,.65)}
+
+/* ── CARD ── */
+.card{background:var(--card);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid var(--border-g);border-radius:var(--r);padding:26px 24px;margin-top:22px;box-shadow:0 24px 72px rgba(0,0,0,.55),0 0 0 1px rgba(201,168,76,.04)}
+.card-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.05)}
+.card-badge{font-family:var(--mono);font-size:9px;font-weight:700;color:rgba(201,168,76,.6);background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.18);border-radius:6px;padding:4px 9px;white-space:nowrap;margin-top:2px;flex-shrink:0}
+.card-title{font-family:var(--syne);font-size:16px;font-weight:700;color:var(--text);line-height:1.2}
+.card-sub{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.45}
+
+/* ── FIELDS ── */
+.field{margin-bottom:20px}
+.field label{display:block;font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.field label .req{color:rgba(201,168,76,.75);margin-left:2px;font-size:8px}
+.field input,.field select,.field textarea{
+  width:100%;background:transparent;border:none;
+  border-bottom:1px solid rgba(255,255,255,.11);border-radius:0;
+  padding:8px 0 10px;color:var(--text);font-size:14px;font-family:var(--sans);
+  outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-bottom-color:var(--gold)}
+.field select{
+  cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath fill='%23C9A84C' opacity='.6' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 2px center;padding-right:20px;
+}
+.field select option{background:#141b2e;color:var(--text)}
+.field textarea{border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 13px;background:rgba(255,255,255,.025);resize:vertical;min-height:80px}
+.field textarea:focus{border-color:rgba(201,168,76,.38)}
+.field-hint{font-size:10px;color:var(--muted);margin-top:6px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+
+/* ── PROJECT TYPE CHIPS ── */
+.chip-grid{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.pt-chip{display:flex;align-items:center;gap:5px;padding:7px 13px;border:1px solid rgba(255,255,255,.1);border-radius:99px;cursor:pointer;font-size:11px;font-weight:500;color:rgba(228,212,176,.45);background:rgba(255,255,255,.025);user-select:none;transition:all .15s}
+.pt-chip input{display:none}
+.pt-chip:hover{border-color:rgba(201,168,76,.35);color:rgba(201,168,76,.7)}
+.pt-chip.on{border-color:rgba(201,168,76,.55);background:rgba(201,168,76,.1);color:var(--gold);font-weight:700}
+
+/* ── USERNAME ── */
+.uname-card{background:linear-gradient(135deg,rgba(201,168,76,.06) 0%,rgba(201,168,76,.11) 100%);border:1px solid rgba(201,168,76,.22);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.uname-left{flex:1;min-width:0}
+.uname-eyebrow{font-family:var(--syne);font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,168,76,.45);margin-bottom:4px}
+.uname-val{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uname-domain{font-family:var(--mono);font-size:10px;color:rgba(201,168,76,.38);margin-top:2px}
+.uname-regen{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.25);border-radius:8px;padding:7px 12px;color:rgba(201,168,76,.8);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:5px;flex-shrink:0}
+.uname-regen:hover{background:rgba(201,168,76,.14);color:var(--gold)}
+
+/* ── AGREE ── */
+.agree-row{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:rgba(255,255,255,.025);border-radius:8px;border:1px solid rgba(255,255,255,.06)}
+.agree-row input[type=checkbox]{width:15px;height:15px;flex-shrink:0;margin-top:2px;accent-color:var(--gold);cursor:pointer}
+.agree-row span{font-size:11px;color:var(--text2);line-height:1.55}
+
+/* ── BUTTONS ── */
+.btn-row{display:flex;gap:10px;margin-top:26px}
+.btn{flex:1;padding:13px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:var(--syne);display:flex;align-items:center;justify-content:center;gap:7px;transition:all .22s;letter-spacing:.04em}
+.btn-primary{background:linear-gradient(100deg,#a07830 0%,#e8d07a 45%,#C9A84C 100%);background-size:200% 100%;background-position:0% 0%;color:#0a0a10}
+.btn-primary:hover:not(:disabled){background-position:100% 0%;box-shadow:0 0 32px rgba(201,168,76,.32),0 4px 16px rgba(0,0,0,.4)}
+.btn-primary:disabled{opacity:.38;cursor:not-allowed}
+.btn-ghost{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);color:var(--text2)}
+.btn-ghost:hover{border-color:rgba(201,168,76,.3);color:rgba(201,168,76,.8);background:rgba(201,168,76,.04)}
+.ph-spin{animation:phspin 1s linear infinite;display:inline-block}
+@keyframes phspin{to{transform:rotate(360deg)}}
+
+/* ── SUCCESS ── */
+.success-wrap{text-align:center;padding:18px 0 8px}
+.success-icon{width:80px;height:80px;border-radius:50%;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.22);display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--gold);margin:0 auto 18px}
+.success-title{font-family:var(--serif);font-size:30px;font-weight:600;color:var(--text);margin-bottom:8px;line-height:1.2}
+.success-sub{font-size:12px;color:var(--text2);line-height:1.7;max-width:310px;margin:0 auto 20px}
+.success-uname{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--gold);background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.22);border-radius:8px;padding:10px 22px;display:inline-block;margin-bottom:22px}
+.next-steps{text-align:left;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px 16px}
+.next-steps li{font-size:12px;color:var(--text2);padding:5px 0;display:flex;align-items:flex-start;gap:10px;line-height:1.5;list-style:none}
+.next-steps li i{color:var(--gold);flex-shrink:0;margin-top:1px;font-size:14px}
+
+.page-footer{text-align:center;padding:28px 0 0;font-size:10px;color:var(--muted);letter-spacing:.05em}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(14,20,34,.97);border:1px solid rgba(255,255,255,.1);color:var(--text);font-size:12px;font-weight:500;padding:10px 22px;border-radius:99px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.7);opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+.toast.err{border-color:rgba(240,96,96,.35);color:#f09898}
+
+@media(max-width:480px){
+  .hero-title{font-size:28px}
+  .hero{padding:40px 0 28px}
+  .card{padding:18px 16px}
+  .field-row{grid-template-columns:1fr}
+  .vp-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ── HERO ── -->
+  <header class="hero">
+    <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden" aria-hidden="true">
+      <svg viewBox="0 0 540 200" xmlns="http://www.w3.org/2000/svg" fill="none" style="width:100%;height:100%;position:absolute;top:0;left:0">
+        <path d="M8 8 L8 36 M8 8 L36 8" stroke="rgba(201,168,76,.38)" stroke-width="1.5"/>
+        <path d="M532 8 L532 36 M532 8 L504 8" stroke="rgba(201,168,76,.38)" stroke-width="1.5"/>
+        <path d="M8 192 L8 164 M8 192 L36 192" stroke="rgba(201,168,76,.38)" stroke-width="1.5"/>
+        <path d="M532 192 L532 164 M532 192 L504 192" stroke="rgba(201,168,76,.38)" stroke-width="1.5"/>
+        <line x1="8" y1="55" x2="148" y2="55" stroke="rgba(201,168,76,.07)" stroke-width="0.5"/>
+        <line x1="392" y1="55" x2="532" y2="55" stroke="rgba(201,168,76,.07)" stroke-width="0.5"/>
+        <line x1="8" y1="145" x2="148" y2="145" stroke="rgba(201,168,76,.07)" stroke-width="0.5"/>
+        <line x1="392" y1="145" x2="532" y2="145" stroke="rgba(201,168,76,.07)" stroke-width="0.5"/>
+        <!-- building silhouette hint -->
+        <rect x="240" y="12" width="60" height="4" fill="rgba(201,168,76,.06)" rx="1"/>
+        <rect x="256" y="8" width="28" height="4" fill="rgba(201,168,76,.08)" rx="1"/>
+        <polygon points="270,4 278,12 262,12" fill="rgba(201,168,76,.12)"/>
+        <line x1="110" y1="51" x2="110" y2="59" stroke="rgba(201,168,76,.22)" stroke-width="0.5"/>
+        <line x1="430" y1="51" x2="430" y2="59" stroke="rgba(201,168,76,.22)" stroke-width="0.5"/>
+      </svg>
+    </div>
+
+    <div style="position:relative">
+      <div class="hero-eyebrow">
+        <span class="ey-line ey-line-l"></span>
+        <span class="ey-text">App Làm Nhà Corp.</span>
+        <span class="ey-line ey-line-r"></span>
+      </div>
+      <h1 class="hero-title">
+        Studio KTS Trực Tuyến<br>
+        <em>Giải pháp cho Doanh nghiệp</em>
+      </h1>
+      <p class="hero-sub">Thuê đội ngũ kiến trúc sư đã xác minh — quản lý dự án online, bàn giao đúng tiến độ, minh bạch từng hạng mục</p>
+
+      <div class="vp-row">
+        <div class="vp-card">
+          <div class="vp-icon"><i class="ph-duotone ph-users-three"></i></div>
+          <div class="vp-title">Đội ngũ KTS xác minh</div>
+          <div class="vp-sub">Hồ sơ năng lực kiểm duyệt kỹ càng</div>
+        </div>
+        <div class="vp-card">
+          <div class="vp-icon"><i class="ph-duotone ph-chart-line-up"></i></div>
+          <div class="vp-title">Quản lý dự án số</div>
+          <div class="vp-sub">Theo dõi tiến độ theo thời gian thực</div>
+        </div>
+        <div class="vp-card">
+          <div class="vp-icon"><i class="ph-duotone ph-receipt"></i></div>
+          <div class="vp-title">Minh bạch chi phí</div>
+          <div class="vp-sub">Hợp đồng rõ ràng, không phát sinh ẩn</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── STEPPER ── -->
+  <div class="stepper-wrap">
+    <div class="stepper" id="stepper">
+      <div class="stepper-track"></div>
+      <div class="stepper-fill" id="stepFill"></div>
+      <div class="step-item active" data-s="1">
+        <div class="step-circle">01</div>
+        <div class="step-label">Doanh nghiệp</div>
+      </div>
+      <div class="step-item" data-s="2">
+        <div class="step-circle">02</div>
+        <div class="step-label">Liên hệ</div>
+      </div>
+      <div class="step-item" data-s="3">
+        <div class="step-circle">03</div>
+        <div class="step-label">Tài khoản</div>
+      </div>
+      <div class="step-item" data-s="4">
+        <div class="step-circle">04</div>
+        <div class="step-label">Hoàn tất</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BƯỚC 01: Thông tin doanh nghiệp ── -->
+  <div class="card" id="step1">
+    <div class="card-header">
+      <div class="card-badge">Bước 01</div>
+      <div>
+        <div class="card-title">Thông tin doanh nghiệp</div>
+        <div class="card-sub">Cho chúng tôi biết về công ty và nhu cầu dự án của bạn</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Tên công ty / Tổ chức <span class="req">✦</span></label>
+      <input type="text" id="f_company" placeholder="VD: Công ty CP TK House" autocomplete="organization">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Lĩnh vực hoạt động <span class="req">✦</span></label>
+        <select id="f_industry">
+          <option value="">Chọn…</option>
+          <option value="realestate">Chủ đầu tư / Bất động sản</option>
+          <option value="construction">Xây dựng & Thi công</option>
+          <option value="hospitality">Khách sạn / Du lịch</option>
+          <option value="retail">Thương mại / Bán lẻ</option>
+          <option value="fnb">Nhà hàng / F&B</option>
+          <option value="office">Văn phòng / Công nghệ</option>
+          <option value="edu">Giáo dục / Y tế</option>
+          <option value="other">Lĩnh vực khác</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Số dự án / năm <span class="req">✦</span></label>
+        <select id="f_volume">
+          <option value="">Chọn…</option>
+          <option value="1-3">1 – 3 dự án</option>
+          <option value="4-10">4 – 10 dự án</option>
+          <option value="11-30">11 – 30 dự án</option>
+          <option value=">30">Trên 30 dự án</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Loại dự án tiêu biểu <span class="req">✦</span></label>
+      <div class="chip-grid" id="projGrid">
+        <label class="pt-chip"><input type="checkbox" value="villa"><i class="ph-duotone ph-house-line"></i> Nhà ở / Biệt thự</label>
+        <label class="pt-chip"><input type="checkbox" value="apartment"><i class="ph-duotone ph-buildings"></i> Căn hộ / Chung cư</label>
+        <label class="pt-chip"><input type="checkbox" value="office"><i class="ph-duotone ph-office-chair"></i> Văn phòng / Showroom</label>
+        <label class="pt-chip"><input type="checkbox" value="hotel"><i class="ph-duotone ph-bed"></i> Khách sạn / Resort</label>
+        <label class="pt-chip"><input type="checkbox" value="fnb"><i class="ph-duotone ph-fork-knife"></i> Nhà hàng / Café</label>
+        <label class="pt-chip"><input type="checkbox" value="interior"><i class="ph-duotone ph-couch"></i> Nội thất thương mại</label>
+        <label class="pt-chip"><input type="checkbox" value="industrial"><i class="ph-duotone ph-factory"></i> Công nghiệp / Kho xưởng</label>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Ngân sách TB / dự án <span class="req">✦</span></label>
+        <select id="f_budget">
+          <option value="">Chọn…</option>
+          <option value="<500m">Dưới 500 triệu</option>
+          <option value="500m-2b">500 triệu – 2 tỷ</option>
+          <option value="2b-10b">2 – 10 tỷ</option>
+          <option value=">10b">Trên 10 tỷ</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Địa chỉ trụ sở</label>
+        <input type="text" id="f_address" placeholder="TP. Hồ Chí Minh">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Mô tả yêu cầu</label>
+      <textarea id="f_req" placeholder="Mô tả phong cách, tiêu chuẩn hoặc yêu cầu đặc thù của doanh nghiệp…" maxlength="600"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep(2)">
+        Tiếp theo <i class="ph-duotone ph-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── BƯỚC 02: Người liên hệ ── -->
+  <div class="card" id="step2" style="display:none">
+    <div class="card-header">
+      <div class="card-badge">Bước 02</div>
+      <div>
+        <div class="card-title">Người đại diện</div>
+        <div class="card-sub">Founder sẽ liên hệ trực tiếp để xác nhận hợp tác</div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Họ và tên <span class="req">✦</span></label>
+        <input type="text" id="f_contact" placeholder="Nguyễn Văn A" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Chức vụ</label>
+        <input type="text" id="f_title" placeholder="Giám đốc / PM…">
+      </div>
+    </div>
+    <div class="field">
+      <label>Số điện thoại <span class="req">✦</span></label>
+      <input type="tel" id="f_phone" placeholder="0901 234 567" autocomplete="tel">
+    </div>
+    <div class="field">
+      <label>Email doanh nghiệp</label>
+      <input type="email" id="f_email" placeholder="contact@company.com" autocomplete="email">
+    </div>
+
+    <!-- How it works mini-section -->
+    <div style="margin-top:6px;padding:16px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:10px">
+      <div style="font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(201,168,76,.5);margin-bottom:12px">Quy trình sau đăng ký</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <div style="width:20px;height:20px;border-radius:50%;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--mono);font-size:9px;font-weight:700;color:var(--gold)">1</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.5"><strong style="color:var(--text);font-weight:600">Founder xét duyệt</strong> — kiểm tra thông tin doanh nghiệp trong 1–2 ngày</div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <div style="width:20px;height:20px;border-radius:50%;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--mono);font-size:9px;font-weight:700;color:var(--gold)">2</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.5"><strong style="color:var(--text);font-weight:600">Gói dịch vụ</strong> — tư vấn chọn Studio KTS phù hợp quy mô dự án</div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <div style="width:20px;height:20px;border-radius:50%;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--mono);font-size:9px;font-weight:700;color:var(--gold)">3</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.5"><strong style="color:var(--text);font-weight:600">Khởi động dự án</strong> — đăng dự án, nhận đề xuất từ KTS trong vòng 24h</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goStep(1)"><i class="ph-duotone ph-arrow-left"></i> Quay lại</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Tiếp theo <i class="ph-duotone ph-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- ── BƯỚC 03: Tài khoản ── -->
+  <div class="card" id="step3" style="display:none">
+    <div class="card-header">
+      <div class="card-badge">Bước 03</div>
+      <div>
+        <div class="card-title">Tài khoản doanh nghiệp</div>
+        <div class="card-sub">Tên đăng nhập tạo từ tên công ty của bạn</div>
+      </div>
+    </div>
+
+    <div class="field" style="margin-bottom:22px">
+      <label>Định danh ALN</label>
+      <div class="uname-card">
+        <div class="uname-left">
+          <div class="uname-eyebrow">Tên đăng nhập</div>
+          <div class="uname-val" id="unameDisplay">dn.tkhouse1234</div>
+          <div class="uname-domain">@aln.vn</div>
+        </div>
+        <button class="uname-regen" onclick="regenUsername()">
+          <i class="ph-duotone ph-arrows-clockwise"></i> Tạo lại
+        </button>
+      </div>
+      <div class="field-hint" style="margin-top:8px">Có thể thay đổi sau khi tài khoản được duyệt.</div>
+    </div>
+    <div class="field">
+      <label>Mật khẩu <span class="req">✦</span></label>
+      <input type="password" id="f_pw" placeholder="Tối thiểu 8 ký tự" autocomplete="new-password">
+    </div>
+    <div class="field">
+      <label>Xác nhận mật khẩu <span class="req">✦</span></label>
+      <input type="password" id="f_pw2" placeholder="Nhập lại mật khẩu" autocomplete="new-password">
+    </div>
+    <div class="agree-row" style="margin-top:4px">
+      <input type="checkbox" id="f_agree">
+      <span>Tôi đồng ý với <a href="#">Điều khoản sử dụng</a> và <a href="#">Chính sách bảo mật</a> của App Làm Nhà Corp.</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goStep(2)"><i class="ph-duotone ph-arrow-left"></i> Quay lại</button>
+      <button class="btn btn-primary" id="submitBtn" onclick="submitApply()">
+        <i class="ph-duotone ph-paper-plane-tilt"></i> Đăng ký ngay
+      </button>
+    </div>
+  </div>
+
+  <!-- ── BƯỚC 04: Hoàn tất ── -->
+  <div class="card" id="step4" style="display:none">
+    <div class="success-wrap">
+      <div class="success-icon"><i class="ph-duotone ph-buildings"></i></div>
+      <h2 class="success-title">Đăng ký thành công!</h2>
+      <p class="success-sub">Cảm ơn bạn đã tin tưởng App Làm Nhà. Founder sẽ liên hệ xác nhận và tư vấn gói dịch vụ phù hợp.</p>
+      <div class="success-uname" id="successUname">dn.tkhouse1234</div>
+      <ul class="next-steps">
+        <li><i class="ph-duotone ph-clock"></i> Hồ sơ doanh nghiệp đang chờ xét duyệt</li>
+        <li><i class="ph-duotone ph-phone"></i> Founder gọi điện tư vấn gói Studio KTS</li>
+        <li><i class="ph-duotone ph-shield-check"></i> Sau duyệt, đăng dự án và nhận đề xuất từ KTS</li>
+        <li><i class="ph-duotone ph-sign-in"></i> Đăng nhập tại <a href="login.html">login.html</a> bằng tên đăng nhập trên</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="page-footer">© 2025 App Làm Nhà Corp. · <a href="login.html">Đăng nhập</a> · <a href="kts-apply.html">Bạn là KTS?</a></div>
+
+</div><!-- .page -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+var currentStep = 1;
+var generatedUsername = '';
+
+function setStep(n) {
+  for (var i = 1; i <= 4; i++) {
+    var card = document.getElementById('step' + i);
+    if (card) {
+      if (i === n) {
+        card.style.display = 'block';
+        card.style.animation = 'none';
+        void card.offsetWidth;
+        card.style.animationName = 'fadeUp';
+        card.style.animationDuration = '.3s';
+        card.style.animationTimingFunction = 'ease';
+      } else {
+        card.style.display = 'none';
+      }
+    }
+  }
+  var items = document.querySelectorAll('.step-item');
+  items.forEach(function(el) {
+    var s = parseInt(el.getAttribute('data-s'));
+    el.classList.remove('active','done');
+    if (s === n) el.classList.add('active');
+    else if (s < n) el.classList.add('done');
+  });
+  var fill = document.getElementById('stepFill');
+  if (fill) fill.style.width = ((n - 1) / 3 * 75) + '%';
+  currentStep = n;
+  window.scrollTo(0, 0);
+}
+window.setStep = setStep;
+
+function goStep(n) {
+  if (n > currentStep && !validateStep(currentStep)) return;
+  setStep(n);
+}
+
+function validateStep(n) {
+  if (n === 1) {
+    var company  = document.getElementById('f_company').value.trim();
+    var industry = document.getElementById('f_industry').value;
+    var volume   = document.getElementById('f_volume').value;
+    var budget   = document.getElementById('f_budget').value;
+    var types    = document.querySelectorAll('#projGrid input:checked');
+    if (!company)  { showToast('Vui lòng nhập tên công ty', true); return false; }
+    if (!industry) { showToast('Vui lòng chọn lĩnh vực hoạt động', true); return false; }
+    if (!volume)   { showToast('Vui lòng chọn số dự án / năm', true); return false; }
+    if (types.length === 0) { showToast('Vui lòng chọn ít nhất 1 loại dự án', true); return false; }
+    if (!budget)   { showToast('Vui lòng chọn ngân sách trung bình', true); return false; }
+    generatedUsername = genUsername(company);
+    document.getElementById('unameDisplay').textContent = generatedUsername;
+    return true;
+  }
+  if (n === 2) {
+    var contact = document.getElementById('f_contact').value.trim();
+    var phone   = document.getElementById('f_phone').value.trim();
+    if (!contact) { showToast('Vui lòng nhập tên người đại diện', true); return false; }
+    if (!phone || phone.replace(/\D/g,'').length < 9) { showToast('Số điện thoại chưa hợp lệ', true); return false; }
+    return true;
+  }
+  if (n === 3) {
+    var pw  = document.getElementById('f_pw').value;
+    var pw2 = document.getElementById('f_pw2').value;
+    if (pw.length < 8) { showToast('Mật khẩu tối thiểu 8 ký tự', true); return false; }
+    if (pw !== pw2)    { showToast('Mật khẩu xác nhận không khớp', true); return false; }
+    if (!document.getElementById('f_agree').checked) { showToast('Vui lòng đồng ý điều khoản', true); return false; }
+    return true;
+  }
+  return true;
+}
+
+function removeVietnameseTones(s) {
+  s = s.toLowerCase();
+  s = s.replace(/[àáâãăạảấầẩẫắằẳẵặ]/g,'a');
+  s = s.replace(/[èéêẹẻẽếềểễệ]/g,'e');
+  s = s.replace(/[ìíĩịỉ]/g,'i');
+  s = s.replace(/[òóôõơọỏốồổỗộớờởỡợ]/g,'o');
+  s = s.replace(/[ùúũưụủứừửữự]/g,'u');
+  s = s.replace(/[ỳýỵỷỹ]/g,'y');
+  s = s.replace(/[đ]/g,'d');
+  s = s.replace(/[^a-z0-9\s]/g,'');
+  return s.trim();
+}
+function genUsername(companyName) {
+  var slug = removeVietnameseTones(companyName)
+    .replace(/cong ty|tnhh|co phan|tap doan|cp |mtv/gi,'')
+    .replace(/\s+/g,'')
+    .replace(/[^a-z0-9]/g,'')
+    .slice(0,10);
+  return 'dn.' + (slug || 'dn') + String(Math.floor(1000 + Math.random() * 9000));
+}
+function regenUsername() {
+  generatedUsername = genUsername(document.getElementById('f_company').value.trim() || 'dn');
+  document.getElementById('unameDisplay').textContent = generatedUsername;
+}
+
+document.querySelectorAll('.pt-chip').forEach(function(chip) {
+  chip.querySelector('input').addEventListener('change', function() {
+    chip.classList.toggle('on', this.checked);
+  });
+});
+
+var _tt = null;
+function showToast(msg, isErr) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isErr ? ' err' : '');
+  clearTimeout(_tt);
+  _tt = setTimeout(function() { el.className = 'toast'; }, 3000);
+}
+window.showToast = showToast;
+
+function submitApply() {
+  if (!validateStep(3)) return;
+  window._doSubmit();
+}
+</script>
+
+<script type="module">
+import {
+  auth, db, createUserWithEmailAndPassword, setDoc, doc, serverTimestamp
+} from './firebase-config.js';
+
+window._doSubmit = async function() {
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph-duotone ph-spinner ph-spin"></i> Đang gửi…';
+  try {
+    var company  = document.getElementById('f_company').value.trim();
+    var industry = document.getElementById('f_industry').value;
+    var volume   = document.getElementById('f_volume').value;
+    var budget   = document.getElementById('f_budget').value;
+    var address  = document.getElementById('f_address').value.trim();
+    var req      = document.getElementById('f_req').value.trim();
+    var contact  = document.getElementById('f_contact').value.trim();
+    var title    = document.getElementById('f_title').value.trim();
+    var phone    = document.getElementById('f_phone').value.trim();
+    var email    = document.getElementById('f_email').value.trim();
+    var uname    = window.generatedUsername || document.getElementById('unameDisplay').textContent;
+    var pw       = document.getElementById('f_pw').value;
+
+    var typeEls = document.querySelectorAll('#projGrid input:checked');
+    var types   = Array.from(typeEls).map(function(el){ return el.value; });
+
+    var cred = await createUserWithEmailAndPassword(auth, uname + '@aln.vn', pw);
+    var uid  = cred.user.uid;
+
+    await setDoc(doc(db, 'users', uid), {
+      username: uname, name: company, role: 'dn',
+      email: email || (uname + '@aln.vn'), status: 'pending', createdAt: serverTimestamp()
+    });
+    await setDoc(doc(db, 'dnApplications', uid), {
+      uid: uid,
+      companyName:    company,
+      industry:       industry,
+      projectsPerYear:volume,
+      projectTypes:   types,
+      budgetRange:    budget,
+      address:        address,
+      requirements:   req,
+      contactName:    contact,
+      contactTitle:   title,
+      phone:          phone,
+      email:          email || '',
+      username:       uname,
+      status:         'pending',
+      submittedAt:    serverTimestamp()
+    });
+
+    document.getElementById('successUname').textContent = uname;
+    window.setStep(4);
+  } catch (err) {
+    console.error(err);
+    var msg = 'Có lỗi xảy ra, vui lòng thử lại';
+    if (err.code === 'auth/email-already-in-use') msg = 'Tên đăng nhập đã tồn tại — hãy tạo lại';
+    if (err.code === 'auth/weak-password')        msg = 'Mật khẩu quá yếu (tối thiểu 8 ký tự)';
+    window.showToast(msg, true);
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ph-duotone ph-paper-plane-tilt"></i> Đăng ký ngay';
+  }
+};
+</script>
+
+</body>
+</html>
