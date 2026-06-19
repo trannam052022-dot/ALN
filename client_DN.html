@@ -1040,14 +1040,14 @@ function openPAReview(projId, rid, paId){
     modal = document.createElement('div');
     modal.id = 'paRvModal';
     modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9990;align-items:center;justify-content:center;padding:16px';
-    modal.innerHTML = '<div onclick="event.stopPropagation()" style="background:var(--ink2);border-radius:14px;max-width:min(92vw,640px);width:100%;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden">'
-      + '<div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px">'
+    modal.innerHTML = '<div onclick="event.stopPropagation()" style="background:var(--ink2);border-radius:14px;max-width:min(92vw,640px);width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.35);display:flex;flex-direction:column">'
+      + '<div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;position:sticky;top:0;background:var(--ink2);z-index:1">'
       + '<div style="flex:1;min-width:0"><div id="paRvName" style="font-size:14px;font-weight:700;color:var(--text)"></div><div id="paRvMeta" style="font-size:11px;color:var(--muted);margin-top:3px"></div></div>'
       + '<button onclick="closePAReview()" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--ink3);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ph-duotone ph-x" style="font-size:13px"></i></button>'
       + '</div>'
-      + '<div id="paRvImgWrap" style="background:#111;display:flex;align-items:center;justify-content:center;max-height:58vh;overflow:hidden"></div>'
+      + '<div id="paRvImgWrap" style="background:#111;width:100%"></div>'
       + '<div id="paRvDesc" style="padding:12px 18px;font-size:12px;color:var(--text2);border-bottom:1px solid var(--border);display:none"></div>'
-      + '<div id="paRvFooter" style="padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:8px"></div>'
+      + '<div id="paRvFooter" style="padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;bottom:0;background:var(--ink2);border-top:1px solid var(--border)"></div>'
       + '</div>';
     modal.onclick = function(){ closePAReview(); };
     document.body.appendChild(modal);
@@ -1057,8 +1057,8 @@ function openPAReview(projId, rid, paId){
   document.getElementById('paRvMeta').innerHTML = (pa.version||'v1.0')+' · <span style="color:'+fl.color+'">'+fl.label+'</span>'+(pa.date?' · '+pa.date:'');
   var wrap = document.getElementById('paRvImgWrap');
   wrap.innerHTML = pa.imageURL
-    ? '<img src="'+pa.imageURL+'" alt="" style="max-width:100%;max-height:58vh;object-fit:contain;display:block">'
-    : '<span style="font-size:72px;padding:30px;filter:drop-shadow(0 2px 12px rgba(0,0,0,.5))">'+(pa.icon||'')+'</span>';
+    ? '<img src="'+pa.imageURL+'" alt="" style="width:100%;height:auto;display:block">'
+    : '<div style="display:flex;align-items:center;justify-content:center;min-height:160px"><span style="font-size:72px;filter:drop-shadow(0 2px 12px rgba(0,0,0,.5))">'+(pa.icon||'')+'</span></div>';
   var descEl = document.getElementById('paRvDesc');
   if(pa.desc){ descEl.textContent = pa.desc; descEl.style.display=''; } else { descEl.style.display='none'; }
   var footer = document.getElementById('paRvFooter');
