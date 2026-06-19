@@ -32,6 +32,44 @@ service cloud.firestore {
       allow update, delete: if isFounder();
     }
 
+    match /designerApplications/{uid} {
+      allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow create: if signedIn() && request.auth.uid == uid;
+      allow update: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow delete: if isFounder();
+    }
+
+    match /designProjects/{pid} {
+      allow read: if isFounder() || (signedIn() && (
+        request.auth.uid in resource.data.memberUids ||
+        request.auth.uid == resource.data.designer.uid ||
+        request.auth.uid == resource.data.cn.uid ||
+        (resource.data.dn != null && request.auth.uid == resource.data.dn.uid)
+      ));
+      allow create: if isFounder();
+      allow update: if isFounder() ||
+        (signedIn() && request.auth.uid in resource.data.memberUids);
+      allow delete: if isFounder();
+
+      match /documents/{docId} {
+        allow read:   if signedIn();
+        allow create: if isFounder() ||
+          (signedIn() && request.resource.data.uploader.uid == request.auth.uid);
+        allow update, delete: if isFounder() ||
+          resource.data.uploader.uid == request.auth.uid;
+      }
+
+      match /stages/{sid} {
+        allow read:  if signedIn();
+        allow write: if signedIn();
+
+        match /proposals/{paId} {
+          allow read:   if signedIn();
+          allow create, update: if isFounder() || signedIn();
+        }
+      }
+    }
+
     match /dnApplications/{uid} {
       allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
       allow create: if signedIn() && request.auth.uid == uid;

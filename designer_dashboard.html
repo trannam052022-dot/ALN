@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<script>
+window.DES_PROJECT_ID   = null;
+window.DES_PROJECT_DATA = null;
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Designer Dashboard — App Làm Nhà</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+.ph-spin{animation:phspin 1s linear infinite;display:inline-block}
+@keyframes phspin{to{transform:rotate(360deg)}}
+:root{
+  --ink:#f0f4f8;--ink2:#fff;--ink3:#f8fafc;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --muted:#94a3b8;--sub:rgba(0,0,0,.05);
+  --text:#1e293b;--text2:#475569;
+  --accent:#7c3aed;--accent2:#a78bfa;
+  --accent-bg:rgba(124,58,237,.1);
+  --gold:#d4a017;--gold-bg:rgba(212,160,23,.11);
+  --violet:#7c3aed;--violet-bg:rgba(124,58,237,.1);
+  --green:#16a34a;--green-bg:rgba(22,163,74,.1);
+  --red:#dc2626;--red-bg:rgba(220,38,38,.1);
+  --amber:#d97706;--amber-bg:rgba(217,119,6,.1);
+  --blue:#2563eb;--blue-bg:rgba(37,99,235,.1);
+  --rose:#e11d48;--rose-bg:rgba(225,29,72,.1);
+  --r:10px;--r-sm:7px;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --sh-lg:0 4px 16px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.06);
+  --serif:'Cormorant Garamond',serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:100vh;font-size:13px;line-height:1.6}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--ink2)}
+::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:99px}
+
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:210px;background:var(--ink2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:50;transition:transform .25s}
+.sidebar-logo{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(124,58,237,.06),transparent)}
+.logo-mark{width:30px;height:30px;border-radius:var(--r-sm);border:1px solid rgba(124,58,237,.4);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--violet);background:rgba(124,58,237,.08)}
+.logo-text{font-family:var(--syne);font-weight:800;font-size:14px;letter-spacing:.04em;color:var(--text)}
+.logo-text span{color:var(--violet)}
+.sidebar-brand{padding:18px 18px 14px;border-bottom:1px solid var(--border)}
+.sidebar-brand-top{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.sidebar-brand-name{font-size:15px;font-weight:700;color:var(--text);margin-top:3px}
+.nav-section{padding:14px 18px 4px;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;margin:1px 0;font-size:13px;font-weight:450;color:var(--text2);cursor:pointer;transition:all .12s;text-decoration:none;border-left:2px solid transparent}
+.nav-item:hover{background:rgba(0,0,0,.04);color:var(--text)}
+.nav-item.active{background:rgba(124,58,237,.07);color:var(--violet);font-weight:600;border-left-color:var(--violet)}
+.nav-item .icon{width:16px;text-align:center;font-size:13px;opacity:.7}
+.nav-item.active .icon{opacity:1}
+.sidebar-footer{margin-top:auto;padding:14px 16px;border-top:1px solid var(--border)}
+.des-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-weight:800;font-size:13px;flex-shrink:0}
+.des-av img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.des-name{font-family:var(--serif);font-size:13px;font-weight:600;font-style:italic;color:var(--text)}
+.des-rank{font-size:10px;color:var(--muted)}
+.hamburger{display:none;background:none;border:none;cursor:pointer;font-size:22px;color:var(--text2);padding:6px}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.mobile-open{transform:translateX(0);box-shadow:var(--sh-lg)}
+  .main{margin-left:0!important}
+  .hamburger{display:block}
+  .topbar{padding-left:6px}
+}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:49}
+
+/* ── MAIN ── */
+.main{margin-left:210px;flex:1;min-width:0}
+.topbar{background:rgba(255,255,255,.88);backdrop-filter:blur(14px);border-bottom:1px solid rgba(226,232,240,.7);padding:0 14px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;gap:8px}
+.page-title{font-family:var(--serif);font-weight:600;font-style:italic;font-size:15px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.notif-btn{position:relative;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;cursor:pointer;color:var(--text2);font-size:12px;flex-shrink:0}
+.notif-dot{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--red);border:1.5px solid var(--ink2)}
+.topbar-clock{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.content{padding:24px 28px 60px}
+@media(max-width:600px){.content{padding:16px 14px 60px}.topbar-clock{display:none}}
+
+/* ── GRID / CARD ── */
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:900px){.grid4{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid4,.grid3,.grid2{grid-template-columns:1fr}}
+.card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
+.card-sm{padding:12px}
+.card-title{font-family:var(--serif);font-weight:600;font-style:italic;font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--text)}
+.card-title .ct-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+
+/* ── STAT CARDS ── */
+.stat-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;position:relative;overflow:hidden;box-shadow:var(--sh)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;border-radius:var(--r) 0 0 var(--r)}
+.stat-card.s-violet::before{background:var(--violet)}
+.stat-card.s-green::before{background:var(--green)}
+.stat-card.s-gold::before{background:var(--gold)}
+.stat-card.s-blue::before{background:var(--blue)}
+.stat-label{font-size:10px;color:var(--muted);font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px}
+.stat-val{font-family:var(--syne);font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1.1}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:6px}
+.stat-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:99px;font-size:10px;font-weight:700;margin-top:6px}
+.sb-green{background:var(--green-bg);color:var(--green)}
+.sb-red{background:var(--red-bg);color:var(--red)}
+.sb-amber{background:var(--amber-bg);color:var(--amber)}
+.sb-blue{background:var(--blue-bg);color:var(--blue)}
+.sb-violet{background:var(--violet-bg);color:var(--violet)}
+.sb-gold{background:var(--gold-bg);color:var(--gold)}
+
+/* ── SECTION LABEL ── */
+.sec-label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.04em;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── BUTTONS ── */
+.btn{padding:8px 16px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:var(--text);color:#fff}
+.btn-primary:hover:not(:disabled){background:#2d3748;transform:translateY(-1px)}
+.btn-ghost{background:#fff;color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover:not(:disabled){background:var(--ink3)}
+.btn-violet{background:var(--violet);color:#fff}
+.btn-violet:hover:not(:disabled){background:#6d28d9}
+.btn-green{background:var(--green);color:#fff}
+.btn-sm{padding:5px 12px;font-size:11px;border-radius:6px}
+
+/* ── PROJECT CARDS ── */
+.proj-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;cursor:pointer;transition:.18s}
+.proj-card:hover{border-color:rgba(124,58,237,.4);background:rgba(124,58,237,.03)}
+.proj-card-id{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--violet);background:rgba(124,58,237,.1);padding:2px 8px;border-radius:99px}
+.proj-card-name{font-size:13px;font-weight:600;color:var(--text)}
+.proj-meta{font-size:11px;color:var(--muted);display:flex;gap:12px;margin-top:6px}
+
+/* ── UPLOAD SLOTS ── */
+.upload-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:700px){.upload-grid{grid-template-columns:1fr 1fr}}
+.upload-slot{border:1.5px dashed rgba(124,58,237,.25);border-radius:var(--r-sm);padding:12px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.upload-slot:hover{border-color:var(--violet);background:rgba(124,58,237,.05)}
+.upload-slot.has-file{border-style:solid;border-color:var(--green);background:var(--green-bg)}
+.upload-slot.has-error{border-style:solid;border-color:var(--red);background:var(--red-bg)}
+.us-icon{font-size:20px;margin-bottom:5px}
+.us-label{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:2px}
+.us-sub{font-size:9px;color:var(--muted)}
+.us-file-name{font-size:10px;color:var(--green);font-weight:600;margin-top:4px;word-break:break-all}
+.upload-slot.has-error .us-file-name{color:var(--red)}
+.us-remove{position:absolute;top:5px;right:5px;background:var(--red);color:#fff;border:none;border-radius:4px;width:16px;height:16px;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center}
+.upload-slot.has-file .us-remove,.upload-slot.has-error .us-remove{display:flex}
+.upload-slot input[type=file]{display:none}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex}
+.modal{background:var(--ink2);border-radius:var(--r);max-width:520px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.modal-head h3{font-family:var(--serif);font-size:15px;font-weight:600;font-style:italic;display:flex;align-items:center;gap:8px}
+.modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text2);line-height:1}
+.modal-body{padding:20px}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+.form-row{margin-bottom:14px}
+.form-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:5px}
+.form-input{width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none}
+.form-input:focus{border-color:rgba(124,58,237,.5)}
+.form-textarea{width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;height:80px;resize:none;outline:none}
+.form-textarea:focus{border-color:rgba(124,58,237,.5)}
+
+/* ── PROPOSAL CARDS ── */
+.pa-card{border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;margin-bottom:10px;cursor:pointer;transition:.15s}
+.pa-card:hover{border-color:rgba(124,58,237,.3)}
+.pa-card.selected{border-color:var(--violet);background:rgba(124,58,237,.04)}
+.pa-card-name{font-size:13px;font-weight:600;color:var(--text)}
+.pa-card-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.pa-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;margin-top:6px}
+.pa-badge.pending{background:var(--amber-bg);color:var(--amber)}
+.pa-badge.approved{background:var(--green-bg);color:var(--green)}
+.pa-badge.revision{background:var(--blue-bg);color:var(--blue)}
+
+/* ── PROFILE ── */
+.profile-avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px;background:var(--ink2);border-radius:var(--r);border:1px solid var(--border);margin-bottom:12px}
+.profile-avatar-init{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;font-size:28px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:var(--syne)}
+.profile-upload-btn{padding:8px 18px;border-radius:8px;border:1px solid rgba(124,58,237,.4);background:rgba(124,58,237,.08);color:var(--violet);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.profile-field{margin-bottom:10px}
+.profile-field label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px}
+.profile-field input{width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;outline:none}
+.profile-field input:focus{border-color:rgba(124,58,237,.5)}
+.profile-save-btn{width:100%;padding:11px;background:linear-gradient(135deg,#7c3aed,#a78bfa);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;margin-top:4px}
+
+/* ── REVIEW STAGE TABS ── */
+.rv-stage-tabs{display:flex;gap:6px;margin-bottom:16px}
+
+/* ── SCAN RESULT ── */
+.scan-result{margin-top:12px;border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;display:none}
+
+/* ── SKELETON ── */
+.skel-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+@keyframes shimmer{0%{background-position:-300px 0}100%{background-position:300px 0}}
+.skeleton{background:linear-gradient(90deg,var(--ink3) 25%,rgba(226,232,240,.5) 50%,var(--ink3) 75%);background-size:600px 100%;animation:shimmer 1.4s infinite;border-radius:5px}
+
+/* ── TOAST ── */
+#desigToastArea{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.desig-toast{background:var(--text);color:#fff;padding:10px 16px;border-radius:var(--r-sm);font-size:12px;font-weight:500;box-shadow:var(--sh-lg);animation:toastIn .25s ease;pointer-events:all;display:flex;align-items:center;gap:8px;max-width:280px}
+.desig-toast.t-green{background:#16a34a}.desig-toast.t-red{background:#dc2626}.desig-toast.t-amber{background:#d97706}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── VEIL ── */
+#desigAuthVeil{position:fixed;inset:0;background:#f0f4f8;display:flex;align-items:center;justify-content:center;z-index:9999}
+.veil-inner{display:flex;flex-direction:column;align-items:center;gap:14px;font-family:var(--sans);text-align:center;padding:0 24px}
+.veil-logo{width:48px;height:48px;border-radius:12px;border:1.5px solid rgba(124,58,237,.4);background:rgba(124,58,237,.08);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--violet);margin-bottom:6px}
+.veil-title{font-family:var(--serif);font-size:20px;font-weight:600;font-style:italic;color:var(--text)}
+.veil-sub{font-size:12px;color:var(--muted)}
+
+/* notification item */
+.notif-item{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+.notif-item:last-child{border-bottom:none}
+.ni-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.ni-green{background:var(--green-bg)}.ni-green .ni-icon{background:var(--green-bg);color:var(--green)}
+.ni-amber{background:var(--amber-bg)}.ni-amber .ni-icon{background:var(--amber-bg);color:var(--amber)}
+.ni-violet{background:var(--violet-bg)}.ni-violet .ni-icon{background:var(--violet-bg);color:var(--violet)}
+.ni-text{color:var(--text);line-height:1.4}
+.ni-time{font-size:10px;color:var(--muted);margin-top:2px}
+</style>
+</head>
+<body>
+
+<!-- AUTH VEIL -->
+<div id="desigAuthVeil">
+  <div class="veil-inner">
+    <div class="veil-logo"><i class="ph-duotone ph-paint-brush-household"></i></div>
+    <div class="veil-title">Designer Studio</div>
+    <div class="veil-sub">Đang xác thực phiên đăng nhập…</div>
+    <div style="width:36px;height:36px;border-radius:50%;border:3px solid rgba(124,58,237,.18);border-top-color:var(--violet);animation:phspin .8s linear infinite;margin-top:6px"></div>
+  </div>
+</div>
+
+<div id="desigToastArea"></div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+<div class="layout">
+
+<!-- ══ SIDEBAR ══ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark"><i class="ph-duotone ph-paint-brush-household"></i></div>
+    <div class="logo-text">App <span>Làm Nhà</span></div>
+  </div>
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-top">Designer Studio</div>
+    <div class="sidebar-brand-name" id="desSidebarName">Đang tải…</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:2px">Nhà thiết kế nội thất</div>
+  </div>
+
+  <div class="nav-section">Tổng quan</div>
+  <a class="nav-item active" data-tab="dashboard" onclick="desShowTab('dashboard',this)">
+    <span class="icon"><i class="ph-duotone ph-squares-four"></i></span> Dashboard
+  </a>
+  <a class="nav-item" data-tab="myproj" onclick="desShowTab('myproj',this)">
+    <span class="icon"><i class="ph-duotone ph-briefcase"></i></span> Dự án của tôi
+  </a>
+
+  <div class="nav-section">Công việc</div>
+  <a class="nav-item" data-tab="proposal" onclick="desShowTab('proposal',this)">
+    <span class="icon"><i class="ph-duotone ph-paper-plane-tilt"></i></span> Gửi Phương án
+  </a>
+  <a class="nav-item" data-tab="docs" onclick="desShowTab('docs',this)">
+    <span class="icon"><i class="ph-duotone ph-cloud-arrow-up"></i></span> Hồ sơ Nội thất
+  </a>
+  <a class="nav-item" data-tab="review" onclick="desShowTab('review',this)">
+    <span class="icon"><i class="ph-duotone ph-chat-circle-dots"></i></span> Phản hồi Khách
+  </a>
+
+  <div class="nav-section">Cá nhân</div>
+  <a class="nav-item" data-tab="wallet" onclick="desShowTab('wallet',this)">
+    <span class="icon"><i class="ph-duotone ph-wallet"></i></span> Ví của tôi
+  </a>
+  <a class="nav-item" data-tab="profile" onclick="desShowTab('profile',this)">
+    <span class="icon"><i class="ph-duotone ph-user-circle"></i></span> Hồ sơ cá nhân
+  </a>
+
+  <div class="sidebar-footer">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="des-av" id="desSidebarAv" style="font-size:13px"><i class="ph-duotone ph-user" style="font-size:16px"></i></div>
+      <div>
+        <div class="des-name" id="desSidebarNameSm">Designer</div>
+        <div class="des-rank">Nhà thiết kế</div>
+      </div>
+    </div>
+    <button onclick="desLogout()" style="margin-top:10px;width:100%;padding:7px;border-radius:var(--r-sm);background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit">
+      <i class="ph-duotone ph-sign-out"></i> Đăng xuất
+    </button>
+  </div>
+</nav><!-- end sidebar -->
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="hamburger" onclick="openMobileSidebar()"><i class="ph-duotone ph-list"></i></button>
+      <div class="page-title" id="desPageTitle">Designer Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-clock" id="desTopbarClock"></div>
+      <div class="notif-btn" onclick="toggleDesNotif()"><i class="ph-duotone ph-bell"></i><div class="notif-dot" id="desNotifDot" style="display:none"></div></div>
+      <div id="desNotifPanel" style="display:none;position:fixed;top:56px;right:8px;width:min(300px,calc(100vw - 16px));background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:12px;box-shadow:var(--sh-lg);z-index:50;max-height:70vh;overflow-y:auto">
+        <div style="font-family:var(--serif);font-weight:600;font-style:italic;font-size:14px;color:var(--text);margin-bottom:8px">Thông báo</div>
+        <div id="desNotifList"><div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Chưa có thông báo mới</div></div>
+      </div>
+      <div style="font-size:10px;font-weight:700;background:var(--green-bg);color:var(--green);border:1px solid rgba(22,163,74,.3);padding:3px 8px;border-radius:99px;white-space:nowrap"><i class="ph-duotone ph-circle" style="font-size:6px;margin-right:3px"></i>Online</div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ══════════ TAB: DASHBOARD ══════════ -->
+    <div id="tab-dashboard">
+      <div style="margin-bottom:22px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px" id="desGreetDate">—</div>
+        <div style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--text);letter-spacing:-.4px;line-height:1.15" id="desGreetName">Designer</div>
+      </div>
+
+      <div class="grid4" style="margin-bottom:24px">
+        <div class="stat-card s-violet">
+          <div class="stat-label"><i class="ph-duotone ph-briefcase"></i> Dự án đang chạy</div>
+          <div class="stat-val" id="statActive">—</div>
+          <div class="stat-sub">dự án nội thất</div>
+        </div>
+        <div class="stat-card s-green">
+          <div class="stat-label"><i class="ph-duotone ph-wallet"></i> Ví khả dụng</div>
+          <div class="stat-val" id="statWallet">—</div>
+          <div class="stat-sub">VND</div>
+        </div>
+        <div class="stat-card s-gold">
+          <div class="stat-label"><i class="ph-duotone ph-star"></i> Điểm uy tín</div>
+          <div class="stat-val">—<span style="font-size:14px;color:var(--muted);font-weight:400">/100</span></div>
+          <div class="stat-sub">Đang xây dựng</div>
+        </div>
+        <div class="stat-card s-blue">
+          <div class="stat-label"><i class="ph-duotone ph-check-circle"></i> Hoàn thành</div>
+          <div class="stat-val" id="statDone">—</div>
+          <div class="stat-sub">dự án</div>
+        </div>
+      </div>
+
+      <div class="sec-label">Dự án gần đây</div>
+      <div id="dashProjCards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px">
+        <div class="skel-card"><div class="skeleton" style="height:80px;margin-bottom:10px"></div><div class="skeleton" style="height:10px;width:60%"></div></div>
+        <div class="skel-card"><div class="skeleton" style="height:80px;margin-bottom:10px"></div><div class="skeleton" style="height:10px;width:70%"></div></div>
+        <div class="skel-card"><div class="skeleton" style="height:80px;margin-bottom:10px"></div><div class="skeleton" style="height:10px;width:55%"></div></div>
+      </div>
+
+      <div class="sec-label">Thao tác nhanh</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px">
+        <div onclick="desShowTab('proposal')" style="background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer;transition:.18s" onmouseover="this.style.borderColor='rgba(124,58,237,.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="width:36px;height:36px;border-radius:9px;background:var(--violet-bg);color:var(--violet);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:16px"><i class="ph-duotone ph-paper-plane-tilt"></i></div>
+          <div style="font-size:11px;font-weight:700;color:var(--text2)">Gửi PA</div>
+        </div>
+        <div onclick="desShowTab('docs')" style="background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer;transition:.18s" onmouseover="this.style.borderColor='rgba(22,163,74,.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="width:36px;height:36px;border-radius:9px;background:var(--green-bg);color:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:16px"><i class="ph-duotone ph-cloud-arrow-up"></i></div>
+          <div style="font-size:11px;font-weight:700;color:var(--text2)">Nộp hồ sơ</div>
+        </div>
+        <div onclick="desShowTab('review')" style="background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer;transition:.18s" onmouseover="this.style.borderColor='rgba(37,99,235,.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="width:36px;height:36px;border-radius:9px;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:16px"><i class="ph-duotone ph-chat-circle-dots"></i></div>
+          <div style="font-size:11px;font-weight:700;color:var(--text2)">Phản hồi</div>
+        </div>
+        <div onclick="desShowTab('wallet')" style="background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer;transition:.18s" onmouseover="this.style.borderColor='rgba(212,160,23,.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="width:36px;height:36px;border-radius:9px;background:var(--gold-bg);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:16px"><i class="ph-duotone ph-wallet"></i></div>
+          <div style="font-size:11px;font-weight:700;color:var(--text2)">Ví của tôi</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ TAB: DỰ ÁN ══════════ -->
+    <div id="tab-myproj" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-family:var(--serif);font-size:20px;font-weight:600;font-style:italic;color:var(--text)">Dự án của tôi</div>
+        <div style="font-size:11px;color:var(--muted)">Mã dự án: <b style="color:var(--violet);font-family:var(--mono)" id="desActiveId">—</b></div>
+      </div>
+      <div id="projListWrap">
+        <div style="font-size:13px;color:var(--muted);text-align:center;padding:40px 0">Đang tải danh sách dự án…</div>
+      </div>
+    </div>
+
+    <!-- ══════════ TAB: PHƯƠNG ÁN ══════════ -->
+    <div id="tab-proposal" style="display:none">
+      <div style="font-family:var(--serif);font-size:20px;font-weight:600;font-style:italic;margin-bottom:4px">Gửi Phương án Nội thất</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Dự án: <b id="paProj">—</b></div>
+
+      <div class="card" style="max-width:640px">
+        <div class="card-title"><div class="ct-icon" style="background:var(--violet-bg);color:var(--violet)"><i class="ph-duotone ph-paint-brush-household"></i></div>Phương án thiết kế nội thất</div>
+
+        <div class="form-row">
+          <label class="form-label">Chặng thiết kế</label>
+          <select id="paStage" class="form-input">
+            <option value="C1">C1 — Khảo sát & Phương án Concept</option>
+            <option value="C2">C2 — Thiết kế chi tiết 3D/2D</option>
+            <option value="C3">C3 — Hồ sơ thi công nội thất</option>
+            <option value="C4">C4 — Nghiệm thu & Bàn giao</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Tên phương án</label>
+          <input id="paName" type="text" class="form-input" placeholder="VD: Phong cách Indochine — Tân cổ điển ấm áp">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Mô tả phương án</label>
+          <textarea id="paDesc" class="form-textarea" placeholder="Mô tả concept, vật liệu chủ đạo, palette màu, phong cách…"></textarea>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Hình ảnh moodboard / phối cảnh 3D</label>
+          <label style="display:flex;flex-direction:column;align-items:center;gap:8px;border:1.5px dashed rgba(124,58,237,.3);border-radius:var(--r-sm);padding:20px;cursor:pointer;transition:.2s" onmouseover="this.style.borderColor='var(--violet)'" onmouseout="this.style.borderColor='rgba(124,58,237,.3)'">
+            <input id="paImgInput" type="file" style="display:none" accept="image/*" multiple onchange="handlePaImg(this)">
+            <i class="ph-duotone ph-image" style="font-size:28px;color:var(--violet)"></i>
+            <span id="paImgLabel" style="font-size:12px;color:var(--muted)">Kéo thả hoặc click để chọn ảnh (nhiều ảnh)</span>
+          </label>
+          <div id="paImgPreview" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"></div>
+        </div>
+        <div id="paScanResult" style="display:none;margin-top:8px"></div>
+        <button class="btn btn-violet" id="paSubmitBtn" style="width:100%;justify-content:center" onclick="desSubmitProposal()">
+          <i class="ph-duotone ph-paper-plane-tilt"></i> Gửi phương án cho Khách hàng
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════ TAB: HỒ SƠ NỘI THẤT (C3 equivalent) ══════════ -->
+    <div id="tab-docs" style="display:none">
+      <div style="font-family:var(--serif);font-size:20px;font-weight:600;font-style:italic;margin-bottom:4px">Hồ sơ thi công Nội thất</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Dự án: <b id="docsProj">—</b></div>
+
+      <div class="card" style="max-width:720px">
+        <div class="card-title"><div class="ct-icon" style="background:var(--violet-bg);color:var(--violet)"><i class="ph-duotone ph-folder-open"></i></div>Nộp Hồ sơ Chặng C3 — Thi công nội thất</div>
+
+        <div class="upload-grid" id="desUploadGrid">
+          <!-- rendered by renderDesUploadSlots() -->
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;padding:10px;background:var(--ink3);border-radius:var(--r-sm);border:1px solid var(--border)" id="desC3ValidationBar">
+          <div style="font-size:11px;color:var(--muted)">Chưa tải file nào</div>
+        </div>
+
+        <div id="desC3ScanResult" class="scan-result"></div>
+
+        <button class="btn btn-violet" id="desSubmitC3Btn" disabled style="margin-top:14px;width:100%;justify-content:center">
+          <i class="ph-duotone ph-cloud-arrow-up"></i> Nộp Hồ sơ C3
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════ TAB: PHẢN HỒI KHÁCH ══════════ -->
+    <div id="tab-review" style="display:none">
+      <div style="font-family:var(--serif);font-size:20px;font-weight:600;font-style:italic;margin-bottom:4px">Phản hồi từ Khách hàng</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Dự án: <b id="rvProj">—</b></div>
+
+      <div class="rv-stage-tabs" id="rvStageTabs">
+        <button class="btn btn-ghost btn-sm" id="rvBtnC1" onclick="desRvLoadStage('C1')">C1</button>
+        <button class="btn btn-violet btn-sm" id="rvBtnC2" onclick="desRvLoadStage('C2')">C2</button>
+        <button class="btn btn-ghost btn-sm" id="rvBtnC3" onclick="desRvLoadStage('C3')">C3</button>
+        <button class="btn btn-ghost btn-sm" id="rvBtnC4" onclick="desRvLoadStage('C4')">C4</button>
+      </div>
+
+      <div id="rvPropArea">
+        <div style="font-size:13px;color:var(--muted);text-align:center;padding:40px 0">Chọn chặng để xem phương án đã gửi</div>
+      </div>
+    </div>
+
+    <!-- ══════════ TAB: VÍ ══════════ -->
+    <div id="tab-wallet" style="display:none">
+      <div style="font-family:var(--serif);font-size:20px;font-weight:600;font-style:italic;margin-bottom:16px">Ví & Giải ngân</div>
+      <div class="grid3" style="margin-bottom:20px">
+        <div class="card" style="border-left:3px solid var(--green)">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--green);margin-bottom:6px">Ví chính (khả dụng)</div>
+          <div style="font-family:var(--syne);font-size:28px;font-weight:800;color:var(--text)" id="walletMain">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">VND</div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--amber)">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-bottom:6px">Đang tạm giữ</div>
+          <div style="font-family:var(--syne);font-size:28px;font-weight:800;color:var(--text)" id="walletEscrow">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Chờ khách duyệt chặng</div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--violet)">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--violet);margin-bottom:6px">Tổng phí hợp đồng</div>
+          <div style="font-family:var(--syne);font-size:28px;font-weight:800;color:var(--text)" id="walletTotal">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Dự án đang chạy</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="ct-icon" style="background:var(--violet-bg);color:var(--violet)"><i class="ph-duotone ph-receipt"></i></div>Lịch sử giải ngân</div>
+        <div id="txHistory" style="font-size:13px;color:var(--muted);text-align:center;padding:24px 0">Chưa có giao dịch nào</div>
+      </div>
+    </div>
+
+    <!-- ══════════ TAB: HỒ SƠ CÁ NHÂN ══════════ -->
+    <div id="tab-profile" style="display:none">
+      <div style="font-family:var(--serif);font-size:20px;font-weight:600;font-style:italic;margin-bottom:16px">Hồ sơ cá nhân</div>
+      <div style="display:grid;grid-template-columns:240px 1fr;gap:20px;max-width:860px">
+        <div>
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar-init" id="desAvInit">D</div>
+            <label class="profile-upload-btn">
+              <input type="file" style="display:none" accept="image/*" onchange="desUploadAvatar(this)">
+              <i class="ph-duotone ph-camera"></i> Đổi ảnh đại diện
+            </label>
+          </div>
+        </div>
+        <div class="card">
+          <div class="profile-field">
+            <label>Họ và tên</label>
+            <input type="text" id="profileName" class="form-input">
+          </div>
+          <div class="profile-field">
+            <label>Chuyên môn</label>
+            <input type="text" id="profileSpecialty" class="form-input" placeholder="VD: Nội thất Indochine, Hiện đại, Wabi-Sabi">
+          </div>
+          <div class="profile-field">
+            <label>Số năm kinh nghiệm</label>
+            <input type="number" id="profileYears" class="form-input" placeholder="3">
+          </div>
+          <div class="profile-field">
+            <label>Email liên hệ</label>
+            <input type="text" id="profileEmail" class="form-input" readonly style="color:var(--muted)">
+          </div>
+          <button class="profile-save-btn" onclick="desSaveProfile()">
+            <i class="ph-duotone ph-floppy-disk"></i> Lưu thông tin
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .content -->
+</div><!-- end .main -->
+</div><!-- end .layout -->
+
+<!-- ══ MODAL: PHƯƠNG ÁN CHI TIẾT ══ -->
+<div class="modal-bg" id="paDetailModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3><i class="ph-duotone ph-paint-brush-household" style="color:var(--violet)"></i> Chi tiết phương án</h3>
+      <button class="modal-close" onclick="closeModal('paDetailModal')">✕</button>
+    </div>
+    <div class="modal-body" id="paDetailBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('paDetailModal')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PLAIN SCRIPT ══ -->
+<script>
+/* ─── Tab switching ─── */
+window.desShowTab = function(name, el) {
+  var tabs = ['dashboard','myproj','proposal','docs','review','wallet','profile'];
+  tabs.forEach(function(t) {
+    var d = document.getElementById('tab-' + t);
+    if (d) d.style.display = (t === name) ? '' : 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach(function(a) { a.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  else {
+    var found = document.querySelector('.nav-item[data-tab="' + name + '"]');
+    if (found) found.classList.add('active');
+  }
+  var titles = {
+    dashboard: 'Designer Dashboard',
+    myproj: 'Dự án của tôi',
+    proposal: 'Gửi Phương án',
+    docs: 'Hồ sơ Nội thất',
+    review: 'Phản hồi Khách',
+    wallet: 'Ví của tôi',
+    profile: 'Hồ sơ cá nhân'
+  };
+  var pt = document.getElementById('desPageTitle');
+  if (pt) pt.textContent = titles[name] || 'Designer';
+};
+
+function openMobileSidebar() {
+  document.getElementById('sidebar').classList.add('mobile-open');
+  document.getElementById('sidebarOverlay').style.display = 'block';
+}
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').style.display = 'none';
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function toggleDesNotif() {
+  var p = document.getElementById('desNotifPanel');
+  p.style.display = p.style.display === 'none' ? '' : 'none';
+}
+
+function showToast(msg, cls) {
+  var area = document.getElementById('desigToastArea');
+  var t = document.createElement('div');
+  t.className = 'desig-toast' + (cls ? ' ' + cls : '');
+  t.textContent = msg;
+  area.appendChild(t);
+  setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 3200);
+}
+
+/* ─── Clock ─── */
+(function() {
+  function tick() {
+    var el = document.getElementById('desTopbarClock');
+    if (!el) return;
+    var d = new Date();
+    el.textContent = d.toLocaleDateString('vi-VN') + ' · ' + d.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'});
+  }
+  tick();
+  setInterval(tick, 30000);
+})();
+
+(function() {
+  var el = document.getElementById('desGreetDate');
+  if (!el) return;
+  var d = new Date();
+  var days = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+  el.textContent = days[d.getDay()] + ', ' + d.toLocaleDateString('vi-VN');
+})();
+
+/* ─── C3 upload slots ─── */
+var desC3Slots = [
+  {id:'mb_plan', label:'Mặt bằng bố trí NT', icon:'🗺️', accept:'.pdf,.png,.jpg,.dwg', req:true},
+  {id:'tran_san', label:'Bản vẽ Trần – Sàn', icon:'📐', accept:'.pdf,.png,.jpg,.dwg', req:true},
+  {id:'dien_nuoc', label:'Điện – Nước (M&E)', icon:'⚡', accept:'.pdf,.png,.jpg', req:false},
+  {id:'nt_3d', label:'File 3D nội thất', icon:'🎨', accept:'.skp,.3ds,.fbx,.obj,.zip,.rar', req:true},
+  {id:'ff_e', label:'Bảng FF&E vật liệu', icon:'🛋️', accept:'.xlsx,.xls,.pdf', req:true, xlsx:true},
+  {id:'du_toan', label:'Dự toán thi công NT', icon:'💰', accept:'.xlsx,.xls,.pdf', req:false, xlsx:true}
+];
+var desUploadedFiles = {};
+
+function renderDesUploadSlots() {
+  var g = document.getElementById('desUploadGrid');
+  if (!g) return;
+  g.innerHTML = desC3Slots.map(function(s) {
+    var f = desUploadedFiles[s.id];
+    var cls = f ? (f.hasError ? 'has-error' : 'has-file') : (s.req ? 'required-empty' : '');
+    return '<div class="upload-slot ' + cls + '" id="us_' + s.id + '">'
+      + '<button class="us-remove" id="removeBtn_' + s.id + '" onclick="desRemoveC3File(event,\'' + s.id + '\')">✕</button>'
+      + '<div class="us-icon">' + s.icon + '</div>'
+      + '<div class="us-label">' + s.label + '</div>'
+      + '<div class="us-sub">' + (s.req ? 'Bắt buộc' : 'Tùy chọn') + '</div>'
+      + (f ? '<div class="us-file-name">' + (f.file ? f.file.name : '') + '</div>' : '')
+      + '<input type="file" accept="' + s.accept + '" onchange="desHandleC3File(this,\'' + s.id + '\')">'
+      + '</div>';
+  }).join('');
+  g.querySelectorAll('.upload-slot').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      if (e.target.classList.contains('us-remove') || e.target.tagName === 'INPUT') return;
+      var inp = el.querySelector('input[type=file]');
+      if (inp) inp.click();
+    });
+  });
+}
+
+function desHandleC3File(input, slotId) {
+  var f = input.files[0];
+  if (!f) return;
+  var slot = desC3Slots.find(function(s) { return s.id === slotId; });
+  var hasError = false;
+  if (slot && slot.xlsx) {
+    var ext = f.name.split('.').pop().toLowerCase();
+    if (ext !== 'xlsx' && ext !== 'xls') hasError = true;
+  }
+  desUploadedFiles[slotId] = {file: f, hasError: hasError};
+  renderDesUploadSlots();
+  updateDesC3Validation();
+}
+
+function desRemoveC3File(e, slotId) {
+  e.stopPropagation();
+  delete desUploadedFiles[slotId];
+  renderDesUploadSlots();
+  updateDesC3Validation();
+}
+
+function updateDesC3Validation() {
+  var bar = document.getElementById('desC3ValidationBar');
+  var btn = document.getElementById('desSubmitC3Btn');
+  var reqFilled = desC3Slots.filter(function(s) { return s.req; }).every(function(s) { return desUploadedFiles[s.id] && !desUploadedFiles[s.id].hasError; });
+  var hasError = Object.values(desUploadedFiles).some(function(f) { return f.hasError; });
+  var total = Object.keys(desUploadedFiles).length;
+  if (bar) bar.innerHTML = total === 0
+    ? '<div style="font-size:11px;color:var(--muted)">Chưa tải file nào</div>'
+    : '<div style="font-size:11px;color:' + (hasError ? 'var(--red)' : reqFilled ? 'var(--green)' : 'var(--amber)') + ';font-weight:600">'
+      + (hasError ? '❌ Có file lỗi định dạng' : reqFilled ? '✅ Đủ file bắt buộc — sẵn sàng nộp' : '⏳ Cần thêm ' + desC3Slots.filter(function(s){ return s.req && !desUploadedFiles[s.id]; }).length + ' file bắt buộc')
+      + '</div>';
+  if (btn) btn.disabled = !reqFilled || hasError;
+}
+
+/* ─── PA image preview ─── */
+var paImgFiles = [];
+function handlePaImg(input) {
+  paImgFiles = Array.from(input.files);
+  var prev = document.getElementById('paImgPreview');
+  if (!prev) return;
+  prev.innerHTML = paImgFiles.map(function(f, i) {
+    var url = URL.createObjectURL(f);
+    return '<div style="position:relative;width:72px;height:72px;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border)">'
+      + '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover">'
+      + '<div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,.5);color:#fff;font-size:8px;padding:1px 4px;border-radius:3px">' + (i+1) + '</div>'
+      + '</div>';
+  }).join('');
+  var lbl = document.getElementById('paImgLabel');
+  if (lbl) lbl.textContent = paImgFiles.length + ' ảnh đã chọn';
+}
+
+/* ─── Review stage tabs ─── */
+function desRvLoadStage(stage) {
+  ['C1','C2','C3','C4'].forEach(function(s) {
+    var btn = document.getElementById('rvBtn' + s);
+    if (btn) btn.className = 'btn btn-sm ' + (s === stage ? 'btn-violet' : 'btn-ghost');
+  });
+  if (typeof window._desRvLoad === 'function') window._desRvLoad(stage);
+}
+
+function desLogout() {
+  if (typeof window._desDoLogout === 'function') window._desDoLogout();
+  else window.location.replace('login.html');
+}
+
+/* ─── Profile save (plain) ─── */
+function desSaveProfile() {
+  if (typeof window._desFbSaveProfile === 'function') window._desFbSaveProfile();
+  else showToast('Firebase chưa sẵn sàng', 't-amber');
+}
+</script>
+
+<!-- ══ MODULE SCRIPT ══ -->
+<script type="module">
+import {
+  auth, db, storage, storageRef, uploadBytes, getDownloadURL,
+  onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc,
+  collection, addDoc, query, where, orderBy, onSnapshot,
+  serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY
+} from './firebase-config.js';
+
+const REQUIRED_ROLE = 'designer';
+
+/* ── helpers ── */
+function fmtM(n) {
+  if (!n && n !== 0) return '—';
+  if (n >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M';
+  if (n >= 1000) return (n/1000).toFixed(0) + 'K';
+  return n.toLocaleString('vi-VN');
+}
+function desUser() { try { return JSON.parse(sessionStorage.getItem('aln_user') || '{}'); } catch(e) { return {}; } }
+
+/* ── render project cards ── */
+function renderProjCards(projs, containerId) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  if (!projs || projs.length === 0) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--muted);text-align:center;padding:40px 0">Chưa có dự án nào</div>';
+    return;
+  }
+  var STAGE_LABEL = { C1:'Khảo sát & Concept', C2:'Thiết kế chi tiết', C3:'Hồ sơ thi công', C4:'Nghiệm thu', done:'Hoàn thành' };
+  var STAGE_CLS   = { C1:'sb-violet', C2:'sb-blue', C3:'sb-amber', C4:'sb-green', done:'sb-green' };
+  el.innerHTML = projs.map(function(p) {
+    var prog = p.progress || {};
+    var pct = Math.round((['C1','C2','C3','C4'].reduce(function(a,s){ return a + (prog[s]||0); },0))/4*100);
+    var clientInfo = (p.cn && p.cn.name ? 'CN: ' + p.cn.name : '') + (p.dn && p.dn.name ? (p.cn ? ' · DN: ' : 'DN: ') + p.dn.name : '');
+    return '<div class="proj-card" onclick="window.desSelectProject && window.desSelectProject(\'' + p.id + '\')">'
+      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+      + '<span class="proj-card-id">' + p.id + '</span>'
+      + '<span class="stat-badge ' + STAGE_CLS[p.stage||'C1'] + '">' + (STAGE_LABEL[p.stage]||p.stage) + '</span>'
+      + '</div>'
+      + '<div class="proj-card-name">' + (p.name || '—') + '</div>'
+      + '<div style="margin:8px 0 4px;background:var(--ink3);border-radius:99px;height:5px;overflow:hidden">'
+      + '<div style="height:100%;background:var(--violet);border-radius:99px;width:' + pct + '%"></div>'
+      + '</div>'
+      + '<div class="proj-meta">'
+      + (clientInfo ? '<span><i class="ph-duotone ph-user"></i> ' + clientInfo + '</span>' : '')
+      + '<span style="font-family:var(--mono)">' + fmtM(p.totalFee) + 'đ</span>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+/* ── render review proposals ── */
+window._desRvLoad = function(stage) {
+  var pid = window.DES_PROJECT_ID;
+  var el  = document.getElementById('rvPropArea');
+  if (!pid || !el) { if(el) el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:40px">Chưa có dự án — chọn ở tab "Dự án"</div>'; return; }
+  el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px"><i class="ph-duotone ph-spinner-gap ph-spin"></i> Đang tải…</div>';
+  var q = query(
+    collection(db, 'designProjects', pid, 'stages', stage, 'proposals'),
+    orderBy('createdAt', 'desc')
+  );
+  onSnapshot(q, function(snap) {
+    if (snap.empty) {
+      el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:40px">Chưa có phương án nào cho chặng ' + stage + '</div>';
+      return;
+    }
+    el.innerHTML = snap.docs.map(function(d) {
+      var pa = Object.assign({ id: d.id }, d.data());
+      var cls = pa.status === 'approved' ? 'approved' : pa.status === 'revision' ? 'revision' : 'pending';
+      var badgeLabel = pa.status === 'approved' ? '✅ Đã duyệt' : pa.status === 'revision' ? '💬 Yêu cầu sửa' : '⏳ Chờ phản hồi';
+      var imgs = pa.images || [];
+      return '<div class="pa-card ' + (cls==='approved'?'selected':'') + '">'
+        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+        + '<span class="pa-card-name">' + (pa.name||'Phương án') + '</span>'
+        + '<span class="pa-badge ' + cls + '">' + badgeLabel + '</span>'
+        + '</div>'
+        + '<div class="pa-card-sub">' + (pa.desc||'') + '</div>'
+        + (imgs.length ? '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px">' + imgs.slice(0,4).map(function(u){ return '<img src="' + u + '" style="width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">'; }).join('') + '</div>' : '')
+        + '</div>';
+    }).join('');
+  });
+};
+
+/* ── select project ── */
+window.desSelectProject = function(pid) {
+  window.DES_PROJECT_ID = pid;
+  var projs = window.DES_PROJECTS || [];
+  var p = projs.find(function(x) { return x.id === pid; });
+  window.DES_PROJECT_DATA = p || null;
+
+  ['desActiveId','paProj','docsProj','rvProj'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = pid + (p && p.name ? ' — ' + p.name : '');
+  });
+  var c3Proj = document.getElementById('docsProj');
+  if (c3Proj) c3Proj.textContent = pid + (p && p.name ? ' — ' + p.name : '');
+
+  if (p) {
+    var w = document.getElementById('walletMain'); if(w) w.textContent = fmtM(p.escrowBalance||0)+'đ';
+    var we = document.getElementById('walletEscrow'); if(we) we.textContent = fmtM((p.totalFee||0)*0.3)+'đ';
+    var wt = document.getElementById('walletTotal'); if(wt) wt.textContent = fmtM(p.totalFee||0)+'đ';
+  }
+
+  window.desShowTab('myproj');
+  showToast('Đang xem: ' + pid);
+};
+
+/* ── submit proposal ── */
+window.desSubmitProposal = async function() {
+  var pid = window.DES_PROJECT_ID;
+  if (!pid) { showToast('Chưa có dự án — chọn dự án trước', 't-amber'); return; }
+  var stage = (document.getElementById('paStage')||{}).value || 'C1';
+  var name  = ((document.getElementById('paName')||{}).value||'').trim();
+  var desc  = ((document.getElementById('paDesc')||{}).value||'').trim();
+  if (!name) { showToast('Nhập tên phương án', 't-amber'); return; }
+
+  var btn = document.getElementById('paSubmitBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph-duotone ph-spinner-gap ph-spin"></i> Đang upload…'; }
+
+  try {
+    var imageURLs = [];
+    var u = auth.currentUser;
+    var uploaderName = desUser().name || 'Designer';
+    for (var i = 0; i < paImgFiles.length; i++) {
+      var f = paImgFiles[i];
+      var ref = storageRef(storage, 'designProjects/' + pid + '/proposals/' + Date.now() + '_' + f.name);
+      await uploadBytes(ref, f);
+      imageURLs.push(await getDownloadURL(ref));
+    }
+    await addDoc(collection(db, 'designProjects', pid, 'stages', stage, 'proposals'), {
+      name, desc, stage,
+      images: imageURLs,
+      status: 'pending',
+      createdBy: { uid: u ? u.uid : '', name: uploaderName, role: 'designer' },
+      createdAt: serverTimestamp()
+    });
+    await updateDoc(doc(db, 'designProjects', pid), { updatedAt: serverTimestamp() });
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi phương án cho Khách hàng'; }
+    document.getElementById('paScanResult').style.display = '';
+    document.getElementById('paScanResult').innerHTML = '<div style="padding:10px 14px;background:var(--green-bg);border:1px solid rgba(22,163,74,.2);border-radius:var(--r-sm);font-size:12px;color:var(--green);font-weight:600">✅ Đã gửi phương án ' + name + ' — Chặng ' + stage + ' cho Khách hàng!</div>';
+    showToast('Đã gửi phương án!', 't-green');
+    paImgFiles = [];
+    var pi = document.getElementById('paImgInput'); if(pi) pi.value='';
+    var pp = document.getElementById('paImgPreview'); if(pp) pp.innerHTML='';
+    var lbl = document.getElementById('paImgLabel'); if(lbl) lbl.textContent='Kéo thả hoặc click để chọn ảnh';
+  } catch(e) {
+    console.error('[DES proposal]', e);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi phương án cho Khách hàng'; }
+    showToast('Lỗi: ' + (e.code || e.message), 't-red');
+  }
+};
+
+/* ── submit C3 (hồ sơ nội thất) ── */
+window.desSubmitC3 = async function() {
+  document.getElementById('desSubmitC3Btn').onclick = window.desSubmitC3;
+  var pid = window.DES_PROJECT_ID;
+  if (!pid) { showToast('Chưa có dự án', 't-amber'); return; }
+  var slots  = desC3Slots;
+  var files  = desUploadedFiles;
+  var btn    = document.getElementById('desSubmitC3Btn');
+  var sr     = document.getElementById('desC3ScanResult');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph-duotone ph-spinner-gap ph-spin"></i> Đang upload…'; }
+  if (sr)  { sr.style.display = ''; sr.innerHTML = '<div style="font-size:11px;color:var(--muted)">Đang kiểm tra & upload…</div>'; }
+
+  var toUpload = slots.filter(function(s) { return files[s.id] && !files[s.id].hasError && files[s.id].file; });
+  var done = 0, failed = 0;
+  var uploaderUid  = (auth.currentUser && auth.currentUser.uid) || '';
+  var uploaderName = desUser().name || 'Designer';
+
+  for (var i = 0; i < toUpload.length; i++) {
+    var slot = toUpload[i];
+    var f = files[slot.id].file;
+    try {
+      if (sr) sr.innerHTML = '<div style="font-size:11px;color:var(--muted)"><i class="ph-duotone ph-spinner-gap ph-spin"></i> Upload ' + (done+1) + '/' + toUpload.length + ': ' + slot.label + '…</div>';
+      var ref = storageRef(storage, 'designProjects/' + pid + '/c3/' + slot.id + '/' + Date.now() + '_' + f.name);
+      await uploadBytes(ref, f);
+      var url = await getDownloadURL(ref);
+      await addDoc(collection(db, 'designProjects', pid, 'documents'), {
+        name: f.name, folder: slot.id, label: slot.label, url, stage: 'C3',
+        uploader: { uid: uploaderUid, name: uploaderName, role: 'designer' },
+        date: new Date().toLocaleDateString('vi-VN')
+      });
+      done++;
+    } catch(e) {
+      console.error('[DES C3 upload]', slot.id, e);
+      failed++;
+    }
+  }
+
+  if (failed === 0) {
+    if (sr) sr.innerHTML = '<div style="padding:10px 14px;background:var(--green-bg);border:1px solid rgba(22,163,74,.2);border-radius:var(--r-sm);font-size:12px;color:var(--green);font-weight:600">✅ Đã upload ' + done + '/' + toUpload.length + ' tài liệu C3 thành công</div>';
+    if (btn) btn.innerHTML = '<i class="ph-duotone ph-check-circle"></i> Đã nộp — chờ khách duyệt';
+    showToast('Nộp hồ sơ C3 thành công!', 't-green');
+  } else {
+    if (sr) sr.innerHTML = '<div style="padding:10px 14px;background:var(--amber-bg);border:1px solid rgba(217,119,6,.2);border-radius:var(--r-sm);font-size:12px;color:var(--amber);font-weight:600">⚠ Upload ' + done + '/' + toUpload.length + ' — ' + failed + ' tệp lỗi</div>';
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-cloud-arrow-up"></i> Nộp Hồ sơ C3'; }
+  }
+};
+
+/* ── upload avatar ── */
+window.desUploadAvatar = async function(input) {
+  var f = input.files[0];
+  if (!f) return;
+  var u = auth.currentUser;
+  if (!u) return;
+  try {
+    var ref = storageRef(storage, 'designer-profiles/' + u.uid + '/avatar');
+    await uploadBytes(ref, f);
+    var url = await getDownloadURL(ref);
+    var av = document.getElementById('desAvInit');
+    if (av) { av.innerHTML = '<img src="' + url + '" style="width:80px;height:80px;border-radius:50%;object-fit:cover">'; }
+    var sav = document.getElementById('desSidebarAv');
+    if (sav) sav.innerHTML = '<img src="' + url + '" style="width:34px;height:34px;border-radius:50%;object-fit:cover">';
+    await updateDoc(doc(db, 'users', u.uid), { avatarURL: url });
+    showToast('Đã cập nhật ảnh đại diện', 't-green');
+  } catch(e) { showToast('Lỗi upload: ' + (e.code||e.message), 't-red'); }
+};
+
+/* ── save profile ── */
+window._desFbSaveProfile = async function() {
+  var u = auth.currentUser;
+  if (!u) return;
+  var name = (document.getElementById('profileName')||{}).value || '';
+  var spec = (document.getElementById('profileSpecialty')||{}).value || '';
+  var yrs  = parseInt((document.getElementById('profileYears')||{}).value)||0;
+  try {
+    await updateDoc(doc(db, 'users', u.uid), { name, specialty: spec, years: yrs, updatedAt: serverTimestamp() });
+    showToast('Đã lưu hồ sơ', 't-green');
+  } catch(e) { showToast('Lỗi: ' + (e.code||e.message), 't-red'); }
+};
+
+/* ── logout ── */
+window._desDoLogout = async function() {
+  try { await signOut(auth); } catch(e) {}
+  try { localStorage.removeItem('aln_user'); sessionStorage.removeItem('aln_user'); } catch(e) {}
+  window.location.replace('login.html');
+};
+
+/* ── wire submitC3 button after DOM ready ── */
+var c3Btn = document.getElementById('desSubmitC3Btn');
+if (c3Btn) c3Btn.onclick = window.desSubmitC3;
+
+/* ── init upload slots ── */
+renderDesUploadSlots();
+
+/* ── AUTH GUARD ── */
+onAuthStateChanged(auth, async function(user) {
+  if (!user) { window.location.replace('login.html'); return; }
+
+  var snap = null;
+  for (var i = 0; i < 3; i++) {
+    try { snap = await getDoc(doc(db, 'users', user.uid)); break; }
+    catch(e) { await new Promise(function(r){ setTimeout(r, 800); }); }
+  }
+
+  if (user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2' && (!snap || !snap.exists())) {
+    snap = { exists: function(){ return true; }, data: function(){ return { role:'founder', name:'KTS. Trần Đại Long', username:'founder.tranlong' }; } };
+  }
+  var profile = (snap && snap.exists()) ? snap.data() : null;
+  if (!profile) { await signOut(auth); window.location.replace('login.html'); return; }
+
+  if (profile.role !== REQUIRED_ROLE && profile.role !== 'founder') {
+    var PAGE_BY_ROLE = { founder:'founder_panel.html', kts:'kts_dashboard.html', dn:'client_DN.html', cn:'client_CN.html' };
+    window.location.replace(PAGE_BY_ROLE[profile.role] || 'login.html');
+    return;
+  }
+
+  /* persist session */
+  var ud = JSON.stringify({ name: profile.name||'', userId: profile.username||'', role: profile.role, uid: user.uid });
+  try { localStorage.setItem('aln_user', ud); sessionStorage.setItem('aln_user', ud); } catch(e) {}
+
+  /* update UI */
+  var nm = profile.name || 'Designer';
+  var init = nm.split(' ').pop()[0] || 'D';
+  ['desSidebarName','desGreetName'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=nm; });
+  var smEl = document.getElementById('desSidebarNameSm'); if(smEl) smEl.textContent=nm;
+  var avEl = document.getElementById('desAvInit'); if(avEl) { avEl.textContent = init; }
+  var sav  = document.getElementById('desSidebarAv'); if(sav) { sav.textContent = init; }
+
+  /* profile tab */
+  var pn = document.getElementById('profileName'); if(pn) pn.value = profile.name||'';
+  var ps = document.getElementById('profileSpecialty'); if(ps) ps.value = profile.specialty||'';
+  var py = document.getElementById('profileYears'); if(py) py.value = profile.years||'';
+  var pe = document.getElementById('profileEmail'); if(pe) pe.value = profile.email||(profile.username+'@aln.vn')||'';
+
+  /* load avatar */
+  if (profile.avatarURL) {
+    var avImg = '<img src="' + profile.avatarURL + '" style="width:80px;height:80px;border-radius:50%;object-fit:cover">';
+    if(avEl) avEl.outerHTML = '<div id="desAvInit" class="profile-avatar-init">' + avImg + '</div>';
+    if(sav) sav.innerHTML = '<img src="' + profile.avatarURL + '" style="width:34px;height:34px;border-radius:50%;object-fit:cover">';
+  }
+
+  /* hide veil */
+  var veil = document.getElementById('desigAuthVeil');
+  if (veil) veil.style.display = 'none';
+
+  /* ── PROJECTS LISTENER ── */
+  var isFounder = (user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2');
+  var q;
+  if (isFounder) {
+    q = query(collection(db, 'designProjects'), orderBy('updatedAt', 'desc'));
+  } else {
+    q = query(
+      collection(db, 'designProjects'),
+      where('designer.uid', '==', user.uid),
+      orderBy('updatedAt', 'desc')
+    );
+  }
+
+  onSnapshot(q, function(snap) {
+    var projs = snap.docs.map(function(d) { return Object.assign({ id: d.id }, d.data()); });
+    window.DES_PROJECTS = projs;
+
+    /* auto-select first project */
+    if (projs.length > 0 && !window.DES_PROJECT_ID) {
+      var p = projs[0];
+      window.DES_PROJECT_ID   = p.id;
+      window.DES_PROJECT_DATA = p;
+      ['desActiveId','paProj','docsProj','rvProj'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=p.id+(p.name?' — '+p.name:''); });
+      var w = document.getElementById('walletMain'); if(w) w.textContent=fmtM(p.escrowBalance||0)+'đ';
+      var we = document.getElementById('walletEscrow'); if(we) we.textContent=fmtM((p.totalFee||0)*0.3)+'đ';
+      var wt = document.getElementById('walletTotal'); if(wt) wt.textContent=fmtM(p.totalFee||0)+'đ';
+    }
+
+    /* stats */
+    var active = projs.filter(function(p){ return p.stage && p.stage !== 'done'; }).length;
+    var done   = projs.filter(function(p){ return p.stage === 'done'; }).length;
+    var el = document.getElementById('statActive'); if(el) el.textContent = active;
+    var ed = document.getElementById('statDone');   if(ed) ed.textContent = done;
+
+    /* dashboard cards (show first 6) */
+    renderProjCards(projs.slice(0,6), 'dashProjCards');
+    /* all projects */
+    renderProjCards(projs, 'projListWrap');
+  });
+
+  /* ── FCM PUSH ── */
+  try {
+    if (await fcmSupported()) {
+      var messaging = getMessaging();
+      var perm = await Notification.requestPermission();
+      if (perm === 'granted' && ALN_VAPID_KEY && !ALN_VAPID_KEY.startsWith('DAN_KHOA')) {
+        var reg = await navigator.serviceWorker.ready;
+        var tok = await getToken(messaging, { vapidKey: ALN_VAPID_KEY, serviceWorkerRegistration: reg });
+        if (tok) {
+          await setDoc(doc(db, 'fcmTokens', tok), {
+            token: tok, uid: user.uid, role: 'designer', updatedAt: serverTimestamp()
+          });
+        }
+        onFcmMessage(messaging, function(payload) {
+          var n = payload.notification || {};
+          showToast((n.title||'') + ' — ' + (n.body||''), 't-violet');
+        });
+      }
+    }
+  } catch(e) { console.warn('[DES Push]', e); }
+});
+</script>
+</body>
+</html>

@@ -1347,6 +1347,11 @@ body::after {
         <i class="ph-duotone ph-buildings"></i> Doanh nghiệp
         <span id="pendingCountDn" style="background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.25);border-radius:99px;font-size:9px;padding:1px 7px;font-weight:700">0</span>
       </button>
+      <button id="pendingTabDes" onclick="switchPendingTab('designer')"
+        style="padding:7px 18px;border-radius:7px 7px 0 0;border:1px solid var(--border);border-bottom:none;font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;background:var(--card);color:var(--sub)">
+        <i class="ph-duotone ph-paint-brush-household"></i> Designer NT
+        <span id="pendingCountDes" style="background:rgba(124,58,237,.1);color:var(--purple);border:1px solid rgba(124,58,237,.25);border-radius:99px;font-size:9px;padding:1px 7px;font-weight:700">0</span>
+      </button>
     </div>
   </div>
   <!-- List -->
@@ -2779,8 +2784,10 @@ function switchPendingTab(role){
   _pendingActiveTab = role;
   var tabKts = document.getElementById('pendingTabKts');
   var tabDn  = document.getElementById('pendingTabDn');
-  if(tabKts){ tabKts.style.background = role==='kts' ? 'var(--raised)' : 'var(--card)'; tabKts.style.color = role==='kts' ? 'var(--amber)' : 'var(--sub)'; }
-  if(tabDn) { tabDn.style.background  = role==='dn'  ? 'var(--raised)' : 'var(--card)'; tabDn.style.color  = role==='dn'  ? 'var(--blue)'  : 'var(--sub)'; }
+  var tabDes = document.getElementById('pendingTabDes');
+  if(tabKts){ tabKts.style.background = role==='kts'      ? 'var(--raised)' : 'var(--card)'; tabKts.style.color = role==='kts'      ? 'var(--amber)'  : 'var(--sub)'; }
+  if(tabDn) { tabDn.style.background  = role==='dn'       ? 'var(--raised)' : 'var(--card)'; tabDn.style.color  = role==='dn'       ? 'var(--blue)'   : 'var(--sub)'; }
+  if(tabDes){ tabDes.style.background = role==='designer' ? 'var(--raised)' : 'var(--card)'; tabDes.style.color = role==='designer' ? 'var(--purple)' : 'var(--sub)'; }
   renderPending();
 }
 
@@ -2791,20 +2798,22 @@ function renderPending(){
   // Cập nhật số đếm trên 2 tab
   var nKts = all.filter(function(u){ return u.role==='kts'; }).length;
   var nDn  = all.filter(function(u){ return u.role==='dn';  }).length;
+  var nDes = all.filter(function(u){ return u.role==='designer'; }).length;
   var elK = document.getElementById('pendingCountKts'); if(elK) elK.textContent = nKts;
   var elD = document.getElementById('pendingCountDn');  if(elD) elD.textContent = nDn;
+  var elDes = document.getElementById('pendingCountDes'); if(elDes) elDes.textContent = nDes;
   // Lọc theo tab đang chọn
   var users = all.filter(function(u){ return u.role === _pendingActiveTab; });
   if(users.length === 0){
-    var emptyLabel = _pendingActiveTab==='kts' ? 'Không có KTS nào đang chờ duyệt' : 'Không có Doanh nghiệp nào đang chờ duyệt';
+    var emptyLabel = _pendingActiveTab==='kts' ? 'Không có KTS nào đang chờ duyệt' : _pendingActiveTab==='designer' ? 'Không có Designer nào đang chờ duyệt' : 'Không có Doanh nghiệp nào đang chờ duyệt';
     list.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--dim);font-size:13px">'
       +'<i class="ph-duotone ph-check-circle" style="font-size:36px;display:block;margin-bottom:12px;color:var(--green)"></i>'
       +emptyLabel+'</div>';
     return;
   }
-  var ROLE_COLOR = {kts:'var(--amber)', dn:'var(--blue)', cn:'var(--green)'};
-  var ROLE_LABEL = {kts:'Kiến trúc sư', dn:'Doanh nghiệp', cn:'Chủ nhà'};
-  var ROLE_ICON  = {kts:'ph-pencil-ruler', dn:'ph-buildings', cn:'ph-house-line'};
+  var ROLE_COLOR = {kts:'var(--amber)', dn:'var(--blue)', cn:'var(--green)', designer:'var(--purple)'};
+  var ROLE_LABEL = {kts:'Kiến trúc sư', dn:'Doanh nghiệp', cn:'Chủ nhà', designer:'Designer NT'};
+  var ROLE_ICON  = {kts:'ph-pencil-ruler', dn:'ph-buildings', cn:'ph-house-line', designer:'ph-paint-brush-household'};
   list.innerHTML = users.map(function(u){
     var app = u.app || {};
     var ts  = u.createdAt ? (u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString('vi-VN') : u.createdAt) : '—';
@@ -2874,6 +2883,28 @@ function renderPending(){
         +(pts.length ? '<div><div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Loại công trình</div><div style="display:flex;flex-wrap:wrap;gap:5px">'+ptChips+'</div></div>' : '')
         +((app.contactName||app.contactPhone) ? '<div style="display:flex;align-items:center;gap:8px;font-size:11px"><i class="ph-duotone ph-user-circle" style="color:var(--sub);font-size:14px"></i><span style="color:var(--sub)">Người liên hệ:</span><span style="color:var(--text2);font-weight:600">'+(app.contactName||'')+'</span>'+(app.contactPhone?'<span style="color:var(--dim);font-family:var(--mono)">· '+app.contactPhone+'</span>':'')+'</div>' : '')
         +(app.requirements ? '<div style="font-size:11px;color:var(--sub);line-height:1.6;background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:7px;padding:10px 12px">'+(app.requirements.length>180?app.requirements.slice(0,180)+'…':app.requirements)+'</div>' : '')
+      +'</div>';
+    }
+    if(u.role === 'designer'){
+      var styles = app.styles || [];
+      var styleChips = styles.slice(0,5).map(function(s){ return '<span style="font-size:9px;font-weight:700;padding:2px 8px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.22);border-radius:5px;color:var(--purple)">'+s+'</span>'; }).join('');
+      if(styles.length > 5) styleChips += '<span style="font-size:9px;color:var(--dim)">+'+(styles.length-5)+'</span>';
+      details = '<div style="padding:14px 20px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--border)">'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+          +'<div style="background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">'
+            +'<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Kinh nghiệm</div>'
+            +'<div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text1)">'+(app.years||'—')+' năm</div>'
+          +'</div>'
+          +'<div style="background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">'
+            +'<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Điện thoại</div>'
+            +'<div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text1)">'+(app.phone||'—')+'</div>'
+          +'</div>'
+        +'</div>'
+        +(styles.length ? '<div><div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Phong cách</div><div style="display:flex;flex-wrap:wrap;gap:5px">'+styleChips+'</div></div>' : '')
+        +(app.bio ? '<div style="font-size:11px;color:var(--sub);line-height:1.6;background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:7px;padding:10px 12px">'+(app.bio.length>180 ? app.bio.slice(0,180)+'…' : app.bio)+'</div>' : '')
+        +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+          +(app.cvUrl ? '<a href="'+app.cvUrl+'" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.25);border-radius:6px;font-size:11px;font-weight:600;color:var(--purple);text-decoration:none"><i class="ph-duotone ph-file-pdf"></i> Xem Portfolio</a>' : '<span style="font-size:10px;color:var(--mute)"><i class="ph-duotone ph-file-x"></i> Chưa có Portfolio</span>')
+        +'</div>'
       +'</div>';
     }
     var actions = '<div style="padding:12px 20px;display:flex;justify-content:flex-end;gap:8px">'
@@ -3516,7 +3547,7 @@ function _adaptForFounder(id, d) {
 window.founderApprovePending = async function(uid, role) {
   try {
     await updateDoc(doc(db,'users',uid), { status:'active' });
-    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : null;
+    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : null;
     if(appColl){ try{ await updateDoc(doc(db,appColl,uid), { status:'approved', reviewedAt:serverTimestamp() }); }catch(e){} }
     window.PENDING_USERS = (window.PENDING_USERS||[]).filter(function(u){ return u.uid!==uid; });
     renderPending(); _updatePendingBadge();
@@ -3528,7 +3559,7 @@ window.founderRejectPending = async function(uid, role) {
   if(!confirm('Xác nhận từ chối tài khoản này?')) return;
   try {
     await updateDoc(doc(db,'users',uid), { status:'rejected' });
-    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : null;
+    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : null;
     if(appColl){ try{ await updateDoc(doc(db,appColl,uid), { status:'rejected', reviewedAt:serverTimestamp() }); }catch(e){} }
     window.PENDING_USERS = (window.PENDING_USERS||[]).filter(function(u){ return u.uid!==uid; });
     renderPending(); _updatePendingBadge();
@@ -3584,7 +3615,7 @@ async function _startPendingListen() {
       var base = snap.docs.map(function(d){ return Object.assign({uid:d.id}, d.data()); });
       var enriched = await Promise.all(base.map(async function(u) {
         try {
-          var appColl = u.role==='kts' ? 'ktsApplications' : u.role==='dn' ? 'dnApplications' : null;
+          var appColl = u.role==='kts' ? 'ktsApplications' : u.role==='dn' ? 'dnApplications' : u.role==='designer' ? 'designerApplications' : null;
           if(appColl){
             var aSnap = await getDoc(doc(db, appColl, u.uid));
             if(aSnap.exists()) return Object.assign({}, u, {app: aSnap.data()});

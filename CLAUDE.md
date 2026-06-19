@@ -14,13 +14,15 @@ Nền tảng theo dõi công trình xây dựng. **Frontend tĩnh** (HTML/JS thu
 
 | File | Vai trò |
 |------|--------|
-| `login.html` | Đăng nhập — dark luxury, role tabs, 2 nút đăng ký KTS/DN |
+| `login.html` | Đăng nhập — dark luxury, role tabs, 3 nút đăng ký KTS/DN/Designer |
 | `client_CN.html` | Trang Chủ nhà (CN) |
 | `client_DN.html` | Trang Doanh nghiệp (DN) |
 | `kts_dashboard.html` | Trang Kiến trúc sư (KTS) |
-| `founder_panel.html` | Trang quản trị founder — dark luxury, tab Duyệt đăng ký KTS/DN |
+| `designer_dashboard.html` | Trang Designer Nội thất — violet accent, collection `designProjects/` |
+| `founder_panel.html` | Trang quản trị founder — dark luxury, tab Duyệt đăng ký KTS/DN/Designer |
 | `kts-apply.html` | Form đăng ký KTS (dark luxury) → ghi `ktsApplications/{uid}` |
 | `dn-studio.html` | Form đăng ký DN (dark luxury) → ghi `dnApplications/{uid}` |
+| `designer-apply.html` | Form đăng ký Designer NT (dark luxury, violet) → ghi `designerApplications/{uid}` |
 | `seed.html` | Nạp dữ liệu mẫu lên Firestore |
 | `firebase-config.js` | Khởi tạo Firebase + export hàm dùng chung |
 | `firebase-messaging-sw.js` | Service worker cho web push |
@@ -35,6 +37,16 @@ CÓ export: `app, auth, db, usernameToEmail, signIn/createUser, onAuthStateChang
 
 Quy ước: `username + "@aln.vn"` = email đăng nhập (email ảo).
 
+## Vai trò hệ thống
+
+| Vai | Trang | Collection dự án | Accent color |
+|-----|-------|-----------------|-------------|
+| `founder` | `founder_panel.html` | — (quản lý tất cả) | gold |
+| `kts` | `kts_dashboard.html` | `projects/` (ALN-XXXX) | amber |
+| `designer` | `designer_dashboard.html` | `designProjects/` (DES-XXXX) | violet `#7c3aed` |
+| `dn` | `client_DN.html` | — (xem projects + designProjects) | blue |
+| `cn` | `client_CN.html` | — (xem projects của mình) | green |
+
 ## 4 tài khoản thật (Auth + Firestore `users/{uid}`)
 
 Mật khẩu chung: `Test@1234`
@@ -48,6 +60,8 @@ Mật khẩu chung: `Test@1234`
 
 Mỗi `users/{uid}` có: `username, name, role, email`.
 
+Designer dùng username prefix `des.` — đăng ký qua `designer-apply.html`, chờ founder duyệt.
+
 ## Dữ liệu mẫu
 
 `projects/ALN-9921` "Biệt thự Vườn Tân Cổ Điển" — `stage: 'C2'`, `sla_warn`, `totalFee: 125tr`, `escrow: 75tr`, `progress: {C1:1, C2:0.4, C3:0, C4:0}`, `memberUids: [cn.uid, kts.uid, dn.uid]` + 4 stages + 3 documents + 1 proposal. `cn.uid` = UID cn.trannam, `kts.uid` = UID kts.tranlong.
@@ -60,6 +74,7 @@ Khi CN duyệt proposal: `projects/{pid}.stage` tự advance C1→C2→C3→C4, 
 |----------|---------|---------|
 | `onKtsApply` | `ktsApplications/{uid}` onCreate | Push cho founder |
 | `onDnApply` | `dnApplications/{uid}` onCreate | Push cho founder |
+| `onDesignerApply` | `designerApplications/{uid}` onCreate | Push cho founder |
 | `onStageAdvanced` | `projects/{pid}` onUpdate (stage thay đổi) | Push cho KTS |
 | `onDocUploaded` | `projects/{pid}/documents/{id}` onCreate (uploader.role=kts) | Push cho CN + DN |
 
@@ -78,7 +93,8 @@ Deploy: `firebase deploy --only functions`
 ## Query theo trang
 
 - `client_CN.html`: `where('cn.uid','==',uid) orderBy('updatedAt','desc')` — trừ founder thì bỏ where, lấy tất cả.
-- `kts_dashboard.html`: `where('kts.uid','==',uid) orderBy('updatedAt','desc')`.
+- `kts_dashboard.html`: `where('kts.uid','==',uid) orderBy('updatedAt','desc')` trên `projects/`.
+- `designer_dashboard.html`: `where('designer.uid','==',uid) orderBy('updatedAt','desc')` trên `designProjects/`.
 - `client_DN.html`: `orderBy('updatedAt','desc')` (không where → mọi dự án).
 - `founder_panel.html`: `orderBy('updatedAt')`.
 
@@ -92,6 +108,8 @@ Deploy: `firebase deploy --only functions`
 
 - `fcmTokens`: create/update = `signedIn()` — cho phép mọi vai lưu token.
 - `projects/{pid}` update: founder hoặc `uid in memberUids` → CN/KTS/DN trong project đều update được (dùng khi advance stage).
+- `designerApplications/{uid}`: giống pattern ktsApplications — designer tự ghi, founder duyệt.
+- `designProjects/{pid}`: founder create, `designer.uid`/`cn.uid`/`dn.uid`/`memberUids` read, `memberUids` update.
 - **App Check bypass còn tồn tại**: founder UID cứng được mock `role:founder` mà không đọc Firestore → cần điều tra và bỏ bypass sau.
 
 ## Các nút GHI đã được nối (Firestore/Storage)
@@ -106,7 +124,10 @@ Deploy: `firebase deploy --only functions`
 | client_CN | `_cnSingleSend` | `projects/{pid}/documents` + Storage |
 | client_DN | `_dnFbApprovePA` | proposal `status:approved` + advance `projects/{pid}.stage` |
 | client_DN | `_dnSingleSend` | `projects/{pid}/documents` + Storage |
-| founder_panel | `founderApprovePending` | `users/{uid}.status:active` + `ktsApplications/{uid}.status:approved` |
+| founder_panel | `founderApprovePending` | `users/{uid}.status:active` + `ktsApplications/dnApplications/designerApplications/{uid}.status:approved` |
+| designer_dashboard | `desSubmitProposal()` | `designProjects/{pid}/stages/{s}/proposals` + Storage |
+| designer_dashboard | `window.desSubmitC3` (module) | `designProjects/{pid}/documents` + Storage |
+| designer_dashboard | `window.desUploadAvatar` (module) | Storage `designer-profiles/{uid}/` |
 
 ## QUYỀN TỰ ĐỘNG (dành cho phiên autonomous)
 

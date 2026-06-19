@@ -170,7 +170,7 @@ input::placeholder{color:var(--muted)}
 }
 .divider-reg-line{flex:1;height:1px;background:rgba(255,255,255,.07)}
 .divider-reg span{font-size:10px;color:var(--muted);white-space:nowrap}
-.reg-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:420px;margin-top:8px}
+.reg-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%;max-width:420px;margin-top:8px}
 .reg-btn{
   display:flex;align-items:center;gap:9px;
   padding:11px 12px;
@@ -292,6 +292,11 @@ input::placeholder{color:var(--muted)}
       <div class="rt-label">Chủ nhà</div>
       <div class="rt-dot"></div>
     </div>
+    <div class="role-tab" data-role="designer" onclick="switchRole('designer')">
+      <div class="rt-icon"><i class="ph-duotone ph-paint-brush-household"></i></div>
+      <div class="rt-label">Designer NT</div>
+      <div class="rt-dot"></div>
+    </div>
   </div>
 
   <!-- ── LOGIN CARD ── -->
@@ -354,6 +359,13 @@ input::placeholder{color:var(--muted)}
       <div>
         <div class="reg-btn-title">Bạn là Doanh nghiệp?</div>
         <div class="reg-btn-sub">Thuê Studio KTS trực tuyến</div>
+      </div>
+    </a>
+    <a href="designer-apply.html" class="reg-btn" style="border-color:rgba(124,58,237,.25)">
+      <i class="ph-duotone ph-paint-brush-household" style="color:rgba(124,58,237,.6)"></i>
+      <div>
+        <div class="reg-btn-title">Bạn là Designer?</div>
+        <div class="reg-btn-sub">Đăng ký thiết kế nội thất</div>
       </div>
     </a>
   </div>
@@ -436,6 +448,10 @@ const ACCOUNTS = {
     { user:'cn.binhtt',   pw:'aln2026', name:'Trần Thị Bình',    file:'client_CN.html', badge:'Chủ nhà' },
     { user:'cn.cuonglq',  pw:'aln2026', name:'Lê Quang Cường',   file:'client_CN.html', badge:'Chủ nhà' },
   ],
+  designer: [
+    { user:'des.minhchau', pw:'aln2026', name:'Minh Châu Studio',  file:'designer_dashboard.html', badge:'Designer' },
+    { user:'des.thaovan',  pw:'aln2026', name:'Thảo Vân Interiors',file:'designer_dashboard.html', badge:'Designer' },
+  ],
   founder: [
     { user:'founder', pw:'aln@2026!', name:'Hội đồng Sáng lập', file:'founder_panel.html', badge:'Founder' },
   ],
@@ -446,8 +462,9 @@ var KTS_BEE = '<svg viewBox="0 0 100 100" width="22" height="22" xmlns="http://w
 const ROLE_META = {
   kts:     { icon:KTS_BEE, title:'Kiến trúc sư',      desc:'Quản lý dự án, bản vẽ & doanh thu',  color:'var(--amber)', bg:'rgba(255,170,51,.1)'  },
   dn:      { icon:'<i class="ph-duotone ph-building"></i>', title:'Doanh nghiệp', desc:'Tổng quan danh mục & đội ngũ KTS', color:'var(--blue)', bg:'rgba(91,143,255,.1)' },
-  cn:      { icon:'<i class="ph-duotone ph-user"></i>', title:'Chủ nhà', desc:'Theo dõi công trình & trao đổi KTS', color:'var(--green)', bg:'rgba(61,214,140,.1)' },
-  founder: { icon:'<i class="ph-duotone ph-crown"></i>', title:'Hội đồng Sáng lập', desc:'Toàn quyền quản trị hệ thống ALN', color:'var(--gold)', bg:'rgba(201,168,76,.12)' },
+  cn:       { icon:'<i class="ph-duotone ph-user"></i>', title:'Chủ nhà', desc:'Theo dõi công trình & trao đổi KTS', color:'var(--green)', bg:'rgba(61,214,140,.1)' },
+  designer: { icon:'<i class="ph-duotone ph-paint-brush-household"></i>', title:'Designer Nội thất', desc:'Quản lý dự án & hồ sơ nội thất', color:'#7c3aed', bg:'rgba(124,58,237,.1)' },
+  founder:  { icon:'<i class="ph-duotone ph-crown"></i>', title:'Hội đồng Sáng lập', desc:'Toàn quyền quản trị hệ thống ALN', color:'var(--gold)', bg:'rgba(201,168,76,.12)' },
 };
 
 let activeRole = 'kts';
@@ -510,7 +527,7 @@ function showError(msg){
   setTimeout(()=>{ card.style.animation='shake .35s ease'; },10);
 }
 
-const FILE_BY_ROLE = { kts:'kts_dashboard.html', dn:'client_DN.html', cn:'client_CN.html', founder:'founder_panel.html' };
+const FILE_BY_ROLE = { kts:'kts_dashboard.html', dn:'client_DN.html', cn:'client_CN.html', designer:'designer_dashboard.html', founder:'founder_panel.html' };
 
 function resetLoginBtn(){
   const btn = document.getElementById('btnLogin');

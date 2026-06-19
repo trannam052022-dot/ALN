@@ -9,10 +9,11 @@ const BASE_URL    = "https://trannam052022-dot.github.io/ALN/";
 const APP_URL     = BASE_URL + "founder_panel.html";
 
 const PAGE_BY_ROLE = {
-  founder: "founder_panel.html",
-  kts:     "kts_dashboard.html",
-  dn:      "client_DN.html",
-  cn:      "client_CN.html",
+  founder:  "founder_panel.html",
+  kts:      "kts_dashboard.html",
+  designer: "designer_dashboard.html",
+  dn:       "client_DN.html",
+  cn:       "client_CN.html",
 };
 
 /* Gửi push đến tất cả FCM tokens của một uid cụ thể */
@@ -58,6 +59,24 @@ async function notifyUser(uid, title, body, extraData, role) {
 }
 
 const notifyFounder = (title, body, extra) => notifyUser(FOUNDER_UID, title, body, extra, "founder");
+
+/* ── Designer NT đăng ký mới ── */
+exports.onDesignerApply = functions
+  .region("asia-southeast1")
+  .firestore.document("designerApplications/{uid}")
+  .onCreate(async (snap) => {
+    const d = snap.data() || {};
+    const detail = [
+      d.years ? d.years + " năm KN" : "",
+      (d.styles || []).slice(0, 2).join(", "),
+    ].filter(Boolean).join(" · ");
+
+    await notifyFounder(
+      "🖼 Designer NT đăng ký",
+      `${d.name || "Designer"} ${detail ? "— " + detail : ""} — chờ duyệt`,
+      { type: "NEW_DESIGNER_APPLICATION", uid: snap.id, name: d.name || "" }
+    );
+  });
 
 /* ── KTS đăng ký mới ── */
 exports.onKtsApply = functions
