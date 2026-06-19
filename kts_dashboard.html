@@ -2617,13 +2617,14 @@ function renderMyProjects(projects) {
 
   function mplItem(p) {
     const isOn = p.id === window._mplActiveId;
-    const isDN = !!(p.dn && p.dn.uid) && !(p.cn && p.cn.uid);
+    const isDN = !!(p.dn && p.dn.uid);
     const client = isDN ? (p.dn&&p.dn.name)||'—' : (p.cn&&p.cn.name)||'—';
+    const mCode = isDN ? 'ALN-DN-'+(p.CODE||p.code||p.id.replace(/^ALN-/,'')) : 'ALN-CN-'+p.id.replace(/^ALN-/,'');
     return `<div class="mpl-item${isOn?' on':''}" data-pid="${p.id}" onclick="window.mplSelect('${p.id}')">
       <div class="mpl-dot" style="background:${S_DOT[p.status]||'var(--muted)'}"></div>
       <div style="flex:1;min-width:0">
         <div class="mpl-nm">${p.name||'—'}</div>
-        <div class="mpl-sub">ALN-DN-${p.CODE||p.code||p.id.replace(/^ALN-/,'')} · ${p.stage||'C1'}</div>
+        <div class="mpl-sub">${mCode} · ${p.stage||'C1'}</div>
         <div style="font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${client}</div>
       </div>
     </div>`;
@@ -2665,7 +2666,8 @@ function renderMyProjects(projects) {
     const pcts = [10,20,60,10];
     const stLbl = S_LBL[p.status] || p.status;
     const stClr = S_CLR[p.status] || '';
-    const isDN = !!(p.dn && p.dn.uid) && !(p.cn && p.cn.uid);
+    const isDN = !!(p.dn && p.dn.uid);
+    const detCode = isDN ? 'ALN-DN-'+(p.CODE||p.code||pid.replace(/^ALN-/,'')) : 'ALN-CN-'+pid.replace(/^ALN-/,'');
     const bar = prog.map((v,i) => `<div style="flex:${pcts[i]};height:7px;background:${v>0?SCOLS[i]:'rgba(0,0,0,.1)'};border-radius:99px"></div>`).join('');
     const pid = p.id;
     const stages = ['C1','C2','C3','C4'].map((c,i) =>
@@ -2674,7 +2676,7 @@ function renderMyProjects(projects) {
     el.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:14px">
         <div>
-          <div style="font-family:var(--mono);font-size:10px;color:var(--gold);background:var(--gold-bg);padding:2px 8px;border-radius:99px;display:inline-block;margin-bottom:5px">${isDN?'DN':'CN'} · ${p.id}</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--gold);background:var(--gold-bg);padding:2px 8px;border-radius:99px;display:inline-block;margin-bottom:5px">${detCode}</div>
           <div style="font-size:15px;font-weight:700;color:var(--text);line-height:1.3">${p.name||'—'}</div>
           <div style="font-size:11px;color:var(--muted);margin-top:3px">${isDN?'<i class="ph-duotone ph-buildings"></i>':'<i class="ph-duotone ph-user"></i>'} ${isDN?(p.dn&&p.dn.name)||'—':(p.cn&&p.cn.name)||'—'}</div>
         </div>
