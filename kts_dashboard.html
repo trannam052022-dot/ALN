@@ -3219,6 +3219,29 @@ window.rvSwitch = function(mode) {
   if (tabDoc) { tabDoc.style.color = mode==='doc' ? 'var(--gold)' : 'var(--muted)'; tabDoc.style.borderBottomColor = mode==='doc' ? 'var(--gold)' : 'transparent'; }
 };
 
+window.openImgLight = function(url, name) {
+  var lb = document.getElementById('imgLight');
+  if (!lb) {
+    lb = document.createElement('div');
+    lb.id = 'imgLight';
+    lb.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;align-items:center;justify-content:center;padding:20px;cursor:zoom-out';
+    lb.innerHTML = '<div onclick="event.stopPropagation()" style="max-width:min(92vw,860px);position:relative;cursor:default">'
+      + '<img id="imgLightImg" src="" alt="" style="max-width:100%;max-height:86vh;border-radius:10px;display:block;box-shadow:0 12px 48px rgba(0,0,0,.7)">'
+      + '<div id="imgLightName" style="color:rgba(255,255,255,.75);font-size:12px;text-align:center;margin-top:10px;font-family:var(--sans)"></div>'
+      + '<button onclick="window.closeImgLight()" style="position:absolute;top:-14px;right:-14px;background:#fff;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:18px;color:#333;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.35)"><i class="ph-duotone ph-x"></i></button>'
+      + '</div>';
+    lb.onclick = function() { window.closeImgLight(); };
+    document.body.appendChild(lb);
+  }
+  document.getElementById('imgLightImg').src = url;
+  document.getElementById('imgLightName').textContent = name || '';
+  lb.style.display = 'flex';
+};
+window.closeImgLight = function() {
+  var lb = document.getElementById('imgLight');
+  if (lb) { lb.style.display = 'none'; var img = document.getElementById('imgLightImg'); if(img) img.src = ''; }
+};
+
 window.rvLoadStage = function(stage) {
   _rvStage = stage;
   ['C1','C2','C3','C4'].forEach(s => {
@@ -3254,8 +3277,9 @@ window.rvLoadStage = function(stage) {
         const thumb = p.imageURL
           ? `<img src="${p.imageURL}" style="width:52px;height:52px;border-radius:7px;object-fit:cover;flex-shrink:0;border:1px solid var(--border)">`
           : `<div style="width:52px;height:52px;border-radius:7px;background:var(--ink3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;color:var(--muted)"><i class="ph-duotone ph-image"></i></div>`;
+        const _safeName = displayName.replace(/'/g, '&#39;');
         const viewBtn = p.imageURL
-          ? `<a href="${p.imageURL}" target="_blank" rel="noopener" style="flex-shrink:0;padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-weight:600;color:var(--text2);background:var(--ink2);text-decoration:none;display:flex;align-items:center;gap:4px;white-space:nowrap"><i class="ph-duotone ph-eye"></i> Xem</a>`
+          ? `<button onclick="window.openImgLight('${p.imageURL}','${_safeName}')" style="flex-shrink:0;padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-weight:600;color:var(--text2);background:var(--ink2);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;white-space:nowrap"><i class="ph-duotone ph-eye"></i> Xem</button>`
           : '';
         return `<div style="display:flex;align-items:center;gap:10px;background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px">
           ${thumb}
