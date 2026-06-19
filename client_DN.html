@@ -1058,13 +1058,14 @@ function openPAReview(projId, rid, paId){
   document.getElementById('paRvMeta').innerHTML = (pa.version||'v1.0')+' · <span style="color:'+fl.color+'">'+fl.label+'</span>'+(pa.date?' · '+pa.date:'');
   var wrap = document.getElementById('paRvImgWrap');
   wrap.innerHTML = '';
-  if(pa.imageURL){
+  var _imgURL = (window._dnImgMap && window._dnImgMap[paId]) || pa.imageURL || '';
+  if(_imgURL){
     var _img = document.createElement('img');
     _img.alt = pa.name || '';
     _img.style.cssText = 'width:100%;height:auto;display:block;min-height:220px;background:#111';
     _img.onerror = function(){ this.style.display='none'; wrap.insertAdjacentHTML('beforeend','<div style="padding:30px;text-align:center;color:rgba(255,255,255,.5);font-size:12px">Không tải được ảnh</div>'); };
     wrap.appendChild(_img);
-    _img.src = pa.imageURL;
+    _img.src = _imgURL;
   } else {
     wrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:160px"><span style="font-size:72px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))">📐</span></div>';
   }
@@ -2035,7 +2036,7 @@ function renderMain(){
                 ? `<span style="font-size:10px;color:var(--red);display:flex;align-items:center;gap:3px"><i class="ph-duotone ph-x-circle"></i> Không chọn</span>`
                 : `<span style="font-size:10px;color:var(--amber);display:flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;display:inline-block"></span> Chờ duyệt</span>`;
             const viewBtn = pa.imageURL
-              ? `<button onclick="openPAReview('${p.id}','${rid}','${pa.id}')" style="padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:var(--ink2);cursor:pointer;font-size:11px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:4px;font-family:var(--sans);white-space:nowrap"><i class="ph-duotone ph-eye"></i> Xem</button>`
+              ? `<button data-img="${pa.imageURL}" onclick="var _u=this.getAttribute('data-img');if(_u)openImgLight(_u,'${safeName}')" style="padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:var(--ink2);cursor:pointer;font-size:11px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:4px;font-family:var(--sans);white-space:nowrap"><i class="ph-duotone ph-eye"></i> Xem</button>`
               : '';
             const approveBtn = !isApproved&&!isRejected
               ? `<button onclick="approvePA('${p.id}','${rid}','${pa.id}')" style="padding:5px 11px;border-radius:7px;border:1px solid rgba(34,201,122,.35);background:rgba(34,201,122,.08);cursor:pointer;font-size:11px;font-weight:600;color:var(--green);display:flex;align-items:center;gap:4px;font-family:var(--sans);white-space:nowrap"><i class="ph-duotone ph-check-circle"></i> Duyệt</button>`
@@ -3116,6 +3117,11 @@ window._dnSubProposals = function(pid) {
           isNew: ts ? (Date.now()-ts.getTime() < 48*3600*1000) : false,
           pins: []
         };
+      });
+      if (!window._dnImgMap) window._dnImgMap = {};
+      snap.docs.forEach(function(d) {
+        var url = (d.data().imageURL) || '';
+        if (url) window._dnImgMap[d.id] = url;
       });
       if (window.activeProj === pid && typeof window.renderMain === 'function') {
         try { window.renderMain(); } catch(e){}
