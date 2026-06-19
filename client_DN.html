@@ -1085,6 +1085,20 @@ function closePAReview(){
   var m = document.getElementById('paRvModal'); if(m) m.style.display='none';
 }
 
+function _dnApplyKtsAvatar(url){
+  var el = document.getElementById('ktsHeroAv');
+  if(!el || !url) return;
+  el.textContent = '';
+  el.style.overflow = 'hidden';
+  el.style.padding = '0';
+  el.style.background = 'transparent';
+  var img = document.createElement('img');
+  img.src = url; img.alt = 'KTS';
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;display:block';
+  img.onerror = function(){ el.remove(); };
+  el.appendChild(img);
+}
+
 function openImgLight(url, name){
   var lb = document.getElementById('imgLight');
   if(!lb){
@@ -2227,7 +2241,11 @@ function renderMain(){
 
     </div>`;
 
-  /* ktsHeroAv is now a div with initials — no canvas draw needed */
+  /* Load KTS avatar từ Firestore sau khi DOM ready */
+  var _ktsUidForAv = p.ktsUid;
+  if (_ktsUidForAv && typeof window._dnLoadKtsAvatar === 'function') {
+    setTimeout(function(){ window._dnLoadKtsAvatar(_ktsUidForAv); }, 60);
+  }
 }
 
 function selectProj(id){
@@ -3089,6 +3107,23 @@ function _startProjectsListenDN() {
 }
 
 /* ══ PROPOSALS LISTENER: realtime Firestore cho Bảng Review DN ══ */
+/* Load avatar KTS từ Firestore users/{uid}/avatarURL */
+window._dnUserCache = {};
+window._dnLoadKtsAvatar = async function(ktsUid) {
+  if (!ktsUid) return;
+  if (window._dnUserCache[ktsUid] !== undefined) {
+    var cu = window._dnUserCache[ktsUid];
+    if (cu && cu.avatarURL) _dnApplyKtsAvatar(cu.avatarURL);
+    return;
+  }
+  try {
+    var snap = await getDoc(doc(db, 'users', ktsUid));
+    var data = snap.exists() ? snap.data() : null;
+    window._dnUserCache[ktsUid] = data;
+    if (data && data.avatarURL) _dnApplyKtsAvatar(data.avatarURL);
+  } catch(e) { console.warn('[DN ktsAvatar]', e.code); }
+};
+
 window._dnPropUnsubs = [];
 window._dnSubProposals = function(pid) {
   window._dnPropUnsubs.forEach(function(u){ try{ u(); }catch(e){} });
