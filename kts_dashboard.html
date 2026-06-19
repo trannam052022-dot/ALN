@@ -1009,11 +1009,14 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     ══════════════════════════════════ -->
     <div class="sec-label review-section"><i class="ph-duotone ph-clipboard-text" style="font-size:13px"></i> Bảng Review & Tài liệu dự án</div>
     <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
         <div>
           <div class="card-title" style="margin-bottom:2px"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-clipboard-text"></i></div>Bảng review — <span id="rvProjId" style="font-family:var(--mono);font-size:13px;color:var(--gold)">đang tải...</span></div>
           <div style="font-size:11px;color:var(--muted)">Phương án KTS đã gửi · Tài liệu từ Chủ nhà &amp; Doanh nghiệp</div>
         </div>
+        <select id="rvProjPicker" onchange="window.switchKtsProject&&window.switchKtsProject(this.value)" style="background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 10px;font-size:11px;color:var(--text2);font-family:inherit;cursor:pointer;min-width:150px;outline:none;flex-shrink:0">
+          <option value="">Chọn dự án...</option>
+        </select>
       </div>
       <!-- Tab bar -->
       <div style="display:flex;border-bottom:1px solid var(--border);margin-bottom:12px">
@@ -2392,6 +2395,14 @@ function _startKtsProjectListen(uid) {
     renderMyProjects(allProjs);
     if (typeof renderDashProjList === 'function') renderDashProjList(allProjs);
     if (typeof renderProjCards === 'function') renderProjCards(allProjs);
+    const _rvPicker = document.getElementById('rvProjPicker');
+    if (_rvPicker) {
+      _rvPicker.innerHTML = allProjs.map(p => {
+        const _isDNp = !!(p.dn && p.dn.uid) && !(p.cn && p.cn.uid);
+        const _shortId = (_isDNp ? 'DN · ' : 'CN · ') + p.id.replace(/^ALN-/, '');
+        return `<option value="${p.id}"${p.id === window.KTS_PROJECT_ID ? ' selected' : ''}>${_shortId} — ${p.name || ''}</option>`;
+      }).join('');
+    }
     // Khởi động bảng review (tài liệu + phương án)
     if (typeof window._alnWatchDocs === 'function') window._alnWatchDocs(d.id);
     if (typeof window.rvLoadStage === 'function') window.rvLoadStage('C2');
@@ -2440,6 +2451,8 @@ window.switchKtsProject = function(pid) {
   if (chatH) chatH.innerHTML = '<i class="ph-duotone ph-chats-circle" style="color:var(--blue)"></i> Chat — Dự án ' + _displayId;
   if (typeof window._alnWatchDocs === 'function') window._alnWatchDocs(pid);
   if (typeof window.rvLoadStage === 'function') window.rvLoadStage('C2');
+  const _rvP = document.getElementById('rvProjPicker');
+  if (_rvP) _rvP.value = pid;
   if (typeof showToast === 'function') showToast('Đã chuyển: ' + (pr.name || _displayId), 't-blue');
 };
 
@@ -3228,6 +3241,9 @@ window.rvLoadStage = function(stage) {
         const thumb = p.imageURL
           ? `<img src="${p.imageURL}" style="width:52px;height:52px;border-radius:7px;object-fit:cover;flex-shrink:0;border:1px solid var(--border)">`
           : `<div style="width:52px;height:52px;border-radius:7px;background:var(--ink3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;color:var(--muted)"><i class="ph-duotone ph-image"></i></div>`;
+        const viewBtn = p.imageURL
+          ? `<a href="${p.imageURL}" target="_blank" rel="noopener" style="flex-shrink:0;padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-weight:600;color:var(--text2);background:var(--ink2);text-decoration:none;display:flex;align-items:center;gap:4px;white-space:nowrap"><i class="ph-duotone ph-eye"></i> Xem</a>`
+          : '';
         return `<div style="display:flex;align-items:center;gap:10px;background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px">
           ${thumb}
           <div style="flex:1;min-width:0">
@@ -3235,6 +3251,7 @@ window.rvLoadStage = function(stage) {
             <div style="font-size:10px;color:var(--muted)">${p.version||''} · Chặng ${stage}</div>
             <div style="font-size:10px;margin-top:2px">${st}</div>
           </div>
+          ${viewBtn}
         </div>`;
       }).join('');
     }, err => { list.innerHTML = '<div style="color:var(--red);font-size:12px">Không tải được (kiểm tra rules).</div>'; console.error('[RV proposals]',err); });
