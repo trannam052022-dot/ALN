@@ -200,7 +200,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 .badge-host     { background: rgba(90,122,92,.1);   border: 1px solid rgba(90,122,92,.25);   color: var(--land); }
 .pc-time { font-size: 10px; color: var(--muted); font-family: var(--mono); margin-top: 1px; }
 
-/* Images */
+/* Images & Video */
 .pc-images { display: flex; flex-direction: column; gap: 2px; }
 .pc-img-grid { display: grid; gap: 2px; }
 .pc-img-grid.cols-1 { grid-template-columns: 1fr; }
@@ -211,6 +211,31 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
   cursor: pointer; transition: opacity .15s;
 }
 .pc-img-grid img:hover { opacity: .92; }
+.pc-img-grid video {
+  width: 100%; aspect-ratio: 4/3; object-fit: cover;
+  background: #000; display: block;
+}
+.pc-vid-wrap { position: relative; cursor: pointer; }
+.pc-vid-play {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.pc-vid-play i { font-size: 36px; color: rgba(255,255,255,.9); filter: drop-shadow(0 2px 6px rgba(0,0,0,.5)); }
+/* Founder hide/show */
+.founder-hide-btn {
+  padding: 4px 9px; border-radius: 6px; font-size: 10px; font-weight: 700;
+  border: 1px solid rgba(90,122,92,.35); background: rgba(90,122,92,.06);
+  color: var(--land); cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all .15s;
+}
+.founder-hide-btn:hover { background: rgba(90,122,92,.14); }
+.founder-hide-btn.is-hidden { border-color: rgba(224,90,90,.35); background: rgba(224,90,90,.06); color: #e05a5a; }
+.founder-hide-btn.is-hidden:hover { background: rgba(224,90,90,.14); }
+.post-card.post-hidden { opacity: .42; }
+.post-card.post-hidden .pc-header::after {
+  content: 'ĐÃ ẨN'; font-size: 9px; font-weight: 800; letter-spacing: .1em;
+  color: #e05a5a; border: 1px solid rgba(224,90,90,.4); background: rgba(224,90,90,.08);
+  padding: 2px 6px; border-radius: 4px; margin-left: auto;
+}
 
 /* Text */
 .pc-text { padding: 12px 16px; font-size: 13px; color: var(--text2); line-height: 1.65; }
@@ -496,13 +521,13 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 
       <!-- Upload ảnh -->
       <div>
-        <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.1em;margin-bottom:8px">HÌNH ẢNH <span style="font-weight:400;text-transform:none">(tối đa 4 ảnh)</span></div>
+        <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.1em;margin-bottom:8px">HÌNH ẢNH & CLIP <span style="font-weight:400;text-transform:none">(tối đa 4 files)</span></div>
         <div id="imgPreview" class="img-preview" style="display:none;margin-bottom:10px"></div>
         <div class="img-upload-area" onclick="document.getElementById('imgInput').click()">
-          <i class="ph-duotone ph-image"></i>
-          <p>Nhấn để chọn ảnh</p>
+          <i class="ph-duotone ph-film-strip"></i>
+          <p>Nhấn để chọn ảnh hoặc clip ngắn</p>
         </div>
-        <input type="file" id="imgInput" accept="image/*" multiple style="display:none" onchange="handleImgSelect(this)">
+        <input type="file" id="imgInput" accept="image/*,video/*" multiple style="display:none" onchange="handleImgSelect(this)">
       </div>
     </div>
     <div class="modal-foot">
@@ -1105,7 +1130,11 @@ function renderImgPreview(){
   wrap.style.display = 'flex';
   wrap.innerHTML = _selectedFiles.map(function(f, i){
     var url = URL.createObjectURL(f);
-    return '<div class="img-prev-item"><img src="'+url+'"><button class="img-prev-del" onclick="removeImg('+i+')">✕</button></div>';
+    var isVid = f.type.startsWith('video');
+    var thumb = isVid
+      ? '<video src="'+url+'" muted style="width:80px;height:80px;object-fit:cover;border-radius:6px;display:block"></video>'
+      : '<img src="'+url+'">';
+    return '<div class="img-prev-item" style="position:relative">'+thumb+'<button class="img-prev-del" onclick="removeImg('+i+')">✕</button></div>';
   }).join('');
 }
 function removeImg(i){
@@ -1140,6 +1169,9 @@ function setFilter(f, btn){
 function renderFeed(){
   var grid = document.getElementById('feedGrid');
   var list = FILTER==='all' ? ALL_POSTS : ALL_POSTS.filter(function(p){ return p.tag===FILTER; });
+  if(!_currentUser || _currentUser.role !== 'founder'){
+    list = list.filter(function(p){ return !p.hidden; });
+  }
   var cnt = document.getElementById('postCount');
   cnt.textContent = list.length + ' khoảnh khắc';
   if(list.length===0){
@@ -1162,27 +1194,43 @@ function renderCard(p){
     ? '<img src="'+escH(p.authorAvatar)+'" alt="">'
     : '<span>'+escH((p.authorName||'?')[0].toUpperCase())+'</span>';
 
+  var mediaItems = p.media || (p.images||[]).map(function(u){ return {url:u,type:'image'}; });
   var imagesHtml = '';
-  if(p.images && p.images.length > 0){
-    var cols = p.images.length >= 3 ? 'cols-3' : p.images.length === 2 ? 'cols-2' : 'cols-1';
+  if(mediaItems.length > 0){
+    var cols = mediaItems.length >= 3 ? 'cols-3' : mediaItems.length === 2 ? 'cols-2' : 'cols-1';
     imagesHtml = '<div class="pc-images"><div class="pc-img-grid '+cols+'">'
-      + p.images.map(function(url){
-          return '<img src="'+escH(url)+'" loading="lazy" onclick="openLightbox(\''+escH(url)+'\')" alt="">';
+      + mediaItems.map(function(m){
+          if(m.type === 'video'){
+            return '<div class="pc-vid-wrap">'
+              +'<video src="'+escH(m.url)+'" autoplay muted loop playsinline></video>'
+              +'<div class="pc-vid-play"><i class="ph-duotone ph-play-circle"></i></div>'
+              +'</div>';
+          }
+          return '<img src="'+escH(m.url)+'" loading="lazy" onclick="openLightbox(\''+escH(m.url)+'\')" alt="">';
         }).join('')
       +'</div></div>';
   }
 
+  var isHidden = !!p.hidden;
   var pinHtml = p.pinned ? '<span class="pc-pin"><i class="ph-duotone ph-push-pin"></i>Nổi bật</span>' : '<span></span>';
-  var optHtml = (_currentUser && (_currentUser.role==='founder' || _currentUser.uid===p.authorUid))
-    ? '<button class="pc-options" onclick="deletePost(\''+p.id+'\')"><i class="ph-duotone ph-trash"></i></button>'
-    : '';
+  var optHtml = '';
+  if(_currentUser && _currentUser.role === 'founder'){
+    optHtml = '<div style="display:flex;gap:6px;align-items:center">'
+      +'<button class="founder-hide-btn'+(isHidden?' is-hidden':'')+'" onclick="toggleHidden(\''+p.id+'\','+isHidden+')">'
+      +(isHidden?'<i class="ph-duotone ph-eye"></i> Hiện':'<i class="ph-duotone ph-eye-slash"></i> Ẩn')
+      +'</button>'
+      +'<button class="pc-options" onclick="deletePost(\''+p.id+'\')"><i class="ph-duotone ph-trash"></i></button>'
+      +'</div>';
+  } else if(_currentUser && _currentUser.uid === p.authorUid){
+    optHtml = '<button class="pc-options" onclick="deletePost(\''+p.id+'\')"><i class="ph-duotone ph-trash"></i></button>';
+  }
 
   var hasProfile = p.authorRole === 'kts' || p.authorRole === 'designer';
   var profileHref = hasProfile ? 'href="profile.html?uid='+escH(p.authorUid)+'"' : '';
   var authorTag   = hasProfile ? 'a' : 'div';
   var authorStyle = hasProfile ? ' style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:10px;flex:1;min-width:0"' : ' style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"';
 
-  return '<div class="post-card" id="card-'+p.id+'">'
+  return '<div class="post-card'+(isHidden&&_currentUser&&_currentUser.role==='founder'?' post-hidden':'')+'" id="card-'+p.id+'">'
     +'<div class="pc-header">'
       +'<'+authorTag+' '+profileHref+authorStyle+'>'
         +'<div class="pc-avatar">'+avatarHtml+'</div>'
@@ -1318,13 +1366,13 @@ window.submitPost = async function(){
   btn.disabled = true; btn.textContent = 'Đang đăng...';
 
   try {
-    var imageUrls = [];
+    var media = [];
     for(var i=0; i<_selectedFiles.length; i++){
       var f = _selectedFiles[i];
       var ref = storageRef(storage, 'community/'+Date.now()+'_'+i+'_'+f.name);
       var snap = await uploadBytes(ref, f);
       var url  = await getDownloadURL(snap.ref);
-      imageUrls.push(url);
+      media.push({ url: url, type: f.type.startsWith('video') ? 'video' : 'image' });
     }
     var u = window._currentUser;
     await addDoc(collection(db,'alnPosts'), {
@@ -1333,10 +1381,12 @@ window.submitPost = async function(){
       authorRole:   u.role,
       authorAvatar: u.avatar || '',
       text:         text,
-      images:       imageUrls,
+      media:        media,
+      images:       media.filter(function(m){ return m.type==='image'; }).map(function(m){ return m.url; }),
       tag:          _selectedTag,
       heartCount:   0,
       heartedBy:    [],
+      hidden:       false,
       pinned:       false,
       createdAt:    serverTimestamp()
     });
@@ -1364,6 +1414,13 @@ window.toggleHeart = async function(postId){
     } else {
       await updateDoc(postRef, { heartedBy: arrayUnion(u.uid), heartCount: increment(1) });
     }
+  } catch(e){ showToast('Lỗi: '+e.message); }
+};
+
+/* ── TOGGLE HIDDEN (founder only) ── */
+window.toggleHidden = async function(postId, currentHidden){
+  try {
+    await updateDoc(doc(db,'alnPosts',postId), { hidden: !currentHidden });
   } catch(e){ showToast('Lỗi: '+e.message); }
 };
 

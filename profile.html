@@ -259,6 +259,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); m
 <div class="lightbox" id="lightbox" onclick="closeLb()">
   <button class="lb-close" onclick="closeLb()">✕</button>
   <img id="lbImg" src="" alt="">
+  <video id="lbVid" src="" controls style="display:none;max-width:92vw;max-height:88vh;border-radius:8px" onclick="event.stopPropagation()"></video>
 </div>
 
 <script>
@@ -304,7 +305,8 @@ function renderStats(posts) {
   var photoCount = 0;
   var heartCount = 0;
   posts.forEach(function(p) {
-    if(p.images && p.images.length) photoCount += p.images.length;
+    var items = p.media || (p.images || []).map(function(u){ return {url:u,type:'image'}; });
+    photoCount += items.length;
     heartCount += p.heartCount || 0;
   });
   document.getElementById('statPosts').textContent  = posts.length;
@@ -314,26 +316,33 @@ function renderStats(posts) {
 
 function renderPhotos(posts) {
   var grid = document.getElementById('photoGrid');
-  var allImgs = [];
+  var allMedia = [];
   posts.forEach(function(p) {
-    if(p.images && p.images.length) {
-      p.images.forEach(function(url) {
-        allImgs.push({ url: url, tag: p.tag });
-      });
-    }
+    var items = p.media || (p.images||[]).map(function(u){ return {url:u,type:'image'}; });
+    items.forEach(function(m){ allMedia.push({ url:m.url, type:m.type||'image', tag:p.tag }); });
   });
 
-  if(!allImgs.length) {
+  if(!allMedia.length) {
     grid.innerHTML = '<div class="no-photo"><i class="ph-duotone ph-camera-slash"></i>Chưa có ảnh nào</div>';
     return;
   }
 
   var html = '<div class="photo-grid">';
-  allImgs.slice(0, 12).forEach(function(img) {
-    html += '<div class="photo-cell" onclick="openLb(\'' + img.url.replace(/'/g,"\\'") + '\')">'
-          + '<img src="' + img.url + '" alt="" loading="lazy">'
-          + '<div class="tag-dot ' + (img.tag||'arch') + '"></div>'
-          + '</div>';
+  allMedia.slice(0, 12).forEach(function(m) {
+    var safeUrl = m.url.replace(/'/g,"\\'");
+    if(m.type === 'video'){
+      html += '<div class="photo-cell" onclick="openLb(\'' + safeUrl + '\',\'video\')" style="position:relative">'
+            + '<video src="' + m.url + '" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video>'
+            + '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">'
+            + '<i class="ph-duotone ph-play-circle" style="font-size:30px;color:rgba(255,255,255,.9);filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))"></i></div>'
+            + '<div class="tag-dot ' + (m.tag||'arch') + '"></div>'
+            + '</div>';
+    } else {
+      html += '<div class="photo-cell" onclick="openLb(\'' + safeUrl + '\',\'image\')">'
+            + '<img src="' + m.url + '" alt="" loading="lazy">'
+            + '<div class="tag-dot ' + (m.tag||'arch') + '"></div>'
+            + '</div>';
+    }
   });
   html += '</div>';
   grid.innerHTML = html;
@@ -362,8 +371,23 @@ function renderMoments(posts) {
 
 function escH(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-function openLb(url) { document.getElementById('lbImg').src = url; document.getElementById('lightbox').classList.add('open'); }
-function closeLb()   { document.getElementById('lightbox').classList.remove('open'); }
+function openLb(url, type) {
+  var img = document.getElementById('lbImg');
+  var vid = document.getElementById('lbVid');
+  if(type === 'video'){
+    img.style.display = 'none'; img.src = '';
+    vid.style.display = ''; vid.src = url; vid.play();
+  } else {
+    vid.style.display = 'none'; vid.pause(); vid.src = '';
+    img.style.display = ''; img.src = url;
+  }
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLb() {
+  var vid = document.getElementById('lbVid');
+  vid.pause(); vid.src = '';
+  document.getElementById('lightbox').classList.remove('open');
+}
 
 window.renderProfile = function(profile, posts) {
   renderHero(profile, posts.length);
