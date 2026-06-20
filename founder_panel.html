@@ -1799,6 +1799,15 @@ function renderTableMore(){ _tblShown += _TBL_PAGE; renderTable(true); }
 function renderTable(keepShown) {
   const tbody = document.getElementById('tableBody');
   if (!tbody) return;
+  // Cập nhật KPI counters từ dữ liệu thật
+  var _p = DN_PROJECTS || [];
+  var _setCnt = function(id, v){ var el=document.getElementById(id); if(el) el.textContent=String(v).padStart(2,'0'); };
+  _setCnt('cnt-all',     _p.length);
+  _setCnt('cnt-run',     _p.filter(function(p){return p.status!=='done';}).length);
+  _setCnt('cnt-c3',      _p.filter(function(p){return p.stage==='C3'&&(p.status==='pending'||p.status==='on_track');}).length);
+  _setCnt('cnt-dispute', _p.filter(function(p){return p.status==='dispute';}).length);
+  _setCnt('cnt-sla',     _p.filter(function(p){return p.status==='sla_warn';}).length);
+  _setCnt('cnt-done',    _p.filter(function(p){return p.status==='done';}).length);
   const allRows = getFilteredRows();
   if (!allRows.length) {
     tbody.innerHTML = !_dnLoaded
@@ -1830,7 +1839,7 @@ function renderTable(keepShown) {
       </td>
     </tr>`;
   }).join('');
-  document.getElementById('pageInfo').textContent = `Hiển thị 1–${Math.min(rows.length,10)} / ${rows.length + 96} dự án`;
+  document.getElementById('pageInfo').textContent = `Hiển thị ${rows.length} / ${allRows.length} dự án`;
 }
 
 /* ══════════════════════════════════════════
