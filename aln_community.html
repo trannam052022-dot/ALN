@@ -1177,15 +1177,22 @@ function renderCard(p){
     ? '<button class="pc-options" onclick="deletePost(\''+p.id+'\')"><i class="ph-duotone ph-trash"></i></button>'
     : '';
 
+  var hasProfile = p.authorRole === 'kts' || p.authorRole === 'designer';
+  var profileHref = hasProfile ? 'href="profile.html?uid='+escH(p.authorUid)+'"' : '';
+  var authorTag   = hasProfile ? 'a' : 'div';
+  var authorStyle = hasProfile ? ' style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:10px;flex:1;min-width:0"' : ' style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"';
+
   return '<div class="post-card" id="card-'+p.id+'">'
     +'<div class="pc-header">'
-      +'<div class="pc-avatar">'+avatarHtml+'</div>'
-      +'<div class="pc-meta">'
-        +'<div class="pc-name">'+escH(p.authorName||'ALN')
-          +' <span class="pc-role-badge '+(roleCls[p.authorRole]||'badge-host')+'">'+escH(roleLabel[p.authorRole]||p.authorRole)+'</span>'
+      +'<'+authorTag+' '+profileHref+authorStyle+'>'
+        +'<div class="pc-avatar">'+avatarHtml+'</div>'
+        +'<div class="pc-meta">'
+          +'<div class="pc-name">'+escH(p.authorName||'ALN')
+            +' <span class="pc-role-badge '+(roleCls[p.authorRole]||'badge-host')+'">'+escH(roleLabel[p.authorRole]||p.authorRole)+'</span>'
+          +'</div>'
+          +'<div class="pc-time">'+timeAgo(p.createdAt)+(hasProfile ? ' · <span style="color:var(--arch);font-weight:600">Xem hồ sơ →</span>' : '')+'</div>'
         +'</div>'
-        +'<div class="pc-time">'+timeAgo(p.createdAt)+'</div>'
-      +'</div>'
+      +'</'+authorTag+'>'
       +optHtml
     +'</div>'
     + imagesHtml

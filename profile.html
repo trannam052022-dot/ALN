@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hồ sơ — ALN</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/>
+<style>
+:root {
+  --cream:  #f8f6f2;
+  --cream2: #f2ede6;
+  --white:  #ffffff;
+  --border: #e8e2d8;
+  --border2:#d8d0c4;
+  --text:   #2a2520;
+  --text2:  #5a5048;
+  --sub:    #8a8078;
+  --muted:  #b8b0a4;
+  --sans:   'DM Sans', sans-serif;
+  --serif:  'Cormorant Garamond', serif;
+  --syne:   'Syne', sans-serif;
+  --r: 14px;
+  --role-c: #8a6b4a;
+  --role-bg: rgba(138,107,74,.08);
+  --role-bd: rgba(138,107,74,.22);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--cream); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+/* ── VEIL ── */
+#authVeil {
+  position: fixed; inset: 0; background: var(--cream);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999; font-size: 13px; color: var(--muted);
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(248,246,242,.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px; height: 52px;
+  display: flex; align-items: center; gap: 12px;
+}
+.tb-back {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; color: var(--text2);
+  text-decoration: none; padding: 6px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--white);
+  transition: all .15s;
+}
+.tb-back:hover { border-color: var(--border2); background: var(--cream2); }
+.tb-brand { font-family: var(--syne); font-size: 14px; font-weight: 800; color: var(--text); margin-left: auto; letter-spacing: -.3px; }
+
+/* ── HERO ── */
+.hero-wrap {
+  max-width: 680px; margin: 0 auto; padding: 36px 20px 0;
+}
+.hero-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 20px; padding: 32px 28px 24px;
+  display: flex; gap: 24px; align-items: flex-start;
+}
+.hero-av {
+  width: 96px; height: 96px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--role-c), color-mix(in srgb, var(--role-c) 60%, #000));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--syne); font-size: 28px; font-weight: 800; color: #fff;
+  border: 3px solid var(--border); overflow: hidden;
+}
+.hero-av img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.hero-info { flex: 1; min-width: 0; }
+.hero-name {
+  font-family: var(--serif); font-size: 24px; font-weight: 600;
+  color: var(--text); line-height: 1.2; margin-bottom: 6px;
+}
+.hero-role-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700;
+  background: var(--role-bg); border: 1px solid var(--role-bd); color: var(--role-c);
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px;
+}
+.hero-meta { font-size: 12px; color: var(--sub); line-height: 1.8; }
+.hero-meta span { display: block; }
+
+/* ── STATS ── */
+.stats-row {
+  max-width: 680px; margin: 12px auto 0; padding: 0 20px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+}
+.stat-card {
+  background: var(--white); border: 1px solid var(--border); border-radius: 14px;
+  padding: 14px 16px; text-align: center;
+}
+.stat-num {
+  font-family: var(--syne); font-size: 22px; font-weight: 800;
+  color: var(--role-c); line-height: 1;
+}
+.stat-lbl { font-size: 10px; color: var(--muted); margin-top: 3px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; }
+
+/* ── SECTION LABEL ── */
+.sec-wrap { max-width: 680px; margin: 28px auto 0; padding: 0 20px; }
+.sec-label {
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .12em;
+  margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+}
+
+/* ── PHOTO GRID ── */
+.photo-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+  border-radius: 14px; overflow: hidden;
+}
+.photo-cell {
+  aspect-ratio: 1; overflow: hidden; cursor: pointer; position: relative;
+  background: var(--cream2);
+}
+.photo-cell img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .3s;
+}
+.photo-cell:hover img { transform: scale(1.05); }
+.photo-cell .tag-dot {
+  position: absolute; bottom: 6px; right: 6px;
+  width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.8);
+}
+.tag-dot.arch { background: #8a6b4a; }
+.tag-dot.land { background: #5a7a5c; }
+.tag-dot.nat  { background: #c9a84c; }
+.no-photo {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 14px; padding: 32px 20px; text-align: center;
+  color: var(--muted); font-size: 13px;
+}
+.no-photo i { font-size: 28px; display: block; margin-bottom: 8px; opacity: .5; }
+
+/* ── MOMENTS LIST ── */
+.moments-list { display: flex; flex-direction: column; gap: 10px; }
+.moment-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 16px;
+}
+.moment-meta { font-size: 10px; color: var(--muted); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.moment-tag {
+  padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+}
+.tag-arch { background: rgba(138,107,74,.1); color: #8a6b4a; }
+.tag-land { background: rgba(90,122,92,.1);  color: #5a7a5c; }
+.tag-nat  { background: rgba(201,168,76,.1); color: #a07838; }
+.moment-text { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.moment-hearts { font-size: 11px; color: var(--muted); margin-top: 8px; display: flex; align-items: center; gap: 4px; }
+
+/* ── LIGHTBOX ── */
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,.88); align-items: center; justify-content: center;
+}
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 92vw; max-height: 88vh; border-radius: 8px; object-fit: contain; }
+.lb-close {
+  position: fixed; top: 18px; right: 22px; background: rgba(255,255,255,.15);
+  border: none; color: #fff; font-size: 22px; cursor: pointer;
+  width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+}
+.lb-close:hover { background: rgba(255,255,255,.25); }
+
+/* ── EMPTY ── */
+.profile-404 {
+  max-width: 400px; margin: 80px auto; text-align: center; padding: 0 20px;
+}
+.profile-404 i { font-size: 48px; color: var(--muted); margin-bottom: 16px; }
+.profile-404 h2 { font-family: var(--serif); font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+.profile-404 p { font-size: 13px; color: var(--sub); }
+
+/* ── FOOTER ── */
+.profile-footer { height: 48px; }
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .hero-card { flex-direction: column; align-items: center; text-align: center; padding: 24px 20px; }
+  .hero-av { width: 80px; height: 80px; }
+  .hero-name { font-size: 20px; }
+  .stats-row { grid-template-columns: repeat(3, 1fr); }
+  .photo-grid { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div id="authVeil">Đang tải...</div>
+
+<div id="pageContent" style="display:none">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <a class="tb-back" id="backBtn" href="aln_community.html">
+      <i class="ph-duotone ph-arrow-left"></i> Quay lại
+    </a>
+    <div class="tb-brand">ALN</div>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero-wrap">
+    <div class="hero-card" id="heroCard">
+      <div class="hero-av" id="heroAv">?</div>
+      <div class="hero-info">
+        <div class="hero-name" id="heroName">—</div>
+        <div class="hero-role-badge" id="heroRole">—</div>
+        <div class="hero-meta" id="heroMeta"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num" id="statPosts">—</div>
+      <div class="stat-lbl">bài đăng</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statPhotos">—</div>
+      <div class="stat-lbl">khoảnh khắc</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statHearts">—</div>
+      <div class="stat-lbl">tim nhận được</div>
+    </div>
+  </div>
+
+  <!-- Photo grid -->
+  <div class="sec-wrap">
+    <div class="sec-label"><i class="ph-duotone ph-images"></i> Khoảnh khắc</div>
+    <div id="photoGrid"></div>
+  </div>
+
+  <!-- Text moments -->
+  <div class="sec-wrap" id="momentsWrap" style="display:none">
+    <div class="sec-label"><i class="ph-duotone ph-quotes"></i> Chia sẻ gần đây</div>
+    <div class="moments-list" id="momentsList"></div>
+  </div>
+
+  <div class="profile-footer"></div>
+
+</div>
+
+<!-- 404 -->
+<div id="page404" style="display:none">
+  <div class="profile-404">
+    <i class="ph-duotone ph-user-circle-dashed"></i>
+    <h2>Không tìm thấy hồ sơ</h2>
+    <p>Thành viên này không tồn tại hoặc chưa có thông tin.</p>
+    <a href="aln_community.html" style="display:inline-block;margin-top:16px;font-size:13px;color:#8a6b4a;font-weight:600">← Quay lại cộng đồng</a>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLb()">
+  <button class="lb-close" onclick="closeLb()">✕</button>
+  <img id="lbImg" src="" alt="">
+</div>
+
+<script>
+/* ── UI helpers ── */
+var ROLE_LABEL = { kts:'Kiến trúc sư', designer:'Designer Nội thất', cn:'Chủ nhà', dn:'Doanh nghiệp', founder:'Founder' };
+var ROLE_COLOR = {
+  kts:      { c:'#d4a017', bg:'rgba(212,160,23,.08)', bd:'rgba(212,160,23,.25)' },
+  designer: { c:'#7c3aed', bg:'rgba(124,58,237,.08)', bd:'rgba(124,58,237,.25)' },
+  cn:       { c:'#2d7a4f', bg:'rgba(45,122,79,.08)',  bd:'rgba(45,122,79,.25)'  },
+  dn:       { c:'#2b6cb0', bg:'rgba(43,108,176,.08)', bd:'rgba(43,108,176,.25)' },
+  founder:  { c:'#c9a84c', bg:'rgba(201,168,76,.08)', bd:'rgba(201,168,76,.25)' }
+};
+var TAG_LABEL = { arch:'Kiến trúc', land:'Cảnh quan', nat:'Thiên nhiên' };
+
+function setRoleColor(role) {
+  var c = ROLE_COLOR[role] || ROLE_COLOR.kts;
+  document.documentElement.style.setProperty('--role-c',  c.c);
+  document.documentElement.style.setProperty('--role-bg', c.bg);
+  document.documentElement.style.setProperty('--role-bd', c.bd);
+}
+
+function renderHero(profile, postCount) {
+  setRoleColor(profile.role);
+  var avEl = document.getElementById('heroAv');
+  if(profile.avatarURL) {
+    avEl.innerHTML = '<img src="' + profile.avatarURL + '" alt="avatar">';
+  } else {
+    var nm = (profile.name || '').replace(/^KTS\.?\s*/i,'').replace(/^Designer\.?\s*/i,'').trim();
+    var parts = nm.split(/\s+/);
+    var ini = parts.length >= 2 ? parts[parts.length-2][0]+parts[parts.length-1][0] : (parts[0]||'?')[0];
+    avEl.textContent = ini.toUpperCase();
+  }
+  document.getElementById('heroName').textContent = profile.name || '—';
+  document.getElementById('heroRole').innerHTML = '<i class="ph-duotone ph-' + (profile.role==='designer'?'paint-brush':'pencil-ruler') + '"></i> ' + (ROLE_LABEL[profile.role] || profile.role);
+  var meta = [];
+  if(profile.years) meta.push(profile.years + ' năm kinh nghiệm');
+  if(profile.specialty) meta.push(profile.specialty);
+  if(profile.license) meta.push('GP: ' + profile.license);
+  document.getElementById('heroMeta').innerHTML = meta.map(function(m){ return '<span>' + m + '</span>'; }).join('');
+}
+
+function renderStats(posts) {
+  var photoCount = 0;
+  var heartCount = 0;
+  posts.forEach(function(p) {
+    if(p.images && p.images.length) photoCount += p.images.length;
+    heartCount += p.heartCount || 0;
+  });
+  document.getElementById('statPosts').textContent  = posts.length;
+  document.getElementById('statPhotos').textContent = photoCount;
+  document.getElementById('statHearts').textContent = heartCount;
+}
+
+function renderPhotos(posts) {
+  var grid = document.getElementById('photoGrid');
+  var allImgs = [];
+  posts.forEach(function(p) {
+    if(p.images && p.images.length) {
+      p.images.forEach(function(url) {
+        allImgs.push({ url: url, tag: p.tag });
+      });
+    }
+  });
+
+  if(!allImgs.length) {
+    grid.innerHTML = '<div class="no-photo"><i class="ph-duotone ph-camera-slash"></i>Chưa có ảnh nào</div>';
+    return;
+  }
+
+  var html = '<div class="photo-grid">';
+  allImgs.slice(0, 12).forEach(function(img) {
+    html += '<div class="photo-cell" onclick="openLb(\'' + img.url.replace(/'/g,"\\'") + '\')">'
+          + '<img src="' + img.url + '" alt="" loading="lazy">'
+          + '<div class="tag-dot ' + (img.tag||'arch') + '"></div>'
+          + '</div>';
+  });
+  html += '</div>';
+  grid.innerHTML = html;
+}
+
+function renderMoments(posts) {
+  var textPosts = posts.filter(function(p){ return p.text && (!p.images || !p.images.length); }).slice(0, 5);
+  if(!textPosts.length) return;
+  document.getElementById('momentsWrap').style.display = '';
+  var list = document.getElementById('momentsList');
+  list.innerHTML = textPosts.map(function(p) {
+    var ts = p.createdAt;
+    var ms = ts && typeof ts.toMillis === 'function' ? ts.toMillis() : (ts && ts.seconds ? ts.seconds*1000 : Date.now());
+    var diff = Math.floor((Date.now()-ms)/1000);
+    var ago = diff < 3600 ? Math.floor(diff/60)+'p trước' : diff < 86400 ? Math.floor(diff/3600)+'h trước' : Math.floor(diff/86400)+'d trước';
+    return '<div class="moment-card">'
+      + '<div class="moment-meta">'
+      + '<span class="moment-tag tag-'+(p.tag||'arch')+'">'+(TAG_LABEL[p.tag]||p.tag||'')+'</span>'
+      + '<span>' + ago + '</span>'
+      + '</div>'
+      + '<div class="moment-text">' + escH(p.text || '') + '</div>'
+      + (p.heartCount ? '<div class="moment-hearts">❤️ ' + p.heartCount + '</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+function escH(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function openLb(url) { document.getElementById('lbImg').src = url; document.getElementById('lightbox').classList.add('open'); }
+function closeLb()   { document.getElementById('lightbox').classList.remove('open'); }
+
+window.renderProfile = function(profile, posts) {
+  renderHero(profile, posts.length);
+  renderStats(posts);
+  renderPhotos(posts);
+  renderMoments(posts);
+  document.getElementById('pageContent').style.display = '';
+};
+window.show404 = function() {
+  document.getElementById('page404').style.display = '';
+};
+</script>
+
+<script type="module">
+import {
+  auth, db, onAuthStateChanged, signOut,
+  doc, getDoc, collection, getDocs, query, where, orderBy
+} from './firebase-config.js';
+
+/* get uid from ?uid= */
+var uid = new URLSearchParams(location.search).get('uid');
+
+onAuthStateChanged(auth, async function(user) {
+  var veil = document.getElementById('authVeil');
+
+  if(!user) { location.replace('login.html'); return; }
+  if(!uid)  { veil.remove(); window.show404(); return; }
+
+  try {
+    /* ── Load profile ── */
+    var userSnap = await getDoc(doc(db,'users',uid));
+    if(!userSnap.exists()) { veil.remove(); window.show404(); return; }
+    var profile = userSnap.data();
+
+    /* Only show KTS / Designer profiles publicly */
+    if(profile.role !== 'kts' && profile.role !== 'designer') {
+      veil.remove(); window.show404(); return;
+    }
+
+    /* ── Load posts ── */
+    var postsSnap = await getDocs(
+      query(collection(db,'alnPosts'), where('authorUid','==',uid))
+    );
+    var posts = postsSnap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+    /* sort client-side: newest first */
+    posts.sort(function(a,b){
+      var ta = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+      var tb = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+      return tb - ta;
+    });
+
+    /* set page title */
+    document.title = (profile.name || 'Hồ sơ') + ' — ALN';
+
+    /* back button: go back if history exists, else community */
+    var backBtn = document.getElementById('backBtn');
+    if(backBtn && document.referrer && document.referrer.includes(location.hostname)) {
+      backBtn.href = '#';
+      backBtn.onclick = function(e){ e.preventDefault(); history.back(); };
+    }
+
+    veil.remove();
+    window.renderProfile(profile, posts);
+
+  } catch(e) {
+    console.error('[profile]', e);
+    veil.remove();
+    window.show404();
+  }
+});
+</script>
+</body>
+</html>
