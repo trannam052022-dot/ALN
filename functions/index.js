@@ -13,11 +13,12 @@ const BASE_URL    = "https://trannam052022-dot.github.io/ALN/";
 const APP_URL     = BASE_URL + "founder_panel.html";
 
 const PAGE_BY_ROLE = {
-  founder:  "founder_panel.html",
-  kts:      "kts_dashboard.html",
-  designer: "designer_dashboard.html",
-  dn:       "client_DN.html",
-  cn:       "client_CN.html",
+  founder:   "founder_panel.html",
+  kts:       "kts_dashboard.html",
+  designer:  "designer_dashboard.html",
+  dn:        "client_DN.html",
+  cn:        "client_CN.html",
+  community: "aln_community.html",
 };
 
 /* Gửi push đến tất cả FCM tokens của một uid cụ thể */
@@ -217,6 +218,41 @@ Nói chuyện như người thật đang nhắn tin. Nếu cuộc hội thoại 
     }
   }
 );
+
+/* ── Bài mới trong Nhịp sống ALN → thông báo Founder + KTS + Designer ── */
+exports.onCommunityPost = functions
+  .region("asia-southeast1")
+  .firestore.document("alnPosts/{postId}")
+  .onCreate(async (snap, context) => {
+    const d = snap.data() || {};
+    const authorUid  = d.authorUid  || "";
+    const authorName = d.authorName || "Ai đó";
+    const tagLabel   = { arch: "Kiến trúc", land: "Cảnh quan", nat: "Thiên nhiên" };
+    const hasVideo   = Array.isArray(d.media) && d.media.some(function(m){ return m.type === "video"; });
+
+    const title   = hasVideo
+      ? "🎬 " + authorName + " vừa đăng clip mới"
+      : "📸 " + authorName + " vừa đăng khoảnh khắc";
+    const preview = d.text
+      ? (d.text.length > 55 ? d.text.slice(0, 55) + "..." : d.text)
+      : (tagLabel[d.tag] || "Nhịp sống ALN");
+
+    const [ktsSnap, desSnap] = await Promise.all([
+      db.collection("users").where("role", "==", "kts").get(),
+      db.collection("users").where("role", "==", "designer").get(),
+    ]);
+
+    const uids = new Set([FOUNDER_UID]);
+    ktsSnap.docs.forEach(function(doc){ uids.add(doc.id); });
+    desSnap.docs.forEach(function(doc){ uids.add(doc.id); });
+    uids.delete(authorUid);
+
+    const extra = { type: "NEW_COMMUNITY_POST", postId: context.params.postId };
+    await Promise.all(Array.from(uids).map(function(uid){
+      return notifyUser(uid, title, preview, extra, "community");
+    }));
+    return null;
+  });
 
 /* ── KTS upload tài liệu → thông báo CN/DN ── */
 exports.onDocUploaded = functions
