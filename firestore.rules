@@ -75,6 +75,15 @@ service cloud.firestore {
       allow create, update, delete: if isFounder();
     }
 
+    match /alnPosts/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn();
+      allow update: if isFounder() ||
+        (signedIn() && request.auth.uid == resource.data.authorUid);
+      allow delete: if isFounder() ||
+        (signedIn() && request.auth.uid == resource.data.authorUid);
+    }
+
     match /dnApplications/{uid} {
       allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
       allow create: if signedIn() && request.auth.uid == uid;
