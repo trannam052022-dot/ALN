@@ -517,6 +517,428 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 
 <div id="toast"></div>
 
+<!-- ══════════════════════════════════════
+     AN — NGƯỜI BẠN NHỎ CỦA CỘNG ĐỒNG ALN
+══════════════════════════════════════ -->
+<style>
+/* Trigger button */
+.an-trigger {
+  position: fixed; bottom: 26px; right: 26px; z-index: 120;
+  width: 54px; height: 54px; border-radius: 50%;
+  background: linear-gradient(135deg, #5a7a5c, #3d5e40);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(90,122,92,.4);
+  transition: transform .2s, box-shadow .2s;
+}
+.an-trigger:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(90,122,92,.5); }
+.an-trigger svg { width: 24px; height: 24px; fill: rgba(255,255,255,.95); }
+.an-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 11px; height: 11px; border-radius: 50%;
+  background: #c9a84c; border: 2px solid #fff;
+  animation: anPulse 2s infinite;
+}
+@keyframes anPulse {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.2); opacity: .7; }
+}
+
+/* Panel */
+.an-panel {
+  position: fixed; bottom: 92px; right: 26px; z-index: 119;
+  width: 298px; background: var(--white);
+  border: 1px solid var(--border); border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(60,40,20,.14), 0 2px 8px rgba(60,40,20,.06);
+  display: flex; flex-direction: column; overflow: hidden;
+  transform: translateY(16px) scale(.97); opacity: 0;
+  pointer-events: none;
+  transition: transform .22s cubic-bezier(.34,1.56,.64,1), opacity .18s;
+  max-height: 520px;
+}
+.an-panel.open {
+  transform: translateY(0) scale(1); opacity: 1; pointer-events: all;
+}
+
+/* Header */
+.an-head {
+  padding: 13px 14px 11px;
+  background: linear-gradient(135deg, rgba(90,122,92,.06), rgba(201,168,76,.04));
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.an-av {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, #5a7a5c, #3d5e40);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--syne); font-size: 14px; font-weight: 800; color: #fff;
+}
+.an-info { flex: 1; min-width: 0; }
+.an-name { font-size: 13px; font-weight: 700; color: var(--text); }
+.an-name span { font-weight: 400; color: var(--sub); font-size: 11px; }
+.an-status { font-size: 10px; color: var(--land); display: flex; align-items: center; gap: 4px; }
+.an-status::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--land); flex-shrink: 0;
+}
+.an-close-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 16px; padding: 4px;
+  border-radius: 6px; line-height: 1; transition: color .15s;
+}
+.an-close-btn:hover { color: var(--text2); }
+
+/* Messages */
+.an-msgs {
+  flex: 1; overflow-y: auto; padding: 14px 12px;
+  display: flex; flex-direction: column; gap: 10px;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.an-bubble {
+  max-width: 88%; font-size: 12px; line-height: 1.65;
+  padding: 9px 12px; border-radius: 13px; white-space: pre-wrap;
+  animation: anFadeIn .25s ease;
+}
+@keyframes anFadeIn { from { opacity:0; transform:translateY(6px); } }
+.an-bubble.from-an {
+  background: var(--cream2); color: var(--text2);
+  border-bottom-left-radius: 4px; align-self: flex-start;
+  border: 1px solid var(--border);
+}
+.an-bubble.from-user {
+  background: var(--text); color: #fff;
+  border-bottom-right-radius: 4px; align-self: flex-end;
+  font-weight: 500;
+}
+
+/* Typing indicator */
+.an-typing {
+  display: flex; gap: 4px; align-items: center;
+  padding: 10px 14px; align-self: flex-start;
+  animation: anFadeIn .2s ease;
+}
+.an-typing span {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--muted);
+  animation: anBounce 1.2s infinite;
+}
+.an-typing span:nth-child(2) { animation-delay: .18s; }
+.an-typing span:nth-child(3) { animation-delay: .36s; }
+@keyframes anBounce {
+  0%,60%,100% { transform: translateY(0); }
+  30%          { transform: translateY(-5px); background: var(--land); }
+}
+
+/* Options */
+.an-options {
+  padding: 8px 12px 12px; display: flex; flex-direction: column; gap: 5px; flex-shrink: 0;
+  border-top: 1px solid var(--border); background: var(--cream);
+}
+.an-opt {
+  padding: 7px 12px; border-radius: 99px; font-size: 11px; font-weight: 600;
+  border: 1px solid var(--land-bd); background: var(--land-bg); color: var(--land);
+  cursor: pointer; text-align: left; font-family: var(--sans);
+  transition: all .15s; width: 100%;
+}
+.an-opt:hover { background: var(--land); color: #fff; border-color: var(--land); }
+.an-opts-empty { display: none; }
+</style>
+
+<!-- Floating trigger -->
+<button class="an-trigger" id="anTrigger" onclick="anToggle()" aria-label="Nói chuyện với An">
+  <div class="an-dot" id="anDot"></div>
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17 8C8 10 5.9 16.17 3.82 22.34A1 1 0 0 0 5.24 23.5l.15-.07 4.28-1.83a1 1 0 0 0 .54-.64l.38-1.35A5 5 0 0 1 14 16h1a7 7 0 0 0 7-7V8a1 1 0 0 0-1-1h-1a7 7 0 0 0-3 .65V8z"/>
+  </svg>
+</button>
+
+<!-- Chat panel -->
+<div class="an-panel" id="anPanel">
+  <div class="an-head">
+    <div class="an-av">An</div>
+    <div class="an-info">
+      <div class="an-name">An <span>· Nhịp sống ALN</span></div>
+      <div class="an-status">luôn ở đây</div>
+    </div>
+    <button class="an-close-btn" onclick="anToggle()">✕</button>
+  </div>
+  <div class="an-msgs" id="anMsgs"></div>
+  <div class="an-options" id="anOptions"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════
+   AN — NGƯỜI BẠN NHỎ ALN
+═══════════════════════════════ */
+var AN_OPEN = false;
+var AN_STARTED = false;
+var AN_TIMER = null;
+
+var AN_FLOWS = {
+  greeting: {
+    msg: function(){
+      var h = new Date().getHours();
+      var time = h<11?'buổi sáng':h<13?'trưa':h<17?'buổi chiều':'buổi tối';
+      var u = window._currentUser;
+      var last = u && u.name ? u.name.trim().split(' ').pop() : '';
+      return 'Chào ' + time + (last ? ', ' + last : '') + ' ✦\n\nMình là An — người bạn nhỏ của cộng đồng ALN. Hôm nay bạn đang thấy thế nào?';
+    },
+    options: [
+      { label: '✦ Tràn đầy cảm hứng', next: 'energized' },
+      { label: '◎ Bình thường thôi',   next: 'normal'    },
+      { label: '◌ Hơi mệt mỏi',        next: 'tired'     }
+    ]
+  },
+  energized: {
+    msg: 'Cảm hứng đến rồi thì đừng để mất!\n\nHôm nay bạn đang làm gì?',
+    options: [
+      { label: 'Đang bận một dự án',          next: 'busy'       },
+      { label: 'Muốn chia sẻ khoảnh khắc',    next: 'post_nudge' },
+      { label: 'Chỉ ghé xem mọi người',        next: 'browse'     }
+    ]
+  },
+  normal: {
+    msg: 'Những ngày "bình thường" thường ẩn chứa quan sát sâu nhất — khi tâm trí không bị kéo đi đâu cả.\n\nBạn để ý điều gì gần đây không?',
+    options: [
+      { label: 'Một chi tiết vật liệu', next: 'material'    },
+      { label: 'Ánh sáng ở đâu đó',    next: 'light'       },
+      { label: 'Không có gì đặc biệt', next: 'inspiration' }
+    ]
+  },
+  tired: {
+    msg: 'Mệt sau một ngày dài là dấu hiệu bạn đã thật sự cho đi.\n\nNghề này cần cả trí và cảm — đôi khi ngồi im nhìn ra cửa sổ cũng là đang làm việc đó.',
+    options: [
+      { label: 'Ừ, mình cần nghỉ',            next: 'rest'  },
+      { label: 'Cho tôi nghe điều gì đó hay', next: 'quote' }
+    ]
+  },
+  rest: {
+    msg: 'Bình yên nhé 🌿\n\nNhớ uống đủ nước và nhìn ra cửa sổ một lần trước khi ngủ — não sẽ tự sắp xếp lại mọi thứ trong lúc bạn nghỉ.',
+    options: [{ label: 'Cảm ơn An', next: 'bye' }]
+  },
+  busy: {
+    msg: 'Khi đang bận mà vẫn ghé vào đây — chắc trong đầu đang có điều muốn chia sẻ?\n\nDù chỉ một góc nhỏ của bản vẽ, hay ánh sáng qua cửa sổ — cũng đủ rồi.',
+    options: [
+      { label: 'Đăng ảnh nhỏ thôi',  next: 'post_nudge' },
+      { label: 'Để hôm khác vậy',    next: 'bye_gentle' }
+    ]
+  },
+  browse: {
+    msg: 'Đôi khi chỉ ngắm khoảnh khắc của người khác cũng là cách nạp lại cảm hứng.\n\nBạn hay thích loại nội dung nào nhất?',
+    options: [
+      { label: 'Ảnh công trình thực tế',  next: 'like_arch'     },
+      { label: 'Chi tiết nội thất',        next: 'like_interior' },
+      { label: 'Khoảnh khắc thiên nhiên', next: 'like_nature'   }
+    ]
+  },
+  like_arch: {
+    msg: 'Mặt tiền, tỉ lệ, cách ánh sáng chạm vào vật liệu — những thứ không có trong bản vẽ 2D.\n\nKTS nào ở ALN bạn thấy chia sẻ hay nhất?',
+    options: [
+      { label: 'Chưa để ý nhiều',      next: 'explore'    },
+      { label: 'Tôi cũng muốn chia sẻ', next: 'post_nudge' }
+    ]
+  },
+  like_interior: {
+    msg: 'Nội thất là nơi người ta sống thật sự — không phải để ngắm.\n\nKhi Designer chia sẻ một góc phòng, bạn có đọc được câu chuyện ẩn sau đó không?',
+    options: [
+      { label: 'Thú vị, chưa nghĩ vậy',     next: 'depth_space' },
+      { label: 'Tôi cũng muốn chia sẻ góc phòng', next: 'post_nudge' }
+    ]
+  },
+  like_nature: {
+    msg: 'Thiên nhiên là kiến trúc sư đầu tiên — và không bao giờ xây thừa, không bao giờ thiếu.\n\nBạn nhìn thiên nhiên theo góc nghề nghiệp không?',
+    options: [
+      { label: 'Có, rất nhiều',         next: 'nature_pro' },
+      { label: 'Chưa nghĩ đến',         next: 'quote'      }
+    ]
+  },
+  material: {
+    msg: 'Texture là thứ tay cảm nhận trước mắt thấy.\n\nĐá thô, gỗ mộc, bê tông cốt pha — mỗi vật liệu có "nhiệt độ" riêng. Gần đây bạn đang thích loại nào?',
+    options: [
+      { label: 'Gỗ tự nhiên',         next: 'mat_wood'   },
+      { label: 'Đá và bê tông',       next: 'mat_stone'  },
+      { label: 'Muốn chụp và chia sẻ', next: 'post_nudge' }
+    ]
+  },
+  mat_wood: {
+    msg: 'Gỗ ấm — cả nghĩa đen lẫn nghĩa bóng. Nó già đi đẹp hơn phần lớn vật liệu khác.\n\nBạn có thể chụp một chi tiết gỗ và đăng lên feed không? Sẽ có người trân trọng lắm đó.',
+    options: [
+      { label: 'Hay đó, tôi thử!', next: 'post_nudge' },
+      { label: 'Hôm khác nhé',     next: 'bye_gentle' }
+    ]
+  },
+  mat_stone: {
+    msg: 'Đá và bê tông nói chuyện với thời gian — không phải với mốt.\n\nNhững gì còn lại sau 100 năm mới thật sự là kiến trúc. Bạn đang theo đuổi điều gì trong công trình của mình?',
+    options: [
+      { label: 'Sự bền vững',             next: 'depth_time'  },
+      { label: 'Cảm xúc cho người dùng', next: 'depth_space' }
+    ]
+  },
+  light: {
+    msg: 'Ánh sáng tự nhiên không thể thiết kế hoàn toàn — chỉ có thể mời nó vào.\n\nKiến trúc sư giỏi biết cách "bẫy" nắng đúng lúc, đúng góc. Bạn thấy điều đó ở đâu gần đây?',
+    options: [
+      { label: 'Tại công trình đang làm',      next: 'post_nudge' },
+      { label: 'Ở một nơi ngẫu nhiên',          next: 'post_nudge' },
+      { label: 'Chỉ trong đầu, chưa bắt được', next: 'quote'      }
+    ]
+  },
+  inspiration: {
+    msg: 'Không có gì đặc biệt cũng ổn. Đôi khi cần khoảng trống để cảm nhận lại.\n\nAn có thể chia sẻ một điều nhỏ — muốn không?',
+    options: [
+      { label: 'Vâng, cho nghe đi',     next: 'quote'      },
+      { label: 'Thôi, cảm ơn An nhé', next: 'bye_gentle' }
+    ]
+  },
+  quote: {
+    msg: function(){
+      var q = [
+        '"Kiến trúc là âm nhạc đông lại."\n— Goethe\n\nKhi đứng trước một công trình đẹp, bạn có nghe thấy nhịp điệu trong đó không?',
+        '"Thiên nhiên không bao giờ vội — nhưng mọi thứ đều hoàn thành."\n— Lão Tử\n\nNghề thiết kế có nhịp riêng của nó. Bạn đang đi đúng nhịp không?',
+        '"Ánh sáng tạo không gian.\nBóng tối tạo chiều sâu."\n\nCông trình của bạn đang có đủ cả hai chưa?',
+        '"Vật liệu tốt nhất là thứ tồn tại sau 100 năm và vẫn đẹp."\n\nBạn đang lựa chọn vật liệu với tiêu chí gì?',
+        '"Người thiết kế không tạo ra vẻ đẹp — họ tạo ra điều kiện để vẻ đẹp xuất hiện."\n\nĐiều đó có ý nghĩa với bạn không?',
+        '"Không gian tốt không được nhận ra — nó chỉ được cảm nhận."\n\nBạn có từng ở một nơi mà không biết tại sao lại thấy dễ chịu?'
+      ];
+      return q[Math.floor(Math.random() * q.length)];
+    },
+    options: [
+      { label: 'Hay lắm, cảm ơn An',         next: 'bye'        },
+      { label: 'Muốn chia sẻ điều này lên feed', next: 'post_nudge' }
+    ]
+  },
+  explore: {
+    msg: 'Cuộn xuống và để ý — mỗi bài đăng là một khoảnh khắc có thật từ người làm nghề thật.\n\nKhông phải render, không phải stock photo. Đó là thứ hiếm có đó.',
+    options: [
+      { label: 'Tôi cũng muốn đóng góp', next: 'post_nudge' },
+      { label: 'OK, tôi đi xem',          next: 'bye_gentle' }
+    ]
+  },
+  depth_space: {
+    msg: 'Không gian không có người là bản vẽ.\nKhông gian có người sử dụng mới là kiến trúc.\n\nQuan sát cách người ta di chuyển, dừng lại, ngồi — đó là phản hồi thật nhất.',
+    options: [
+      { label: 'Tôi muốn chia sẻ điều này', next: 'post_nudge' },
+      { label: 'Cảm ơn, hôm nay thế thôi', next: 'bye'        }
+    ]
+  },
+  depth_time: {
+    msg: 'Bền vững không chỉ là vật liệu — là cách công trình già đi.\n\nGỗ lên màu, đá mòn nhẹ, cây lớn thêm. Những thứ đó không có trong bản vẽ. Bạn thiết kế cho 10 năm sau chưa?',
+    options: [
+      { label: 'Chưa nghĩ đến',             next: 'bye_gentle' },
+      { label: 'Có, đây là điều tôi quan tâm', next: 'post_nudge' }
+    ]
+  },
+  nature_pro: {
+    msg: 'Người thiết kế biết đọc thiên nhiên thì hiểu tỉ lệ, ánh sáng và nhịp điệu tốt hơn nhiều.\n\nBạn có khoảnh khắc thiên nhiên nào muốn chia sẻ không?',
+    options: [
+      { label: 'Có, tôi đăng ngay',        next: 'post_nudge' },
+      { label: 'Chưa có ảnh ưng ý lắm',   next: 'post_help'  }
+    ]
+  },
+  post_nudge: {
+    msg: 'Nhấn nút "Đăng bài" phía trên bên phải — chọn chủ đề, viết vài dòng hoặc up ảnh.\n\nKhông cần hoàn hảo. Khoảnh khắc thật, dù nhỏ, mới đáng nhớ nhất.',
+    options: [
+      { label: 'OK, tôi đăng ngay!',  next: 'bye_post' },
+      { label: 'Chưa biết viết gì', next: 'post_help' }
+    ]
+  },
+  post_help: {
+    msg: 'Thử một trong ba hướng này:\n\n① Mô tả ánh sáng bạn thấy hôm nay\n② Một chi tiết vật liệu đang thích\n③ Câu hỏi bạn đang tự hỏi về một dự án\n\nNhiêu đó thôi là đủ.',
+    options: [
+      { label: 'Hay đó, tôi thử!', next: 'bye_post' },
+      { label: 'Cảm ơn An',       next: 'bye'      }
+    ]
+  },
+  bye: {
+    msg: 'Chúc bạn một buổi sáng tạo và bình yên 🌿\n\nKhi nào có khoảnh khắc muốn chia sẻ — An ở đây.',
+    options: []
+  },
+  bye_post: {
+    msg: 'Tuyệt vời! Feed đang chờ khoảnh khắc của bạn.\n\nMọi người trong ALN sẽ trân trọng đó 🌿',
+    options: []
+  },
+  bye_gentle: {
+    msg: 'Không vội đâu. Khi có điều muốn chia sẻ, An ở đây 🌿',
+    options: []
+  }
+};
+
+function anToggle(){
+  if(AN_OPEN){ anClose(); } else { anOpen(); }
+}
+function anOpen(){
+  AN_OPEN = true;
+  document.getElementById('anPanel').classList.add('open');
+  document.getElementById('anDot').style.display = 'none';
+  if(!AN_STARTED){ AN_STARTED = true; setTimeout(anStart, 350); }
+}
+function anClose(){
+  AN_OPEN = false;
+  document.getElementById('anPanel').classList.remove('open');
+}
+
+function anStart(){
+  var msgs = document.getElementById('anMsgs');
+  if(!msgs) return;
+  msgs.innerHTML = '';
+  document.getElementById('anOptions').innerHTML = '';
+  anFlow('greeting');
+}
+
+function anFlow(key){
+  var flow = AN_FLOWS[key];
+  if(!flow) return;
+  var msg = typeof flow.msg === 'function' ? flow.msg() : flow.msg;
+  anTypingThen(msg, function(){
+    if(flow.options && flow.options.length > 0){
+      anShowOptions(flow.options);
+    }
+  });
+}
+
+function anTypingThen(text, callback){
+  var msgs = document.getElementById('anMsgs');
+  var typing = document.createElement('div');
+  typing.className = 'an-typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  var delay = Math.min(1200, 600 + text.length * 8);
+  clearTimeout(AN_TIMER);
+  AN_TIMER = setTimeout(function(){
+    msgs.removeChild(typing);
+    anAddMsg(text, 'an');
+    if(callback) callback();
+  }, delay);
+}
+
+function anAddMsg(text, side){
+  var msgs = document.getElementById('anMsgs');
+  var b = document.createElement('div');
+  b.className = 'an-bubble from-' + side;
+  b.textContent = text;
+  msgs.appendChild(b);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function anShowOptions(options){
+  var wrap = document.getElementById('anOptions');
+  wrap.innerHTML = '';
+  options.forEach(function(opt){
+    var btn = document.createElement('button');
+    btn.className = 'an-opt';
+    btn.textContent = opt.label;
+    btn.onclick = function(){ anPick(opt.label, opt.next); };
+    wrap.appendChild(btn);
+  });
+}
+
+function anPick(label, next){
+  document.getElementById('anOptions').innerHTML = '';
+  anAddMsg(label, 'user');
+  setTimeout(function(){ anFlow(next); }, 300);
+}
+</script>
+
 <script>
 /* ── GLOBALS ── */
 var CAN_POST_ROLES = ['kts','designer','founder','host'];
