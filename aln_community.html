@@ -681,9 +681,11 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 /* ═══════════════════════════════
    MYMY / NAM — AGENT CỘNG ĐỒNG ALN
 ═══════════════════════════════ */
-var AN_OPEN = false;
+var AN_OPEN    = false;
 var AN_STARTED = false;
-var AN_TIMER = null;
+var AN_TIMER   = null;
+var AN_HISTORY = []; /* conversation history for LLM */
+var AN_TYPING_EL = null; /* typing indicator currently shown */
 
 /* Agent config — switched by _initAgent() based on user gender */
 var AGENT = { name:'MyMy', toUser:'bạn', selfRef:'em', color:'#c9a84c', grad:'linear-gradient(135deg,#c9a84c,#a07838)', glow:'rgba(201,168,76,.45)' };
@@ -705,8 +707,8 @@ window._initAgent = function(gender){
   var avEl = document.getElementById('anAv');        if(avEl) avEl.textContent = AGENT.name;
   var nmEl = document.getElementById('anAgentName'); if(nmEl) nmEl.textContent = AGENT.name;
   var arEl = document.getElementById('anTrigger');   if(arEl) arEl.setAttribute('aria-label','Nói chuyện với '+AGENT.name);
-  /* Reset chat nếu chưa mở để flows dùng AGENT mới */
   AN_STARTED = false;
+  AN_HISTORY = [];
   document.getElementById('anMsgs').innerHTML = '';
   document.getElementById('anOptions').innerHTML = '';
 };
@@ -982,6 +984,59 @@ function anAddMsg(text, side){
   b.textContent = text;
   msgs.appendChild(b);
   msgs.scrollTop = msgs.scrollHeight;
+  /* push to LLM history */
+  AN_HISTORY.push({ role: side === 'an' ? 'assistant' : 'user', content: text });
+  if(AN_HISTORY.length > 14) AN_HISTORY.splice(0, AN_HISTORY.length - 14);
+}
+
+/* ── LLM reply via Cloud Function ── */
+async function anLLMReply(){
+  var msgs = document.getElementById('anMsgs');
+  /* show typing */
+  var typing = document.createElement('div');
+  typing.className = 'an-typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+  AN_TYPING_EL = typing;
+
+  /* disable input while waiting */
+  var input = document.getElementById('anInput');
+  if(input) input.disabled = true;
+
+  try {
+    var fn = window.__ALN_CHAT_FN;
+    if(!fn) throw new Error('fn_not_ready');
+
+    var u = window._currentUser || {};
+    var result = await fn({
+      messages:  AN_HISTORY.slice(-12),
+      agentName: AGENT.name,
+      toUser:    AGENT.toUser,
+      userName:  u.name  || '',
+      role:      u.role  || ''
+    });
+
+    if(AN_TYPING_EL && AN_TYPING_EL.parentNode) AN_TYPING_EL.parentNode.removeChild(AN_TYPING_EL);
+    AN_TYPING_EL = null;
+
+    var reply = result && result.data && result.data.reply;
+    anAddMsg(reply || '...', 'an');
+
+  } catch(e) {
+    if(AN_TYPING_EL && AN_TYPING_EL.parentNode) AN_TYPING_EL.parentNode.removeChild(AN_TYPING_EL);
+    AN_TYPING_EL = null;
+    /* fallback graceful */
+    var fb = AGENT.toUser === 'bạn'
+      ? 'Bạn ơi, em gặp chút sự cố kỹ thuật — thử lại sau nha 🙏'
+      : AGENT.toUser === 'anh'
+        ? 'Anh ơi, em gặp chút sự cố kỹ thuật — thử lại sau nha 🙏'
+        : 'Chị ơi, em gặp chút sự cố kỹ thuật — thử lại sau nha 🙏';
+    anAddMsg(fb, 'an');
+  } finally {
+    if(input) input.disabled = false;
+    if(input) input.focus();
+  }
 }
 function anShowOptions(options){
   var wrap = document.getElementById('anOptions');
@@ -1002,23 +1057,13 @@ function anPick(label, next){
 }
 function anSendText(){
   var input = document.getElementById('anInput');
-  if(!input) return;
+  if(!input || input.disabled) return;
   var text = (input.value || '').trim();
   if(!text) return;
   input.value = '';
   document.getElementById('anOptions').innerHTML = '';
   anAddMsg(text, 'user');
-  var t = text.toLowerCase();
-  var next;
-  if(/mệt|stress|khó|nặng|áp lực|buồn|chán/.test(t))          next = 'free_reply_tired';
-  else if(/cảm hứng|vui|thích|hay|đẹp|tuyệt|thú vị/.test(t)) next = 'free_reply_inspired';
-  else if(/ánh sáng|nắng|sáng|tối|bóng/.test(t))              next = 'light';
-  else if(/gỗ|đá|bê tông|vật liệu|tile|gạch/.test(t))         next = 'material';
-  else if(/thiên nhiên|cây|xanh|rừng|vườn/.test(t))           next = 'like_nature';
-  else if(/đăng|bài|chia sẻ|post|ảnh|hình/.test(t))           next = 'post_nudge';
-  else if(/dự án|công trình|khách hàng/.test(t))               next = 'busy';
-  else                                                           next = 'free_reply_default';
-  setTimeout(function(){ anFlow(next); }, 400);
+  anLLMReply();
 }
 </script>
 
@@ -1191,7 +1236,7 @@ var BACK_BY_ROLE = {
 
 <script type="module">
 import {
-  auth, db, onAuthStateChanged, signOut,
+  app, auth, db, onAuthStateChanged, signOut,
   doc, getDoc, updateDoc, deleteDoc,
   collection, addDoc, getDocs, query, orderBy, onSnapshot,
   serverTimestamp, storage, storageRef, uploadBytes, getDownloadURL
@@ -1199,6 +1244,12 @@ import {
 
 import { arrayUnion, arrayRemove, increment }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+import { getFunctions, httpsCallable }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+
+const _fns = getFunctions(app, 'asia-southeast1');
+window.__ALN_CHAT_FN = httpsCallable(_fns, 'alnChat');
 
 /* ── AUTH ── */
 onAuthStateChanged(auth, async function(user){

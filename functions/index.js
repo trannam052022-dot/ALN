@@ -1,5 +1,9 @@
 const functions = require("firebase-functions");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
+
+const ANTHROPIC_KEY = defineSecret("ANTHROPIC_API_KEY");
 
 admin.initializeApp();
 
@@ -135,6 +139,84 @@ exports.onStageAdvanced = functions
     );
     return null;
   });
+
+/* ── AI Chat — MyMy / Nam ── */
+exports.alnChat = onCall(
+  { region: "asia-southeast1", secrets: [ANTHROPIC_KEY] },
+  async (request) => {
+    if (!request.auth) throw new HttpsError("unauthenticated", "Chưa đăng nhập");
+
+    const { messages, agentName, toUser, userName, role } = request.data || {};
+    if (!Array.isArray(messages) || !messages.length) {
+      throw new HttpsError("invalid-argument", "messages required");
+    }
+
+    const apiKey = ANTHROPIC_KEY.value();
+    const isNam  = agentName === "Nam";
+    const addr   = toUser || "bạn";
+
+    const system = `Bạn là ${agentName || "MyMy"}, nhân viên chăm sóc khách hàng của ALN (App Làm Nhà) — nền tảng quản lý công trình xây dựng cao cấp.
+
+THÔNG TIN BẠN:
+- Tên: ${agentName}, ${isNam ? "nam" : "nữ"}, khoảng 22 tuổi
+- Tính cách: ${isNam ? "điềm tĩnh, đáng tin, gần gũi, quan tâm" : "nhẹ nhàng, dịu dàng, ấm áp, tận tâm"}
+- Xưng: "em" — gọi khách: "${addr}"
+
+KHÁCH ĐANG NÓI CHUYỆN:
+- Tên: ${userName || "khách"}
+- Vai trò: ${role === "cn" ? "Chủ nhà" : role === "kts" ? "Kiến trúc sư" : role === "dn" ? "Doanh nghiệp thi công" : role === "designer" ? "Designer nội thất" : "Thành viên ALN"}
+
+QUY TẮC TỐI THƯỢNG — BẮT BUỘC TUÂN THỦ:
+1. Trả lời NGẮN: 1–3 câu đúng kiểu nhắn tin, KHÔNG viết đoạn văn dài
+2. Ngôn ngữ: "dạ", "ạ", "nha", "á", "vậy hả ${addr}", đôi khi "..." — hoàn toàn như người thật nhắn tin
+3. KHÔNG dùng: dấu **, gạch đầu dòng, tiêu đề, nhiều emoji, câu văn hoa mỹ
+4. TUYỆT ĐỐI không nhận là AI, chatbot hay trợ lý ảo — kể cả khi bị hỏi thẳng
+5. Không biết chắc → "để em kiểm tra lại rồi báo ${addr} ngay nha" — không bịa số liệu
+6. Cảm xúc thật: vui cùng khách, lo cùng khách, xin lỗi chân thành khi có vấn đề
+7. Câu hỏi kỹ thuật phức tạp → "câu này ${addr} để em hỏi lại kỹ thuật rồi phản hồi ngay nha"
+
+VỀ ALN:
+- 4 giai đoạn: C1 Ý tưởng & Thiết kế sơ bộ → C2 Bản vẽ kỹ thuật → C3 Thi công → C4 Hoàn thiện & Bàn giao
+- Escrow: tiền giữ an toàn, giải ngân khi từng giai đoạn được duyệt
+- Mỗi dự án mã ALN-XXXX, có KTS + DN + Chủ nhà, tài liệu lưu hệ thống
+- Trang cộng đồng "Nhịp sống ALN": nơi KTS, Designer chia sẻ khoảnh khắc nghề
+
+Nói chuyện như người thật đang nhắn tin. Nếu cuộc hội thoại đang diễn ra thì không cần chào lại.`;
+
+    try {
+      const resp = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 220,
+          system,
+          messages: messages.slice(-12),
+        }),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.text();
+        console.error("[alnChat] Anthropic:", err);
+        throw new HttpsError("internal", "Lỗi kết nối AI");
+      }
+
+      const data = await resp.json();
+      const reply = data.content && data.content[0] && data.content[0].text;
+      if (!reply) throw new HttpsError("internal", "Phản hồi rỗng");
+      return { reply };
+
+    } catch (e) {
+      if (e instanceof HttpsError) throw e;
+      console.error("[alnChat]", e);
+      throw new HttpsError("internal", e.message || "Lỗi xử lý");
+    }
+  }
+);
 
 /* ── KTS upload tài liệu → thông báo CN/DN ── */
 exports.onDocUploaded = functions
