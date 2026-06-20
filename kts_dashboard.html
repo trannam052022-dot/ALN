@@ -70,6 +70,8 @@ window.KTS_PROJECT_DATA = null;
 .profile-field input{width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box}
 .profile-field input:focus{outline:none;border-color:rgba(212,160,23,.5)}
 .profile-save-btn{width:100%;padding:11px;background:linear-gradient(135deg,#d4a017,#e8c44a);border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer;margin-top:4px}
+.profile-view-btn{width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(212,160,23,.45);background:rgba(212,160,23,.07);color:#b8860b;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;transition:all .15s;box-sizing:border-box}
+.profile-view-btn:hover{background:rgba(212,160,23,.15);border-color:rgba(212,160,23,.7);color:#d4a017}
 </style>
 <style>
 :root {
@@ -1166,9 +1168,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <button class="profile-save-btn" onclick="saveProfile()">
       <i class="ph-duotone ph-floppy-disk"></i> Lưu hồ sơ
     </button>
-    <a id="btnViewPublicProfile" href="#" target="_blank"
-       style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;padding:10px;border-radius:10px;border:1.5px solid rgba(212,160,23,.4);color:#d4a017;font-size:12px;font-weight:700;text-decoration:none;background:rgba(212,160,23,.06);transition:all .15s"
-       onmouseover="this.style.background='rgba(212,160,23,.12)'" onmouseout="this.style.background='rgba(212,160,23,.06)'">
+    <a id="btnViewPublicProfile" href="#" target="_blank" class="profile-view-btn">
       <i class="ph-duotone ph-user-circle"></i> Xem hồ sơ công khai
     </a>
 
