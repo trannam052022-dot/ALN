@@ -201,6 +201,36 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
 .next-steps li{font-size:12px;color:var(--text2);padding:5px 0;display:flex;align-items:flex-start;gap:10px;line-height:1.5;list-style:none}
 .next-steps li i{color:var(--gold);flex-shrink:0;margin-top:1px;font-size:14px}
 
+/* ── PAIN POINTS ── */
+.pain-box{background:rgba(240,96,96,.06);border:1px solid rgba(240,96,96,.18);border-radius:var(--r);padding:18px 20px;margin-bottom:22px}
+.pain-label{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(240,96,96,.7);margin-bottom:12px}
+.pain-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.pain-list li{font-size:12px;color:rgba(240,200,200,.75);display:flex;gap:8px;line-height:1.5}
+.pain-list li::before{content:'—';color:rgba(240,96,96,.5);flex-shrink:0}
+
+/* ── STATS ROW ── */
+.stats-row{display:flex;justify-content:center;gap:0;margin-bottom:26px}
+.stat-item{flex:1;text-align:center;padding:14px 10px;border-right:1px solid rgba(201,168,76,.14)}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--gold);display:block;line-height:1}
+.stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;display:block;line-height:1.3}
+
+/* ── PROVINCE CHIPS ── */
+.prov-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.prov-chip{display:flex;align-items:center;gap:4px;padding:5px 11px;border:1px solid rgba(255,255,255,.1);border-radius:99px;cursor:pointer;font-size:11px;font-weight:500;color:rgba(228,212,176,.45);background:rgba(255,255,255,.025);user-select:none;transition:all .15s}
+.prov-chip input{display:none}
+.prov-chip:hover{border-color:rgba(201,168,76,.35);color:rgba(201,168,76,.7)}
+.prov-chip.on{border-color:rgba(201,168,76,.55);background:rgba(201,168,76,.1);color:var(--gold);font-weight:700}
+
+/* ── CONTRACT BOX ── */
+.contract-box{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px;margin-bottom:18px}
+.contract-title{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,168,76,.6);margin-bottom:12px}
+.contract-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px;line-height:1.5}
+.contract-row:last-child{border-bottom:none}
+.contract-key{color:var(--muted);min-width:130px;flex-shrink:0;font-weight:600}
+.contract-val{color:var(--text2)}
+.contract-val.hi{color:var(--gold);font-weight:700}
+
 /* ── FOOTER ── */
 .page-footer{text-align:center;padding:28px 0 0;font-size:10px;color:var(--muted);letter-spacing:.05em}
 
@@ -249,14 +279,40 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
     <div style="position:relative">
       <div class="hero-eyebrow">
         <span class="ey-line ey-line-l"></span>
-        <span class="ey-text">App Làm Nhà Corp.</span>
+        <span class="ey-text">🏆 Founding Member — 100 KTS đầu tiên</span>
         <span class="ey-line ey-line-r"></span>
       </div>
       <h1 class="hero-title">
-        Gia nhập mạng lưới<br>
-        <em>Kiến trúc sư Chuyên nghiệp</em>
+        Làm đẹp đi —<br>
+        <em>Tiền đã chờ sẵn rồi</em>
       </h1>
-      <p class="hero-sub">Kết nối với hàng nghìn dự án thực tế — nâng tầm sự nghiệp và thu nhập của bạn</p>
+      <p class="hero-sub">Khách hàng chuyển tiền cho ALN trước khi bạn bắt đầu làm. Không còn cảnh làm xong đi đòi tiền. Không sợ bùng.</p>
+
+      <div class="stats-row" style="background:rgba(201,168,76,.055);border:1px solid rgba(201,168,76,.16);border-radius:12px;margin-bottom:26px">
+        <div class="stat-item">
+          <span class="stat-num">48h</span>
+          <span class="stat-lbl">Nhận tiền sau<br>khi KH duyệt</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">10%</span>
+          <span class="stat-lbl">Royalty Kho mẫu<br>thụ động</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">3 tháng</span>
+          <span class="stat-lbl">Miễn phí<br>Founding Member</span>
+        </div>
+      </div>
+
+      <div class="pain-box" style="text-align:left">
+        <div class="pain-label">Bạn có đang gặp chuyện này không?</div>
+        <ul class="pain-list">
+          <li>Làm xong giao hồ sơ — KH bảo "để xem lại" rồi mất hút</li>
+          <li>Sửa bản vẽ 5–7 lần không có phí, không có deadline rõ ràng</li>
+          <li>Bị giam vốn 2–3 tháng, tiền về nhỏ giọt hoặc không về</li>
+          <li>Tự tìm khách, tự đàm phán, tự đòi nợ — hết thời gian sáng tạo</li>
+        </ul>
+      </div>
+
       <div class="trust-row">
         <div class="trust-item">
           <i class="ph-duotone ph-shield-check" style="font-size:16px;color:var(--gold);margin-bottom:3px"></i>
@@ -316,7 +372,7 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
     </div>
     <div class="field-row">
       <div class="field">
-        <label>Số điện thoại <span class="req">✦</span></label>
+        <label>Số điện thoại Zalo <span class="req">✦</span></label>
         <input type="tel" id="f_phone" placeholder="0901 234 567" autocomplete="tel">
       </div>
       <div class="field">
@@ -325,6 +381,17 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
       </div>
     </div>
     <div class="field-row">
+      <div class="field">
+        <label>Bộ môn <span class="req">✦</span></label>
+        <select id="f_bomon">
+          <option value="">Chọn…</option>
+          <option value="ARC">Kiến trúc (ARC)</option>
+          <option value="STR">Kết cấu (STR)</option>
+          <option value="ELE">Điện (ELE)</option>
+          <option value="PLU">Cấp thoát nước (PLU)</option>
+          <option value="ALL">Tất cả bộ môn</option>
+        </select>
+      </div>
       <div class="field">
         <label>Kinh nghiệm <span class="req">✦</span></label>
         <select id="f_years">
@@ -336,9 +403,53 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
           <option value=">10">Trên 10 năm</option>
         </select>
       </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Tỉnh / Thành phố nơi ở <span class="req">✦</span></label>
+        <select id="f_province_home">
+          <option value="">Chọn tỉnh…</option>
+          <option value="HCM">TP. Hồ Chí Minh</option>
+          <option value="HN">Hà Nội</option>
+          <option value="DN">Đà Nẵng</option>
+          <option value="CT">Cần Thơ</option>
+          <option value="HP">Hải Phòng</option>
+          <option value="BD">Bình Dương</option>
+          <option value="DNai">Đồng Nai</option>
+          <option value="BR-VT">Bà Rịa – Vũng Tàu</option>
+          <option value="LA">Long An</option>
+          <option value="TG">Tiền Giang</option>
+          <option value="AG">An Giang</option>
+          <option value="KG">Kiên Giang</option>
+          <option value="DL">Đắk Lắk</option>
+          <option value="KH">Khánh Hòa</option>
+          <option value="BDinh">Bình Định</option>
+          <option value="NA">Nghệ An</option>
+          <option value="TH">Thanh Hóa</option>
+          <option value="OTHER">Tỉnh khác</option>
+        </select>
+      </div>
       <div class="field">
         <label>Mã CCHN KTS <span class="req">✦</span></label>
         <input type="text" id="f_cchn" placeholder="CCHN-HN-12345">
+      </div>
+    </div>
+    <div class="field">
+      <label>Khu vực nhận dự án <span class="req">✦</span> <span class="field-hint" style="display:inline">(chọn nhiều)</span></label>
+      <div class="prov-grid" id="provWorkGrid">
+        <label class="prov-chip"><input type="checkbox" value="HCM">TP. HCM</label>
+        <label class="prov-chip"><input type="checkbox" value="HN">Hà Nội</label>
+        <label class="prov-chip"><input type="checkbox" value="DN">Đà Nẵng</label>
+        <label class="prov-chip"><input type="checkbox" value="CT">Cần Thơ</label>
+        <label class="prov-chip"><input type="checkbox" value="HP">Hải Phòng</label>
+        <label class="prov-chip"><input type="checkbox" value="BD">Bình Dương</label>
+        <label class="prov-chip"><input type="checkbox" value="DNai">Đồng Nai</label>
+        <label class="prov-chip"><input type="checkbox" value="BR-VT">Vũng Tàu</label>
+        <label class="prov-chip"><input type="checkbox" value="LA">Long An</label>
+        <label class="prov-chip"><input type="checkbox" value="KH">Khánh Hòa</label>
+        <label class="prov-chip"><input type="checkbox" value="BDinh">Bình Định</label>
+        <label class="prov-chip"><input type="checkbox" value="NA">Nghệ An</label>
+        <label class="prov-chip"><input type="checkbox" value="OTHER">Tỉnh khác</label>
       </div>
     </div>
     <div class="field">
@@ -448,9 +559,32 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
       <label>Xác nhận mật khẩu <span class="req">✦</span></label>
       <input type="password" id="f_pw2" placeholder="Nhập lại mật khẩu" autocomplete="new-password">
     </div>
+    <div class="contract-box">
+      <div class="contract-title">📋 Điều khoản hợp đồng thành viên KTS</div>
+      <div class="contract-row">
+        <span class="contract-key">Phí nền tảng</span>
+        <span class="contract-val hi">20% cố định / mỗi giao dịch</span>
+      </div>
+      <div class="contract-row">
+        <span class="contract-key">Thuế khấu trừ</span>
+        <span class="contract-val hi">7% tại nguồn (5% GTGT + 2% TNCN)</span>
+      </div>
+      <div class="contract-row">
+        <span class="contract-key">Cam kết SLA</span>
+        <span class="contract-val">Phản hồi trong 48 giờ. Trễ: Gậy Vàng (−0.1đ uy tín)</span>
+      </div>
+      <div class="contract-row">
+        <span class="contract-key">Không giao ngoài</span>
+        <span class="contract-val">Cam kết 2 năm không liên hệ KH ngoài nền tảng ALN</span>
+      </div>
+      <div class="contract-row">
+        <span class="contract-key">Quy trình thanh toán</span>
+        <span class="contract-val">KH trả trước → ALN giữ → KTS làm → KH duyệt → ALN chuyển tiền trong 48h</span>
+      </div>
+    </div>
     <div class="agree-row" style="margin-top:4px">
       <input type="checkbox" id="f_agree">
-      <span>Tôi đồng ý với <a href="#">Điều khoản sử dụng</a> và <a href="#">Chính sách bảo mật</a> của App Làm Nhà Corp.</span>
+      <span>Tôi đã đọc và đồng ý với <a href="#">Điều khoản sử dụng</a>, <a href="#">Chính sách bảo mật</a> và các điều khoản hợp đồng thành viên KTS nêu trên.</span>
     </div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="goStep(2)"><i class="ph-duotone ph-arrow-left"></i> Quay lại</button>
@@ -527,13 +661,19 @@ function validateStep(n) {
   if (n === 1) {
     var name = document.getElementById('f_name').value.trim();
     var phone = document.getElementById('f_phone').value.trim();
+    var bomon = document.getElementById('f_bomon').value;
     var years = document.getElementById('f_years').value;
+    var provHome = document.getElementById('f_province_home').value;
     var cchn = document.getElementById('f_cchn').value.trim();
     var bio = document.getElementById('f_bio').value.trim();
     var specs = document.querySelectorAll('#specGrid input:checked');
+    var provWork = document.querySelectorAll('#provWorkGrid input:checked');
     if (!name) { showToast('Vui lòng nhập họ và tên', true); return false; }
-    if (!phone || phone.replace(/\D/g,'').length < 9) { showToast('Số điện thoại chưa hợp lệ', true); return false; }
+    if (!phone || phone.replace(/\D/g,'').length < 9) { showToast('Số điện thoại Zalo chưa hợp lệ', true); return false; }
+    if (!bomon) { showToast('Vui lòng chọn bộ môn', true); return false; }
     if (!years) { showToast('Vui lòng chọn số năm kinh nghiệm', true); return false; }
+    if (!provHome) { showToast('Vui lòng chọn tỉnh nơi ở', true); return false; }
+    if (provWork.length === 0) { showToast('Vui lòng chọn ít nhất 1 khu vực nhận dự án', true); return false; }
     if (specs.length === 0) { showToast('Vui lòng chọn ít nhất 1 chuyên môn', true); return false; }
     if (!cchn) { showToast('Vui lòng nhập số CCHN KTS', true); return false; }
     if (!bio || bio.length < 20) { showToast('Giới thiệu tối thiểu 20 ký tự', true); return false; }
@@ -585,6 +725,11 @@ document.getElementById('f_bio').addEventListener('input', function() {
   document.getElementById('bioCount').textContent = this.value.length;
 });
 document.querySelectorAll('.spec-chip').forEach(function(chip) {
+  chip.querySelector('input').addEventListener('change', function() {
+    chip.classList.toggle('on', this.checked);
+  });
+});
+document.querySelectorAll('.prov-chip').forEach(function(chip) {
   chip.querySelector('input').addEventListener('change', function() {
     chip.classList.toggle('on', this.checked);
   });
@@ -701,17 +846,21 @@ window._doSubmit = async function() {
   btn.disabled = true;
   btn.innerHTML = '<i class="ph-duotone ph-spinner ph-spin"></i> Đang gửi…';
   try {
-    var name   = document.getElementById('f_name').value.trim();
-    var phone  = document.getElementById('f_phone').value.trim();
-    var email  = document.getElementById('f_email').value.trim();
-    var years  = document.getElementById('f_years').value;
-    var cchn   = document.getElementById('f_cchn').value.trim();
-    var bio    = document.getElementById('f_bio').value.trim();
-    var uname  = window.generatedUsername || document.getElementById('unameDisplay').textContent;
-    var pw     = document.getElementById('f_pw').value;
+    var name      = document.getElementById('f_name').value.trim();
+    var phone     = document.getElementById('f_phone').value.trim();
+    var email     = document.getElementById('f_email').value.trim();
+    var bomon     = document.getElementById('f_bomon').value;
+    var years     = document.getElementById('f_years').value;
+    var provHome  = document.getElementById('f_province_home').value;
+    var cchn      = document.getElementById('f_cchn').value.trim();
+    var bio       = document.getElementById('f_bio').value.trim();
+    var uname     = window.generatedUsername || document.getElementById('unameDisplay').textContent;
+    var pw        = document.getElementById('f_pw').value;
 
-    var specEls = document.querySelectorAll('#specGrid input:checked');
-    var specs   = Array.from(specEls).map(function(el){ return el.value; });
+    var specEls   = document.querySelectorAll('#specGrid input:checked');
+    var specs     = Array.from(specEls).map(function(el){ return el.value; });
+    var provEls   = document.querySelectorAll('#provWorkGrid input:checked');
+    var provWork  = Array.from(provEls).map(function(el){ return el.value; });
 
     var cred = await createUserWithEmailAndPassword(auth, uname + '@aln.vn', pw);
     var uid  = cred.user.uid;
@@ -729,11 +878,13 @@ window._doSubmit = async function() {
 
     await setDoc(doc(db, 'users', uid), {
       username: uname, name: name, role: 'kts',
-      email: email || (uname + '@aln.vn'), status: 'pending', createdAt: serverTimestamp()
+      email: email || (uname + '@aln.vn'),
+      province: provHome, status: 'pending', createdAt: serverTimestamp()
     });
     await setDoc(doc(db, 'ktsApplications', uid), {
       uid: uid, name: name, phone: phone, email: email || '',
-      years: years, specialties: specs, cchn: cchn, bio: bio,
+      boMon: bomon, years: years, specialties: specs, cchn: cchn, bio: bio,
+      province_home: provHome, provinces_work: provWork,
       avatarUrl: avatarUrl, cvUrl: cvUrl, certUrls: certUrls,
       username: uname, status: 'pending', submittedAt: serverTimestamp()
     });
