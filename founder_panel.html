@@ -1731,168 +1731,13 @@ var _cnStatusColor = {on_track:'var(--green)',sla_warn:'var(--amber)',dispute:'v
 var _stgColors = ['var(--green)','var(--amber)','var(--blue)','var(--sub)'];
 function _fmtM(v){if(v>=1e9)return(v/1e9).toFixed(1)+'T';if(v>=1e6)return(v/1e6).toFixed(1)+'M';return(v/1e3).toFixed(0)+'K'}
 
-var STATS_KTS = [
-  {name:'KTS. Trần Đại Long',   cchn:'KTS-2021-84821', tier:'VIP Vàng',   projects:23, activeProjects:2, rating:4.8, revenue:187500000, status:'active'},
-  {name:'KTS. Nguyễn Thị Lan', cchn:'KTS-2019-11234', tier:'VIP Bạc',    projects:18, activeProjects:2, rating:4.6, revenue:124800000, status:'active'},
-  {name:'KTS. Vũ Minh Khoa',   cchn:'KTS-2020-55678', tier:'VIP Vàng',   projects:31, activeProjects:2, rating:4.9, revenue:312000000, status:'active'},
-  {name:'KTS. Phạm Hoài Nam',  cchn:'KTS-2022-33412', tier:'Chuẩn',      projects:12, activeProjects:2, rating:4.3, revenue:63000000,  status:'active'},
-  {name:'KTS. Lê Hoàng Nam',   cchn:'KTS-2023-77890', tier:'Chuẩn',      projects:8,  activeProjects:2, rating:4.5, revenue:92000000,  status:'active'},
-  {name:'KTS. Đỗ Thanh Hương', cchn:'KTS-2021-44231', tier:'VIP Bạc',    projects:15, activeProjects:0, rating:4.7, revenue:98500000,  status:'inactive'},
-  {name:'KTS. Bùi Quang Minh', cchn:'KTS-2023-98123', tier:'Chuẩn',      projects:4,  activeProjects:1, rating:4.1, revenue:28000000,  status:'active'},
-  {name:'KTS. Lý Thị Thu',     cchn:'KTS-2022-12345', tier:'VIP Bạc',    projects:9,  activeProjects:0, rating:4.4, revenue:71000000,  status:'suspended'},
-];
-
-var STATS_DN = [
-  {name:'App Làm Nhà Corp.',    type:'Công ty TNHH',  projects:10, activeProjects:8, totalGtv:1490000000, escrow:435700000, ktsLinked:5, status:'active'},
-  {name:'ALN Construct',        type:'Công ty Cổ phần',projects:6, activeProjects:4, totalGtv:820000000,  escrow:287000000, ktsLinked:3, status:'active'},
-  {name:'Nhà Đẹp Việt Nam',     type:'Công ty TNHH',  projects:4, activeProjects:2, totalGtv:350000000,  escrow:98000000,  ktsLinked:2, status:'active'},
-  {name:'SunHome Design',       type:'Hộ kinh doanh', projects:3, activeProjects:1, totalGtv:210000000,  escrow:42000000,  ktsLinked:2, status:'active'},
-  {name:'Kiến Trúc Xanh HCM',  type:'Công ty TNHH',  projects:2, activeProjects:0, totalGtv:160000000,  escrow:0,         ktsLinked:1, status:'inactive'},
-];
+var STATS_KTS = [];
+var STATS_DN  = [];
 
 /* ══════════════════════════════════════════
-   MOCK DATA
+   DATA (filled from Firestore)
 ══════════════════════════════════════════ */
-const ROWS = [
-  {
-    id:'ALN_PRJ_03', cn:'Lê Quang Cường',    ktsName:'KTS. Nguyễn Thị Lan',
-    stage:'C3', stageLabel:'C3 — Hồ sơ KT',
-    frozen: 3300000,  status:'dispute',
-    stageClass:'sb-c3', rowClass:'row-dispute',
-    invest:'Tiêu chuẩn', floor:'2–3 tầng',
-    contract:'ALN-HDDT-000003-2026',
-    finance:{ total:5500000, giuho:1100000, thue:385000, ctv:4015000 },
-    rubric:{ total:78, pass:false,
-      items:[
-        {name:'Kiến trúc', score:18, max:25},
-        {name:'Kết cấu',   score:20, max:25},
-        {name:'MEP',       score:12, max:15},
-        {name:'Thép Excel',score:5,  max:10, fail:true},
-        {name:'Vật tư',    score:8,  max:10},
-        {name:'Dự toán',   score:15, max:15},
-      ]
-    },
-    aiLog:[
-      {tag:'INFO', text:'Tự động trích xuất <b>6 hạng mục</b> hồ sơ C3 · hash SHA-256 OK'},
-      {tag:'PASS', text:'Lớp 1 Auto-scan: Đủ file, định dạng đúng — nhưng STEEL_BOM phát hiện <b>#REF! D14 + #VALUE! G22</b>'},
-      {tag:'FAIL', text:'Rubric score <b>78/100</b> — dưới ngưỡng 80 · STEEL_BOM: 5/10 (lỗi hàm Excel)'},
-      {tag:'WARN', text:'KTS thừa nhận lỗi copy template trong chat · Đề xuất: <b>Tối hậu thư 48h</b>'},
-      {tag:'WARN', text:'Khách hàng từ chối vô căn cứ (đối chiếu: thợ quen chưa đủ chuyên môn KT)'},
-    ],
-    chat:[
-      {ts:'14:00', role:'kts',   name:'KTS Nguyễn Thị Lan', text:'Tôi đã nộp đủ hồ sơ kỹ thuật thi công 6 hạng mục lên hệ thống.'},
-      {ts:'15:30', role:'cn',    name:'KH Lê Quang Cường',  text:'Thợ quen của tôi xem bảo bảng thép này tính thừa! Tôi không nghiệm thu.'},
-      {ts:'16:00', role:'kts',   name:'KTS Nguyễn Thị Lan', text:'Bảng thép được tính theo TCVN 5574:2018, có cơ sở kỹ thuật rõ ràng. Xin Sàn xem xét.'},
-      {ts:'09:28', role:'admin', name:'Admin Hoàng Duy Thắng', text:'HĐNT ghi nhận: KTS thừa nhận lỗi hàm Excel D14, G22. Đang xem xét cho nộp lại.'},
-      {ts:'09:35', role:'sys',   name:'SYSTEM', text:'⚖️ Hồ sơ chuyển Founder · Rubric 78/100 · Chờ phán quyết Checker.'},
-    ],
-    commands:[
-      { id:'APPROVE', label:'NGHIỆM THU ĐƠN PHƯƠNG', sub:'Ép giải ngân thù lao CTV · Thu lợi nhuận về công ty', icon:'<i class="ph-duotone ph-check-square"></i>', style:'approve' },
-      { id:'CANCEL',  label:'HỦY DỰ ÁN & ĐỀN BÙ',  sub:'Hoàn tiền khách · Phạt gậy trừng phạt CTV', icon:'<i class="ph-duotone ph-x-square"></i>', style:'cancel'  },
-    ]
-  },
-  {
-    id:'ALN_PRJ_02', cn:'Trần Thị Bình',    ktsName:'KTS. Phạm Hoài Nam',
-    stage:'C2', stageLabel:'C2 — Phối cảnh',
-    frozen:1440000, status:'sla',
-    stageClass:'sb-c2', rowClass:'row-sla',
-    invest:'Tiêu chuẩn', floor:'4–5 tầng',
-    contract:'ALN-HDDT-000002-2026',
-    finance:{ total:7200000, giuho:1440000, thue:504000, ctv:5256000 },
-    rubric:null,
-    aiLog:[
-      {tag:'WARN', text:'SLA KTS_REVISION_RESPONSE <b>quá hạn +1089h</b> · deadline 2026-04-29 09:00'},
-      {tag:'INFO', text:'Auto-action: Gậy vàng lần 1 phát · RS −0.1 (71.4 → 71.3)'},
-      {tag:'INFO', text:'Admin nhận alert tự động lúc 09:05'},
-      {tag:'INFO', text:'Ví tạm ứng C2 đang HOLD: 576,000đ (40% × C2)'},
-    ],
-    chat:[
-      {ts:'09:00', role:'cn',  name:'KH Trần Thị Bình',  text:'Mặt tiền cần làm lại theo Japandi thuần túy — bỏ chi tiết gỗ ngoài trời.'},
-      {ts:'~SLA~', role:'sys', name:'SYSTEM', text:'⏰ SLA 48h kích hoạt. KTS chưa phản hồi sau 1089h.'},
-    ],
-    commands:[
-      { id:'WARN_KTS', label:'PHÁT CẢNH CÁO KTS',    sub:'Gậy vàng lần 2 + nhắc nhở khẩn', icon:'<i class="ph-duotone ph-warning"></i>', style:'cancel' },
-      { id:'REASSIGN', label:'CHUYỂN KTS KHÁC',       sub:'Mở đấu thầu lại · Bảo vệ KH', icon:'<i class="ph-duotone ph-arrows-clockwise"></i>', style:'approve'  },
-    ]
-  },
-  {
-    id:'ALN_PRJ_04', cn:'Trần Văn An',       ktsName:'KTS. Phạm Hoài Nam',
-    stage:'C3', stageLabel:'C3 — Hồ sơ KT',
-    frozen:8000000, status:'pending',
-    stageClass:'sb-c3', rowClass:'row-c3',
-    invest:'Cao cấp', floor:'Biệt thự vườn',
-    contract:'ALN-HDDT-000004-2026',
-    finance:{ total:14400000, giuho:2880000, thue:1008000, ctv:10512000 },
-    rubric:{ total:91, pass:true,
-      items:[
-        {name:'Kiến trúc', score:23, max:25},
-        {name:'Kết cấu',   score:22, max:25},
-        {name:'MEP',       score:14, max:15},
-        {name:'Thép Excel',score:10, max:10},
-        {name:'Vật tư',    score:9,  max:10},
-        {name:'Dự toán',   score:13, max:15},
-      ]
-    },
-    aiLog:[
-      {tag:'PASS', text:'Lớp 1 Auto-scan: 6/6 hạng mục đầy đủ · 0% lỗi hàm Excel · DWG layer đúng chuẩn'},
-      {tag:'PASS', text:'Rubric score <b>91/100</b> — Đạt tiêu chuẩn nghiệm thu (ngưỡng 80)'},
-      {tag:'INFO', text:'KH đã bấm XÁC NHẬN HÀI LÒNG lúc 11:00 · Chờ Maker tạo lệnh'},
-      {tag:'INFO', text:'Maker Hoàng Duy Thắng tạo lệnh giải ngân lúc 09:15'},
-      {tag:'WARN', text:'Đang chờ <b>Checker (Founder)</b> phê duyệt lệnh · Net: 10,512,000đ'},
-    ],
-    chat:[
-      {ts:'11:00', role:'cn',  name:'KH Trần Văn An', text:'Tôi đã xem xong toàn bộ 6 hồ sơ. Chất lượng tốt, mình hài lòng.'},
-      {ts:'09:15', role:'admin',name:'Maker Thắng',   text:'Đề xuất giải ngân 10,512,000đ về TK Vietcombank 1019****0001 — Trần Đại Long.'},
-    ],
-    commands:[
-      { id:'C3_APPROVE', label:'PHÊ DUYỆT GIẢI NGÂN C3', sub:'Chuyển 10,512,000đ → KTS · Sinh Signed URL 15p cho KH', icon:'<i class="ph-duotone ph-check-circle"></i>', style:'approve' },
-      { id:'REJECT_C3',  label:'TỪ CHỐI & YÊU CẦU KIỂM TRA', sub:'Trả hồ sơ để KTV xét lại', icon:'<i class="ph-duotone ph-magnifying-glass"></i>', style:'cancel' },
-    ]
-  },
-  {
-    id:'ALN_PRJ_01', cn:'Nguyễn Văn Thuận',  ktsName:'KTS. Lê Hoàng Nam',
-    stage:'C1', stageLabel:'C1 — Ý tưởng 2D',
-    frozen:240000, status:'ok',
-    stageClass:'sb-c1', rowClass:'',
-    invest:'Kinh tế', floor:'1 tầng',
-    contract:'ALN-HDDT-000001-2026',
-    finance:{ total:1900000, giuho:380000, thue:133000, ctv:1387000 },
-    rubric:null,
-    aiLog:[
-      {tag:'INFO', text:'KTS nộp mặt bằng 2D lần đầu · Đang chờ KH xem xét'},
-      {tag:'INFO', text:'SLA CN_REVIEW: còn 4 ngày 16h trước deadline'},
-      {tag:'INFO', text:'Hệ thống gửi reminder email → KH lúc 08:00'},
-    ],
-    chat:[
-      {ts:'16:00', role:'kts', name:'KTS Lê Hoàng Nam', text:'Em đã nộp mặt bằng ý tưởng 2D. Anh xem và góp ý nhé!'},
-      {ts:'~',     role:'sys', name:'SYSTEM',           text:'⏳ Đang chờ Chủ nhà xem xét · SLA: 5 ngày làm việc'},
-    ],
-    commands:[
-      { id:'VIEW_ONLY', label:'XEM HỒ SƠ ĐẦY ĐỦ', sub:'Mở PDF / DWG preview', icon:'<i class="ph-duotone ph-eye"></i>', style:'approve' },
-      { id:'SEND_MSG',  label:'GỬI NHẮC NHỞ KH',  sub:'Nhắc KH phản hồi C1', icon:'<i class="ph-duotone ph-envelope-open"></i>', style:'cancel' },
-    ]
-  },
-  // Filler rows
-  ...Array.from({length:6},(_,i)=>({
-    id:`ALN_PRJ_${String(i+5).padStart(2,'0')}`,
-    cn:['Nguyễn T. Hoa','Phạm Văn Đức','Lê Thị Mai','Trần Minh Tuấn','Võ Thị Lan','Đặng Quốc Bảo'][i],
-    ktsName:['KTS. Hoài Nam','KTS. Minh Vũ','KTS. Khắc Vũ','KTS. Lê Hoa','KTS. Nam Phong','KTS. Trần Minh'][i],
-    stage:['C2','C3','C1','C4','C2','C3'][i], stageLabel:['C2 — Phối cảnh','C3 — Hồ sơ KT','C1 — Ý tưởng','C4 — Bảo hành','C2 — Phối cảnh','C3 — Hồ sơ KT'][i],
-    frozen:[5000000,12000000,800000,1500000,3200000,9600000][i],
-    status:['ok','ok','ok','done','ok','pending'][i],
-    stageClass:['sb-c2','sb-c3','sb-c1','sb-c4','sb-c2','sb-c3'][i], rowClass:'',
-    invest:['Tiêu chuẩn','Cao cấp','Kinh tế','Tiêu chuẩn','Kinh tế','Cao cấp'][i],
-    floor:['2–3 tầng','Biệt thự vườn','1 tầng','4–5 tầng','2–3 tầng','Biệt thự vườn'][i],
-    contract:`ALN-HDDT-00000${i+5}-2026`,
-    finance:{total:[10000000,24000000,1900000,15000000,6400000,19200000][i],giuho:0,thue:0,ctv:0},
-    rubric:null, aiLog:[{tag:'INFO',text:'Dự án đang chạy bình thường'}],
-    chat:[{ts:'—',role:'sys',name:'SYSTEM',text:'Dự án trong hạn, không có cảnh báo.'}],
-    commands:[
-      {id:'VIEW_ONLY',label:'XEM HỒ SƠ',sub:'',icon:'<i class="ph-duotone ph-eye"></i>',style:'approve'},
-      {id:'SEND_MSG', label:'NHẮN TIN',  sub:'',icon:'<i class="ph-duotone ph-envelope-open"></i>',style:'cancel'},
-    ]
-  })),
-];
+const ROWS = [];
 
 /* ══════════════════════════════════════════
    STATE
@@ -1927,7 +1772,7 @@ const ACTION_MAP = {
 
 function getFilteredRows() {
   if (!_dnLoaded) return [];
-  var base = (DN_PROJECTS && DN_PROJECTS.length > 0) ? DN_PROJECTS.map(_adaptDNtoRow) : ROWS;
+  var base = DN_PROJECTS.map(_adaptDNtoRow);
   return base.filter(r => {
     if (activeFilter === 'DISPUTE'    && r.status !== 'dispute') return false;
     if (activeFilter === 'SLA_BREACH' && r.status !== 'sla')     return false;
@@ -2029,7 +1874,7 @@ function openDrawer(id) {
     var _did = (_ic?'ALN-CN-':'ALN-DN-')+p.id.replace(/^ALN-/,'');
     return _did===id || p.id===id;
   });
-  var row = realP ? _adaptDNtoRow(realP) : ROWS.find(r => r.id === id);
+  var row = realP ? _adaptDNtoRow(realP) : null;
   if (!row) return;
   currentRow = row;
 
@@ -2449,13 +2294,12 @@ var _mgDnData  = null;
 var _mgCnData  = null;
 
 function _ensureMgData(){
-  if(!_mgKtsData || !_mgKtsData.length) _mgKtsData = JSON.parse(JSON.stringify(STATS_KTS));
-  if(!_mgDnData  || !_mgDnData.length)  _mgDnData  = JSON.parse(JSON.stringify(STATS_DN));
-  if(!_mgCnData  || !_mgCnData.length)  _mgCnData  = JSON.parse(JSON.stringify(DN_PROJECTS));
-  // Safety: nếu vẫn null thì gán trực tiếp
-  if(!_mgKtsData) _mgKtsData = STATS_KTS ? [].concat(STATS_KTS) : [];
-  if(!_mgDnData)  _mgDnData  = STATS_DN  ? [].concat(STATS_DN)  : [];
-  if(!_mgCnData)  _mgCnData  = DN_PROJECTS ? [].concat(DN_PROJECTS) : [];
+  // Ưu tiên dữ liệu thật từ Firestore (set bởi module sau khi load xong)
+  if(window._LIVE_KTS) _mgKtsData = window._LIVE_KTS;
+  else if(!_mgKtsData || !_mgKtsData.length) _mgKtsData = [];
+  if(window._LIVE_DN)  _mgDnData  = window._LIVE_DN;
+  else if(!_mgDnData  || !_mgDnData.length)  _mgDnData  = [];
+  if(!_mgCnData  || !_mgCnData.length)  _mgCnData  = [].concat(DN_PROJECTS||[]);
 }
 
 var _activeRowId = null;
@@ -3229,6 +3073,10 @@ function toggleStatCard(type){
 }
 
 function renderStats(){
+  /* Dùng dữ liệu thật từ Firestore khi có */
+  var STATS_KTS = window._LIVE_KTS || [];
+  var STATS_DN  = window._LIVE_DN  || [];
+
   /* Update time */
   document.getElementById('statsUpdateTime').textContent = 'Cập nhật: ' + new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 
@@ -3236,7 +3084,7 @@ function renderStats(){
   var totalKts = STATS_KTS.length;
   var activeKts = STATS_KTS.filter(function(k){return k.status==='active' && k.activeProjects>0;}).length;
   var vipKts = STATS_KTS.filter(function(k){return k.tier==='VIP Vàng';}).length;
-  var avgRating = (STATS_KTS.reduce(function(a,k){return a+k.rating;},0)/totalKts).toFixed(1);
+  var avgRating = totalKts ? (STATS_KTS.reduce(function(a,k){return a+(k.rating||0);},0)/totalKts).toFixed(1) : '0.0';
   document.getElementById('stat-kts-total').textContent = totalKts;
   document.getElementById('stat-kts-active').textContent = activeKts;
   document.getElementById('stat-kts-vip').textContent = vipKts;
@@ -3362,33 +3210,7 @@ function renderStats(){
   }).join('');
 }
 
-const DN_DOCS_POOL = {
-  'ALN-9921': [
-    {id:'DOC001',name:'Mặt bằng tổng thể C1',    type:'pdf',  stage:'C1',kts:'KTS. Trần Đại Long',     date:'2026-05-10',size:'2.4MB', status:'approved'},
-    {id:'DOC002',name:'Phối cảnh 3D ngoại thất',  type:'img',  stage:'C2',kts:'KTS. Trần Đại Long',     date:'2026-05-28',size:'8.1MB', status:'pending'},
-    {id:'DOC003',name:'Phối cảnh 3D nội thất',    type:'img',  stage:'C2',kts:'KTS. Trần Đại Long',     date:'2026-05-29',size:'6.3MB', status:'pending'},
-  ],
-  'ALN-9834': [
-    {id:'DOC004',name:'Mặt bằng 2D C1',           type:'pdf',  stage:'C1',kts:'KTS. Nguyễn Thị Lan',   date:'2026-04-15',size:'1.2MB', status:'approved'},
-    {id:'DOC005',name:'3D Phối cảnh chính diện',  type:'img',  stage:'C2',kts:'KTS. Nguyễn Thị Lan',   date:'2026-04-28',size:'9.5MB', status:'approved'},
-    {id:'DOC006',name:'Hồ sơ Kiến trúc C3',       type:'pdf',  stage:'C3',kts:'KTS. Nguyễn Thị Lan',   date:'2026-05-20',size:'12.8MB',status:'dispute'},
-    {id:'DOC007',name:'Hồ sơ Kết cấu C3',         type:'dwg',  stage:'C3',kts:'KTS. Nguyễn Thị Lan',   date:'2026-05-20',size:'4.1MB', status:'dispute'},
-  ],
-  'ALN-9756': [
-    {id:'DOC008',name:'Mặt bằng C1',              type:'pdf',  stage:'C1',kts:'KTS. Vũ Minh Khoa',     date:'2026-03-12',size:'2.1MB', status:'approved'},
-    {id:'DOC009',name:'3D Villa full option',     type:'img',  stage:'C2',kts:'KTS. Vũ Minh Khoa',     date:'2026-03-28',size:'15.2MB',status:'approved'},
-    {id:'DOC010',name:'Hồ sơ KT thi công full',  type:'zip',  stage:'C3',kts:'KTS. Vũ Minh Khoa',     date:'2026-04-20',size:'48.6MB',status:'approved'},
-    {id:'DOC011',name:'Dự toán chi phí C4',       type:'xlsx', stage:'C4',kts:'KTS. Vũ Minh Khoa',     date:'2026-05-02',size:'0.8MB', status:'pending'},
-  ],
-  'ALN-9648': [
-    {id:'DOC012',name:'Mặt bằng ý tưởng 2D',     type:'pdf',  stage:'C1',kts:'KTS. Lê Hoàng Nam',     date:'2026-05-05',size:'1.8MB', status:'approved'},
-    {id:'DOC013',name:'Phối cảnh góc phố',        type:'img',  stage:'C2',kts:'KTS. Lê Hoàng Nam',     date:'2026-05-22',size:'7.4MB', status:'pending'},
-  ],
-  'ALN-9590': [
-    {id:'DOC014',name:'Bộ hồ sơ hoàn công đầy đủ',type:'zip', stage:'C3',kts:'KTS. Vũ Minh Khoa',     date:'2026-02-10',size:'85.2MB',status:'approved'},
-    {id:'DOC015',name:'Dự toán nghiệm thu',       type:'xlsx', stage:'C4',kts:'KTS. Vũ Minh Khoa',     date:'2026-02-15',size:'1.1MB', status:'approved'},
-  ],
-};
+const DN_DOCS_POOL = {};
 
 
 function updateDNKpi(){
@@ -3446,15 +3268,24 @@ function renderDNTable(reset){
   }).join('');
 }
 
-function openDocDrawer(projectId){
+async function openDocDrawer(projectId){
   const p=DN_PROJECTS.find(x=>x.id===projectId);
-  const docs=DN_DOCS_POOL[projectId]||[];
   const ICON={pdf:'ph-file-pdf',img:'ph-file-image',dwg:'ph-file-code',xlsx:'ph-file-xls',zip:'ph-file-zip'};
   const ICOLOR={pdf:'var(--red)',img:'var(--cyan)',dwg:'var(--amber)',xlsx:'var(--green)',zip:'var(--purple)'};
   const SBADGE={approved:'✅ Đã duyệt',pending:'⏳ Chờ duyệt',dispute:'⚠️ Tranh chấp'};
   const SCLS={approved:'p-green',pending:'p-amber',dispute:'p-red'};
   document.getElementById('dhTitle').textContent=p?p.name:projectId;
-  document.getElementById('dhSub').textContent=`${projectId} · ${p?.cn||''} · ${docs.length} tài liệu`;
+  document.getElementById('dhSub').textContent=(projectId)+' · '+(p?p.cn:'')+' · Đang tải...';
+  document.getElementById('drawerBody').innerHTML='<div style="padding:40px;text-align:center;color:var(--dim)"><i class="ph-duotone ph-spinner-gap" style="font-size:24px"></i><div style="margin-top:8px;font-size:12px">Đang tải tài liệu...</div></div>';
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  // Load real docs from Firestore (cache per session)
+  var docs=DN_DOCS_POOL[projectId]||[];
+  if(window._founderLoadDocs&&!docs.length){
+    try{docs=await window._founderLoadDocs(projectId);DN_DOCS_POOL[projectId]=docs;}catch(e){}
+  }
+  document.getElementById('dhSub').textContent=(projectId)+' · '+(p?p.cn:'')+' · '+docs.length+' tài liệu';
   const foldersHTML=['C1','C2','C3','C4'].map(stg=>{
     const sd=docs.filter(d=>d.stage===stg);
     const sc={C1:'var(--green)',C2:'var(--amber)',C3:'var(--blue)',C4:'var(--sub)'}[stg];
@@ -3472,10 +3303,10 @@ function openDocDrawer(projectId){
             <i class="ph-duotone ${ICON[d.type]||'ph-file'}" style="color:${ICOLOR[d.type]||'var(--sub)'};font-size:16px;flex-shrink:0"></i>
             <div style="flex:1;min-width:0">
               <div style="font-size:12px;font-weight:600;color:var(--text1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.name}</div>
-              <div style="font-size:10px;color:var(--dim)">${d.kts} · ${d.date} · ${d.size}</div>
+              <div style="font-size:10px;color:var(--dim)">${d.kts||'—'} · ${d.date||'—'} · ${d.size||'—'}</div>
             </div>
-            <span class="status-badge ${SCLS[d.status]||'p-gray'}" style="font-size:10px;flex-shrink:0">${SBADGE[d.status]||'—'}</span>
-            <button onclick="openOtpModal('APPROVE_DOC','${d.id}')" style="padding:4px 9px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--green);border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--sans)">Duyệt</button>
+            <span class="status-badge ${SCLS[d.status]||'p-gray'}" style="font-size:10px;flex-shrink:0">${SBADGE[d.status]||'Chờ duyệt'}</span>
+            ${d.url?`<a href="${d.url}" target="_blank" style="padding:4px 9px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:var(--blue);border-radius:5px;font-size:10px;font-weight:700;text-decoration:none">Xem</a>`:''}
           </div>`).join('')
       }
     </div>`;
@@ -3485,22 +3316,7 @@ function openDocDrawer(projectId){
       <i class="ph-duotone ph-info" style="color:var(--accent2);flex-shrink:0;margin-top:1px"></i>
       KTS upload tài liệu → Chủ đầu tư thấy ngay trên <b style="color:var(--accent2)">Cổng Client DN</b>. Tổ chức theo thư mục C1→C4.
     </div>
-    ${foldersHTML}
-    <div style="background:var(--raised);border:1px solid var(--border);border-radius:8px;padding:14px">
-      <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px"><i class="ph-duotone ph-upload-simple" style="color:var(--gold);margin-right:5px"></i>Upload tài liệu thủ công</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <input type="text" id="newDocName" placeholder="Tên tài liệu..." style="background:var(--card);border:1px solid var(--border);color:var(--text1);padding:7px 10px;border-radius:6px;font-family:var(--sans);font-size:12px;outline:none">
-        <select id="newDocStage" style="background:var(--card);border:1px solid var(--border);color:var(--text2);padding:7px 10px;border-radius:6px;font-family:var(--sans);font-size:12px;outline:none;-webkit-appearance:none">
-          <option value="C1">Chặng C1</option><option value="C2">Chặng C2</option><option value="C3">Chặng C3</option><option value="C4">Chặng C4</option>
-        </select>
-      </div>
-      <button onclick="addDocDN('${projectId}')" style="width:100%;padding:8px;background:var(--gold);color:#000;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:6px">
-        <i class="ph-duotone ph-rocket-launch"></i> Đăng tải & Thông báo Client DN
-      </button>
-    </div>`;
-  document.getElementById('drawer').classList.add('open');
-  document.getElementById('drawerOverlay').classList.add('open');
-  document.body.style.overflow='hidden';
+    ${foldersHTML}`;
 }
 
 let _dSeq=100;
@@ -3881,8 +3697,83 @@ function _startFounderListen() {
     window._dnLoaded = true; _dnLoaded = true;
     try { if(typeof renderStats==='function') renderStats(); } catch(e){}
     try { if(typeof renderTable==='function') renderTable(); } catch(e){}
+    _loadMgData();
     console.log('[Founder]', DN_PROJECTS.length, 'dự án');
   }, function(err){ console.error('[Founder]', err.code); });
+}
+
+/* Tải tài liệu thật của một dự án từ Firestore */
+window._founderLoadDocs = async function(pid) {
+  try {
+    const snap = await getDocs(collection(db, 'projects', pid, 'documents'));
+    const EXT = {pdf:'pdf',png:'img',jpg:'img',jpeg:'img',webp:'img',dwg:'dwg',xlsx:'xlsx',xls:'xlsx',zip:'zip'};
+    return snap.docs.map(function(d){
+      const data = d.data();
+      const ext  = (data.name||'').split('.').pop().toLowerCase();
+      return {
+        id:     d.id,
+        name:   data.name || data.label || '—',
+        type:   EXT[ext] || 'pdf',
+        stage:  data.stage || 'C1',
+        kts:    (data.uploader && data.uploader.name) || '—',
+        date:   data.date || '—',
+        url:    data.url || '',
+        size:   '—',
+        status: 'pending',
+      };
+    });
+  } catch(e) { return []; }
+};
+
+/* Tải KTS + DN thật từ Firestore, tính stats từ DN_PROJECTS */
+async function _loadMgData() {
+  try {
+    const [usersSnap, ktsAppsSnap, dnAppsSnap] = await Promise.all([
+      getDocs(collection(db, 'users')),
+      getDocs(collection(db, 'ktsApplications')),
+      getDocs(collection(db, 'dnApplications')),
+    ]);
+    const allUsers = usersSnap.docs.map(function(d){ return Object.assign({uid:d.id}, d.data()); });
+    const ktsApps  = {};  ktsAppsSnap.docs.forEach(function(d){ ktsApps[d.id]=d.data(); });
+    const dnApps   = {};  dnAppsSnap.docs.forEach(function(d){ dnApps[d.id]=d.data(); });
+    const ktsUsers = allUsers.filter(function(u){ return u.role==='kts' && u.status==='active'; });
+    const dnUsers  = allUsers.filter(function(u){ return u.role==='dn'  && u.status==='active'; });
+    window._LIVE_KTS = ktsUsers.map(function(u){
+      var projs  = (DN_PROJECTS||[]).filter(function(p){ return p._raw && p._raw.kts && p._raw.kts.uid===u.uid; });
+      var active = projs.filter(function(p){ return p.status!=='done'; });
+      var app    = ktsApps[u.uid] || {};
+      return {
+        uid:           u.uid,
+        name:          u.name || '',
+        cchn:          app.cchn || '—',
+        tier:          u.tier  || app.tier || 'Chuẩn',
+        projects:      projs.length,
+        activeProjects: active.length,
+        rating:        u.rating || app.rating || 0,
+        revenue:       projs.reduce(function(a,p){ return a+(p.escrow||0); }, 0),
+        status:        u.status || 'active',
+      };
+    });
+    window._LIVE_DN = dnUsers.map(function(u){
+      var projs  = (DN_PROJECTS||[]).filter(function(p){ return p._raw && p._raw.dn && p._raw.dn.uid===u.uid; });
+      var active = projs.filter(function(p){ return p.status!=='done'; });
+      var app    = dnApps[u.uid] || {};
+      var ktsSet = new Set(projs.map(function(p){ return p._raw&&p._raw.kts&&p._raw.kts.uid; }).filter(Boolean));
+      return {
+        uid:           u.uid,
+        name:          u.name || '',
+        type:          app.industry || '—',
+        projects:      projs.length,
+        activeProjects: active.length,
+        totalGtv:      projs.reduce(function(a,p){ return a+(p.total||0); }, 0),
+        escrow:        projs.reduce(function(a,p){ return a+(p.escrow||0); }, 0),
+        ktsLinked:     ktsSet.size,
+        status:        u.status || 'active',
+      };
+    });
+    if(typeof renderMgKts==='function') renderMgKts();
+    if(typeof renderMgDn ==='function') renderMgDn();
+  } catch(e){ console.error('[Founder mgData]', e); }
 }
 
 onAuthStateChanged(auth, async (user) => {
