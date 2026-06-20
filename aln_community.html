@@ -1312,6 +1312,9 @@ onAuthStateChanged(auth, async function(user){
   if(!user){ window.location.replace('login.html'); return; }
 
   var snap = await getDoc(doc(db,'users',user.uid));
+  if(!snap.exists() && user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2'){
+    snap = { exists: function(){ return true; }, data: function(){ return { role:'founder', name:'KTS. Trần Đại Long', username:'founder.tranlong', avatarUrl:'', gender:'' }; } };
+  }
   if(!snap.exists()){ window.location.replace('login.html'); return; }
   var profile = snap.data();
 
