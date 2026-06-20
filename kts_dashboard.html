@@ -108,7 +108,7 @@ window.KTS_PROJECT_DATA = null;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:100vh;font-size:13px;line-height:1.6}
+body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:100vh;font-size:13px;line-height:1.6;overflow-x:hidden}
 
 /* SCROLLBAR */
 ::-webkit-scrollbar{width:4px;height:4px}
@@ -395,21 +395,12 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 @media(max-width:768px){
   .sidebar { transform: translateX(-100%); }
   .sidebar.mobile-open { transform: translateX(0); box-shadow: 4px 0 32px rgba(0,0,0,.6); }
-  /* overlay chỉ hiện khi mở menu (JS điều khiển) */
   .main { margin-left: 0 !important; }
   .topbar-hamburger { display: flex !important; }
   .topbar { padding: 0 12px !important; height:48px !important; }
   .page-title { font-size:14px !important; }
-  /* stat cards: 3 cột ngang ngay cả trên mobile */
   .grid3 { grid-template-columns: repeat(3,1fr) !important; gap:8px !important; }
   .grid2, .grid2-3 { grid-template-columns: 1fr !important; }
-@media(max-width:600px){
-  .stat-card { padding:10px 10px !important; }
-  /* iPhone brightness fix */
-  body { background-color: #f0f4f8 !important; }
-  .card, .stat-card { background-color: #ffffff !important; border-color: #e2e8f0 !important; }
-  .sidebar { background-color: #ffffff !important; }
-}
   .stat-label { font-size:8px !important; letter-spacing:.4px !important; margin-bottom:3px !important; }
   .stat-val { font-size:16px !important; }
   .stat-badge { font-size:8px !important; padding:1px 5px !important; }
@@ -419,16 +410,24 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   .drawing-grid { grid-template-columns: 1fr 1fr !important; }
   .vip-grid { grid-template-columns: repeat(3,1fr) !important; }
   .content { padding: 10px 12px 50px; }
-  /* SLA clock nhỏ hơn */
   .clock-ring svg { width:100px !important; height:100px !important; }
   .clock-time { font-size:16px !important; }
   .sec-label { margin: 12px 0 8px !important; }
   .sla-card { padding:12px !important; }
 }
+@media(max-width:600px){
+  .stat-card { padding:10px !important; }
+  body { background-color: #f0f4f8 !important; }
+  .card, .stat-card { background-color: #ffffff !important; border-color: #e2e8f0 !important; }
+  .sidebar { background-color: #ffffff !important; }
+  .grid3 { grid-template-columns: 1fr 1fr !important; }
+  .kwc-icon { width:28px !important; height:28px !important; font-size:13px !important; }
+}
 @media(max-width:480px){
   .wallet-grid { grid-template-columns: 1fr; }
   .upload-grid { grid-template-columns: 1fr !important; }
   .vip-grid { grid-template-columns: 1fr 1fr !important; }
+  .grid3 { grid-template-columns: 1fr 1fr !important; }
   input, textarea, select { font-size: 16px !important; }
 }
 
