@@ -1166,6 +1166,11 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <button class="profile-save-btn" onclick="saveProfile()">
       <i class="ph-duotone ph-floppy-disk"></i> Lưu hồ sơ
     </button>
+    <a id="btnViewPublicProfile" href="#" target="_blank"
+       style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;padding:10px;border-radius:10px;border:1.5px solid rgba(212,160,23,.4);color:#d4a017;font-size:12px;font-weight:700;text-decoration:none;background:rgba(212,160,23,.06);transition:all .15s"
+       onmouseover="this.style.background='rgba(212,160,23,.12)'" onmouseout="this.style.background='rgba(212,160,23,.06)'">
+      <i class="ph-duotone ph-user-circle"></i> Xem hồ sơ công khai
+    </a>
 
     <!-- ═══ UY TÍN ═══ -->
     <div class="sec-label reputation-section"><i class="ph-duotone ph-seal-check" style="font-size:13px"></i> Uy tín & Xếp hạng</div>
@@ -2952,6 +2957,8 @@ onAuthStateChanged(auth, async (user) => {
 
     // ── WEB PUSH (FCM): đăng ký token tự động khi đã có quyền thông báo ──
     window.__ALN_UID = user.uid;
+    var _pvBtn = document.getElementById('btnViewPublicProfile');
+    if(_pvBtn) _pvBtn.href = 'profile.html?uid=' + user.uid;
     window.alnInitPush = async function(){
       try {
         if (!('serviceWorker' in navigator) || !('Notification' in window)) return;
