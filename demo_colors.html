@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALN — Demo Màu sắc (Phương án mới)</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/>
+<style>
+/* ── TOKENS GỐC (không đổi) ── */
+:root {
+  --bg:      #080c14;
+  --surface: #0d1120;
+  --raised:  #111828;
+  --card:    #151d2e;
+  --border:  #1e2840;
+  --dim:     #556080;
+  --sub:     #7a88a8;
+  --text2:   #a8b4c8;
+  --text1:   #d8e0f0;
+  --white:   #eaeefc;
+  --sans:    'DM Sans', sans-serif;
+  --serif:   'Cormorant Garamond', serif;
+  --syne:    'Syne', sans-serif;
+  --mono:    'JetBrains Mono', monospace;
+  --r: 9px; --r-sm: 6px;
+
+  /* ── MÀU CŨ ── */
+  --old-founder: #C9A84C;
+  --old-kts:     #f59e0b;
+  --old-dn:      #4a8fff;
+  --old-cn:      #10b981;
+  --old-des:     #a78bfa;
+
+  /* ── MÀU MỚI ĐỀ XUẤT ── */
+  --new-founder: #C9A84C;   /* giữ nguyên */
+  --new-kts:     #c8913a;   /* copper-gold — thủ công, kiến trúc */
+  --new-dn:      #4b7ea8;   /* slate-blue — vững chắc, chuyên nghiệp */
+  --new-cn:      #6b9e7e;   /* sage-green — ấm áp, "home" */
+  --new-des:     #9b6ec9;   /* amethyst — sáng tạo, chiều sâu */
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text1);
+  min-height: 100vh;
+  line-height: 1.5;
+  background-image:
+    linear-gradient(rgba(201,168,76,.014) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,.014) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+body::before {
+  content: '';
+  position: fixed; top: -10%; left: 50%; transform: translateX(-50%);
+  width: 900px; height: 500px;
+  background: radial-gradient(ellipse, rgba(201,168,76,.06) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── LAYOUT ── */
+.wrap { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
+
+/* ── TOPBAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 24px; height: 46px;
+  background: rgba(8,12,20,.92); backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(201,168,76,.14);
+}
+.tb-logo { font-family: var(--syne); font-size: 14px; font-weight: 800; color: #e8d07a; letter-spacing: .06em; }
+.tb-sep { width: 1px; height: 18px; background: rgba(201,168,76,.2); }
+.tb-tag { font-size: 11px; color: var(--dim); font-family: var(--mono); }
+.tb-badge {
+  margin-left: auto; padding: 3px 12px; border-radius: 99px;
+  background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3);
+  color: #ef4444; font-size: 10px; font-weight: 700; font-family: var(--mono);
+}
+
+/* ── SECTION TITLE ── */
+.sec-label { font-size: 10px; font-weight: 700; color: var(--dim); letter-spacing: .18em; text-transform: uppercase; font-family: var(--mono); margin-bottom: 6px; }
+.sec-title { font-family: var(--serif); font-size: 26px; font-weight: 300; color: var(--white); margin-bottom: 24px; }
+.sec-title strong { font-weight: 600; }
+.section { margin-bottom: 60px; }
+
+/* ── COMPARE ROW ── */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.compare-col-head {
+  font-size: 11px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; font-family: var(--mono);
+  padding: 8px 14px; border-radius: var(--r-sm);
+  margin-bottom: 14px; text-align: center;
+}
+.head-old { background: rgba(255,255,255,.04); color: var(--sub); border: 1px solid var(--border); }
+.head-new { background: rgba(201,168,76,.06); color: var(--gold2, #e8d07a); border: 1px solid rgba(201,168,76,.2); }
+
+/* ── ROLE CARD ── */
+.role-cards { display: flex; flex-direction: column; gap: 12px; }
+
+.role-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 18px;
+  display: flex; flex-direction: column; gap: 12px;
+  transition: all .2s;
+}
+.role-card:hover { transform: translateY(-1px); }
+
+/* Role header */
+.rc-head { display: flex; align-items: center; gap: 10px; }
+.rc-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; flex-shrink: 0;
+}
+.rc-name { font-size: 13px; font-weight: 700; color: var(--text1); }
+.rc-sub  { font-size: 11px; color: var(--sub); font-family: var(--mono); }
+
+/* UI samples */
+.rc-samples { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+/* Badge */
+.badge {
+  padding: 3px 10px; border-radius: 99px;
+  font-size: 10px; font-weight: 700; font-family: var(--mono);
+  letter-spacing: .08em;
+}
+/* Button */
+.btn-s {
+  padding: 6px 14px; border-radius: var(--r-sm);
+  font-size: 11px; font-weight: 700; font-family: var(--sans);
+  cursor: default; border: 1.5px solid;
+}
+/* Stat */
+.stat-chip {
+  padding: 5px 12px; border-radius: var(--r-sm);
+  font-size: 12px; font-weight: 700; font-family: var(--mono);
+  border: 1px solid;
+}
+/* Progress bar container */
+.prog-wrap { display: flex; align-items: center; gap: 8px; width: 100%; }
+.prog-label { font-size: 10px; color: var(--sub); font-family: var(--mono); white-space: nowrap; }
+.prog-bar { flex: 1; height: 4px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 99px; }
+
+/* ── ACCENT LINE ── */
+.acline { height: 2px; border-radius: 99px; margin-bottom: 6px; width: 40%; }
+
+/* OLD role styles */
+.old-founder { --c: var(--old-founder); }
+.old-kts     { --c: var(--old-kts);     }
+.old-dn      { --c: var(--old-dn);      }
+.old-cn      { --c: var(--old-cn);      }
+.old-des     { --c: var(--old-des);     }
+
+/* NEW role styles */
+.new-founder { --c: var(--new-founder); }
+.new-kts     { --c: var(--new-kts);     }
+.new-dn      { --c: var(--new-dn);      }
+.new-cn      { --c: var(--new-cn);      }
+.new-des     { --c: var(--new-des);     }
+
+/* Apply --c to elements */
+.role-card { border-left: 3px solid var(--c, var(--border)); }
+.rc-icon   { background: color-mix(in srgb, var(--c) 12%, transparent); border: 1px solid color-mix(in srgb, var(--c) 30%, transparent); color: var(--c); }
+.badge     { background: color-mix(in srgb, var(--c) 12%, transparent); border: 1px solid color-mix(in srgb, var(--c) 30%, transparent); color: var(--c); }
+.btn-s     { background: color-mix(in srgb, var(--c) 14%, transparent); border-color: color-mix(in srgb, var(--c) 40%, transparent); color: var(--c); }
+.stat-chip { background: color-mix(in srgb, var(--c) 8%, transparent);  border-color: color-mix(in srgb, var(--c) 25%, transparent); color: var(--c); }
+.prog-fill { background: var(--c); }
+.acline    { background: linear-gradient(90deg, var(--c), transparent); }
+.rc-name   { color: var(--c); }
+
+/* ── SIDE-BY-SIDE FULL PREVIEW ── */
+.full-preview {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.fp-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 18px 14px;
+  display: flex; flex-direction: column; gap: 10px;
+  position: relative; overflow: hidden;
+}
+.fp-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--c); }
+.fp-title { font-size: 11px; font-weight: 700; color: var(--c); font-family: var(--mono); letter-spacing: .08em; }
+.fp-hex { font-size: 10px; color: var(--sub); font-family: var(--mono); }
+.fp-swatch {
+  width: 100%; height: 48px; border-radius: 7px;
+  background: color-mix(in srgb, var(--c) 18%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--c) 40%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: var(--c);
+}
+.fp-samples { display: flex; flex-direction: column; gap: 5px; }
+.fp-btn {
+  padding: 5px 0; border-radius: var(--r-sm); text-align: center;
+  font-size: 10px; font-weight: 700; font-family: var(--sans);
+  background: color-mix(in srgb, var(--c) 14%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--c) 40%, transparent);
+  color: var(--c);
+}
+.fp-badge {
+  padding: 2px 8px; border-radius: 99px; text-align: center;
+  font-size: 9px; font-weight: 700; font-family: var(--mono);
+  background: color-mix(in srgb, var(--c) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c) 30%, transparent);
+  color: var(--c);
+}
+.fp-bar-wrap { height: 4px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; }
+.fp-bar-fill { height: 100%; border-radius: 99px; background: var(--c); width: 65%; }
+
+/* ── NOTE BOX ── */
+.note {
+  background: rgba(201,168,76,.06); border: 1px solid rgba(201,168,76,.2);
+  border-radius: var(--r); padding: 16px 20px;
+  font-size: 12.5px; color: var(--text2); line-height: 1.7;
+  margin-bottom: 20px;
+}
+.note strong { color: #e8d07a; }
+
+/* ── VERDICT TABLE ── */
+.verdict-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.verdict-table th {
+  text-align: left; padding: 8px 12px;
+  background: rgba(255,255,255,.03); border: 1px solid var(--border);
+  font-family: var(--mono); font-size: 10px; color: var(--sub); letter-spacing: .1em;
+}
+.verdict-table td { padding: 10px 12px; border: 1px solid var(--border); color: var(--text2); vertical-align: middle; }
+.verdict-table tr:hover td { background: rgba(255,255,255,.02); }
+.swatch-dot {
+  display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+  margin-right: 6px; vertical-align: middle;
+}
+
+@media (max-width: 700px) {
+  .compare-grid { grid-template-columns: 1fr; }
+  .full-preview { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-logo">ALN</div>
+  <div class="tb-sep"></div>
+  <div class="tb-tag">demo_colors.html — phương án màu mới</div>
+  <div class="tb-badge">⚠ FILE THỬ NGHIỆM — không ảnh hưởng hệ thống</div>
+</div>
+
+<div class="wrap">
+
+  <!-- ── PALETTE OVERVIEW ── -->
+  <div class="section">
+    <div class="sec-label">Tổng quan</div>
+    <div class="sec-title">Palette <strong>đề xuất mới</strong> — 5 vai trò</div>
+
+    <div class="note">
+      <strong>Nguyên tắc:</strong> Background tối <code>#080c14</code> giữ nguyên. Chỉ thay màu <strong>nhấn (accent)</strong>.
+      Hướng đi: giảm độ bão hòa, tăng chiều sâu — bớt "app", thêm "sang trọng".<br>
+      <strong>Founder</strong> vẫn giữ gold — đây là màu thương hiệu ALN.
+    </div>
+
+    <!-- 5-column swatch -->
+    <div class="full-preview">
+
+      <div class="fp-card new-founder">
+        <div class="fp-title">FOUNDER</div>
+        <div class="fp-hex">#C9A84C · giữ nguyên</div>
+        <div class="fp-swatch"><i class="ph-duotone ph-crown"></i></div>
+        <div class="fp-samples">
+          <div class="fp-btn">Phê duyệt</div>
+          <div class="fp-badge">● ONLINE</div>
+          <div class="fp-bar-wrap"><div class="fp-bar-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="fp-card new-kts">
+        <div class="fp-title">KTS</div>
+        <div class="fp-hex">#c8913a · copper-gold</div>
+        <div class="fp-swatch"><i class="ph-duotone ph-pencil-ruler"></i></div>
+        <div class="fp-samples">
+          <div class="fp-btn">Nộp C2</div>
+          <div class="fp-badge">C2 · 40%</div>
+          <div class="fp-bar-wrap"><div class="fp-bar-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="fp-card new-dn">
+        <div class="fp-title">DOANH NGHIỆP</div>
+        <div class="fp-hex">#4b7ea8 · slate-blue</div>
+        <div class="fp-swatch"><i class="ph-duotone ph-buildings"></i></div>
+        <div class="fp-samples">
+          <div class="fp-btn">Duyệt đề xuất</div>
+          <div class="fp-badge">ĐANG THI CÔNG</div>
+          <div class="fp-bar-wrap"><div class="fp-bar-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="fp-card new-cn">
+        <div class="fp-title">CHỦ NHÀ</div>
+        <div class="fp-hex">#6b9e7e · sage-green</div>
+        <div class="fp-swatch"><i class="ph-duotone ph-house-line"></i></div>
+        <div class="fp-samples">
+          <div class="fp-btn">Duyệt giai đoạn</div>
+          <div class="fp-badge">ALN-9921</div>
+          <div class="fp-bar-wrap"><div class="fp-bar-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="fp-card new-des">
+        <div class="fp-title">DESIGNER NT</div>
+        <div class="fp-hex">#9b6ec9 · amethyst</div>
+        <div class="fp-swatch"><i class="ph-duotone ph-paint-brush-household"></i></div>
+        <div class="fp-samples">
+          <div class="fp-btn">Nộp thiết kế</div>
+          <div class="fp-badge">DES-0042</div>
+          <div class="fp-bar-wrap"><div class="fp-bar-fill"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── SO SÁNH CŨ vs MỚI ── -->
+  <div class="section">
+    <div class="sec-label">So sánh trực tiếp</div>
+    <div class="sec-title">Cũ <strong>vs</strong> Mới — từng vai trò</div>
+
+    <!-- FOUNDER -->
+    <div class="compare-grid" style="margin-bottom:32px">
+      <div>
+        <div class="compare-col-head head-old">CŨ</div>
+        <div class="role-cards">
+          <div class="role-card old-founder">
+            <div class="acline"></div>
+            <div class="rc-head">
+              <div class="rc-icon"><i class="ph-duotone ph-crown"></i></div>
+              <div><div class="rc-name">Founder</div><div class="rc-sub">#C9A84C · gold</div></div>
+            </div>
+            <div class="rc-samples">
+              <span class="badge">FOUNDER</span>
+              <span class="btn-s">Duyệt đăng ký</span>
+              <div class="prog-wrap"><div class="prog-label">Hệ thống</div><div class="prog-bar"><div class="prog-fill" style="width:80%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="compare-col-head head-new">MỚI (giữ nguyên)</div>
+        <div class="role-cards">
+          <div class="role-card new-founder">
+            <div class="acline"></div>
+            <div class="rc-head">
+              <div class="rc-icon"><i class="ph-duotone ph-crown"></i></div>
+              <div><div class="rc-name">Founder</div><div class="rc-sub">#C9A84C · gold — không đổi ✓</div></div>
+            </div>
+            <div class="rc-samples">
+              <span class="badge">FOUNDER</span>
+              <span class="btn-s">Duyệt đăng ký</span>
+              <div class="prog-wrap"><div class="prog-label">Hệ thống</div><div class="prog-bar"><div class="prog-fill" style="width:80%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KTS -->
+    <div class="compare-grid" style="margin-bottom:32px">
+      <div>
+        <div class="compare-col-head head-old">CŨ — Amber #f59e0b</div>
+        <div class="role-cards">
+          <div class="role-card old-kts">
+            <div class="acline"></div>
+            <div class="rc-head">
+              <div class="rc-icon"><i class="ph-duotone ph-pencil-ruler"></i></div>
+              <div><div class="rc-name">Kiến trúc sư</div><div class="rc-sub">cảm giác: "cảnh báo"</div></div>
+            </div>
+            <div class="rc-samples">
+              <span class="badge">KTS</span>
+              <span class="btn-s">Nộp thiết kế C2</span>
+              <div class="prog-wrap"><div class="prog-label">Tiến độ</div><div class="prog-bar"><div class="prog-fill" style="width:40%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="compare-col-head head-new">MỚI — Copper-Gold #c8913a</div>
+        <div class="role-cards">
+          <div class="role-card new-kts">
+            <div class="acline"></div>
+            <div class="rc-head">
+              <div class="rc-icon"><i class="ph-duotone ph-pencil-ruler"></i></div>
+              <div><div class="rc-name">Kiến trúc sư</div><div class="rc-sub">cảm giác: "thủ công tinh xảo"</div></div>
+            </div>
+            <div class="rc-samples">
+              <span class="badge">KTS</span>
+              <span class="btn-s">Nộp thiết kế C2</span>
+              <div class="prog-wrap"><div class="prog-label">Tiến độ</div><div class="prog-bar"><div class="prog-fill" style="width:40%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DN -->
+    <div class="compare-grid" style="margin-bottom:32px">
+      <div>
+        <div class="compare-col-head head-old">CŨ — Blue #4a8fff</div>
+        <div class="role-cards">
+          <div class="role-card old-dn">
+            <div class="acline"></div>
+            <div class="rc-head">
+              <div class="rc-icon"><i class="ph-duotone ph-buildings"></i></div>
+              <div><div class="rc-name">Doanh nghiệp</div><div class="rc-sub">cảm giác: "app thông thường"</div></div>
+            </div>
+            <div class="rc-samples">
+              <span class="badge">DN</span>
+              <span class="btn-s">Duyệt đề xuất</span>
+              <div class="prog-wrap"><div class="prog-label">C3</div><div class="prog-bar"><div class="prog-fill" style="width:65%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="compare-col-head head-new">MỚI — Slate-Blue #4b7ea8</div>
+        <div class="role-cards">
+          <div class="role-card new-dn">
+            <div class="acline"></div>
+            <div class="rc-head">
+              <div class="rc-icon"><i class="ph-duotone ph-buildings"></i></div>
+              <div><div class="rc-name">Doanh nghiệp</div><div class="rc-sub">cảm giác: "vững chắc, chuyên nghiệp"</div></div>
+            </div>
+            <div class="rc-samples">
+              <span class="badge">DN</span>
+              <span class="btn-s">Duyệt đề xuất</span>
+              <div class="prog-wrap"><div class="prog-label">C3</div><div class="prog-bar"><div class="prog-fill" style="width:65%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CN -->
+    <div class="compare-grid" style="margin-bottom:32px">
+      <div>
+        <div class="compare-col-head head-old">CŨ — Green #10b981</div>
+        <div class="role-cards">
+          <div class="role-card old-cn">
+            <div class="acline"></div>
+            <div class="rc-head">
+              <div class="rc-icon"><i class="ph-duotone ph-house-line"></i></div>
+              <div><div class="rc-name">Chủ nhà</div><div class="rc-sub">cảm giác: "trạng thái thành công"</div></div>
+            </div>
+            <div class="rc-samples">
+              <span class="badge">CHỦ NHÀ</span>
+              <span class="btn-s">Duyệt giai đoạn</span>
+              <div class="prog-wrap"><div class="prog-label">ALN-9921</div><div class="prog-bar"><div class="prog-fill" style="width:50%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="compare-col-head head-new">MỚI — Sage-Green #6b9e7e</div>
+        <div class="role-cards">
+          <div class="role-card new-cn">
+            <div class="acline"></div>
+            <div class="rc-head">
+              <div class="rc-icon"><i class="ph-duotone ph-house-line"></i></div>
+              <div><div class="rc-name">Chủ nhà</div><div class="rc-sub">cảm giác: "ấm áp, tổ ấm"</div></div>
+            </div>
+            <div class="rc-samples">
+              <span class="badge">CHỦ NHÀ</span>
+              <span class="btn-s">Duyệt giai đoạn</span>
+              <div class="prog-wrap"><div class="prog-label">ALN-9921</div><div class="prog-bar"><div class="prog-fill" style="width:50%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESIGNER -->
+    <div class="compare-grid" style="margin-bottom:32px">
+      <div>
+        <div class="compare-col-head head-old">CŨ — Violet #a78bfa</div>
+        <div class="role-cards">
+          <div class="role-card old-des">
+            <div class="acline"></div>
+            <div class="rc-head">
+              <div class="rc-icon"><i class="ph-duotone ph-paint-brush-household"></i></div>
+              <div><div class="rc-name">Designer NT</div><div class="rc-sub">cảm giác: "hơi neon, thiếu chiều sâu"</div></div>
+            </div>
+            <div class="rc-samples">
+              <span class="badge">DESIGNER</span>
+              <span class="btn-s">Nộp thiết kế NT</span>
+              <div class="prog-wrap"><div class="prog-label">DES-0042</div><div class="prog-bar"><div class="prog-fill" style="width:30%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="compare-col-head head-new">MỚI — Amethyst #9b6ec9</div>
+        <div class="role-cards">
+          <div class="role-card new-des">
+            <div class="acline"></div>
+            <div class="rc-head">
+              <div class="rc-icon"><i class="ph-duotone ph-paint-brush-household"></i></div>
+              <div><div class="rc-name">Designer NT</div><div class="rc-sub">cảm giác: "sáng tạo, sang trọng"</div></div>
+            </div>
+            <div class="rc-samples">
+              <span class="badge">DESIGNER</span>
+              <span class="btn-s">Nộp thiết kế NT</span>
+              <div class="prog-wrap"><div class="prog-label">DES-0042</div><div class="prog-bar"><div class="prog-fill" style="width:30%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── BẢNG TÓM TẮT ── -->
+  <div class="section">
+    <div class="sec-label">Bảng tóm tắt</div>
+    <div class="sec-title">Quyết định <strong>thay đổi</strong></div>
+
+    <table class="verdict-table">
+      <thead>
+        <tr>
+          <th>VAI TRÒ</th>
+          <th>MÀU CŨ</th>
+          <th>MÀU MỚI</th>
+          <th>LÝ DO</th>
+          <th>THAY ĐỔI</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700;color:var(--text1)"><i class="ph-duotone ph-crown" style="color:#C9A84C;margin-right:6px"></i>Founder</td>
+          <td><span class="swatch-dot" style="background:#C9A84C"></span>#C9A84C</td>
+          <td><span class="swatch-dot" style="background:#C9A84C"></span>#C9A84C</td>
+          <td>Màu thương hiệu ALN — hoàn hảo</td>
+          <td style="color:var(--sub)">Giữ nguyên</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--text1)"><i class="ph-duotone ph-pencil-ruler" style="color:#c8913a;margin-right:6px"></i>KTS</td>
+          <td><span class="swatch-dot" style="background:#f59e0b"></span>#f59e0b amber</td>
+          <td><span class="swatch-dot" style="background:#c8913a"></span>#c8913a copper</td>
+          <td>Bớt "cảnh báo", thêm "thủ công kiến trúc"</td>
+          <td style="color:#10b981;font-weight:700">✓ Thay</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--text1)"><i class="ph-duotone ph-buildings" style="color:#4b7ea8;margin-right:6px"></i>DN</td>
+          <td><span class="swatch-dot" style="background:#4a8fff"></span>#4a8fff blue</td>
+          <td><span class="swatch-dot" style="background:#4b7ea8"></span>#4b7ea8 slate</td>
+          <td>Bớt neon, thêm trọng lượng và uy tín</td>
+          <td style="color:#10b981;font-weight:700">✓ Thay</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--text1)"><i class="ph-duotone ph-house-line" style="color:#6b9e7e;margin-right:6px"></i>CN</td>
+          <td><span class="swatch-dot" style="background:#10b981"></span>#10b981 green</td>
+          <td><span class="swatch-dot" style="background:#6b9e7e"></span>#6b9e7e sage</td>
+          <td>Bớt "success state", thêm "ấm áp, nhà ở"</td>
+          <td style="color:#10b981;font-weight:700">✓ Thay</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--text1)"><i class="ph-duotone ph-paint-brush-household" style="color:#9b6ec9;margin-right:6px"></i>Designer</td>
+          <td><span class="swatch-dot" style="background:#a78bfa"></span>#a78bfa violet</td>
+          <td><span class="swatch-dot" style="background:#9b6ec9"></span>#9b6ec9 amethyst</td>
+          <td>Bớt neon, giữ sáng tạo, thêm chiều sâu</td>
+          <td style="color:#10b981;font-weight:700">✓ Thay</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── FOOTER NOTE ── -->
+  <div class="note" style="text-align:center">
+    Đây là <strong>file thử nghiệm</strong> — không ảnh hưởng đến bất kỳ trang nào của hệ thống.<br>
+    Bạn duyệt → tôi apply vào tất cả các file thật. Bạn từ chối → xóa file này là xong.
+  </div>
+
+</div>
+</body>
+</html>
