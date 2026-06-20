@@ -231,6 +231,9 @@ input::placeholder{color:var(--muted)}
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#080c14">
 <link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ALN Studio">
 </head>
 <body>
 
@@ -700,6 +703,12 @@ renderDemoRow();
 import { auth, db, usernameToEmail, signInWithEmailAndPassword, signOut, doc, getDoc }
   from "./firebase-config.js";
 window.__ALN_FB_RESOLVE({ auth, db, usernameToEmail, signInWithEmailAndPassword, signOut, doc, getDoc });
+</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./firebase-messaging-sw.js', {scope:'./'})
+    .catch(function(){});
+}
 </script>
 </body>
 </html>
