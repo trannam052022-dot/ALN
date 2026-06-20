@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALN — CTV Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+:root{
+  --bg:#080c14;--bg2:#0e1422;--bg3:#141b2e;
+  --card:rgba(14,20,34,.92);--border:rgba(255,255,255,.07);
+  --border-g:rgba(201,168,76,.18);--muted:rgba(228,212,176,.38);
+  --text:#f0e6cc;--text2:rgba(240,230,204,.62);
+  --gold:#C9A84C;--gold2:#e8d07a;
+  --green:#3dd68c;--red:#f06060;--cyan:#22d3ee;
+  --r:12px;--mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;--serif:'Cormorant Garamond',serif;
+  --syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;
+  background-image:linear-gradient(rgba(201,168,76,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.018) 1px,transparent 1px);
+  background-size:56px 56px;}
+body::before{content:'';position:fixed;top:-20%;left:50%;transform:translateX(-50%);width:800px;height:500px;
+  background:radial-gradient(ellipse,rgba(201,168,76,.08) 0%,transparent 65%);pointer-events:none;z-index:0;}
+a{color:var(--gold);text-decoration:none}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(201,168,76,.25);border-radius:99px}
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;padding:0 24px;height:52px;
+  background:rgba(8,12,20,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.06);}
+.topbar-logo{font-family:var(--syne);font-size:13px;font-weight:800;letter-spacing:.18em;color:var(--gold);text-transform:uppercase}
+.topbar-sep{width:1px;height:20px;background:rgba(255,255,255,.1)}
+.topbar-title{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+.topbar-grow{flex:1}
+.topbar-prov{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gold);background:rgba(201,168,76,.1);
+  border:1px solid rgba(201,168,76,.22);border-radius:6px;padding:3px 10px}
+.topbar-name{font-size:12px;font-weight:600;color:var(--text2)}
+.topbar-logout{background:transparent;border:1px solid rgba(255,255,255,.1);color:var(--muted);font-size:11px;
+  border-radius:7px;padding:5px 12px;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:5px;transition:all .15s}
+.topbar-logout:hover{border-color:rgba(201,168,76,.3);color:rgba(201,168,76,.8)}
+/* LAYOUT */
+.layout{max-width:900px;margin:0 auto;padding:28px 20px 72px;position:relative;z-index:1}
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.stat-card{background:var(--card);border:1px solid var(--border-g);border-radius:var(--r);padding:16px 18px;
+  display:flex;align-items:flex-start;gap:14px}
+.stat-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.stat-icon.gold{background:rgba(201,168,76,.1)}
+.stat-icon.green{background:rgba(61,214,140,.1)}
+.stat-icon.cyan{background:rgba(34,211,238,.1)}
+.stat-label{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.stat-val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);line-height:1}
+.stat-sub{font-size:10px;color:var(--muted);margin-top:3px}
+/* TABS */
+.tabs{display:flex;gap:2px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:3px;margin-bottom:20px}
+.tab{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--syne);transition:all .18s;text-align:center}
+.tab.active{background:rgba(201,168,76,.12);color:var(--gold);border:1px solid rgba(201,168,76,.22);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+/* SECTION */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-family:var(--syne);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.badge-count{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.22);color:var(--gold);
+  font-family:var(--mono);font-size:10px;font-weight:700;border-radius:99px;padding:2px 9px}
+/* KTS CARD (PENDING) */
+.kts-card{background:var(--card);border:1px solid var(--border-g);border-radius:var(--r);padding:20px;margin-bottom:14px;transition:border-color .2s}
+.kts-card:hover{border-color:rgba(201,168,76,.35)}
+.kts-card-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.kts-avatar{width:44px;height:44px;border-radius:50%;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.22);
+  display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-size:15px;font-weight:700;color:var(--gold);flex-shrink:0}
+.kts-info{flex:1;min-width:0}
+.kts-name{font-family:var(--syne);font-size:14px;font-weight:700;color:var(--text)}
+.kts-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.kts-status-badge{font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 8px;border-radius:99px;margin-left:8px}
+.kts-status-badge.pending{background:rgba(255,180,0,.12);color:#ffb400;border:1px solid rgba(255,180,0,.28)}
+.kts-status-badge.recommended{background:rgba(61,214,140,.12);color:var(--green);border:1px solid rgba(61,214,140,.28)}
+.kts-status-badge.pass{background:rgba(240,96,96,.1);color:var(--red);border:1px solid rgba(240,96,96,.22)}
+/* GRID 2x2 */
+.kts-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kts-grid-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:8px 10px}
+.kts-grid-label{font-family:var(--syne);font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.kts-grid-val{font-size:12px;font-weight:600;color:var(--text)}
+/* PROVINCE CHIPS */
+.chips-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.chip{font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid rgba(34,211,238,.28);color:var(--cyan);background:rgba(34,211,238,.07)}
+/* BIO */
+.kts-bio{font-size:11px;color:var(--text2);line-height:1.6;padding:10px;background:rgba(255,255,255,.025);border-radius:7px;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+/* CTV NOTE */
+.ctv-note-area{margin-bottom:12px}
+.ctv-note-area label{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+.ctv-note-area textarea{width:100%;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:8px;
+  padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--sans);resize:none;min-height:64px;outline:none;transition:border-color .2s}
+.ctv-note-area textarea:focus{border-color:rgba(201,168,76,.38)}
+textarea::placeholder{color:rgba(228,212,176,.22)}
+/* ACTION BUTTONS */
+.action-row{display:flex;gap:8px}
+.btn{padding:9px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;
+  font-family:var(--syne);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;flex:1}
+.btn-recommend{background:rgba(61,214,140,.12);border:1px solid rgba(61,214,140,.3);color:var(--green)}
+.btn-recommend:hover{background:rgba(61,214,140,.2);box-shadow:0 0 20px rgba(61,214,140,.18)}
+.btn-pass{background:rgba(240,96,96,.08);border:1px solid rgba(240,96,96,.25);color:var(--red)}
+.btn-pass:hover{background:rgba(240,96,96,.15)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+/* ALREADY NOTED */
+.ctv-noted{padding:10px 12px;background:rgba(61,214,140,.07);border:1px solid rgba(61,214,140,.2);border-radius:8px;font-size:11px;color:var(--green);margin-bottom:10px}
+.ctv-noted.pass{background:rgba(240,96,96,.07);border-color:rgba(240,96,96,.2);color:var(--red)}
+.ctv-noted-label{font-family:var(--syne);font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;opacity:.7}
+/* ACTIVE KTS CARD */
+.akts-card{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:16px 18px;
+  margin-bottom:10px;display:flex;align-items:center;gap:14px;transition:border-color .2s}
+.akts-card:hover{border-color:rgba(201,168,76,.28)}
+.akts-avatar{width:38px;height:38px;border-radius:50%;background:rgba(61,214,140,.1);border:1px solid rgba(61,214,140,.18);
+  display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-size:13px;font-weight:700;color:var(--green);flex-shrink:0}
+.akts-info{flex:1;min-width:0}
+.akts-name{font-family:var(--syne);font-size:13px;font-weight:700;color:var(--text)}
+.akts-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.akts-badge{font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;
+  background:rgba(61,214,140,.12);color:var(--green);border:1px solid rgba(61,214,140,.22);white-space:nowrap}
+/* EMPTY STATE */
+.empty{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty-icon{font-size:36px;margin-bottom:14px;opacity:.4}
+.empty-text{font-size:13px;line-height:1.6}
+/* LOADING */
+.loader{display:flex;align-items:center;justify-content:center;gap:8px;padding:36px;color:var(--muted);font-size:12px}
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(14,20,34,.97);
+  border:1px solid rgba(255,255,255,.1);color:var(--text);font-size:12px;font-weight:500;
+  padding:10px 22px;border-radius:99px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.7);
+  opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;max-width:90vw}
+.toast.show{opacity:1}
+.toast.ok{border-color:rgba(61,214,140,.35);color:#7dffc0}
+.toast.err{border-color:rgba(240,96,96,.35);color:#f09898}
+@media(max-width:600px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .stats-row .stat-card:last-child{grid-column:span 2}
+  .kts-grid{grid-template-columns:1fr}
+  .topbar{padding:0 14px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <span class="topbar-logo">ALN</span>
+  <div class="topbar-sep"></div>
+  <span class="topbar-title">CTV Dashboard</span>
+  <div class="topbar-grow"></div>
+  <span class="topbar-prov" id="topProvince">…</span>
+  <span class="topbar-name" id="topName"></span>
+  <button class="topbar-logout" onclick="doLogout()">
+    <i class="ph-duotone ph-sign-out"></i> Đăng xuất
+  </button>
+</div>
+
+<div class="layout">
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon gold"><i class="ph-duotone ph-clock"></i></div>
+      <div>
+        <div class="stat-label">Chờ xét duyệt</div>
+        <div class="stat-val" id="statPending">—</div>
+        <div class="stat-sub">KTS trong khu vực</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><i class="ph-duotone ph-check-circle"></i></div>
+      <div>
+        <div class="stat-label">Đang hoạt động</div>
+        <div class="stat-val" id="statActive">—</div>
+        <div class="stat-sub">KTS đã được duyệt</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon cyan"><i class="ph-duotone ph-map-pin"></i></div>
+      <div>
+        <div class="stat-label">Khu vực quản lý</div>
+        <div class="stat-val" id="statProv" style="font-size:15px">—</div>
+        <div class="stat-sub" id="statProvFull"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" id="tabPending" onclick="switchTab('pending')">
+      <i class="ph-duotone ph-user-circle-check"></i>
+      KTS chờ xét duyệt <span id="tabPendingCount"></span>
+    </button>
+    <button class="tab" id="tabActive" onclick="switchTab('active')">
+      <i class="ph-duotone ph-users-three"></i>
+      KTS đang hoạt động <span id="tabActiveCount"></span>
+    </button>
+  </div>
+
+  <!-- PANEL: PENDING -->
+  <div id="panelPending">
+    <div class="section-head">
+      <span class="section-title">KTS chờ xét duyệt trong khu vực</span>
+      <span class="badge-count" id="countPending">0</span>
+    </div>
+    <div id="listPending"><div class="loader"><i class="ph-duotone ph-spinner" style="animation:phspin 1s linear infinite"></i> Đang tải…</div></div>
+  </div>
+
+  <!-- PANEL: ACTIVE -->
+  <div id="panelActive" style="display:none">
+    <div class="section-head">
+      <span class="section-title">KTS đang hoạt động trong khu vực</span>
+      <span class="badge-count" id="countActive">0</span>
+    </div>
+    <div id="listActive"><div class="loader"><i class="ph-duotone ph-spinner" style="animation:phspin 1s linear infinite"></i> Đang tải…</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<style>@keyframes phspin{to{transform:rotate(360deg)}}</style>
+
+<script>
+var PROV_NAME = {
+  HCM:'TP. HCM', HN:'Hà Nội', DN:'Đà Nẵng', CT:'Cần Thơ',
+  HP:'Hải Phòng', BD:'Bình Dương', DNai:'Đồng Nai', 'BR-VT':'Vũng Tàu',
+  LA:'Long An', TG:'Tiền Giang', KH:'Khánh Hòa', BDinh:'Bình Định',
+  NA:'Nghệ An', TH:'Thanh Hóa', OTHER:'Tỉnh khác'
+};
+var BOMON_NAME = {ARC:'Kiến trúc',STR:'Kết cấu',ELE:'Điện',PLU:'Cấp thoát nước',ALL:'Tất cả'};
+
+var CTV_PROFILE = null;
+var PENDING_LIST = [];
+var ACTIVE_LIST  = [];
+
+function switchTab(t) {
+  document.getElementById('tabPending').classList.toggle('active', t === 'pending');
+  document.getElementById('tabActive').classList.toggle('active', t === 'active');
+  document.getElementById('panelPending').style.display = t === 'pending' ? 'block' : 'none';
+  document.getElementById('panelActive').style.display  = t === 'active'  ? 'block' : 'none';
+}
+
+function initials(name) {
+  if (!name) return '?';
+  var p = name.trim().split(/\s+/);
+  return p.length > 1 ? (p[p.length-2][0] + p[p.length-1][0]).toUpperCase() : name[0].toUpperCase();
+}
+
+function renderPending(list) {
+  var el = document.getElementById('listPending');
+  document.getElementById('countPending').textContent = list.length;
+  document.getElementById('statPending').textContent  = list.length;
+  document.getElementById('tabPendingCount').textContent = list.length ? ' (' + list.length + ')' : '';
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon"><i class="ph-duotone ph-check-square"></i></div><div class="empty-text">Không có hồ sơ KTS đang chờ trong khu vực của bạn</div></div>';
+    return;
+  }
+  el.innerHTML = list.map(function(d) {
+    var uid = d.uid || d._id;
+    var provHome = PROV_NAME[d.province_home] || d.province_home || '—';
+    var provWork = (d.provinces_work || []).map(function(p){ return '<span class="chip">' + (PROV_NAME[p] || p) + '</span>'; }).join('');
+    var boMon = BOMON_NAME[d.boMon] || d.boMon || '—';
+    var yrs  = d.years ? d.years + ' năm' : '—';
+    var bio  = d.bio || '';
+
+    var noted = d.ctvNote;
+    var notedHtml = '';
+    if (noted) {
+      var isRec = noted.recommendation === 'recommended';
+      notedHtml = '<div class="ctv-noted' + (isRec ? '' : ' pass') + '">'
+        + '<div class="ctv-noted-label">' + (isRec ? '✓ Đã đề xuất duyệt' : '✗ Đã đánh dấu chưa đạt') + '</div>'
+        + '<div>' + (noted.note || '') + '</div></div>';
+    }
+
+    return '<div class="kts-card" id="kcard-' + uid + '">'
+      + '<div class="kts-card-head">'
+        + '<div class="kts-avatar">' + initials(d.name) + '</div>'
+        + '<div class="kts-info">'
+          + '<div class="kts-name">' + (d.name || 'KTS') + '<span class="kts-status-badge ' + (noted ? (noted.recommendation === 'recommended' ? 'recommended' : 'pass') : 'pending') + '">' + (noted ? (noted.recommendation === 'recommended' ? 'Đã đề xuất' : 'Chưa đạt') : 'Chờ xét') + '</span></div>'
+          + '<div class="kts-meta">' + (d.phone || '') + (d.email ? ' · ' + d.email : '') + '</div>'
+        + '</div>'
+      + '</div>'
+      + '<div class="kts-grid">'
+        + '<div class="kts-grid-item"><div class="kts-grid-label">Bộ môn</div><div class="kts-grid-val">' + boMon + '</div></div>'
+        + '<div class="kts-grid-item"><div class="kts-grid-label">Kinh nghiệm</div><div class="kts-grid-val">' + yrs + '</div></div>'
+        + '<div class="kts-grid-item"><div class="kts-grid-label">Tỉnh nơi ở</div><div class="kts-grid-val">' + provHome + '</div></div>'
+        + '<div class="kts-grid-item"><div class="kts-grid-label">Khu vực làm việc</div><div class="kts-grid-val">' + (provWork || '—') + '</div></div>'
+      + '</div>'
+      + (bio ? '<div class="kts-bio">' + bio + '</div>' : '')
+      + notedHtml
+      + (noted ? '' :
+          '<div class="ctv-note-area">'
+            + '<label>Ghi chú gửi Founder</label>'
+            + '<textarea id="note-' + uid + '" placeholder="Nhận xét sơ bộ về hồ sơ, mức độ tin cậy, số lần gặp gỡ…" rows="2"></textarea>'
+          + '</div>'
+          + '<div class="action-row">'
+            + '<button class="btn btn-recommend" onclick="sendNote(\'' + uid + '\',\'recommended\')">'
+              + '<i class="ph-duotone ph-thumbs-up"></i> Đề xuất duyệt'
+            + '</button>'
+            + '<button class="btn btn-pass" onclick="sendNote(\'' + uid + '\',\'pass\')">'
+              + '<i class="ph-duotone ph-thumbs-down"></i> Chưa đạt'
+            + '</button>'
+          + '</div>'
+        )
+      + '</div>';
+  }).join('');
+}
+
+function renderActive(list) {
+  var el = document.getElementById('listActive');
+  document.getElementById('countActive').textContent = list.length;
+  document.getElementById('statActive').textContent  = list.length;
+  document.getElementById('tabActiveCount').textContent = list.length ? ' (' + list.length + ')' : '';
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon"><i class="ph-duotone ph-users"></i></div><div class="empty-text">Chưa có KTS nào hoạt động trong khu vực</div></div>';
+    return;
+  }
+  el.innerHTML = list.map(function(u) {
+    return '<div class="akts-card">'
+      + '<div class="akts-avatar">' + initials(u.name) + '</div>'
+      + '<div class="akts-info">'
+        + '<div class="akts-name">' + (u.name || '—') + '</div>'
+        + '<div class="akts-meta">' + (u.username || '') + (u.phone ? ' · ' + u.phone : '') + '</div>'
+      + '</div>'
+      + '<div class="akts-badge"><i class="ph-duotone ph-check-circle"></i> Active</div>'
+    + '</div>';
+  }).join('');
+}
+
+function doLogout() { window._doLogout && window._doLogout(); }
+
+var _tt = null;
+function showToast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(_tt);
+  _tt = setTimeout(function() { el.className = 'toast'; }, 3000);
+}
+window.showToast = showToast;
+
+function sendNote(uid, recommendation) {
+  var noteEl = document.getElementById('note-' + uid);
+  var note = noteEl ? noteEl.value.trim() : '';
+  window._sendNote && window._sendNote(uid, recommendation, note);
+}
+window.sendNote = sendNote;
+</script>
+
+<script type="module">
+import {
+  auth, db,
+  onAuthStateChanged, signOut,
+  doc, getDoc, getDocs, updateDoc,
+  collection, query, where, orderBy,
+  serverTimestamp
+} from './firebase-config.js';
+
+var CTV = null;
+
+onAuthStateChanged(auth, async function(user) {
+  if (!user) { location.href = 'login.html'; return; }
+  var snap = await getDoc(doc(db, 'users', user.uid));
+  if (!snap.exists() || snap.data().role !== 'ctv') { location.href = 'login.html'; return; }
+
+  CTV = snap.data();
+  CTV.uid = user.uid;
+
+  var pname = window.PROV_NAME[CTV.province] || CTV.province || '—';
+  document.getElementById('topName').textContent = CTV.name || '';
+  document.getElementById('topProvince').textContent = pname;
+  document.getElementById('statProv').textContent = CTV.province || '—';
+  document.getElementById('statProvFull').textContent = pname;
+
+  await Promise.all([loadPendingKts(), loadActiveKts()]);
+});
+
+async function loadPendingKts() {
+  try {
+    var snap = await getDocs(collection(db, 'ktsApplications'));
+    var ctvProv = CTV.province;
+    var list = [];
+    snap.forEach(function(d) {
+      var data = d.data();
+      if (data.province_home === ctvProv || (data.provinces_work && data.provinces_work.indexOf(ctvProv) >= 0)) {
+        data._id = d.id;
+        list.push(data);
+      }
+    });
+    list.sort(function(a, b) {
+      var ta = a.submittedAt ? a.submittedAt.seconds : 0;
+      var tb = b.submittedAt ? b.submittedAt.seconds : 0;
+      return tb - ta;
+    });
+    window.PENDING_LIST = list;
+    window.renderPending(list);
+  } catch(e) {
+    console.error('loadPendingKts', e);
+    document.getElementById('listPending').innerHTML = '<div class="empty"><div class="empty-text">Không thể tải dữ liệu</div></div>';
+  }
+}
+
+async function loadActiveKts() {
+  try {
+    var snap = await getDocs(query(collection(db, 'users'), where('role', '==', 'kts'), where('status', '==', 'active')));
+    var ctvProv = CTV.province;
+    var list = [];
+    snap.forEach(function(d) {
+      var data = d.data();
+      if (data.province === ctvProv) {
+        data._id = d.id;
+        list.push(data);
+      }
+    });
+    list.sort(function(a, b) { return (a.name || '').localeCompare(b.name || ''); });
+    window.ACTIVE_LIST = list;
+    window.renderActive(list);
+  } catch(e) {
+    console.error('loadActiveKts', e);
+    document.getElementById('listActive').innerHTML = '<div class="empty"><div class="empty-text">Không thể tải dữ liệu</div></div>';
+  }
+}
+
+window._sendNote = async function(uid, recommendation, note) {
+  var btns = document.querySelectorAll('#kcard-' + uid + ' .btn');
+  btns.forEach(function(b){ b.disabled = true; });
+  try {
+    await updateDoc(doc(db, 'ktsApplications', uid), {
+      ctvNote: {
+        ctvUid: CTV.uid,
+        ctvName: CTV.name,
+        ctvProvince: CTV.province,
+        recommendation: recommendation,
+        note: note,
+        createdAt: serverTimestamp()
+      }
+    });
+    window.showToast(recommendation === 'recommended' ? '✓ Đã gửi đề xuất duyệt cho Founder' : '✗ Đã đánh dấu chưa đạt', recommendation === 'recommended' ? 'ok' : 'err');
+    var updated = window.PENDING_LIST.map(function(d) {
+      var id = d.uid || d._id;
+      if (id === uid) {
+        d.ctvNote = { ctvUid: CTV.uid, ctvName: CTV.name, recommendation: recommendation, note: note };
+      }
+      return d;
+    });
+    window.PENDING_LIST = updated;
+    window.renderPending(updated);
+  } catch(e) {
+    console.error('sendNote', e);
+    window.showToast('Lỗi: ' + e.message, 'err');
+    btns.forEach(function(b){ b.disabled = false; });
+  }
+};
+
+window._doLogout = async function() {
+  await signOut(auth);
+  location.href = 'login.html';
+};
+</script>
+</body>
+</html>

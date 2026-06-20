@@ -1361,6 +1361,11 @@ body::after {
         <i class="ph-duotone ph-paint-brush-household"></i> Designer NT
         <span id="pendingCountDes" style="background:rgba(124,58,237,.1);color:var(--purple);border:1px solid rgba(124,58,237,.25);border-radius:99px;font-size:9px;padding:1px 7px;font-weight:700">0</span>
       </button>
+      <button id="pendingTabCtv" onclick="switchPendingTab('ctv')"
+        style="padding:7px 18px;border-radius:7px 7px 0 0;border:1px solid var(--border);border-bottom:none;font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;background:var(--card);color:var(--sub)">
+        <i class="ph-duotone ph-map-pin-area"></i> CTV Trưởng nhóm
+        <span id="pendingCountCtv" style="background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.25);border-radius:99px;font-size:9px;padding:1px 7px;font-weight:700">0</span>
+      </button>
     </div>
   </div>
   <!-- List -->
@@ -2729,9 +2734,11 @@ function switchPendingTab(role){
   var tabKts = document.getElementById('pendingTabKts');
   var tabDn  = document.getElementById('pendingTabDn');
   var tabDes = document.getElementById('pendingTabDes');
+  var tabCtv = document.getElementById('pendingTabCtv');
   if(tabKts){ tabKts.style.background = role==='kts'      ? 'var(--raised)' : 'var(--card)'; tabKts.style.color = role==='kts'      ? 'var(--amber)'  : 'var(--sub)'; }
   if(tabDn) { tabDn.style.background  = role==='dn'       ? 'var(--raised)' : 'var(--card)'; tabDn.style.color  = role==='dn'       ? 'var(--blue)'   : 'var(--sub)'; }
   if(tabDes){ tabDes.style.background = role==='designer' ? 'var(--raised)' : 'var(--card)'; tabDes.style.color = role==='designer' ? 'var(--purple)' : 'var(--sub)'; }
+  if(tabCtv){ tabCtv.style.background = role==='ctv'      ? 'var(--raised)' : 'var(--card)'; tabCtv.style.color = role==='ctv'      ? 'var(--gold)'   : 'var(--sub)'; }
   renderPending();
 }
 
@@ -2743,21 +2750,23 @@ function renderPending(){
   var nKts = all.filter(function(u){ return u.role==='kts'; }).length;
   var nDn  = all.filter(function(u){ return u.role==='dn';  }).length;
   var nDes = all.filter(function(u){ return u.role==='designer'; }).length;
+  var nCtv = all.filter(function(u){ return u.role==='ctv'; }).length;
   var elK = document.getElementById('pendingCountKts'); if(elK) elK.textContent = nKts;
   var elD = document.getElementById('pendingCountDn');  if(elD) elD.textContent = nDn;
   var elDes = document.getElementById('pendingCountDes'); if(elDes) elDes.textContent = nDes;
+  var elCtv = document.getElementById('pendingCountCtv'); if(elCtv) elCtv.textContent = nCtv;
   // Lọc theo tab đang chọn
   var users = all.filter(function(u){ return u.role === _pendingActiveTab; });
   if(users.length === 0){
-    var emptyLabel = _pendingActiveTab==='kts' ? 'Không có KTS nào đang chờ duyệt' : _pendingActiveTab==='designer' ? 'Không có Designer nào đang chờ duyệt' : 'Không có Doanh nghiệp nào đang chờ duyệt';
+    var emptyLabel = _pendingActiveTab==='kts' ? 'Không có KTS nào đang chờ duyệt' : _pendingActiveTab==='designer' ? 'Không có Designer nào đang chờ duyệt' : _pendingActiveTab==='ctv' ? 'Không có CTV nào đang chờ duyệt' : 'Không có Doanh nghiệp nào đang chờ duyệt';
     list.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--dim);font-size:13px">'
       +'<i class="ph-duotone ph-check-circle" style="font-size:36px;display:block;margin-bottom:12px;color:var(--green)"></i>'
       +emptyLabel+'</div>';
     return;
   }
-  var ROLE_COLOR = {kts:'var(--amber)', dn:'var(--blue)', cn:'var(--green)', designer:'var(--purple)'};
-  var ROLE_LABEL = {kts:'Kiến trúc sư', dn:'Doanh nghiệp', cn:'Chủ nhà', designer:'Designer NT'};
-  var ROLE_ICON  = {kts:'ph-pencil-ruler', dn:'ph-buildings', cn:'ph-house-line', designer:'ph-paint-brush-household'};
+  var ROLE_COLOR = {kts:'var(--amber)', dn:'var(--blue)', cn:'var(--green)', designer:'var(--purple)', ctv:'var(--gold)'};
+  var ROLE_LABEL = {kts:'Kiến trúc sư', dn:'Doanh nghiệp', cn:'Chủ nhà', designer:'Designer NT', ctv:'CTV Trưởng nhóm'};
+  var ROLE_ICON  = {kts:'ph-pencil-ruler', dn:'ph-buildings', cn:'ph-house-line', designer:'ph-paint-brush-household', ctv:'ph-map-pin-area'};
   list.innerHTML = users.map(function(u){
     var app = u.app || {};
     var ts  = u.createdAt ? (u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString('vi-VN') : u.createdAt) : '—';
@@ -2861,7 +2870,36 @@ function renderPending(){
         +'</div>'
       +'</div>';
     }
-    var actions = '<div style="padding:12px 20px;display:flex;justify-content:flex-end;gap:8px">'
+    if(u.role === 'ctv'){
+      var PROV_NAME_CTV = {HCM:'TP. HCM',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'Vũng Tàu',LA:'Long An',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TH:'Thanh Hóa',TG:'Tiền Giang',OTHER:'Tỉnh khác'};
+      var IND_LABEL = {kts:'Kiến trúc sư',construction:'Xây dựng / Thầu',realestate:'Bất động sản',interior:'Nội thất',other:'Ngành khác'};
+      var provName = PROV_NAME_CTV[app.province] || app.province || '—';
+      var ctvNote = app.ctvNote || {};
+      var noteHtml = ctvNote.recommendation ? '<div style="padding:8px 12px;border-radius:7px;font-size:11px;'+(ctvNote.recommendation==='recommended' ? 'background:rgba(61,214,140,.07);border:1px solid rgba(61,214,140,.2);color:var(--green)' : 'background:rgba(240,96,96,.07);border:1px solid rgba(240,96,96,.2);color:#f09898')+'">'+(ctvNote.recommendation==='recommended' ? '✓ ' : '✗ ')+'<strong>CTV tự đánh giá:</strong> '+(ctvNote.note||'')+'</div>' : '';
+      details = '<div style="padding:14px 20px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--border)">'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+          +'<div style="background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">'
+            +'<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Khu vực quản lý</div>'
+            +'<div style="font-size:13px;font-weight:700;color:var(--gold)">'+provName+'</div>'
+          +'</div>'
+          +'<div style="background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">'
+            +'<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Ngành nghề</div>'
+            +'<div style="font-size:12px;font-weight:600;color:var(--text1)">'+(IND_LABEL[app.industry]||app.industry||'—')+'</div>'
+          +'</div>'
+          +'<div style="background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">'
+            +'<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">KTS quen biết</div>'
+            +'<div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text1)">'+(app.numKts||'—')+'</div>'
+          +'</div>'
+          +'<div style="background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">'
+            +'<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Zalo</div>'
+            +'<div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text1)">'+(app.phone||'—')+'</div>'
+          +'</div>'
+        +'</div>'
+        +(app.bio ? '<div style="font-size:11px;color:var(--sub);line-height:1.6;background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:7px;padding:10px 12px">'+(app.bio.length>200 ? app.bio.slice(0,200)+'…' : app.bio)+'</div>' : '')
+        +noteHtml
+      +'</div>';
+    }
+    var actions =<div style="padding:12px 20px;display:flex;justify-content:flex-end;gap:8px">'
       +'<button onclick="founderRejectPending(\''+u.uid+'\',\''+u.role+'\')" style="padding:8px 18px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:7px;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);display:inline-flex;align-items:center;gap:6px"><i class="ph-duotone ph-x"></i> Từ chối</button>'
       +'<button onclick="founderApprovePending(\''+u.uid+'\',\''+u.role+'\')" style="padding:8px 20px;background:linear-gradient(135deg,rgba(16,185,129,.18),rgba(16,185,129,.1));border:1.5px solid rgba(16,185,129,.4);border-radius:7px;color:var(--green);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);display:inline-flex;align-items:center;gap:6px"><i class="ph-duotone ph-check"></i> Duyệt</button>'
     +'</div>';
@@ -3601,7 +3639,7 @@ function _adaptForFounder(id, d) {
 window.founderApprovePending = async function(uid, role) {
   try {
     await updateDoc(doc(db,'users',uid), { status:'active', approvedNotified: false });
-    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : null;
+    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : role==='ctv' ? 'ctvApplications' : null;
     if(appColl){ try{ await updateDoc(doc(db,appColl,uid), { status:'approved', reviewedAt:serverTimestamp() }); }catch(e){} }
     window.PENDING_USERS = (window.PENDING_USERS||[]).filter(function(u){ return u.uid!==uid; });
     renderPending(); _updatePendingBadge();
@@ -3613,7 +3651,7 @@ window.founderRejectPending = async function(uid, role) {
   if(!confirm('Xác nhận từ chối tài khoản này?')) return;
   try {
     await updateDoc(doc(db,'users',uid), { status:'rejected' });
-    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : null;
+    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : role==='ctv' ? 'ctvApplications' : null;
     if(appColl){ try{ await updateDoc(doc(db,appColl,uid), { status:'rejected', reviewedAt:serverTimestamp() }); }catch(e){} }
     window.PENDING_USERS = (window.PENDING_USERS||[]).filter(function(u){ return u.uid!==uid; });
     renderPending(); _updatePendingBadge();
@@ -3669,7 +3707,7 @@ async function _startPendingListen() {
       var base = snap.docs.map(function(d){ return Object.assign({uid:d.id}, d.data()); });
       var enriched = await Promise.all(base.map(async function(u) {
         try {
-          var appColl = u.role==='kts' ? 'ktsApplications' : u.role==='dn' ? 'dnApplications' : u.role==='designer' ? 'designerApplications' : null;
+          var appColl = u.role==='kts' ? 'ktsApplications' : u.role==='dn' ? 'dnApplications' : u.role==='designer' ? 'designerApplications' : u.role==='ctv' ? 'ctvApplications' : null;
           if(appColl){
             var aSnap = await getDoc(doc(db, appColl, u.uid));
             if(aSnap.exists()) return Object.assign({}, u, {app: aSnap.data()});
