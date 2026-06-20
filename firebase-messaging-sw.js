@@ -25,6 +25,13 @@ messaging.onBackgroundMessage(function(payload) {
   });
 });
 
+/* Fetch passthrough — bắt buộc để Chrome nhận diện PWA installable */
+self.addEventListener('fetch', function(e) {
+  e.respondWith(fetch(e.request).catch(function() {
+    return new Response('', { status: 503 });
+  }));
+});
+
 self.addEventListener('notificationclick', function(e) {
   e.notification.close();
   e.waitUntil(
