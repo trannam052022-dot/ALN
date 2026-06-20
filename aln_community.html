@@ -28,6 +28,11 @@
 
   --nat:     #c9a84c;   /* Nature — ALN gold */
   --nat-bg:  rgba(201,168,76,.08);
+
+  /* Agent colors — overridden by JS based on user gender */
+  --agent-c:    #c9a84c;
+  --agent-g:    linear-gradient(135deg,#c9a84c,#a07838);
+  --agent-glow: rgba(201,168,76,.45);
   --nat-bd:  rgba(201,168,76,.25);
 
   --heart:   #e05a5a;
@@ -524,13 +529,13 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 .an-trigger {
   position: fixed; bottom: 26px; right: 26px; z-index: 120;
   width: 54px; height: 54px; border-radius: 50%;
-  background: linear-gradient(135deg, #c9a84c, #a07838);
+  background: var(--agent-g);
   border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 20px rgba(201,168,76,.45);
+  box-shadow: 0 4px 20px var(--agent-glow);
   transition: transform .2s, box-shadow .2s;
 }
-.an-trigger:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(201,168,76,.55); }
+.an-trigger:hover { transform: scale(1.08); box-shadow: 0 6px 28px var(--agent-glow); }
 .an-trigger svg { width: 22px; height: 22px; fill: rgba(255,255,255,.95); }
 .an-dot {
   position: absolute; top: 6px; right: 6px;
@@ -562,7 +567,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 }
 .an-av {
   width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
-  background: linear-gradient(135deg, #c9a84c, #a07838);
+  background: var(--agent-g);
   display: flex; align-items: center; justify-content: center;
   font-family: var(--syne); font-size: 12px; font-weight: 800; color: #fff;
   letter-spacing: -.5px;
@@ -570,8 +575,8 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 .an-info { flex: 1; min-width: 0; }
 .an-name { font-size: 13px; font-weight: 700; color: var(--text); }
 .an-name span { font-weight: 400; color: var(--sub); font-size: 11px; }
-.an-status { font-size: 10px; color: var(--arch); display: flex; align-items: center; gap: 4px; }
-.an-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--arch); flex-shrink: 0; }
+.an-status { font-size: 10px; color: var(--agent-c); display: flex; align-items: center; gap: 4px; }
+.an-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--agent-c); flex-shrink: 0; }
 .an-close-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 16px; padding: 4px; border-radius: 6px; line-height: 1; transition: color .15s; }
 .an-close-btn:hover { color: var(--text2); }
 .an-msgs {
@@ -591,7 +596,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
   border: 1px solid var(--border);
 }
 .an-bubble.from-user {
-  background: var(--arch); color: #fff;
+  background: var(--agent-c); color: #fff;
   border-bottom-right-radius: 4px; align-self: flex-end;
   font-weight: 500;
 }
@@ -607,7 +612,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 .an-typing span:nth-child(3) { animation-delay: .36s; }
 @keyframes anBounce {
   0%,60%,100% { transform: translateY(0); }
-  30%          { transform: translateY(-5px); background: var(--arch); }
+  30%          { transform: translateY(-5px); background: var(--agent-c); }
 }
 .an-bottom {
   border-top: 1px solid var(--border); background: var(--cream);
@@ -616,10 +621,10 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 .an-options { padding: 8px 10px 6px; display: flex; flex-direction: column; gap: 5px; }
 .an-opt {
   padding: 7px 12px; border-radius: 99px; font-size: 11px; font-weight: 600;
-  border: 1px solid var(--arch-bd); background: var(--arch-bg); color: var(--arch);
+  border: 1px solid var(--border2); background: var(--cream2); color: var(--text2);
   cursor: pointer; text-align: left; font-family: var(--sans); transition: all .15s; width: 100%;
 }
-.an-opt:hover { background: var(--arch); color: #fff; border-color: var(--arch); }
+.an-opt:hover { background: var(--agent-c); color: #fff; border-color: var(--agent-c); }
 .an-input-row {
   display: flex; align-items: center; gap: 6px;
   padding: 8px 10px 10px; border-top: 1px solid var(--border);
@@ -630,15 +635,15 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
   border-radius: 99px; padding: 7px 13px; outline: none; color: var(--text);
   transition: border-color .15s;
 }
-#anInput:focus { border-color: var(--arch); }
+#anInput:focus { border-color: var(--agent-c); }
 #anInput::placeholder { color: var(--muted); }
 .an-send {
   width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-  background: var(--arch); border: none; cursor: pointer;
+  background: var(--agent-c); border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 13px; transition: background .15s;
+  color: #fff; font-size: 13px; transition: opacity .15s;
 }
-.an-send:hover { background: var(--arch-bd); filter: brightness(0.8); }
+.an-send:hover { opacity: .82; }
 </style>
 
 <!-- Trigger -->
@@ -652,10 +657,10 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 <!-- Chat panel -->
 <div class="an-panel" id="anPanel">
   <div class="an-head">
-    <div class="an-av">MyMy</div>
+    <div class="an-av" id="anAv">MyMy</div>
     <div class="an-info">
-      <div class="an-name">MyMy <span>· Nhịp sống ALN</span></div>
-      <div class="an-status">luôn ở đây với bạn</div>
+      <div class="an-name"><span id="anAgentName">MyMy</span> <span>· Nhịp sống ALN</span></div>
+      <div class="an-status" id="anStatus">luôn ở đây với bạn</div>
     </div>
     <button class="an-close-btn" onclick="anToggle()">✕</button>
   </div>
@@ -663,7 +668,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
   <div class="an-bottom">
     <div class="an-options" id="anOptions"></div>
     <div class="an-input-row">
-      <input id="anInput" type="text" placeholder="Nhắn gì cho MyMy đi..."
+      <input id="anInput" type="text" placeholder="Nhắn gì cho em đi..."
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();anSendText();}">
       <button class="an-send" onclick="anSendText()" title="Gửi">
         <i class="ph-duotone ph-paper-plane-tilt"></i>
@@ -674,11 +679,37 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 
 <script>
 /* ═══════════════════════════════
-   MYMY — NGƯỜI BẠN NHỎ ALN
+   MYMY / NAM — AGENT CỘNG ĐỒNG ALN
 ═══════════════════════════════ */
 var AN_OPEN = false;
 var AN_STARTED = false;
 var AN_TIMER = null;
+
+/* Agent config — switched by _initAgent() based on user gender */
+var AGENT = { name:'MyMy', toUser:'bạn', selfRef:'em', color:'#c9a84c', grad:'linear-gradient(135deg,#c9a84c,#a07838)', glow:'rgba(201,168,76,.45)' };
+
+/* Token substitution: {n}=agent name, {u}=user address, {s}=agent self */
+function _tpl(s){ return (s||'').replace(/\{n\}/g,AGENT.name).replace(/\{u\}/g,AGENT.toUser).replace(/\{s\}/g,AGENT.selfRef); }
+
+/* Switch agent persona based on user gender */
+window._initAgent = function(gender){
+  if(gender === 'nu'){
+    AGENT = { name:'Nam', toUser:'chị', selfRef:'em', color:'#2b7a8f', grad:'linear-gradient(135deg,#2b7a8f,#1a5f72)', glow:'rgba(43,122,143,.45)' };
+  } else {
+    AGENT = { name:'MyMy', toUser: gender==='nam' ? 'anh' : 'bạn', selfRef:'em', color:'#c9a84c', grad:'linear-gradient(135deg,#c9a84c,#a07838)', glow:'rgba(201,168,76,.45)' };
+  }
+  var r = document.documentElement.style;
+  r.setProperty('--agent-c',    AGENT.color);
+  r.setProperty('--agent-g',    AGENT.grad);
+  r.setProperty('--agent-glow', AGENT.glow);
+  var avEl = document.getElementById('anAv');        if(avEl) avEl.textContent = AGENT.name;
+  var nmEl = document.getElementById('anAgentName'); if(nmEl) nmEl.textContent = AGENT.name;
+  var arEl = document.getElementById('anTrigger');   if(arEl) arEl.setAttribute('aria-label','Nói chuyện với '+AGENT.name);
+  /* Reset chat nếu chưa mở để flows dùng AGENT mới */
+  AN_STARTED = false;
+  document.getElementById('anMsgs').innerHTML = '';
+  document.getElementById('anOptions').innerHTML = '';
+};
 
 var AN_FLOWS = {
   greeting: {
@@ -687,7 +718,7 @@ var AN_FLOWS = {
       var time = h<11?'buổi sáng':h<13?'trưa':h<17?'buổi chiều':'buổi tối';
       var u = window._currentUser;
       var last = u && u.name ? u.name.trim().split(' ').pop() : '';
-      return 'Chào ' + time + (last ? ', ' + last : '') + ' ✨\n\nMình là MyMy — người bạn nhỏ của cộng đồng ALN. Hôm nay bạn đang thấy thế nào ạ?';
+      return _tpl('Chào ' + time + (last ? ', ' + last : '') + ' ✨\n\n{s} là {n} — người bạn nhỏ của cộng đồng ALN. Hôm nay {u} đang thấy thế nào ạ?');
     },
     options: [
       { label: '✦ Tràn đầy cảm hứng', next: 'energized' },
@@ -696,7 +727,7 @@ var AN_FLOWS = {
     ]
   },
   energized: {
-    msg: 'Ôi vui quá! Cảm hứng đến rồi thì đừng để mất bạn ơi 🌟\n\nHôm nay bạn đang làm gì vậy?',
+    msg: 'Ôi vui quá! Cảm hứng đến rồi thì đừng để mất {u} ơi 🌟\n\nHôm nay {u} đang làm gì vậy?',
     options: [
       { label: 'Đang bận một dự án',       next: 'busy'       },
       { label: 'Muốn chia sẻ khoảnh khắc', next: 'post_nudge' },
@@ -712,25 +743,25 @@ var AN_FLOWS = {
     ]
   },
   tired: {
-    msg: 'Mệt rồi thì cần được nghỉ ngơi thật sự — không phải cố thêm đâu bạn ơi.\n\nNghề thiết kế đòi hỏi cả trí lẫn cảm, đôi khi ngồi im nhìn ra cửa sổ cũng là đang làm việc đó.',
+    msg: 'Mệt rồi thì cần được nghỉ ngơi thật sự — không phải cố thêm đâu {u} ơi.\n\nNghề thiết kế đòi hỏi cả trí lẫn cảm, đôi khi ngồi im nhìn ra cửa sổ cũng là đang làm việc đó.',
     options: [
       { label: 'Ừ, mình cần nghỉ thật',      next: 'rest'  },
       { label: 'Cho tôi nghe điều gì hay đi', next: 'quote' }
     ]
   },
   rest: {
-    msg: 'Bình yên nhé 🌿\n\nNhớ uống đủ nước, và trước khi ngủ nhìn ra cửa sổ một cái — não mình sẽ tự sắp xếp lại mọi thứ trong lúc nghỉ đó.',
-    options: [{ label: 'Cảm ơn MyMy nha', next: 'bye' }]
+    msg: 'Bình yên nhé {u} 🌿\n\nNhớ uống đủ nước, và trước khi ngủ nhìn ra cửa sổ một cái — não sẽ tự sắp xếp lại mọi thứ trong lúc nghỉ đó.',
+    options: [{ label: 'Cảm ơn {n} nha', next: 'bye' }]
   },
   busy: {
-    msg: 'Đang bận mà vẫn ghé vào đây — chắc trong đầu đang có điều muốn chia sẻ lắm rồi!\n\nDù chỉ một góc nhỏ của bản vẽ, hay ánh sáng qua cửa sổ — cũng đủ đẹp lắm bạn ơi.',
+    msg: 'Đang bận mà vẫn ghé vào đây — chắc trong đầu đang có điều muốn chia sẻ lắm rồi!\n\nDù chỉ một góc nhỏ của bản vẽ, hay ánh sáng qua cửa sổ — cũng đủ đẹp lắm {u} ơi.',
     options: [
       { label: 'Đăng ảnh nhỏ thôi',  next: 'post_nudge' },
       { label: 'Để hôm khác vậy',    next: 'bye_gentle' }
     ]
   },
   browse: {
-    msg: 'Ngắm khoảnh khắc của người khác cũng là cách nạp lại năng lượng rất hay đó!\n\nBạn thường thích loại nội dung nào nhất ạ?',
+    msg: 'Ngắm khoảnh khắc của người khác cũng là cách nạp lại năng lượng rất hay đó!\n\n{u} thường thích loại nội dung nào nhất ạ?',
     options: [
       { label: 'Ảnh công trình thực tế',   next: 'like_arch'     },
       { label: 'Chi tiết nội thất đẹp',    next: 'like_interior' },
@@ -789,10 +820,10 @@ var AN_FLOWS = {
     ]
   },
   inspiration: {
-    msg: 'Không có gì đặc biệt cũng ổn mà bạn — đôi khi cần khoảng trống để cảm nhận lại.\n\nMyMy muốn chia sẻ một điều nhỏ cho bạn nghe — muốn không?',
+    msg: 'Không có gì đặc biệt cũng ổn mà {u} — đôi khi cần khoảng trống để cảm nhận lại.\n\n{n} muốn chia sẻ một điều nhỏ cho {u} nghe — muốn không?',
     options: [
       { label: 'Vâng, cho nghe đi nào', next: 'quote'      },
-      { label: 'Thôi, cảm ơn MyMy',    next: 'bye_gentle' }
+      { label: 'Thôi, cảm ơn {n}',    next: 'bye_gentle' }
     ]
   },
   quote: {
@@ -808,7 +839,7 @@ var AN_FLOWS = {
       return q[Math.floor(Math.random() * q.length)];
     },
     options: [
-      { label: 'Hay lắm, cảm ơn MyMy',         next: 'bye'        },
+      { label: 'Hay lắm, cảm ơn {n}',         next: 'bye'        },
       { label: 'Muốn chia sẻ điều này lên feed', next: 'post_nudge' }
     ]
   },
@@ -851,34 +882,34 @@ var AN_FLOWS = {
     msg: 'Thử một trong ba hướng này nha:\n\n① Mô tả ánh sáng bạn thấy hôm nay\n② Một chi tiết vật liệu đang thích\n③ Câu hỏi bạn đang tự hỏi về một dự án\n\nNhiêu đó thôi là đủ rồi — không cần hoàn hảo đâu bạn!',
     options: [
       { label: 'Hay đó, tôi thử ngay!', next: 'after_post' },
-      { label: 'Cảm ơn MyMy nha',       next: 'bye'        }
+      { label: 'Cảm ơn {n} nha',       next: 'bye'        }
     ]
   },
   after_post: {
-    msg: 'Tuyệt vời! Bài đã xuất hiện ngay trên feed rồi — cuộn lên để xem nhé!\n\nMọi người trong ALN sẽ thấy và có thể thả tim cho bạn đó 💛',
+    msg: 'Tuyệt vời! Bài đã xuất hiện ngay trên feed rồi — cuộn lên để xem nhé!\n\nMọi người trong ALN sẽ thấy và có thể thả tim cho {u} đó 💛',
     options: [{ label: 'OK, tôi đi xem liền!', next: 'bye_post' }]
   },
   bye: {
-    msg: 'Chúc bạn một buổi thật sáng tạo và bình yên 🌿\n\nKhi nào có điều muốn chia sẻ — MyMy ở đây nhé!',
+    msg: 'Chúc {u} một buổi thật sáng tạo và bình yên 🌿\n\nKhi nào có điều muốn chia sẻ — {n} ở đây nhé!',
     options: []
   },
   bye_post: {
-    msg: 'Cảm ơn bạn đã đóng góp cho cộng đồng ALN!\n\nMyMy ở đây nếu bạn cần nói chuyện 🌿',
+    msg: 'Cảm ơn {u} đã đóng góp cho cộng đồng ALN!\n\n{n} ở đây nếu {u} cần nói chuyện 🌿',
     options: []
   },
   bye_gentle: {
-    msg: 'Không vội đâu! Khi có điều muốn chia sẻ — MyMy luôn ở đây 🌿',
+    msg: 'Không vội đâu! Khi {u} có điều muốn chia sẻ — {n} luôn ở đây 🌿',
     options: []
   },
   free_reply_tired: {
-    msg: 'Mình nghe bạn rồi. Mệt thì cứ để mệt — không phải lúc nào cũng cần cố vượt qua ngay.\n\nNgồi yên một lúc, uống gì ấm ấm, nhìn ra ngoài cửa sổ. Não mình cần khoảng lặng đó bạn ơi.',
+    msg: '{s} nghe {u} rồi. Mệt thì cứ để mệt — không phải lúc nào cũng cần cố vượt qua ngay.\n\nNgồi yên một lúc, uống gì ấm ấm, nhìn ra ngoài cửa sổ. Não cần khoảng lặng đó {u} ơi.',
     options: [
       { label: 'Ừ, mình làm vậy',         next: 'bye'   },
       { label: 'Cho mình nghe điều gì đó', next: 'quote' }
     ]
   },
   free_reply_inspired: {
-    msg: 'Nghe bạn nói là MyMy cũng thấy vui lây rồi!\n\nCảm hứng đến thì mình hành động liền đi — đừng để nó qua. Bạn có muốn chia sẻ điều đó lên feed không?',
+    msg: 'Nghe {u} nói là {n} cũng thấy vui lây rồi!\n\nCảm hứng đến thì hành động liền đi — đừng để nó qua. {u} có muốn chia sẻ điều đó lên feed không?',
     options: [
       { label: 'Có, tôi đăng ngay!',  next: 'post_nudge' },
       { label: 'Thôi để mình nghĩ thêm', next: 'bye_gentle' }
@@ -887,15 +918,15 @@ var AN_FLOWS = {
   free_reply_default: {
     msg: function(){
       var r = [
-        'Cảm ơn bạn đã chia sẻ với MyMy!\n\nBạn có muốn đăng điều này lên feed để mọi người cùng cảm nhận không?',
-        'Mình hiểu bạn — những khoảnh khắc như vậy thường rất đáng nhớ.\n\nBạn có thể chụp một cái và chia sẻ lên Nhịp sống ALN không?',
-        'Nghe hay lắm! Bạn có thể diễn tả thêm không — MyMy muốn hiểu hơn.'
+        'Cảm ơn {u} đã chia sẻ với {n}!\n\n{u} có muốn đăng điều này lên feed để mọi người cùng cảm nhận không?',
+        '{s} hiểu {u} — những khoảnh khắc như vậy thường rất đáng nhớ.\n\n{u} có thể chụp một cái và chia sẻ lên Nhịp sống ALN không?',
+        'Nghe hay lắm! {u} có thể diễn tả thêm không — {n} muốn hiểu hơn.'
       ];
       return r[Math.floor(Math.random() * r.length)];
     },
     options: [
       { label: 'Đăng lên feed luôn!', next: 'post_nudge' },
-      { label: 'Thôi, cảm ơn MyMy',  next: 'bye'        }
+      { label: 'Thôi, cảm ơn {n}',  next: 'bye'        }
     ]
   }
 };
@@ -924,7 +955,7 @@ function anStart(){
 function anFlow(key){
   var flow = AN_FLOWS[key];
   if(!flow) return;
-  var msg = typeof flow.msg === 'function' ? flow.msg() : flow.msg;
+  var msg = _tpl(typeof flow.msg === 'function' ? flow.msg() : flow.msg);
   anTypingThen(msg, function(){
     if(flow.options && flow.options.length > 0){ anShowOptions(flow.options); }
   });
@@ -958,8 +989,9 @@ function anShowOptions(options){
   options.forEach(function(opt){
     var btn = document.createElement('button');
     btn.className = 'an-opt';
-    btn.textContent = opt.label;
-    btn.onclick = function(){ anPick(opt.label, opt.next); };
+    var label = _tpl(opt.label);
+    btn.textContent = label;
+    btn.onclick = function(){ anPick(label, opt.next); };
     wrap.appendChild(btn);
   });
 }
@@ -1177,7 +1209,8 @@ onAuthStateChanged(auth, async function(user){
   if(!snap.exists()){ window.location.replace('login.html'); return; }
   var profile = snap.data();
 
-  window._currentUser = { uid: user.uid, role: profile.role, name: profile.name, avatar: profile.avatarUrl || '' };
+  window._currentUser = { uid: user.uid, role: profile.role, name: profile.name, avatar: profile.avatarUrl || '', gender: profile.gender || '' };
+  if(typeof window._initAgent === 'function') window._initAgent(profile.gender || '');
 
   /* topbar */
   var tbUser = document.getElementById('tbUser');

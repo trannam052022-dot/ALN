@@ -1155,6 +1155,14 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <label>Chứng chỉ hành nghề</label>
       <input type="text" id="profileLicense" placeholder="KTS-2021-xxxxx">
     </div>
+    <div class="profile-field">
+      <label>Giới tính</label>
+      <select id="profileGender" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;outline:none">
+        <option value="">— Không muốn nói —</option>
+        <option value="nam">Nam</option>
+        <option value="nu">Nữ</option>
+      </select>
+    </div>
     <button class="profile-save-btn" onclick="saveProfile()">
       <i class="ph-duotone ph-floppy-disk"></i> Lưu hồ sơ
     </button>
@@ -2845,6 +2853,7 @@ window.saveProfile = async function saveProfile() {
     email:   (document.getElementById('profileEmail')||{}).value.trim() || '',
     phone:   (document.getElementById('profilePhone')||{}).value.trim() || '',
     license: (document.getElementById('profileLicense')||{}).value.trim() || '',
+    gender:  (document.getElementById('profileGender')||{}).value || '',
   };
   try {
     await setDoc(doc(db,'users',uid), data, {merge:true});
@@ -2878,6 +2887,8 @@ function _fillProfileForm(profile) {
   set('profileEmail',   profile.email);
   set('profilePhone',   profile.phone);
   set('profileLicense', profile.license);
+  const gEl = document.getElementById('profileGender');
+  if (gEl && profile.gender) gEl.value = profile.gender;
   if (profile.avatarURL) _showAvatar(profile.avatarURL);
 }
 

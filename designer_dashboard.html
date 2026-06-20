@@ -525,6 +525,14 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
             <label>Email liên hệ</label>
             <input type="text" id="profileEmail" class="form-input" readonly style="color:var(--muted)">
           </div>
+          <div class="profile-field">
+            <label>Giới tính</label>
+            <select id="profileGender" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;outline:none">
+              <option value="">— Không muốn nói —</option>
+              <option value="nam">Nam</option>
+              <option value="nu">Nữ</option>
+            </select>
+          </div>
           <button class="profile-save-btn" onclick="desSaveProfile()">
             <i class="ph-duotone ph-floppy-disk"></i> Lưu thông tin
           </button>
@@ -952,11 +960,12 @@ window.desUploadAvatar = async function(input) {
 window._desFbSaveProfile = async function() {
   var u = auth.currentUser;
   if (!u) return;
-  var name = (document.getElementById('profileName')||{}).value || '';
-  var spec = (document.getElementById('profileSpecialty')||{}).value || '';
-  var yrs  = parseInt((document.getElementById('profileYears')||{}).value)||0;
+  var name   = (document.getElementById('profileName')||{}).value || '';
+  var spec   = (document.getElementById('profileSpecialty')||{}).value || '';
+  var yrs    = parseInt((document.getElementById('profileYears')||{}).value)||0;
+  var gender = (document.getElementById('profileGender')||{}).value || '';
   try {
-    await updateDoc(doc(db, 'users', u.uid), { name, specialty: spec, years: yrs, updatedAt: serverTimestamp() });
+    await updateDoc(doc(db, 'users', u.uid), { name: name, specialty: spec, years: yrs, gender: gender, updatedAt: serverTimestamp() });
     showToast('Đã lưu hồ sơ', 't-green');
   } catch(e) { showToast('Lỗi: ' + (e.code||e.message), 't-red'); }
 };
@@ -1014,6 +1023,7 @@ onAuthStateChanged(auth, async function(user) {
   var ps = document.getElementById('profileSpecialty'); if(ps) ps.value = profile.specialty||'';
   var py = document.getElementById('profileYears'); if(py) py.value = profile.years||'';
   var pe = document.getElementById('profileEmail'); if(pe) pe.value = profile.email||(profile.username+'@aln.vn')||'';
+  var pg = document.getElementById('profileGender'); if(pg && profile.gender) pg.value = profile.gender;
 
   /* load avatar */
   if (profile.avatarURL) {
