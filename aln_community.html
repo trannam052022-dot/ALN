@@ -744,7 +744,7 @@ var AN_FLOWS = {
       var time = h<11?'buổi sáng':h<13?'trưa':h<17?'buổi chiều':'buổi tối';
       var u = window._currentUser;
       var last = u && u.name ? u.name.trim().split(' ').pop() : '';
-      return _tpl('Chào ' + time + (last ? ', ' + last : '') + ' ✨\n\n{s} là {n} — người bạn nhỏ của cộng đồng ALN. Hôm nay {u} đang thấy thế nào ạ?');
+      return _tpl('Chào {u}' + (last ? ' ' + last : '') + ' ' + time + ' ✨\n\n{s} là {n} — người bạn nhỏ của cộng đồng ALN. Hôm nay {u} đang thấy thế nào ạ?');
     },
     options: [
       { label: '✦ Tràn đầy cảm hứng', next: 'energized' },
