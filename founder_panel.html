@@ -2779,24 +2779,34 @@ function renderPending(){
     +'</div>';
     var details = '';
     if(u.role === 'kts'){
+      var PROV_NAME = {HCM:'TP. HCM',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'Vũng Tàu',LA:'Long An',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TG:'Tiền Giang',AG:'An Giang',KG:'Kiên Giang',DL:'Đắk Lắk',TH:'Thanh Hóa',OTHER:'Tỉnh khác'};
       var specs = app.specialties || [];
+      var provWork = app.provinces_work || [];
       var specChips = specs.slice(0,5).map(function(s){ return '<span style="font-size:9px;font-weight:700;padding:2px 8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);border-radius:5px;color:var(--amber)">'+s+'</span>'; }).join('');
-      if(specs.length > 5) specChips += '<span style="font-size:9px;color:var(--dim)">+'+( specs.length-5)+'</span>';
+      if(specs.length > 5) specChips += '<span style="font-size:9px;color:var(--dim)">+'+(specs.length-5)+'</span>';
+      var provChips = provWork.map(function(p){ return '<span style="font-size:9px;font-weight:700;padding:2px 8px;background:rgba(34,211,238,.07);border:1px solid rgba(34,211,238,.22);border-radius:5px;color:var(--cyan)">'+(PROV_NAME[p]||p)+'</span>'; }).join('');
+      var boMonLabel = {ARC:'Kiến trúc',STR:'Kết cấu',ELE:'Điện',PLU:'Cấp thoát nước',ALL:'Tất cả'};
       details = '<div style="padding:14px 20px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--border)">'
-        +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+          +'<div style="background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">'
+            +'<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Bộ môn</div>'
+            +'<div style="font-size:12px;font-weight:700;color:var(--amber)">'+(boMonLabel[app.boMon]||app.boMon||'—')+'</div>'
+          +'</div>'
           +'<div style="background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">'
             +'<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Kinh nghiệm</div>'
             +'<div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text1)">'+(app.years||'—')+' năm</div>'
           +'</div>'
           +'<div style="background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">'
-            +'<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">CCHN</div>'
-            +'<div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text1)">'+(app.cchn||'Chưa có')+'</div>'
+            +'<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Tỉnh nơi ở</div>'
+            +'<div style="font-size:12px;font-weight:600;color:var(--text1)">'+(PROV_NAME[app.province_home]||app.province_home||'—')+'</div>'
           +'</div>'
           +'<div style="background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">'
-            +'<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Điện thoại</div>'
-            +'<div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text1)">'+(app.phone||'—')+'</div>'
+            +'<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">CCHN · Zalo</div>'
+            +'<div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text1)">'+(app.cchn||'—')+'</div>'
+            +'<div style="font-family:var(--mono);font-size:10px;color:var(--sub);margin-top:2px">'+(app.phone||'—')+'</div>'
           +'</div>'
         +'</div>'
+        +(provWork.length ? '<div><div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Khu vực nhận dự án</div><div style="display:flex;flex-wrap:wrap;gap:5px">'+provChips+'</div></div>' : '')
         +(specs.length ? '<div><div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Chuyên môn</div><div style="display:flex;flex-wrap:wrap;gap:5px">'+specChips+'</div></div>' : '')
         +(app.bio ? '<div style="font-size:11px;color:var(--sub);line-height:1.6;background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:7px;padding:10px 12px">'+(app.bio.length>180 ? app.bio.slice(0,180)+'…' : app.bio)+'</div>' : '')
         +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
