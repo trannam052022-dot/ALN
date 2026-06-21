@@ -1109,32 +1109,32 @@ body::after {
 <div class="stat-band" id="statBand">
   <div class="stat-cell s-all active" onclick="setFilter('ALL')">
     <div class="sc-label">Tất cả</div>
-    <div class="sc-val" id="cnt-all">106</div>
+    <div class="sc-val" id="cnt-all">00</div>
     <div class="sc-sub">Tổng dự án</div>
   </div>
   <div class="stat-cell s-run" onclick="setFilter('RUNNING')">
     <div class="sc-label">🟢 Đang chạy</div>
-    <div class="sc-val" id="cnt-run">30</div>
+    <div class="sc-val" id="cnt-run">00</div>
     <div class="sc-sub">Trong hạn</div>
   </div>
   <div class="stat-cell s-c3" onclick="setFilter('C3_PENDING')">
     <div class="sc-label">⚠ Cần duyệt C3</div>
-    <div class="sc-val" id="cnt-c3" style="color:var(--amber)">02</div>
+    <div class="sc-val" id="cnt-c3" style="color:var(--amber)">00</div>
     <div class="sc-sub">Chờ Checker ký</div>
   </div>
   <div class="stat-cell s-dispute" onclick="setFilter('DISPUTE')">
     <div class="sc-label">❌ Tranh chấp</div>
-    <div class="sc-val" id="cnt-dispute" style="color:var(--red)">01</div>
+    <div class="sc-val" id="cnt-dispute" style="color:var(--red)">00</div>
     <div class="sc-sub">Cần phán xét</div>
   </div>
   <div class="stat-cell s-sla" onclick="setFilter('SLA_BREACH')">
     <div class="sc-label">⏰ Trễ SLA</div>
-    <div class="sc-val" id="cnt-sla" style="color:var(--amber)">03</div>
+    <div class="sc-val" id="cnt-sla" style="color:var(--amber)">00</div>
     <div class="sc-sub">KTS quá hạn</div>
   </div>
   <div class="stat-cell s-done" onclick="setFilter('DONE')">
     <div class="sc-label">✓ Hoàn thành</div>
-    <div class="sc-val" id="cnt-done">70</div>
+    <div class="sc-val" id="cnt-done">00</div>
     <div class="sc-sub">Đã giải ngân</div>
   </div>
 </div>
@@ -1192,23 +1192,14 @@ body::after {
         <th>HÀNH ĐỘNG</th>
       </tr>
     </thead>
-    <tbody id="tableBody"><!-- injected --></tbody>
+    <tbody id="tableBody"><tr><td colspan="7" style="text-align:center;padding:40px;color:var(--mute)"><i class="ph-duotone ph-spinner-gap ph-spin"></i> Đang tải dữ liệu...</td></tr></tbody>
   </table>
 </div>
 
 <!-- Pagination -->
 <div class="pagination">
-  <div class="pagination-info" id="pageInfo">Hiển thị 1–10 / 106 dự án</div>
-  <div class="page-btns" id="pageBtns">
-    <button class="page-btn disabled"><i class="ph-duotone ph-caret-left"></i></button>
-    <button class="page-btn active">1</button>
-    <button class="page-btn">2</button>
-    <button class="page-btn">3</button>
-    <button class="page-btn">4</button>
-    <span style="color:var(--dim);padding:0 4px;font-size:11px">…</span>
-    <button class="page-btn">10</button>
-    <button class="page-btn"><i class="ph-duotone ph-caret-right"></i></button>
-  </div>
+  <div class="pagination-info" id="pageInfo">Đang tải...</div>
+  <div class="page-btns" id="pageBtns"></div>
 </div>
 </div>
 
@@ -2280,6 +2271,7 @@ function switchTab(t){
     }
   });
 
+  if(t==='projects') renderTable();
   if(t==='stats')   renderStats();
   if(t==='mgKts')   renderMgKts();
   if(t==='mgDn')    renderMgDn();
@@ -3750,12 +3742,12 @@ window.founderRejectStage = async function(pid, stage) {
 function _startFounderListen() {
   var q = query(collection(db,'projects'), orderBy('updatedAt','desc'));
   onSnapshot(q, function(snap){
-    DN_PROJECTS = snap.docs.map(function(d){ return _adaptForFounder(d.id, d.data()); });
-    window._dnLoaded = true; _dnLoaded = true;
+    window.DN_PROJECTS = snap.docs.map(function(d){ return _adaptForFounder(d.id, d.data()); });
+    window._dnLoaded = true;
     try { if(typeof renderStats==='function') renderStats(); } catch(e){}
     try { if(typeof renderTable==='function') renderTable(); } catch(e){}
     _loadMgData();
-    console.log('[Founder]', DN_PROJECTS.length, 'dự án');
+    console.log('[Founder]', window.DN_PROJECTS.length, 'dự án');
   }, function(err){ console.error('[Founder]', err.code); });
 }
 
