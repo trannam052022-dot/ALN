@@ -297,8 +297,27 @@ input::placeholder{color:var(--muted)}
       </p>
     </div>
 
+    <!-- ═══ TWO CTAs ═══ -->
+    <div id="ctaBlock" style="margin-bottom:6px">
+      <button class="btn btn-gold" onclick="openRegisterPanel()" style="margin-bottom:10px">
+        <i class="ph-duotone ph-clipboard-text"></i>
+        LÀM KHẢO SÁT NHẬN BÁO GIÁ
+        <i class="ph-duotone ph-arrow-right" style="margin-left:auto;font-size:16px"></i>
+      </button>
+      <button onclick="openRegisterPanel()" style="width:100%;padding:15px;border-radius:11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:rgba(240,230,204,.65);font-family:var(--syne);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s">
+        <i class="ph-duotone ph-envelope-open" style="font-size:16px;color:var(--gold)"></i>
+        Hoặc để lại thông tin
+      </button>
+      <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--muted)">
+        <span style="color:#f5c842">⭐</span> 87% khách hàng tin tưởng ALN sau lần đầu liên hệ
+      </div>
+      <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--muted)">
+        Đã có tài khoản? <a onclick="showLoginDirect()" style="color:var(--gold);text-decoration:none;cursor:pointer;font-weight:600">Đăng nhập →</a>
+      </div>
+    </div>
+
     <!-- Panel đăng ký -->
-    <div id="panelRegister">
+    <div id="panelRegister" style="display:none;margin-top:18px">
       <div class="card">
         <div class="card-title">Giữ chỗ ngay</div>
         <div class="card-sub">Điền 2 ô, xong trong 30 giây</div>
