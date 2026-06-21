@@ -3233,20 +3233,55 @@ function _startProjectsListenCN() {
       try { if(typeof window.renderSidebar==='function') window.renderSidebar(); } catch(e){ console.error('[CN render]',e); }
       try { if(typeof window.selectProj==='function') window.selectProj(window.activeProj); } catch(e){}
     } else {
-      // Empty state — CN mới đăng ký chưa có dự án
+      // Empty state — CN mới, hiện form tư vấn
+      var _n = window._cnCurrentName || 'bạn';
+      var _chkOpts = [
+        ['kien_truc','Thiết kế KTS','ph-compass-tool'],
+        ['noi_that','Nội thất','ph-paint-brush-household'],
+        ['xay_dung','Xây dựng trọn gói','ph-hard-hat'],
+        ['tu_van','Tư vấn & Phong thủy','ph-yin-yang']
+      ];
+      var _chkHtml = _chkOpts.map(function(c){
+        return '<label style="display:flex;align-items:center;gap:7px;padding:9px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);cursor:pointer;background:var(--ink3)">'
+          +'<input type="checkbox" class="cn-needs-chk" value="'+c[0]+'" style="width:13px;height:13px;accent-color:var(--gold);flex-shrink:0">'
+          +'<i class="ph-duotone '+c[2]+'" style="font-size:13px;color:var(--gold)"></i>'
+          +'<span style="font-size:11px;font-weight:600;color:var(--text2)">'+c[1]+'</span></label>';
+      }).join('');
       var el = document.getElementById('projList');
       if(el) el.innerHTML = '<div style="padding:20px 16px;text-align:center">'
-        +'<div style="width:48px;height:48px;border-radius:50%;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px;color:var(--green)"><i class="ph-duotone ph-house-line"></i></div>'
-        +'<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px">Tài khoản đã kích hoạt</div>'
-        +'<div style="font-size:11px;color:var(--sub);line-height:1.6">ALN sẽ liên hệ sớm để<br>khởi tạo dự án của bạn.</div>'
+        +'<div style="width:44px;height:44px;border-radius:50%;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:20px;color:var(--green)"><i class="ph-duotone ph-check-circle"></i></div>'
+        +'<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:5px">Tài khoản kích hoạt ✓</div>'
+        +'<div style="font-size:11px;color:var(--sub);line-height:1.6">Điền thông tin dự án<br>để ALN tư vấn sớm nhất.</div>'
         +'</div>';
-      // Xoá main content, hiện empty state toàn trang
       var main = document.getElementById('mainContent') || document.querySelector('.main-content');
-      if(main) main.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;padding:40px;text-align:center">'
-        +'<div style="width:80px;height:80px;border-radius:50%;background:rgba(16,185,129,.06);border:1.5px solid rgba(16,185,129,.18);display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--green)"><i class="ph-duotone ph-check-circle"></i></div>'
-        +'<div style="font-family:var(--serif,serif);font-size:28px;font-weight:300;color:var(--text1)">Xin chào, <b style="font-weight:600">'+( window._cnCurrentName||'bạn')+'</b></div>'
-        +'<div style="font-size:13px;color:var(--sub);line-height:1.75;max-width:320px">Tài khoản Chủ nhà đã sẵn sàng.<br>ALN sẽ liên hệ để trao đổi và tạo dự án cho bạn.</div>'
-        +'<div style="font-size:11px;color:var(--dim);margin-top:4px">Câu hỏi? Liên hệ ALN qua Zalo hoặc hotline.</div>'
+      if(main) main.innerHTML = '<div style="padding:28px 20px 40px;max-width:600px;margin:0 auto">'
+        +'<div style="text-align:center;margin-bottom:22px">'
+        +'<div style="font-family:var(--serif,serif);font-size:26px;font-weight:300;color:var(--text)">Xin chào, <b style="font-weight:600">'+_n+'</b></div>'
+        +'<div style="font-size:12px;color:var(--sub);margin-top:6px;line-height:1.7">Tài khoản đã kích hoạt. Cho đội ALN biết về dự án để được tư vấn sớm nhất.</div>'
+        +'</div>'
+        +'<div class="card">'
+        +'<div class="ct"><i class="ph-duotone ph-chats-teardrop"></i> Thông tin tư vấn</div>'
+        +'<div style="margin-bottom:14px">'
+        +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Diện tích đất / sàn xây dựng <span style="color:var(--gold)">✦</span></label>'
+        +'<div style="position:relative"><input type="number" id="cn_area" min="20" max="9999" placeholder="VD: 150" style="width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 44px 10px 12px;font-size:14px;font-family:inherit;background:var(--ink3);color:var(--text);outline:none">'
+        +'<span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:var(--muted)">m²</span></div></div>'
+        +'<div style="margin-bottom:14px">'
+        +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Số tầng dự kiến</label>'
+        +'<select id="cn_floors" style="width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:14px;font-family:inherit;background:var(--ink3);color:var(--text);outline:none;cursor:pointer">'
+        +'<option value="">— Chọn —</option><option value="1">1 tầng</option><option value="2">2 tầng</option><option value="3">3 tầng</option><option value="4">4 tầng</option><option value="5+">5 tầng trở lên</option>'
+        +'</select></div>'
+        +'<div style="margin-bottom:14px">'
+        +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">Bạn cần gì? <span style="font-size:10px;font-weight:400;color:var(--sub)">(chọn 1 hoặc nhiều)</span></label>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">'+_chkHtml+'</div></div>'
+        +'<div style="margin-bottom:14px">'
+        +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Tỉnh / Thành phố</label>'
+        +'<input type="text" id="cn_city" placeholder="VD: TP. Hồ Chí Minh" style="width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:14px;font-family:inherit;background:var(--ink3);color:var(--text);outline:none"></div>'
+        +'<div style="margin-bottom:20px">'
+        +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Ghi chú thêm <span style="font-size:10px;font-weight:400;color:var(--sub)">(tùy chọn)</span></label>'
+        +'<textarea id="cn_note" rows="3" placeholder="Phong cách, ngân sách, thời gian bắt đầu..." style="width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:14px;font-family:inherit;background:var(--ink3);color:var(--text);outline:none;resize:vertical;line-height:1.5"></textarea></div>'
+        +'<button onclick="window.cnSubmitConsultation()" id="cnConsultBtn" style="width:100%;padding:13px;background:var(--green);border:none;border-radius:var(--r-sm);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px"><i class="ph-duotone ph-paper-plane-tilt"></i> Gửi thông tin cho đội ALN</button>'
+        +'</div>'
+        +'<div style="text-align:center;font-size:11px;color:var(--sub);margin-top:12px">Đội ALN sẽ liên hệ qua SĐT trong vòng 24 giờ.</div>'
         +'</div>';
     }
   }, function(err){ console.error('[CN] Lỗi:', err.code, err.message); });
@@ -3486,6 +3521,34 @@ onAuthStateChanged(auth, async (user) => {
     window._cnSaveDoc = async function(pid, data){
       await addDoc(collection(db, 'projects', pid, 'documents'),
         Object.assign({}, data, { createdAt: serverTimestamp() }));
+    };
+    window.cnSubmitConsultation = async function(){
+      var uid = window.__ALN_UID;
+      if(!uid){ showToast('Lỗi xác thực','t-amber'); return; }
+      var area = Number((document.getElementById('cn_area')||{}).value||0);
+      if(!area){ showToast('Vui lòng nhập diện tích','t-amber'); return; }
+      var floors = ((document.getElementById('cn_floors')||{}).value||'');
+      var city   = ((document.getElementById('cn_city') ||{}).value||'').trim();
+      var note   = ((document.getElementById('cn_note') ||{}).value||'').trim();
+      var needs  = [];
+      document.querySelectorAll('.cn-needs-chk:checked').forEach(function(cb){ needs.push(cb.value); });
+      var btn = document.getElementById('cnConsultBtn');
+      if(btn){ btn.disabled=true; btn.innerHTML='<i class="ph-duotone ph-spinner-gap ph-spin"></i> Đang gửi...'; }
+      try{
+        var cdata = { area:area, floors:floors, needs:needs, city:city, note:note, submittedAt:serverTimestamp() };
+        await updateDoc(doc(db,'users',uid), { consultationRequest:cdata });
+        try{ await updateDoc(doc(db,'reservations',uid), { consultationRequest:cdata }); }catch(e2){}
+        var mc = document.getElementById('mainContent');
+        if(mc) mc.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;padding:40px;text-align:center">'
+          +'<div style="width:80px;height:80px;border-radius:50%;background:rgba(16,185,129,.1);border:2px solid rgba(16,185,129,.3);display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--green)"><i class="ph-duotone ph-check-circle"></i></div>'
+          +'<div style="font-family:var(--serif,serif);font-size:24px;font-weight:600;color:var(--text)">Đã ghi nhận!</div>'
+          +'<div style="font-size:13px;color:var(--sub);line-height:1.75;max-width:300px">Đội ALN sẽ liên hệ qua SĐT của bạn trong vòng 24 giờ.</div>'
+          +'</div>';
+        showToast('Đã gửi thông tin ✓ ALN sẽ liên hệ sớm','t-green');
+      }catch(e3){
+        showToast('Lỗi gửi, thử lại','t-amber');
+        if(btn){ btn.disabled=false; btn.innerHTML='<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi thông tin cho đội ALN'; }
+      }
     };
   } catch(e) {
     console.error("[ALN Guard]", e);

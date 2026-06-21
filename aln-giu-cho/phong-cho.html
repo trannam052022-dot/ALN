@@ -366,6 +366,62 @@ input::placeholder{color:var(--muted)}
         </div>
       </div>
     </div>
+
+    <!-- ═══ LEAD CAPTURE — Để lại thông tin tư vấn ═══ -->
+    <div id="leadPanel" style="margin-top:18px;padding-bottom:32px">
+      <div style="text-align:center;margin:0 0 12px;display:flex;align-items:center;gap:10px">
+        <div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>
+        <span style="font-size:10px;color:var(--muted);letter-spacing:.1em">HOẶC</span>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>
+      </div>
+      <div class="card" style="padding:22px 22px 20px;border-color:rgba(255,255,255,.06)">
+        <div class="card-title" style="font-size:18px">Để lại thông tin tư vấn</div>
+        <div class="card-sub">Chưa sẵn sàng đăng ký? Điền nhanh — đội ALN gọi lại trong 24 giờ.</div>
+        <div class="field">
+          <label>Họ và tên <span style="color:var(--gold)">✦</span></label>
+          <div class="field-wrap"><i class="ph-duotone ph-user fi"></i>
+            <input type="text" id="lc_name" placeholder="VD: Nguyễn Văn A" autocomplete="name">
+          </div>
+        </div>
+        <div class="field">
+          <label>Số điện thoại <span style="color:var(--gold)">✦</span></label>
+          <div class="field-wrap"><i class="ph-duotone ph-phone fi"></i>
+            <input type="tel" id="lc_phone" placeholder="0901 234 567" inputmode="numeric">
+          </div>
+        </div>
+        <div class="field">
+          <label>Diện tích đất (m²)</label>
+          <div class="field-wrap"><i class="ph-duotone ph-ruler fi"></i>
+            <input type="number" id="lc_area" min="20" max="9999" placeholder="VD: 150">
+          </div>
+          <div class="field-hint">Diện tích đất hoặc sàn xây dựng.</div>
+        </div>
+        <div class="field">
+          <label>Số tầng dự kiến</label>
+          <select id="lc_floors" style="width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(201,168,76,.13);border-radius:10px;padding:13px;font-size:15px;font-family:var(--sans);color:var(--text);outline:none;cursor:pointer">
+            <option value="" style="background:#0d1120">— Chọn —</option>
+            <option value="1" style="background:#0d1120">1 tầng</option>
+            <option value="2" style="background:#0d1120">2 tầng</option>
+            <option value="3" style="background:#0d1120">3 tầng</option>
+            <option value="4" style="background:#0d1120">4 tầng</option>
+            <option value="5+" style="background:#0d1120">5 tầng trở lên</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Bạn cần gì? <span style="font-size:9px;font-weight:400;color:var(--muted)">(chọn 1 hoặc nhiều)</span></label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <label style="display:flex;align-items:center;gap:7px;padding:10px 11px;border:1.5px solid rgba(201,168,76,.13);border-radius:10px;cursor:pointer;background:rgba(255,255,255,.03)"><input type="checkbox" class="lc-needs-chk" value="kien_truc" style="width:14px;height:14px;accent-color:var(--gold);flex-shrink:0"><i class="ph-duotone ph-compass-tool" style="font-size:13px;color:var(--gold)"></i><span style="font-size:11px;color:var(--text2);font-weight:600">Thiết kế KTS</span></label>
+            <label style="display:flex;align-items:center;gap:7px;padding:10px 11px;border:1.5px solid rgba(201,168,76,.13);border-radius:10px;cursor:pointer;background:rgba(255,255,255,.03)"><input type="checkbox" class="lc-needs-chk" value="noi_that" style="width:14px;height:14px;accent-color:var(--gold);flex-shrink:0"><i class="ph-duotone ph-paint-brush-household" style="font-size:13px;color:var(--gold)"></i><span style="font-size:11px;color:var(--text2);font-weight:600">Nội thất</span></label>
+            <label style="display:flex;align-items:center;gap:7px;padding:10px 11px;border:1.5px solid rgba(201,168,76,.13);border-radius:10px;cursor:pointer;background:rgba(255,255,255,.03)"><input type="checkbox" class="lc-needs-chk" value="xay_dung" style="width:14px;height:14px;accent-color:var(--gold);flex-shrink:0"><i class="ph-duotone ph-hard-hat" style="font-size:13px;color:var(--gold)"></i><span style="font-size:11px;color:var(--text2);font-weight:600">Xây dựng trọn gói</span></label>
+            <label style="display:flex;align-items:center;gap:7px;padding:10px 11px;border:1.5px solid rgba(201,168,76,.13);border-radius:10px;cursor:pointer;background:rgba(255,255,255,.03)"><input type="checkbox" class="lc-needs-chk" value="tu_van" style="width:14px;height:14px;accent-color:var(--gold);flex-shrink:0"><i class="ph-duotone ph-yin-yang" style="font-size:13px;color:var(--gold)"></i><span style="font-size:11px;color:var(--text2);font-weight:600">Tư vấn & Phong thủy</span></label>
+          </div>
+        </div>
+        <button class="btn btn-ghost" id="lcBtn" onclick="doLeadCapture()" style="margin-top:6px;border-color:rgba(201,168,76,.22);color:var(--gold2)">
+          <i class="ph-duotone ph-paper-plane-tilt"></i> Gửi thông tin tư vấn
+        </button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -581,12 +637,16 @@ let CURRENT=null, cdTimer=null;
 const uploads={portfolio:[],projects:[],license:[]};
 
 /* Auth state */
+let _lcMode=false;
 onAuthStateChanged(auth, async (user)=>{
   if(!user){ showView('viewAuth'); return; }
+  if(_lcMode) return;
   try{
     const snap=await getDoc(doc(db,'reservations',user.uid));
     if(!snap.exists()){ showView('viewAuth'); return; }
     CURRENT={...snap.data(),uid:user.uid};
+    if(CURRENT.role==='cn' && CURRENT.status==='active'){ location.href='../client_CN.html'; return; }
+    if(CURRENT.role==='cn'){ showView('viewAuth'); return; }
     renderDash();
     showView('viewDash');
     showPwaBanner();
@@ -617,6 +677,9 @@ window.doRegister=async function(){
       const uref=doc(db,'users',uid);
       const usnap=await getDoc(uref);
       if(!usnap.exists()) await setDoc(uref,{name,phone,role:'cn',status:'active',createdAt:serverTimestamp()});
+      const rref=doc(db,'reservations',uid);
+      const rsnap=await getDoc(rref);
+      if(!rsnap.exists()) await setDoc(rref,{uid,name,phone,role:'cn',status:'active',reservedAt:serverTimestamp()});
       showToast('Tạo tài khoản thành công ✓ Đang vào...');
       setTimeout(function(){ location.href='../client_CN.html'; },1000);
     } else {
@@ -820,6 +883,47 @@ function goWorkspace(){
   setTimeout(function(){location.href=MAP[CURRENT&&CURRENT.role]||'../login.html';},900);
 }
 window.goWorkspace=goWorkspace;
+
+/* ══ LEAD CAPTURE (để lại thông tin, không cần đăng ký đầy đủ) ══ */
+window.doLeadCapture=async function(){
+  const name=(document.getElementById('lc_name').value||'').trim();
+  const phone=cleanPhone(document.getElementById('lc_phone').value);
+  const area=Number((document.getElementById('lc_area')||{}).value||0);
+  const floors=((document.getElementById('lc_floors')||{}).value)||'';
+  const needs=[];
+  document.querySelectorAll('.lc-needs-chk:checked').forEach(cb=>needs.push(cb.value));
+  if(!name){showToast('Vui lòng nhập họ tên',true);return;}
+  if(!validPhone(phone)){showToast('SĐT chưa đúng (10 số, bắt đầu bằng 0)',true);return;}
+  const btn=document.getElementById('lcBtn');
+  btn.disabled=true;btn.innerHTML='<i class="ph-duotone ph-spinner ph-spin"></i> Đang gửi…';
+  const email=phone+'@aln.vn';
+  _lcMode=true;
+  try{
+    let uid;
+    try{const c=await createUserWithEmailAndPassword(auth,email,phone);uid=c.user.uid;}
+    catch(e){if(e.code==='auth/email-already-in-use'){const c=await signInWithEmailAndPassword(auth,email,phone);uid=c.user.uid;}else throw e;}
+    const consult={area,floors,needs,submittedAt:serverTimestamp()};
+    const uref=doc(db,'users',uid),usnap=await getDoc(uref);
+    if(!usnap.exists()) await setDoc(uref,{name,phone,role:'cn',status:'lead',consultationRequest:consult,createdAt:serverTimestamp()});
+    else await updateDoc(uref,{consultationRequest:consult});
+    const rref=doc(db,'reservations',uid),rsnap=await getDoc(rref);
+    if(!rsnap.exists()) await setDoc(rref,{uid,name,phone,role:'cn',status:'lead',consultationRequest:consult,reservedAt:serverTimestamp()});
+    else await updateDoc(rref,{consultationRequest:consult});
+    await signOut(auth);
+    document.getElementById('leadPanel').innerHTML=
+      '<div style="text-align:center;padding:22px 16px;background:rgba(61,214,140,.06);border:1px solid rgba(61,214,140,.2);border-radius:18px">'
+      +'<div style="font-size:32px;color:var(--green);margin-bottom:8px"><i class="ph-duotone ph-check-circle"></i></div>'
+      +'<div style="font-family:var(--syne);font-size:14px;font-weight:700;color:var(--green)">Đã ghi nhận!</div>'
+      +'<div style="font-size:12px;color:var(--sub);margin-top:6px;line-height:1.65">Đội ALN sẽ liên hệ qua SĐT của bạn trong vòng 24 giờ.</div>'
+      +'</div>';
+    showToast('Đã gửi ✓ ALN sẽ liên hệ sớm');
+  }catch(err){
+    let m='Có lỗi, thử lại';
+    if(err.code==='auth/network-request-failed')m='Lỗi mạng';
+    showToast(m,true);
+    btn.disabled=false;btn.innerHTML='<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi thông tin tư vấn';
+  }finally{_lcMode=false;}
+};
 </script>
 </body>
 </html>
