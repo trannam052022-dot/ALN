@@ -493,12 +493,46 @@ window.installPwa=async function(){
     if(res.outcome==='accepted') document.getElementById('pwaBanner').classList.remove('show');
     _deferredPrompt=null;
   } else if(_isIos){
-    showToast('iOS: Bấm nút Share ⎙ → "Thêm vào màn hình chính"');
+    showDesktopGuide('ios');
   } else {
-    // Chrome: chỉ tay vào icon cài trên thanh địa chỉ
-    showToast('Nhấn biểu tượng ⊕ hoặc ⊞ trên thanh địa chỉ Chrome để cài');
+    showDesktopGuide('chrome');
   }
 };
+
+function showDesktopGuide(type){
+  var html='';
+  if(type==='ios'){
+    html='<div style="font-size:13px;line-height:1.7">'
+      +'<b style="color:var(--gold2)">Cài trên iPhone / iPad</b><br>'
+      +'① Bấm nút <b>Share</b> <span style="font-size:16px">⎙</span> ở thanh dưới Safari<br>'
+      +'② Chọn <b>"Thêm vào Màn hình chính"</b><br>'
+      +'③ Bấm <b>Thêm</b> — icon ALN xuất hiện trên home screen</div>';
+  } else {
+    var isEdge=/edg/i.test(navigator.userAgent);
+    html='<div style="font-size:13px;line-height:1.7">'
+      +(isEdge
+        ? '<b style="color:var(--gold2)">Cài trên Edge (máy tính)</b><br>'
+          +'Nhấn icon <b>⊕</b> bên phải thanh địa chỉ → <b>Cài đặt</b>'
+        : '<b style="color:var(--gold2)">Cài trên Chrome (máy tính)</b><br>'
+          +'① Nhìn góc phải thanh địa chỉ — tìm icon <b style="font-size:16px">⊕</b> hoặc <b>⊞</b><br>'
+          +'② Nếu chưa thấy: mở menu <b>⋮</b> → <b>"Lưu và chia sẻ"</b> → <b>"Cài đặt trang này dưới dạng ứng dụng"</b><br>'
+          +'③ Hoặc dùng <b>điện thoại Android + Chrome</b> để cài nhanh hơn')
+      +'</div>';
+  }
+  // hiện modal nhỏ
+  var old=document.getElementById('pwaGuideModal');
+  if(old) old.remove();
+  var modal=document.createElement('div');
+  modal.id='pwaGuideModal';
+  modal.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(4,6,12,.82);backdrop-filter:blur(8px);padding:20px';
+  modal.innerHTML='<div style="background:#0e1422;border:1px solid rgba(201,168,76,.28);border-radius:18px;padding:26px 24px;max-width:360px;width:100%;position:relative">'
+    +'<button onclick="document.getElementById(\'pwaGuideModal\').remove()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:rgba(240,230,204,.4);font-size:18px;cursor:pointer">✕</button>'
+    +html
+    +'<button onclick="document.getElementById(\'pwaGuideModal\').remove()" style="margin-top:18px;width:100%;padding:12px;border-radius:9px;background:linear-gradient(100deg,#7a5c18,#e8d07a 55%,#C9A84C);color:#1a1407;font-weight:700;font-size:13px;border:none;cursor:pointer;font-family:var(--syne)">Đã hiểu</button>'
+    +'</div>';
+  document.body.appendChild(modal);
+  modal.addEventListener('click',function(e){if(e.target===modal)modal.remove();});
+}
 window.dismissPwa=function(){
   document.getElementById('pwaBanner').classList.remove('show');
   sessionStorage.setItem('pwaDismissed','1');
