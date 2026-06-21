@@ -1381,13 +1381,14 @@ body::after {
         <i class="ph-duotone ph-arrow-clockwise"></i> Tải lại
       </button>
     </div>
-    <!-- Filter tabs -->
-    <div style="display:flex;gap:6px;padding-bottom:12px" id="wrFilterRow">
-      <button onclick="wrFilter('all')" id="wrf_all" style="padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(167,139,250,.4);background:rgba(124,58,237,.15);color:#a78bfa;font-family:var(--sans)">Tất cả</button>
-      <button onclick="wrFilter('submitted')" id="wrf_submitted" style="padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--raised);color:var(--dim);font-family:var(--sans)">Chờ duyệt</button>
-      <button onclick="wrFilter('reserved')" id="wrf_reserved" style="padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--raised);color:var(--dim);font-family:var(--sans)">Giữ chỗ</button>
-      <button onclick="wrFilter('approved')" id="wrf_approved" style="padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--raised);color:var(--dim);font-family:var(--sans)">Đã duyệt</button>
+    <!-- Role tabs -->
+    <div style="display:flex;gap:6px;padding-bottom:0" id="wrFilterRow">
+      <button onclick="wrFilter('architect')" id="wrf_architect" style="padding:6px 14px;border-radius:7px 7px 0 0;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(245,158,11,.4);border-bottom:none;background:rgba(245,158,11,.12);color:var(--amber);font-family:var(--sans);display:flex;align-items:center;gap:5px"><i class="ph-duotone ph-compass-tool"></i>KTS <span id="wrc_architect" style="background:rgba(245,158,11,.25);border-radius:99px;padding:0 5px;font-size:9px">0</span></button>
+      <button onclick="wrFilter('designer')" id="wrf_designer" style="padding:6px 14px;border-radius:7px 7px 0 0;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);border-bottom:none;background:var(--raised);color:var(--dim);font-family:var(--sans);display:flex;align-items:center;gap:5px"><i class="ph-duotone ph-paint-brush-household"></i>Designer <span id="wrc_designer" style="background:rgba(255,255,255,.06);border-radius:99px;padding:0 5px;font-size:9px">0</span></button>
+      <button onclick="wrFilter('business')" id="wrf_business" style="padding:6px 14px;border-radius:7px 7px 0 0;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);border-bottom:none;background:var(--raised);color:var(--dim);font-family:var(--sans);display:flex;align-items:center;gap:5px"><i class="ph-duotone ph-buildings"></i>Doanh nghiệp <span id="wrc_business" style="background:rgba(255,255,255,.06);border-radius:99px;padding:0 5px;font-size:9px">0</span></button>
+      <button onclick="wrFilter('cn')" id="wrf_cn" style="padding:6px 14px;border-radius:7px 7px 0 0;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);border-bottom:none;background:var(--raised);color:var(--dim);font-family:var(--sans);display:flex;align-items:center;gap:5px"><i class="ph-duotone ph-house-line"></i>Chủ nhà <span id="wrc_cn" style="background:rgba(255,255,255,.06);border-radius:99px;padding:0 5px;font-size:9px">0</span></button>
     </div>
+    <div style="height:1px;background:var(--border);margin-bottom:0"></div>
   </div>
   <div id="wrList" style="padding:16px 20px;display:flex;flex-direction:column;gap:10px">
     <div style="color:var(--dim);font-size:12px;text-align:center;padding:40px 0">Đang tải...</div>
@@ -4086,10 +4087,17 @@ window._recruitDelete = async function(id){
    PHÒNG CHỜ — reservations/
 ══════════════════════════════════════════ */
 var _wrData = [];
-var _wrCurrentFilter = 'all';
+var _wrCurrentFilter = 'architect';
 
-var WR_ROLE_LABEL = { architect:'KTS', designer:'Designer NT', business:'Doanh nghiệp' };
-var WR_ROLE_COLOR = { architect:'var(--amber)', designer:'#a78bfa', business:'var(--blue)' };
+var WR_ROLE_LABEL = { architect:'KTS', designer:'Designer NT', business:'Doanh nghiệp', cn:'Chủ nhà' };
+var WR_ROLE_COLOR = { architect:'var(--amber)', designer:'#a78bfa', business:'var(--blue)', cn:'var(--green)' };
+var WR_TAB_STYLE = {
+  architect: { on:'padding:6px 14px;border-radius:7px 7px 0 0;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(245,158,11,.5);border-bottom:2px solid var(--bg);background:rgba(245,158,11,.18);color:var(--amber);font-family:var(--sans);display:flex;align-items:center;gap:5px', off:'padding:6px 14px;border-radius:7px 7px 0 0;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);border-bottom:none;background:var(--raised);color:var(--dim);font-family:var(--sans);display:flex;align-items:center;gap:5px' },
+  designer:  { on:'padding:6px 14px;border-radius:7px 7px 0 0;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(167,139,250,.5);border-bottom:2px solid var(--bg);background:rgba(124,58,237,.18);color:#a78bfa;font-family:var(--sans);display:flex;align-items:center;gap:5px',   off:'padding:6px 14px;border-radius:7px 7px 0 0;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);border-bottom:none;background:var(--raised);color:var(--dim);font-family:var(--sans);display:flex;align-items:center;gap:5px' },
+  business:  { on:'padding:6px 14px;border-radius:7px 7px 0 0;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(59,130,246,.5);border-bottom:2px solid var(--bg);background:rgba(59,130,246,.15);color:var(--blue);font-family:var(--sans);display:flex;align-items:center;gap:5px',   off:'padding:6px 14px;border-radius:7px 7px 0 0;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);border-bottom:none;background:var(--raised);color:var(--dim);font-family:var(--sans);display:flex;align-items:center;gap:5px' },
+  cn:        { on:'padding:6px 14px;border-radius:7px 7px 0 0;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(16,185,129,.5);border-bottom:2px solid var(--bg);background:rgba(16,185,129,.14);color:var(--green);font-family:var(--sans);display:flex;align-items:center;gap:5px',  off:'padding:6px 14px;border-radius:7px 7px 0 0;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);border-bottom:none;background:var(--raised);color:var(--dim);font-family:var(--sans);display:flex;align-items:center;gap:5px' },
+};
+var WR_COUNT_COLOR = { architect:'rgba(245,158,11,.28)', designer:'rgba(167,139,250,.28)', business:'rgba(59,130,246,.22)', cn:'rgba(16,185,129,.22)' };
 
 window.loadWaitRoom = async function() {
   document.getElementById('wrList').innerHTML = '<div style="color:var(--dim);font-size:12px;text-align:center;padding:40px 0"><i class="ph-duotone ph-spinner" style="animation:spin 1s linear infinite;display:inline-block;margin-right:6px"></i>Đang tải...</div>';
@@ -4097,31 +4105,29 @@ window.loadWaitRoom = async function() {
     const snap = await getDocs(collection(db, 'reservations'));
     _wrData = snap.docs.map(d => Object.assign({ uid: d.id }, d.data()))
       .sort((a,b) => (b.reservedAt?.seconds||0) - (a.reservedAt?.seconds||0));
-    // badge: số chờ duyệt
+    // cập nhật count badge trên mỗi tab
+    ['architect','designer','business','cn'].forEach(function(role) {
+      var cnt = _wrData.filter(r => r.role === role).length;
+      var el = document.getElementById('wrc_'+role);
+      if(el){ el.textContent = cnt; el.style.background = cnt>0 ? WR_COUNT_COLOR[role] : 'rgba(255,255,255,.06)'; }
+    });
+    // badge tổng chờ duyệt trên tab nav
     const pending = _wrData.filter(r => r.profileSubmitted && r.status !== 'approved' && r.status !== 'rejected').length;
     const badge = document.getElementById('waitRoomBadge');
     if(badge){ badge.textContent = pending; badge.style.display = pending > 0 ? '' : 'none'; }
     wrFilter(_wrCurrentFilter);
   } catch(e) {
-    document.getElementById('wrList').innerHTML = '<div style="color:var(--red);font-size:12px;text-align:center;padding:40px 0">Lỗi tải dữ liệu: ' + (e.message||e.code) + '</div>';
+    document.getElementById('wrList').innerHTML = '<div style="color:var(--red);font-size:12px;text-align:center;padding:40px 0">Lỗi: ' + (e.message||e.code) + '</div>';
   }
 };
 
 window.wrFilter = function(f) {
   _wrCurrentFilter = f;
-  // cập nhật style filter buttons
-  ['all','submitted','reserved','approved'].forEach(function(k) {
+  ['architect','designer','business','cn'].forEach(function(k) {
     var btn = document.getElementById('wrf_'+k);
-    if(!btn) return;
-    btn.style.cssText = k === f
-      ? 'padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(167,139,250,.45);background:rgba(124,58,237,.18);color:#a78bfa;font-family:var(--sans)'
-      : 'padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--raised);color:var(--dim);font-family:var(--sans)';
+    if(btn) btn.style.cssText = WR_TAB_STYLE[k][k===f?'on':'off'];
   });
-  var list = _wrData;
-  if(f === 'submitted') list = list.filter(r => r.profileSubmitted && r.status !== 'approved');
-  else if(f === 'reserved') list = list.filter(r => !r.profileSubmitted);
-  else if(f === 'approved') list = list.filter(r => r.status === 'approved');
-  renderWrList(list);
+  renderWrList(_wrData.filter(r => r.role === f));
 };
 
 function renderWrList(list) {
