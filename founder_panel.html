@@ -3757,10 +3757,15 @@ function _startFounderListen() {
     window.DN_PROJECTS = snap.docs.map(function(d){ return _adaptForFounder(d.id, d.data()); });
     window._dnLoaded = true;
     console.log('[Founder] Loaded', window.DN_PROJECTS.length, 'dự án');
+    try { if(typeof window.renderTable==='function') window.renderTable(); } catch(e){ console.error('renderTable',e); }
+    try { if(typeof window.renderStats==='function') window.renderStats(); } catch(e){}
     document.dispatchEvent(new CustomEvent('aln:projects-loaded'));
     _loadMgData();
   }, function(err){
     console.error('[Founder] Firestore error:', err.code, err.message);
+    var tbody = document.getElementById('tableBody');
+    if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#f06060"><i class="ph-duotone ph-warning"></i> Lỗi Firestore: <strong>' + (err.code||err.message) + '</strong></td></tr>';
+    var pi = document.getElementById('pageInfo'); if(pi) pi.textContent = 'Lỗi tải dữ liệu';
     document.dispatchEvent(new CustomEvent('aln:projects-error', { detail: err.code || err.message }));
   });
 }
