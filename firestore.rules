@@ -105,6 +105,12 @@ service cloud.firestore {
       allow delete: if isFounder();
     }
 
+    // Module Giữ chỗ — mỗi user chỉ đọc/ghi bản ghi của chính mình
+    match /reservations/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read: if isFounder();
+    }
+
     match /projects/{pid} {
       // Chỉ THÀNH VIÊN của dự án (CN/KTS/DN) hoặc Founder mới đọc được.
       // Mỗi nhánh khớp với 1 kiểu query: cn.uid (CN), kts.uid (KTS),
