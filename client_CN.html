@@ -3399,6 +3399,12 @@ onAuthStateChanged(auth, async (user) => {
     try { localStorage.setItem("aln_user", ud); } catch(e){}
     try { sessionStorage.setItem("aln_user", ud); } catch(e){}
 
+    // Cập nhật sidebar tên CN từ Firestore (IIFE có thể đã chạy với data cũ)
+    const _sbName = document.getElementById('cnSidebarName');
+    if (_sbName) _sbName.textContent = profile.name || '';
+    const _sbAv = document.getElementById('cnSidebarAv');
+    if (_sbAv) { const _w=(profile.name||'').trim().split(/\s+/); _sbAv.textContent=_w.length>=2?(_w[0][0]+_w[_w.length-1][0]).toUpperCase():(profile.name||'CN').slice(0,2).toUpperCase(); }
+
     // Xác thực OK → mở màn che
     const veil = document.getElementById("alnAuthVeil");
     if (veil) veil.remove();
