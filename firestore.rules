@@ -98,6 +98,13 @@ service cloud.firestore {
       allow delete: if isFounder();
     }
 
+    match /ctvApplications/{uid} {
+      allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow create: if signedIn() && request.auth.uid == uid;
+      allow update: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow delete: if isFounder();
+    }
+
     match /projects/{pid} {
       // Chỉ THÀNH VIÊN của dự án (CN/KTS/DN) hoặc Founder mới đọc được.
       // Mỗi nhánh khớp với 1 kiểu query: cn.uid (CN), kts.uid (KTS),
