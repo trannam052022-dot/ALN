@@ -312,6 +312,10 @@ input::placeholder{color:var(--muted)}
             <i class="ph-duotone ph-buildings"></i>
             <div class="rtab-name">Doanh nghiệp</div><div class="rtab-tag">Tìm KTS</div>
           </div>
+          <div class="rtab" data-room="cn" onclick="pickRoom('cn',this)">
+            <i class="ph-duotone ph-house-line"></i>
+            <div class="rtab-name">Chủ nhà</div><div class="rtab-tag">Xây nhà</div>
+          </div>
         </div>
 
         <div class="field">
@@ -448,11 +452,21 @@ function cleanPhone(p){return(p||'').replace(/\D/g,'');}
 function validPhone(p){return/^0\d{9}$/.test(p);}
 
 var selectedRoom='architect';
-var ROOM_LABEL={architect:'KTS',designer:'Designer NT',business:'Doanh nghiệp'};
+var ROOM_LABEL={architect:'KTS',designer:'Designer NT',business:'Doanh nghiệp',cn:'Chủ nhà'};
+var ROOM_CARD={
+  architect:{title:'Giữ chỗ ngay',sub:'KTS — điền 2 ô, xong trong 30 giây',btn:'Giữ chỗ &amp; Vào phòng chờ'},
+  designer: {title:'Giữ chỗ ngay',sub:'Designer — điền 2 ô, xong trong 30 giây',btn:'Giữ chỗ &amp; Vào phòng chờ'},
+  business: {title:'Giữ chỗ ngay',sub:'Doanh nghiệp — điền 2 ô, xong trong 30 giây',btn:'Giữ chỗ &amp; Vào phòng chờ'},
+  cn:       {title:'Đăng ký Chủ nhà',sub:'Tạo tài khoản ngay — ALN liên hệ để khởi tạo dự án',btn:'Đăng ký &amp; Vào ngay'},
+};
 function pickRoom(r,el){
   selectedRoom=r;
   document.querySelectorAll('#roomTabs .rtab').forEach(function(x){x.classList.remove('on');});
   el.classList.add('on');
+  var c=ROOM_CARD[r]||ROOM_CARD.architect;
+  var t=document.querySelector('.card-title'); if(t) t.textContent=c.title.replace('&amp;','&');
+  var s=document.querySelector('.card-sub');   if(s) s.textContent=c.sub;
+  var b=document.getElementById('regBtn');     if(b) b.innerHTML='<i class="ph-duotone ph-bookmark-simple"></i> '+c.btn;
 }
 function showLogin(){document.getElementById('panelRegister').style.display='none';document.getElementById('panelLogin').style.display='';}
 function showRegister(){document.getElementById('panelLogin').style.display='none';document.getElementById('panelRegister').style.display='';}
@@ -586,7 +600,9 @@ window.doRegister=async function(){
   const btn=document.getElementById('regBtn');
   if(!name){showToast('Vui lòng nhập họ tên',true);return;}
   if(!validPhone(phone)){showToast('SĐT chưa đúng (10 số, bắt đầu bằng 0)',true);return;}
-  btn.disabled=true;btn.innerHTML='<i class="ph-duotone ph-spinner ph-spin"></i> Đang giữ chỗ…';
+  const isCn = selectedRoom==='cn';
+  btn.disabled=true;
+  btn.innerHTML='<i class="ph-duotone ph-spinner ph-spin"></i> '+(isCn?'Đang tạo tài khoản…':'Đang giữ chỗ…');
   const email=phone+'@aln.vn';
   try{
     let uid;
@@ -595,25 +611,37 @@ window.doRegister=async function(){
       if(e.code==='auth/email-already-in-use'){ const c=await signInWithEmailAndPassword(auth,email,phone); uid=c.user.uid; }
       else throw e;
     }
-    const deadline=Date.now()+RESERVE_DAYS*864e5;
-    const uref=doc(db,'users',uid);
-    const usnap=await getDoc(uref);
-    if(!usnap.exists()) await setDoc(uref,{name,phone,role:selectedRoom,status:'reserved',profileSubmitted:false,createdAt:serverTimestamp()});
-    const rref=doc(db,'reservations',uid);
-    const rsnap=await getDoc(rref);
-    if(!rsnap.exists()){
-      await setDoc(rref,{uid,name,phone,role:selectedRoom,status:'reserved',profileSubmitted:false,reminderCount:0,reservedAt:serverTimestamp(),deadlineMs:deadline});
-      CURRENT={uid,name,phone,role:selectedRoom,status:'reserved',profileSubmitted:false,deadlineMs:deadline};
+
+    if(isCn){
+      /* ── Chủ nhà: tạo account active, vào thẳng client_CN ── */
+      const uref=doc(db,'users',uid);
+      const usnap=await getDoc(uref);
+      if(!usnap.exists()) await setDoc(uref,{name,phone,role:'cn',status:'active',createdAt:serverTimestamp()});
+      showToast('Tạo tài khoản thành công ✓ Đang vào...');
+      setTimeout(function(){ location.href='../client_CN.html'; },1000);
     } else {
-      CURRENT={...rsnap.data(),uid};
+      /* ── KTS / Designer / DN: giữ chỗ → phòng chờ ── */
+      const deadline=Date.now()+RESERVE_DAYS*864e5;
+      const uref=doc(db,'users',uid);
+      const usnap=await getDoc(uref);
+      if(!usnap.exists()) await setDoc(uref,{name,phone,role:selectedRoom,status:'reserved',profileSubmitted:false,createdAt:serverTimestamp()});
+      const rref=doc(db,'reservations',uid);
+      const rsnap=await getDoc(rref);
+      if(!rsnap.exists()){
+        await setDoc(rref,{uid,name,phone,role:selectedRoom,status:'reserved',profileSubmitted:false,reminderCount:0,reservedAt:serverTimestamp(),deadlineMs:deadline});
+        CURRENT={uid,name,phone,role:selectedRoom,status:'reserved',profileSubmitted:false,deadlineMs:deadline};
+      } else {
+        CURRENT={...rsnap.data(),uid};
+      }
+      renderDash(); showView('viewDash'); showPwaBanner();
+      showToast('Đã giữ chỗ ✓ Nhấn "Nộp hồ sơ ngay" để tiếp tục');
     }
-    renderDash(); showView('viewDash'); showPwaBanner();
-    showToast('Đã giữ chỗ ✓ Nhấn "Nộp hồ sơ ngay" để tiếp tục');
   }catch(err){
     let m='Có lỗi, thử lại';
     if(err.code==='auth/network-request-failed') m='Lỗi mạng';
     showToast(m,true);
-    btn.disabled=false;btn.innerHTML='<i class="ph-duotone ph-bookmark-simple"></i> Giữ chỗ &amp; Vào phòng chờ';
+    btn.disabled=false;
+    btn.innerHTML='<i class="ph-duotone ph-bookmark-simple"></i> '+(isCn?'Đăng ký &amp; Vào ngay':'Giữ chỗ &amp; Vào phòng chờ');
   }
 };
 

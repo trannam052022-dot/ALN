@@ -3233,8 +3233,21 @@ function _startProjectsListenCN() {
       try { if(typeof window.renderSidebar==='function') window.renderSidebar(); } catch(e){ console.error('[CN render]',e); }
       try { if(typeof window.selectProj==='function') window.selectProj(window.activeProj); } catch(e){}
     } else {
+      // Empty state — CN mới đăng ký chưa có dự án
       var el = document.getElementById('projList');
-      if (el) el.innerHTML = '<div style="padding:16px;color:var(--sub);font-size:13px">Chưa có dự án nào của bạn.</div>';
+      if(el) el.innerHTML = '<div style="padding:20px 16px;text-align:center">'
+        +'<div style="width:48px;height:48px;border-radius:50%;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px;color:var(--green)"><i class="ph-duotone ph-house-line"></i></div>'
+        +'<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px">Tài khoản đã kích hoạt</div>'
+        +'<div style="font-size:11px;color:var(--sub);line-height:1.6">ALN sẽ liên hệ sớm để<br>khởi tạo dự án của bạn.</div>'
+        +'</div>';
+      // Xoá main content, hiện empty state toàn trang
+      var main = document.getElementById('mainContent') || document.querySelector('.main-content');
+      if(main) main.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;padding:40px;text-align:center">'
+        +'<div style="width:80px;height:80px;border-radius:50%;background:rgba(16,185,129,.06);border:1.5px solid rgba(16,185,129,.18);display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--green)"><i class="ph-duotone ph-check-circle"></i></div>'
+        +'<div style="font-family:var(--serif,serif);font-size:28px;font-weight:300;color:var(--text1)">Xin chào, <b style="font-weight:600">'+( window._cnCurrentName||'bạn')+'</b></div>'
+        +'<div style="font-size:13px;color:var(--sub);line-height:1.75;max-width:320px">Tài khoản Chủ nhà đã sẵn sàng.<br>ALN sẽ liên hệ để trao đổi và tạo dự án cho bạn.</div>'
+        +'<div style="font-size:11px;color:var(--dim);margin-top:4px">Câu hỏi? Liên hệ ALN qua Zalo hoặc hotline.</div>'
+        +'</div>';
     }
   }, function(err){ console.error('[CN] Lỗi:', err.code, err.message); });
 }
@@ -3402,6 +3415,7 @@ onAuthStateChanged(auth, async (user) => {
     // Cập nhật sidebar tên CN từ Firestore
     // Nếu Founder xem trang này → hiện tên CN thật, không hiện tên Founder
     let _displayName = profile.role === 'founder' ? 'Trần Nam' : (profile.name || '');
+    window._cnCurrentName = _displayName;
     const _sbName = document.getElementById('cnSidebarName');
     if (_sbName) _sbName.textContent = _displayName;
     const _sbAv = document.getElementById('cnSidebarAv');
