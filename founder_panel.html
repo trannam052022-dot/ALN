@@ -3636,7 +3636,7 @@ const REQUIRED_ROLE = "founder";
 
 function _adaptForFounder(id, d) {
   var prog = d.progress || {};
-  return { id: id, name: d.name||'', cn: (d.cn&&d.cn.name)||'', kts: (d.kts&&d.kts.name)||'', dn: (d.dn&&d.dn.name)||'', stage: d.stage||'C1', status: d.status||'on_track', progress: [prog.C1||0, prog.C2||0, prog.C3||0, prog.C4||0], escrow: d.escrowBalance||0, total: d.totalFee||0, _raw: d };
+  return { id: d.code||id, name: d.name||'', cn: (d.cn&&d.cn.name)||'', kts: (d.kts&&d.kts.name)||'', dn: (d.dn&&d.dn.name)||'', stage: d.stage||'C1', status: d.status||'on_track', progress: [prog.C1||0, prog.C2||0, prog.C3||0, prog.C4||0], escrow: d.escrowBalance||0, total: d.totalFee||0, _raw: d };
 }
 window.founderApprovePending = async function(uid, role) {
   try {
