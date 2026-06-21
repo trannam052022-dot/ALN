@@ -297,27 +297,8 @@ input::placeholder{color:var(--muted)}
       </p>
     </div>
 
-    <!-- ═══ TWO CTAs ═══ -->
-    <div style="margin-bottom:6px">
-      <button class="btn btn-gold" onclick="openRegisterPanel()" style="margin-bottom:10px">
-        <i class="ph-duotone ph-clipboard-text"></i>
-        LÀM KHẢO SÁT NHẬN BÁO GIÁ
-        <i class="ph-duotone ph-arrow-right" style="margin-left:auto;font-size:16px"></i>
-      </button>
-      <button onclick="openLeadPanel()" id="btnOpenLead" style="width:100%;padding:15px;border-radius:11px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);color:var(--text2);font-family:var(--syne);font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .22s" onmouseover="this.style.background='rgba(255,255,255,.07)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">
-        <i class="ph-duotone ph-envelope-open" style="font-size:16px;color:var(--gold)"></i>
-        Hoặc để lại thông tin
-      </button>
-      <div style="text-align:center;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:4px;font-size:11px;color:var(--muted)">
-        <span style="color:#f5c842">⭐</span> 87% khách hàng tin tưởng ALN sau lần đầu liên hệ
-      </div>
-      <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--muted)">
-        Đã có tài khoản? <a onclick="showLoginDirect()" style="color:var(--gold);cursor:pointer;font-weight:600;text-decoration:none">Đăng nhập →</a>
-      </div>
-    </div>
-
     <!-- Panel đăng ký -->
-    <div id="panelRegister" style="display:none;margin-top:18px">
+    <div id="panelRegister">
       <div class="card">
         <div class="card-title">Giữ chỗ ngay</div>
         <div class="card-sub">Điền 2 ô, xong trong 30 giây</div>
@@ -397,28 +378,13 @@ input::placeholder{color:var(--muted)}
         <!-- Toggle header -->
         <div onclick="toggleLeadBody()" style="padding:18px 22px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;user-select:none">
           <div>
-            <div style="font-family:var(--syne);font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text)">Để lại thông tin nhanh</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:3px">Đội ALN gọi lại trong 24 giờ · Miễn phí</div>
+            <div style="font-family:var(--syne);font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text)">Thêm thông tin về ngôi nhà</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px">Diện tích · Số tầng · Nhu cầu — để nhận báo giá chính xác hơn</div>
           </div>
           <span id="lcArrowIcon" style="color:var(--gold);font-size:11px;flex-shrink:0;transition:transform .25s;display:inline-block">▼</span>
         </div>
         <!-- Form body -->
         <div id="lcFormBody" style="display:none;border-top:1px solid rgba(201,168,76,.09);padding:18px 22px 22px">
-          <div style="font-size:12px;color:var(--sub);margin-bottom:18px;line-height:1.65">
-            Hoặc bạn có thể <a onclick="openRegisterPanel()" style="color:var(--gold);cursor:pointer;font-weight:600;text-decoration:none">đăng ký đầy đủ ngay</a> để kết nối trực tiếp với KTS!
-          </div>
-          <div class="field">
-            <label>Họ và tên <span style="color:var(--gold)">✦</span></label>
-            <div class="field-wrap"><i class="ph-duotone ph-user fi"></i>
-              <input type="text" id="lc_name" placeholder="VD: Nguyễn Văn A" autocomplete="name">
-            </div>
-          </div>
-          <div class="field">
-            <label>Số điện thoại <span style="color:var(--gold)">✦</span></label>
-            <div class="field-wrap"><i class="ph-duotone ph-phone fi"></i>
-              <input type="tel" id="lc_phone" placeholder="0901 234 567" inputmode="numeric">
-            </div>
-          </div>
           <div class="field">
             <label>Diện tích đất (m²)</label>
             <div class="field-wrap"><i class="ph-duotone ph-ruler fi"></i>
@@ -939,8 +905,8 @@ window.goWorkspace=goWorkspace;
 
 /* ══ LEAD CAPTURE (để lại thông tin, không cần đăng ký đầy đủ) ══ */
 window.doLeadCapture=async function(){
-  const name=(document.getElementById('lc_name').value||'').trim();
-  const phone=cleanPhone(document.getElementById('lc_phone').value);
+  const name=(document.getElementById('r_name').value||'').trim();
+  const phone=cleanPhone(document.getElementById('r_phone').value);
   const area=Number((document.getElementById('lc_area')||{}).value||0);
   const floors=((document.getElementById('lc_floors')||{}).value)||'';
   const needs=[];
