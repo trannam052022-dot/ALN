@@ -3524,6 +3524,18 @@ function _renderRecruitList(){
 
 function escFounder(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+// Lắng nghe events từ module script
+document.addEventListener('aln:projects-loaded', function() {
+  try { if(typeof renderTable==='function') renderTable(); } catch(e){ console.error('renderTable', e); }
+  try { if(typeof renderStats==='function') renderStats(); } catch(e){}
+});
+document.addEventListener('aln:projects-error', function(ev) {
+  var code = ev.detail || 'unknown';
+  var tbody = document.getElementById('tableBody');
+  if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#f06060"><i class="ph-duotone ph-warning"></i> Lỗi tải dự án: <strong>' + code + '</strong><br><span style="font-size:10px;opacity:.7">Kiểm tra Firebase Console → App Check hoặc Firestore Rules</span></td></tr>';
+  var pi = document.getElementById('pageInfo'); if(pi) pi.textContent = 'Lỗi tải dữ liệu';
+  try { if(typeof toast==='function') toast('Firestore: ' + code, 'err'); } catch(e){}
+});
 
 </script>
 
@@ -3744,11 +3756,13 @@ function _startFounderListen() {
   onSnapshot(q, function(snap){
     window.DN_PROJECTS = snap.docs.map(function(d){ return _adaptForFounder(d.id, d.data()); });
     window._dnLoaded = true;
-    try { if(typeof renderStats==='function') renderStats(); } catch(e){}
-    try { if(typeof renderTable==='function') renderTable(); } catch(e){}
+    console.log('[Founder] Loaded', window.DN_PROJECTS.length, 'dự án');
+    document.dispatchEvent(new CustomEvent('aln:projects-loaded'));
     _loadMgData();
-    console.log('[Founder]', window.DN_PROJECTS.length, 'dự án');
-  }, function(err){ console.error('[Founder]', err.code); });
+  }, function(err){
+    console.error('[Founder] Firestore error:', err.code, err.message);
+    document.dispatchEvent(new CustomEvent('aln:projects-error', { detail: err.code || err.message }));
+  });
 }
 
 /* Tải tài liệu thật của một dự án từ Firestore */
