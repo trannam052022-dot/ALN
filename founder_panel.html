@@ -1694,7 +1694,10 @@ function _adaptDNtoRow(p) {
   var st = p.status||'on_track';
   var rowSt = st==='sla_warn'?'sla':st==='on_track'?'ok':st;
   var next = {C1:'C2',C2:'C3',C3:'C4',C4:'C4'}[p.stage]||'C4';
-  var _displayId = p.id;
+  var _isDN = !!(p._raw && p._raw.dn && p._raw.dn.uid);
+  var _displayId = (_isDN ? 'ALN-DN-' : 'ALN-CN-') + p.id.replace(/^ALN-/,'');
+  var _customer = _isDN ? (p.dn||'—') : (p.cn||'—');
+  var _customerSub = _isDN ? (p.cn ? p.cn : p.name||'') : (p.name||'');
   var cmds = [];
   if(p.stage!=='C4'&&st!=='done'){
     cmds.push({id:'STAGE_APPROVE',label:'DUYỆT CHẶNG '+p.stage+' → '+next,sub:'Chuyển chặng & ghi nhận tiến độ',icon:'<i class="ph-duotone ph-check-circle"></i>',style:'approve'});
@@ -1703,8 +1706,8 @@ function _adaptDNtoRow(p) {
   return {
     id:_displayId, _firestoreId:p.id, _real:true, _pdata:p,
     rowClass:st==='dispute'?'row-dispute':st==='sla_warn'?'row-sla':'',
-    cn:p.cn||'—', ktsName:p.kts||'—',
-    invest:p.name||p.id, contract:p.dn||'Dự án CN', floor:'Chặng '+p.stage,
+    cn:_customer, ktsName:p.kts||'—',
+    invest:_customerSub, contract:p.name||p.id, floor:'Chặng '+p.stage,
     stageLabel:p.stage||'C1', stageClass:STAGE_CLS[p.stage]||'sb-c1',
     stage:p.stage||'C1', status:rowSt,
     frozen:Math.round((p.escrow||0)/100),
@@ -1820,7 +1823,7 @@ function renderTable(keepShown) {
     const sm  = STATUS_MAP[r.status] || STATUS_MAP.ok;
     const am  = ACTION_MAP[r.status] || ACTION_MAP.ok;
     const fmtMoney = v => v >= 1000000 ? (v/1000000).toFixed(1).replace('.0','')+'M' : (v/1000).toFixed(0)+'K';
-    return `<tr class="${r.rowClass}" onclick="openDrawer('${r.id}')">
+    return `<tr class="${r.rowClass}" onclick="openDrawer('${r._firestoreId}')">
       <td><div class="col-id">${r.id}</div><div style="font-size:10px;color:var(--mute);margin-top:2px">${r.contract}</div></td>
       <td><div class="col-person">${r.cn}</div><div class="col-person-sub">${r.invest}</div></td>
       <td><div class="col-person">${r.ktsName}</div><div class="col-person-sub">${r.floor}</div></td>
@@ -1828,7 +1831,7 @@ function renderTable(keepShown) {
       <td><div class="col-money">${fmtMoney(r.frozen * 100)}đ</div></td>
       <td><span class="status-badge ${sm.cls}">${sm.label}</span></td>
       <td>
-        <button class="action-btn ${am.cls}" onclick="event.stopPropagation();openDrawer('${r.id}')">
+        <button class="action-btn ${am.cls}" onclick="event.stopPropagation();openDrawer('${r._firestoreId}')">
           ${am.label}
         </button>
       </td>
@@ -1883,7 +1886,8 @@ function openDrawer(id) {
 
   // Highlight row
   document.querySelectorAll('.row-active').forEach(r => r.classList.remove('row-active'));
-  document.querySelector(`[onclick="openDrawer('${id}')"]`)?.parentElement?.classList.add('row-active');
+  var _rowEl = document.querySelector('[onclick="openDrawer(\''+id+'\')"]');
+  if(_rowEl && _rowEl.parentElement) _rowEl.parentElement.classList.add('row-active');
 
   // Header
   document.getElementById('dhIcon').textContent = row.status === 'dispute' ? '⚠️' : row.status === 'sla' ? '⏰' : row.status === 'pending' ? '👁️' : '🗂️';
