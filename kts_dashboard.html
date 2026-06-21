@@ -2387,14 +2387,14 @@ const REQUIRED_ROLE = "kts";
 
 /* ══ KTS PROJECT: Firestore realtime ══ */
 function _startKtsProjectListen(uid) {
-  const q = query(
-    collection(db, 'projects'),
-    where('kts.uid', '==', uid),
-    orderBy('updatedAt', 'desc')
-  );
+  const q = uid
+    ? query(collection(db, 'projects'), where('kts.uid', '==', uid), orderBy('updatedAt', 'desc'))
+    : query(collection(db, 'projects'), orderBy('updatedAt', 'desc'));
   onSnapshot(q, snap => {
     if (snap.empty) {
       console.log('[KTS] Chưa có dự án nào được giao');
+      renderMyProjects([]);
+      if (typeof renderDashProjList === 'function') renderDashProjList([]);
       return;
     }
     // Lấy dự án đầu tiên (mới nhất)
@@ -2987,7 +2987,8 @@ onAuthStateChanged(auth, async (user) => {
     window.alnInitPush();
 
     // ── LOAD DỰ ÁN KTS TỪ FIRESTORE ──
-    _startKtsProjectListen(user.uid);
+    // Founder xem tất cả projects (giám sát), KTS chỉ xem của mình
+    _startKtsProjectListen(profile.role === 'founder' ? null : user.uid);
     // Điền form profile
     _fillProfileForm(profile);
     // Điền username vào Cài đặt
