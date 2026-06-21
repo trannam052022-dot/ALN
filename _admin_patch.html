@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>ALN Admin Patch</title>
+<style>
+  body { font-family: monospace; background: #0a0a0a; color: #0f0; padding: 24px; }
+  .ok  { color: #0f0; }
+  .err { color: #f44; }
+  .log { margin: 4px 0; }
+</style>
+</head>
+<body>
+<h2 style="color:#fff">ALN Admin Patch — Chạy 1 lần</h2>
+<div id="out"><div class="log">Đang khởi tạo Firebase...</div></div>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, setDoc, updateDoc, deleteField, serverTimestamp, collection }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCPv-KbyK8ajRba1b2wy5qSwc--m_vbRUc",
+  authDomain: "aln-platform.firebaseapp.com",
+  projectId: "aln-platform",
+  storageBucket: "aln-platform.firebasestorage.app",
+  messagingSenderId: "1073827504988",
+  appId: "1:1073827504988:web:8895fd6b68dff00a67d799"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+function log(msg, ok = true) {
+  const div = document.createElement('div');
+  div.className = 'log ' + (ok ? 'ok' : 'err');
+  div.textContent = msg;
+  document.getElementById('out').appendChild(div);
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { log('❌ Chưa đăng nhập. Mở trang này sau khi đăng nhập ở login.html', false); return; }
+  log('✓ Đăng nhập: ' + user.uid);
+
+  const FOUNDER_UID = 'h4kEguPEyMcwJwl89stc0Q6j2si2';
+  if (user.uid !== FOUNDER_UID) { log('❌ Cần đăng nhập bằng tài khoản founder', false); return; }
+
+  try {
+    // 1) Cập nhật ALN-9921: xóa field 'cn', cập nhật memberUids (chỉ KTS + DN)
+    log('Đang cập nhật ALN-9921...');
+    await updateDoc(doc(db, 'projects', 'ALN-9921'), {
+      cn: deleteField(),
+      memberUids: [
+        'kw5TgVDggIfboEqERS1cAphn3263',  // kts.tranlong
+        'aTyHR3oQw6P87xpA9p8hTr2NbGA2'   // dn.tkhouse
+      ]
+    });
+    log('✓ ALN-9921 đã xóa field cn, cập nhật memberUids');
+
+    // 2) Tạo mới CN project ALN-8821 (Nhà Phố — Trần Nam)
+    log('Đang tạo ALN-8821...');
+    await setDoc(doc(db, 'projects', 'ALN-8821'), {
+      code: 'ALN-8821',
+      name: 'Nhà Phố',
+      stage: 'C2',
+      status: 'on_track',
+      cn: {
+        uid: 'G4RhRH5ECMYcE9aFcKYVn5Wdy952',
+        name: 'Trần Nam',
+        username: 'cn.trannam'
+      },
+      kts: {
+        uid: 'kw5TgVDggIfboEqERS1cAphn3263',
+        name: 'KTS. Trần Đại Long',
+        username: 'kts.tranlong'
+      },
+      memberUids: [
+        'G4RhRH5ECMYcE9aFcKYVn5Wdy952',  // cn.trannam
+        'kw5TgVDggIfboEqERS1cAphn3263'    // kts.tranlong
+      ],
+      progress: { C1: 1, C2: 0.4, C3: 0, C4: 0 },
+      totalFee: 850000000,
+      escrowBalance: 500000000,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    log('✓ ALN-8821 đã tạo xong (Nhà Phố — Trần Nam)');
+    log('');
+    log('✅ XONG! Bây giờ có thể đóng trang này.');
+    log('   - Trang KTS: thấy 2 dự án (ALN-8821 + ALN-9921)');
+    log('   - Trang CN:  thấy 1 dự án (ALN-8821 — Nhà Phố)');
+    log('   - Trang DN:  thấy 1 dự án (ALN-9921 — Biệt thự...)');
+  } catch (e) {
+    log('❌ Lỗi: ' + e.message, false);
+  }
+});
+</script>
+</body>
+</html>
