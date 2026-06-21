@@ -3085,7 +3085,7 @@ function mgEdit(type, idx){
 ═══════════════════════════════════════════ */
 
 var STATS_CN = null;
-function _getStatsCn(){ if(!STATS_CN) STATS_CN = DN_PROJECTS.map(function(p){ return {name:p.cn, project:p.name, projectId:p.id, stage:p.stage, status:p.status, escrow:p.escrow, total:p.total}; }); return STATS_CN; }
+function _getStatsCn(){ if(!STATS_CN) STATS_CN = DN_PROJECTS.filter(function(p){ return p._raw && p._raw.cn && p._raw.cn.uid && !(p._raw.dn && p._raw.dn.uid); }).map(function(p){ return {name:p.cn, project:p.name, projectId:p.id, stage:p.stage, status:p.status, escrow:p.escrow, total:p.total}; }); return STATS_CN; }
 
 /* ── STAT CARD ACCORDION ── */
 var _activeStatCard = null;
@@ -3124,6 +3124,7 @@ function toggleStatCard(type){
 }
 
 function renderStats(){
+  STATS_CN = null;
   /* Dùng dữ liệu thật từ Firestore khi có */
   var STATS_KTS = window._LIVE_KTS || [];
   var STATS_DN  = window._LIVE_DN  || [];
@@ -3806,8 +3807,8 @@ async function _loadMgData() {
     const allUsers = usersSnap.docs.map(function(d){ return Object.assign({uid:d.id}, d.data()); });
     const ktsApps  = {};  ktsAppsSnap.docs.forEach(function(d){ ktsApps[d.id]=d.data(); });
     const dnApps   = {};  dnAppsSnap.docs.forEach(function(d){ dnApps[d.id]=d.data(); });
-    const ktsUsers = allUsers.filter(function(u){ return u.role==='kts' && u.status==='active'; });
-    const dnUsers  = allUsers.filter(function(u){ return u.role==='dn'  && u.status==='active'; });
+    const ktsUsers = allUsers.filter(function(u){ return u.role==='kts'; });
+    const dnUsers  = allUsers.filter(function(u){ return u.role==='dn'; });
     window._LIVE_KTS = ktsUsers.map(function(u){
       var projs  = (DN_PROJECTS||[]).filter(function(p){ return p._raw && p._raw.kts && p._raw.kts.uid===u.uid; });
       var active = projs.filter(function(p){ return p.status!=='done'; });
