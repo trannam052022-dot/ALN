@@ -3217,6 +3217,8 @@ function _startProjectsListenCN() {
     : query(collection(db,'projects'), where('cn.uid','==',uid), orderBy('updatedAt','desc'));
   onSnapshot(q, function(snap){
     var arr = snap.docs.map(function(d){ return _adaptProjectCN(d.id, d.data()); });
+    // CN chỉ thấy project không có DN (pure CN project)
+    if (!isFounder) arr = arr.filter(function(p){ return !p._raw || !p._raw.dn || !p._raw.dn.uid; });
     if (!isFounder) {
       // sắp xếp client-side theo updatedAt giảm dần (tránh phải tạo composite index)
       arr.sort(function(a,b){
