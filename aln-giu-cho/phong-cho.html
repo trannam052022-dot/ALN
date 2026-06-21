@@ -456,7 +456,8 @@ function showView(v){
   document.getElementById(v).classList.add('active');
 }
 function bgClick(e){if(e.target===document.getElementById('sheetBg'))closeSheet();}
-function closeSheet(){document.getElementById('sheetBg').classList.remove('show');}
+function closeSheet(){document.getElementById('sheetBg').classList.remove('show');document.body.style.overflow='';}
+function openSheetBase(){document.body.style.overflow='hidden';window.scrollTo(0,0);}
 
 /* PWA install */
 var _deferredPrompt=null;
@@ -602,8 +603,7 @@ window.doRegister=async function(){
       CURRENT={...rsnap.data(),uid};
     }
     renderDash(); showView('viewDash'); showPwaBanner();
-    showToast('Đã giữ chỗ ✓');
-    setTimeout(openUploadSheet,800);
+    showToast('Đã giữ chỗ ✓ Nhấn "Nộp hồ sơ ngay" để tiếp tục');
   }catch(err){
     let m='Có lỗi, thử lại';
     if(err.code==='auth/network-request-failed') m='Lỗi mạng';
@@ -686,6 +686,7 @@ window.onCtaClick=function(){ openUploadSheet(); };
 /* ══ UPLOAD SHEET ══ */
 function openUploadSheet(){
   if(!CURRENT) return;
+  openSheetBase();
   const role=CURRENT.role;
   uploads.portfolio=[]; uploads.projects=[]; uploads.license=[];
   let html='';
