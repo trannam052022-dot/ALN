@@ -297,8 +297,27 @@ input::placeholder{color:var(--muted)}
       </p>
     </div>
 
+    <!-- ═══ TWO CTAs ═══ -->
+    <div style="margin-bottom:6px">
+      <button class="btn btn-gold" onclick="openRegisterPanel()" style="margin-bottom:10px">
+        <i class="ph-duotone ph-clipboard-text"></i>
+        LÀM KHẢO SÁT NHẬN BÁO GIÁ
+        <i class="ph-duotone ph-arrow-right" style="margin-left:auto;font-size:16px"></i>
+      </button>
+      <button onclick="openRegisterPanel()" style="width:100%;padding:15px;border-radius:11px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);color:var(--text2);font-family:var(--syne);font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .22s" onmouseover="this.style.background='rgba(255,255,255,.07)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">
+        <i class="ph-duotone ph-envelope-open" style="font-size:16px;color:var(--gold)"></i>
+        Hoặc để lại thông tin
+      </button>
+      <div style="text-align:center;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:4px;font-size:11px;color:var(--muted)">
+        <span style="color:#f5c842">⭐</span> 87% khách hàng tin tưởng ALN sau lần đầu liên hệ
+      </div>
+      <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--muted)">
+        Đã có tài khoản? <a onclick="showLoginDirect()" style="color:var(--gold);cursor:pointer;font-weight:600;text-decoration:none">Đăng nhập →</a>
+      </div>
+    </div>
+
     <!-- Panel đăng ký -->
-    <div id="panelRegister">
+    <div id="panelRegister" style="display:none;margin-top:18px">
       <div class="card">
         <div class="card-title">Giữ chỗ ngay</div>
         <div class="card-sub">Điền 2 ô, xong trong 30 giây</div>
@@ -368,53 +387,6 @@ input::placeholder{color:var(--muted)}
         </button>
         <div class="switch-link" style="margin-top:14px">
           Chưa giữ chỗ? <a onclick="showRegister()">Đăng ký ngay →</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ LEAD CAPTURE — Collapsible ═══ -->
-    <div id="leadPanel" style="margin-top:22px;padding-bottom:44px">
-      <div style="background:var(--card);border:1px solid rgba(201,168,76,.16);border-radius:18px;overflow:hidden;box-shadow:0 20px 56px rgba(0,0,0,.45)">
-        <!-- Toggle header -->
-        <div onclick="toggleLeadBody()" style="padding:18px 22px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;user-select:none">
-          <div>
-            <div style="font-family:var(--syne);font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text)">Thêm thông tin về ngôi nhà</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:3px">Diện tích · Số tầng · Nhu cầu — để nhận báo giá chính xác hơn</div>
-          </div>
-          <span id="lcArrowIcon" style="color:var(--gold);font-size:11px;flex-shrink:0;transition:transform .25s;display:inline-block">▼</span>
-        </div>
-        <!-- Form body -->
-        <div id="lcFormBody" style="display:none;border-top:1px solid rgba(201,168,76,.09);padding:18px 22px 22px">
-          <div class="field">
-            <label>Diện tích đất (m²)</label>
-            <div class="field-wrap"><i class="ph-duotone ph-ruler fi"></i>
-              <input type="number" id="lc_area" min="20" max="9999" placeholder="VD: 150">
-            </div>
-            <div class="field-hint">Diện tích đất hoặc sàn xây dựng.</div>
-          </div>
-          <div class="field">
-            <label>Số tầng dự kiến</label>
-            <select id="lc_floors" style="width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(201,168,76,.13);border-radius:10px;padding:13px;font-size:15px;font-family:var(--sans);color:var(--text);outline:none;cursor:pointer">
-              <option value="" style="background:#0d1120">— Chọn —</option>
-              <option value="1" style="background:#0d1120">1 tầng</option>
-              <option value="2" style="background:#0d1120">2 tầng</option>
-              <option value="3" style="background:#0d1120">3 tầng</option>
-              <option value="4" style="background:#0d1120">4 tầng</option>
-              <option value="5+" style="background:#0d1120">5 tầng trở lên</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Bạn cần gì? <span style="font-size:9px;font-weight:400;color:var(--muted)">(chọn 1 hoặc nhiều)</span></label>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-              <label style="display:flex;align-items:center;gap:7px;padding:10px 11px;border:1.5px solid rgba(201,168,76,.13);border-radius:10px;cursor:pointer;background:rgba(255,255,255,.03)"><input type="checkbox" class="lc-needs-chk" value="kien_truc" style="width:14px;height:14px;accent-color:var(--gold);flex-shrink:0"><i class="ph-duotone ph-compass-tool" style="font-size:13px;color:var(--gold)"></i><span style="font-size:11px;color:var(--text2);font-weight:600">Thiết kế KTS</span></label>
-              <label style="display:flex;align-items:center;gap:7px;padding:10px 11px;border:1.5px solid rgba(201,168,76,.13);border-radius:10px;cursor:pointer;background:rgba(255,255,255,.03)"><input type="checkbox" class="lc-needs-chk" value="noi_that" style="width:14px;height:14px;accent-color:var(--gold);flex-shrink:0"><i class="ph-duotone ph-paint-brush-household" style="font-size:13px;color:var(--gold)"></i><span style="font-size:11px;color:var(--text2);font-weight:600">Nội thất</span></label>
-              <label style="display:flex;align-items:center;gap:7px;padding:10px 11px;border:1.5px solid rgba(201,168,76,.13);border-radius:10px;cursor:pointer;background:rgba(255,255,255,.03)"><input type="checkbox" class="lc-needs-chk" value="xay_dung" style="width:14px;height:14px;accent-color:var(--gold);flex-shrink:0"><i class="ph-duotone ph-hard-hat" style="font-size:13px;color:var(--gold)"></i><span style="font-size:11px;color:var(--text2);font-weight:600">Xây dựng trọn gói</span></label>
-              <label style="display:flex;align-items:center;gap:7px;padding:10px 11px;border:1.5px solid rgba(201,168,76,.13);border-radius:10px;cursor:pointer;background:rgba(255,255,255,.03)"><input type="checkbox" class="lc-needs-chk" value="tu_van" style="width:14px;height:14px;accent-color:var(--gold);flex-shrink:0"><i class="ph-duotone ph-yin-yang" style="font-size:13px;color:var(--gold)"></i><span style="font-size:11px;color:var(--text2);font-weight:600">Tư vấn & Phong thủy</span></label>
-            </div>
-          </div>
-          <button class="btn btn-ghost" id="lcBtn" onclick="doLeadCapture()" style="margin-top:6px;border-color:rgba(201,168,76,.22);color:var(--gold2)">
-            <i class="ph-duotone ph-paper-plane-tilt"></i> Gửi thông tin tư vấn
-          </button>
         </div>
       </div>
     </div>
