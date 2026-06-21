@@ -285,39 +285,15 @@ input::placeholder{color:var(--muted)}
 <!-- ══ VIEW 1: ĐĂNG KÝ / ĐĂNG NHẬP ══ -->
 <div class="view active" id="viewAuth">
   <div class="auth-wrap">
-
-    <!-- ═══ LUXURY HERO ═══ -->
-    <div style="text-align:center;padding:6px 0 24px">
-      <div class="eyebrow" style="margin-bottom:20px">BẮT ĐẦU HÀNH TRÌNH CỦA BẠN</div>
-      <h1 style="font-family:var(--serif);font-size:46px;font-weight:600;line-height:1.18;margin-bottom:16px;letter-spacing:-.01em">
-        Sẵn Sàng Xây<br><span style="color:var(--gold2)">Giấc Mơ</span> Của Bạn?
-      </h1>
-      <p style="font-size:13px;color:var(--sub);line-height:1.75;max-width:310px;margin:0 auto">
-        Chọn cách bắt đầu — <b style="color:var(--text2)">đăng ký vào hệ thống</b> để kết nối với KTS chuyên nghiệp, hoặc <b style="color:var(--text2)">để lại thông tin</b> cho đội ALN tư vấn sớm.
-      </p>
-    </div>
-
-    <!-- ═══ TWO CTAs ═══ -->
-    <div id="ctaBlock" style="margin-bottom:6px">
-      <button class="btn btn-gold" onclick="openRegisterPanel()" style="margin-bottom:10px">
-        <i class="ph-duotone ph-clipboard-text"></i>
-        LÀM KHẢO SÁT NHẬN BÁO GIÁ
-        <i class="ph-duotone ph-arrow-right" style="margin-left:auto;font-size:16px"></i>
-      </button>
-      <button onclick="openRegisterPanel()" style="width:100%;padding:15px;border-radius:11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:rgba(240,230,204,.65);font-family:var(--syne);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s">
-        <i class="ph-duotone ph-envelope-open" style="font-size:16px;color:var(--gold)"></i>
-        Hoặc để lại thông tin
-      </button>
-      <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--muted)">
-        <span style="color:#f5c842">⭐</span> 87% khách hàng tin tưởng ALN sau lần đầu liên hệ
-      </div>
-      <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--muted)">
-        Đã có tài khoản? <a onclick="showLoginDirect()" style="color:var(--gold);text-decoration:none;cursor:pointer;font-weight:600">Đăng nhập →</a>
-      </div>
+    <div class="brand">
+      <div class="monogram">ALN</div>
+      <div class="eyebrow">Mạng lưới · Xây dựng</div>
+      <div class="brand-title">App <b>Làm Nhà</b></div>
+      <div class="brand-sub">Giữ chỗ · Phòng chờ</div>
     </div>
 
     <!-- Panel đăng ký -->
-    <div id="panelRegister" style="display:none;margin-top:18px">
+    <div id="panelRegister">
       <div class="card">
         <div class="card-title">Giữ chỗ ngay</div>
         <div class="card-sub">Điền 2 ô, xong trong 30 giây</div>
@@ -369,7 +345,7 @@ input::placeholder{color:var(--muted)}
     </div>
 
     <!-- Panel đăng nhập -->
-    <div id="panelLogin" style="display:none;margin-top:18px">
+    <div id="panelLogin" style="display:none">
       <div class="card">
         <div class="card-title">Vào phòng chờ</div>
         <div class="card-sub">Nhập số điện thoại đã giữ chỗ</div>
@@ -390,7 +366,6 @@ input::placeholder{color:var(--muted)}
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -495,30 +470,6 @@ function pickRoom(r,el){
 }
 function showLogin(){document.getElementById('panelRegister').style.display='none';document.getElementById('panelLogin').style.display='';}
 function showRegister(){document.getElementById('panelLogin').style.display='none';document.getElementById('panelRegister').style.display='';}
-function openRegisterPanel(){
-  document.getElementById('panelRegister').style.display='';
-  document.getElementById('panelLogin').style.display='none';
-  setTimeout(function(){document.getElementById('panelRegister').scrollIntoView({behavior:'smooth',block:'nearest'});},80);
-}
-function showLoginDirect(){
-  document.getElementById('panelRegister').style.display='none';
-  document.getElementById('panelLogin').style.display='';
-  setTimeout(function(){document.getElementById('panelLogin').scrollIntoView({behavior:'smooth',block:'nearest'});},80);
-}
-function openLeadPanel(){
-  document.getElementById('panelRegister').style.display='';
-  document.getElementById('panelLogin').style.display='none';
-  document.getElementById('lcFormBody').style.display='';
-  document.getElementById('lcArrowIcon').style.transform='rotate(180deg)';
-  setTimeout(function(){document.getElementById('leadPanel').scrollIntoView({behavior:'smooth',block:'nearest'});},80);
-}
-function toggleLeadBody(){
-  var body=document.getElementById('lcFormBody');
-  var arrow=document.getElementById('lcArrowIcon');
-  var isHidden=body.style.display==='none';
-  body.style.display=isHidden?'':'none';
-  arrow.style.transform=isHidden?'rotate(180deg)':'';
-}
 function showView(v){
   ['viewAuth','viewDash'].forEach(function(id){document.getElementById(id).classList.remove('active');});
   document.getElementById(v).classList.add('active');
@@ -630,16 +581,12 @@ let CURRENT=null, cdTimer=null;
 const uploads={portfolio:[],projects:[],license:[]};
 
 /* Auth state */
-let _lcMode=false;
 onAuthStateChanged(auth, async (user)=>{
   if(!user){ showView('viewAuth'); return; }
-  if(_lcMode) return;
   try{
     const snap=await getDoc(doc(db,'reservations',user.uid));
     if(!snap.exists()){ showView('viewAuth'); return; }
     CURRENT={...snap.data(),uid:user.uid};
-    if(CURRENT.role==='cn' && CURRENT.status==='active'){ location.href='../client_CN.html'; return; }
-    if(CURRENT.role==='cn'){ showView('viewAuth'); return; }
     renderDash();
     showView('viewDash');
     showPwaBanner();
@@ -670,9 +617,6 @@ window.doRegister=async function(){
       const uref=doc(db,'users',uid);
       const usnap=await getDoc(uref);
       if(!usnap.exists()) await setDoc(uref,{name,phone,role:'cn',status:'active',createdAt:serverTimestamp()});
-      const rref=doc(db,'reservations',uid);
-      const rsnap=await getDoc(rref);
-      if(!rsnap.exists()) await setDoc(rref,{uid,name,phone,role:'cn',status:'active',reservedAt:serverTimestamp()});
       showToast('Tạo tài khoản thành công ✓ Đang vào...');
       setTimeout(function(){ location.href='../client_CN.html'; },1000);
     } else {
@@ -876,47 +820,6 @@ function goWorkspace(){
   setTimeout(function(){location.href=MAP[CURRENT&&CURRENT.role]||'../login.html';},900);
 }
 window.goWorkspace=goWorkspace;
-
-/* ══ LEAD CAPTURE (để lại thông tin, không cần đăng ký đầy đủ) ══ */
-window.doLeadCapture=async function(){
-  const name=(document.getElementById('r_name').value||'').trim();
-  const phone=cleanPhone(document.getElementById('r_phone').value);
-  const area=Number((document.getElementById('lc_area')||{}).value||0);
-  const floors=((document.getElementById('lc_floors')||{}).value)||'';
-  const needs=[];
-  document.querySelectorAll('.lc-needs-chk:checked').forEach(cb=>needs.push(cb.value));
-  if(!name){showToast('Vui lòng nhập họ tên',true);return;}
-  if(!validPhone(phone)){showToast('SĐT chưa đúng (10 số, bắt đầu bằng 0)',true);return;}
-  const btn=document.getElementById('lcBtn');
-  btn.disabled=true;btn.innerHTML='<i class="ph-duotone ph-spinner ph-spin"></i> Đang gửi…';
-  const email=phone+'@aln.vn';
-  _lcMode=true;
-  try{
-    let uid;
-    try{const c=await createUserWithEmailAndPassword(auth,email,phone);uid=c.user.uid;}
-    catch(e){if(e.code==='auth/email-already-in-use'){const c=await signInWithEmailAndPassword(auth,email,phone);uid=c.user.uid;}else throw e;}
-    const consult={area,floors,needs,submittedAt:serverTimestamp()};
-    const uref=doc(db,'users',uid),usnap=await getDoc(uref);
-    if(!usnap.exists()) await setDoc(uref,{name,phone,role:'cn',status:'lead',consultationRequest:consult,createdAt:serverTimestamp()});
-    else await updateDoc(uref,{consultationRequest:consult});
-    const rref=doc(db,'reservations',uid),rsnap=await getDoc(rref);
-    if(!rsnap.exists()) await setDoc(rref,{uid,name,phone,role:'cn',status:'lead',consultationRequest:consult,reservedAt:serverTimestamp()});
-    else await updateDoc(rref,{consultationRequest:consult});
-    await signOut(auth);
-    document.getElementById('leadPanel').innerHTML=
-      '<div style="text-align:center;padding:22px 16px;background:rgba(61,214,140,.06);border:1px solid rgba(61,214,140,.2);border-radius:18px">'
-      +'<div style="font-size:32px;color:var(--green);margin-bottom:8px"><i class="ph-duotone ph-check-circle"></i></div>'
-      +'<div style="font-family:var(--syne);font-size:14px;font-weight:700;color:var(--green)">Đã ghi nhận!</div>'
-      +'<div style="font-size:12px;color:var(--sub);margin-top:6px;line-height:1.65">Đội ALN sẽ liên hệ qua SĐT của bạn trong vòng 24 giờ.</div>'
-      +'</div>';
-    showToast('Đã gửi ✓ ALN sẽ liên hệ sớm');
-  }catch(err){
-    let m='Có lỗi, thử lại';
-    if(err.code==='auth/network-request-failed')m='Lỗi mạng';
-    showToast(m,true);
-    btn.disabled=false;btn.innerHTML='<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi thông tin tư vấn';
-  }finally{_lcMode=false;}
-};
 </script>
 </body>
 </html>
