@@ -2650,7 +2650,8 @@ function renderMyProjects(projects) {
     const isOn = p.id === window._mplActiveId;
     const showCN = asCN !== undefined ? asCN : (window._mplFilter === 'cn');
     const client = showCN ? (p.cn&&p.cn.name)||'—' : (p.dn&&p.dn.name)||'—';
-    const mCode = p.code || p.id;
+    const _isDNp = !!(p.dn && p.dn.uid);
+    const mCode = (_isDNp ? 'ALN-DN-' : 'ALN-CN-') + (p.code||p.id).replace(/^ALN-/,'');
     return `<div class="mpl-item${isOn?' on':''}" data-pid="${p.id}" onclick="window.mplSelect('${p.id}')">
       <div class="mpl-dot" style="background:${S_DOT[p.status]||'var(--muted)'}"></div>
       <div style="flex:1;min-width:0">
@@ -2699,7 +2700,7 @@ function renderMyProjects(projects) {
     const stClr = S_CLR[p.status] || '';
     const pid = p.id;
     const isDN = !!(p.dn && p.dn.uid);
-    const detCode = p.code || pid;
+    const detCode = (isDN ? 'ALN-DN-' : 'ALN-CN-') + (p.code||pid).replace(/^ALN-/,'');
     const bar = prog.map((v,i) => `<div style="flex:${pcts[i]};height:7px;background:${v>0?SCOLS[i]:'rgba(0,0,0,.1)'};border-radius:99px"></div>`).join('');
     const stages = ['C1','C2','C3','C4'].map((c,i) =>
       `<span style="color:${prog[i]>0?SCOLS[i]:'var(--muted)'};font-weight:${prog[i]>0?700:400}">${c}&nbsp;${Math.round((prog[i]||0)*100)}%</span>`
