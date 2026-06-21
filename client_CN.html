@@ -3234,6 +3234,7 @@ function _startProjectsListenCN() {
       try { if(typeof window.selectProj==='function') window.selectProj(window.activeProj); } catch(e){}
     } else {
       // Empty state — CN mới, hiện form tư vấn
+      window._cnConsultFiles = [];
       var _n = window._cnCurrentName || 'bạn';
       var _chkOpts = [
         ['kien_truc','Thiết kế KTS','ph-compass-tool'],
@@ -3263,8 +3264,7 @@ function _startProjectsListenCN() {
         +'<div class="ct"><i class="ph-duotone ph-chats-teardrop"></i> Thông tin tư vấn</div>'
         +'<div style="margin-bottom:14px">'
         +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Diện tích đất / sàn xây dựng <span style="color:var(--gold)">✦</span></label>'
-        +'<div style="position:relative"><input type="number" id="cn_area" min="20" max="9999" placeholder="VD: 150" style="width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 44px 10px 12px;font-size:14px;font-family:inherit;background:var(--ink3);color:var(--text);outline:none">'
-        +'<span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:var(--muted)">m²</span></div></div>'
+        +'<input type="text" id="cn_area" placeholder="VD: 150 m²  hoặc  8×16 m" style="width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:14px;font-family:inherit;background:var(--ink3);color:var(--text);outline:none"></div>'
         +'<div style="margin-bottom:14px">'
         +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Số tầng dự kiến</label>'
         +'<select id="cn_floors" style="width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:14px;font-family:inherit;background:var(--ink3);color:var(--text);outline:none;cursor:pointer">'
@@ -3279,6 +3279,16 @@ function _startProjectsListenCN() {
         +'<div style="margin-bottom:20px">'
         +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Ghi chú thêm <span style="font-size:10px;font-weight:400;color:var(--sub)">(tùy chọn)</span></label>'
         +'<textarea id="cn_note" rows="3" placeholder="Phong cách, ngân sách, thời gian bắt đầu..." style="width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:14px;font-family:inherit;background:var(--ink3);color:var(--text);outline:none;resize:vertical;line-height:1.5"></textarea></div>'
+        +'<div style="margin-bottom:20px">'
+        +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Tài liệu đính kèm <span style="font-size:10px;font-weight:400;color:var(--sub)">(Giấy chủ quyền, phác thảo mặt bằng — tùy chọn)</span></label>'
+        +'<div style="border:2px dashed var(--border2);border-radius:var(--r-sm);padding:18px;text-align:center;cursor:pointer;background:var(--ink3);position:relative;transition:border-color .15s" ondragover="event.preventDefault();this.style.borderColor=\'var(--gold)\'" ondragleave="this.style.borderColor=\'\'" ondrop="window.cnHandleFileDrop(event)">'
+        +'<input type="file" id="cn_consult_files" multiple accept="image/*,.pdf" onchange="window.cnHandleFileChange(event)" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">'
+        +'<i class="ph-duotone ph-upload-simple" style="font-size:22px;color:var(--muted);display:block;margin-bottom:5px"></i>'
+        +'<div style="font-size:12px;font-weight:600;color:var(--text2)">Kéo thả hoặc nhấn để chọn file</div>'
+        +'<div style="font-size:10px;color:var(--muted);margin-top:2px">Ảnh, PDF · tối đa 10MB/file</div>'
+        +'</div>'
+        +'<div id="cn_file_preview" style="display:flex;flex-direction:column;gap:5px;margin-top:6px"></div>'
+        +'</div>'
         +'<button onclick="window.cnSubmitConsultation()" id="cnConsultBtn" style="width:100%;padding:13px;background:var(--green);border:none;border-radius:var(--r-sm);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px"><i class="ph-duotone ph-paper-plane-tilt"></i> Gửi thông tin cho đội ALN</button>'
         +'</div>'
         +'<div style="text-align:center;font-size:11px;color:var(--sub);margin-top:12px">Đội ALN sẽ liên hệ qua SĐT trong vòng 24 giờ.</div>'
@@ -3522,10 +3532,41 @@ onAuthStateChanged(auth, async (user) => {
       await addDoc(collection(db, 'projects', pid, 'documents'),
         Object.assign({}, data, { createdAt: serverTimestamp() }));
     };
+    window.cnHandleFileChange = function(e){
+      Array.prototype.forEach.call(e.target.files, function(f){
+        if(f.size>10485760){ showToast(f.name+' vượt 10MB','t-amber'); return; }
+        window._cnConsultFiles.push(f);
+      });
+      window.cnRenderFilePreview();
+    };
+    window.cnHandleFileDrop = function(e){
+      e.preventDefault(); e.currentTarget.style.borderColor='';
+      Array.prototype.forEach.call(e.dataTransfer.files, function(f){
+        if(f.size>10485760){ showToast(f.name+' vượt 10MB','t-amber'); return; }
+        window._cnConsultFiles.push(f);
+      });
+      window.cnRenderFilePreview();
+    };
+    window.cnRemoveConsultFile = function(i){
+      (window._cnConsultFiles||[]).splice(i,1); window.cnRenderFilePreview();
+    };
+    window.cnRenderFilePreview = function(){
+      var el=document.getElementById('cn_file_preview'); if(!el)return;
+      el.innerHTML=(window._cnConsultFiles||[]).map(function(f,i){
+        var ext=(f.name.split('.').pop()||'').toLowerCase();
+        var icon=ext==='pdf'?'ph-file-pdf':f.type.startsWith('image/')?'ph-image':'ph-file';
+        return '<div style="display:flex;align-items:center;gap:8px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 10px">'
+          +'<i class="ph-duotone '+icon+'" style="font-size:15px;color:var(--gold)"></i>'
+          +'<span style="flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+f.name+'</span>'
+          +'<span style="font-size:10px;color:var(--muted);flex-shrink:0">'+(f.size/1024/1024).toFixed(1)+'MB</span>'
+          +'<button onclick="window.cnRemoveConsultFile('+i+')" style="width:18px;height:18px;border-radius:50%;background:var(--red-bg);border:1px solid rgba(220,38,38,.2);color:var(--red);font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>'
+          +'</div>';
+      }).join('');
+    };
     window.cnSubmitConsultation = async function(){
       var uid = window.__ALN_UID;
       if(!uid){ showToast('Lỗi xác thực','t-amber'); return; }
-      var area = Number((document.getElementById('cn_area')||{}).value||0);
+      var area = ((document.getElementById('cn_area')||{}).value||'').trim();
       if(!area){ showToast('Vui lòng nhập diện tích','t-amber'); return; }
       var floors = ((document.getElementById('cn_floors')||{}).value||'');
       var city   = ((document.getElementById('cn_city') ||{}).value||'').trim();
@@ -3535,7 +3576,16 @@ onAuthStateChanged(auth, async (user) => {
       var btn = document.getElementById('cnConsultBtn');
       if(btn){ btn.disabled=true; btn.innerHTML='<i class="ph-duotone ph-spinner-gap ph-spin"></i> Đang gửi...'; }
       try{
+        var attachUrls = [];
+        for(var fi=0; fi<(window._cnConsultFiles||[]).length; fi++){
+          var f=window._cnConsultFiles[fi];
+          var safe=f.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+          var r=storageRef(storage,'reservations/'+uid+'/consult_'+Date.now()+'_'+safe);
+          var s2=await uploadBytes(r,f);
+          attachUrls.push(await getDownloadURL(s2.ref));
+        }
         var cdata = { area:area, floors:floors, needs:needs, city:city, note:note, submittedAt:serverTimestamp() };
+        if(attachUrls.length) cdata.attachmentUrls = attachUrls;
         await updateDoc(doc(db,'users',uid), { consultationRequest:cdata });
         try{ await updateDoc(doc(db,'reservations',uid), { consultationRequest:cdata }); }catch(e2){}
         var mc = document.getElementById('mainContent');
