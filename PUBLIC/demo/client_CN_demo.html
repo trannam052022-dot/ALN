@@ -596,9 +596,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .zp-send:hover{background:#0554a0;transform:scale(1.05)}
 
 </style>
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="../../manifest.json">
 <meta name="theme-color" content="#0a0a0c">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="../../icon-192.png">
 </head>
 <body>
 <!-- ═══ ALN AUTH VEIL — che trang đến khi xác thực xong ═══ -->
@@ -3197,7 +3197,7 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY, storage, storageRef, uploadBytes, getDownloadURL } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY, storage, storageRef, uploadBytes, getDownloadURL } from "../../firebase-config.js";
 
 const REQUIRED_ROLE = "cn";
 
@@ -3440,7 +3440,7 @@ onAuthStateChanged(auth, async (user) => {
         if (!ALN_VAPID_KEY || ALN_VAPID_KEY.indexOf('DAN_KHOA') === 0) { console.warn('[ALN Push] Chưa dán khóa VAPID'); return; }
         const ok = await fcmSupported().catch(() => false);
         if (!ok) return;
-        await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+        await navigator.serviceWorker.register('../../firebase-messaging-sw.js');
         const reg = await navigator.serviceWorker.ready; // chờ Service Worker ACTIVE rồi mới xin token
         const messaging = getMessaging();
         const tok = await getToken(messaging, { vapidKey: ALN_VAPID_KEY, serviceWorkerRegistration: reg });
