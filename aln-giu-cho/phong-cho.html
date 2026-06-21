@@ -460,34 +460,56 @@ function closeSheet(){document.getElementById('sheetBg').classList.remove('show'
 
 /* PWA install */
 var _deferredPrompt=null;
+var _isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
+var _isInStandalone=(window.navigator.standalone===true)||(window.matchMedia('(display-mode: standalone)').matches);
+
 window.addEventListener('beforeinstallprompt',function(e){
   e.preventDefault();
   _deferredPrompt=e;
-  // hiện banner nếu đang ở dashboard và chưa dismiss
-  if(!sessionStorage.getItem('pwaDismissed') && document.getElementById('viewDash').classList.contains('active')){
-    setTimeout(function(){document.getElementById('pwaBanner').classList.add('show');},1200);
-  }
+  updatePwaBtnLabel();
 });
 window.addEventListener('appinstalled',function(){
   document.getElementById('pwaBanner').classList.remove('show');
   showToast('Đã cài thành công ✓ Tìm App Làm Nhà trên màn hình chính');
   _deferredPrompt=null;
 });
+
+function updatePwaBtnLabel(){
+  var btn=document.getElementById('pwaInstallBtn');
+  if(!btn)return;
+  if(_deferredPrompt){
+    btn.innerHTML='<i class="ph-duotone ph-download-simple"></i> Tải về';
+  } else if(_isIos){
+    btn.innerHTML='<i class="ph-duotone ph-export"></i> Hướng dẫn';
+  } else {
+    btn.innerHTML='<i class="ph-duotone ph-download-simple"></i> Tải về';
+  }
+}
+
 window.installPwa=async function(){
-  if(!_deferredPrompt){showToast('Trình duyệt chưa hỗ trợ — thử Chrome/Edge trên Android',true);return;}
-  _deferredPrompt.prompt();
-  const res=await _deferredPrompt.userChoice;
-  if(res.outcome==='accepted'){ document.getElementById('pwaBanner').classList.remove('show'); }
-  _deferredPrompt=null;
+  if(_deferredPrompt){
+    _deferredPrompt.prompt();
+    const res=await _deferredPrompt.userChoice;
+    if(res.outcome==='accepted') document.getElementById('pwaBanner').classList.remove('show');
+    _deferredPrompt=null;
+  } else if(_isIos){
+    showToast('iOS: Bấm nút Share ⎙ → "Thêm vào màn hình chính"');
+  } else {
+    // Chrome: chỉ tay vào icon cài trên thanh địa chỉ
+    showToast('Nhấn biểu tượng ⊕ hoặc ⊞ trên thanh địa chỉ Chrome để cài');
+  }
 };
 window.dismissPwa=function(){
   document.getElementById('pwaBanner').classList.remove('show');
   sessionStorage.setItem('pwaDismissed','1');
 };
 function showPwaBanner(){
-  if(!sessionStorage.getItem('pwaDismissed') && _deferredPrompt){
-    setTimeout(function(){document.getElementById('pwaBanner').classList.add('show');},1200);
-  }
+  if(_isInStandalone) return; // đã cài rồi, không cần banner
+  if(sessionStorage.getItem('pwaDismissed')) return;
+  setTimeout(function(){
+    document.getElementById('pwaBanner').classList.add('show');
+    updatePwaBtnLabel();
+  },1000);
 }
 </script>
 
