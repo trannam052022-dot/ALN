@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giữ chỗ — Mạng lưới ALN</title>
+<meta name="theme-color" content="#080c14">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,600&family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+:root{
+  --bg:#080c14;--bg2:#0e1422;--card:rgba(14,20,34,.88);
+  --border-v:rgba(124,58,237,.2);--muted:rgba(228,212,176,.38);
+  --text:#f0e6cc;--text2:rgba(240,230,204,.62);
+  --gold:#C9A84C;--gold2:#e8d07a;--violet:#7c3aed;--violet2:#a78bfa;
+  --green:#3dd68c;--red:#f06060;--r:14px;
+  --mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;
+  --serif:'Cormorant Garamond',serif;--syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;line-height:1.6;
+  background-image:linear-gradient(rgba(124,58,237,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,.018) 1px,transparent 1px);background-size:56px 56px;}
+body::before{content:'';position:fixed;top:-15%;left:50%;transform:translateX(-50%);width:700px;height:500px;
+  background:radial-gradient(ellipse,rgba(124,58,237,.1) 0%,transparent 68%);pointer-events:none;z-index:0}
+input::placeholder{color:rgba(228,212,176,.22)}
+.page{max-width:480px;margin:0 auto;padding:0 20px 60px;position:relative;z-index:1}
+
+.hero{padding:48px 0 24px;text-align:center}
+.hero-eyebrow{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:18px}
+.ey-line{flex:1;max-width:54px;height:1px}
+.ey-line-l{background:linear-gradient(90deg,transparent,rgba(124,58,237,.55))}
+.ey-line-r{background:linear-gradient(270deg,transparent,rgba(124,58,237,.55))}
+.ey-text{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:var(--violet2);opacity:.9}
+.hero-title{font-family:var(--serif);font-size:34px;font-weight:300;line-height:1.16;margin-bottom:10px}
+.hero-title em{font-style:italic;font-weight:600;color:var(--violet2)}
+.hero-sub{font-size:12px;color:var(--muted);max-width:300px;margin:0 auto;line-height:1.7}
+
+.card{background:var(--card);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid var(--border-v);border-radius:var(--r);padding:26px 22px;margin-top:22px;box-shadow:0 24px 72px rgba(0,0,0,.55)}
+
+.field{margin-bottom:22px}
+.field label{display:block;font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.field label .req{color:rgba(124,58,237,.75);margin-left:2px;font-size:8px}
+.field input{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.11);padding:8px 0 10px;color:var(--text);font-size:15px;font-family:var(--sans);outline:none;transition:border-color .2s}
+.field input:focus{border-bottom-color:var(--violet2)}
+.field-hint{font-size:10px;color:var(--muted);margin-top:6px}
+
+.room-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.room{position:relative;cursor:pointer;border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:15px 8px;text-align:center;background:rgba(255,255,255,.022);transition:all .16s;user-select:none}
+.room input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.room i{font-size:24px;color:rgba(228,212,176,.4);display:block;margin-bottom:7px;transition:color .16s}
+.room-name{font-family:var(--syne);font-size:11px;font-weight:700;color:var(--text2);line-height:1.2}
+.room-tag{font-size:8.5px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
+.room:hover{border-color:rgba(124,58,237,.4)}
+.room.on{border-color:rgba(124,58,237,.65);background:rgba(124,58,237,.12);box-shadow:0 0 18px rgba(124,58,237,.25)}
+.room.on i{color:var(--violet2)}
+.room.on .room-name{color:var(--violet2)}
+
+.note{display:flex;gap:9px;align-items:flex-start;background:rgba(124,58,237,.05);border:1px solid rgba(124,58,237,.16);border-radius:9px;padding:11px 13px;margin-bottom:22px}
+.note i{color:var(--violet2);font-size:15px;flex-shrink:0;margin-top:1px}
+.note span{font-size:11px;color:var(--text2);line-height:1.55}
+
+.btn{width:100%;padding:14px;border-radius:11px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:var(--syne);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .22s;letter-spacing:.04em}
+.btn-primary{background:linear-gradient(100deg,#5b21b6 0%,#a78bfa 45%,#7c3aed 100%);background-size:200% 100%;background-position:0;color:#fff}
+.btn-primary:hover:not(:disabled){background-position:100%;box-shadow:0 0 32px rgba(124,58,237,.4)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-gold{background:linear-gradient(100deg,#8a6d1f,#e8d07a,#C9A84C);color:#1a1407;margin-top:10px}
+.btn-ghost{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);color:var(--text2);margin-top:10px}
+.ph-spin{animation:phspin 1s linear infinite;display:inline-block}@keyframes phspin{to{transform:rotate(360deg)}}
+
+.success{text-align:center;padding:8px 0}
+.success-ic{width:78px;height:78px;border-radius:50%;background:rgba(61,214,140,.1);border:1px solid rgba(61,214,140,.3);display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--green);margin:0 auto 18px}
+.success h2{font-family:var(--serif);font-size:28px;font-weight:600;margin-bottom:8px}
+.success p{font-size:12px;color:var(--text2);line-height:1.7;max-width:300px;margin:0 auto 18px}
+.tag-room{display:inline-block;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--violet2);background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);border-radius:8px;padding:8px 18px;margin-bottom:18px}
+.install-box{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.22);border-radius:11px;padding:15px;margin:18px 0;text-align:left}
+.install-box .ib-head{display:flex;align-items:center;gap:8px;font-family:var(--syne);font-size:12px;font-weight:700;color:var(--gold2);margin-bottom:6px}
+.install-box p{font-size:11px;color:var(--text2);margin:0;text-align:left;line-height:1.55}
+
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:rgba(14,20,34,.97);border:1px solid rgba(255,255,255,.1);font-size:12px;font-weight:500;padding:10px 22px;border-radius:99px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.7);opacity:0;pointer-events:none;transition:opacity .25s;max-width:90vw;text-align:center}
+.toast.show{opacity:1}.toast.err{border-color:rgba(240,96,96,.35);color:#f09898}
+.page-footer{text-align:center;padding:24px 0 0;font-size:10px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <div class="hero-eyebrow"><span class="ey-line ey-line-l"></span><span class="ey-text">App Làm Nhà Corp.</span><span class="ey-line ey-line-r"></span></div>
+    <h1 class="hero-title">Giữ chỗ trong<br><em>mạng lưới ALN toàn quốc</em></h1>
+    <p class="hero-sub">Giữ chỗ trong 30 giây. Bạn có 3 ngày để chuẩn bị & nộp hồ sơ.</p>
+  </header>
+
+  <!-- FORM GIỮ CHỖ -->
+  <div class="card" id="formCard">
+    <div class="field">
+      <label>Họ và tên <span class="req">✦</span></label>
+      <input type="text" id="f_name" placeholder="VD: Trần Đại Long" autocomplete="name">
+    </div>
+    <div class="field">
+      <label>Số điện thoại <span class="req">✦</span></label>
+      <input type="tel" id="f_phone" placeholder="0901 234 567" autocomplete="tel" inputmode="numeric">
+      <div class="field-hint">Số điện thoại cũng là mật khẩu đăng nhập của bạn — dễ nhớ, không cần ghi lại.</div>
+    </div>
+    <div class="field">
+      <label>Chọn phòng làm việc <span class="req">✦</span></label>
+      <div class="room-grid" id="roomGrid">
+        <label class="room"><input type="radio" name="room" value="architect">
+          <i class="ph-duotone ph-compass-tool"></i><div class="room-name">KTS</div><div class="room-tag">Nhận việc</div></label>
+        <label class="room"><input type="radio" name="room" value="designer">
+          <i class="ph-duotone ph-paint-brush-household"></i><div class="room-name">Designer</div><div class="room-tag">Nhận việc</div></label>
+        <label class="room"><input type="radio" name="room" value="business">
+          <i class="ph-duotone ph-buildings"></i><div class="room-name">Doanh nghiệp</div><div class="room-tag">Tìm KTS</div></label>
+      </div>
+    </div>
+    <div class="note">
+      <i class="ph-duotone ph-shield-check"></i>
+      <span>Giữ chỗ chưa cần hồ sơ. Sau khi giữ chỗ, bạn vào <b>phòng chờ</b> và có 3 ngày để nộp hồ sơ — ALN duyệt rồi liên hệ.</span>
+    </div>
+    <button class="btn btn-primary" id="submitBtn" onclick="reserve()">
+      <i class="ph-duotone ph-bookmark-simple"></i> Giữ chỗ ngay
+    </button>
+  </div>
+
+  <!-- THÀNH CÔNG -->
+  <div class="card" id="successCard" style="display:none">
+    <div class="success">
+      <div class="success-ic"><i class="ph-duotone ph-check-circle"></i></div>
+      <h2>Đã giữ chỗ thành công</h2>
+      <div class="tag-room" id="roomLabel">—</div>
+      <p>Bạn có <b>3 ngày</b> để chuẩn bị & nộp hồ sơ. Cài ALN về màn hình để quay lại dễ nhất — không lo lạc link.</p>
+
+      <div class="install-box" id="installBox" style="display:none">
+        <div class="ib-head"><i class="ph-duotone ph-device-mobile"></i> Cài ALN về màn hình chính</div>
+        <p id="installText">Bấm nút bên dưới để thêm icon ALN vào điện thoại. Lần sau chỉ cần bấm icon là vào thẳng phòng chờ.</p>
+      </div>
+
+      <button class="btn btn-gold" id="installBtn" style="display:none" onclick="installPWA()">
+        <i class="ph-duotone ph-download-simple"></i> Cài ALN về máy
+      </button>
+      <button class="btn btn-primary" onclick="location.href='./phong-cho.html'">
+        <i class="ph-duotone ph-arrow-right"></i> Vào phòng chờ
+      </button>
+    </div>
+  </div>
+
+  <div class="page-footer">ALN · App Làm Nhà Corp. — Mạng lưới KTS toàn quốc</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- chọn phòng (highlight) ---------- */
+document.querySelectorAll('#roomGrid .room').forEach(function(r){
+  r.querySelector('input').addEventListener('change', function(){
+    document.querySelectorAll('#roomGrid .room').forEach(function(x){x.classList.remove('on')});
+    r.classList.add('on');
+  });
+});
+
+/* ---------- toast ---------- */
+var _tt=null;
+function showToast(msg,err){var el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(err?' err':'');clearTimeout(_tt);_tt=setTimeout(function(){el.className='toast'},3200);}
+window.showToast=showToast;
+
+var ROOM_VI={architect:'Phòng KTS',designer:'Phòng Designer',business:'Phòng Doanh nghiệp'};
+
+/* ---------- PWA install prompt ---------- */
+var deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;
+  var b=document.getElementById('installBtn');if(b&&document.getElementById('successCard').style.display!=='none')b.style.display='flex';});
+function isIOS(){return /iphone|ipad|ipod/i.test(navigator.userAgent);}
+function isStandalone(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;}
+window.installPWA=async function(){
+  if(deferredPrompt){deferredPrompt.prompt();var c=await deferredPrompt.userChoice;
+    if(c.outcome==='accepted')showToast('Đã thêm ALN vào màn hình ✓');deferredPrompt=null;
+    document.getElementById('installBtn').style.display='none';}
+  else if(isIOS()){showToast('Bấm nút Chia sẻ ⬆️ → "Thêm vào MH chính"');}
+  else{showToast('Mở menu trình duyệt → "Cài đặt ứng dụng"');}
+};
+function showInstallUI(){
+  if(isStandalone())return; // đang chạy trong app rồi, khỏi mời
+  var box=document.getElementById('installBox');box.style.display='block';
+  if(isIOS()){document.getElementById('installText').innerHTML='Trên iPhone: bấm nút <b>Chia sẻ ⬆️</b> ở thanh dưới Safari → chọn <b>“Thêm vào MH chính”</b>. Icon ALN sẽ nằm trên màn hình.';}
+  else{document.getElementById('installBtn').style.display=deferredPrompt?'flex':'flex';}
+}
+</script>
+
+<script type="module">
+import { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  doc, setDoc, getDoc, serverTimestamp } from './firebase-config.js';
+
+const RESERVE_DAYS = 3;
+
+function cleanPhone(p){ return (p||'').replace(/\D/g,''); }
+function validPhone(p){ return /^0\d{9}$/.test(p); } // 10 số, bắt đầu bằng 0
+
+window.reserve = async function(){
+  const name  = document.getElementById('f_name').value.trim();
+  const phone = cleanPhone(document.getElementById('f_phone').value);
+  const roomEl= document.querySelector('input[name="room"]:checked');
+  const btn   = document.getElementById('submitBtn');
+
+  if(!name){ showToast('Vui lòng nhập họ tên', true); return; }
+  if(!validPhone(phone)){ showToast('Số điện thoại chưa đúng (10 số, bắt đầu bằng 0)', true); return; }
+  if(!roomEl){ showToast('Vui lòng chọn phòng làm việc', true); return; }
+  const role = roomEl.value;
+
+  btn.disabled=true; btn.innerHTML='<i class="ph-duotone ph-spinner ph-spin"></i> Đang giữ chỗ…';
+  const email = phone + '@aln.vn';   // SĐT làm danh tính
+  const pass  = phone;               // mật khẩu = SĐT (đủ 10 ký tự > 6)
+
+  try{
+    let uid;
+    try{
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      uid = cred.user.uid;
+    }catch(e){
+      if(e.code==='auth/email-already-in-use'){
+        // đã giữ chỗ trước đó → đăng nhập lại, cập nhật phòng nếu đổi
+        const cred = await signInWithEmailAndPassword(auth, email, pass);
+        uid = cred.user.uid;
+      } else { throw e; }
+    }
+
+    const now = Date.now();
+    const deadline = now + RESERVE_DAYS*24*60*60*1000;
+
+    // users: chỉ ghi nếu chưa có (không ghi đè hồ sơ đã nộp)
+    const uref = doc(db,'users',uid);
+    const usnap = await getDoc(uref);
+    if(!usnap.exists()){
+      await setDoc(uref,{ name, phone, role, status:'reserved', profileSubmitted:false, createdAt:serverTimestamp() });
+    }
+
+    // reservations: bản ghi giữ chỗ (không ghi đè nếu đã nộp hồ sơ)
+    const rref = doc(db,'reservations',uid);
+    const rsnap = await getDoc(rref);
+    if(!rsnap.exists()){
+      await setDoc(rref,{
+        uid, name, phone, role,
+        status:'reserved', profileSubmitted:false, reminderCount:0,
+        reservedAt: serverTimestamp(), deadlineMs: deadline
+      });
+    } else if(!rsnap.data().profileSubmitted){
+      // cho phép đổi phòng khi chưa nộp
+      await setDoc(rref,{ ...rsnap.data(), name, phone, role }, {merge:true});
+    }
+
+    // chuyển sang màn thành công
+    document.getElementById('formCard').style.display='none';
+    document.getElementById('successCard').style.display='block';
+    document.getElementById('roomLabel').textContent = ROOM_VI[role];
+    showInstallUI();
+
+  }catch(err){
+    console.error(err);
+    let msg='Có lỗi xảy ra, vui lòng thử lại';
+    if(err.code==='auth/wrong-password') msg='SĐT này đã giữ chỗ với thông tin khác — kiểm tra lại số.';
+    if(err.code==='auth/network-request-failed') msg='Lỗi mạng — kiểm tra kết nối rồi thử lại.';
+    showToast(msg, true);
+    btn.disabled=false; btn.innerHTML='<i class="ph-duotone ph-bookmark-simple"></i> Giữ chỗ ngay';
+  }
+};
+
+/* đăng ký service worker (PWA) */
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
+</script>
+</body>
+</html>

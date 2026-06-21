@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phòng chờ — ALN</title>
+<meta name="theme-color" content="#080c14">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,600&family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+:root{
+  --bg:#080c14;--bg2:#0e1422;--card:rgba(14,20,34,.88);
+  --border-v:rgba(124,58,237,.2);--muted:rgba(228,212,176,.38);
+  --text:#f0e6cc;--text2:rgba(240,230,204,.62);
+  --gold:#C9A84C;--gold2:#e8d07a;--violet:#7c3aed;--violet2:#a78bfa;
+  --green:#3dd68c;--red:#f06060;--r:14px;
+  --mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;
+  --serif:'Cormorant Garamond',serif;--syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;line-height:1.6;
+  background-image:linear-gradient(rgba(124,58,237,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,.018) 1px,transparent 1px);background-size:56px 56px;}
+body::before{content:'';position:fixed;top:-15%;left:50%;transform:translateX(-50%);width:700px;height:500px;
+  background:radial-gradient(ellipse,rgba(124,58,237,.1) 0%,transparent 68%);pointer-events:none;z-index:0}
+input::placeholder{color:rgba(228,212,176,.22)}
+.page{max-width:520px;margin:0 auto;padding:0 18px 56px;position:relative;z-index:1}
+.center{min-height:100vh;display:flex;align-items:center;justify-content:center}
+
+/* top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 2px 6px}
+.brand{display:flex;align-items:center;gap:9px}
+.brand-logo{font-family:var(--serif);font-weight:600;font-size:20px;color:var(--text);letter-spacing:.02em}
+.brand-logo b{color:var(--violet2)}
+.brand-sub{font-family:var(--syne);font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.bell{position:relative;width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer}
+.bell .dot{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--red)}
+
+/* greeting */
+.greet{padding:14px 2px 4px}
+.greet .hi{font-size:11px;color:var(--violet2);font-family:var(--syne);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.greet h1{font-family:var(--serif);font-size:30px;font-weight:300;margin-top:4px}
+.greet h1 b{font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;padding:4px 11px;border-radius:99px;margin-top:8px}
+.pill-room{background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);color:var(--violet2)}
+
+/* hero countdown card */
+.cd-card{background:var(--card);border:1px solid var(--border-v);border-radius:var(--r);padding:24px 22px;margin-top:18px;box-shadow:0 24px 72px rgba(0,0,0,.5);position:relative;overflow:hidden}
+.cd-card::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--violet),var(--gold))}
+.cd-eyebrow{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:4px}
+.cd-time{font-family:var(--mono);font-size:46px;font-weight:700;text-align:center;letter-spacing:.04em;color:var(--text);line-height:1.1}
+.cd-time.soon{color:var(--gold2)}
+.cd-time.over{color:var(--red);font-size:24px;font-weight:600}
+.cd-units{display:flex;justify-content:center;gap:34px;margin-top:2px}
+.cd-units span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.cd-msg{text-align:center;font-size:12px;color:var(--text2);margin-top:14px;line-height:1.55}
+
+/* big actions */
+.btn{width:100%;padding:15px;border-radius:11px;font-size:13.5px;font-weight:700;cursor:pointer;border:none;font-family:var(--syne);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .22s;letter-spacing:.04em}
+.btn-primary{background:linear-gradient(100deg,#5b21b6 0%,#a78bfa 45%,#7c3aed 100%);background-size:200% 100%;color:#fff;margin-top:18px}
+.btn-primary:hover:not(:disabled){background-position:100%;box-shadow:0 0 32px rgba(124,58,237,.4)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.btn-ghost{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);color:var(--text2);margin-top:10px}
+.btn-gold{background:linear-gradient(100deg,#8a6d1f,#e8d07a,#C9A84C);color:#1a1407}
+.ph-spin{animation:phspin 1s linear infinite;display:inline-block}@keyframes phspin{to{transform:rotate(360deg)}}
+
+/* locked cards grid */
+.locked-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:14px}
+.lk{position:relative;background:rgba(14,20,34,.6);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:16px 14px;overflow:hidden}
+.lk .lk-blur{filter:blur(4px);opacity:.5;pointer-events:none;user-select:none}
+.lk-lab{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:5px}
+.lk-val{font-family:var(--mono);font-size:22px;font-weight:700;margin-top:8px}
+.lk-lock{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(124,58,237,.55);font-size:22px}
+.locked-hint{text-align:center;font-size:11px;color:var(--muted);margin-top:14px;display:flex;align-items:center;justify-content:center;gap:6px}
+
+/* steps strip */
+.steps{display:flex;align-items:center;justify-content:center;gap:0;margin:18px 0 4px}
+.stp{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+.stp-dot{width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--bg2)}
+.stp.done .stp-dot{background:rgba(61,214,140,.12);border-color:rgba(61,214,140,.4);color:var(--green)}
+.stp.active .stp-dot{background:rgba(124,58,237,.16);border-color:var(--violet2);color:var(--violet2);box-shadow:0 0 12px rgba(124,58,237,.35)}
+.stp-lab{font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;text-align:center}
+.stp.active .stp-lab,.stp.done .stp-lab{color:var(--text2)}
+.stp-line{height:1px;flex:.5;background:rgba(255,255,255,.1);margin-top:-18px}
+
+/* login card */
+.lg-card{background:var(--card);border:1px solid var(--border-v);border-radius:var(--r);padding:30px 24px;width:100%;max-width:380px;box-shadow:0 24px 72px rgba(0,0,0,.55)}
+.lg-card h2{font-family:var(--serif);font-size:26px;font-weight:600;text-align:center;margin-bottom:6px}
+.lg-card .sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:22px}
+.field{margin-bottom:18px}
+.field label{display:block;font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.field input{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.11);padding:8px 0 10px;color:var(--text);font-size:16px;font-family:var(--sans);outline:none}
+.field input:focus{border-bottom-color:var(--violet2)}
+.lg-hint{font-size:11px;color:var(--text2);text-align:center;margin-top:14px;line-height:1.5}
+.lg-hint a{color:var(--violet2);text-decoration:none}
+
+/* upload sheet */
+.sheet-bg{position:fixed;inset:0;background:rgba(4,6,12,.8);backdrop-filter:blur(6px);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.sheet-bg.show{display:flex}
+.sheet{background:var(--bg2);border:1px solid var(--border-v);border-top-left-radius:20px;border-top-right-radius:20px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:8px 20px 28px;animation:up .3s ease}
+@keyframes up{from{transform:translateY(40px);opacity:.5}to{transform:translateY(0);opacity:1}}
+.sheet-grip{width:38px;height:4px;border-radius:99px;background:rgba(255,255,255,.18);margin:8px auto 16px}
+.sheet h3{font-family:var(--syne);font-size:16px;font-weight:700;margin-bottom:3px}
+.sheet .desc{font-size:11.5px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.upzone{border:1px dashed rgba(124,58,237,.28);border-radius:11px;padding:22px 14px;text-align:center;cursor:pointer;background:rgba(124,58,237,.025);position:relative;transition:all .2s;margin-bottom:6px}
+.upzone:hover{border-color:rgba(124,58,237,.55);background:rgba(124,58,237,.06)}
+.upzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upzone i{font-size:26px;color:rgba(124,58,237,.55);display:block;margin-bottom:6px}
+.upzone .u1{font-size:13px;font-weight:600;color:var(--text2)}
+.upzone .u2{font-size:10px;color:var(--muted);margin-top:2px}
+.prev{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.prev-item{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:8px 11px}
+.prev-item i{color:var(--violet2);font-size:16px}
+.prev-item .nm{flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prev-item .rm{color:var(--muted);cursor:pointer;font-size:15px;display:flex}
+.prev-item .rm:hover{color:var(--red)}
+.or{text-align:center;font-size:10px;color:var(--muted);letter-spacing:.1em;margin:14px 0;text-transform:uppercase;position:relative}
+.or::before,.or::after{content:'';position:absolute;top:50%;width:34%;height:1px;background:rgba(255,255,255,.08)}
+.or::before{left:0}.or::after{right:0}
+
+/* status banner */
+.status-card{background:var(--card);border:1px solid var(--border-v);border-radius:var(--r);padding:30px 24px;margin-top:18px;text-align:center}
+.status-ic{width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 16px}
+.si-review{background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);color:var(--violet2)}
+.si-ok{background:rgba(61,214,140,.1);border:1px solid rgba(61,214,140,.3);color:var(--green)}
+.status-card h2{font-family:var(--serif);font-size:27px;font-weight:600;margin-bottom:8px}
+.status-card p{font-size:12px;color:var(--text2);line-height:1.7;max-width:320px;margin:0 auto}
+
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:rgba(14,20,34,.97);border:1px solid rgba(255,255,255,.1);font-size:12px;padding:10px 22px;border-radius:99px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.7);opacity:0;pointer-events:none;transition:opacity .25s;max-width:90vw;text-align:center}
+.toast.show{opacity:1}.toast.err{border-color:rgba(240,96,96,.35);color:#f09898}
+.hidden{display:none!important}
+.spin-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--muted);font-size:12px}
+.spin-wrap i{font-size:30px;color:var(--violet2)}
+</style>
+</head>
+<body>
+
+<!-- ====== LOADING ====== -->
+<div class="center" id="loadingView">
+  <div class="spin-wrap"><i class="ph-duotone ph-spinner ph-spin"></i> Đang tải phòng chờ…</div>
+</div>
+
+<!-- ====== LOGIN ====== -->
+<div class="center hidden" id="loginView">
+  <div class="lg-card">
+    <h2>Vào phòng chờ</h2>
+    <div class="sub">Nhập số điện thoại bạn đã giữ chỗ</div>
+    <div class="field">
+      <label>Số điện thoại</label>
+      <input type="tel" id="lg_phone" placeholder="0901 234 567" inputmode="numeric" autocomplete="tel">
+    </div>
+    <button class="btn btn-primary" id="lgBtn" style="margin-top:8px" onclick="login()">
+      <i class="ph-duotone ph-sign-in"></i> Vào phòng chờ
+    </button>
+    <div class="lg-hint">Chưa giữ chỗ? <a href="./giu-cho.html">Giữ chỗ ngay →</a></div>
+  </div>
+</div>
+
+<!-- ====== DASHBOARD (PHÒNG CHỜ) ====== -->
+<div class="page hidden" id="dashView">
+  <div class="topbar">
+    <div class="brand">
+      <div>
+        <div class="brand-logo">App <b>Làm Nhà</b></div>
+        <div class="brand-sub">Phòng chờ · ALN</div>
+      </div>
+    </div>
+    <div class="bell"><i class="ph-duotone ph-bell"></i><span class="dot" id="bellDot"></span></div>
+  </div>
+
+  <div class="greet">
+    <div class="hi" id="greetHi">Xin chào trở lại</div>
+    <h1>Xin chào, <b id="greetName">bạn</b></h1>
+    <span class="pill pill-room" id="greetRoom"><i class="ph-duotone ph-compass-tool"></i> Phòng KTS</span>
+  </div>
+
+  <!-- nội dung đổi theo trạng thái -->
+  <div id="stateReserved">
+    <div class="cd-card">
+      <div class="cd-eyebrow">⏳ Còn lại để nộp hồ sơ</div>
+      <div class="cd-time" id="cdTime">00:00:00</div>
+      <div class="cd-units"><span>Giờ</span><span>Phút</span><span>Giây</span></div>
+      <div class="cd-msg" id="cdMsg">Nộp hồ sơ để ALN duyệt và mở khóa không gian của bạn.</div>
+    </div>
+
+    <div class="steps">
+      <div class="stp done"><div class="stp-dot"><i class="ph-bold ph-check"></i></div><div class="stp-lab">Giữ chỗ</div></div>
+      <div class="stp-line"></div>
+      <div class="stp active"><div class="stp-dot">2</div><div class="stp-lab">Nộp hồ sơ</div></div>
+      <div class="stp-line"></div>
+      <div class="stp"><div class="stp-dot">3</div><div class="stp-lab">ALN duyệt</div></div>
+      <div class="stp-line"></div>
+      <div class="stp"><div class="stp-dot">4</div><div class="stp-lab">Mở khóa</div></div>
+    </div>
+
+    <button class="btn btn-primary" onclick="openSheet()">
+      <i class="ph-duotone ph-upload-simple"></i> <span id="submitLabel">Nộp hồ sơ ngay</span>
+    </button>
+
+    <div class="locked-grid">
+      <div class="lk"><div class="lk-blur"><div class="lk-lab"><i class="ph-duotone ph-wallet"></i> Ví khả dụng</div><div class="lk-val">3.87M</div></div><div class="lk-lock"><i class="ph-duotone ph-lock-simple"></i></div></div>
+      <div class="lk"><div class="lk-blur"><div class="lk-lab"><i class="ph-duotone ph-star"></i> Điểm uy tín</div><div class="lk-val">84.5</div></div><div class="lk-lock"><i class="ph-duotone ph-lock-simple"></i></div></div>
+      <div class="lk"><div class="lk-blur"><div class="lk-lab"><i class="ph-duotone ph-briefcase"></i> Dự án</div><div class="lk-val">12</div></div><div class="lk-lock"><i class="ph-duotone ph-lock-simple"></i></div></div>
+      <div class="lk"><div class="lk-blur"><div class="lk-lab"><i class="ph-duotone ph-chart-line-up"></i> Doanh thu</div><div class="lk-val">—</div></div><div class="lk-lock"><i class="ph-duotone ph-lock-simple"></i></div></div>
+    </div>
+    <div class="locked-hint"><i class="ph-duotone ph-lock-key"></i> Hoàn tất hồ sơ để mở khóa không gian làm việc của bạn</div>
+  </div>
+
+  <!-- ĐÃ NỘP / ĐANG DUYỆT -->
+  <div id="stateReview" class="hidden">
+    <div class="status-card">
+      <div class="status-ic si-review"><i class="ph-duotone ph-hourglass-medium"></i></div>
+      <h2>ALN đang duyệt hồ sơ</h2>
+      <p>Hồ sơ của bạn đã được gửi thành công. ALN sẽ xem xét và liên hệ qua số điện thoại của bạn trong vòng <b>1–3 ngày làm việc</b>. Bạn có thể đóng app, ALN sẽ thông báo khi có kết quả.</p>
+    </div>
+    <button class="btn btn-ghost" onclick="doLogout()" style="margin-top:16px"><i class="ph-duotone ph-sign-out"></i> Đăng xuất</button>
+  </div>
+
+  <!-- ĐẠT -->
+  <div id="stateApproved" class="hidden">
+    <div class="status-card">
+      <div class="status-ic si-ok"><i class="ph-duotone ph-confetti"></i></div>
+      <h2>Chúc mừng! Hồ sơ đạt</h2>
+      <p id="approvedMsg">Bạn đã chính thức gia nhập mạng lưới ALN. Hãy hoàn tất tạo tài khoản để vào không gian làm việc riêng của bạn.</p>
+    </div>
+    <button class="btn btn-gold" onclick="goWorkspace()" style="margin-top:16px"><i class="ph-duotone ph-arrow-right"></i> Vào không gian làm việc</button>
+  </div>
+</div>
+
+<!-- ====== UPLOAD SHEET ====== -->
+<div class="sheet-bg" id="sheetBg">
+  <div class="sheet">
+    <div class="sheet-grip"></div>
+    <h3 id="sheetTitle">Nộp hồ sơ</h3>
+    <div class="desc" id="sheetDesc"></div>
+    <div id="sheetFields"></div>
+    <button class="btn btn-primary" id="sheetSubmit" onclick="submitProfile()" style="margin-top:18px">
+      <i class="ph-duotone ph-paper-plane-tilt"></i> Gửi hồ sơ xét duyệt
+    </button>
+    <button class="btn btn-ghost" onclick="closeSheet()"><i class="ph-duotone ph-x"></i> Để sau</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var ROOM = {
+  architect:{vi:'Phòng KTS', icon:'ph-compass-tool'},
+  designer: {vi:'Phòng Designer', icon:'ph-paint-brush-household'},
+  business: {vi:'Phòng Doanh nghiệp', icon:'ph-buildings'}
+};
+var _tt=null;
+function showToast(m,e){var el=document.getElementById('toast');el.textContent=m;el.className='toast show'+(e?' err':'');clearTimeout(_tt);_tt=setTimeout(function(){el.className='toast'},3200);}
+function show(id){['loadingView','loginView','dashView'].forEach(function(v){document.getElementById(v).classList.toggle('hidden',v!==id);});}
+function fileIcon(n){var e=(n.split('.').pop()||'').toLowerCase();if(e==='pdf')return'ph-file-pdf';if(e==='doc'||e==='docx')return'ph-file-doc';if(['jpg','jpeg','png','webp'].indexOf(e)>=0)return'ph-image';return'ph-file';}
+function cleanPhone(p){return (p||'').replace(/\D/g,'');}
+function validPhone(p){return /^0\d{9}$/.test(p);}
+</script>
+
+<script type="module">
+import { auth, db, storage, signInWithEmailAndPassword, onAuthStateChanged, signOut,
+  doc, getDoc, updateDoc, serverTimestamp, storageRef, uploadBytes, getDownloadURL } from './firebase-config.js';
+
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
+
+let CURRENT = null;     // dữ liệu reservation
+let cdTimer = null;
+const uploads = { portfolio:[], projects:[], license:[] };
+
+/* ---------- ĐĂNG NHẬP ---------- */
+window.login = async function(){
+  const phone = cleanPhone(document.getElementById('lg_phone').value);
+  const btn = document.getElementById('lgBtn');
+  if(!validPhone(phone)){ showToast('Số điện thoại chưa đúng (10 số)', true); return; }
+  btn.disabled=true; btn.innerHTML='<i class="ph-duotone ph-spinner ph-spin"></i> Đang vào…';
+  try{
+    await signInWithEmailAndPassword(auth, phone+'@aln.vn', phone);
+  }catch(e){
+    let m='Không tìm thấy chỗ đã giữ với số này';
+    if(e.code==='auth/wrong-password') m='Số điện thoại không khớp thông tin giữ chỗ';
+    if(e.code==='auth/network-request-failed') m='Lỗi mạng — thử lại';
+    showToast(m,true);
+    btn.disabled=false; btn.innerHTML='<i class="ph-duotone ph-sign-in"></i> Vào phòng chờ';
+  }
+};
+
+window.doLogout = async function(){ await signOut(auth); location.reload(); };
+
+/* ---------- THEO DÕI ĐĂNG NHẬP ---------- */
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){ show('loginView'); return; }
+  try{
+    const snap = await getDoc(doc(db,'reservations',user.uid));
+    if(!snap.exists()){ showToast('Chưa có hồ sơ giữ chỗ',true); await signOut(auth); show('loginView'); return; }
+    CURRENT = snap.data();
+    renderDash();
+    show('dashView');
+  }catch(e){ console.error(e); showToast('Lỗi tải dữ liệu',true); }
+});
+
+/* ---------- RENDER DASHBOARD ---------- */
+function renderDash(){
+  const r = ROOM[CURRENT.role] || ROOM.architect;
+  document.getElementById('greetName').textContent = CURRENT.name || 'bạn';
+  document.getElementById('greetRoom').innerHTML = '<i class="ph-duotone '+r.icon+'"></i> '+r.vi;
+
+  const st = CURRENT.status;
+  document.getElementById('stateReserved').classList.add('hidden');
+  document.getElementById('stateReview').classList.add('hidden');
+  document.getElementById('stateApproved').classList.add('hidden');
+
+  if(st==='approved'){
+    document.getElementById('stateApproved').classList.remove('hidden');
+    document.getElementById('bellDot').style.display='block';
+  } else if(CURRENT.profileSubmitted || st==='submitted' || st==='reviewing'){
+    document.getElementById('stateReview').classList.remove('hidden');
+    document.getElementById('bellDot').style.display='none';
+  } else {
+    document.getElementById('stateReserved').classList.remove('hidden');
+    startCountdown();
+  }
+}
+
+/* ---------- ĐẾM NGƯỢC ---------- */
+function startCountdown(){
+  const el=document.getElementById('cdTime'); const msg=document.getElementById('cdMsg');
+  const deadline = CURRENT.deadlineMs || (Date.now()+3*864e5);
+  function tick(){
+    let diff = deadline - Date.now();
+    if(diff<=0){
+      el.classList.add('over'); el.classList.remove('soon');
+      el.textContent='Hết hạn giữ chỗ';
+      msg.innerHTML='Chỗ của bạn đã quá hạn — nhưng bạn vẫn có thể nộp hồ sơ ngay để ALN xem xét.';
+      clearInterval(cdTimer); return;
+    }
+    const h=Math.floor(diff/3.6e6), m=Math.floor(diff%3.6e6/6e4), s=Math.floor(diff%6e4/1000);
+    el.textContent = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    if(diff < 24*3.6e6){ el.classList.add('soon'); msg.innerHTML='🔥 Sắp hết hạn giữ chỗ — nộp ngay để giữ vị trí tại khu vực của bạn.'; }
+  }
+  tick(); clearInterval(cdTimer); cdTimer=setInterval(tick,1000);
+}
+
+/* ---------- SHEET NỘP HỒ SƠ (rẽ nhánh theo phòng) ---------- */
+function uploadZone(key, label, sub, accept, multiple){
+  return '<div class="field"><label>'+label+'</label>'
+    +'<div class="upzone"><input type="file" data-key="'+key+'" accept="'+accept+'"'+(multiple?' multiple':'')+'>'
+    +'<i class="ph-duotone ph-upload-simple"></i><div class="u1">Kéo thả hoặc nhấn để chọn</div>'
+    +'<div class="u2">'+sub+'</div></div><div class="prev" id="prev_'+key+'"></div></div>';
+}
+function textField(id,label,ph,hint){
+  return '<div class="field"><label>'+label+'</label><input type="text" id="'+id+'" placeholder="'+ph+'">'
+    +(hint?'<div class="u2" style="margin-top:6px">'+hint+'</div>':'')+'</div>';
+}
+
+window.openSheet = function(){
+  const role=CURRENT.role;
+  const t=document.getElementById('sheetTitle'), d=document.getElementById('sheetDesc'), f=document.getElementById('sheetFields');
+  uploads.portfolio=[]; uploads.projects=[]; uploads.license=[];
+
+  if(role==='business'){
+    t.textContent='Hồ sơ Doanh nghiệp';
+    d.innerHTML='Doanh nghiệp tìm KTS qua gói <b>Studio KTS</b>. Nộp 3 mục dưới đây để ALN xác minh & kích hoạt.';
+    f.innerHTML =
+      uploadZone('license','Giấy phép kinh doanh ✦','Ảnh chụp hoặc PDF · tối đa 10MB','image/*,.pdf',false)
+      + textField('biz_tax','Mã số thuế ✦','VD: 0312345678','Vốn điều lệ, lĩnh vực, người đại diện đã có trong giấy phép — không cần nhập lại.')
+      + '<div class="field"><label>Quy mô Studio KTS cần ✦</label>'
+      + '<input type="text" id="biz_size" placeholder="VD: 3 KTS + 1 Designer" inputmode="text"></div>';
+  } else {
+    const isArch = role==='architect';
+    t.textContent = isArch ? 'Hồ sơ Kiến trúc sư' : 'Hồ sơ Designer';
+    d.innerHTML='Chọn cách nhanh (link) hoặc đầy đủ (file). Chỉ cần đủ để ALN đánh giá năng lực thực tế.';
+    f.innerHTML =
+      textField('link_portfolio','Link hồ sơ (cách nhanh)','Behance / Drive / Facebook…','Dán link là đủ — khỏi lục file trong máy.')
+      + '<div class="or">hoặc nộp file</div>'
+      + uploadZone('portfolio','Portfolio / Hồ sơ năng lực','PDF hoặc DOCX · tối đa 10MB','.pdf,.doc,.docx',false)
+      + uploadZone('projects','Ảnh 3 công trình đã thi công','Ảnh / PDF · nhiều file · 10MB/file','image/*,.pdf',true)
+      + (isArch ? textField('arch_cchn','Chứng chỉ hành nghề (nếu có)','VD: CCHN-HCM-12345','Không bắt buộc — ALN đánh giá chủ yếu qua năng lực thực tế.') : '');
+  }
+  bindUploads();
+  document.getElementById('sheetBg').classList.add('show');
+};
+window.closeSheet = function(){ document.getElementById('sheetBg').classList.remove('show'); };
+
+function bindUploads(){
+  document.querySelectorAll('#sheetFields input[type=file]').forEach(function(inp){
+    inp.addEventListener('change', function(){
+      const key=inp.dataset.key;
+      Array.prototype.forEach.call(inp.files, function(file){
+        if(file.size>10485760){ showToast(file.name+' vượt 10MB',true); return; }
+        if(inp.multiple) uploads[key].push(file); else uploads[key]=[file];
+      });
+      renderPrev(key);
+    });
+  });
+}
+function renderPrev(key){
+  const el=document.getElementById('prev_'+key); if(!el)return; el.innerHTML='';
+  uploads[key].forEach(function(file,i){
+    const div=document.createElement('div'); div.className='prev-item';
+    div.innerHTML='<i class="ph-duotone '+fileIcon(file.name)+'"></i><span class="nm">'+file.name+'</span><span class="rm"><i class="ph-duotone ph-x-circle"></i></span>';
+    div.querySelector('.rm').onclick=function(){ uploads[key].splice(i,1); renderPrev(key); };
+    el.appendChild(div);
+  });
+}
+
+/* ---------- GỬI HỒ SƠ ---------- */
+async function up(path,file){ const snap=await uploadBytes(storageRef(storage,path),file); return await getDownloadURL(snap.ref); }
+
+window.submitProfile = async function(){
+  const role=CURRENT.role, uid=CURRENT.uid;
+  const btn=document.getElementById('sheetSubmit');
+  const payload={ status:'submitted', profileSubmitted:true, submittedAt:serverTimestamp() };
+
+  // validate tối thiểu
+  if(role==='business'){
+    const tax=(document.getElementById('biz_tax').value||'').trim();
+    const size=(document.getElementById('biz_size').value||'').trim();
+    if(!uploads.license.length){ showToast('Cần nộp giấy phép kinh doanh',true); return; }
+    if(!tax){ showToast('Cần nhập mã số thuế',true); return; }
+    if(!size){ showToast('Cần nhập quy mô Studio cần',true); return; }
+    payload.taxCode=tax; payload.studioSize=size;
+  } else {
+    const link=(document.getElementById('link_portfolio')?.value||'').trim();
+    if(!link && !uploads.portfolio.length && !uploads.projects.length){
+      showToast('Nộp ít nhất 1 link hoặc 1 file',true); return;
+    }
+    if(link) payload.portfolioLink=link;
+    if(role==='architect'){ const c=(document.getElementById('arch_cchn')?.value||'').trim(); if(c) payload.cchn=c; }
+  }
+
+  btn.disabled=true; btn.innerHTML='<i class="ph-duotone ph-spinner ph-spin"></i> Đang gửi…';
+  try{
+    const base='reservations/'+uid+'/';
+    if(uploads.license.length) payload.licenseUrl = await up(base+'license.'+(uploads.license[0].name.split('.').pop()||'jpg'), uploads.license[0]);
+    if(uploads.portfolio.length) payload.portfolioUrl = await up(base+'portfolio.'+(uploads.portfolio[0].name.split('.').pop()||'pdf'), uploads.portfolio[0]);
+    if(uploads.projects.length){
+      payload.projectUrls=[];
+      for(let i=0;i<uploads.projects.length;i++){
+        payload.projectUrls.push(await up(base+'project_'+i+'.'+(uploads.projects[i].name.split('.').pop()||'jpg'), uploads.projects[i]));
+      }
+    }
+    await updateDoc(doc(db,'reservations',uid), payload);
+    await updateDoc(doc(db,'users',uid), { status:'submitted', profileSubmitted:true });
+
+    CURRENT={...CURRENT,...payload, status:'submitted', profileSubmitted:true};
+    clearInterval(cdTimer);
+    closeSheet(); renderDash();
+    showToast('Đã gửi hồ sơ ✓ ALN sẽ duyệt sớm');
+  }catch(e){
+    console.error(e);
+    let m='Lỗi gửi hồ sơ, thử lại';
+    if(e.code==='storage/unauthorized') m='Lỗi quyền tải file — kiểm tra Storage Rules';
+    showToast(m,true);
+    btn.disabled=false; btn.innerHTML='<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi hồ sơ xét duyệt';
+  }
+};
+
+window.goWorkspace = function(){
+  // 👉 Sau khi ALN duyệt đạt, dẫn sang dashboard thật của dự án.
+  //    Đổi đường dẫn này thành trang workspace KTS/Designer/DN của bạn.
+  showToast('Gắn đường dẫn workspace thật vào hàm goWorkspace()');
+};
+</script>
+</body>
+</html>

@@ -14,18 +14,18 @@ window.activeProj = null;
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/><style>.ph-spin{animation:phspin 1s linear infinite;display:inline-block}@keyframes phspin{to{transform:rotate(360deg)}}</style>
 <style>
 :root{
-  --ink:#080c14;--ink2:#0d1120;--ink3:rgba(13,17,32,.97);--ink4:#121828;
-  --border:rgba(201,168,76,.14);--border2:rgba(201,168,76,.28);
-  --text:#f0e6cc;--text2:rgba(240,230,204,.65);--sub:rgba(240,230,204,.48);--muted:rgba(240,230,204,.32);--dim:rgba(255,255,255,.05);
-  --accent:#C9A84C;--accent2:#e8d07a;--accent-bg:rgba(201,168,76,.12);
-  --green:#3dd68c;--green-bg:rgba(61,214,140,.12);
-  --red:#f06060;--red-bg:rgba(240,96,96,.12);
-  --amber:#f59e0b;--amber-bg:rgba(245,158,11,.12);
-  --blue:#60a5fa;--blue-bg:rgba(96,165,250,.12);
-  --gold:#C9A84C;--cyan:#22d3ee;--purple:#a78bfa;--purple-bg:rgba(167,139,250,.12);
+  --ink:#f0f4f8;--ink2:#ffffff;--ink3:#f8fafc;--ink4:#f1f5f9;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --text:#1e293b;--text2:#475569;--sub:#94a3b8;--muted:#94a3b8;--dim:rgba(0,0,0,.08);
+  --accent:#d4a017;--accent2:#e8c44a;--accent-bg:rgba(212,160,23,.12);
+  --green:#16a34a;--green-bg:rgba(22,163,74,.1);
+  --red:#dc2626;--red-bg:rgba(220,38,38,.1);
+  --amber:#d97706;--amber-bg:rgba(217,119,6,.1);
+  --blue:#2563eb;--blue-bg:rgba(37,99,235,.1);
+  --gold:#d4a017;--cyan:#0891b2;--purple:#7c3aed;--purple-bg:rgba(124,58,237,.1);
   --r:10px;--r-sm:7px;
-  --sh:0 2px 8px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.3);
-  --sh-lg:0 8px 32px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.4);
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --sh-lg:0 4px 16px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.06);
   --sans:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;--syne:'Syne',sans-serif;--serif:'Cormorant Garamond',serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -36,7 +36,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 ::-webkit-scrollbar-thumb{background:rgba(212,160,23,.3);border-radius:99px}
 
 /* ── TOPBAR ── */
-.topbar{background:rgba(8,12,20,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(201,168,76,.14);padding:0 22px;height:52px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
+.topbar{background:rgba(255,255,255,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(226,232,240,.7);padding:0 22px;height:52px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
 .tb-logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .tb-logobox{background:transparent;color:var(--gold);padding:5px 11px;border-radius:var(--r-sm);border:1px solid rgba(201,168,76,.35);font-family:var(--syne);font-size:12px;font-weight:800;letter-spacing:.06em}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
@@ -59,7 +59,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .dn-sidebar-nav-section{padding:12px 18px 5px;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
 /* Skeleton loader */
 @keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
-.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 75%);background-size:600px 100%;animation:shimmer 1.4s infinite linear;border-radius:6px}
+.skeleton{background:linear-gradient(90deg,#f1f5f9 25%,#e8edf2 50%,#f1f5f9 75%);background-size:600px 100%;animation:shimmer 1.4s infinite linear;border-radius:6px}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .proj-item-anim{animation:fadeInUp .3s ease both}
 
@@ -480,9 +480,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 #toasts{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:7px;align-items:flex-end}
 .toast{padding:9px 16px;border-radius:var(--r-sm);font-size:12px;font-weight:600;box-shadow:var(--sh-lg);transform:translateX(120%);transition:transform .25s ease;max-width:300px;border:1px solid;font-family:var(--sans)}
 .toast.show{transform:translateX(0)}
-.t-green{background:rgba(61,214,140,.1);border-color:rgba(61,214,140,.35);color:var(--green)}
-.t-amber{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.35);color:var(--amber)}
-.t-blue {background:rgba(96,165,250,.1);border-color:rgba(96,165,250,.3);color:var(--blue)}
+.t-green{background:#f0fdf4;border-color:rgba(22,163,74,.4);color:var(--green)}
+.t-amber{background:#fffbeb;border-color:rgba(217,119,6,.4);color:var(--amber)}
+.t-blue {background:#eff6ff;border-color:rgba(37,99,235,.3);color:var(--blue)}
 
 /* ── ZALO CHAT WIDGET ── */
 /* ── CONTACT SPEED-DIAL FAB ── */
@@ -602,9 +602,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 </head>
 <body>
 <!-- ═══ ALN AUTH VEIL — che trang đến khi xác thực xong ═══ -->
-<div id="alnAuthVeil" style="position:fixed;inset:0;background:#080c14;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
-  <div style="width:38px;height:38px;border:3px solid rgba(201,168,76,.15);border-top-color:#C9A84C;border-radius:50%;animation:alnspin .8s linear infinite"></div>
-  <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:rgba(240,230,204,.48)">Đang xác thực...</div>
+<div id="alnAuthVeil" style="position:fixed;inset:0;background:#f0f4f8;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+  <div style="width:38px;height:38px;border:3px solid rgba(37,99,235,.15);border-top-color:#2563eb;border-radius:50%;animation:alnspin .8s linear infinite"></div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:#64748b">Đang xác thực...</div>
   <style>@keyframes alnspin{to{transform:rotate(360deg)}}</style>
 </div>
 
@@ -615,7 +615,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <i class="ph-duotone ph-list"></i>
   </button>
   <div class="tb-logo" style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-    <div id="cnTopbarName" style="background:rgba(201,168,76,.1);color:#C9A84C;padding:4px 12px;border-radius:var(--r-sm);border:1.5px solid rgba(201,168,76,.35);font-family:var(--syne);font-size:11px;font-weight:800;letter-spacing:.07em;white-space:nowrap;flex-shrink:0">App Làm Nhà Corp.</div>
+    <div id="cnTopbarName" style="background:linear-gradient(135deg,rgba(37,99,235,.14),rgba(96,165,250,.08));color:#2563eb;padding:4px 12px;border-radius:var(--r-sm);border:1.5px solid rgba(37,99,235,.3);font-family:var(--syne);font-size:11px;font-weight:800;letter-spacing:.07em;white-space:nowrap;flex-shrink:0">App Làm Nhà Corp.</div>
     <div class="page-title tb-title-full" style="font-family:var(--serif);font-weight:600;font-style:italic;font-size:15px;color:var(--text);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Cổng Theo dõi Công trình</div>
   </div>
   <div class="tb-right">
@@ -3125,14 +3125,14 @@ function alnNotify(title, body){
     if(!bar){
       bar = document.createElement('div');
       bar.id = 'cnTabBar';
-      bar.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px;position:sticky;top:0;z-index:5;background:linear-gradient(180deg,#080c14 85%,transparent);padding:6px 0 14px';
+      bar.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px;position:sticky;top:0;z-index:5;background:linear-gradient(180deg,#f8fafc 90%,transparent);padding:6px 0 14px';
       TABS.forEach(function(t){
         var b = document.createElement('button');
         b.dataset.tab = t.id;
         b.dataset.clr = t.clr; b.dataset.brd = t.brd; b.dataset.bg = t.bg; b.dataset.ibg = t.ibg;
-        b.innerHTML = '<div class="dn-kwc-icon" style="width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;margin:0 auto 5px;background:rgba(255,255,255,.06);transition:background .15s"><i class="ph-duotone '+t.icon+'" style="color:rgba(240,230,204,.4);transition:color .15s"></i></div>'
-          + '<div class="dn-kwc-label" style="font-size:10px;font-weight:700;color:rgba(240,230,204,.55);line-height:1.3;transition:color .15s">'+t.label+'</div>';
-        b.style.cssText = 'padding:12px 6px;border-radius:10px;border:1.5px solid rgba(201,168,76,.14);background:rgba(13,17,32,.9);cursor:pointer;font-family:inherit;transition:all .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0;box-shadow:0 2px 8px rgba(0,0,0,.3)';
+        b.innerHTML = '<div class="dn-kwc-icon" style="width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;margin:0 auto 5px;background:#f1f5f9;transition:background .15s"><i class="ph-duotone '+t.icon+'" style="color:#94a3b8;transition:color .15s"></i></div>'
+          + '<div class="dn-kwc-label" style="font-size:10px;font-weight:700;color:#475569;line-height:1.3;transition:color .15s">'+t.label+'</div>';
+        b.style.cssText = 'padding:12px 6px;border-radius:10px;border:1.5px solid #e2e8f0;background:#ffffff;cursor:pointer;font-family:inherit;transition:all .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0;box-shadow:0 1px 3px rgba(0,0,0,.06)';
         b.onmouseenter = function(){ if(b.dataset.tab !== cur) b.style.transform = 'translateY(-2px)'; };
         b.onmouseleave = function(){ if(b.dataset.tab !== cur) b.style.transform = ''; };
         b.onclick = (function(td){ return function(){ cur = (cur === td) ? null : td; window.cnApplyTabs(); try{window.scrollTo({top:0});}catch(e){} }; })(t.id);
@@ -3160,16 +3160,16 @@ function alnNotify(title, body){
     bar.querySelectorAll('button').forEach(function(b){
       var on = b.dataset.tab === cur;
       var clr = b.dataset.clr, brd = b.dataset.brd, bg = b.dataset.bg, ibg = b.dataset.ibg;
-      b.style.background   = on ? bg    : 'rgba(13,17,32,.9)';
-      b.style.borderColor  = on ? brd   : 'rgba(201,168,76,.14)';
+      b.style.background   = on ? bg    : '#ffffff';
+      b.style.borderColor  = on ? brd   : '#e2e8f0';
       b.style.transform    = on ? 'translateY(-2px)' : '';
       b.style.boxShadow    = on ? '0 4px 14px rgba(0,0,0,.1)' : '0 1px 3px rgba(0,0,0,.06)';
       var iw = b.querySelector('.dn-kwc-icon');
-      if(iw) iw.style.background = on ? ibg : 'rgba(255,255,255,.06)';
+      if(iw) iw.style.background = on ? ibg : '#f1f5f9';
       var ico = b.querySelector('i');
-      if(ico) ico.style.color = on ? clr : 'rgba(240,230,204,.4)';
+      if(ico) ico.style.color = on ? clr : '#94a3b8';
       var lbl = b.querySelector('.dn-kwc-label');
-      if(lbl) lbl.style.color = on ? clr : 'rgba(240,230,204,.55)';
+      if(lbl) lbl.style.color = on ? clr : '#475569';
     });
     // Lazy subscription: chỉ subscribe proposals khi mở Bảng Review
     if(cur === 'rv' && window.activeProj && typeof window._cnSubProposals === 'function') {
@@ -3233,66 +3233,8 @@ function _startProjectsListenCN() {
       try { if(typeof window.renderSidebar==='function') window.renderSidebar(); } catch(e){ console.error('[CN render]',e); }
       try { if(typeof window.selectProj==='function') window.selectProj(window.activeProj); } catch(e){}
     } else {
-      // Empty state — CN mới, hiện form tư vấn
-      window._cnConsultFiles = [];
-      var _n = window._cnCurrentName || 'bạn';
-      var _chkOpts = [
-        ['kien_truc','Thiết kế KTS','ph-compass-tool'],
-        ['noi_that','Nội thất','ph-paint-brush-household'],
-        ['xay_dung','Xây dựng trọn gói','ph-hard-hat'],
-        ['tu_van','Tư vấn & Phong thủy','ph-yin-yang']
-      ];
-      var _chkHtml = _chkOpts.map(function(c){
-        return '<label style="display:flex;align-items:center;gap:7px;padding:9px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);cursor:pointer;background:var(--ink3)">'
-          +'<input type="checkbox" class="cn-needs-chk" value="'+c[0]+'" style="width:13px;height:13px;accent-color:var(--gold);flex-shrink:0">'
-          +'<i class="ph-duotone '+c[2]+'" style="font-size:13px;color:var(--gold)"></i>'
-          +'<span style="font-size:11px;font-weight:600;color:var(--text2)">'+c[1]+'</span></label>';
-      }).join('');
       var el = document.getElementById('projList');
-      if(el) el.innerHTML = '<div style="padding:20px 16px;text-align:center">'
-        +'<div style="width:44px;height:44px;border-radius:50%;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:20px;color:var(--green)"><i class="ph-duotone ph-check-circle"></i></div>'
-        +'<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:5px">Tài khoản kích hoạt ✓</div>'
-        +'<div style="font-size:11px;color:var(--sub);line-height:1.6">Điền thông tin dự án<br>để ALN tư vấn sớm nhất.</div>'
-        +'</div>';
-      var main = document.getElementById('mainContent') || document.querySelector('.main-content');
-      if(main) main.innerHTML = '<div style="padding:28px 20px 40px;max-width:600px;margin:0 auto">'
-        +'<div style="text-align:center;margin-bottom:22px">'
-        +'<div style="font-family:var(--serif,serif);font-size:26px;font-weight:300;color:var(--text)">Xin chào, <b style="font-weight:600">'+_n+'</b></div>'
-        +'<div style="font-size:12px;color:var(--sub);margin-top:6px;line-height:1.7">Tài khoản đã kích hoạt. Cho đội ALN biết về dự án để được tư vấn sớm nhất.</div>'
-        +'</div>'
-        +'<div class="card">'
-        +'<div class="ct"><i class="ph-duotone ph-chats-teardrop"></i> Thông tin tư vấn</div>'
-        +'<div style="margin-bottom:14px">'
-        +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Diện tích đất / sàn xây dựng <span style="color:var(--gold)">✦</span></label>'
-        +'<input type="text" id="cn_area" placeholder="VD: 150 m²  hoặc  8×16 m" style="width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:14px;font-family:inherit;background:var(--ink3);color:var(--text);outline:none"></div>'
-        +'<div style="margin-bottom:14px">'
-        +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Số tầng dự kiến</label>'
-        +'<select id="cn_floors" style="width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:14px;font-family:inherit;background:var(--ink3);color:var(--text);outline:none;cursor:pointer">'
-        +'<option value="">— Chọn —</option><option value="1">1 tầng</option><option value="2">2 tầng</option><option value="3">3 tầng</option><option value="4">4 tầng</option><option value="5+">5 tầng trở lên</option>'
-        +'</select></div>'
-        +'<div style="margin-bottom:14px">'
-        +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">Bạn cần gì? <span style="font-size:10px;font-weight:400;color:var(--sub)">(chọn 1 hoặc nhiều)</span></label>'
-        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">'+_chkHtml+'</div></div>'
-        +'<div style="margin-bottom:14px">'
-        +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Tỉnh / Thành phố</label>'
-        +'<input type="text" id="cn_city" placeholder="VD: TP. Hồ Chí Minh" style="width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:14px;font-family:inherit;background:var(--ink3);color:var(--text);outline:none"></div>'
-        +'<div style="margin-bottom:20px">'
-        +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Ghi chú thêm <span style="font-size:10px;font-weight:400;color:var(--sub)">(tùy chọn)</span></label>'
-        +'<textarea id="cn_note" rows="3" placeholder="Phong cách, ngân sách, thời gian bắt đầu..." style="width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:14px;font-family:inherit;background:var(--ink3);color:var(--text);outline:none;resize:vertical;line-height:1.5"></textarea></div>'
-        +'<div style="margin-bottom:20px">'
-        +'<label style="display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Tài liệu đính kèm <span style="font-size:10px;font-weight:400;color:var(--sub)">(Giấy chủ quyền, phác thảo mặt bằng — tùy chọn)</span></label>'
-        +'<div style="border:2px dashed var(--border2);border-radius:var(--r-sm);padding:18px;text-align:center;cursor:pointer;background:var(--ink3);position:relative;transition:border-color .15s" ondragover="event.preventDefault();this.style.borderColor=\'var(--gold)\'" ondragleave="this.style.borderColor=\'\'" ondrop="window.cnHandleFileDrop(event)">'
-        +'<input type="file" id="cn_consult_files" multiple accept="image/*,.pdf" onchange="window.cnHandleFileChange(event)" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">'
-        +'<i class="ph-duotone ph-upload-simple" style="font-size:22px;color:var(--muted);display:block;margin-bottom:5px"></i>'
-        +'<div style="font-size:12px;font-weight:600;color:var(--text2)">Kéo thả hoặc nhấn để chọn file</div>'
-        +'<div style="font-size:10px;color:var(--muted);margin-top:2px">Ảnh, PDF · tối đa 10MB/file</div>'
-        +'</div>'
-        +'<div id="cn_file_preview" style="display:flex;flex-direction:column;gap:5px;margin-top:6px"></div>'
-        +'</div>'
-        +'<button onclick="window.cnSubmitConsultation()" id="cnConsultBtn" style="width:100%;padding:13px;background:var(--green);border:none;border-radius:var(--r-sm);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px"><i class="ph-duotone ph-paper-plane-tilt"></i> Gửi thông tin cho đội ALN</button>'
-        +'</div>'
-        +'<div style="text-align:center;font-size:11px;color:var(--sub);margin-top:12px">Đội ALN sẽ liên hệ qua SĐT trong vòng 24 giờ.</div>'
-        +'</div>';
+      if (el) el.innerHTML = '<div style="padding:16px;color:var(--sub);font-size:13px">Chưa có dự án nào của bạn.</div>';
     }
   }, function(err){ console.error('[CN] Lỗi:', err.code, err.message); });
 }
@@ -3460,7 +3402,6 @@ onAuthStateChanged(auth, async (user) => {
     // Cập nhật sidebar tên CN từ Firestore
     // Nếu Founder xem trang này → hiện tên CN thật, không hiện tên Founder
     let _displayName = profile.role === 'founder' ? 'Trần Nam' : (profile.name || '');
-    window._cnCurrentName = _displayName;
     const _sbName = document.getElementById('cnSidebarName');
     if (_sbName) _sbName.textContent = _displayName;
     const _sbAv = document.getElementById('cnSidebarAv');
@@ -3531,74 +3472,6 @@ onAuthStateChanged(auth, async (user) => {
     window._cnSaveDoc = async function(pid, data){
       await addDoc(collection(db, 'projects', pid, 'documents'),
         Object.assign({}, data, { createdAt: serverTimestamp() }));
-    };
-    window.cnHandleFileChange = function(e){
-      Array.prototype.forEach.call(e.target.files, function(f){
-        if(f.size>10485760){ showToast(f.name+' vượt 10MB','t-amber'); return; }
-        window._cnConsultFiles.push(f);
-      });
-      window.cnRenderFilePreview();
-    };
-    window.cnHandleFileDrop = function(e){
-      e.preventDefault(); e.currentTarget.style.borderColor='';
-      Array.prototype.forEach.call(e.dataTransfer.files, function(f){
-        if(f.size>10485760){ showToast(f.name+' vượt 10MB','t-amber'); return; }
-        window._cnConsultFiles.push(f);
-      });
-      window.cnRenderFilePreview();
-    };
-    window.cnRemoveConsultFile = function(i){
-      (window._cnConsultFiles||[]).splice(i,1); window.cnRenderFilePreview();
-    };
-    window.cnRenderFilePreview = function(){
-      var el=document.getElementById('cn_file_preview'); if(!el)return;
-      el.innerHTML=(window._cnConsultFiles||[]).map(function(f,i){
-        var ext=(f.name.split('.').pop()||'').toLowerCase();
-        var icon=ext==='pdf'?'ph-file-pdf':f.type.startsWith('image/')?'ph-image':'ph-file';
-        return '<div style="display:flex;align-items:center;gap:8px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 10px">'
-          +'<i class="ph-duotone '+icon+'" style="font-size:15px;color:var(--gold)"></i>'
-          +'<span style="flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+f.name+'</span>'
-          +'<span style="font-size:10px;color:var(--muted);flex-shrink:0">'+(f.size/1024/1024).toFixed(1)+'MB</span>'
-          +'<button onclick="window.cnRemoveConsultFile('+i+')" style="width:18px;height:18px;border-radius:50%;background:var(--red-bg);border:1px solid rgba(220,38,38,.2);color:var(--red);font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>'
-          +'</div>';
-      }).join('');
-    };
-    window.cnSubmitConsultation = async function(){
-      var uid = window.__ALN_UID;
-      if(!uid){ showToast('Lỗi xác thực','t-amber'); return; }
-      var area = ((document.getElementById('cn_area')||{}).value||'').trim();
-      if(!area){ showToast('Vui lòng nhập diện tích','t-amber'); return; }
-      var floors = ((document.getElementById('cn_floors')||{}).value||'');
-      var city   = ((document.getElementById('cn_city') ||{}).value||'').trim();
-      var note   = ((document.getElementById('cn_note') ||{}).value||'').trim();
-      var needs  = [];
-      document.querySelectorAll('.cn-needs-chk:checked').forEach(function(cb){ needs.push(cb.value); });
-      var btn = document.getElementById('cnConsultBtn');
-      if(btn){ btn.disabled=true; btn.innerHTML='<i class="ph-duotone ph-spinner-gap ph-spin"></i> Đang gửi...'; }
-      try{
-        var attachUrls = [];
-        for(var fi=0; fi<(window._cnConsultFiles||[]).length; fi++){
-          var f=window._cnConsultFiles[fi];
-          var safe=f.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-          var r=storageRef(storage,'reservations/'+uid+'/consult_'+Date.now()+'_'+safe);
-          var s2=await uploadBytes(r,f);
-          attachUrls.push(await getDownloadURL(s2.ref));
-        }
-        var cdata = { area:area, floors:floors, needs:needs, city:city, note:note, submittedAt:serverTimestamp() };
-        if(attachUrls.length) cdata.attachmentUrls = attachUrls;
-        await updateDoc(doc(db,'users',uid), { consultationRequest:cdata });
-        try{ await updateDoc(doc(db,'reservations',uid), { consultationRequest:cdata }); }catch(e2){}
-        var mc = document.getElementById('mainContent');
-        if(mc) mc.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;padding:40px;text-align:center">'
-          +'<div style="width:80px;height:80px;border-radius:50%;background:rgba(16,185,129,.1);border:2px solid rgba(16,185,129,.3);display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--green)"><i class="ph-duotone ph-check-circle"></i></div>'
-          +'<div style="font-family:var(--serif,serif);font-size:24px;font-weight:600;color:var(--text)">Đã ghi nhận!</div>'
-          +'<div style="font-size:13px;color:var(--sub);line-height:1.75;max-width:300px">Đội ALN sẽ liên hệ qua SĐT của bạn trong vòng 24 giờ.</div>'
-          +'</div>';
-        showToast('Đã gửi thông tin ✓ ALN sẽ liên hệ sớm','t-green');
-      }catch(e3){
-        showToast('Lỗi gửi, thử lại','t-amber');
-        if(btn){ btn.disabled=false; btn.innerHTML='<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi thông tin cho đội ALN'; }
-      }
     };
   } catch(e) {
     console.error("[ALN Guard]", e);
