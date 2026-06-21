@@ -3401,13 +3401,7 @@ onAuthStateChanged(auth, async (user) => {
 
     // Cập nhật sidebar tên CN từ Firestore
     // Nếu Founder xem trang này → hiện tên CN thật, không hiện tên Founder
-    let _displayName = profile.name || '';
-    if (profile.role === 'founder') {
-      try {
-        const _cnSnap = await getDoc(doc(db, 'users', 'G4RhRH5ECMYcE9aFcKYVn5Wdy952'));
-        if (_cnSnap.exists()) _displayName = _cnSnap.data().name || 'Trần Nam';
-      } catch(e) { _displayName = 'Trần Nam'; }
-    }
+    let _displayName = profile.role === 'founder' ? 'Trần Nam' : (profile.name || '');
     const _sbName = document.getElementById('cnSidebarName');
     if (_sbName) _sbName.textContent = _displayName;
     const _sbAv = document.getElementById('cnSidebarAv');

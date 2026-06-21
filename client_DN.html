@@ -3402,13 +3402,7 @@ onAuthStateChanged(auth, async (user) => {
 
     // Cập nhật sidebar tên DN từ Firestore
     // Nếu Founder xem trang này → hiện tên DN thật, không hiện tên Founder
-    let _displayName = profile.name || '';
-    if (profile.role === 'founder') {
-      try {
-        const _dnSnap = await getDoc(doc(db, 'users', 'aTyHR3oQw6P87xpA9p8hTr2NbGA2'));
-        if (_dnSnap.exists()) _displayName = _dnSnap.data().name || 'Công ty TK House';
-      } catch(e) { _displayName = 'Công ty TK House'; }
-    }
+    let _displayName = profile.role === 'founder' ? 'Công ty TK House' : (profile.name || '');
     const _sbName = document.getElementById('dnSidebarName');
     if (_sbName) _sbName.textContent = _displayName;
     const _sbAv = document.getElementById('dnSidebarAv');
