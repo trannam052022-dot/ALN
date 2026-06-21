@@ -3399,11 +3399,19 @@ onAuthStateChanged(auth, async (user) => {
     try { localStorage.setItem("aln_user", ud); } catch(e){}
     try { sessionStorage.setItem("aln_user", ud); } catch(e){}
 
-    // Cập nhật sidebar tên CN từ Firestore (IIFE có thể đã chạy với data cũ)
+    // Cập nhật sidebar tên CN từ Firestore
+    // Nếu Founder xem trang này → hiện tên CN thật, không hiện tên Founder
+    let _displayName = profile.name || '';
+    if (profile.role === 'founder') {
+      try {
+        const _cnSnap = await getDoc(doc(db, 'users', 'G4RhRH5ECMYcE9aFcKYVn5Wdy952'));
+        if (_cnSnap.exists()) _displayName = _cnSnap.data().name || 'Trần Nam';
+      } catch(e) { _displayName = 'Trần Nam'; }
+    }
     const _sbName = document.getElementById('cnSidebarName');
-    if (_sbName) _sbName.textContent = profile.name || '';
+    if (_sbName) _sbName.textContent = _displayName;
     const _sbAv = document.getElementById('cnSidebarAv');
-    if (_sbAv) { const _w=(profile.name||'').trim().split(/\s+/); _sbAv.textContent=_w.length>=2?(_w[0][0]+_w[_w.length-1][0]).toUpperCase():(profile.name||'CN').slice(0,2).toUpperCase(); }
+    if (_sbAv) { const _w=_displayName.trim().split(/\s+/); _sbAv.textContent=_w.length>=2?(_w[0][0]+_w[_w.length-1][0]).toUpperCase():_displayName.slice(0,2).toUpperCase(); }
 
     // Xác thực OK → mở màn che
     const veil = document.getElementById("alnAuthVeil");
