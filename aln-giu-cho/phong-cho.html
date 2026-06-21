@@ -237,6 +237,35 @@ input::placeholder{color:var(--muted)}
 .or::before,.or::after{content:'';position:absolute;top:50%;width:36%;height:1px;background:rgba(255,255,255,.07)}
 .or::before{left:0}.or::after{right:0}
 
+/* PWA install banner */
+.pwa-banner{
+  display:none;margin-top:20px;
+  background:linear-gradient(135deg,rgba(14,20,34,.97),rgba(20,28,46,.97));
+  border:1px solid rgba(201,168,76,.28);border-radius:16px;
+  padding:16px 18px;position:relative;overflow:hidden;
+  animation:fadein .4s ease;
+}
+.pwa-banner.show{display:flex;align-items:center;gap:14px}
+.pwa-banner::before{
+  content:'';position:absolute;top:-40%;left:-20%;width:140%;height:200%;
+  background:radial-gradient(ellipse,rgba(201,168,76,.06) 0%,transparent 65%);
+  pointer-events:none;
+}
+.pwa-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));
+  border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;
+  font-size:22px;color:var(--gold2);flex-shrink:0}
+.pwa-body{flex:1}
+.pwa-title{font-family:var(--syne);font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
+.pwa-sub{font-size:10.5px;color:var(--sub);line-height:1.45}
+.pwa-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.pwa-btn{padding:8px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:none;
+  font-family:var(--syne);display:flex;align-items:center;gap:5px;white-space:nowrap;transition:all .18s}
+.pwa-btn-install{background:linear-gradient(100deg,#7a5c18,#e8d07a 60%,#C9A84C);color:#1a1407}
+.pwa-btn-install:hover{box-shadow:0 0 18px rgba(201,168,76,.4)}
+.pwa-btn-later{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:var(--muted);font-size:10px}
+.pwa-close{position:absolute;top:8px;right:10px;color:var(--muted);cursor:pointer;font-size:14px;background:none;border:none;padding:2px}
+@keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
   background:rgba(14,20,34,.97);border:1px solid rgba(255,255,255,.1);
   font-size:12px;font-weight:500;padding:10px 22px;border-radius:99px;
@@ -377,6 +406,22 @@ input::placeholder{color:var(--muted)}
       <div class="lk"><div class="lk-blur"><div class="lk-lab"><i class="ph-duotone ph-chart-line-up"></i> Doanh thu</div><div class="lk-val">—</div></div><div class="lk-lock"><i class="ph-duotone ph-lock-simple"></i></div></div>
     </div>
     <div class="locked-hint"><i class="ph-duotone ph-lock-key"></i> Nộp hồ sơ để mở khóa không gian làm việc</div>
+
+    <!-- PWA install banner -->
+    <div class="pwa-banner" id="pwaBanner">
+      <button class="pwa-close" onclick="dismissPwa()" title="Đóng"><i class="ph-duotone ph-x"></i></button>
+      <div class="pwa-icon"><i class="ph-duotone ph-device-mobile"></i></div>
+      <div class="pwa-body">
+        <div class="pwa-title">Tải App Làm Nhà về máy</div>
+        <div class="pwa-sub">Vào phòng chờ nhanh hơn — không cần mở trình duyệt, nhận thông báo khi được duyệt.</div>
+      </div>
+      <div class="pwa-actions">
+        <button class="pwa-btn pwa-btn-install" id="pwaInstallBtn" onclick="installPwa()">
+          <i class="ph-duotone ph-download-simple"></i> Tải về
+        </button>
+        <button class="pwa-btn pwa-btn-later" onclick="dismissPwa()">Để sau</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -412,6 +457,38 @@ function showView(v){
 }
 function bgClick(e){if(e.target===document.getElementById('sheetBg'))closeSheet();}
 function closeSheet(){document.getElementById('sheetBg').classList.remove('show');}
+
+/* PWA install */
+var _deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault();
+  _deferredPrompt=e;
+  // hiện banner nếu đang ở dashboard và chưa dismiss
+  if(!sessionStorage.getItem('pwaDismissed') && document.getElementById('viewDash').classList.contains('active')){
+    setTimeout(function(){document.getElementById('pwaBanner').classList.add('show');},1200);
+  }
+});
+window.addEventListener('appinstalled',function(){
+  document.getElementById('pwaBanner').classList.remove('show');
+  showToast('Đã cài thành công ✓ Tìm App Làm Nhà trên màn hình chính');
+  _deferredPrompt=null;
+});
+window.installPwa=async function(){
+  if(!_deferredPrompt){showToast('Trình duyệt chưa hỗ trợ — thử Chrome/Edge trên Android',true);return;}
+  _deferredPrompt.prompt();
+  const res=await _deferredPrompt.userChoice;
+  if(res.outcome==='accepted'){ document.getElementById('pwaBanner').classList.remove('show'); }
+  _deferredPrompt=null;
+};
+window.dismissPwa=function(){
+  document.getElementById('pwaBanner').classList.remove('show');
+  sessionStorage.setItem('pwaDismissed','1');
+};
+function showPwaBanner(){
+  if(!sessionStorage.getItem('pwaDismissed') && _deferredPrompt){
+    setTimeout(function(){document.getElementById('pwaBanner').classList.add('show');},1200);
+  }
+}
 </script>
 
 <script type="module">
@@ -436,6 +513,7 @@ onAuthStateChanged(auth, async (user)=>{
     CURRENT={...snap.data(),uid:user.uid};
     renderDash();
     showView('viewDash');
+    showPwaBanner();
   }catch(e){ showView('viewAuth'); }
 });
 
@@ -467,7 +545,7 @@ window.doRegister=async function(){
     } else {
       CURRENT={...rsnap.data(),uid};
     }
-    renderDash(); showView('viewDash');
+    renderDash(); showView('viewDash'); showPwaBanner();
     showToast('Đã giữ chỗ ✓');
     setTimeout(openUploadSheet,800);
   }catch(err){
