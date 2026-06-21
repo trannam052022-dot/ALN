@@ -2403,7 +2403,7 @@ function _startKtsProjectListen(uid) {
     window.KTS_PROJECT_DATA = d.data();
     const p = d.data();
     const _isDNp = !!(p.dn && p.dn.uid);
-    const _displayId = _isDNp ? 'ALN-DN-'+(p.CODE||p.code||d.id.replace(/^ALN-/,'')) : 'ALN-CN-'+(p.CHUNHA||d.id.replace(/^ALN-/,''));
+    const _displayId = p.code || d.id;
 
     // Cập nhật tất cả chỗ hiển thị project ID
     const _setTxt = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
@@ -2480,7 +2480,7 @@ window.switchKtsProject = function(pid) {
   window.KTS_PROJECT_ID = pid;
   window.KTS_PROJECT_DATA = pr;
   const _isDNpr = !!(pr.dn && pr.dn.uid);
-  const _displayId = _isDNpr ? 'ALN-DN-'+(pr.CODE||pr.code||pid.replace(/^ALN-/,'')) : 'ALN-CN-'+(pr.CHUNHA||pid.replace(/^ALN-/,''));
+  const _displayId = pr.code || pid;
   const _setTxt = function(id, v){ const el=document.getElementById(id); if(el) el.textContent=v; };
   _setTxt('paProjTitle', '#' + _displayId);
   _setTxt('slaProjId', '#' + _displayId);
@@ -2586,7 +2586,7 @@ function renderProjCards(projs) {
     var color = SC[p.status] || 'var(--muted)';
     var label = SL[p.status] || p.status;
     var isDNcard = !!(p.dn && p.dn.uid);
-    var did = isDNcard ? 'ALN-DN-'+(p.CODE||p.code||(p.id||'').replace(/^ALN-/,'')) : 'ALN-CN-'+(p.CHUNHA||(p.id||'').replace(/^ALN-/,''));
+    var did = p.code || p.id;
     var prog = p.progress || [0,0,0,0];
     var earnPct = (prog[0]||0)*0.10 + (prog[1]||0)*0.20 + (prog[2]||0)*0.60 + (prog[3]||0)*0.10;
     var earnPctDisp = Math.round(earnPct * 100);
@@ -2650,7 +2650,7 @@ function renderMyProjects(projects) {
     const isOn = p.id === window._mplActiveId;
     const showCN = asCN !== undefined ? asCN : (window._mplFilter === 'cn');
     const client = showCN ? (p.cn&&p.cn.name)||'—' : (p.dn&&p.dn.name)||'—';
-    const mCode = showCN ? 'ALN-CN-'+(p.CHUNHA||p.id.replace(/^ALN-/,'')) : 'ALN-DN-'+(p.CODE||p.code||p.id.replace(/^ALN-/,''));
+    const mCode = p.code || p.id;
     return `<div class="mpl-item${isOn?' on':''}" data-pid="${p.id}" onclick="window.mplSelect('${p.id}')">
       <div class="mpl-dot" style="background:${S_DOT[p.status]||'var(--muted)'}"></div>
       <div style="flex:1;min-width:0">
@@ -2699,7 +2699,7 @@ function renderMyProjects(projects) {
     const stClr = S_CLR[p.status] || '';
     const pid = p.id;
     const isDN = !!(p.dn && p.dn.uid);
-    const detCode = isDN ? 'ALN-DN-'+(p.CODE||p.code||pid.replace(/^ALN-/,'')) : 'ALN-CN-'+(p.CHUNHA||pid.replace(/^ALN-/,''));
+    const detCode = p.code || pid;
     const bar = prog.map((v,i) => `<div style="flex:${pcts[i]};height:7px;background:${v>0?SCOLS[i]:'rgba(0,0,0,.1)'};border-radius:99px"></div>`).join('');
     const stages = ['C1','C2','C3','C4'].map((c,i) =>
       `<span style="color:${prog[i]>0?SCOLS[i]:'var(--muted)'};font-weight:${prog[i]>0?700:400}">${c}&nbsp;${Math.round((prog[i]||0)*100)}%</span>`
@@ -3142,7 +3142,7 @@ window.alnSubmitProposal = async function(){
   const total=_paFiles.length;
   const _kpd = window.KTS_PROJECT_DATA || {};
   const _isDNpa = !!(_kpd.dn && _kpd.dn.uid);
-  const _dpid = _isDNpa ? 'ALN-DN-'+(_kpd.CODE||_kpd.code||PID.replace(/^ALN-/,'')) : 'ALN-CN-'+(_kpd.CHUNHA||PID.replace(/^ALN-/,''));
+  const _dpid = _kpd.code || PID;
   paStatus(`<div style="background:var(--ink3);border:1px solid rgba(212,160,23,.3);border-radius:8px;padding:10px 12px">
     <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">📋 Sắp gửi <b>${total} ảnh</b> · Chặng <b>${stage}</b> · <b>${name}</b></div>
     <div style="font-size:10px;color:var(--sub);margin-bottom:10px">Dự án ${_dpid} — Chủ nhà &amp; DN nhận ngay sau khi gửi.</div>
@@ -3347,7 +3347,7 @@ function _watchDocs(pid) {
   if (projIdEl) {
     const _kd = window.KTS_PROJECT_DATA || {};
     const _isDNwd = !!(_kd.dn && _kd.dn.uid);
-    projIdEl.textContent = '#' + (_isDNwd ? 'ALN-DN-'+(_kd.CODE||_kd.code||pid.replace(/^ALN-/,'')) : 'ALN-CN-'+(_kd.CHUNHA||pid.replace(/^ALN-/,'')));
+    projIdEl.textContent = '#' + (_kd.code || pid);
   }
   if (!list) return;
   if (_rvDocUnsub) { try { _rvDocUnsub(); } catch(e) {} _rvDocUnsub = null; }

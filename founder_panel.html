@@ -1694,8 +1694,7 @@ function _adaptDNtoRow(p) {
   var st = p.status||'on_track';
   var rowSt = st==='sla_warn'?'sla':st==='on_track'?'ok':st;
   var next = {C1:'C2',C2:'C3',C3:'C4',C4:'C4'}[p.stage]||'C4';
-  var _isCN = !!(p._raw && p._raw.cn && p._raw.cn.uid);
-  var _displayId = (_isCN ? 'ALN-CN-' : 'ALN-DN-') + p.id.replace(/^ALN-/,'');
+  var _displayId = p.id;
   var cmds = [];
   if(p.stage!=='C4'&&st!=='done'){
     cmds.push({id:'STAGE_APPROVE',label:'DUYỆT CHẶNG '+p.stage+' → '+next,sub:'Chuyển chặng & ghi nhận tiến độ',icon:'<i class="ph-duotone ph-check-circle"></i>',style:'approve'});
@@ -1876,8 +1875,7 @@ function refreshTable() {
 function openDrawer(id) {
   var realP = (DN_PROJECTS||[]).find(function(p){
     var _ic = !!(p._raw&&p._raw.cn&&p._raw.cn.uid);
-    var _did = (_ic?'ALN-CN-':'ALN-DN-')+p.id.replace(/^ALN-/,'');
-    return _did===id || p.id===id;
+    return p.id===id;
   });
   var row = realP ? _adaptDNtoRow(realP) : null;
   if (!row) return;
