@@ -12,12 +12,12 @@
 </style>
 </head>
 <body>
-<h2 style="color:#fff">ALN Admin Patch v3 — Xoá user giả</h2>
+<h2 style="color:#fff">ALN Admin Patch v4 — Fix tên user + xoá user giả</h2>
 <div id="out"><div class="log">Đang khởi tạo Firebase...</div></div>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, doc, deleteDoc, collection, getDocs, query, where }
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, query, where }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -40,72 +40,63 @@ function log(msg, cls) {
   document.getElementById('out').appendChild(div);
 }
 
-// UID thật — GIỮ LẠI, không xoá
-const KEEP_UIDS = new Set([
-  'h4kEguPEyMcwJwl89stc0Q6j2si2', // founder.tranlong
-  'kw5TgVDggIfboEqERS1cAphn3263', // kts.tranlong
-  'aTyHR3oQw6P87xpA9p8hTr2NbGA2', // dn.tkhouse
-  'G4RhRH5ECMYcE9aFcKYVn5Wdy952', // cn.trannam
-]);
+// 4 user thật + tên đúng
+const REAL_USERS = {
+  'h4kEguPEyMcwJwl89stc0Q6j2si2': { username:'founder.tranlong', name:'KTS. Trần Đại Long', role:'founder' },
+  'kw5TgVDggIfboEqERS1cAphn3263': { username:'kts.tranlong',     name:'KTS. Trần Đại Long', role:'kts'     },
+  'aTyHR3oQw6P87xpA9p8hTr2NbGA2': { username:'dn.tkhouse',       name:'Công ty TK House',    role:'dn'      },
+  'G4RhRH5ECMYcE9aFcKYVn5Wdy952': { username:'cn.trannam',       name:'Trần Nam',            role:'cn'      },
+};
+const KEEP_UIDS = new Set(Object.keys(REAL_USERS));
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) { log('Chưa đăng nhập. Đăng nhập founder trước.', 'err'); return; }
-
   const FOUNDER_UID = 'h4kEguPEyMcwJwl89stc0Q6j2si2';
   if (user.uid !== FOUNDER_UID) { log('Cần đăng nhập founder', 'err'); return; }
   log('Đăng nhập: ' + user.uid);
 
-  // Xoá KTS giả
-  log('--- Kiểm tra KTS ---');
-  try {
-    const snap = await getDocs(query(collection(db, 'users'), where('role', '==', 'kts')));
-    log('Tìm thấy ' + snap.size + ' KTS trong Firestore');
-    for (const d of snap.docs) {
-      if (KEEP_UIDS.has(d.id)) {
-        log('  GIỮ: ' + d.id + ' (' + (d.data().name || d.data().username) + ')', 'warn');
+  // BƯỚC 1: Fix tên đúng cho 4 user thật
+  log('--- Bước 1: Fix tên 4 user thật ---');
+  for (const [uid, data] of Object.entries(REAL_USERS)) {
+    try {
+      const snap = await getDoc(doc(db, 'users', uid));
+      if (snap.exists()) {
+        const cur = snap.data();
+        if (cur.name !== data.name) {
+          await updateDoc(doc(db, 'users', uid), { name: data.name });
+          log('  FIX: ' + uid.slice(0,8) + '... ' + (cur.name||'(trống)') + ' → ' + data.name, 'ok');
+        } else {
+          log('  OK:  ' + uid.slice(0,8) + '... ' + data.name + ' (đúng rồi)', 'warn');
+        }
       } else {
-        log('  XOÁ: ' + d.id + ' (' + (d.data().name || d.data().username) + ')', 'err');
-        await deleteDoc(doc(db, 'users', d.id));
-        log('  → Đã xoá', 'ok');
+        await setDoc(doc(db, 'users', uid), { uid, ...data, status:'active', email: data.username+'@aln.vn' });
+        log('  TẠO: ' + uid.slice(0,8) + '... ' + data.name, 'ok');
       }
-    }
-  } catch(e) { log('LỖI KTS: ' + e.message, 'err'); }
+    } catch(e) { log('  LỖI ' + uid.slice(0,8) + ': ' + e.message, 'err'); }
+  }
 
-  // Xoá DN giả
-  log('--- Kiểm tra DN ---');
+  // BƯỚC 2: Xoá user giả (mọi role, ngoài 4 UID thật)
+  log('--- Bước 2: Xoá user giả ---');
   try {
-    const snap2 = await getDocs(query(collection(db, 'users'), where('role', '==', 'dn')));
-    log('Tìm thấy ' + snap2.size + ' DN trong Firestore');
-    for (const d of snap2.docs) {
+    const allSnap = await getDocs(collection(db, 'users'));
+    log('Tổng users trong Firestore: ' + allSnap.size);
+    for (const d of allSnap.docs) {
       if (KEEP_UIDS.has(d.id)) {
-        log('  GIỮ: ' + d.id + ' (' + (d.data().name || d.data().username) + ')', 'warn');
+        log('  GIỮ: ' + d.id.slice(0,8) + '... (' + (d.data().name||d.data().username) + ')', 'warn');
       } else {
-        log('  XOÁ: ' + d.id + ' (' + (d.data().name || d.data().username) + ')', 'err');
+        log('  XOÁ: ' + d.id.slice(0,8) + '... (' + (d.data().name||d.data().username||d.data().role) + ')', 'err');
         await deleteDoc(doc(db, 'users', d.id));
-        log('  → Đã xoá', 'ok');
+        log('    → Đã xoá', 'ok');
       }
     }
-  } catch(e) { log('LỖI DN: ' + e.message, 'err'); }
-
-  // Xoá CN giả (ngoài cn.trannam)
-  log('--- Kiểm tra CN ---');
-  try {
-    const snap3 = await getDocs(query(collection(db, 'users'), where('role', '==', 'cn')));
-    log('Tìm thấy ' + snap3.size + ' CN trong Firestore');
-    for (const d of snap3.docs) {
-      if (KEEP_UIDS.has(d.id)) {
-        log('  GIỮ: ' + d.id + ' (' + (d.data().name || d.data().username) + ')', 'warn');
-      } else {
-        log('  XOÁ: ' + d.id + ' (' + (d.data().name || d.data().username) + ')', 'err');
-        await deleteDoc(doc(db, 'users', d.id));
-        log('  → Đã xoá', 'ok');
-      }
-    }
-  } catch(e) { log('LỖI CN: ' + e.message, 'err'); }
+  } catch(e) { log('LỖI bước 2: ' + e.message, 'err'); }
 
   log('');
-  log('XONG! Còn lại đúng 4 user thật:', 'ok');
-  log('  founder.tranlong / kts.tranlong / dn.tkhouse / cn.trannam', 'ok');
+  log('XONG! Kết quả:', 'ok');
+  log('  cn.trannam   → Trần Nam', 'ok');
+  log('  dn.tkhouse   → Công ty TK House', 'ok');
+  log('  kts.tranlong → KTS. Trần Đại Long', 'ok');
+  log('Đóng trang này, xoá cache browser (Ctrl+Shift+R) rồi đăng nhập lại.', 'warn');
 });
 </script>
 </body>
