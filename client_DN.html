@@ -3218,6 +3218,8 @@ function _startProjectsListenDN() {
     : query(collection(db,'projects'), where('memberUids','array-contains', uid));
   onSnapshot(q, function(snap){
     var arr = snap.docs.map(function(d){ return _adaptProjectDN(d.id, d.data()); });
+    // DN chỉ thấy project có DN partner (loại bỏ project thuần CN)
+    arr = arr.filter(function(p){ return p._raw && p._raw.dn && p._raw.dn.uid; });
     if (!isFounder) {
       // sắp xếp client-side theo updatedAt giảm dần (tránh phải tạo composite index)
       arr.sort(function(a,b){
