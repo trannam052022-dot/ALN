@@ -2307,7 +2307,7 @@ function _ensureMgData(){
   else if(!_mgKtsData || !_mgKtsData.length) _mgKtsData = [];
   if(window._LIVE_DN)  _mgDnData  = window._LIVE_DN;
   else if(!_mgDnData  || !_mgDnData.length)  _mgDnData  = [];
-  if(!_mgCnData  || !_mgCnData.length)  _mgCnData  = [].concat(DN_PROJECTS||[]);
+  _mgCnData = (DN_PROJECTS||[]).filter(function(p){ return p._raw && p._raw.cn && p._raw.cn.uid && !(p._raw.dn && p._raw.dn.uid); });
 }
 
 var _activeRowId = null;
