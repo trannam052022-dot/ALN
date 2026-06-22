@@ -62,11 +62,38 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);line-height
 .cs-chk.on .box i{opacity:1}
 .cs-chk.on .tx{color:var(--text)}
 
-/* Submit */
-.cs-submit{width:100%;margin-top:8px;padding:14px;border:none;border-radius:var(--r-sm);background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;font-size:13.5px;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 4px 14px rgba(22,163,74,.25)}
-.cs-submit:hover{box-shadow:0 6px 20px rgba(22,163,74,.35);transform:translateY(-1px)}
+/* Submit — tone vàng, 2 dòng */
+.cs-submit{width:100%;margin-top:8px;padding:13px 18px;border:none;border-radius:var(--r-sm);background:linear-gradient(135deg,#bf8f1a 0%,#d4a017 60%,#e0b32e 100%);color:#fff;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:11px;transition:all .18s;box-shadow:0 4px 14px rgba(212,160,23,.3)}
+.cs-submit:hover{box-shadow:0 7px 22px rgba(212,160,23,.42);transform:translateY(-1px)}
+.cs-submit > i{font-size:22px}
+.cs-submit .txt{display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.cs-submit .big{font-size:16px;font-weight:800;letter-spacing:.01em}
+.cs-submit .small{font-size:11px;font-weight:500;opacity:.9;margin-top:1px}
 .cs-foot{text-align:center;font-size:11.5px;color:var(--sub);margin-top:16px;display:flex;align-items:center;justify-content:center;gap:6px}
-.cs-foot i{color:var(--green)}
+.cs-foot i{color:var(--accent)}
+
+/* ── CHAT MyMy ── */
+.cs-chat{background:var(--ink2);border:1px solid var(--border);border-radius:16px;margin-top:20px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,.06),0 1px 3px rgba(15,23,42,.04)}
+.cs-chat-head{display:flex;align-items:center;gap:11px;padding:15px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(212,160,23,.06),transparent)}
+.cs-chat-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#d4a017,#e8c44a);display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-weight:800;font-size:16px;color:#fff;flex-shrink:0;box-shadow:0 2px 10px rgba(212,160,23,.3);position:relative}
+.cs-chat-av .on-dot{position:absolute;bottom:1px;right:1px;width:11px;height:11px;border-radius:50%;background:var(--green);border:2px solid #fff}
+.cs-chat-id .nm{font-family:var(--syne);font-weight:800;font-size:13px;color:var(--text);display:flex;align-items:center;gap:6px}
+.cs-chat-id .nm .badge{font-family:var(--sans);font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.25);padding:1px 6px;border-radius:99px}
+.cs-chat-id .role{font-size:11px;color:var(--sub);margin-top:1px}
+.cs-chat-body{padding:18px;display:flex;flex-direction:column;gap:11px;max-height:280px;overflow-y:auto}
+.cs-msg{display:flex;gap:9px;align-items:flex-end;max-width:88%}
+.cs-msg .m-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#d4a017,#e8c44a);display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-weight:800;font-size:10px;color:#fff;flex-shrink:0}
+.cs-msg .bubble{background:var(--ink4);border:1px solid var(--border);border-radius:4px 13px 13px 13px;padding:9px 13px;font-size:12.5px;color:var(--text2);line-height:1.55}
+.cs-chips{display:flex;flex-wrap:wrap;gap:7px;padding:0 18px 4px}
+.cs-chip{font-size:11.5px;font-weight:600;color:var(--accent);background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.25);border-radius:99px;padding:6px 13px;cursor:pointer;transition:all .15s}
+.cs-chip:hover{background:rgba(212,160,23,.14)}
+.cs-chat-input{display:flex;gap:9px;align-items:center;padding:13px 16px;border-top:1px solid var(--border);background:var(--ink3)}
+.cs-chat-input input{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:10px 16px;font-size:12.5px;font-family:var(--sans);color:var(--text);outline:none;transition:border-color .15s}
+.cs-chat-input input:focus{border-color:var(--accent)}
+.cs-chat-send{width:40px;height:40px;border-radius:50%;border:none;background:linear-gradient(135deg,#bf8f1a,#d4a017);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;box-shadow:0 2px 8px rgba(212,160,23,.3)}
+.cs-chat-send:hover{transform:scale(1.06)}
+.cs-chat-note{text-align:center;font-size:10.5px;color:var(--sub);padding:9px 16px 13px;display:flex;align-items:center;justify-content:center;gap:5px}
+.cs-chat-note i{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -149,9 +176,40 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);line-height
       <textarea class="cs-textarea" placeholder="Phong cách bạn yêu thích, ngân sách dự kiến, thời gian mong muốn khởi công, hoặc bất cứ điều gì bạn đang băn khoăn…"></textarea>
     </div>
 
-    <button class="cs-submit"><i class="ph-duotone ph-paper-plane-tilt"></i> Gửi thông tin — đội ALN sẽ liên hệ bạn sớm</button>
+    <button class="cs-submit">
+      <i class="ph-duotone ph-paper-plane-tilt"></i>
+      <span class="txt">
+        <span class="big">Gửi thông tin</span>
+        <span class="small">ALN sẽ liên hệ với bạn ngay</span>
+      </span>
+    </button>
 
     <div class="cs-foot"><i class="ph-duotone ph-shield-check"></i> Thông tin của bạn được bảo mật, chỉ dùng để tư vấn công trình.</div>
+  </div>
+
+  <!-- ── CHAT MyMy ── -->
+  <div class="cs-chat">
+    <div class="cs-chat-head">
+      <div class="cs-chat-av">My<span class="on-dot"></span></div>
+      <div class="cs-chat-id">
+        <div class="nm">MyMy <span class="badge">Trực tuyến</span></div>
+        <div class="role">Đội Thiết kế & Xây dựng ALN</div>
+      </div>
+    </div>
+    <div class="cs-chat-body">
+      <div class="cs-msg"><div class="m-av">My</div><div class="bubble">Chào bạn 👋 Mình là <b>MyMy</b>, cùng đội Thiết kế & Xây dựng của ALN.</div></div>
+      <div class="cs-msg"><div class="m-av">My</div><div class="bubble">Trong lúc bạn điền thông tin, cứ nhắn mình bất cứ điều gì về <b>thiết kế, vật liệu hay chi phí xây dựng</b> nhé — mình ở đây để giúp bạn.</div></div>
+    </div>
+    <div class="cs-chips">
+      <span class="cs-chip">Chi phí xây nhà 2 tầng?</span>
+      <span class="cs-chip">Phong cách hiện đại</span>
+      <span class="cs-chip">Thời gian thi công?</span>
+    </div>
+    <div class="cs-chat-input">
+      <input type="text" placeholder="Nhắn cho MyMy về ngôi nhà của bạn…">
+      <button class="cs-chat-send"><i class="ph-duotone ph-paper-plane-right"></i></button>
+    </div>
+    <div class="cs-chat-note"><i class="ph-duotone ph-info"></i> MyMy hỗ trợ các câu hỏi về thiết kế & xây dựng.</div>
   </div>
 
 </div>
