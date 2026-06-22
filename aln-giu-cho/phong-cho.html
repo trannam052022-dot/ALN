@@ -621,6 +621,10 @@ window.doRegister=async function(){
       const uref=doc(db,'users',uid);
       const usnap=await getDoc(uref);
       if(!usnap.exists()) await setDoc(uref,{name,phone,role:'cn',status:'active',createdAt:serverTimestamp()});
+      /* Ghi reservations để Founder thấy trong Phòng chờ */
+      const rref=doc(db,'reservations',uid);
+      const rsnap=await getDoc(rref);
+      if(!rsnap.exists()) await setDoc(rref,{uid,name,phone,role:'cn',status:'active',profileSubmitted:true,reservedAt:serverTimestamp()});
       showToast('Tạo tài khoản thành công ✓ Đang vào...');
       setTimeout(function(){ location.href='../client_CN.html'; },1000);
     } else {

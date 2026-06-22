@@ -3052,7 +3052,7 @@ function _cpPopulateSelect(id, users, placeholder){
   if(!sel) return;
   sel.innerHTML = '<option value="">' + placeholder + '</option>'
     + users.map(function(u){
-        return '<option value="' + u.uid + '">' + u.name + ' (' + u.username + ')</option>';
+        return '<option value="' + u.uid + '">' + u.name + ' (' + (u.username || u.phone || u.uid.slice(0,6)) + ')</option>';
       }).join('');
 }
 
@@ -3953,8 +3953,8 @@ window._cpFb = {
     const all  = snap.docs.map(d => Object.assign({ uid: d.id }, d.data()));
     return {
       cn:  all.filter(u => u.role === 'cn'  && u.status !== 'rejected'),
-      kts: all.filter(u => u.role === 'kts' && u.status === 'active'),
-      dn:  all.filter(u => u.role === 'dn'  && u.status === 'active'),
+      kts: all.filter(u => u.role === 'kts' && u.status !== 'rejected' && u.status !== 'pending'),
+      dn:  all.filter(u => u.role === 'dn'  && u.status !== 'rejected' && u.status !== 'pending'),
     };
   },
   createProject: async function(data) {
