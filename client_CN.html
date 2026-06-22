@@ -3603,13 +3603,15 @@ window.cnInitMymyFlow = function(){
   var hintt = document.getElementById('cnMymyHintT');
   if(!bdy) return;
 
-  // Lấy tên + giới tính từ sessionStorage
+  // Lấy tên + giới tính: đọc sidebar trước (đã set từ profile Firestore ngay sau auth),
+  // fallback sessionStorage (đã lưu từ auth flow)
   var _su = JSON.parse(sessionStorage.getItem('aln_user') || '{}');
   var rawName = _su.name || '';
   var firstName = rawName ? rawName.split(' ').pop() : '';
-  var gender = _su.gender || ''; // 'male' | 'female' | ''
-  var honorific = gender === 'female' ? 'chị' : (gender === 'male' ? 'anh' : '');
-  // cn = "chị Thanh" / "anh Long" / "Thanh" (nếu chưa có gender)
+  var _gEl = document.getElementById('sidebarGender');
+  var gender = (_gEl && _gEl.value) || _su.gender || ''; // 'nam' | 'nu' | ''
+  var honorific = gender === 'nu' ? 'chị' : (gender === 'nam' ? 'anh' : '');
+  // cn = "chị Thanh" / "anh Nam" / firstName (nếu chưa có gender)
   var cn = honorific ? (honorific + ' ' + firstName) : (firstName || 'bạn');
   var genderKnown = !!honorific;
 
