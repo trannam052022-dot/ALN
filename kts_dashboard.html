@@ -1200,6 +1200,75 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <option value="nu">Nữ</option>
       </select>
     </div>
+    <!-- ─── Tỉnh/Thành gốc ─── -->
+    <div class="profile-field">
+      <label>Tỉnh/Thành gốc</label>
+      <select id="profileHomeProvince" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;outline:none">
+        <option value="">— Chọn tỉnh thành —</option>
+        <option value="HCM">TP. Hồ Chí Minh</option>
+        <option value="HN">Hà Nội</option>
+        <option value="DN">Đà Nẵng</option>
+        <option value="CT">Cần Thơ</option>
+        <option value="HP">Hải Phòng</option>
+        <option value="BD">Bình Dương</option>
+        <option value="DNai">Đồng Nai</option>
+        <option value="BR-VT">Vũng Tàu</option>
+        <option value="LA">Long An</option>
+        <option value="TG">Tiền Giang</option>
+        <option value="AG">An Giang</option>
+        <option value="KG">Kiên Giang</option>
+        <option value="DL">Đắk Lắk</option>
+        <option value="KH">Khánh Hòa</option>
+        <option value="BDinh">Bình Định</option>
+        <option value="NA">Nghệ An</option>
+        <option value="TH">Thanh Hóa</option>
+        <option value="OTHER">Tỉnh/Thành khác</option>
+      </select>
+    </div>
+
+    <!-- ─── Địa điểm tạm thời ─── -->
+    <div style="background:rgba(34,211,238,.05);border:1px solid rgba(34,211,238,.2);border-radius:10px;padding:12px 14px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-size:10px;font-weight:700;color:var(--cyan);letter-spacing:.1em;text-transform:uppercase"><i class="ph-duotone ph-map-pin"></i> Địa điểm tạm thời</div>
+        <div id="tempLocBadge" style="display:none;font-size:9px;font-weight:700;padding:2px 9px;border-radius:99px;background:rgba(34,211,238,.18);color:var(--cyan)">Đang bật</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Đang công tác ở tỉnh khác? Bật để được gợi ý dự án nơi đó.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div>
+          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Đang ở tại</div>
+          <select id="tempLocProvince" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+            <option value="">— Chọn tỉnh —</option>
+            <option value="HCM">TP. Hồ Chí Minh</option>
+            <option value="HN">Hà Nội</option>
+            <option value="DN">Đà Nẵng</option>
+            <option value="CT">Cần Thơ</option>
+            <option value="HP">Hải Phòng</option>
+            <option value="BD">Bình Dương</option>
+            <option value="DNai">Đồng Nai</option>
+            <option value="BR-VT">Vũng Tàu</option>
+            <option value="LA">Long An</option>
+            <option value="TG">Tiền Giang</option>
+            <option value="AG">An Giang</option>
+            <option value="KG">Kiên Giang</option>
+            <option value="DL">Đắk Lắk</option>
+            <option value="KH">Khánh Hòa</option>
+            <option value="BDinh">Bình Định</option>
+            <option value="NA">Nghệ An</option>
+            <option value="TH">Thanh Hóa</option>
+            <option value="OTHER">Tỉnh/Thành khác</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Đến ngày</div>
+          <input type="date" id="tempLocUntil" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+        </div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button onclick="setTempLocation()" style="flex:1;padding:8px;border-radius:7px;background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.35);color:var(--cyan);font-size:11px;font-weight:700;cursor:pointer"><i class="ph-duotone ph-check-circle"></i> Bật vị trí tạm</button>
+        <button onclick="clearTempLocation()" id="clearTempBtn" style="display:none;padding:8px 14px;border-radius:7px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);color:var(--red);font-size:11px;font-weight:700;cursor:pointer"><i class="ph-duotone ph-x-circle"></i> Tắt</button>
+      </div>
+    </div>
+
     <button class="profile-save-btn" onclick="saveProfile()">
       <i class="ph-duotone ph-floppy-disk"></i> Lưu hồ sơ
     </button>
@@ -2890,11 +2959,12 @@ window.saveProfile = async function saveProfile() {
   const btn = document.querySelector('.profile-save-btn');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin"></i> Đang lưu...'; }
   const data = {
-    name:    (document.getElementById('profileName')||{}).value.trim() || '',
-    email:   (document.getElementById('profileEmail')||{}).value.trim() || '',
-    phone:   (document.getElementById('profilePhone')||{}).value.trim() || '',
-    license: (document.getElementById('profileLicense')||{}).value.trim() || '',
-    gender:  (document.getElementById('profileGender')||{}).value || '',
+    name:         (document.getElementById('profileName')||{}).value.trim() || '',
+    email:        (document.getElementById('profileEmail')||{}).value.trim() || '',
+    phone:        (document.getElementById('profilePhone')||{}).value.trim() || '',
+    license:      (document.getElementById('profileLicense')||{}).value.trim() || '',
+    gender:       (document.getElementById('profileGender')||{}).value || '',
+    homeProvince: (document.getElementById('profileHomeProvince')||{}).value || '',
   };
   try {
     await setDoc(doc(db,'users',uid), data, {merge:true});
@@ -2924,14 +2994,65 @@ window.saveProfile = async function saveProfile() {
 function _fillProfileForm(profile) {
   if (!profile) return;
   const set = (id,v) => { const el=document.getElementById(id); if(el&&v) el.value=v; };
-  set('profileName',    profile.name);
-  set('profileEmail',   profile.email);
-  set('profilePhone',   profile.phone);
-  set('profileLicense', profile.license);
+  set('profileName',         profile.name);
+  set('profileEmail',        profile.email);
+  set('profilePhone',        profile.phone);
+  set('profileLicense',      profile.license);
   const gEl = document.getElementById('profileGender');
   if (gEl && profile.gender) gEl.value = profile.gender;
+  const hpEl = document.getElementById('profileHomeProvince');
+  if (hpEl && (profile.homeProvince || profile.province)) hpEl.value = profile.homeProvince || profile.province;
+  _updateTempLocUI(profile.temporaryLocation);
   if (profile.avatarURL) _showAvatar(profile.avatarURL);
 }
+
+function _updateTempLocUI(tl) {
+  var badge    = document.getElementById('tempLocBadge');
+  var clearBtn = document.getElementById('clearTempBtn');
+  var isActive = false;
+  if (tl && tl.province) {
+    var untilMs = tl.until
+      ? (tl.until.seconds ? tl.until.seconds * 1000 : +new Date(tl.until))
+      : 0;
+    isActive = untilMs > Date.now();
+  }
+  if (badge)    badge.style.display    = isActive ? 'block'       : 'none';
+  if (clearBtn) clearBtn.style.display = isActive ? 'inline-flex' : 'none';
+  if (isActive) {
+    var sel = document.getElementById('tempLocProvince');
+    if (sel) sel.value = tl.province;
+    var until = new Date(tl.until.seconds ? tl.until.seconds * 1000 : tl.until);
+    var dateEl = document.getElementById('tempLocUntil');
+    if (dateEl) dateEl.value = until.toISOString().split('T')[0];
+  }
+}
+
+window.setTempLocation = async function() {
+  const uid = window.__ALN_UID;
+  if (!uid) return;
+  const province = (document.getElementById('tempLocProvince')||{}).value;
+  const untilStr = (document.getElementById('tempLocUntil')||{}).value;
+  if (!province) { showToast('Vui lòng chọn tỉnh thành', 't-red'); return; }
+  if (!untilStr) { showToast('Vui lòng chọn ngày kết thúc', 't-red'); return; }
+  const untilDate = new Date(untilStr);
+  untilDate.setHours(23, 59, 59, 999);
+  if (untilDate <= new Date()) { showToast('Ngày kết thúc phải là tương lai', 't-red'); return; }
+  try {
+    await setDoc(doc(db,'users',uid), { temporaryLocation: { province, until: untilDate } }, {merge:true});
+    showToast('Đã bật địa điểm tạm thời', 't-green');
+    _updateTempLocUI({ province, until: { seconds: untilDate.getTime()/1000 } });
+  } catch(e) { showToast('Lỗi: ' + (e.message||e.code), 't-red'); }
+};
+
+window.clearTempLocation = async function() {
+  const uid = window.__ALN_UID;
+  if (!uid) return;
+  try {
+    await setDoc(doc(db,'users',uid), { temporaryLocation: null }, {merge:true});
+    showToast('Đã tắt địa điểm tạm thời', 't-green');
+    _updateTempLocUI(null);
+  } catch(e) { showToast('Lỗi: ' + (e.message||e.code), 't-red'); }
+};
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {

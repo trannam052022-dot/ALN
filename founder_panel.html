@@ -3081,17 +3081,30 @@ async function cpSuggestKts(){
       list.innerHTML = '<div style="color:var(--dim);font-size:12px;padding:4px 0">Không tìm thấy KTS tại ' + provLabel + '. <span style="color:var(--sub)">Hãy chọn thủ công.</span></div>';
       return;
     }
-    var ranked = window.ALNMatching ? window.ALNMatching.rankKts(ktsList, province) : ktsList.map(function(k){ return {kts:k, score:0}; });
+    var ranked = window.ALNMatching ? window.ALNMatching.rankKts(ktsList, province) : ktsList.map(function(k){ return {kts:k, score:0, effectiveProv:k.homeProvince}; });
+    var PROV = (window.ALNMatching && window.ALNMatching.PROV_LABEL) || {};
     list.innerHTML = ranked.map(function(r, i){
       var k = r.kts;
       var star = Math.round(k.rating) || 3;
       var stars = '★'.repeat(star) + '☆'.repeat(5-star);
-      var isHome = k.homeProvince === province;
+      var effProv = r.effectiveProv || k.homeProvince || '';
+      var isHome = effProv === province;
+      // Check if KTS is using temporary location
+      var tl = k.temporaryLocation;
+      var tempActive = false;
+      if (tl && tl.province) {
+        var untilMs = tl.until ? (tl.until.seconds ? tl.until.seconds*1000 : +new Date(tl.until)) : 0;
+        tempActive = untilMs > Date.now() && tl.province !== (k.homeProvince || k.province || '');
+      }
+      var locBadge = tempActive
+        ? '<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;background:rgba(34,211,238,.15);color:var(--cyan);margin-left:4px">📍 tạm</span>'
+        : (isHome ? '<span style="color:var(--green)">Thường trú</span>' : '<span style="color:var(--sub)">Nhận dự án</span>');
+      var provName = PROV[effProv] || effProv || '—';
       return '<div onclick="document.getElementById(\'cp_kts\').value=\'' + k.uid + '\';this.style.borderColor=\'var(--amber)\'" style="cursor:pointer;padding:8px 10px;border-radius:6px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;gap:10px" onmouseover="this.style.borderColor=\'rgba(245,158,11,.5)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
         + '<span style="font-size:10px;font-weight:700;color:var(--sub);min-width:18px;text-align:center">#'+(i+1)+'</span>'
         + '<div style="flex:1;min-width:0">'
-          + '<div style="font-size:12px;font-weight:600;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+k.name+'</div>'
-          + '<div style="font-size:10px;color:var(--dim);margin-top:2px">'+(isHome?'<span style="color:var(--green)">Thường trú</span>':'Nhận dự án')+' · '+provLabel+' · <span style="color:var(--amber);letter-spacing:.5px">'+stars+'</span></div>'
+          + '<div style="font-size:12px;font-weight:600;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+k.name+locBadge+'</div>'
+          + '<div style="font-size:10px;color:var(--dim);margin-top:2px">'+provName+' · <span style="color:var(--amber);letter-spacing:.5px">'+stars+'</span></div>'
         + '</div>'
         + '<div style="text-align:right;min-width:48px">'
           + '<div style="font-size:13px;font-weight:700;color:var(--amber);font-family:var(--mono)">'+r.score+'</div>'
@@ -3885,14 +3898,21 @@ window._cpFb = {
   suggestKts: async function(province) {
     const snap = await getDocs(query(
       collection(db, 'users'),
-      where('serviceProvinces', 'array-contains', province)
+      where('role', '==', 'kts'),
+      where('status', '==', 'active')
     ));
     const result = [];
     snap.forEach(function(d) {
       const u = d.data();
-      if (u.role === 'kts' && u.status === 'active') {
-        result.push({ uid: d.id, name: u.name || '', username: u.username || '', homeProvince: u.homeProvince || u.province || '', serviceProvinces: u.serviceProvinces || [], rating: u.rating || 0 });
-      }
+      result.push({
+        uid: d.id,
+        name: u.name || '',
+        username: u.username || '',
+        homeProvince: u.homeProvince || u.province || '',
+        serviceProvinces: u.serviceProvinces || [],
+        rating: u.rating || 0,
+        temporaryLocation: u.temporaryLocation || null,
+      });
     });
     return result;
   }
