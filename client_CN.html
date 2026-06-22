@@ -3602,76 +3602,140 @@ window.cnInitMymyFlow = function(){
   var hintt = document.getElementById('cnMymyHintT');
   if(!bdy) return;
 
+  // Lấy tên từ profile CN
+  var rawName = (window.CN_USER && window.CN_USER.name) ? window.CN_USER.name : '';
+  var firstName = rawName ? rawName.split(' ').pop() : '';
+  // cn = cách xưng hô với chủ nhà (vd: "anh Nam", "chị Lan") — set sau bước chọn giới tính
+  var cn = firstName || 'bạn';
+
   var step = 0, collected = {}, multiSel = [], busy = false;
 
+  // Thay {cn} bằng cách xưng hô thực tế
+  function rdr(s){ return s.replace(/\{cn\}/g, cn); }
+
+  // 3 tin mở đầu — dùng tên trực tiếp
+  var boot0 = 'Chào ' + (firstName || 'bạn') + '! 👋';
+  var boot1 = 'Em là <b>MyMy</b> — tư vấn viên của đội Thiết kế &amp; Xây dựng ALN. Trong lúc đội KTS xem hồ sơ, em sẽ ngồi đây trò chuyện cùng ' + (firstName || 'bạn') + ' một chút nhé.';
+  var boot2 = 'Em muốn hiểu <em>thật sự</em> về ngôi nhà ' + (firstName || 'bạn') + ' đang mơ tới — không phải hỏi cho có, mà để khi KTS ngồi xuống vẽ, họ đã hiểu ' + (firstName || 'bạn') + ' từ trước rồi.';
+
   var flow = [
-    { text:'Ch\xe0o bạn! 👋', think:0, type:600 },
-    { text:'M\xecnh l\xe0 <b>MyMy</b> — tư vấn vi\xean của đội Thiết kế &amp; X\xe2y dựng ALN. Trong l\xfac đội KTS xem hồ sơ của bạn, m\xecnh sẽ ngồi đ\xe2y tr\xf2 chuyện một ch\xfat nh\xe9.', think:800, type:2200 },
-    { text:'M\xecnh muốn hiểu <em>thật sự</em> về ng\xf4i nh\xe0 bạn đang mơ tới — kh\xf4ng phải hỏi cho c\xf3, m\xe0 để khi KTS ngồi xuống vẽ, họ đ\xe3 hiểu bạn từ trước rồi.', think:1200, type:2800 },
-    { text:'Bắt đầu th\xf4i — bạn thấy m\xecnh <b>hợp với phong c\xe1ch ng\xf4i nh\xe0 như thế n\xe0o</b>? Cứ m\xf4 tả theo cảm gi\xe1c, kh\xf4ng cần đ\xfang t\xean gọi.',
-      key:'phong_cach', freeText:true, hint:'V\xed dụ: "tho\xe1ng s\xe1ng, \xedt đồ" hay "sang trọng, c\xf3 hoa văn"',
-      chipHint:'Hoặc chọn nhanh:', chips:['Hiện đại \xb7 Tối giản','T\xe2n cổ điển','Cổ điển \xb7 Sang trọng','Nhiệt đới \xb7 Gần gũi','Indochine','Chưa r\xf5'],
-      think:1800, type:2400 },
-    { text:'Hay đ\xf3 😊 M\xecnh hỏi th\xeam — <b>gia đ\xecnh bạn gồm những ai</b> sẽ sống trong ng\xf4i nh\xe0 n\xe0y?',
-      key:'gia_dinh', freeText:true, hint:'V\xed dụ: "vợ chồng m\xecnh + 2 con + bố mẹ chồng"',
-      chipHint:'Gợi \xfd nhanh:', chips:['Vợ chồng + con nhỏ','Gia đ\xecnh 3 thế hệ','Chỉ 2 vợ chồng','Sống một m\xecnh','Kinh doanh + ở'],
+    /* 0 — Chọn xưng hô */
+    { text: firstName
+        ? 'Tiện thể, để em xưng hô cho thân mật — em gọi <b>' + firstName + '</b> là anh hay chị ạ? 😊'
+        : 'Để em xưng hô cho thân mật — em gọi là anh hay chị ạ? 😊',
+      key:'xung_ho', genderStep:true,
+      chips: firstName ? ['Anh ' + firstName, 'Chị ' + firstName] : ['Anh', 'Chị'],
+      think:1400, type:1200 },
+
+    /* 1 — Phong cách */
+    { text:'{cn} thấy mình <b>hợp với phong cách ngôi nhà như thế nào</b>? Cứ mô tả theo cảm giác, không cần đúng tên gọi.',
+      key:'phong_cach', freeText:true, hint:'Ví dụ: "thoáng sáng, ít đồ" hay "sang trọng, có hoa văn"',
+      chipHint:'Hoặc chọn nhanh:',
+      chips:['Hiện đại · Tối giản','Tân cổ điển','Cổ điển · Sang trọng','Nhiệt đới · Gần gũi','Indochine','Chưa rõ'],
+      think:2000, type:2400 },
+
+    /* 2 — Gia đình */
+    { text:'Hay đó 😊 Em hỏi thêm — <b>gia đình {cn} gồm những ai</b> sẽ sống trong ngôi nhà này?',
+      key:'gia_dinh', freeText:true, hint:'Ví dụ: "vợ chồng em + 2 con + bố mẹ chồng"',
+      chipHint:'Gợi ý nhanh:',
+      chips:['Vợ chồng + con nhỏ','Gia đình 3 thế hệ','Chỉ 2 vợ chồng','Sống một mình','Kinh doanh + ở'],
       think:2200, type:2000 },
-    { text:'M\xecnh hỏi cụ thể hơn một ch\xfat nh\xe9 — <b>tổng cộng bao nhi\xeau người sẽ thường xuy\xean ngủ ở đ\xe2y</b>? Kể lu\xf4n \xf4ng b\xe0, người gi\xfap việc, hay em b\xe9 sắp ch\xe0o đời nếu c\xf3 😊',
-      key:'so_nguoi', freeText:true, hint:'V\xed dụ: "4 người lớn + 2 trẻ, c\xf3 b\xe9 nữa sắp sinh"',
-      chipHint:'Hoặc chọn:', chips:['1 – 2 người','3 – 4 người','5 – 6 người','7 người trở l\xean'],
+
+    /* 3 — Số người chính xác */
+    { text:'Em hỏi cụ thể hơn một chút nhé — <b>tổng cộng bao nhiêu người sẽ thường xuyên ngủ ở đây</b>? Kể luôn ông bà, người giúp việc, hay em bé sắp chào đời nếu có 😊',
+      key:'so_nguoi', freeText:true, hint:'Ví dụ: "4 người lớn + 2 trẻ, có bé nữa sắp sinh"',
+      chipHint:'Hoặc chọn:',
+      chips:['1 – 2 người','3 – 4 người','5 – 6 người','7 người trở lên'],
       think:2400, type:2600 },
-    { text:'Bạn đang c\xf3 l\xf4 đất chưa? Nếu c\xf3 — <b>k\xedch thước khoảng bao nhi\xeau</b> v\xe0 mặt tiền l\xf4 rộng kh\xf4ng?',
-      key:'lo_dat', freeText:true, hint:'V\xed dụ: "5m \xd7 20m, mặt tiền hẻ 4m" hoặc "chưa c\xf3 đất"',
-      chipHint:'Hoặc chọn diện t\xedch:', chips:['Dưới 60 m\xb2','60 – 100 m\xb2','100 – 200 m\xb2','200 – 500 m\xb2','Tr\xean 500 m\xb2','Chưa c\xf3 đất'],
+
+    /* 4 — Lô đất */
+    { text:'{cn} đang có lô đất chưa? Nếu có — <b>kích thước khoảng bao nhiêu</b> và mặt tiền lô rộng không?',
+      key:'lo_dat', freeText:true, hint:'Ví dụ: "5m × 20m, mặt tiền hẻm 4m" hoặc "chưa có đất"',
+      chipHint:'Hoặc chọn diện tích:',
+      chips:['Dưới 60 m²','60 – 100 m²','100 – 200 m²','200 – 500 m²','Trên 500 m²','Chưa có đất'],
       think:2000, type:2400 },
-    { text:'Bạn đang h\xecnh dung <b>x\xe2y mấy tầng</b>? V\xe0 khoảng <b>tổng diện t\xedch s\xe0n</b> muốn c\xf3 l\xe0 bao nhi\xeau?',
-      key:'so_tang', freeText:true, hint:'V\xed dụ: "3 tầng, khoảng 300m\xb2 s\xe0n" hoặc "nhờ KTS tư vấn"',
-      chipHint:'Hoặc chọn số tầng:', chips:['1 tầng','2 tầng','3 tầng','4 tầng trở l\xean','Nhờ KTS tư vấn'],
+
+    /* 5 — Số tầng + diện tích sàn */
+    { text:'{cn} đang hình dung <b>xây mấy tầng</b>? Và khoảng <b>tổng diện tích sàn</b> muốn có là bao nhiêu?',
+      key:'so_tang', freeText:true, hint:'Ví dụ: "3 tầng, khoảng 300m² sàn" hoặc "nhờ KTS tư vấn"',
+      chipHint:'Hoặc chọn số tầng:',
+      chips:['1 tầng','2 tầng','3 tầng','4 tầng trở lên','Nhờ KTS tư vấn'],
       think:2600, type:2800 },
-    { text:'Vậy <b>nh\xe0 cần bao nhi\xeau ph\xf2ng ngủ</b>? Trong đ\xf3 ph\xf2ng n\xe0o l\xe0 ph\xf2ng master — ph\xf2ng ch\xednh của chủ nh\xe0?',
-      key:'so_phong_ngu', freeText:true, hint:'V\xed dụ: "4 ph\xf2ng — 1 master vợ chồng, 2 ph\xf2ng con, 1 ph\xf2ng \xf4ng b\xe0"',
-      chipHint:'Gợi \xfd:', chips:['2 ph\xf2ng','3 ph\xf2ng','4 ph\xf2ng','5 ph\xf2ng trở l\xean'],
+
+    /* 6 — Số phòng ngủ */
+    { text:'Vậy <b>nhà cần bao nhiêu phòng ngủ</b>? Trong đó phòng nào là phòng master — phòng chính của {cn}?',
+      key:'so_phong_ngu', freeText:true, hint:'Ví dụ: "4 phòng — 1 master vợ chồng, 2 phòng con, 1 phòng ông bà"',
+      chipHint:'Gợi ý:',
+      chips:['2 phòng','3 phòng','4 phòng','5 phòng trở lên'],
       think:2200, type:2400 },
-    { text:'Ph\xf2ng master l\xe0 nơi bạn nghỉ ngơi sau một ng\xe0y d\xe0i — m\xecnh t\xf2 m\xf2 lắm 😊 <b>Bạn muốn ph\xf2ng ch\xednh c\xf3 những g\xec</b>? Ph\xf2ng tắm ri\xeang? Walk-in closet? B\xe0n tr\xe0 buổi s\xe1ng? Ban c\xf4ng nhỏ?',
-      key:'master_detail', freeText:true, hint:'Kể hết đi — c\xe0ng chi tiết KTS c\xe0ng hiểu bạn',
-      chipHint:'Chọn những thứ bạn muốn c\xf3:', multi:true,
-      chips:['WC ri\xeang trong ph\xf2ng','Ph\xf2ng thay đồ (walk-in)','B\xe0n tr\xe0 / g\xf3c thư gi\xe3n','Ban c\xf4ng ri\xeang','Bồn tắm','Cửa sổ lớn / nhiều \xe1nh s\xe1ng'],
-      think:2800, type:3200 },
-    { text:'C\xf2n về độ rộng — bạn muốn ph\xf2ng master <b>rộng cỡ n\xe0o</b>?',
-      key:'master_size', freeText:true, hint:'V\xed dụ: "khoảng 25–30m\xb2, cảm gi\xe1c như ph\xf2ng kh\xe1ch sạn"',
-      chipHint:'Hoặc chọn:', chips:['Rộng kiểu kh\xe1ch sạn (25m\xb2+)','Vừa phải (15–20m\xb2)','Nhỏ gọn l\xe0 được','Nhờ KTS tư vấn'],
+
+    /* 7 — Phòng master chi tiết */
+    { text:'Phòng master là nơi {cn} nghỉ ngơi sau một ngày dài — em tò mò lắm 😊 <b>{cn} muốn phòng chính có những gì</b>? Phòng tắm riêng? Walk-in closet? Bàn trà buổi sáng? Ban công nhỏ?',
+      key:'master_detail', freeText:true, hint:'Kể hết đi — càng chi tiết KTS càng hiểu',
+      chipHint:'Chọn những thứ muốn có:',
+      chips:['WC riêng trong phòng','Phòng thay đồ (walk-in)','Bàn trà / góc thư giãn','Ban công riêng','Bồn tắm','Cửa sổ lớn / nhiều ánh sáng'],
+      multi:true, think:2800, type:3200 },
+
+    /* 8 — Kích cỡ phòng master */
+    { text:'Còn về độ rộng — {cn} muốn phòng master <b>rộng cỡ nào</b>?',
+      key:'master_size', freeText:true, hint:'Ví dụ: "khoảng 25–30m², cảm giác như phòng khách sạn"',
+      chipHint:'Hoặc chọn:',
+      chips:['Rộng kiểu khách sạn (25m²+)','Vừa phải (15–20m²)','Nhỏ gọn là được','Nhờ KTS tư vấn'],
       think:2000, type:2200 },
-    { text:'Ngo\xe0i ph\xf2ng ngủ, bạn <b>nhất định muốn c\xf3 kh\xf4ng gian n\xe0o</b> m\xe0 nếu thiếu sẽ thấy nh\xe0 chưa đủ?',
-      key:'cong_nang', freeText:true, hint:'Liệt k\xea thoải m\xe1i, nhiều c\xe0ng tốt',
+
+    /* 9 — Công năng */
+    { text:'Ngoài phòng ngủ, {cn} <b>nhất định muốn có không gian nào</b> mà nếu thiếu sẽ thấy nhà chưa đủ?',
+      key:'cong_nang', freeText:true, hint:'Liệt kê thoải mái, nhiều càng tốt',
       chipHint:'Hoặc chọn:', multi:true,
-      chips:['Ph\xf2ng thờ','Garage','Bếp mở','Ph\xf2ng l\xe0m việc','S\xe2n vườn / Hồ bơi','S\xe2n thượng','Ph\xf2ng \xf4ng b\xe0','Kho rộng'],
+      chips:['Phòng thờ','Garage','Bếp mở','Phòng làm việc','Sân vườn / Hồ bơi','Sân thượng','Phòng ông bà','Kho rộng'],
       think:2800, type:2200 },
-    { text:'C\xe2u n\xe0y quan trọng — <b>c\xf3 điều g\xec ở chỗ ở hiện tại bạ nhất định kh\xf4ng muốn lặp lại</b> trong nh\xe0 mới kh\xf4ng?',
-      key:'khong_thich', freeText:true, hint:'Cứ n\xf3i thẳng — m\xecnh ghi hết để KTS biết m\xe0 tr\xe1nh',
+
+    /* 10 — Không thích */
+    { text:'Câu này quan trọng — <b>có điều gì ở chỗ ở hiện tại {cn} nhất định không muốn lặp lại</b> trong nhà mới không?',
+      key:'khong_thich', freeText:true, hint:'Cứ nói thẳng — em ghi hết để KTS biết mà tránh',
       think:2200, type:2400 },
-    { text:'Bạn <b>muốn cảm thấy điều g\xec</b> mỗi lần bước qua c\xe1nh cửa nh\xe0 m\xecnh?',
-      key:'cam_xuc', freeText:true, hint:'N\xf3i theo cảm x\xfac thật của bạn',
-      chipHint:'Gợi \xfd:', chips:['B\xecnh y\xean \xb7 Thư gi\xe3n','Tự h\xe0o \xb7 Sang trọng','Ấm \xe1p \xb7 Gắn kết','Gần gũi thi\xean nhi\xean','Ri\xeang tư \xb7 Y\xean tĩnh'],
+
+    /* 11 — Cảm xúc */
+    { text:'{cn} <b>muốn cảm thấy điều gì</b> mỗi lần bước qua cánh cửa nhà mình?',
+      key:'cam_xuc', freeText:true, hint:'Nói theo cảm xúc thật nhé',
+      chipHint:'Gợi ý:',
+      chips:['Bình yên · Thư giãn','Tự hào · Sang trọng','Ấm áp · Gắn kết','Gần gũi thiên nhiên','Riêng tư · Yên tĩnh'],
       think:2600, type:2800 },
-    { text:'Bạn c\xf3 <b>ch\xfa trọng phong thuỷ</b> kh\xf4ng? Hướng nh\xe0, hướng bếp, hay điều ki\xeang kỵ n\xe0o cần lưu \xfd?',
-      key:'phong_thuy', freeText:true, hint:'D\xf9 \xedt hay nhiều cũng kể m\xecnh nghe nh\xe9',
-      chipHint:'Hoặc chọn:', chips:['C\xf3 — rất quan trọng','C\xf3 — nhờ tư vấn th\xeam','B\xecnh thường','Kh\xf4ng quan t\xe2m'],
+
+    /* 12 — Phong thuỷ */
+    { text:'{cn} có <b>chú trọng phong thuỷ</b> không? Hướng nhà, hướng bếp, hay điều kiêng kỵ nào cần lưu ý?',
+      key:'phong_thuy', freeText:true, hint:'Dù ít hay nhiều cũng kể em nghe nhé',
+      chipHint:'Hoặc chọn:',
+      chips:['Có — rất quan trọng','Có — nhờ tư vấn thêm','Bình thường','Không quan tâm'],
       think:2000, type:2200 },
-    { text:'Để KTS tư vấn thực tế — bạn dự kiến <b>đầu tư khoảng bao nhi\xeau</b> cho c\xf4ng tr\xecnh n\xe0y?',
-      key:'ngan_sach', freeText:true, hint:'V\xed dụ: "khoảng 2 tỷ" hoặc "chưa biết, cần tư vấn"',
-      chipHint:'Chọn khoảng:', chips:['Dưới 1 tỷ','1 – 2 tỷ','2 – 4 tỷ','4 – 7 tỷ','Tr\xean 7 tỷ','Chưa x\xe1c định'],
+
+    /* 13 — Ngân sách */
+    { text:'Để KTS tư vấn thực tế — {cn} dự kiến <b>đầu tư khoảng bao nhiêu</b> cho công trình này?',
+      key:'ngan_sach', freeText:true, hint:'Ví dụ: "khoảng 2 tỷ" hoặc "chưa biết, cần tư vấn"',
+      chipHint:'Chọn khoảng:',
+      chips:['Dưới 1 tỷ','1 – 2 tỷ','2 – 4 tỷ','4 – 7 tỷ','Trên 7 tỷ','Chưa xác định'],
       think:2400, type:2200 },
-    { text:'Bạn nhắm <b>khoảng thời gian n\xe0o</b> để bắt đầu khởi c\xf4ng?',
-      key:'thoi_gian', freeText:true, hint:'Deadline thực tế rất gi\xfap KTS l\xean kế hoạch cho bạn',
-      chipHint:'Hoặc chọn:', chips:['1–3 th\xe1ng tới','3–6 th\xe1ng','6 th\xe1ng – 1 năm','Hơn 1 năm','Chưa x\xe1c định'],
+
+    /* 14 — Thời gian */
+    { text:'{cn} nhắm <b>khoảng thời gian nào</b> để bắt đầu khởi công?',
+      key:'thoi_gian', freeText:true, hint:'Deadline thực tế rất giúp KTS lên kế hoạch cho mình',
+      chipHint:'Hoặc chọn:',
+      chips:['1–3 tháng tới','3–6 tháng','6 tháng – 1 năm','Hơn 1 năm','Chưa xác định'],
       think:2000, type:2400 },
-    { text:'Gần xong rồi 😊 — Khi nghĩ đến việc x\xe2y nh\xe0, <b>điều g\xec khiến bạn lo nhất</b>?',
-      key:'lo_lang', freeText:true, hint:'N\xf3i thật nh\xe9 — m\xecnh ghi lại để đội ALN chuẩn bị trước',
-      chipHint:'Gợi \xfd:', chips:['Chi ph\xed ph\xe1t sinh','Chất lượng thi c\xf4ng','Thời gian k\xe9o d\xe0i','KTS kh\xf4ng hiểu \xfd','Chưa lo g\xec cả'],
+
+    /* 15 — Lo lắng */
+    { text:'Gần xong rồi 😊 — Khi nghĩ đến việc xây nhà, <b>điều gì khiến {cn} lo nhất</b>?',
+      key:'lo_lang', freeText:true, hint:'Nói thật nhé — em ghi lại để đội ALN chuẩn bị trước',
+      chipHint:'Gợi ý:',
+      chips:['Chi phí phát sinh','Chất lượng thi công','Thời gian kéo dài','KTS không hiểu ý','Chưa lo gì cả'],
       think:2200, type:2600 },
-    { text:'C\xf2n điều g\xec bạn muốn <b>nhắn ri\xeang với đội KTS</b> kh\xf4ng? Vật liệu y\xeau th\xedch, c\xe2u chuyện đ\xe8ng sau ng\xf4i nh\xe0, hay điều bạn ấp ủ bấy l\xe2u… Cứ kể hết nh\xe9.',
-      key:'nhan_gui', freeText:true, hint:'Đ\xe2y l\xe0 "trang cuối" — bạn muốn n\xf3i g\xec cũng được 🙏',
+
+    /* 16 — Lời nhắn */
+    { text:'Còn điều gì {cn} muốn <b>nhắn riêng với đội KTS</b> không? Vật liệu yêu thích, câu chuyện đằng sau ngôi nhà, hay điều {cn} ấp ủ bấy lâu… Cứ kể hết nhé.',
+      key:'nhan_gui', freeText:true, hint:'Đây là "trang cuối" — muốn nói gì cũng được 🙏',
       think:2800, type:2800 },
+
+    /* 17 — Summary */
     { summary:true, think:2400, type:0 }
   ];
 
@@ -3730,7 +3794,7 @@ window.cnInitMymyFlow = function(){
       var ok = document.createElement('span');
       ok.className = 'cn-mymy-chip mm-ok';
       ok.innerHTML = '<i class="ph-duotone ph-check" style="margin-right:3px;vertical-align:-1px"></i>Xong';
-      ok.onclick = function(){ disableChips(); handleAnswer(multiSel.length ? multiSel.join(' \xb7 ') : 'Bỏ qua'); };
+      ok.onclick = function(){ disableChips(); handleAnswer(multiSel.length ? multiSel.join(' · ') : 'Bỏ qua'); };
       cchip.appendChild(ok);
     }
   }
@@ -3748,6 +3812,10 @@ window.cnInitMymyFlow = function(){
   function handleAnswer(val){
     hideChips(); hideHint();
     var s = flow[step];
+    // Bước chọn xưng hô: lấy cách gọi (vd "anh Nam" → cn = "anh Nam")
+    if(s && s.genderStep){
+      cn = val.charAt(0).toLowerCase() + val.slice(1); // "Anh Nam" → "anh Nam"
+    }
     if(s && s.key) collected[s.key] = val;
     addUser(val);
     step++; busy = false;
@@ -3774,13 +3842,13 @@ window.cnInitMymyFlow = function(){
     if(s.summary){
       showTyping(s.think || 1800, 0, function(){
         var map = [
-          {e:'🎨',l:'Phong c\xe1ch',k:'phong_cach'},{e:'👨‍👩‍👧',l:'Th\xe0nh vi\xean',k:'gia_dinh'},
-          {e:'👥',l:'Số người ở',k:'so_nguoi'},{e:'📏',l:'L\xf4 đất',k:'lo_dat'},
-          {e:'🏗️',l:'Số tầng / S\xe0n',k:'so_tang'},{e:'🛏️',l:'Số ph\xf2ng ngủ',k:'so_phong_ngu'},
-          {e:'✨',l:'Ph\xf2ng master',k:'master_detail'},{e:'📏',l:'K\xedch cỡ master',k:'master_size'},
-          {e:'🔧',l:'C\xf4ng năng',k:'cong_nang'},{e:'❌',l:'Muốn tr\xe1nh',k:'khong_thich'},
-          {e:'💛',l:'Cảm x\xfac',k:'cam_xuc'},{e:'🧭',l:'Phong thuỷ',k:'phong_thuy'},
-          {e:'💰',l:'Ng\xe2n s\xe1ch',k:'ngan_sach'},{e:'📅',l:'Thời gian',k:'thoi_gian'},
+          {e:'🎨',l:'Phong cách',k:'phong_cach'},{e:'👨‍👩‍👧',l:'Thành viên',k:'gia_dinh'},
+          {e:'👥',l:'Số người ở',k:'so_nguoi'},{e:'📐',l:'Lô đất',k:'lo_dat'},
+          {e:'🏗️',l:'Số tầng / Sàn',k:'so_tang'},{e:'🛏️',l:'Số phòng ngủ',k:'so_phong_ngu'},
+          {e:'✨',l:'Phòng master',k:'master_detail'},{e:'📏',l:'Kích cỡ master',k:'master_size'},
+          {e:'🔧',l:'Công năng',k:'cong_nang'},{e:'❌',l:'Muốn tránh',k:'khong_thich'},
+          {e:'💛',l:'Cảm xúc',k:'cam_xuc'},{e:'🧭',l:'Phong thuỷ',k:'phong_thuy'},
+          {e:'💰',l:'Ngân sách',k:'ngan_sach'},{e:'📅',l:'Thời gian',k:'thoi_gian'},
           {e:'😟',l:'Băn khoăn',k:'lo_lang'},{e:'📝',l:'Nhắn KTS',k:'nhan_gui'}
         ];
         var rows = '';
@@ -3788,8 +3856,8 @@ window.cnInitMymyFlow = function(){
           if(collected[map[i].k]) rows += '<div class="cn-mm-sum-row"><span>'+map[i].e+'</span><span><b>'+map[i].l+':</b> '+collected[map[i].k]+'</span></div>';
         }
         var card = rows ? '<div class="cn-mm-sum">'+rows+'</div>' : '';
-        addMM('Cảm ơn bạn rất nhiều v\xec đ\xe3 chia sẻ thật l\xf2ng 🙏 M\xecnh đ\xe3 ghi lại đầy đủ v\xe0 sẽ chuyển ngay cho đội KTS ALN.' + card);
-        cinp.disabled = true; cinp.placeholder = 'MyMy đ\xe3 ghi nhận đủ rồi ✓';
+        addMM('Cảm ơn ' + cn + ' rất nhiều vì đã chia sẻ thật lòng 🙏 Em đã ghi lại đầy đủ và sẽ chuyển ngay cho đội KTS ALN.' + card);
+        cinp.disabled = true; cinp.placeholder = 'MyMy đã ghi nhận đủ rồi ✓';
         var btn = document.getElementById('cnMymySendBtn');
         if(btn) btn.disabled = true;
         busy = false;
@@ -3798,23 +3866,27 @@ window.cnInitMymyFlow = function(){
     }
 
     showTyping(s.think || 1000, s.type || 1400, function(){
-      addMM(s.text || '');
-      if(s.freeText){ showHint(s.hint || 'Cứ g\xf5 ra đ\xe2y cho m\xecnh nh\xe9 👇'); cinp.focus(); }
-      if(s.chips){ showChips(s.chips, s.multi || false, s.chipHint || ''); }
+      addMM(rdr(s.text || ''));
+      if(s.genderStep){ showChips(s.chips, false, ''); }
+      else {
+        if(s.freeText){ showHint(rdr(s.hint || 'Cứ gõ ra đây cho em nhé 👇')); cinp.focus(); }
+        if(s.chips){ showChips(s.chips, s.multi || false, s.chipHint || ''); }
+      }
       busy = false;
     });
   }
 
+  // Boot: 3 tin mở đầu dùng tên thật, sau đó runStep từ step 0
   setTimeout(function(){
     showTyping(0, 600, function(){
-      addMM(flow[0].text);
+      addMM(boot0);
       setTimeout(function(){
         showTyping(900, 2200, function(){
-          addMM(flow[1].text);
+          addMM(boot1);
           setTimeout(function(){
             showTyping(1400, 2800, function(){
-              addMM(flow[2].text);
-              step = 3; busy = false;
+              addMM(boot2);
+              step = 0; busy = false;
               setTimeout(runStep, 400);
             });
           }, 500);
