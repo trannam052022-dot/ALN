@@ -4073,7 +4073,10 @@ onAuthStateChanged(auth, async (user) => {
     }
     if (lastErr) throw lastErr;
     if (user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2' && (!snap || !snap.exists())) {
-      snap = { exists: () => true, data: () => ({ role:'founder', name:'KTS. Trần Đại Long', username:'founder.tranlong', email:'tranlongkts.vn@gmail.com' }) };
+      // Document chưa tồn tại — tự tạo lần đầu rồi dùng
+      const founderData = { role:'founder', name:'KTS. Trần Đại Long', username:'founder.tranlong', email:'tranlongkts.vn@gmail.com', status:'active' };
+      try { await setDoc(doc(db,'users',user.uid), founderData); } catch(e) { console.warn('[Founder] Không tạo được users doc:', e.code); }
+      snap = { exists: () => true, data: () => founderData };
     }
     const profile = (snap && snap.exists()) ? snap.data() : null;
 
