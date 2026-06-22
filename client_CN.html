@@ -3419,11 +3419,23 @@ onAuthStateChanged(auth, async (user) => {
     const veil = document.getElementById("alnAuthVeil");
     if (veil) veil.remove();
 
-    // Thông báo kích hoạt tài khoản lần đầu
+    // Thông báo kích hoạt tài khoản lần đầu (trường hợp CN login SAU khi được duyệt)
     if (profile.approvedNotified === false) {
       setTimeout(function() { showToast('🎉 Tài khoản đã được kích hoạt — Chào mừng!', 't-green'); }, 800);
       try { await updateDoc(doc(db, 'users', user.uid), { approvedNotified: true }); } catch(e) {}
     }
+
+    // Nghe realtime: CN đang mở trang khi founder mới duyệt
+    var _prevNotified = profile.approvedNotified;
+    onSnapshot(doc(db, 'users', user.uid), function(uSnap) {
+      if (!uSnap.exists()) return;
+      var ud2 = uSnap.data();
+      if (ud2.approvedNotified === false && _prevNotified !== false) {
+        showToast('🎉 Tài khoản đã được kích hoạt — Chào mừng!', 't-green');
+        updateDoc(doc(db, 'users', user.uid), { approvedNotified: true }).catch(function(){});
+      }
+      _prevNotified = ud2.approvedNotified;
+    });
 
     // Kích hoạt kênh realtime Firestore cho ALNRealtime
     if (window.__ALN_RT_RESOLVE) {
