@@ -3602,8 +3602,9 @@ window.cnInitMymyFlow = function(){
   var hintt = document.getElementById('cnMymyHintT');
   if(!bdy) return;
 
-  // Lấy tên từ profile CN
-  var rawName = (window.CN_USER && window.CN_USER.name) ? window.CN_USER.name : '';
+  // Lấy tên từ sessionStorage (CN_USER là const trong module, không qua window)
+  var _su = JSON.parse(sessionStorage.getItem('aln_user') || '{}');
+  var rawName = _su.name || '';
   var firstName = rawName ? rawName.split(' ').pop() : '';
   // cn = cách xưng hô với chủ nhà (vd: "anh Nam", "chị Lan") — set sau bước chọn giới tính
   var cn = firstName || 'bạn';
