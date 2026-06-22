@@ -1569,10 +1569,18 @@ body::after {
         <input id="cp_addr" placeholder="TP. Hồ Chí Minh" style="width:100%;background:var(--raised);border:1px solid var(--border);color:var(--text1);padding:9px 12px;border-radius:7px;font-family:var(--sans);font-size:13px;outline:none">
       </div>
 
-      <div>
-        <label style="display:block;font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Tổng phí thiết kế (VND) *</label>
-        <input id="cp_fee" type="number" placeholder="125000000" min="0" style="width:100%;background:var(--raised);border:1px solid var(--border);color:var(--text1);padding:9px 12px;border-radius:7px;font-family:var(--mono);font-size:13px;outline:none" oninput="cpUpdateFeePreview()">
-        <div id="cp_fee_preview" style="font-size:11px;color:var(--amber);margin-top:4px;font-family:var(--mono)"></div>
+      <div style="background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.15);border-radius:8px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Tổng phí thiết kế (VND) *</label>
+          <input id="cp_fee" type="number" placeholder="125000000" min="0" style="width:100%;background:var(--raised);border:1px solid var(--border);color:var(--text1);padding:9px 12px;border-radius:7px;font-family:var(--mono);font-size:13px;outline:none" oninput="cpUpdateFeePreview()">
+          <div id="cp_fee_preview" style="font-size:11px;color:var(--sub);margin-top:4px;font-family:var(--mono)"></div>
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:var(--amber);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Escrow đóng băng (VND)</label>
+          <input id="cp_escrow" type="number" placeholder="75000000" min="0" style="width:100%;background:var(--raised);border:1px solid var(--amber-bd);color:var(--text1);padding:9px 12px;border-radius:7px;font-family:var(--mono);font-size:13px;outline:none" oninput="cpUpdateFeePreview()">
+          <div id="cp_escrow_preview" style="font-size:11px;color:var(--amber);margin-top:4px;font-family:var(--mono)"></div>
+        </div>
+        <div style="grid-column:1/-1;font-size:10px;color:var(--sub);font-family:var(--mono)">💡 Escrow = số CN đóng giữ (thường 60% tổng phí). Để trống = 0đ.</div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -2937,8 +2945,10 @@ function renderPending(){
 function cpUpdateFeePreview(){
   var v = parseInt(document.getElementById('cp_fee').value, 10);
   var el = document.getElementById('cp_fee_preview');
-  if(!el) return;
-  el.textContent = v > 0 ? _fmtM(v) + ' triệu đồng' : '';
+  if(el) el.textContent = v > 0 ? _fmtM(v) + ' đồng' : '';
+  var e2 = parseInt(document.getElementById('cp_escrow').value, 10);
+  var el2 = document.getElementById('cp_escrow_preview');
+  if(el2) el2.textContent = e2 > 0 ? _fmtM(e2) + ' đồng' : '';
 }
 
 function _cpPopulateSelect(id, users, placeholder){
@@ -2954,7 +2964,9 @@ async function openCreateProj(){
   document.getElementById('cp_name').value = '';
   document.getElementById('cp_addr').value = '';
   document.getElementById('cp_fee').value  = '';
+  document.getElementById('cp_escrow').value = '';
   document.getElementById('cp_fee_preview').textContent = '';
+  document.getElementById('cp_escrow_preview').textContent = '';
   document.getElementById('cp_err').style.display = 'none';
   var btn = document.getElementById('cp_btn');
   btn.disabled = false;
@@ -2979,9 +2991,10 @@ function closeCreateProj(){
 }
 
 async function saveCreateProj(){
-  var name = document.getElementById('cp_name').value.trim();
-  var addr = document.getElementById('cp_addr').value.trim();
-  var fee  = parseInt(document.getElementById('cp_fee').value, 10) || 0;
+  var name   = document.getElementById('cp_name').value.trim();
+  var addr   = document.getElementById('cp_addr').value.trim();
+  var fee    = parseInt(document.getElementById('cp_fee').value, 10) || 0;
+  var escrow = parseInt(document.getElementById('cp_escrow').value, 10) || 0;
   var cnUid  = document.getElementById('cp_cn').value;
   var ktsUid = document.getElementById('cp_kts').value;
   var dnUid  = document.getElementById('cp_dn').value;
@@ -3009,6 +3022,7 @@ async function saveCreateProj(){
       name:    name,
       address: addr,
       totalFee: fee,
+      escrow:  escrow,
       cn:  { uid: cnUser.uid,  name: cnUser.name,  username: cnUser.username  },
       kts: { uid: ktsUser.uid, name: ktsUser.name, username: ktsUser.username },
       dn:  dnUser ? { uid: dnUser.uid, name: dnUser.name, username: dnUser.username } : null,
@@ -3724,7 +3738,7 @@ window._cpFb = {
       status: 'on_track',
       progress: { C1: 0, C2: 0, C3: 0, C4: 0 },
       totalFee: data.totalFee,
-      escrowBalance: 0,
+      escrowBalance: data.escrow || 0,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
