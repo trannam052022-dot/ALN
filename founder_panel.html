@@ -3178,9 +3178,9 @@ async function saveCreateProj(){
       meetingProvince: province,
       totalFee:       fee,
       escrow:         escrow,
-      cn:  { uid: cnUser.uid,  name: cnUser.name,  username: cnUser.username  },
-      kts: { uid: ktsUser.uid, name: ktsUser.name, username: ktsUser.username },
-      dn:  dnUser ? { uid: dnUser.uid, name: dnUser.name, username: dnUser.username } : null,
+      cn:  { uid: cnUser.uid,  name: cnUser.name,  username: cnUser.username  || cnUser.phone  || cnUser.uid  },
+      kts: { uid: ktsUser.uid, name: ktsUser.name, username: ktsUser.username || ktsUser.phone || ktsUser.uid },
+      dn:  dnUser ? { uid: dnUser.uid, name: dnUser.name, username: dnUser.username || dnUser.phone || dnUser.uid } : null,
     });
 
     closeCreateProj();
