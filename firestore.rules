@@ -108,7 +108,7 @@ service cloud.firestore {
     // Module Giữ chỗ — mỗi user chỉ đọc/ghi bản ghi của chính mình
     match /reservations/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
-      allow read: if isFounder();
+      allow read, update: if isFounder();
     }
 
     match /projects/{pid} {

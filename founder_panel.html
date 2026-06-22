@@ -4489,8 +4489,9 @@ window.wrApprove = async function(uid, role) {
   const ROLE_MAP = { architect:'kts', designer:'designer', business:'dn', cn:'cn' };
   const sysRole = ROLE_MAP[role] || role;
   try {
-    // Firestore rules chỉ cho chủ sở hữu write vào reservations — founder bị chặn
-    // Chỉ update users/ (founder có quyền), reservations status sẽ đồng bộ qua users
+    if(role !== 'cn') {
+      await updateDoc(doc(db,'reservations',uid), { status:'approved', approvedAt: serverTimestamp() });
+    }
     await updateDoc(doc(db,'users',uid), { status:'active', role: sysRole, approvedNotified: false });
     // cập nhật local
     var idx = _wrData.findIndex(r => r.uid === uid);
@@ -4507,6 +4508,7 @@ window.wrApprove = async function(uid, role) {
 window.wrReject = async function(uid) {
   if(!confirm('Xác nhận từ chối hồ sơ này?')) return;
   try {
+    try { await updateDoc(doc(db,'reservations',uid), { status:'rejected' }); } catch(e) {}
     await updateDoc(doc(db,'users',uid), { status:'rejected' });
     var idx = _wrData.findIndex(r => r.uid === uid);
     if(idx >= 0) _wrData[idx].status = 'rejected';
