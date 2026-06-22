@@ -254,6 +254,40 @@ exports.onCommunityPost = functions
     return null;
   });
 
+/* ── Xóa địa điểm tạm thời đã hết hạn (chạy mỗi 6 tiếng) ── */
+exports.clearExpiredTemporaryLocations = functions
+  .region("asia-southeast1")
+  .pubsub.schedule("every 6 hours")
+  .timeZone("Asia/Ho_Chi_Minh")
+  .onRun(async () => {
+    const now = new Date();
+    const snap = await db.collection("users")
+      .where("temporaryLocation", "!=", null)
+      .get();
+    if (snap.empty) return null;
+
+    const batch = db.batch();
+    let count = 0;
+    snap.docs.forEach(function(d) {
+      const tl = d.data().temporaryLocation;
+      if (!tl || !tl.province) {
+        batch.update(d.ref, { temporaryLocation: admin.firestore.FieldValue.delete() });
+        count++;
+        return;
+      }
+      const until = tl.until && (tl.until.toDate ? tl.until.toDate() : new Date(tl.until));
+      if (!until || until <= now) {
+        batch.update(d.ref, { temporaryLocation: admin.firestore.FieldValue.delete() });
+        count++;
+      }
+    });
+    if (count > 0) {
+      await batch.commit();
+      console.log("[ALN] Cleared " + count + " expired temporaryLocation(s)");
+    }
+    return null;
+  });
+
 /* ── KTS upload tài liệu → thông báo CN/DN ── */
 exports.onDocUploaded = functions
   .region("asia-southeast1")
