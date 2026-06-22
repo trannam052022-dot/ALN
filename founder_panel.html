@@ -4434,15 +4434,18 @@ function renderWrList(list) {
     if(r.studioSize) profileInfo += '<span style="font-size:11px;color:var(--sub)">Studio: <b style="color:var(--text2)">'+r.studioSize+'</b></span>';
     // action buttons
     var actions = '';
-    if(!isApproved && isSubmitted) {
-      actions = '<div style="display:flex;gap:8px;margin-top:12px">'
-        +'<button onclick="wrReject(\''+r.uid+'\')" style="padding:7px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:7px;color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-x"></i> Từ chối</button>'
-        +'<button onclick="wrApprove(\''+r.uid+'\',\''+r.role+'\')" style="padding:7px 20px;background:linear-gradient(135deg,rgba(16,185,129,.18),rgba(16,185,129,.08));border:1.5px solid rgba(16,185,129,.4);border-radius:7px;color:var(--green);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-check"></i> Duyệt &amp; Kích hoạt</button>'
-        +'</div>';
-    } else if(isApproved) {
+    if(isApproved) {
       actions = '<div style="margin-top:10px;font-size:10px;color:var(--green)"><i class="ph-duotone ph-check-circle"></i> Tài khoản đã kích hoạt</div>';
     } else {
-      actions = '<div style="margin-top:10px;font-size:10px;color:var(--dim)"><i class="ph-duotone ph-clock"></i> Chờ người dùng nộp hồ sơ — '+deadlineStr+'</div>';
+      var approveLabel = isSubmitted ? 'Duyệt &amp; Kích hoạt' : 'Kích hoạt trực tiếp';
+      var noteHtml = isSubmitted ? '' : '<div style="font-size:9px;color:var(--dim);margin-top:4px"><i class="ph-duotone ph-info"></i> Chưa nộp hồ sơ — vẫn có thể kích hoạt</div>';
+      actions = '<div style="display:flex;gap:8px;margin-top:12px;flex-direction:column">'
+        +'<div style="display:flex;gap:8px">'
+        +'<button onclick="wrReject(\''+r.uid+'\')" style="padding:7px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:7px;color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-x"></i> Từ chối</button>'
+        +'<button onclick="wrApprove(\''+r.uid+'\',\''+r.role+'\')" style="padding:7px 20px;background:linear-gradient(135deg,rgba(16,185,129,.18),rgba(16,185,129,.08));border:1.5px solid rgba(16,185,129,.4);border-radius:7px;color:var(--green);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-check"></i> '+approveLabel+'</button>'
+        +'</div>'
+        +noteHtml
+      +'</div>';
     }
     return '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:border-color .15s" onmouseover="this.style.borderColor=\'rgba(201,168,76,.25)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
       +'<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px">'
@@ -4467,17 +4470,20 @@ function renderWrList(list) {
 
 window.wrApprove = async function(uid, role) {
   if(!confirm('Duyệt và kích hoạt tài khoản này?')) return;
-  const ROLE_MAP = { architect:'kts', designer:'designer', business:'dn' };
+  const ROLE_MAP = { architect:'kts', designer:'designer', business:'dn', cn:'cn' };
   const sysRole = ROLE_MAP[role] || role;
   try {
-    await updateDoc(doc(db,'reservations',uid), { status:'approved', approvedAt: serverTimestamp() });
+    // CN đã active khi đăng ký — chỉ cần đánh dấu local, không update reservations (rules chặn)
+    if(role !== 'cn') {
+      await updateDoc(doc(db,'reservations',uid), { status:'approved', approvedAt: serverTimestamp() });
+    }
     await updateDoc(doc(db,'users',uid), { status:'active', role: sysRole, approvedNotified: false });
     // cập nhật local
     var idx = _wrData.findIndex(r => r.uid === uid);
     if(idx >= 0) _wrData[idx].status = 'approved';
     wrFilter(_wrCurrentFilter);
     const badge = document.getElementById('waitRoomBadge');
-    const pending = _wrData.filter(r => r.profileSubmitted && r.status !== 'approved').length;
+    const pending = _wrData.filter(r => r.status !== 'approved' && r.status !== 'rejected').length;
     if(badge){ badge.textContent = pending; badge.style.display = pending > 0 ? '' : 'none'; }
     try{ toast('✓ Đã duyệt — tài khoản kích hoạt', 'ok'); }catch(e){}
   } catch(e) { alert('Lỗi: '+(e.message||e.code)); }
