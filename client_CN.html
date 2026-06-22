@@ -1865,6 +1865,12 @@ const _reviewState = {};
 function renderMain(){
   const p = window.PROJECTS_CLIENT.find(x=>x.id===window.activeProj);
   if(!p){
+    if(window.PROJECTS_CLIENT.length===0){
+      if(!document.getElementById('cnMymyBody')){
+        if(typeof window.cnShowMymyChat==='function') window.cnShowMymyChat();
+      }
+      return;
+    }
     document.getElementById('mainContent').innerHTML=
       '<div style="padding:40px;text-align:center;color:var(--muted)">Chọn công trình từ danh sách bên trái</div>';
     return;
@@ -3235,6 +3241,7 @@ function _startProjectsListenCN() {
     } else {
       var el = document.getElementById('projList');
       if (el) el.innerHTML = '<div style="padding:16px;color:var(--sub);font-size:13px">Chưa có dự án nào của bạn.</div>';
+      if(typeof window.cnShowMymyChat==='function') window.cnShowMymyChat();
     }
   }, function(err){ console.error('[CN] Lỗi:', err.code, err.message); });
 }
@@ -3496,6 +3503,326 @@ window.alnLogout = async function(){
 <!-- ═══ ALN CN — Proposals KTS ↔ Chủ nhà (tích hợp qua _cnSubProposals) ═══ -->
 <script>
 /* Listener phương án: _cnSubProposals() kích hoạt lazily khi Chủ nhà mở tab Bảng Review. */
+</script>
+
+<!-- ═══ MyMy CSKH — embedded chat (empty state khi chưa có dự án) ═══ -->
+<style>
+.cn-mymy-wrap{padding:32px 24px 60px;max-width:660px;margin:0 auto}
+.cn-mymy-hello{text-align:center;margin-bottom:20px}
+.cn-mymy-eyebrow{font-family:'Syne',sans-serif;font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:7px;margin-bottom:10px}
+.cn-mymy-eyebrow::before,.cn-mymy-eyebrow::after{content:'';width:20px;height:1px;background:rgba(212,160,23,.4)}
+.cn-mymy-hello h2{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;font-style:italic;line-height:1.3;color:var(--text)}
+.cn-mymy-hello p{font-size:12px;color:var(--sub);margin:6px auto 0;line-height:1.7;max-width:400px}
+.cn-mymy-box{background:var(--ink2);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,.07)}
+.cn-mymy-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(212,160,23,.06),transparent)}
+.cn-mymy-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#c8940e,#e8c44a);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:#fff;flex-shrink:0;box-shadow:0 2px 10px rgba(212,160,23,.28);position:relative}
+.cn-mymy-av .mm-dot{position:absolute;bottom:1px;right:1px;width:11px;height:11px;border-radius:50%;background:#16a34a;border:2.5px solid #fff}
+.cn-mymy-hd .cn-mm-nm{font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:var(--text);display:flex;align-items:center;gap:7px}
+.cn-mymy-badge{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.28);padding:2px 8px;border-radius:99px}
+.cn-mymy-hd .cn-mm-role{font-size:11px;color:var(--sub);margin-top:2px}
+.cn-mymy-body{padding:16px;display:flex;flex-direction:column;gap:11px;max-height:500px;overflow-y:auto;scroll-behavior:smooth}
+.cn-mymy-body::-webkit-scrollbar{width:3px}
+.cn-mymy-body::-webkit-scrollbar-thumb{background:rgba(212,160,23,.2);border-radius:99px}
+.cn-mm-msg{display:flex;gap:9px;align-items:flex-start}
+.cn-mm-msg .cn-mm-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#c8940e,#e8c44a);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:9px;color:#fff;flex-shrink:0;margin-top:2px}
+.cn-mm-msg .cn-mm-b{background:var(--ink3);border:1px solid var(--border);border-radius:4px 14px 14px 14px;padding:10px 13px;font-size:12.5px;color:var(--text2);line-height:1.7;max-width:85%}
+.cn-mm-msg .cn-mm-b b{color:var(--text)}
+.cn-mm-uu{display:flex;justify-content:flex-end}
+.cn-mm-uu .cn-mm-b{background:linear-gradient(135deg,#bf8f1a,#d4a017);color:#fff;border-radius:14px 4px 14px 14px;padding:10px 13px;font-size:12.5px;max-width:78%;line-height:1.55}
+.cn-mymy-clabel{font-size:10px;color:var(--sub);padding:0 18px 4px;letter-spacing:.02em;display:none}
+.cn-mymy-chips{display:none;flex-wrap:wrap;gap:7px;padding:2px 18px 10px}
+.cn-mymy-chip{font-size:11px;font-weight:600;color:var(--accent);background:rgba(212,160,23,.07);border:1.5px solid rgba(212,160,23,.22);border-radius:99px;padding:5px 13px;cursor:pointer;transition:all .15s;user-select:none}
+.cn-mymy-chip:hover{background:rgba(212,160,23,.15)}
+.cn-mymy-chip.mm-multi.mm-on{background:rgba(212,160,23,.14);color:#7a5200;border-color:var(--accent)}
+.cn-mymy-chip.mm-ok{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cn-mymy-foot{border-top:1px solid var(--border);background:var(--ink3)}
+.cn-mymy-hint{font-size:11px;color:var(--accent);padding:9px 18px 2px;display:none;align-items:center;gap:5px;font-weight:600}
+.cn-mymy-hint.show{display:flex}
+.cn-mymy-irow{display:flex;gap:9px;align-items:center;padding:9px 14px 11px}
+.cn-mymy-irow input{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:9px 16px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s}
+.cn-mymy-irow input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(212,160,23,.1)}
+.cn-mymy-irow input::placeholder{color:var(--sub)}
+.cn-mymy-send{width:40px;height:40px;border-radius:50%;border:none;background:linear-gradient(135deg,#bf8f1a,#d4a017);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .18s;box-shadow:0 2px 7px rgba(212,160,23,.28)}
+.cn-mymy-send:hover{transform:scale(1.08)}
+.cn-mymy-note{text-align:center;font-size:10px;color:var(--sub);padding:3px 14px 10px;display:flex;align-items:center;justify-content:center;gap:5px}
+.cn-mm-tw{display:flex;gap:9px;align-items:flex-start}
+.cn-mm-tw .cn-mm-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#c8940e,#e8c44a);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:9px;color:#fff;flex-shrink:0;margin-top:2px}
+.cn-mm-typing{display:inline-flex;gap:4px;padding:10px 13px;background:var(--ink3);border:1px solid var(--border);border-radius:4px 14px 14px 14px}
+.cn-mm-typing span{width:7px;height:7px;border-radius:50%;background:var(--sub);animation:cnTyp 1.1s infinite ease-in-out}
+.cn-mm-typing span:nth-child(2){animation-delay:.22s}
+.cn-mm-typing span:nth-child(3){animation-delay:.44s}
+.cn-mm-typing.mm-think span{width:5px;height:5px;animation:cnThink 1.4s infinite ease-in-out}
+.cn-mm-typing.mm-think span:nth-child(2){animation-delay:.3s}
+.cn-mm-typing.mm-think span:nth-child(3){animation-delay:.6s}
+@keyframes cnTyp{0%,60%,100%{transform:scale(.7);opacity:.3}30%{transform:scale(1.05);opacity:1}}
+@keyframes cnThink{0%,100%{opacity:.18}50%{opacity:.55}}
+.cn-mm-sum{margin-top:7px;background:rgba(212,160,23,.06);border:1px solid rgba(212,160,23,.2);border-radius:10px;padding:12px 14px;font-size:12px;line-height:2;color:var(--text2)}
+.cn-mm-sum-row{display:flex;gap:8px;align-items:baseline}
+</style>
+<script>
+window.cnShowMymyChat = function(){
+  var mc = document.getElementById('mainContent');
+  if(!mc) return;
+  mc.innerHTML = '<div class="cn-mymy-wrap">'
+    +'<div class="cn-mymy-hello">'
+      +'<div class="cn-mymy-eyebrow">Trong l\xfac chờ kết nối KTS</div>'
+      +'<h2>MyMy đang ở đ\xe2y c\xf9ng bạn</h2>'
+      +'<p>H\xe3y c\xf9ng nhau ph\xe1c thảo \xfd tưởng — MyMy lắng nghe v\xe0 ghi lại để đội KTS hiểu bạn thật sự ngay từ buổi đầu.</p>'
+    +'</div>'
+    +'<div class="cn-mymy-box">'
+      +'<div class="cn-mymy-head">'
+        +'<div class="cn-mymy-av">My<span class="mm-dot"></span></div>'
+        +'<div class="cn-mymy-hd">'
+          +'<div class="cn-mm-nm">MyMy <span class="cn-mymy-badge">Đang trực tuyến</span></div>'
+          +'<div class="cn-mm-role">Tư vấn Thiết kế &amp; X\xe2y dựng &middot; ALN</div>'
+        +'</div>'
+      +'</div>'
+      +'<div class="cn-mymy-body" id="cnMymyBody"></div>'
+      +'<div class="cn-mymy-clabel" id="cnMymyClabel"></div>'
+      +'<div class="cn-mymy-chips" id="cnMymyChips"></div>'
+      +'<div class="cn-mymy-foot">'
+        +'<div class="cn-mymy-hint" id="cnMymyHint"><i class="ph-duotone ph-pencil-simple"></i><span id="cnMymyHintT">Cứ g\xf5 ra đ\xe2y cho m\xecnh nh\xe9 👇</span></div>'
+        +'<div class="cn-mymy-irow">'
+          +'<input id="cnMymyIn" type="text" placeholder="Nhắn cho MyMy…" autocomplete="off" onkeydown="if(event.key===\'Enter\')window.cnMymySend()">'
+          +'<button class="cn-mymy-send" id="cnMymySendBtn" onclick="window.cnMymySend()"><i class="ph-duotone ph-paper-plane-right"></i></button>'
+        +'</div>'
+        +'<div class="cn-mymy-note"><i class="ph-duotone ph-lock-simple"></i> Chỉ đội KTS ALN đọc được th\xf4ng tin n\xe0y</div>'
+      +'</div>'
+    +'</div>'
+  +'</div>';
+  window.cnInitMymyFlow();
+};
+
+window.cnInitMymyFlow = function(){
+  var bdy   = document.getElementById('cnMymyBody');
+  var clab  = document.getElementById('cnMymyClabel');
+  var cchip = document.getElementById('cnMymyChips');
+  var cinp  = document.getElementById('cnMymyIn');
+  var hint  = document.getElementById('cnMymyHint');
+  var hintt = document.getElementById('cnMymyHintT');
+  if(!bdy) return;
+
+  var step = 0, collected = {}, multiSel = [], busy = false;
+
+  var flow = [
+    { text:'Ch\xe0o bạn! 👋', think:0, type:600 },
+    { text:'M\xecnh l\xe0 <b>MyMy</b> — tư vấn vi\xean của đội Thiết kế &amp; X\xe2y dựng ALN. Trong l\xfac đội KTS xem hồ sơ của bạn, m\xecnh sẽ ngồi đ\xe2y tr\xf2 chuyện một ch\xfat nh\xe9.', think:800, type:2200 },
+    { text:'M\xecnh muốn hiểu <em>thật sự</em> về ng\xf4i nh\xe0 bạn đang mơ tới — kh\xf4ng phải hỏi cho c\xf3, m\xe0 để khi KTS ngồi xuống vẽ, họ đ\xe3 hiểu bạn từ trước rồi.', think:1200, type:2800 },
+    { text:'Bắt đầu th\xf4i — bạn thấy m\xecnh <b>hợp với phong c\xe1ch ng\xf4i nh\xe0 như thế n\xe0o</b>? Cứ m\xf4 tả theo cảm gi\xe1c, kh\xf4ng cần đ\xfang t\xean gọi.',
+      key:'phong_cach', freeText:true, hint:'V\xed dụ: "tho\xe1ng s\xe1ng, \xedt đồ" hay "sang trọng, c\xf3 hoa văn"',
+      chipHint:'Hoặc chọn nhanh:', chips:['Hiện đại \xb7 Tối giản','T\xe2n cổ điển','Cổ điển \xb7 Sang trọng','Nhiệt đới \xb7 Gần gũi','Indochine','Chưa r\xf5'],
+      think:1800, type:2400 },
+    { text:'Hay đ\xf3 😊 M\xecnh hỏi th\xeam — <b>gia đ\xecnh bạn gồm những ai</b> sẽ sống trong ng\xf4i nh\xe0 n\xe0y?',
+      key:'gia_dinh', freeText:true, hint:'V\xed dụ: "vợ chồng m\xecnh + 2 con + bố mẹ chồng"',
+      chipHint:'Gợi \xfd nhanh:', chips:['Vợ chồng + con nhỏ','Gia đ\xecnh 3 thế hệ','Chỉ 2 vợ chồng','Sống một m\xecnh','Kinh doanh + ở'],
+      think:2200, type:2000 },
+    { text:'M\xecnh hỏi cụ thể hơn một ch\xfat nh\xe9 — <b>tổng cộng bao nhi\xeau người sẽ thường xuy\xean ngủ ở đ\xe2y</b>? Kể lu\xf4n \xf4ng b\xe0, người gi\xfap việc, hay em b\xe9 sắp ch\xe0o đời nếu c\xf3 😊',
+      key:'so_nguoi', freeText:true, hint:'V\xed dụ: "4 người lớn + 2 trẻ, c\xf3 b\xe9 nữa sắp sinh"',
+      chipHint:'Hoặc chọn:', chips:['1 – 2 người','3 – 4 người','5 – 6 người','7 người trở l\xean'],
+      think:2400, type:2600 },
+    { text:'Bạn đang c\xf3 l\xf4 đất chưa? Nếu c\xf3 — <b>k\xedch thước khoảng bao nhi\xeau</b> v\xe0 mặt tiền l\xf4 rộng kh\xf4ng?',
+      key:'lo_dat', freeText:true, hint:'V\xed dụ: "5m \xd7 20m, mặt tiền hẻ 4m" hoặc "chưa c\xf3 đất"',
+      chipHint:'Hoặc chọn diện t\xedch:', chips:['Dưới 60 m\xb2','60 – 100 m\xb2','100 – 200 m\xb2','200 – 500 m\xb2','Tr\xean 500 m\xb2','Chưa c\xf3 đất'],
+      think:2000, type:2400 },
+    { text:'Bạn đang h\xecnh dung <b>x\xe2y mấy tầng</b>? V\xe0 khoảng <b>tổng diện t\xedch s\xe0n</b> muốn c\xf3 l\xe0 bao nhi\xeau?',
+      key:'so_tang', freeText:true, hint:'V\xed dụ: "3 tầng, khoảng 300m\xb2 s\xe0n" hoặc "nhờ KTS tư vấn"',
+      chipHint:'Hoặc chọn số tầng:', chips:['1 tầng','2 tầng','3 tầng','4 tầng trở l\xean','Nhờ KTS tư vấn'],
+      think:2600, type:2800 },
+    { text:'Vậy <b>nh\xe0 cần bao nhi\xeau ph\xf2ng ngủ</b>? Trong đ\xf3 ph\xf2ng n\xe0o l\xe0 ph\xf2ng master — ph\xf2ng ch\xednh của chủ nh\xe0?',
+      key:'so_phong_ngu', freeText:true, hint:'V\xed dụ: "4 ph\xf2ng — 1 master vợ chồng, 2 ph\xf2ng con, 1 ph\xf2ng \xf4ng b\xe0"',
+      chipHint:'Gợi \xfd:', chips:['2 ph\xf2ng','3 ph\xf2ng','4 ph\xf2ng','5 ph\xf2ng trở l\xean'],
+      think:2200, type:2400 },
+    { text:'Ph\xf2ng master l\xe0 nơi bạn nghỉ ngơi sau một ng\xe0y d\xe0i — m\xecnh t\xf2 m\xf2 lắm 😊 <b>Bạn muốn ph\xf2ng ch\xednh c\xf3 những g\xec</b>? Ph\xf2ng tắm ri\xeang? Walk-in closet? B\xe0n tr\xe0 buổi s\xe1ng? Ban c\xf4ng nhỏ?',
+      key:'master_detail', freeText:true, hint:'Kể hết đi — c\xe0ng chi tiết KTS c\xe0ng hiểu bạn',
+      chipHint:'Chọn những thứ bạn muốn c\xf3:', multi:true,
+      chips:['WC ri\xeang trong ph\xf2ng','Ph\xf2ng thay đồ (walk-in)','B\xe0n tr\xe0 / g\xf3c thư gi\xe3n','Ban c\xf4ng ri\xeang','Bồn tắm','Cửa sổ lớn / nhiều \xe1nh s\xe1ng'],
+      think:2800, type:3200 },
+    { text:'C\xf2n về độ rộng — bạn muốn ph\xf2ng master <b>rộng cỡ n\xe0o</b>?',
+      key:'master_size', freeText:true, hint:'V\xed dụ: "khoảng 25–30m\xb2, cảm gi\xe1c như ph\xf2ng kh\xe1ch sạn"',
+      chipHint:'Hoặc chọn:', chips:['Rộng kiểu kh\xe1ch sạn (25m\xb2+)','Vừa phải (15–20m\xb2)','Nhỏ gọn l\xe0 được','Nhờ KTS tư vấn'],
+      think:2000, type:2200 },
+    { text:'Ngo\xe0i ph\xf2ng ngủ, bạn <b>nhất định muốn c\xf3 kh\xf4ng gian n\xe0o</b> m\xe0 nếu thiếu sẽ thấy nh\xe0 chưa đủ?',
+      key:'cong_nang', freeText:true, hint:'Liệt k\xea thoải m\xe1i, nhiều c\xe0ng tốt',
+      chipHint:'Hoặc chọn:', multi:true,
+      chips:['Ph\xf2ng thờ','Garage','Bếp mở','Ph\xf2ng l\xe0m việc','S\xe2n vườn / Hồ bơi','S\xe2n thượng','Ph\xf2ng \xf4ng b\xe0','Kho rộng'],
+      think:2800, type:2200 },
+    { text:'C\xe2u n\xe0y quan trọng — <b>c\xf3 điều g\xec ở chỗ ở hiện tại bạ nhất định kh\xf4ng muốn lặp lại</b> trong nh\xe0 mới kh\xf4ng?',
+      key:'khong_thich', freeText:true, hint:'Cứ n\xf3i thẳng — m\xecnh ghi hết để KTS biết m\xe0 tr\xe1nh',
+      think:2200, type:2400 },
+    { text:'Bạn <b>muốn cảm thấy điều g\xec</b> mỗi lần bước qua c\xe1nh cửa nh\xe0 m\xecnh?',
+      key:'cam_xuc', freeText:true, hint:'N\xf3i theo cảm x\xfac thật của bạn',
+      chipHint:'Gợi \xfd:', chips:['B\xecnh y\xean \xb7 Thư gi\xe3n','Tự h\xe0o \xb7 Sang trọng','Ấm \xe1p \xb7 Gắn kết','Gần gũi thi\xean nhi\xean','Ri\xeang tư \xb7 Y\xean tĩnh'],
+      think:2600, type:2800 },
+    { text:'Bạn c\xf3 <b>ch\xfa trọng phong thuỷ</b> kh\xf4ng? Hướng nh\xe0, hướng bếp, hay điều ki\xeang kỵ n\xe0o cần lưu \xfd?',
+      key:'phong_thuy', freeText:true, hint:'D\xf9 \xedt hay nhiều cũng kể m\xecnh nghe nh\xe9',
+      chipHint:'Hoặc chọn:', chips:['C\xf3 — rất quan trọng','C\xf3 — nhờ tư vấn th\xeam','B\xecnh thường','Kh\xf4ng quan t\xe2m'],
+      think:2000, type:2200 },
+    { text:'Để KTS tư vấn thực tế — bạn dự kiến <b>đầu tư khoảng bao nhi\xeau</b> cho c\xf4ng tr\xecnh n\xe0y?',
+      key:'ngan_sach', freeText:true, hint:'V\xed dụ: "khoảng 2 tỷ" hoặc "chưa biết, cần tư vấn"',
+      chipHint:'Chọn khoảng:', chips:['Dưới 1 tỷ','1 – 2 tỷ','2 – 4 tỷ','4 – 7 tỷ','Tr\xean 7 tỷ','Chưa x\xe1c định'],
+      think:2400, type:2200 },
+    { text:'Bạn nhắm <b>khoảng thời gian n\xe0o</b> để bắt đầu khởi c\xf4ng?',
+      key:'thoi_gian', freeText:true, hint:'Deadline thực tế rất gi\xfap KTS l\xean kế hoạch cho bạn',
+      chipHint:'Hoặc chọn:', chips:['1–3 th\xe1ng tới','3–6 th\xe1ng','6 th\xe1ng – 1 năm','Hơn 1 năm','Chưa x\xe1c định'],
+      think:2000, type:2400 },
+    { text:'Gần xong rồi 😊 — Khi nghĩ đến việc x\xe2y nh\xe0, <b>điều g\xec khiến bạn lo nhất</b>?',
+      key:'lo_lang', freeText:true, hint:'N\xf3i thật nh\xe9 — m\xecnh ghi lại để đội ALN chuẩn bị trước',
+      chipHint:'Gợi \xfd:', chips:['Chi ph\xed ph\xe1t sinh','Chất lượng thi c\xf4ng','Thời gian k\xe9o d\xe0i','KTS kh\xf4ng hiểu \xfd','Chưa lo g\xec cả'],
+      think:2200, type:2600 },
+    { text:'C\xf2n điều g\xec bạn muốn <b>nhắn ri\xeang với đội KTS</b> kh\xf4ng? Vật liệu y\xeau th\xedch, c\xe2u chuyện đ\xe8ng sau ng\xf4i nh\xe0, hay điều bạn ấp ủ bấy l\xe2u… Cứ kể hết nh\xe9.',
+      key:'nhan_gui', freeText:true, hint:'Đ\xe2y l\xe0 "trang cuối" — bạn muốn n\xf3i g\xec cũng được 🙏',
+      think:2800, type:2800 },
+    { summary:true, think:2400, type:0 }
+  ];
+
+  function sd(){ bdy.scrollTop = bdy.scrollHeight; }
+  function showHint(t){ hintt.textContent = t; hint.classList.add('show'); }
+  function hideHint(){ hint.classList.remove('show'); }
+
+  function makeTW(isThink){
+    var w = document.createElement('div'); w.className = 'cn-mm-tw';
+    var cls = isThink ? 'cn-mm-typing mm-think' : 'cn-mm-typing';
+    w.innerHTML = '<div class="cn-mm-av">My</div><div class="'+cls+'"><span></span><span></span><span></span></div>';
+    return w;
+  }
+
+  function showTyping(thinkMs, typeMs, cb){
+    var tw1 = makeTW(true); bdy.appendChild(tw1); sd();
+    setTimeout(function(){
+      if(tw1.parentNode) tw1.parentNode.removeChild(tw1);
+      if(typeMs <= 0){ cb(); return; }
+      var tw2 = makeTW(false); bdy.appendChild(tw2); sd();
+      setTimeout(function(){ if(tw2.parentNode) tw2.parentNode.removeChild(tw2); cb(); }, typeMs);
+    }, thinkMs || 100);
+  }
+
+  function addMM(html){
+    var w = document.createElement('div'); w.className = 'cn-mm-msg';
+    w.innerHTML = '<div class="cn-mm-av">My</div><div class="cn-mm-b">'+html+'</div>';
+    bdy.appendChild(w); sd();
+  }
+
+  function addUser(html){
+    var w = document.createElement('div'); w.className = 'cn-mm-uu';
+    w.innerHTML = '<div class="cn-mm-b">'+html+'</div>';
+    bdy.appendChild(w); sd();
+  }
+
+  function showChips(chips, isMulti, label){
+    if(label){ clab.textContent = label; clab.style.display = 'block'; }
+    cchip.style.display = 'flex'; cchip.innerHTML = '';
+    multiSel = [];
+    chips.forEach(function(c){
+      var el = document.createElement('span');
+      el.className = 'cn-mymy-chip' + (isMulti ? ' mm-multi' : '');
+      el.textContent = c;
+      el.onclick = function(){
+        if(!isMulti){ disableChips(); handleAnswer(c); }
+        else {
+          el.classList.toggle('mm-on');
+          var i = multiSel.indexOf(c);
+          if(i >= 0) multiSel.splice(i,1); else multiSel.push(c);
+        }
+      };
+      cchip.appendChild(el);
+    });
+    if(isMulti){
+      var ok = document.createElement('span');
+      ok.className = 'cn-mymy-chip mm-ok';
+      ok.innerHTML = '<i class="ph-duotone ph-check" style="margin-right:3px;vertical-align:-1px"></i>Xong';
+      ok.onclick = function(){ disableChips(); handleAnswer(multiSel.length ? multiSel.join(' \xb7 ') : 'Bỏ qua'); };
+      cchip.appendChild(ok);
+    }
+  }
+
+  function disableChips(){
+    var chips = cchip.querySelectorAll('.cn-mymy-chip');
+    for(var i=0;i<chips.length;i++){ chips[i].style.pointerEvents='none'; chips[i].style.opacity='.4'; }
+  }
+
+  function hideChips(){
+    cchip.style.display = 'none'; cchip.innerHTML = '';
+    clab.style.display = 'none'; clab.textContent = '';
+  }
+
+  function handleAnswer(val){
+    hideChips(); hideHint();
+    var s = flow[step];
+    if(s && s.key) collected[s.key] = val;
+    addUser(val);
+    step++; busy = false;
+    setTimeout(runStep, 350);
+  }
+
+  window.cnMymySend = function(){
+    var val = (cinp.value || '').trim();
+    if(!val || busy) return;
+    cinp.value = '';
+    hideChips(); hideHint();
+    var s = flow[step];
+    if(s && s.key) collected[s.key] = val;
+    addUser(val);
+    step++; busy = false;
+    setTimeout(runStep, 350);
+  };
+
+  function runStep(){
+    if(busy || step >= flow.length) return;
+    busy = true;
+    var s = flow[step];
+
+    if(s.summary){
+      showTyping(s.think || 1800, 0, function(){
+        var map = [
+          {e:'🎨',l:'Phong c\xe1ch',k:'phong_cach'},{e:'👨‍👩‍👧',l:'Th\xe0nh vi\xean',k:'gia_dinh'},
+          {e:'👥',l:'Số người ở',k:'so_nguoi'},{e:'📏',l:'L\xf4 đất',k:'lo_dat'},
+          {e:'🏗️',l:'Số tầng / S\xe0n',k:'so_tang'},{e:'🛏️',l:'Số ph\xf2ng ngủ',k:'so_phong_ngu'},
+          {e:'✨',l:'Ph\xf2ng master',k:'master_detail'},{e:'📏',l:'K\xedch cỡ master',k:'master_size'},
+          {e:'🔧',l:'C\xf4ng năng',k:'cong_nang'},{e:'❌',l:'Muốn tr\xe1nh',k:'khong_thich'},
+          {e:'💛',l:'Cảm x\xfac',k:'cam_xuc'},{e:'🧭',l:'Phong thuỷ',k:'phong_thuy'},
+          {e:'💰',l:'Ng\xe2n s\xe1ch',k:'ngan_sach'},{e:'📅',l:'Thời gian',k:'thoi_gian'},
+          {e:'😟',l:'Băn khoăn',k:'lo_lang'},{e:'📝',l:'Nhắn KTS',k:'nhan_gui'}
+        ];
+        var rows = '';
+        for(var i=0;i<map.length;i++){
+          if(collected[map[i].k]) rows += '<div class="cn-mm-sum-row"><span>'+map[i].e+'</span><span><b>'+map[i].l+':</b> '+collected[map[i].k]+'</span></div>';
+        }
+        var card = rows ? '<div class="cn-mm-sum">'+rows+'</div>' : '';
+        addMM('Cảm ơn bạn rất nhiều v\xec đ\xe3 chia sẻ thật l\xf2ng 🙏 M\xecnh đ\xe3 ghi lại đầy đủ v\xe0 sẽ chuyển ngay cho đội KTS ALN.' + card);
+        cinp.disabled = true; cinp.placeholder = 'MyMy đ\xe3 ghi nhận đủ rồi ✓';
+        var btn = document.getElementById('cnMymySendBtn');
+        if(btn) btn.disabled = true;
+        busy = false;
+      });
+      return;
+    }
+
+    showTyping(s.think || 1000, s.type || 1400, function(){
+      addMM(s.text || '');
+      if(s.freeText){ showHint(s.hint || 'Cứ g\xf5 ra đ\xe2y cho m\xecnh nh\xe9 👇'); cinp.focus(); }
+      if(s.chips){ showChips(s.chips, s.multi || false, s.chipHint || ''); }
+      busy = false;
+    });
+  }
+
+  setTimeout(function(){
+    showTyping(0, 600, function(){
+      addMM(flow[0].text);
+      setTimeout(function(){
+        showTyping(900, 2200, function(){
+          addMM(flow[1].text);
+          setTimeout(function(){
+            showTyping(1400, 2800, function(){
+              addMM(flow[2].text);
+              step = 3; busy = false;
+              setTimeout(runStep, 400);
+            });
+          }, 500);
+        });
+      }, 400);
+    });
+  }, 800);
+};
 </script>
 </body>
 </html>
