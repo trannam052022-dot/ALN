@@ -24,11 +24,11 @@ var _dnLoaded = false;
   --card:     #151d2e;
   --border:   #1e2840;
   --line:     #243050;
-  --mute:     #334060;
-  --dim:      #556080;
-  --sub:      #7a88a8;
-  --text2:    #a8b4c8;
-  --text1:    #d8e0f0;
+  --mute:     #5a6890;
+  --dim:      #8090ae;
+  --sub:      #9aaac4;
+  --text2:    #bcc8dc;
+  --text1:    #dce6f4;
   --white:    #eaeefc;
 
   --red:      #ef4444;
@@ -180,7 +180,7 @@ body::after {
 .stat-cell.s-sla.active::after     { background: var(--amber); }
 .stat-cell.s-done.active::after    { background: var(--sub); }
 
-.sc-label { font-family: var(--syne); font-size: 8px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.sc-label { font-family: var(--syne); font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .s-all .sc-label     { color: rgba(201,168,76,.7); }
 .s-run .sc-label     { color: var(--green); }
 .s-c3 .sc-label      { color: var(--amber); }
@@ -257,8 +257,8 @@ body::after {
 }
 .data-table th {
   padding: 9px 14px; text-align: left;
-  font-family: var(--syne); font-size: 8px; font-weight: 700;
-  letter-spacing: .14em; text-transform: uppercase; color: var(--dim);
+  font-family: var(--syne); font-size: 10px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--sub);
   white-space: nowrap; cursor: pointer; user-select: none;
   transition: color .12s;
 }
@@ -519,9 +519,9 @@ body::after {
 
 .ds-label {
   display: flex; align-items: center; gap: 7px;
-  font-family: var(--syne); font-size: 8px; font-weight: 700;
-  letter-spacing: .16em; text-transform: uppercase;
-  color: rgba(201,168,76,.5); margin-bottom: 10px;
+  font-family: var(--syne); font-size: 10px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: rgba(201,168,76,.75); margin-bottom: 10px;
 }
 
 /* Financial breakdown */
@@ -533,12 +533,12 @@ body::after {
   background: var(--raised); border: 1px solid var(--border);
   border-radius: var(--r-sm); padding: 10px 10px 8px;
 }
-.fin-lbl { font-size: 9px; color: var(--dim); font-family: var(--mono); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 4px; }
+.fin-lbl { font-size: 10px; color: var(--sub); font-family: var(--mono); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 4px; }
 .fin-val { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--white); line-height: 1; }
 .fin-val.green { color: var(--green); }
 .fin-val.amber { color: var(--amber); }
 .fin-val.red   { color: var(--red); }
-.fin-sub { font-size: 9px; color: var(--dim); margin-top: 3px; }
+.fin-sub { font-size: 10px; color: var(--sub); margin-top: 3px; }
 
 /* AI Log block */
 .ai-log {
@@ -633,8 +633,8 @@ body::after {
   padding: 14px 18px;
 }
 .cmd-label {
-  font-family: var(--mono); font-size: 9px; font-weight: 700;
-  color: var(--dim); letter-spacing: 1.5px; text-transform: uppercase;
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  color: var(--sub); letter-spacing: 1px; text-transform: uppercase;
   margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
 }
 .cmd-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
