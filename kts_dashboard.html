@@ -886,7 +886,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           <!-- Ví chính -->
           <div class="wallet-pocket wp-main">
             <div class="wp-label"><i class="ph-duotone ph-circle" style="font-size:7px"></i> Ví chính</div>
-            <div class="wp-amount">3,878,220đ</div>
+            <div class="wp-amount" id="walletMainAmt">—</div>
             <div class="wp-sub">Khả dụng · Rút được ngay</div>
             <button class="btn btn-sm btn-green" style="margin-top:7px;width:100%" onclick="openWithdrawModal()"><i class="ph-duotone ph-sign-out"></i> Rút tiền</button>
           </div>
@@ -934,7 +934,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <!-- TX history -->
       <div class="card">
         <div class="card-title"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-list-bullets"></i></div>Lịch sử giao dịch</div>
-        <div>
+        <div id="walletTxList">
           <div class="tx-row">
             <div class="tx-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ph-duotone ph-lock"></i></div>
             <div class="tx-info"><div class="tx-title">Ví tạm ứng C2 kích hoạt</div><div class="tx-meta">#9921 · 05/06 09:42</div></div>
@@ -2537,6 +2537,7 @@ function _startKtsProjectListen(uid) {
     });
     window._KTS_ALL_PROJECTS = allProjs;
     renderMyProjects(allProjs);
+    _updateWallet(allProjs);
     if (typeof renderDashProjList === 'function') renderDashProjList(allProjs);
     if (typeof renderProjCards === 'function') renderProjCards(allProjs);
     const _rvPicker = document.getElementById('rvProjPicker');
@@ -2987,6 +2988,49 @@ window.saveProfile = async function saveProfile() {
     showToast('Lỗi lưu: ' + (e.code || e.message), 't-red');
   } finally {
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-floppy-disk"></i> Lưu hồ sơ'; }
+  }
+}
+
+// Cập nhật Ví thu nhập từ dữ liệu Firestore thật
+function _updateWallet(allProjs) {
+  var paid = 0, pending = 0, txItems = [];
+  var fmtVN = function(v) { return v.toLocaleString('vi-VN') + 'đ'; };
+  (allProjs || []).forEach(function(p) {
+    var pays = p.payments || {};
+    ['C1','C2','C3','C4'].forEach(function(stage) {
+      var pay = pays[stage];
+      if (!pay) return;
+      var projCode = p.code || p.id;
+      var dateStr = '';
+      if (pay.status === 'paid') {
+        paid += (pay.amount || 0);
+        dateStr = pay.paidAt && pay.paidAt.toDate ? pay.paidAt.toDate().toLocaleDateString('vi-VN') : '';
+        txItems.push({ type:'paid', label:'Giải ngân ' + stage + ' — ' + projCode, sub:'Founder đã xác nhận' + (dateStr ? ' · ' + dateStr : ''), amount: pay.amount || 0 });
+      } else if (pay.status === 'pending') {
+        pending += (pay.amount || 0);
+        dateStr = pay.stagedAt && pay.stagedAt.toDate ? pay.stagedAt.toDate().toLocaleDateString('vi-VN') : '';
+        txItems.push({ type:'lock', label:'Chờ xác nhận ' + stage + ' — ' + projCode, sub:'Chờ Founder chuyển tiền' + (dateStr ? ' · ' + dateStr : ''), amount: pay.amount || 0 });
+      }
+    });
+  });
+  var mainEl = document.getElementById('walletMainAmt');
+  if (mainEl) mainEl.textContent = fmtVN(paid);
+  var lockEl = document.getElementById('lockedAmount');
+  if (lockEl) lockEl.textContent = pending > 0 ? fmtVN(pending) : '0đ';
+  var txEl = document.getElementById('walletTxList');
+  if (txEl) {
+    if (!txItems.length) {
+      txEl.innerHTML = '<div style="text-align:center;padding:20px;font-size:11px;color:var(--muted)">Chưa có giao dịch nào</div>';
+    } else {
+      txEl.innerHTML = txItems.map(function(tx) {
+        var isLock = tx.type === 'lock';
+        return '<div class="tx-row">'
+          + '<div class="tx-icon" style="background:var(' + (isLock ? '--amber-bg);color:var(--amber' : '--green-bg);color:var(--green') + ')"><i class="ph-duotone ph-' + (isLock ? 'lock' : 'money') + '"></i></div>'
+          + '<div class="tx-info"><div class="tx-title">' + tx.label + '</div><div class="tx-meta">' + tx.sub + '</div></div>'
+          + '<div class="tx-amount ' + (isLock ? 'tx-lock' : 'tx-pos') + '">+' + fmtVN(tx.amount) + '</div>'
+          + '</div>';
+      }).join('');
+    }
   }
 }
 

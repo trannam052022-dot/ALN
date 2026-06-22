@@ -254,6 +254,36 @@ exports.onCommunityPost = functions
     return null;
   });
 
+/* ── Founder xác nhận thanh toán → thông báo KTS ── */
+exports.onPaymentConfirmed = functions
+  .region("asia-southeast1")
+  .firestore.document("projects/{pid}")
+  .onUpdate(async (change, context) => {
+    const before = change.before.data() || {};
+    const after  = change.after.data()  || {};
+    const beforePay = before.payments || {};
+    const afterPay  = after.payments  || {};
+
+    for (const stage of ['C1','C2','C3','C4']) {
+      const bp = beforePay[stage] || {};
+      const ap = afterPay[stage]  || {};
+      if (bp.status !== 'paid' && ap.status === 'paid') {
+        const ktsUid  = ap.ktsUid || '';
+        const amount  = ap.amount || 0;
+        const projName = after.name || context.params.pid;
+        if (!ktsUid) continue;
+        await notifyUser(
+          ktsUid,
+          "💵 Thanh toán chặng " + stage + " đã xác nhận",
+          `"${projName}" — ${(amount/1000000).toFixed(1)}tr đã được chuyển`,
+          { type: "PAYMENT_CONFIRMED", pid: context.params.pid, stage, amount: String(amount) },
+          "kts"
+        );
+      }
+    }
+    return null;
+  });
+
 /* ── Xóa địa điểm tạm thời đã hết hạn (chạy mỗi 6 tiếng) ── */
 exports.clearExpiredTemporaryLocations = functions
   .region("asia-southeast1")
