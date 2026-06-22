@@ -3402,6 +3402,7 @@ onAuthStateChanged(auth, async (user) => {
       role:   profile.role,
       badge:  profile.badge || "",
       uid:    user.uid,
+      gender: profile.gender || "",
     });
     try { localStorage.setItem("aln_user", ud); } catch(e){}
     try { sessionStorage.setItem("aln_user", ud); } catch(e){}
@@ -3602,25 +3603,27 @@ window.cnInitMymyFlow = function(){
   var hintt = document.getElementById('cnMymyHintT');
   if(!bdy) return;
 
-  // Lấy tên từ sessionStorage (CN_USER là const trong module, không qua window)
+  // Lấy tên + giới tính từ sessionStorage
   var _su = JSON.parse(sessionStorage.getItem('aln_user') || '{}');
   var rawName = _su.name || '';
   var firstName = rawName ? rawName.split(' ').pop() : '';
-  // cn = cách xưng hô với chủ nhà (vd: "anh Nam", "chị Lan") — set sau bước chọn giới tính
-  var cn = firstName || 'bạn';
+  var gender = _su.gender || ''; // 'male' | 'female' | ''
+  var honorific = gender === 'female' ? 'chị' : (gender === 'male' ? 'anh' : '');
+  // cn = "chị Thanh" / "anh Long" / "Thanh" (nếu chưa có gender)
+  var cn = honorific ? (honorific + ' ' + firstName) : (firstName || 'bạn');
+  var genderKnown = !!honorific;
 
   var step = 0, collected = {}, multiSel = [], busy = false;
 
-  // Thay {cn} bằng cách xưng hô thực tế
   function rdr(s){ return s.replace(/\{cn\}/g, cn); }
 
-  // 3 tin mở đầu — dùng tên trực tiếp
-  var boot0 = 'Chào ' + (firstName || 'bạn') + '! 👋';
-  var boot1 = 'Em là <b>MyMy</b> — tư vấn viên của đội Thiết kế &amp; Xây dựng ALN. Trong lúc đội KTS xem hồ sơ, em sẽ ngồi đây trò chuyện cùng ' + (firstName || 'bạn') + ' một chút nhé.';
-  var boot2 = 'Em muốn hiểu <em>thật sự</em> về ngôi nhà ' + (firstName || 'bạn') + ' đang mơ tới — không phải hỏi cho có, mà để khi KTS ngồi xuống vẽ, họ đã hiểu ' + (firstName || 'bạn') + ' từ trước rồi.';
+  // Boot: dùng đúng cách xưng hô ngay từ đầu
+  var boot0 = 'Chào ' + cn + '! 👋';
+  var boot1 = 'Em là <b>MyMy</b> — tư vấn viên của đội Thiết kế &amp; Xây dựng ALN. Trong lúc đội KTS xem hồ sơ, em sẽ ngồi đây trò chuyện cùng ' + cn + ' một chút nhé.';
+  var boot2 = 'Em muốn hiểu <em>thật sự</em> về ngôi nhà ' + cn + ' đang <em>nghĩ tới</em> — không phải hỏi cho có, mà để khi KTS ngồi xuống vẽ, họ đã hiểu ' + cn + ' từ trước rồi.';
 
   var flow = [
-    /* 0 — Chọn xưng hô */
+    /* 0 — Hỏi giới tính (chỉ hiện nếu chưa có gender trong profile) */
     { text: firstName
         ? 'Tiện thể, để em xưng hô cho thân mật — em gọi <b>' + firstName + '</b> là anh hay chị ạ? 😊'
         : 'Để em xưng hô cho thân mật — em gọi là anh hay chị ạ? 😊',
@@ -3877,7 +3880,7 @@ window.cnInitMymyFlow = function(){
     });
   }
 
-  // Boot: 3 tin mở đầu dùng tên thật, sau đó runStep từ step 0
+  // Boot: 3 tin mở đầu → bỏ qua bước hỏi giới tính nếu đã có trong profile
   setTimeout(function(){
     showTyping(0, 600, function(){
       addMM(boot0);
@@ -3887,7 +3890,8 @@ window.cnInitMymyFlow = function(){
           setTimeout(function(){
             showTyping(1400, 2800, function(){
               addMM(boot2);
-              step = 0; busy = false;
+              step = genderKnown ? 1 : 0; // bỏ qua step 0 (hỏi giới tính) nếu đã biết
+              busy = false;
               setTimeout(runStep, 400);
             });
           }, 500);
