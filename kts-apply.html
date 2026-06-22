@@ -31,13 +31,15 @@
   --syne:'Syne',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+html{font-size:13px;scroll-behavior:smooth}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
 body{
   font-family:var(--sans);
   background:var(--bg);
   color:var(--text);
   min-height:100vh;
-  font-size:13px;
+  font-size:1rem;
   line-height:1.6;
   background-image:
     linear-gradient(rgba(201,168,76,.022) 1px,transparent 1px),
@@ -247,6 +249,7 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
   .trust-item{padding:0 12px}
 }
 </style>
+<link rel="stylesheet" href="aln-tokens.css">
 </head>
 <body>
 

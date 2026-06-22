@@ -23,9 +23,12 @@
   --syne:'Syne',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{min-height:100vh;-webkit-font-smoothing:antialiased}
+html{font-size:13px;-webkit-font-smoothing:antialiased}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
+html,body{min-height:100vh}
 body{
-  font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;
+  font-family:var(--sans);background:var(--bg);color:var(--text);font-size:1rem;
   background-image:linear-gradient(rgba(201,168,76,.022) 1px,transparent 1px),
     linear-gradient(90deg,rgba(201,168,76,.022) 1px,transparent 1px);
   background-size:56px 56px;
@@ -279,6 +282,7 @@ input::placeholder{color:var(--muted)}
   max-width:90vw;text-align:center}
 .toast.show{opacity:1}.toast.err{border-color:rgba(240,96,96,.35);color:#f09898}
 </style>
+<link rel="stylesheet" href="../aln-tokens.css">
 </head>
 <body>
 

@@ -37,8 +37,10 @@ window.DES_PROJECT_DATA = null;
   --syne:'Syne',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:100vh;font-size:13px;line-height:1.6;overflow-x:hidden}
+html{font-size:13px;scroll-behavior:smooth}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
+body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:100vh;font-size:1rem;line-height:1.6;overflow-x:hidden}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:var(--ink2)}
 ::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:99px}
@@ -224,6 +226,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .ni-text{color:var(--text);line-height:1.4}
 .ni-time{font-size:10px;color:var(--muted);margin-top:2px}
 </style>
+<link rel="stylesheet" href="aln-tokens.css">
 </head>
 <body>
 
