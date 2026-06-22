@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Demo — Bảng thông tin công trình</title>
+<title>Demo — MyMy CSKH Chat</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/>
 <style>
@@ -12,206 +12,267 @@
   --border:#e2e8f0;--border2:#cbd5e1;
   --text:#1e293b;--text2:#475569;--sub:#94a3b8;--muted:#94a3b8;
   --accent:#d4a017;--accent2:#e8c44a;--gold:#d4a017;
-  --green:#16a34a;--green-bg:rgba(22,163,74,.1);
-  --blue:#2563eb;--blue-bg:rgba(37,99,235,.1);
+  --green:#16a34a;
   --r:10px;--r-sm:7px;
   --sans:'DM Sans',sans-serif;--syne:'Syne',sans-serif;--serif:'Cormorant Garamond',serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--sans);background:var(--ink);color:var(--text);line-height:1.6;padding:30px 16px;font-size:13px}
-.wrap{max-width:620px;margin:0 auto}
+body{font-family:var(--sans);background:var(--ink);color:var(--text);line-height:1.6;padding:24px 16px 60px;font-size:13px}
+.wrap{max-width:640px;margin:0 auto}
 
-/* Lời chào mở đầu */
-.cs-hello{text-align:center;margin-bottom:22px}
+/* Header chào */
+.cs-hello{text-align:center;margin-bottom:20px}
 .cs-eyebrow{font-family:var(--syne);font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:7px;margin-bottom:10px}
 .cs-eyebrow::before,.cs-eyebrow::after{content:'';width:24px;height:1px;background:linear-gradient(90deg,transparent,rgba(212,160,23,.5))}
 .cs-eyebrow::after{background:linear-gradient(270deg,transparent,rgba(212,160,23,.5))}
-.cs-title{font-family:var(--serif);font-size:27px;font-weight:600;font-style:italic;color:var(--text);line-height:1.25;letter-spacing:-.01em}
-.cs-sub{font-size:12.5px;color:var(--sub);max-width:440px;margin:10px auto 0;line-height:1.7}
+.cs-title{font-family:var(--serif);font-size:26px;font-weight:600;font-style:italic;color:var(--text);line-height:1.25}
+.cs-sub{font-size:12px;color:var(--sub);max-width:440px;margin:8px auto 0;line-height:1.7}
 
-/* Card form */
-.cs-card{background:var(--ink2);border:1px solid var(--border);border-radius:16px;padding:26px 24px;box-shadow:0 4px 24px rgba(15,23,42,.06),0 1px 3px rgba(15,23,42,.04)}
-.cs-card-head{display:flex;align-items:center;gap:9px;padding-bottom:16px;margin-bottom:20px;border-bottom:1px solid var(--border)}
-.cs-card-head i{font-size:20px;color:var(--accent)}
-.cs-card-head .h{font-family:var(--syne);font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--text)}
+/* ── CHAT MYMY ── */
+.cs-chat{background:var(--ink2);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,.07)}
 
-.cs-field{margin-bottom:18px}
-.cs-label{display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:7px;letter-spacing:.01em}
-.cs-label .opt{font-weight:500;color:var(--sub);text-transform:none;letter-spacing:0}
-.cs-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.cs-inwrap{position:relative}
-.cs-inwrap .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--sub);font-size:15px;pointer-events:none}
-.cs-inwrap .unit{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--sub);font-size:12px;font-weight:600}
-.cs-input,.cs-select,.cs-textarea{width:100%;background:var(--ink3);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:11px 13px 11px 38px;font-size:13px;font-family:var(--sans);color:var(--text);outline:none;transition:border-color .15s,background .15s}
-.cs-select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center}
-.cs-textarea{padding:11px 13px;resize:vertical;min-height:84px;line-height:1.6}
-.cs-input:focus,.cs-select:focus,.cs-textarea:focus{border-color:var(--accent);background:#fff}
-.cs-input::placeholder,.cs-textarea::placeholder{color:var(--sub)}
+.cs-chat-head{display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(212,160,23,.07),transparent)}
+.av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#c8940e,#e8c44a);display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-weight:800;font-size:15px;color:#fff;flex-shrink:0;box-shadow:0 2px 12px rgba(212,160,23,.32);position:relative}
+.av .dot{position:absolute;bottom:1px;right:1px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid #fff}
+.hd-info .nm{font-family:var(--syne);font-weight:800;font-size:13px;color:var(--text);display:flex;align-items:center;gap:7px}
+.hd-info .badge{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.25);padding:1px 7px;border-radius:99px}
+.hd-info .role{font-size:11px;color:var(--sub);margin-top:1px}
 
-/* Checkbox cards */
-.cs-needs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.cs-chk{display:flex;align-items:center;gap:9px;padding:12px 13px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--ink3);cursor:pointer;transition:all .15s;user-select:none}
-.cs-chk:hover{border-color:var(--border2)}
-.cs-chk input{display:none}
-.cs-chk .box{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:#fff}
-.cs-chk .box i{font-size:11px;color:#fff;opacity:0}
-.cs-chk i.lead{font-size:17px;color:var(--accent)}
-.cs-chk .tx{font-size:12px;font-weight:600;color:var(--text2)}
-.cs-chk.on{border-color:var(--accent);background:rgba(212,160,23,.06)}
-.cs-chk.on .box{background:var(--accent);border-color:var(--accent)}
-.cs-chk.on .box i{opacity:1}
-.cs-chk.on .tx{color:var(--text)}
+/* Chuỗi hội thoại */
+.chat-body{padding:18px;display:flex;flex-direction:column;gap:14px;min-height:220px;max-height:420px;overflow-y:auto}
 
-/* Submit — tone vàng, 2 dòng */
-.cs-submit{width:100%;margin-top:8px;padding:13px 18px;border:none;border-radius:var(--r-sm);background:linear-gradient(135deg,#bf8f1a 0%,#d4a017 60%,#e0b32e 100%);color:#fff;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:11px;transition:all .18s;box-shadow:0 4px 14px rgba(212,160,23,.3)}
-.cs-submit:hover{box-shadow:0 7px 22px rgba(212,160,23,.42);transform:translateY(-1px)}
-.cs-submit > i{font-size:22px}
-.cs-submit .txt{display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
-.cs-submit .big{font-size:16px;font-weight:800;letter-spacing:.01em}
-.cs-submit .small{font-size:11px;font-weight:500;opacity:.9;margin-top:1px}
-.cs-foot{text-align:center;font-size:11.5px;color:var(--sub);margin-top:16px;display:flex;align-items:center;justify-content:center;gap:6px}
-.cs-foot i{color:var(--accent)}
+/* Tin MyMy */
+.msg-mymy{display:flex;gap:9px;align-items:flex-start;max-width:90%}
+.msg-mymy .m-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#c8940e,#e8c44a);display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-weight:800;font-size:10px;color:#fff;flex-shrink:0;margin-top:2px}
+.msg-mymy .bubble{background:var(--ink3);border:1px solid var(--border);border-radius:4px 13px 13px 13px;padding:10px 14px;font-size:12.5px;color:var(--text2);line-height:1.6}
+.msg-mymy .bubble b{color:var(--text)}
 
-/* ── CHAT MyMy ── */
-.cs-chat{background:var(--ink2);border:1px solid var(--border);border-radius:16px;margin-top:20px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,.06),0 1px 3px rgba(15,23,42,.04)}
-.cs-chat-head{display:flex;align-items:center;gap:11px;padding:15px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(212,160,23,.06),transparent)}
-.cs-chat-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#d4a017,#e8c44a);display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-weight:800;font-size:16px;color:#fff;flex-shrink:0;box-shadow:0 2px 10px rgba(212,160,23,.3);position:relative}
-.cs-chat-av .on-dot{position:absolute;bottom:1px;right:1px;width:11px;height:11px;border-radius:50%;background:var(--green);border:2px solid #fff}
-.cs-chat-id .nm{font-family:var(--syne);font-weight:800;font-size:13px;color:var(--text);display:flex;align-items:center;gap:6px}
-.cs-chat-id .nm .badge{font-family:var(--sans);font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.25);padding:1px 6px;border-radius:99px}
-.cs-chat-id .role{font-size:11px;color:var(--sub);margin-top:1px}
-.cs-chat-body{padding:18px;display:flex;flex-direction:column;gap:11px;max-height:280px;overflow-y:auto}
-.cs-msg{display:flex;gap:9px;align-items:flex-end;max-width:88%}
-.cs-msg .m-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#d4a017,#e8c44a);display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-weight:800;font-size:10px;color:#fff;flex-shrink:0}
-.cs-msg .bubble{background:var(--ink4);border:1px solid var(--border);border-radius:4px 13px 13px 13px;padding:9px 13px;font-size:12.5px;color:var(--text2);line-height:1.55}
-.cs-chips{display:flex;flex-wrap:wrap;gap:7px;padding:0 18px 4px}
-.cs-chip{font-size:11.5px;font-weight:600;color:var(--accent);background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.25);border-radius:99px;padding:6px 13px;cursor:pointer;transition:all .15s}
-.cs-chip:hover{background:rgba(212,160,23,.14)}
-.cs-chat-input{display:flex;gap:9px;align-items:center;padding:13px 16px;border-top:1px solid var(--border);background:var(--ink3)}
-.cs-chat-input input{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:10px 16px;font-size:12.5px;font-family:var(--sans);color:var(--text);outline:none;transition:border-color .15s}
-.cs-chat-input input:focus{border-color:var(--accent)}
-.cs-chat-send{width:40px;height:40px;border-radius:50%;border:none;background:linear-gradient(135deg,#bf8f1a,#d4a017);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;box-shadow:0 2px 8px rgba(212,160,23,.3)}
-.cs-chat-send:hover{transform:scale(1.06)}
-.cs-chat-note{text-align:center;font-size:10.5px;color:var(--sub);padding:9px 16px 13px;display:flex;align-items:center;justify-content:center;gap:5px}
-.cs-chat-note i{color:var(--accent)}
+/* Tin khách */
+.msg-user{display:flex;justify-content:flex-end}
+.msg-user .bubble{background:linear-gradient(135deg,#bf8f1a,#d4a017);color:#fff;border-radius:13px 4px 13px 13px;padding:10px 14px;font-size:12.5px;max-width:75%;line-height:1.5}
+
+/* Gợi ý nhanh dạng chip */
+.chip-row{display:flex;flex-wrap:wrap;gap:7px;padding:0 18px 4px}
+.chip{font-size:12px;font-weight:600;color:var(--accent);background:rgba(212,160,23,.08);border:1.5px solid rgba(212,160,23,.28);border-radius:99px;padding:7px 14px;cursor:pointer;transition:all .15s;user-select:none}
+.chip:hover,.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.chip.multi.on{background:rgba(212,160,23,.15);color:#8a5f00;border-color:var(--accent)}
+
+/* Input */
+.chat-input-row{display:flex;gap:9px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--ink3)}
+.chat-input-row input{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:10px 16px;font-size:13px;font-family:var(--sans);color:var(--text);outline:none;transition:border-color .15s}
+.chat-input-row input:focus{border-color:var(--accent)}
+.chat-input-row input::placeholder{color:var(--sub)}
+.send-btn{width:42px;height:42px;border-radius:50%;border:none;background:linear-gradient(135deg,#bf8f1a,#d4a017);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;box-shadow:0 2px 8px rgba(212,160,23,.3)}
+.send-btn:hover{transform:scale(1.07)}
+
+.chat-note{text-align:center;font-size:10.5px;color:var(--sub);padding:8px 16px 12px;display:flex;align-items:center;justify-content:center;gap:5px}
+.chat-note i{color:var(--accent)}
+
+/* Typing indicator */
+.typing{display:flex;gap:4px;padding:8px 12px;background:var(--ink3);border:1px solid var(--border);border-radius:4px 13px 13px 13px;width:fit-content}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--sub);animation:tp .9s infinite}
+.typing span:nth-child(2){animation-delay:.18s}
+.typing span:nth-child(3){animation-delay:.36s}
+@keyframes tp{0%,80%,100%{transform:scale(.8);opacity:.4}40%{transform:scale(1);opacity:1}}
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <div class="cs-hello">
-    <div class="cs-eyebrow">Chào mừng bạn đến với ALN</div>
-    <div class="cs-title">Kể cho chúng tôi nghe<br>về ngôi nhà của bạn</div>
-    <div class="cs-sub">Trong lúc đội ngũ ALN chuẩn bị kết nối bạn với kiến trúc sư phù hợp, hãy để lại đôi dòng về công trình mơ ước. Mỗi chi tiết bạn chia sẻ giúp chúng tôi tư vấn đúng và chân thành hơn ngay từ buổi đầu.</div>
+    <div class="cs-eyebrow">Trong lúc chờ kết nối KTS</div>
+    <div class="cs-title">MyMy đang ở đây cùng bạn</div>
+    <div class="cs-sub">Hãy cùng nhau phác thảo ý tưởng ngôi nhà — MyMy sẽ ghi lại mọi điều bạn mong muốn để đội KTS hiểu rõ ngay từ buổi đầu.</div>
   </div>
 
-  <div class="cs-card">
-    <div class="cs-card-head">
-      <i class="ph-duotone ph-house-line"></i>
-      <span class="h">Thông tin công trình</span>
-    </div>
-
-    <div class="cs-row">
-      <div class="cs-field">
-        <label class="cs-label">Diện tích đất / sàn</label>
-        <div class="cs-inwrap">
-          <i class="ic ph-duotone ph-ruler"></i>
-          <input class="cs-input" type="number" placeholder="VD: 150" inputmode="numeric">
-          <span class="unit">m²</span>
-        </div>
-      </div>
-      <div class="cs-field">
-        <label class="cs-label">Số tầng dự kiến</label>
-        <div class="cs-inwrap">
-          <i class="ic ph-duotone ph-stack"></i>
-          <select class="cs-select" style="padding-left:38px">
-            <option value="">— Chọn —</option>
-            <option>Nhà trệt (1 tầng)</option>
-            <option>2 tầng</option>
-            <option>3 tầng</option>
-            <option>4 tầng</option>
-            <option>5 tầng trở lên</option>
-            <option>Chưa xác định</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="cs-field">
-      <label class="cs-label">Bạn đang mong muốn điều gì? <span class="opt">(chọn 1 hoặc nhiều)</span></label>
-      <div class="cs-needs">
-        <label class="cs-chk" onclick="this.classList.toggle('on')">
-          <span class="box"><i class="ph-bold ph-check"></i></span>
-          <i class="lead ph-duotone ph-compass-tool"></i>
-          <span class="tx">Thiết kế kiến trúc</span>
-        </label>
-        <label class="cs-chk" onclick="this.classList.toggle('on')">
-          <span class="box"><i class="ph-bold ph-check"></i></span>
-          <i class="lead ph-duotone ph-paint-brush-household"></i>
-          <span class="tx">Nội thất</span>
-        </label>
-        <label class="cs-chk" onclick="this.classList.toggle('on')">
-          <span class="box"><i class="ph-bold ph-check"></i></span>
-          <i class="lead ph-duotone ph-hammer"></i>
-          <span class="tx">Xây dựng trọn gói</span>
-        </label>
-        <label class="cs-chk" onclick="this.classList.toggle('on')">
-          <span class="box"><i class="ph-bold ph-check"></i></span>
-          <i class="lead ph-duotone ph-compass"></i>
-          <span class="tx">Tư vấn & phong thủy</span>
-        </label>
-      </div>
-    </div>
-
-    <div class="cs-field">
-      <label class="cs-label">Khu vực xây dựng <span class="opt">(tùy chọn)</span></label>
-      <div class="cs-inwrap">
-        <i class="ic ph-duotone ph-map-pin"></i>
-        <input class="cs-input" type="text" placeholder="VD: Quận 7, TP. Hồ Chí Minh">
-      </div>
-    </div>
-
-    <div class="cs-field">
-      <label class="cs-label">Đôi điều muốn nhắn gửi <span class="opt">(tùy chọn)</span></label>
-      <textarea class="cs-textarea" placeholder="Phong cách bạn yêu thích, ngân sách dự kiến, thời gian mong muốn khởi công, hoặc bất cứ điều gì bạn đang băn khoăn…"></textarea>
-    </div>
-
-    <button class="cs-submit">
-      <i class="ph-duotone ph-paper-plane-tilt"></i>
-      <span class="txt">
-        <span class="big">Gửi thông tin</span>
-        <span class="small">ALN sẽ liên hệ với bạn ngay</span>
-      </span>
-    </button>
-
-    <div class="cs-foot"><i class="ph-duotone ph-shield-check"></i> Thông tin của bạn được bảo mật, chỉ dùng để tư vấn công trình.</div>
-  </div>
-
-  <!-- ── CHAT MyMy ── -->
   <div class="cs-chat">
     <div class="cs-chat-head">
-      <div class="cs-chat-av">My<span class="on-dot"></span></div>
-      <div class="cs-chat-id">
-        <div class="nm">MyMy <span class="badge">Trực tuyến</span></div>
-        <div class="role">Đội Thiết kế & Xây dựng ALN</div>
+      <div class="av">My<span class="dot"></span></div>
+      <div class="hd-info">
+        <div class="nm">MyMy <span class="badge">Đang trực</span></div>
+        <div class="role">Tư vấn Thiết kế & Xây dựng · ALN</div>
       </div>
     </div>
-    <div class="cs-chat-body">
-      <div class="cs-msg"><div class="m-av">My</div><div class="bubble">Chào bạn 👋 Mình là <b>MyMy</b>, cùng đội Thiết kế & Xây dựng của ALN.</div></div>
-      <div class="cs-msg"><div class="m-av">My</div><div class="bubble">Trong lúc bạn điền thông tin, cứ nhắn mình bất cứ điều gì về <b>thiết kế, vật liệu hay chi phí xây dựng</b> nhé — mình ở đây để giúp bạn.</div></div>
+
+    <div class="chat-body" id="chatBody"></div>
+
+    <!-- Chip gợi ý (ẩn mặc định, JS hiện theo từng bước) -->
+    <div class="chip-row" id="chipRow" style="display:none"></div>
+
+    <div class="chat-input-row">
+      <input id="chatIn" type="text" placeholder="Nhắn cho MyMy…" autocomplete="off" onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="send-btn" onclick="sendMsg()"><i class="ph-duotone ph-paper-plane-right"></i></button>
     </div>
-    <div class="cs-chips">
-      <span class="cs-chip">Chi phí xây nhà 2 tầng?</span>
-      <span class="cs-chip">Phong cách hiện đại</span>
-      <span class="cs-chip">Thời gian thi công?</span>
-    </div>
-    <div class="cs-chat-input">
-      <input type="text" placeholder="Nhắn cho MyMy về ngôi nhà của bạn…">
-      <button class="cs-chat-send"><i class="ph-duotone ph-paper-plane-right"></i></button>
-    </div>
-    <div class="cs-chat-note"><i class="ph-duotone ph-info"></i> MyMy hỗ trợ các câu hỏi về thiết kế & xây dựng.</div>
+    <div class="chat-note"><i class="ph-duotone ph-info"></i> MyMy hỗ trợ tư vấn thiết kế & xây dựng.</div>
   </div>
 
 </div>
+
+<script>
+var step = 0;
+var collected = {};
+var multiSel = [];
+
+var flow = [
+  {
+    from:'mymy',
+    text:'Chào bạn! 👋 Mình là <b>MyMy</b>, tư vấn viên của đội Thiết kế & Xây dựng ALN. Trong lúc đội KTS xem hồ sơ của bạn, mình sẽ giúp ghi lại ý tưởng để buổi tư vấn đầu tiên thật hiệu quả nhé.',
+    delay:400
+  },
+  {
+    from:'mymy',
+    text:'Bắt đầu thôi — bạn đang mơ tới <b>phong cách ngôi nhà</b> như thế nào?',
+    chips:['Hiện đại · Tối giản','Tân cổ điển','Cổ điển · Sang trọng','Nhiệt đới · Gần gũi','Chưa biết, nhờ KTS tư vấn'],
+    key:'phong_cach',
+    delay:900
+  },
+  {
+    from:'mymy',
+    text:'Tuyệt! Ngôi nhà cần những <b>không gian & công năng</b> nào? (chọn nhiều)',
+    chips:['Phòng thờ','Garage / Sân xe','Bếp mở liền phòng khách','Phòng làm việc tại nhà','Sân vườn / Hồ bơi','Ban công rộng','Phòng ngủ cho ông bà','Phòng sinh hoạt chung'],
+    key:'cong_nang',
+    multi:true,
+    delay:700
+  },
+  {
+    from:'mymy',
+    text:'Bạn dự kiến <b>mức đầu tư</b> cho công trình này là bao nhiêu?',
+    chips:['Dưới 1 tỷ','1 – 2 tỷ','2 – 4 tỷ','4 – 7 tỷ','Trên 7 tỷ','Chưa xác định'],
+    key:'ngan_sach',
+    delay:700
+  },
+  {
+    from:'mymy',
+    text:'Bạn mong muốn <b>khởi công</b> vào khoảng thời gian nào?',
+    chips:['Trong 1 – 3 tháng tới','3 – 6 tháng tới','6 tháng – 1 năm','Chưa xác định'],
+    key:'thoi_gian',
+    delay:600
+  },
+  {
+    from:'mymy',
+    text:'Còn điều gì bạn muốn nhắn riêng với đội KTS không? Ví dụ: phong thủy, vật liệu yêu thích, trải nghiệm sống bạn mong muốn… Cứ nhắn thoải mái!',
+    key:'ghi_chu',
+    freeText:true,
+    delay:700
+  },
+  {
+    from:'mymy',
+    text:'Cảm ơn bạn đã chia sẻ 🙏 Mình đã ghi lại đầy đủ và sẽ chuyển ngay cho đội KTS của ALN. Họ sẽ liên hệ bạn sớm để bắt đầu hành trình xây nhà thật sự!',
+    summary:true,
+    delay:600
+  }
+];
+
+var body = document.getElementById('chatBody');
+var chipRow = document.getElementById('chipRow');
+var chatIn = document.getElementById('chatIn');
+
+function scrollDown(){ body.scrollTop = body.scrollHeight; }
+
+function addMsg(role, html, cb){
+  if(role === 'mymy'){
+    var wrap = document.createElement('div');
+    wrap.className = 'msg-mymy';
+    // typing indicator
+    var tEl = document.createElement('div');
+    tEl.style.cssText = 'display:flex;gap:9px;align-items:flex-start;max-width:90%';
+    tEl.innerHTML = '<div class="m-av">My</div><div class="typing"><span></span><span></span><span></span></div>';
+    body.appendChild(tEl);
+    scrollDown();
+    setTimeout(function(){
+      body.removeChild(tEl);
+      wrap.innerHTML = '<div class="m-av">My</div><div class="bubble">'+html+'</div>';
+      body.appendChild(wrap);
+      scrollDown();
+      if(cb) cb();
+    }, 900);
+  } else {
+    var wrap2 = document.createElement('div');
+    wrap2.className = 'msg-user';
+    wrap2.innerHTML = '<div class="bubble">'+html+'</div>';
+    body.appendChild(wrap2);
+    scrollDown();
+    if(cb) cb();
+  }
+}
+
+function showChips(chips, multi){
+  chipRow.style.display = 'flex';
+  chipRow.innerHTML = '';
+  multiSel = [];
+  chips.forEach(function(c){
+    var el = document.createElement('span');
+    el.className = 'chip' + (multi?' multi':'');
+    el.textContent = c;
+    el.onclick = function(){
+      if(!multi){
+        handleChip(c);
+      } else {
+        el.classList.toggle('on');
+        var idx = multiSel.indexOf(c);
+        if(idx>=0) multiSel.splice(idx,1); else multiSel.push(c);
+      }
+    };
+    chipRow.appendChild(el);
+  });
+  if(multi){
+    var ok = document.createElement('span');
+    ok.className = 'chip';
+    ok.innerHTML = '<i class="ph-duotone ph-check" style="margin-right:4px"></i>Xong';
+    ok.style.cssText = 'background:var(--accent);color:#fff;border-color:var(--accent)';
+    ok.onclick = function(){
+      if(!multiSel.length){ multiSel.push('Bỏ qua'); }
+      handleChip(multiSel.join(', '));
+    };
+    chipRow.appendChild(ok);
+  }
+}
+
+function hideChips(){ chipRow.style.display='none'; chipRow.innerHTML=''; }
+
+function handleChip(val){
+  hideChips();
+  var s = flow[step];
+  if(s && s.key) collected[s.key] = val;
+  addMsg('user', val, function(){ step++; nextStep(); });
+}
+
+function sendMsg(){
+  var val = chatIn.value.trim();
+  if(!val) return;
+  chatIn.value = '';
+  hideChips();
+  var s = flow[step];
+  if(s && s.key) collected[s.key] = val;
+  addMsg('user', val, function(){ step++; nextStep(); });
+}
+
+function nextStep(){
+  if(step >= flow.length) return;
+  var s = flow[step];
+  setTimeout(function(){
+    if(s.summary){
+      var lines = [];
+      if(collected.phong_cach) lines.push('🎨 Phong cách: '+collected.phong_cach);
+      if(collected.cong_nang)  lines.push('🏠 Công năng: '+collected.cong_nang);
+      if(collected.ngan_sach)  lines.push('💰 Ngân sách: '+collected.ngan_sach);
+      if(collected.thoi_gian)  lines.push('📅 Khởi công: '+collected.thoi_gian);
+      if(collected.ghi_chu)    lines.push('📝 Ghi chú: '+collected.ghi_chu);
+      var sum = lines.length ? '<br><div style="margin-top:10px;background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.2);border-radius:10px;padding:10px 13px;font-size:12px;line-height:1.8">'+lines.join('<br>')+'</div>' : '';
+      addMsg('mymy', s.text + sum);
+      chatIn.disabled = true;
+      chatIn.placeholder = 'MyMy đã ghi nhận đủ thông tin ✓';
+    } else {
+      addMsg('mymy', s.text, function(){
+        if(s.chips) showChips(s.chips, s.multi);
+        else if(s.freeText){ chatIn.focus(); }
+      });
+    }
+  }, s.delay||500);
+}
+
+// Khởi động
+setTimeout(function(){ nextStep(); step++; nextStep(); },300);
+</script>
 </body>
 </html>
