@@ -822,6 +822,7 @@ body::after {
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a0a0c">
 <link rel="apple-touch-icon" href="icon-192.png">
+<script src="features/matching/matchingEngine.js"></script>
 </head>
 <body>
 <!-- ═══ ALN AUTH VEIL — che trang đến khi xác thực xong ═══ -->
@@ -1566,7 +1567,32 @@ body::after {
 
       <div>
         <label style="display:block;font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Địa chỉ</label>
-        <input id="cp_addr" placeholder="TP. Hồ Chí Minh" style="width:100%;background:var(--raised);border:1px solid var(--border);color:var(--text1);padding:9px 12px;border-radius:7px;font-family:var(--sans);font-size:13px;outline:none">
+        <input id="cp_addr" placeholder="12 Nguyễn Văn Bảo, Quận Gò Vấp" style="width:100%;background:var(--raised);border:1px solid var(--border);color:var(--text1);padding:9px 12px;border-radius:7px;font-family:var(--sans);font-size:13px;outline:none">
+      </div>
+
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Tỉnh/Thành phố dự án *</label>
+        <select id="cp_province" onchange="cpSuggestKts()" style="width:100%;background:var(--raised);border:1px solid rgba(6,182,212,.3);color:var(--text1);padding:9px 10px;border-radius:7px;font-family:var(--sans);font-size:13px;outline:none">
+          <option value="">— Chọn tỉnh/thành phố...</option>
+          <option value="HCM">TP. Hồ Chí Minh</option>
+          <option value="HN">Hà Nội</option>
+          <option value="DN">Đà Nẵng</option>
+          <option value="CT">Cần Thơ</option>
+          <option value="HP">Hải Phòng</option>
+          <option value="BD">Bình Dương</option>
+          <option value="DNai">Đồng Nai</option>
+          <option value="BR-VT">Bà Rịa – Vũng Tàu</option>
+          <option value="LA">Long An</option>
+          <option value="TG">Tiền Giang</option>
+          <option value="AG">An Giang</option>
+          <option value="KG">Kiên Giang</option>
+          <option value="DL">Đắk Lắk</option>
+          <option value="KH">Khánh Hòa</option>
+          <option value="BDinh">Bình Định</option>
+          <option value="NA">Nghệ An</option>
+          <option value="TH">Thanh Hóa</option>
+          <option value="OTHER">Tỉnh khác</option>
+        </select>
       </div>
 
       <div style="background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.15);border-radius:8px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -1596,6 +1622,13 @@ body::after {
             <option value="">— Đang tải...</option>
           </select>
         </div>
+      </div>
+
+      <div id="cp_kts_suggest" style="display:none;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:12px">
+        <div style="font-size:10px;font-weight:700;color:var(--amber);letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <i class="ph-duotone ph-sparkle"></i> GỢI Ý KTS PHÙ HỢP <span id="cp_kts_province_label" style="font-weight:400;color:var(--sub);text-transform:none;letter-spacing:0;font-size:10px"></span>
+        </div>
+        <div id="cp_kts_list" style="display:flex;flex-direction:column;gap:6px"></div>
       </div>
 
       <div>
@@ -2963,10 +2996,13 @@ function _cpPopulateSelect(id, users, placeholder){
 async function openCreateProj(){
   document.getElementById('cp_name').value = '';
   document.getElementById('cp_addr').value = '';
+  document.getElementById('cp_province').value = '';
   document.getElementById('cp_fee').value  = '';
   document.getElementById('cp_escrow').value = '';
   document.getElementById('cp_fee_preview').textContent = '';
   document.getElementById('cp_escrow_preview').textContent = '';
+  document.getElementById('cp_kts_suggest').style.display = 'none';
+  document.getElementById('cp_kts_list').innerHTML = '';
   document.getElementById('cp_err').style.display = 'none';
   var btn = document.getElementById('cp_btn');
   btn.disabled = false;
@@ -2990,14 +3026,56 @@ function closeCreateProj(){
   document.getElementById('createProjModal').style.display = 'none';
 }
 
+async function cpSuggestKts(){
+  var province = document.getElementById('cp_province').value;
+  var panel = document.getElementById('cp_kts_suggest');
+  var list  = document.getElementById('cp_kts_list');
+  var lbl   = document.getElementById('cp_kts_province_label');
+  if(!province){ panel.style.display = 'none'; return; }
+  var provLabel = (window.ALNMatching && window.ALNMatching.PROV_LABEL[province]) || province;
+  if(lbl) lbl.textContent = '· ' + provLabel;
+  panel.style.display = '';
+  list.innerHTML = '<div style="color:var(--dim);font-size:12px;padding:4px 0">Đang tìm KTS...</div>';
+  try {
+    var fb = window._cpFb;
+    if(!fb){ list.innerHTML = '<div style="color:var(--red);font-size:12px">Firebase chưa sẵn sàng</div>'; return; }
+    var ktsList = await fb.suggestKts(province);
+    if(!ktsList.length){
+      list.innerHTML = '<div style="color:var(--dim);font-size:12px;padding:4px 0">Không tìm thấy KTS tại ' + provLabel + '. <span style="color:var(--sub)">Hãy chọn thủ công.</span></div>';
+      return;
+    }
+    var ranked = window.ALNMatching ? window.ALNMatching.rankKts(ktsList, province) : ktsList.map(function(k){ return {kts:k, score:0}; });
+    list.innerHTML = ranked.map(function(r, i){
+      var k = r.kts;
+      var star = Math.round(k.rating) || 3;
+      var stars = '★'.repeat(star) + '☆'.repeat(5-star);
+      var isHome = k.homeProvince === province;
+      return '<div onclick="document.getElementById(\'cp_kts\').value=\'' + k.uid + '\';this.style.borderColor=\'var(--amber)\'" style="cursor:pointer;padding:8px 10px;border-radius:6px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;gap:10px" onmouseover="this.style.borderColor=\'rgba(245,158,11,.5)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
+        + '<span style="font-size:10px;font-weight:700;color:var(--sub);min-width:18px;text-align:center">#'+(i+1)+'</span>'
+        + '<div style="flex:1;min-width:0">'
+          + '<div style="font-size:12px;font-weight:600;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+k.name+'</div>'
+          + '<div style="font-size:10px;color:var(--dim);margin-top:2px">'+(isHome?'<span style="color:var(--green)">Thường trú</span>':'Nhận dự án')+' · '+provLabel+' · <span style="color:var(--amber);letter-spacing:.5px">'+stars+'</span></div>'
+        + '</div>'
+        + '<div style="text-align:right;min-width:48px">'
+          + '<div style="font-size:13px;font-weight:700;color:var(--amber);font-family:var(--mono)">'+r.score+'</div>'
+          + '<div style="font-size:9px;color:var(--dim)">score</div>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+  } catch(e){
+    list.innerHTML = '<div style="color:var(--red);font-size:12px">Lỗi: '+(e.message||e)+'</div>';
+  }
+}
+
 async function saveCreateProj(){
-  var name   = document.getElementById('cp_name').value.trim();
-  var addr   = document.getElementById('cp_addr').value.trim();
-  var fee    = parseInt(document.getElementById('cp_fee').value, 10) || 0;
-  var escrow = parseInt(document.getElementById('cp_escrow').value, 10) || 0;
-  var cnUid  = document.getElementById('cp_cn').value;
-  var ktsUid = document.getElementById('cp_kts').value;
-  var dnUid  = document.getElementById('cp_dn').value;
+  var name     = document.getElementById('cp_name').value.trim();
+  var addr     = document.getElementById('cp_addr').value.trim();
+  var province = document.getElementById('cp_province').value;
+  var fee      = parseInt(document.getElementById('cp_fee').value, 10) || 0;
+  var escrow   = parseInt(document.getElementById('cp_escrow').value, 10) || 0;
+  var cnUid    = document.getElementById('cp_cn').value;
+  var ktsUid   = document.getElementById('cp_kts').value;
+  var dnUid    = document.getElementById('cp_dn').value;
   var errEl  = document.getElementById('cp_err');
 
   errEl.style.display = 'none';
@@ -3019,10 +3097,11 @@ async function saveCreateProj(){
     var dnUser  = dnUid ? (users.dn.find(function(u){ return u.uid === dnUid; }) || null) : null;
 
     var pid = await fb.createProject({
-      name:    name,
-      address: addr,
-      totalFee: fee,
-      escrow:  escrow,
+      name:           name,
+      address:        addr,
+      meetingProvince: province,
+      totalFee:       fee,
+      escrow:         escrow,
       cn:  { uid: cnUser.uid,  name: cnUser.name,  username: cnUser.username  },
       kts: { uid: ktsUser.uid, name: ktsUser.name, username: ktsUser.username },
       dn:  dnUser ? { uid: dnUser.uid, name: dnUser.name, username: dnUser.username } : null,
@@ -3691,8 +3770,22 @@ function _adaptForFounder(id, d) {
 }
 window.founderApprovePending = async function(uid, role) {
   try {
-    await updateDoc(doc(db,'users',uid), { status:'active', approvedNotified: false });
+    var userUpdate = { status:'active', approvedNotified: false };
     var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : role==='ctv' ? 'ctvApplications' : null;
+    if(role==='kts' && appColl) {
+      try {
+        var appSnap = await getDoc(doc(db,appColl,uid));
+        if(appSnap.exists()) {
+          var ad = appSnap.data();
+          if(ad.homeProvince || ad.province_home) userUpdate.homeProvince = ad.homeProvince || ad.province_home;
+          if(ad.serviceProvinces || ad.provinces_work) {
+            var sp = ad.serviceProvinces || ad.provinces_work || [];
+            userUpdate.serviceProvinces = sp.length ? sp : (userUpdate.homeProvince ? [userUpdate.homeProvince] : []);
+          }
+        }
+      } catch(e2){}
+    }
+    await updateDoc(doc(db,'users',uid), userUpdate);
     if(appColl){ try{ await updateDoc(doc(db,appColl,uid), { status:'approved', reviewedAt:serverTimestamp() }); }catch(e){} }
     window.PENDING_USERS = (window.PENDING_USERS||[]).filter(function(u){ return u.uid!==uid; });
     renderPending(); _updatePendingBadge();
@@ -3730,6 +3823,7 @@ window._cpFb = {
       code: pid,
       name: data.name,
       address: data.address || '',
+      meetingProvince: data.meetingProvince || '',
       cn:  data.cn,
       kts: data.kts,
       dn:  data.dn || null,
@@ -3750,6 +3844,20 @@ window._cpFb = {
     await setDoc(doc(db, 'projects', pid, 'stages', 'C3'), Object.assign({}, stageBase, { status: 'locked' }));
     await setDoc(doc(db, 'projects', pid, 'stages', 'C4'), Object.assign({}, stageBase, { status: 'locked' }));
     return pid;
+  },
+  suggestKts: async function(province) {
+    const snap = await getDocs(query(
+      collection(db, 'users'),
+      where('serviceProvinces', 'array-contains', province)
+    ));
+    const result = [];
+    snap.forEach(function(d) {
+      const u = d.data();
+      if (u.role === 'kts' && u.status === 'active') {
+        result.push({ uid: d.id, name: u.name || '', username: u.username || '', homeProvince: u.homeProvince || u.province || '', serviceProvinces: u.serviceProvinces || [], rating: u.rating || 0 });
+      }
+    });
+    return result;
   }
 };
 

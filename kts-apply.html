@@ -879,7 +879,10 @@ window._doSubmit = async function() {
     await setDoc(doc(db, 'users', uid), {
       username: uname, name: name, role: 'kts',
       email: email || (uname + '@aln.vn'),
-      province: provHome, status: 'pending', createdAt: serverTimestamp()
+      province: provHome,
+      homeProvince: provHome,
+      serviceProvinces: provWork.length ? provWork : [provHome],
+      status: 'pending', createdAt: serverTimestamp()
     });
     await setDoc(doc(db, 'ktsApplications', uid), {
       uid: uid, name: name, phone: phone, email: email || '',
