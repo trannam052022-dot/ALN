@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo — Bảng thông tin công trình</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/>
+<style>
+:root{
+  --ink:#f0f4f8;--ink2:#ffffff;--ink3:#f8fafc;--ink4:#f1f5f9;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --text:#1e293b;--text2:#475569;--sub:#94a3b8;--muted:#94a3b8;
+  --accent:#d4a017;--accent2:#e8c44a;--gold:#d4a017;
+  --green:#16a34a;--green-bg:rgba(22,163,74,.1);
+  --blue:#2563eb;--blue-bg:rgba(37,99,235,.1);
+  --r:10px;--r-sm:7px;
+  --sans:'DM Sans',sans-serif;--syne:'Syne',sans-serif;--serif:'Cormorant Garamond',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--ink);color:var(--text);line-height:1.6;padding:30px 16px;font-size:13px}
+.wrap{max-width:620px;margin:0 auto}
+
+/* Lời chào mở đầu */
+.cs-hello{text-align:center;margin-bottom:22px}
+.cs-eyebrow{font-family:var(--syne);font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:7px;margin-bottom:10px}
+.cs-eyebrow::before,.cs-eyebrow::after{content:'';width:24px;height:1px;background:linear-gradient(90deg,transparent,rgba(212,160,23,.5))}
+.cs-eyebrow::after{background:linear-gradient(270deg,transparent,rgba(212,160,23,.5))}
+.cs-title{font-family:var(--serif);font-size:27px;font-weight:600;font-style:italic;color:var(--text);line-height:1.25;letter-spacing:-.01em}
+.cs-sub{font-size:12.5px;color:var(--sub);max-width:440px;margin:10px auto 0;line-height:1.7}
+
+/* Card form */
+.cs-card{background:var(--ink2);border:1px solid var(--border);border-radius:16px;padding:26px 24px;box-shadow:0 4px 24px rgba(15,23,42,.06),0 1px 3px rgba(15,23,42,.04)}
+.cs-card-head{display:flex;align-items:center;gap:9px;padding-bottom:16px;margin-bottom:20px;border-bottom:1px solid var(--border)}
+.cs-card-head i{font-size:20px;color:var(--accent)}
+.cs-card-head .h{font-family:var(--syne);font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--text)}
+
+.cs-field{margin-bottom:18px}
+.cs-label{display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:7px;letter-spacing:.01em}
+.cs-label .opt{font-weight:500;color:var(--sub);text-transform:none;letter-spacing:0}
+.cs-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cs-inwrap{position:relative}
+.cs-inwrap .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--sub);font-size:15px;pointer-events:none}
+.cs-inwrap .unit{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--sub);font-size:12px;font-weight:600}
+.cs-input,.cs-select,.cs-textarea{width:100%;background:var(--ink3);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:11px 13px 11px 38px;font-size:13px;font-family:var(--sans);color:var(--text);outline:none;transition:border-color .15s,background .15s}
+.cs-select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center}
+.cs-textarea{padding:11px 13px;resize:vertical;min-height:84px;line-height:1.6}
+.cs-input:focus,.cs-select:focus,.cs-textarea:focus{border-color:var(--accent);background:#fff}
+.cs-input::placeholder,.cs-textarea::placeholder{color:var(--sub)}
+
+/* Checkbox cards */
+.cs-needs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cs-chk{display:flex;align-items:center;gap:9px;padding:12px 13px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--ink3);cursor:pointer;transition:all .15s;user-select:none}
+.cs-chk:hover{border-color:var(--border2)}
+.cs-chk input{display:none}
+.cs-chk .box{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:#fff}
+.cs-chk .box i{font-size:11px;color:#fff;opacity:0}
+.cs-chk i.lead{font-size:17px;color:var(--accent)}
+.cs-chk .tx{font-size:12px;font-weight:600;color:var(--text2)}
+.cs-chk.on{border-color:var(--accent);background:rgba(212,160,23,.06)}
+.cs-chk.on .box{background:var(--accent);border-color:var(--accent)}
+.cs-chk.on .box i{opacity:1}
+.cs-chk.on .tx{color:var(--text)}
+
+/* Submit */
+.cs-submit{width:100%;margin-top:8px;padding:14px;border:none;border-radius:var(--r-sm);background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;font-size:13.5px;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 4px 14px rgba(22,163,74,.25)}
+.cs-submit:hover{box-shadow:0 6px 20px rgba(22,163,74,.35);transform:translateY(-1px)}
+.cs-foot{text-align:center;font-size:11.5px;color:var(--sub);margin-top:16px;display:flex;align-items:center;justify-content:center;gap:6px}
+.cs-foot i{color:var(--green)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="cs-hello">
+    <div class="cs-eyebrow">Chào mừng bạn đến với ALN</div>
+    <div class="cs-title">Kể cho chúng tôi nghe<br>về ngôi nhà của bạn</div>
+    <div class="cs-sub">Trong lúc đội ngũ ALN chuẩn bị kết nối bạn với kiến trúc sư phù hợp, hãy để lại đôi dòng về công trình mơ ước. Mỗi chi tiết bạn chia sẻ giúp chúng tôi tư vấn đúng và chân thành hơn ngay từ buổi đầu.</div>
+  </div>
+
+  <div class="cs-card">
+    <div class="cs-card-head">
+      <i class="ph-duotone ph-house-line"></i>
+      <span class="h">Thông tin công trình</span>
+    </div>
+
+    <div class="cs-row">
+      <div class="cs-field">
+        <label class="cs-label">Diện tích đất / sàn</label>
+        <div class="cs-inwrap">
+          <i class="ic ph-duotone ph-ruler"></i>
+          <input class="cs-input" type="number" placeholder="VD: 150" inputmode="numeric">
+          <span class="unit">m²</span>
+        </div>
+      </div>
+      <div class="cs-field">
+        <label class="cs-label">Số tầng dự kiến</label>
+        <div class="cs-inwrap">
+          <i class="ic ph-duotone ph-stack"></i>
+          <select class="cs-select" style="padding-left:38px">
+            <option value="">— Chọn —</option>
+            <option>Nhà trệt (1 tầng)</option>
+            <option>2 tầng</option>
+            <option>3 tầng</option>
+            <option>4 tầng</option>
+            <option>5 tầng trở lên</option>
+            <option>Chưa xác định</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="cs-field">
+      <label class="cs-label">Bạn đang mong muốn điều gì? <span class="opt">(chọn 1 hoặc nhiều)</span></label>
+      <div class="cs-needs">
+        <label class="cs-chk" onclick="this.classList.toggle('on')">
+          <span class="box"><i class="ph-bold ph-check"></i></span>
+          <i class="lead ph-duotone ph-compass-tool"></i>
+          <span class="tx">Thiết kế kiến trúc</span>
+        </label>
+        <label class="cs-chk" onclick="this.classList.toggle('on')">
+          <span class="box"><i class="ph-bold ph-check"></i></span>
+          <i class="lead ph-duotone ph-paint-brush-household"></i>
+          <span class="tx">Nội thất</span>
+        </label>
+        <label class="cs-chk" onclick="this.classList.toggle('on')">
+          <span class="box"><i class="ph-bold ph-check"></i></span>
+          <i class="lead ph-duotone ph-hammer"></i>
+          <span class="tx">Xây dựng trọn gói</span>
+        </label>
+        <label class="cs-chk" onclick="this.classList.toggle('on')">
+          <span class="box"><i class="ph-bold ph-check"></i></span>
+          <i class="lead ph-duotone ph-compass"></i>
+          <span class="tx">Tư vấn & phong thủy</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="cs-field">
+      <label class="cs-label">Khu vực xây dựng <span class="opt">(tùy chọn)</span></label>
+      <div class="cs-inwrap">
+        <i class="ic ph-duotone ph-map-pin"></i>
+        <input class="cs-input" type="text" placeholder="VD: Quận 7, TP. Hồ Chí Minh">
+      </div>
+    </div>
+
+    <div class="cs-field">
+      <label class="cs-label">Đôi điều muốn nhắn gửi <span class="opt">(tùy chọn)</span></label>
+      <textarea class="cs-textarea" placeholder="Phong cách bạn yêu thích, ngân sách dự kiến, thời gian mong muốn khởi công, hoặc bất cứ điều gì bạn đang băn khoăn…"></textarea>
+    </div>
+
+    <button class="cs-submit"><i class="ph-duotone ph-paper-plane-tilt"></i> Gửi thông tin — đội ALN sẽ liên hệ bạn sớm</button>
+
+    <div class="cs-foot"><i class="ph-duotone ph-shield-check"></i> Thông tin của bạn được bảo mật, chỉ dùng để tư vấn công trình.</div>
+  </div>
+
+</div>
+</body>
+</html>
