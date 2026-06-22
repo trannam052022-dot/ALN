@@ -3435,16 +3435,24 @@ function renderStats(){
     +'</tr>';
   }).join('');
 
-  /* CN table */
+  /* CN table — dùng _LIVE_CN để hiện tất cả CN kể cả chưa có dự án */
   var cnStatusLabel = {on_track:'🟢 Đúng tiến độ',sla_warn:'⏰ SLA',dispute:'❌ Tranh chấp',done:'✅ Hoàn thành'};
   var cnStatusColor = {on_track:'var(--green)',sla_warn:'var(--amber)',dispute:'var(--red)',done:'var(--sub)'};
-  document.getElementById('statCnBody').innerHTML = _getStatsCn().map(function(c){
+  document.getElementById('statCnBody').innerHTML = LIVE_CN.map(function(c){
+    var projCell = c.projects > 0
+      ? '<div style="font-size:11px;color:var(--text2)">' + c.projects + ' dự án</div>'
+      : '<div style="font-size:11px;color:var(--dim);font-style:italic">Chưa có dự án</div>';
+    var stageCell = c.projects > 0 ? c.stage : '—';
+    var escrowCell = c.projects > 0 ? _fmtM(c.escrow)+'đ' : '—';
+    var statusCell = c.projects > 0
+      ? '<span style="color:'+(cnStatusColor[c.status]||'var(--sub)')+'">'+( cnStatusLabel[c.status]||c.status)+'</span>'
+      : '<span style="color:var(--dim)">Chờ dự án</span>';
     return '<tr style="border-top:1px solid var(--border);transition:background .1s" onmouseover="this.style.background=\'var(--raised)\'" onmouseout="this.style.background=\'\'">'
-      +'<td style="padding:9px 14px;font-size:12px;font-weight:600;color:var(--text1)">'+c.name+'</td>'
-      +'<td style="padding:9px 14px"><div style="font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+c.project+'</div><div style="font-size:9px;color:var(--dim);font-family:var(--mono)">'+c.projectId+'</div></td>'
-      +'<td style="padding:9px 14px;text-align:center"><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:'+stageColors[stages.indexOf(c.stage)||0]+'">'+c.stage+'</span></td>'
-      +'<td style="padding:9px 14px;text-align:center;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--amber)">'+_fmtM(c.escrow)+'đ</td>'
-      +'<td style="padding:9px 14px;text-align:center;font-size:10px;color:'+(cnStatusColor[c.status]||'var(--sub)')+'">'+( cnStatusLabel[c.status]||c.status)+'</td>'
+      +'<td style="padding:9px 14px"><div style="font-size:12px;font-weight:600;color:var(--text1)">'+c.name+'</div><div style="font-size:9px;color:var(--dim)">'+(c.phone||'')+'</div></td>'
+      +'<td style="padding:9px 14px">'+projCell+'</td>'
+      +'<td style="padding:9px 14px;text-align:center;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--amber)">'+stageCell+'</td>'
+      +'<td style="padding:9px 14px;text-align:center;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--amber)">'+escrowCell+'</td>'
+      +'<td style="padding:9px 14px;text-align:center;font-size:10px">'+statusCell+'</td>'
     +'</tr>';
   }).join('');
 
@@ -4164,6 +4172,9 @@ async function _loadMgData() {
     });
     if(typeof renderMgKts==='function') renderMgKts();
     if(typeof renderMgDn ==='function') renderMgDn();
+    // Nếu đang xem tab Thống kê thì render lại ngay
+    var statsPanel = document.getElementById('panelStats');
+    if(statsPanel && statsPanel.style.display !== 'none' && typeof renderStats==='function') renderStats();
   } catch(e){ console.error('[Founder mgData]', e); }
 }
 
