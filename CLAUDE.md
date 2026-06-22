@@ -80,6 +80,59 @@ Khi CN duyệt proposal: `projects/{pid}.stage` tự advance C1→C2→C3→C4, 
 
 Deploy: `firebase deploy --only functions`
 
+## Design System (QUAN TRỌNG — đọc trước khi thêm CSS)
+
+### File shared: `aln-tokens.css`
+Mọi trang đều import file này. **Không được xoá hoặc đổi tên.**
+
+```html
+<link rel="stylesheet" href="aln-tokens.css">          <!-- trang gốc -->
+<link rel="stylesheet" href="../aln-tokens.css">       <!-- trang trong subdir -->
+```
+
+### Responsive font-size — pattern bắt buộc
+Mọi trang mới phải dùng đúng pattern này trong `<style>`:
+```css
+html { font-size: 13px; }
+@media (min-width: 1440px) { html { font-size: 14px; } }
+@media (min-width: 1920px) { html { font-size: 16px; } }
+body { font-size: 1rem; /* kế thừa từ html */ }
+```
+→ Text tự scale: 13px (laptop) → 14px (1440p) → 16px (27" 1920p+)
+
+### Type scale — dùng cho code mới
+| Token | @13px | @16px | Dùng cho |
+|-------|-------|-------|---------|
+| `--text-2xs` | 9.1px | 11.2px | fine print tối thiểu |
+| `--text-xs` | 10.4px | 12.8px | label nhỏ |
+| `--text-sm` | 11.4px | 14px | text phụ |
+| `--text-base` | 13px | 16px | body |
+| `--text-md` | 14.3px | 17.6px | body nổi bật |
+| `--text-lg` | 16.9px | 20.8px | section heading |
+| `--text-xl` | 19.5px | 24px | heading |
+| `--text-2xl` | 26px | 32px | large heading |
+
+**Quy tắc:** KHÔNG dùng `font-size: 9px` hay `font-size: 10px` cứng. Dùng `var(--text-xs)` để chữ scale trên màn to.
+
+### Hai hệ màu song song (KHÔNG TRỘN)
+| Theme | Trang | Bg token | Text token |
+|-------|-------|----------|-----------|
+| **Dark luxury** | `founder_panel`, `login`, `*-apply`, `dn-studio` | `--bg: #080c14` | `--text1: #dce6f4` |
+| **Light professional** | `client_CN`, `client_DN`, `kts_dashboard`, `designer_dashboard` | `--ink: #f0f4f8` | `--text: #1e293b` |
+
+**Code mới dùng `--c-*` prefix** (canonical, không conflict theme):
+`--c-gold`, `--c-amber`, `--c-green`, `--c-red`, `--c-blue`, `--c-cyan`, `--c-purple`, `--c-violet`
+
+### Contrast tối thiểu (dark theme)
+| Token | Hex | Contrast vs `--bg` | Dùng cho |
+|-------|-----|-------------------|---------|
+| `--dim` | `#8090ae` | 6.8:1 ✅ | decorative labels, icon |
+| `--sub` | `#9aaac4` | 9.2:1 ✅ | secondary text |
+| `--text2` | `#bcc8dc` | 12:1 ✅ | content phụ |
+| `--text1` | `#dce6f4` | 14:1 ✅ | primary content |
+
+**KHÔNG dùng `opacity: 0.5` trên text** — dùng đúng token thay thế.
+
 ## Quy ước làm việc (QUAN TRỌNG)
 
 1. **GOM TẤT CẢ LỖI ĐỂ SỬA MỘT LẦN**: audit toàn bộ trước (`node --check` phần script, grep tìm hàm/biến thiếu), sửa một lần, không vá lẻ tẻ.
