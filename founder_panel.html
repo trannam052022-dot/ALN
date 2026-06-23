@@ -4208,7 +4208,7 @@ onAuthStateChanged(auth, async (user) => {
     }
     if (profile.role !== REQUIRED_ROLE) {
       // Sai vai trò → chuyển về đúng trang của vai trò đó (KHÔNG đăng xuất)
-      const PAGE_BY_ROLE = { founder:"founder_panel.html", kts:"kts_dashboard.html", dn:"client_DN.html", cn:"client_CN.html" };
+      const PAGE_BY_ROLE = { founder:"founder_panel.html", kts:"kts_dashboard.html", designer:"designer_dashboard.html", dn:"client_DN.html", cn:"client_CN.html" };
       window.location.replace(PAGE_BY_ROLE[profile.role] || "login.html");
       return;
     }
