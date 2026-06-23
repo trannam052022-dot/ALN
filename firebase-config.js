@@ -2,6 +2,7 @@
    ALN PLATFORM — Firebase Config (dùng chung 5 trang)
 ════════════════════════════════════════════════ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js";
 import {
   getAuth, initializeAuth,
   indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence, inMemoryPersistence,
@@ -31,6 +32,11 @@ const firebaseConfig = {
 };
 
 const app  = initializeApp(firebaseConfig);
+
+initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider('6LeuZi8tAAAAMfnZOHxH_xnLM8C0OpnexVgKFPb'),
+  isTokenAutoRefreshEnabled: true
+});
 
 /* Persistence đa tầng: nếu kho lưu trữ chính của trình duyệt lỗi
    (ví dụ sau khi tab bị crash), tự lùi xuống tầng kế tiếp thay vì mất phiên */
