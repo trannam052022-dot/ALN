@@ -77,6 +77,20 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .cn-proj-item.active .cpi-name{color:var(--gold)}
 .cpi-meta{font-size:10px;color:var(--muted);margin-top:2px}
 .cpi-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-badge{font-size:9px;padding:1px 6px;border-radius:20px;font-weight:700;display:inline-flex;align-items:center;gap:3px;flex-shrink:0;white-space:nowrap}
+.express-badge{background:var(--express);color:#fff}
+.pending-badge{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(217,119,6,.2)}
+/* Pending founder state */
+.pending-founder-state{background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:28px 24px;text-align:center;margin-bottom:0}
+.pf-icon{font-size:36px;margin-bottom:10px;line-height:1}
+.pf-title{font-family:var(--serif);font-size:17px;font-weight:600;font-style:italic;color:var(--text);margin-bottom:5px}
+.pf-sub{font-size:12px;color:var(--sub);margin-bottom:16px}
+.pf-pref{background:var(--ink4);border-radius:var(--r-sm);padding:10px 16px;display:inline-block;text-align:left;min-width:220px}
+.pf-pref-title{font-size:9px;color:var(--sub);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.pf-pref-val{font-size:12px;color:var(--text2);font-style:italic}
+.info-pf-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 14px}
+.info-pf-lbl{font-size:9px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
+.info-pf-val{font-size:13px;font-weight:600;color:var(--text)}
 
 /* ── MAIN CONTENT ── */
 .cn-header{padding:18px 24px 16px;border-bottom:1px solid var(--border);background:var(--ink2);box-shadow:var(--sh)}
@@ -1844,22 +1858,140 @@ function closeCallModal(){
 }
 document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeCallModal(); closeAnnotation(); }});
 
+/* ════════════════════════════════════════
+   PENDING FOUNDER — Màn hình chờ ghép KTS
+════════════════════════════════════════ */
+function _renderPendingFounder(p){
+  const isExpress = p.priority === 'express';
+  const pref = p.ktsPreference || {};
+
+  // Build sở thích text
+  function renderKtsPref(pref){
+    var parts = [];
+    if(pref.gender === 'male') parts.push('Nam');
+    else if(pref.gender === 'female') parts.push('Nữ');
+    if(pref.experience === 'junior') parts.push('Junior (1–3 năm)');
+    else if(pref.experience === 'senior') parts.push('Senior (5+ năm)');
+    if(pref.note) parts.push('"' + pref.note + '"');
+    return parts.length ? parts.join(' · ') : 'Không ưu tiên';
+  }
+
+  const prefText = renderKtsPref(pref);
+  const styleText = (p.stylePrefs||[]).join(', ') || '—';
+  const budgetMap = {thap:'Dưới 500 triệu', trung:'500tr – 1 tỷ', 'trung-cao':'1 – 2 tỷ', cao:'Trên 2 tỷ'};
+  const budgetText = budgetMap[p.budgetTier] || p.budgetTier || '—';
+
+  const subHtml = isExpress
+    ? `<div class="pf-sub" id="pfSub" style="color:var(--express)">
+         Express Lane · còn <span id="pfCountdown" style="font-weight:700">—</span>
+       </div>`
+    : `<div class="pf-sub" id="pfSub">Bình thường · Founder duyệt trong 24–48h</div>`;
+
+  document.getElementById('mainContent').innerHTML = `
+    <div style="padding:20px 24px">
+      <div class="pending-founder-state">
+        <div class="pf-icon">
+          <i class="ph-duotone ${isExpress ? 'ph-lightning' : 'ph-hourglass-medium'}"
+             style="color:${isExpress ? 'var(--express)' : 'var(--accent)'}"></i>
+        </div>
+        <div class="pf-title">Đang chờ Founder ALN duyệt ghép KTS</div>
+        ${subHtml}
+        <div class="pf-pref">
+          <div class="pf-pref-title">Gợi ý của bạn</div>
+          <div class="pf-pref-val">${prefText}</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+        <div class="info-pf-card">
+          <div class="info-pf-lbl">Công trình</div>
+          <div class="info-pf-val">${p.name||p.projectName||'—'}</div>
+        </div>
+        <div class="info-pf-card">
+          <div class="info-pf-lbl">Loại</div>
+          <div class="info-pf-val">${p.projectConstructionType||p.projectType||'—'}</div>
+        </div>
+        <div class="info-pf-card">
+          <div class="info-pf-lbl">Phong cách</div>
+          <div class="info-pf-val">${styleText}</div>
+        </div>
+        <div class="info-pf-card">
+          <div class="info-pf-lbl">Ngân sách</div>
+          <div class="info-pf-val">${budgetText}</div>
+        </div>
+        <div class="info-pf-card">
+          <div class="info-pf-lbl">Khu vực công trình</div>
+          <div class="info-pf-val">${p.projectProvince||'—'}</div>
+        </div>
+        <div class="info-pf-card">
+          <div class="info-pf-lbl">Nơi gặp KTS</div>
+          <div class="info-pf-val">${p.meetingProvince||'—'}</div>
+        </div>
+      </div>
+
+      ${isExpress ? `
+      <div style="display:flex;align-items:center;gap:10px;background:var(--express-bg);border:1px solid var(--express-border);border-radius:var(--r-sm);padding:10px 14px;margin-top:14px">
+        <i class="ph-duotone ph-info" style="color:var(--express);font-size:15px;flex-shrink:0"></i>
+        <span style="font-size:12px;color:var(--express);line-height:1.5">
+          Phí ưu tiên <strong>2.500.000đ</strong> sẽ được hoàn 100% nếu Founder không ghép được KTS trong 4h.
+        </span>
+      </div>` : ''}
+    </div>`;
+
+  // Khởi động countdown nếu Express
+  if(isExpress && p.founderDeadline){
+    _startPendingCountdown(p.founderDeadline);
+  }
+}
+
+function _startPendingCountdown(deadline){
+  var el = document.getElementById('pfCountdown');
+  if(!el) return;
+  var ts = deadline instanceof Date ? deadline.getTime()
+         : (deadline.toMillis ? deadline.toMillis() : Number(deadline));
+  function tick(){
+    var diff = ts - Date.now();
+    if(!document.getElementById('pfCountdown')) return; // đã unmount
+    if(diff <= 0){ el.textContent = 'Đã hết giờ'; return; }
+    var h = Math.floor(diff / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    el.textContent = h + 'h ' + m + 'm';
+    setTimeout(tick, 30000);
+  }
+  tick();
+}
+
 function renderSidebar(){
   if(window.PROJECTS_CLIENT.length===0){
     document.getElementById('projList').innerHTML='<div style="padding:20px 16px;display:flex;flex-direction:column;gap:8px">'
       +['','',''].map(()=>`<div style="display:flex;gap:8px;align-items:center"><div class="skeleton" style="width:8px;height:8px;border-radius:50%;flex-shrink:0"></div><div style="flex:1"><div class="skeleton" style="height:10px;margin-bottom:5px;border-radius:4px"></div><div class="skeleton" style="height:8px;width:60%;border-radius:4px"></div></div></div>`).join('')+'</div>';
     return;
   }
-  document.getElementById('projList').innerHTML=window.PROJECTS_CLIENT.map((p,idx)=>`
+  document.getElementById('projList').innerHTML=window.PROJECTS_CLIENT.map((p,idx)=>{
+    const isPending = p.status === 'pending_founder';
+    const isExpress = p.priority === 'express' && p.stage !== 'C4' && !isPending;
+    const newDocCount = (DOCS[p.id]||[]).filter(d=>d.isNew).length;
+    const statusBadge = isPending
+      ? `<span class="sb-badge pending-badge"><i class="ph-duotone ph-hourglass-medium"></i>Chờ ghép</span>`
+      : isExpress
+      ? `<span class="sb-badge express-badge"><i class="ph-duotone ph-lightning"></i>Gấp</span>`
+      : newDocCount > 0
+      ? `<span style="background:var(--green);color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:99px;flex-shrink:0">${newDocCount}</span>`
+      : '';
+    const metaText = isPending
+      ? `<span style="color:var(--amber)">Chờ Founder ghép KTS</span>`
+      : `${p.stage} · ${(p.kts||'').replace('KTS. ','')}`;
+    return `
     <div class="cn-proj-item proj-item-anim ${window.activeProj===p.id?'active':''}" style="animation-delay:${idx*40}ms" onclick="selectProj('${p.id}')">
-      <span class="cpi-dot" style="background:${STATUS_DOT[p.status]};box-shadow:0 0 4px ${STATUS_DOT[p.status]}66"></span>
+      <span class="cpi-dot" style="background:${STATUS_DOT[p.status]||'var(--muted)'};box-shadow:0 0 4px ${STATUS_DOT[p.status]||'var(--muted)'}66"></span>
       <div style="min-width:0;flex:1">
-        <div class="cpi-id">${'ALN-DN-'+(p.code||'').replace(/^ALN-/,'')}</div>
-        <div class="cpi-name">${p.name}</div>
-        <div class="cpi-meta">${p.stage} · ${p.kts.replace('KTS. ','')}</div>
+        <div class="cpi-id">${'ALN-DN-'+(p.code||p.id||'').replace(/^ALN-/,'')}</div>
+        <div class="cpi-name">${p.name||p.projectName||'—'}</div>
+        <div class="cpi-meta">${metaText}</div>
       </div>
-      ${(DOCS[p.id]||[]).filter(d=>d.isNew).length>0?`<span style="background:var(--green);color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:99px;flex-shrink:0">${(DOCS[p.id]||[]).filter(d=>d.isNew).length}</span>`:''}
-    </div>`).join('');
+      ${statusBadge}
+    </div>`;
+  }).join('');
 }
 
 /* ════════════════════════════════════════
@@ -1876,6 +2008,12 @@ function renderMain(){
   if(!p){
     document.getElementById('mainContent').innerHTML=
       '<div style="padding:40px;text-align:center;color:var(--muted)">Chọn công trình từ danh sách bên trái</div>';
+    return;
+  }
+
+  // Màn hình chờ Founder ghép cặp (ALN_SPEC_DN_EXTENSION Mục 7)
+  if(p.status === 'pending_founder'){
+    _renderPendingFounder(p);
     return;
   }
 
@@ -3881,7 +4019,46 @@ function openExpressModal(){
   var activeProjects = (window.PROJECTS_CLIENT || []).filter(function(p){
     return p.status === 'active' && p.stage !== 'C4';
   });
-  openNewProjectModal({ defaultPriority: 'express' });
+  if(activeProjects.length === 0){
+    // Không có dự án nào → tạo mới với Express chọn sẵn
+    openNewProjectModal({ defaultPriority: 'express' });
+    return;
+  }
+  // Có dự án active → hiện picker để chọn dự án nào muốn gắn Express
+  _showExpressPicker(activeProjects);
+}
+
+function _showExpressPicker(projects){
+  var existing = document.getElementById('expressPickerOverlay');
+  if(existing) existing.remove();
+  var list = projects.map(function(p){
+    return '<div class="ep-item" onclick="_closeExpressPicker();openNewProjectModal({defaultPriority:\'express\'})" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;transition:background .12s" onmouseover="this.style.background=\'rgba(200,90,58,.07)\'" onmouseout="this.style.background=\'\'">'
+      + '<i class="ph-duotone ph-lightning" style="color:var(--express);font-size:15px;flex-shrink:0"></i>'
+      + '<div><div style="font-size:12px;font-weight:600;color:var(--text)">' + (p.name||p.projectName||'—') + '</div>'
+      + '<div style="font-size:10px;color:var(--sub);">' + (p.stage||'') + ' · ' + ((p.kts||'').replace('KTS. ','')) + '</div></div>'
+      + '</div>';
+  }).join('');
+  var overlay = document.createElement('div');
+  overlay.id = 'expressPickerOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px';
+  overlay.innerHTML = '<div style="background:var(--ink2);border-radius:var(--r);box-shadow:0 20px 60px rgba(0,0,0,.18);width:100%;max-width:400px;overflow:hidden">'
+    + '<div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">'
+    + '<div style="font-family:var(--syne);font-size:14px;font-weight:800;color:var(--express)"><i class="ph-duotone ph-lightning"></i> Dự án Gấp</div>'
+    + '<button onclick="_closeExpressPicker()" style="width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center"><i class="ph-duotone ph-x"></i></button>'
+    + '</div>'
+    + '<div style="padding:12px 18px 6px;font-size:12px;color:var(--sub)">Chọn dự án muốn chạy Express, hoặc tạo dự án mới:</div>'
+    + list
+    + '<div style="padding:10px 14px 14px">'
+    + '<button onclick="_closeExpressPicker();openNewProjectModal({defaultPriority:\'express\'})" style="width:100%;padding:9px;background:var(--express);color:#fff;border:none;border-radius:var(--r-sm);font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">'
+    + '<i class="ph-duotone ph-plus"></i> Tạo dự án mới (Express)</button>'
+    + '</div></div>';
+  overlay.addEventListener('click', function(e){ if(e.target === overlay) _closeExpressPicker(); });
+  document.body.appendChild(overlay);
+}
+
+function _closeExpressPicker(){
+  var el = document.getElementById('expressPickerOverlay');
+  if(el) el.remove();
 }
 
 // submitNewProject — ghi vào Firestore matchingRequests
