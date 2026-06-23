@@ -1995,6 +1995,21 @@ function renderSidebar(){
 }
 
 /* ════════════════════════════════════════
+   UPDATE PROJECT STATUS — dùng bởi Realtime
+════════════════════════════════════════ */
+function updateProjectStatus(projectId, newStatus, ktsId, ktsName){
+  var proj = window.PROJECTS_CLIENT.find(function(x){ return x.id === projectId; });
+  if(proj){
+    proj.status = newStatus;
+    if(ktsName) proj.kts = ktsName.indexOf('KTS.') === -1 ? ('KTS. ' + ktsName) : ktsName;
+    if(ktsId) proj.ktsId = ktsId;
+    if(newStatus === 'active' && !proj.stage) proj.stage = 'C1';
+    renderSidebar();
+    if(window.activeProj === projectId) renderMain();
+  }
+}
+
+/* ════════════════════════════════════════
    REVIEW DATA — Phương án C1/C2 mỗi dự án
 ════════════════════════════════════════ */
 var REVIEW_DATA = {};
@@ -2741,6 +2756,36 @@ ALNRealtime.init({
     // Rating
     if(d.type==='KTS_RATED'){
       _addNotif('⭐',`<b>${d.projName}</b>: Chặng ${d.stage} được đánh giá ${d.score}/5 sao`, d.projectId);
+    }
+
+    // Founder đã ghép cặp thành công (ALN_SPEC_DN_EXTENSION Mục 8)
+    if(d.type==='MATCH_CONFIRMED'){
+      _addNotif(
+        '<i class="ph-duotone ph-handshake"></i>',
+        `Founder đã ghép <b>${d.ktsName||'KTS'}</b> cho dự án <b>${d.projectName||d.projectId}</b>`,
+        d.projectId
+      );
+      showToast(`✅ KTS ${d.ktsName||''} đã được ghép cặp!`, 't-green');
+      // Cập nhật UI từ pending_founder → active
+      updateProjectStatus(d.projectId, 'active', d.ktsId, d.ktsName);
+    }
+
+    // Express timeout — không tìm được KTS trong 4h (ALN_SPEC_DN_EXTENSION Mục 8)
+    if(d.type==='EXPRESS_TIMEOUT'){
+      _addNotif(
+        '<i class="ph-duotone ph-warning"></i>',
+        `Dự án Gấp <b>${d.projectName||d.projectId}</b> không ghép được KTS trong 4h — phí ưu tiên sẽ được hoàn`,
+        d.projectId
+      );
+      showToast(`⚠️ Dự án Gấp chuyển về Bình thường`, 't-amber');
+      // Hạ priority về normal, giữ nguyên pending_founder
+      const _epProj = window.PROJECTS_CLIENT.find(x=>x.id===d.projectId);
+      if(_epProj){
+        _epProj.priority = 'normal';
+        delete _epProj.founderDeadline;
+        renderSidebar();
+        if(window.activeProj===d.projectId) renderMain();
+      }
     }
   }
 });
@@ -3888,7 +3933,26 @@ window.alnLogout = async function(){
 let _npStep = 1;
 const NP_TOTAL = 3;
 
-function openNewProjectModal(opts){
+async function checkDnEligibility(){
+  try {
+    var { getDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    var { db } = await import('./firebase-config.js');
+    var uid = window.__ALN_UID;
+    if(!uid){ showToast('Chưa đăng nhập', 't-red'); return false; }
+    var snap = await getDoc(doc(db, 'users', uid));
+    if(snap.exists() && snap.data().membershipActive === false){
+      showToast('⚠️ Cần kích hoạt gói Thành viên để tạo dự án', 't-red');
+      return false;
+    }
+    return true;
+  } catch(e){
+    console.warn('checkDnEligibility error:', e);
+    return true; // fail-open: không chặn nếu lỗi đọc
+  }
+}
+
+async function openNewProjectModal(opts){
+  if(!(await checkDnEligibility())) return;
   opts = opts || {};
   _npStep = 1;
   _npRenderStep();
@@ -4068,13 +4132,22 @@ async function submitNewProject(formData){
   btn.innerHTML = '<i class="ph-spin ph-duotone ph-spinner-gap"></i> Đang gửi...';
   try {
     // Import Firestore functions nếu chưa có sẵn trong scope module
-    var { addDoc, collection, serverTimestamp, updateDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    var { addDoc, collection, serverTimestamp, updateDoc, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     var { db } = await import('./firebase-config.js');
+    // Mục 3: whitelabel override
+    var resolvedProjectType = formData.projectType || 'aln_direct';
+    try {
+      var _uid = window.__ALN_UID;
+      if(_uid){
+        var _usnap = await getDoc(doc(db, 'users', _uid));
+        if(_usnap.exists() && _usnap.data().whitelabel) resolvedProjectType = 'whitelabel';
+      }
+    } catch(e){}
     var projectRef = await addDoc(collection(db, 'matchingRequests'), {
       dnId: window.__ALN_UID || null,
       dnName: (window.__ALN_USER && window.__ALN_USER.name) || '',
       projectName: formData.name,
-      projectType: formData.projectType,
+      projectType: resolvedProjectType,
       projectConstructionType: formData.type,
       areaSqm: formData.area,
       projectProvince: formData.projectProvince,
