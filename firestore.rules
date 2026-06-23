@@ -7,6 +7,28 @@ service cloud.firestore {
         request.auth.uid == 'h4kEguPEyMcwJwl89stc0Q6j2si2';
     }
     function signedIn() { return request.auth != null; }
+    function isKts() {
+      return request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'kts';
+    }
+    function isDesigner() {
+      return request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'designer';
+    }
+    function isMemberOfProject(pid) {
+      let p = get(/databases/$(database)/documents/projects/$(pid)).data;
+      return request.auth.uid in p.memberUids ||
+        request.auth.uid == p.cn.uid ||
+        request.auth.uid == p.kts.uid ||
+        request.auth.uid == p.dn.uid;
+    }
+    function isMemberOfDesignProject(pid) {
+      let p = get(/databases/$(database)/documents/designProjects/$(pid)).data;
+      return request.auth.uid in p.memberUids ||
+        request.auth.uid == p.designer.uid ||
+        request.auth.uid == p.cn.uid ||
+        (p.dn != null && request.auth.uid == p.dn.uid);
+    }
 
     match /users/{uid} {
       allow read: if signedIn();
@@ -52,7 +74,7 @@ service cloud.firestore {
       allow delete: if isFounder();
 
       match /documents/{docId} {
-        allow read:   if signedIn();
+        allow read:   if isFounder() || (signedIn() && isMemberOfDesignProject(pid));
         allow create: if isFounder() ||
           (signedIn() && request.resource.data.uploader.uid == request.auth.uid);
         allow update, delete: if isFounder() ||
@@ -61,7 +83,7 @@ service cloud.firestore {
 
       match /stages/{sid} {
         allow read:  if signedIn();
-        allow write: if signedIn();
+        allow write: if isFounder() || isDesigner();
 
         match /proposals/{paId} {
           allow read:   if signedIn();
@@ -127,7 +149,7 @@ service cloud.firestore {
       allow delete: if isFounder();
 
       match /documents/{docId} {
-        allow read:   if signedIn();
+        allow read:   if isFounder() || (signedIn() && isMemberOfProject(pid));
         allow create: if isFounder() ||
           (signedIn() && request.resource.data.uploader.uid == request.auth.uid);
         allow update, delete: if isFounder() ||
@@ -136,7 +158,7 @@ service cloud.firestore {
 
       match /stages/{sid} {
         allow read:  if signedIn();
-        allow write: if signedIn();
+        allow write: if isFounder() || isKts();
 
         match /proposals/{paId} {
           allow read:   if signedIn();
