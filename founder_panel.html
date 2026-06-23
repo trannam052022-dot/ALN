@@ -944,6 +944,10 @@ body::after {
     style="padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px">
     <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></span>Trang Chủ nhà
   </button>
+  <button id="tabLiveDes" onclick="switchTab('liveDes')"
+    style="padding:5px 13px;border:1px solid rgba(124,58,237,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(124,58,237,.08);color:#a78bfa;display:flex;align-items:center;gap:5px">
+    <span style="width:6px;height:6px;border-radius:50%;background:#a78bfa;flex-shrink:0"></span>Trang Designer
+  </button>
 
   <div style="margin-left:auto;font-size:10px;color:var(--dim);font-family:var(--mono)">
     Founder Command · <span id="navClock"></span>
@@ -1513,6 +1517,26 @@ body::after {
     </a>
   </div>
   <iframe id="iframeCn" src="about:blank" data-src="client_CN.html"
+    style="flex:1;width:100%;border:none;min-height:calc(100vh - 84px)"
+    allow="same-origin"></iframe>
+</div>
+
+<!-- ══ PANEL: TRANG DESIGNER LIVE ══ -->
+<div id="panelLiveDes" style="display:none;flex-direction:column;flex:1;position:relative">
+  <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0">
+    <span style="width:8px;height:8px;border-radius:50%;background:#a78bfa;box-shadow:0 0 6px #a78bfa"></span>
+    <span style="font-size:11px;font-weight:700;color:#a78bfa;font-family:var(--mono)">LIVE — Trang Designer Nội thất</span>
+    <span style="font-size:10px;color:var(--dim)">designer_dashboard.html</span>
+    <button onclick="document.getElementById('iframeDes').src=document.getElementById('iframeDes').dataset.src"
+      style="margin-left:auto;padding:4px 10px;background:var(--raised);border:1px solid var(--border);color:var(--sub);border-radius:5px;font-size:10px;cursor:pointer;font-family:var(--sans)">
+      <i class="ph-duotone ph-arrow-clockwise"></i> Tải lại
+    </button>
+    <a href="designer_dashboard.html" target="_blank"
+      style="padding:4px 10px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);color:#a78bfa;border-radius:5px;font-size:10px;cursor:pointer;font-family:var(--sans);text-decoration:none">
+      <i class="ph-duotone ph-arrow-square-out"></i> Mở tab mới
+    </a>
+  </div>
+  <iframe id="iframeDes" src="about:blank" data-src="designer_dashboard.html"
     style="flex:1;width:100%;border:none;min-height:calc(100vh - 84px)"
     allow="same-origin"></iframe>
 </div>
@@ -2380,7 +2404,7 @@ window.ALNRealtime = (() => {
 ══════════════════════════════════════════ */
 
 function switchTab(t){
-  var ALL = ['projects','stats','mgKts','mgDn','mgCn','pending','payments','recruit','waitRoom','liveKts','liveDn','liveCn'];
+  var ALL = ['projects','stats','mgKts','mgDn','mgCn','pending','payments','recruit','waitRoom','liveKts','liveDn','liveCn','liveDes'];
   var activeStyle  = 'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.15);color:var(--blue);white-space:nowrap';
   var inactiveStyle= 'padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:var(--raised);color:var(--sub);white-space:nowrap';
   var liveStyles = {
@@ -2389,6 +2413,7 @@ function switchTab(t){
     liveKts: {active:'padding:5px 13px;border:1px solid rgba(245,158,11,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(245,158,11,.18);color:var(--amber);display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(245,158,11,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(245,158,11,.08);color:var(--amber);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     liveDn:  {active:'padding:5px 13px;border:1px solid rgba(59,130,246,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.2);color:var(--blue);display:flex;align-items:center;gap:5px;white-space:nowrap',   inactive:'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.08);color:var(--blue);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     liveCn:   {active:'padding:5px 13px;border:1px solid rgba(16,185,129,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.2);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap'},
+    liveDes:  {active:'padding:5px 13px;border:1px solid rgba(124,58,237,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.22);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap',   inactive:'padding:5px 13px;border:1px solid rgba(124,58,237,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.08);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap'},
     waitRoom: {active:'padding:5px 13px;border:1px solid rgba(167,139,250,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.22);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(167,139,250,.3);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.1);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap'},
     payments: {active:'padding:5px 13px;border:1px solid rgba(16,185,129,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.2);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap'},
   };
@@ -2418,7 +2443,7 @@ function switchTab(t){
   if(t==='waitRoom') loadWaitRoom();
 
   // LIVE iframes: chỉ tải khi vào tab, rời tab thì giải phóng bộ nhớ
-  var IFR = { liveKts:'iframeKts', liveDn:'iframeDn', liveCn:'iframeCn' };
+  var IFR = { liveKts:'iframeKts', liveDn:'iframeDn', liveCn:'iframeCn', liveDes:'iframeDes' };
   Object.keys(IFR).forEach(function(k){
     var f = document.getElementById(IFR[k]);
     if(!f) return;
