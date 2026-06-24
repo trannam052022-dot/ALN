@@ -3647,6 +3647,14 @@ onAuthStateChanged(auth, async (user) => {
       try { await updateDoc(doc(db,'users',window.__ALN_UID), { gender: sel.value }); } catch(e){}
     };
 
+    // Lưu profile toàn cục để MyMy truy cập
+    window.__ALN_PROFILE = profile;
+
+    // MyMy Onboarding — chạy 1 lần nếu chưa onboarded
+    if (!profile.mymy_dn_onboarded && profile.role === 'dn') {
+      setTimeout(function(){ if(window.openMymyOnboarding) window.openMymyOnboarding(); }, 1500);
+    }
+
     // ── WEB PUSH (FCM): đăng ký token tự động khi đã có quyền thông báo ──
     window.__ALN_UID = user.uid;
     window.alnInitPush = async function(){
@@ -3960,6 +3968,11 @@ async function checkDnEligibility(){
 
 async function openNewProjectModal(opts){
   if(!(await checkDnEligibility())) return;
+  // Nếu đã có đội KTS → dùng MyMy Brief thay vì form cũ
+  if(window.__ALN_PROFILE && window.__ALN_PROFILE.assignedStudioId) {
+    openMymyBrief();
+    return;
+  }
   opts = opts || {};
   _npStep = 1;
   _npRenderStep();
@@ -4195,6 +4208,512 @@ async function submitNewProject(formData){
     _npRenderStep();
   }
 }
+
+// ════════════════════════════════════════════════════
+//  MyMy DN — helpers
+// ════════════════════════════════════════════════════
+function _mmGr(p) {
+  var g = p ? p.gender : '';
+  if (g === 'male' || g === 'nam') return 'anh';
+  if (g === 'female' || g === 'nu') return 'chị';
+  return 'bạn';
+}
+function _mmCap(gr) { return gr === 'anh' ? 'Anh' : gr === 'chị' ? 'Chị' : 'Bạn'; }
+function _mmFirst(n) { var p = (n||'').trim().split(/\s+/); return p[p.length-1] || n || ''; }
+
+function _mmBubble(txt) {
+  return '<div class="dmm-bubble dmm-bubble-in">' + txt + '</div>';
+}
+function _mmUserBubble(txt) {
+  return '<div class="dmm-bubble dmm-bubble-out">' + txt + '</div>';
+}
+
+// ════════════════════════════════════════════════════
+//  GIAI ĐOẠN 1 — Onboarding
+// ════════════════════════════════════════════════════
+var _mmOb = { step: -1, data: {}, multiSel: {}, gr: 'bạn', cap: 'Bạn', fn: '' };
+
+var _mmObDefs = [
+  {
+    key: 'projectTypes', multi: true,
+    q: function(gr) { return 'Khách hàng của ' + gr + ' thường cần thiết kế loại công trình nào ạ? 🏗️'; },
+    chips: ['Nhà ở · Biệt thự','Căn hộ chung cư','Văn phòng','Nhà hàng · Café','Showroom · Cửa hàng','Khách sạn · Resort','Hỗn hợp nhiều loại']
+  },
+  {
+    key: 'monthlyVolume', multi: false,
+    q: function(gr) { return 'Mỗi tháng ' + gr + ' cần Studio thực hiện khoảng bao nhiêu dự án ạ?'; },
+    chips: ['1–3 dự án','4–10 dự án','Trên 10 dự án','Theo đợt — không cố định']
+  },
+  {
+    key: 'avgArea', multi: false,
+    q: function() { return 'Diện tích trung bình mỗi dự án thường khoảng bao nhiêu m² ạ?'; },
+    chips: ['Dưới 100m²','100–300m²','300–1000m²','Trên 1000m²']
+  },
+  {
+    key: 'docStage', multi: false,
+    q: function(gr, cap) { return cap + ' cần Studio cung cấp hồ sơ đến giai đoạn nào ạ? 📐'; },
+    chips: ['Ý tưởng + Phối cảnh 3D','Bản vẽ kỹ thuật thi công','Hồ sơ xin phép xây dựng','Trọn gói từ C1 đến C4']
+  },
+  {
+    key: 'timeline', multi: false,
+    q: function(gr) { return 'Khách hàng của ' + gr + ' thường yêu cầu tiến độ như thế nào ạ? ⏱️'; },
+    chips: ['Gấp — dưới 2 tuần','Tiêu chuẩn — khoảng 1 tháng','Linh hoạt — trên 1 tháng']
+  },
+  {
+    key: 'styles', multi: true,
+    q: function(gr) { return 'Khách hàng của ' + gr + ' thường yêu cầu phong cách nào nhiều nhất? (chọn nhiều được nha) 🎨'; },
+    chips: ['Hiện đại · Tối giản','Indochine · Đông Dương','Tân cổ điển','Scandinavian','Wabi-sabi · Japandi','Đa dạng · Không cố định']
+  },
+  {
+    key: 'budget', multi: false,
+    q: function(gr) { return 'Ngân sách thiết kế trung bình mỗi dự án của khách hàng ' + gr + ' khoảng bao nhiêu ạ? (phí thiết kế, chưa tính thi công)'; },
+    chips: ['Dưới 30 triệu','30–100 triệu','100–300 triệu','Trên 300 triệu']
+  },
+  {
+    key: 'requirements', multi: true,
+    q: function(gr, cap) { return cap + ' có yêu cầu đặc biệt nào với Studio không ạ? 📋 (chọn nhiều được)'; },
+    chips: ['Có KS kết cấu + M&E','Kinh nghiệm dự án cao cấp','Làm được hồ sơ xin phép','Bảo mật thông tin khách hàng','Không có yêu cầu đặc biệt']
+  }
+];
+
+window.openMymyOnboarding = function() {
+  var p = window.__ALN_PROFILE || {};
+  _mmOb.gr  = _mmGr(p);
+  _mmOb.cap = _mmCap(_mmOb.gr);
+  _mmOb.fn  = _mmFirst(p.name);
+  _mmOb.step = -1;
+  _mmOb.data = {};
+  _mmOb.multiSel = {};
+
+  var ov = document.getElementById('dmmObOverlay');
+  if (!ov) return;
+  ov.style.display = 'flex';
+  var body = document.getElementById('dmmObBody');
+  if (body) body.innerHTML = '';
+  // Tin chào
+  _mmObAppend(_mmBubble(
+    'Chào ' + _mmOb.gr + ' ' + _mmOb.fn + '! Em là MyMy 👋<br>' +
+    _mmOb.cap + ' đang cần tìm Studio KTS để thực hiện dự án thiết kế cho khách hàng của mình đúng không ạ?'
+  ));
+  setTimeout(function(){ _mmObNextStep(); }, 900);
+};
+
+function _mmObAppend(html) {
+  var body = document.getElementById('dmmObBody');
+  if (!body) return;
+  var div = document.createElement('div');
+  div.innerHTML = html;
+  body.appendChild(div.firstChild);
+  body.scrollTop = body.scrollHeight;
+}
+
+function _mmObNextStep() {
+  _mmOb.step++;
+  if (_mmOb.step >= _mmObDefs.length) { _mmObFinish(); return; }
+  var def = _mmObDefs[_mmOb.step];
+  _mmOb.multiSel[def.key] = [];
+  setTimeout(function(){
+    _mmObAppend(_mmBubble(def.q(_mmOb.gr, _mmOb.cap)));
+    setTimeout(function(){ _mmObRenderChips(def); }, 400);
+  }, 300);
+}
+
+function _mmObRenderChips(def) {
+  var body = document.getElementById('dmmObBody');
+  if (!body) return;
+  var wrap = document.createElement('div');
+  wrap.className = 'dmm-chips-wrap';
+  wrap.id = 'dmmObChips_' + def.key;
+
+  if (def.multi) {
+    var hint = document.createElement('div');
+    hint.className = 'dmm-chips-hint';
+    hint.textContent = 'Chọn một hoặc nhiều';
+    wrap.appendChild(hint);
+  }
+
+  def.chips.forEach(function(c) {
+    var chip = document.createElement('span');
+    chip.className = 'dmm-chip';
+    chip.textContent = c;
+    chip.onclick = function() {
+      if (def.multi) {
+        chip.classList.toggle('sel');
+        var arr = _mmOb.multiSel[def.key];
+        var idx = arr.indexOf(c);
+        if (idx === -1) arr.push(c); else arr.splice(idx, 1);
+      } else {
+        // single select → tiến ngay
+        var prev = wrap.querySelector('.dmm-chip.sel');
+        if (prev) prev.classList.remove('sel');
+        chip.classList.add('sel');
+        _mmOb.data[def.key] = c;
+        // disable chips
+        wrap.querySelectorAll('.dmm-chip').forEach(function(ch){ ch.style.pointerEvents='none'; });
+        // remove confirm btn if any
+        var cb = wrap.querySelector('.dmm-confirm-btn');
+        if (cb) cb.remove();
+        _mmObAppend(_mmUserBubble(c));
+        setTimeout(function(){ _mmObNextStep(); }, 300);
+      }
+    };
+    wrap.appendChild(chip);
+  });
+
+  if (def.multi) {
+    var btn = document.createElement('button');
+    btn.className = 'dmm-confirm-btn';
+    btn.textContent = 'Xác nhận →';
+    btn.onclick = function() {
+      var sel = _mmOb.multiSel[def.key];
+      if (!sel || sel.length === 0) { showToast('Vui lòng chọn ít nhất 1 mục', 't-red'); return; }
+      _mmOb.data[def.key] = sel.slice();
+      wrap.querySelectorAll('.dmm-chip').forEach(function(ch){ ch.style.pointerEvents='none'; });
+      btn.disabled = true;
+      _mmObAppend(_mmUserBubble(sel.join(' · ')));
+      setTimeout(function(){ _mmObNextStep(); }, 300);
+    };
+    wrap.appendChild(btn);
+  }
+
+  body.appendChild(wrap);
+  body.scrollTop = body.scrollHeight;
+}
+
+async function _mmObFinish() {
+  _mmObAppend(_mmBubble(
+    'Cảm ơn ' + _mmOb.gr + ' ' + _mmOb.fn + ' đã chia sẻ! Em đã ghi lại đầy đủ rồi ✅<br><br>' +
+    'ALN sẽ dựa vào thông tin này để ghép Studio KTS phù hợp nhất — KTS nhận được brief đầy đủ và bắt đầu ngay, không cần hỏi lại ' + _mmOb.gr + ' nhiều nữa.<br><br>' +
+    'Founder sẽ liên hệ trong 24–48h nha! 🙌'
+  ));
+  var btn = document.getElementById('dmmObDoneBtn');
+  if (btn) { btn.style.display = 'block'; btn.disabled = true; }
+
+  var uid = window.__ALN_UID;
+  if (!uid) return;
+  try {
+    await updateDoc(doc(db, 'users', uid), {
+      mymy_dn_onboarded: true,
+      dn_profile: {
+        projectTypes:   _mmOb.data.projectTypes   || [],
+        monthlyVolume:  _mmOb.data.monthlyVolume   || '',
+        avgArea:        _mmOb.data.avgArea          || '',
+        docStage:       _mmOb.data.docStage         || '',
+        timeline:       _mmOb.data.timeline         || '',
+        styles:         _mmOb.data.styles           || [],
+        budget:         _mmOb.data.budget           || '',
+        requirements:   _mmOb.data.requirements     || [],
+        onboardedAt:    serverTimestamp()
+      }
+    });
+    await addDoc(collection(db, 'founderTasks'), {
+      type: 'match_dn_studio',
+      dnId: uid,
+      dnName: (window.__ALN_PROFILE || {}).name || '',
+      dn_profile: _mmOb.data,
+      status: 'pending',
+      createdAt: serverTimestamp()
+    });
+    if (window.__ALN_PROFILE) window.__ALN_PROFILE.mymy_dn_onboarded = true;
+    if (btn) btn.disabled = false;
+  } catch(e) {
+    console.error('MyMy onboarding save error:', e);
+    showToast('Lỗi lưu thông tin: ' + e.message, 't-red');
+    if (btn) btn.disabled = false;
+  }
+}
+
+window.closeMymyOnboarding = function() {
+  var ov = document.getElementById('dmmObOverlay');
+  if (ov) ov.style.display = 'none';
+};
+
+// ════════════════════════════════════════════════════
+//  GIAI ĐOẠN 2 — Brief từng dự án
+// ════════════════════════════════════════════════════
+var _mmBr = { step: -1, data: {}, multiSel: {}, gr: 'bạn', cap: 'Bạn', fn: '' };
+
+var _mmBrDefs = [
+  {
+    key: 'projectType', multi: false,
+    q: function(gr) { return 'Khách hàng của ' + gr + ' cần thiết kế công trình gì ạ?'; },
+    chips: ['Nhà phố','Biệt thự','Căn hộ','Văn phòng','Nhà hàng','Showroom','Khác']
+  },
+  {
+    key: 'area', multi: false, freeInput: true,
+    q: function() { return 'Công trình này khoảng bao nhiêu m² ạ?'; },
+    chips: ['Dưới 50m²','50–100m²','100–300m²','Trên 300m²'],
+    placeholder: 'Nhập m² cụ thể...'
+  },
+  {
+    key: 'style', multi: false,
+    q: function() { return 'Khách hàng đang thích phong cách thiết kế nào ạ? 🎨'; },
+    chips: ['Hiện đại','Tối giản','Indochine','Tân cổ điển','Japandi','Chưa xác định']
+  },
+  {
+    key: 'budget', multi: false,
+    q: function() { return 'Ngân sách thiết kế khách hàng dự kiến khoảng bao nhiêu ạ?'; },
+    chips: ['Dưới 30tr','30–100tr','100–300tr','Trên 300tr']
+  },
+  {
+    key: 'timeline', multi: false,
+    q: function() { return 'Khách hàng cần hoàn thành hồ sơ trong bao lâu ạ?'; },
+    chips: ['Gấp dưới 2 tuần','1 tháng','Linh hoạt']
+  },
+  {
+    key: 'special', multi: false, freeInput: true,
+    q: function() { return 'Khách hàng có yêu cầu gì đặc biệt không ạ? Ví dụ phong thủy, vật liệu cụ thể, không gian cho thú cưng... 🐾'; },
+    chips: ['Phong thủy','Vật liệu xanh','Không gian trẻ em','Không có'],
+    placeholder: 'Hoặc nhập yêu cầu riêng...'
+  },
+  {
+    key: 'images', multi: false, upload: true,
+    q: function(gr, cap) { return cap + ' có hình ảnh tham khảo nào muốn gửi cho KTS không? 📸 (không bắt buộc)'; }
+  }
+];
+
+window.openMymyBrief = function() {
+  var p = window.__ALN_PROFILE || {};
+  _mmBr.gr  = _mmGr(p);
+  _mmBr.cap = _mmCap(_mmBr.gr);
+  _mmBr.fn  = _mmFirst(p.name);
+  _mmBr.step = -1;
+  _mmBr.data = {};
+  _mmBr.multiSel = {};
+
+  var ov = document.getElementById('dmmBrOverlay');
+  if (!ov) return;
+  ov.style.display = 'flex';
+  var body = document.getElementById('dmmBrBody');
+  if (body) body.innerHTML = '';
+  _mmBrAppend(_mmBubble('Chào ' + _mmBr.gr + ' ' + _mmBr.fn + '! Khách hàng mới cần thiết kế gì vậy ạ? 🏡'));
+  setTimeout(function(){ _mmBrNextStep(); }, 900);
+};
+
+function _mmBrAppend(html) {
+  var body = document.getElementById('dmmBrBody');
+  if (!body) return;
+  var div = document.createElement('div');
+  div.innerHTML = html;
+  body.appendChild(div.firstChild);
+  body.scrollTop = body.scrollHeight;
+}
+
+function _mmBrNextStep() {
+  _mmBr.step++;
+  if (_mmBr.step >= _mmBrDefs.length) { _mmBrFinish(); return; }
+  var def = _mmBrDefs[_mmBr.step];
+  setTimeout(function(){
+    _mmBrAppend(_mmBubble(def.q(_mmBr.gr, _mmBr.cap)));
+    setTimeout(function(){ _mmBrRenderInput(def); }, 400);
+  }, 300);
+}
+
+function _mmBrRenderInput(def) {
+  var body = document.getElementById('dmmBrBody');
+  if (!body) return;
+  var wrap = document.createElement('div');
+  wrap.className = 'dmm-chips-wrap';
+
+  if (def.upload) {
+    // Bước upload ảnh — có thể bỏ qua
+    var skipBtn = document.createElement('button');
+    skipBtn.className = 'dmm-confirm-btn';
+    skipBtn.style.background = 'transparent';
+    skipBtn.style.color = 'var(--sub)';
+    skipBtn.style.border = '1.5px solid var(--border2)';
+    skipBtn.textContent = 'Bỏ qua →';
+    skipBtn.onclick = function() {
+      _mmBr.data.images = [];
+      wrap.style.pointerEvents = 'none';
+      _mmBrAppend(_mmUserBubble('Bỏ qua'));
+      setTimeout(function(){ _mmBrNextStep(); }, 300);
+    };
+    var uploadBtn = document.createElement('label');
+    uploadBtn.className = 'dmm-confirm-btn';
+    uploadBtn.style.cursor = 'pointer';
+    uploadBtn.innerHTML = '📎 Chọn ảnh';
+    var fileInp = document.createElement('input');
+    fileInp.type = 'file'; fileInp.accept = 'image/*'; fileInp.multiple = true; fileInp.style.display = 'none';
+    fileInp.onchange = function() {
+      var names = Array.prototype.map.call(fileInp.files, function(f){ return f.name; }).join(', ');
+      _mmBr.data._imageFiles = fileInp.files;
+      _mmBr.data.images = names.split(', ');
+      wrap.style.pointerEvents = 'none';
+      _mmBrAppend(_mmUserBubble('📎 ' + names));
+      setTimeout(function(){ _mmBrNextStep(); }, 300);
+    };
+    uploadBtn.appendChild(fileInp);
+    wrap.appendChild(uploadBtn);
+    wrap.appendChild(skipBtn);
+    body.appendChild(wrap);
+    body.scrollTop = body.scrollHeight;
+    return;
+  }
+
+  if (def.freeInput) {
+    var inp = document.createElement('input');
+    inp.className = 'dmm-free-input';
+    inp.placeholder = def.placeholder || 'Nhập...';
+    wrap.appendChild(inp);
+  }
+
+  if (def.chips) {
+    def.chips.forEach(function(c) {
+      var chip = document.createElement('span');
+      chip.className = 'dmm-chip';
+      chip.textContent = c;
+      chip.onclick = function() {
+        var prev = wrap.querySelector('.dmm-chip.sel');
+        if (prev) prev.classList.remove('sel');
+        chip.classList.add('sel');
+        var val = c;
+        if (inp) inp.value = '';
+        _mmBr.data[def.key] = val;
+        wrap.style.pointerEvents = 'none';
+        _mmBrAppend(_mmUserBubble(val));
+        setTimeout(function(){ _mmBrNextStep(); }, 300);
+      };
+      wrap.appendChild(chip);
+    });
+  }
+
+  if (def.freeInput) {
+    var confirmBtn = document.createElement('button');
+    confirmBtn.className = 'dmm-confirm-btn';
+    confirmBtn.textContent = 'Xác nhận →';
+    confirmBtn.onclick = function() {
+      var val = (inp ? inp.value.trim() : '') || (_mmBr.data[def.key] || '');
+      if (!val) { showToast('Vui lòng nhập hoặc chọn một mục', 't-red'); return; }
+      _mmBr.data[def.key] = val;
+      wrap.style.pointerEvents = 'none';
+      _mmBrAppend(_mmUserBubble(val));
+      setTimeout(function(){ _mmBrNextStep(); }, 300);
+    };
+    wrap.appendChild(confirmBtn);
+  }
+
+  body.appendChild(wrap);
+  body.scrollTop = body.scrollHeight;
+}
+
+async function _mmBrFinish() {
+  _mmBrAppend(_mmBubble(
+    'Xong rồi! Em đã ghi lại đầy đủ ✅<br>' +
+    'KTS sẽ nhận được toàn bộ thông tin này và bắt đầu phác thảo ý tưởng C1 ngay.<br><br>' +
+    _mmBr.cap + ' sẽ nhận thông báo khi KTS có cập nhật mới nha! 🎯'
+  ));
+  var btn = document.getElementById('dmmBrDoneBtn');
+  if (btn) { btn.style.display = 'block'; btn.disabled = true; }
+
+  var uid = window.__ALN_UID;
+  var p   = window.__ALN_PROFILE || {};
+  if (!uid) return;
+  try {
+    var projectRef = await addDoc(collection(db, 'projects'), {
+      dnId: uid,
+      clientBrief: {
+        projectType:        _mmBr.data.projectType  || '',
+        area:               _mmBr.data.area          || '',
+        style:              _mmBr.data.style         || '',
+        budget:             _mmBr.data.budget        || '',
+        timeline:           _mmBr.data.timeline      || '',
+        specialRequirements:_mmBr.data.special       || '',
+        referenceImages:    _mmBr.data.images        || []
+      },
+      status: 'pending_c1',
+      assignedStudio: p.assignedStudioId || '',
+      createdAt: serverTimestamp(),
+      projectType: 'whitelabel'
+    });
+    if (p.assignedKtsId) {
+      await addDoc(collection(db, 'notifications'), {
+        toKtsId: p.assignedKtsId,
+        type: 'new_project_brief',
+        projectId: projectRef.id,
+        message: 'Có dự án mới từ DN — xem brief và bắt đầu C1',
+        createdAt: serverTimestamp()
+      });
+    }
+    if (btn) btn.disabled = false;
+  } catch(e) {
+    console.error('MyMy brief save error:', e);
+    showToast('Lỗi lưu brief: ' + e.message, 't-red');
+    if (btn) btn.disabled = false;
+  }
+}
+
+window.closeMymyBrief = function() {
+  var ov = document.getElementById('dmmBrOverlay');
+  if (ov) ov.style.display = 'none';
+};
 </script>
+
+<!-- ══════════════════════════════════════════════════
+     MyMy DN — CSS + HTML (Onboarding & Brief)
+════════════════════════════════════════════════════ -->
+<style>
+.dmm-overlay{position:fixed;inset:0;z-index:500;background:rgba(5,5,14,.82);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px}
+.dmm-modal{background:var(--ink2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:520px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.dmm-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(212,160,23,.07),transparent);flex-shrink:0}
+.dmm-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#c8940e,#e8c44a);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0;box-shadow:0 2px 10px rgba(212,160,23,.28);position:relative}
+.dmm-av-dot{position:absolute;bottom:1px;right:1px;width:10px;height:10px;border-radius:50%;background:#16a34a;border:2px solid var(--ink2)}
+.dmm-hd-name{font-weight:800;font-size:13px;color:var(--text);display:flex;align-items:center;gap:7px}
+.dmm-badge{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#c8940e;background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.28);padding:2px 8px;border-radius:99px}
+.dmm-hd-sub{font-size:11px;color:var(--sub);margin-top:2px}
+.dmm-close{margin-left:auto;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;line-height:1;border-radius:6px;transition:color .15s}
+.dmm-close:hover{color:var(--text)}
+.dmm-body{padding:16px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1;scroll-behavior:smooth}
+.dmm-body::-webkit-scrollbar{width:3px}
+.dmm-body::-webkit-scrollbar-thumb{background:rgba(212,160,23,.2);border-radius:99px}
+.dmm-bubble{max-width:84%;padding:10px 14px;border-radius:14px;font-size:12px;line-height:1.65;animation:fadeUp .2s ease}
+.dmm-bubble-in{background:var(--ink3);border:1px solid var(--border);color:var(--text2);align-self:flex-start;border-bottom-left-radius:4px}
+.dmm-bubble-out{background:linear-gradient(135deg,#c8940e,#d4a40f);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;border:none}
+.dmm-chips-wrap{display:flex;flex-wrap:wrap;gap:7px;padding:4px 0 8px}
+.dmm-chips-hint{width:100%;font-size:10px;color:var(--sub);margin-bottom:2px;letter-spacing:.02em}
+.dmm-chip{padding:5px 13px;border-radius:99px;border:1.5px solid var(--border2);font-size:11px;color:var(--text2);cursor:pointer;transition:all .15s;user-select:none}
+.dmm-chip:hover{border-color:rgba(212,160,23,.5);color:var(--text)}
+.dmm-chip.sel{border-color:#c8940e;background:rgba(212,160,23,.1);color:#c8940e;font-weight:600}
+.dmm-confirm-btn{margin-top:4px;padding:7px 18px;border-radius:99px;border:none;background:linear-gradient(135deg,#c8940e,#d4a40f);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.dmm-confirm-btn:hover{opacity:.88}
+.dmm-confirm-btn:disabled{opacity:.5;cursor:default}
+.dmm-free-input{width:100%;padding:8px 12px;border-radius:8px;border:1.5px solid var(--border2);background:var(--ink);color:var(--text);font-size:12px;font-family:inherit;outline:none;transition:border-color .15s}
+.dmm-free-input:focus{border-color:rgba(212,160,23,.6)}
+.dmm-done-btn{display:none;margin:12px 16px 16px;padding:10px;border-radius:10px;background:linear-gradient(135deg,#c8940e,#d4a40f);color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit;transition:opacity .15s;flex-shrink:0}
+.dmm-done-btn:hover{opacity:.88}
+.dmm-done-btn:disabled{opacity:.5;cursor:default}
+</style>
+
+<!-- Modal Giai đoạn 1: Onboarding -->
+<div class="dmm-overlay" id="dmmObOverlay" style="display:none">
+  <div class="dmm-modal" onclick="event.stopPropagation()">
+    <div class="dmm-head">
+      <div class="dmm-av">MM<div class="dmm-av-dot"></div></div>
+      <div>
+        <div class="dmm-hd-name">MyMy <span class="dmm-badge">ALN AI</span></div>
+        <div class="dmm-hd-sub">Trợ lý ghép Studio KTS</div>
+      </div>
+      <button class="dmm-close" onclick="closeMymyOnboarding()"><i class="ph-duotone ph-x"></i></button>
+    </div>
+    <div class="dmm-body" id="dmmObBody"></div>
+    <button class="dmm-done-btn" id="dmmObDoneBtn" onclick="closeMymyOnboarding()">Hoàn tất — Đóng ✓</button>
+  </div>
+</div>
+
+<!-- Modal Giai đoạn 2: Brief dự án -->
+<div class="dmm-overlay" id="dmmBrOverlay" style="display:none">
+  <div class="dmm-modal" onclick="event.stopPropagation()">
+    <div class="dmm-head">
+      <div class="dmm-av">MM<div class="dmm-av-dot"></div></div>
+      <div>
+        <div class="dmm-hd-name">MyMy <span class="dmm-badge">ALN AI</span></div>
+        <div class="dmm-hd-sub">Nhận brief dự án cho KTS</div>
+      </div>
+      <button class="dmm-close" onclick="closeMymyBrief()"><i class="ph-duotone ph-x"></i></button>
+    </div>
+    <div class="dmm-body" id="dmmBrBody"></div>
+    <button class="dmm-done-btn" id="dmmBrDoneBtn" onclick="closeMymyBrief()">Xem dự án →</button>
+  </div>
+</div>
 </body>
 </html>
