@@ -141,6 +141,15 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    match /matchingRequests/{id} {
+      allow create: if request.auth != null
+        && request.resource.data.dnId == request.auth.uid;
+      allow read: if request.auth != null
+        && resource.data.dnId == request.auth.uid;
+      allow update: if isFounder();
+      allow delete: if false;
+    }
+
     match /projects/{pid} {
       // Chỉ THÀNH VIÊN của dự án (CN/KTS/DN) hoặc Founder mới đọc được.
       // Mỗi nhánh khớp với 1 kiểu query: cn.uid (CN), kts.uid (KTS),
