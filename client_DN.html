@@ -4145,54 +4145,37 @@ function _closeExpressPicker(){
   if(el) el.remove();
 }
 
-// submitNewProject — ghi vào Firestore matchingRequests
+// submitNewProject — gọi Cloud Function createProjectForDN (không ghi Firestore trực tiếp)
 async function submitNewProject(formData){
   var btn = document.getElementById('npSubmitBtn');
   btn.disabled = true;
   btn.innerHTML = '<i class="ph-spin ph-duotone ph-spinner-gap"></i> Đang gửi...';
   try {
-    // Import Firestore functions nếu chưa có sẵn trong scope module
-    var { addDoc, collection, serverTimestamp, updateDoc, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    var { db } = await import('./firebase-config.js');
-    // Mục 3: whitelabel override
-    var resolvedProjectType = formData.projectType || 'aln_direct';
-    try {
-      var _uid = window.__ALN_UID;
-      if(_uid){
-        var _usnap = await getDoc(doc(db, 'users', _uid));
-        if(_usnap.exists() && _usnap.data().whitelabel) resolvedProjectType = 'whitelabel';
-      }
-    } catch(e){}
-    var projectRef = await addDoc(collection(db, 'matchingRequests'), {
-      dnId: window.__ALN_UID || null,
-      dnName: (window.__ALN_USER && window.__ALN_USER.name) || '',
-      projectName: formData.name,
-      projectType: resolvedProjectType,
-      projectConstructionType: formData.type,
-      areaSqm: formData.area,
-      projectProvince: formData.projectProvince,
-      meetingProvince: formData.meetingProvince,
-      stylePrefs: formData.styles,
-      budgetTier: formData.budget,
+    var { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
+    var { app } = await import('./firebase-config.js');
+    var fns = getFunctions(app, 'asia-southeast1');
+    var createProject = httpsCallable(fns, 'createProjectForDN');
+    var result = await createProject({
+      projectName:            formData.name,
+      projectType:            formData.projectType || 'aln_direct',
+      projectConstructionType:formData.type,
+      areaSqm:                formData.area,
+      projectProvince:        formData.projectProvince,
+      meetingProvince:        formData.meetingProvince,
+      stylePrefs:             formData.styles,
+      budgetTier:             formData.budget,
       ktsPreference: {
-        gender: formData.ktsGender,
+        gender:     formData.ktsGender,
         experience: formData.ktsExperience,
-        note: formData.ktsNote
+        note:       formData.ktsNote
       },
-      priority: formData.priority,
-      expressFee: formData.priority === 'express' ? 2500000 : 0,
-      status: 'pending_founder',
-      createdAt: serverTimestamp()
+      priority: formData.priority
     });
-    if(formData.priority === 'express'){
-      await updateDoc(doc(db, 'matchingRequests', projectRef.id), {
-        founderDeadline: new Date(Date.now() + 4*3600*1000)
-      });
-    }
+    var projectId = result.data && result.data.projectId;
     try {
       if(window.ALNRealtime && ALNRealtime.send) ALNRealtime.send({
         type: 'NEW_PROJECT_REQUEST',
-        projectId: projectRef.id,
+        projectId: projectId || '',
         priority: formData.priority,
         dnName: (window.__ALN_USER && window.__ALN_USER.name) || ''
       });

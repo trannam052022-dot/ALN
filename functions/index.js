@@ -318,6 +318,75 @@ exports.clearExpiredTemporaryLocations = functions
     return null;
   });
 
+/* ── DN tạo project mới qua Cloud Function (bypass client-side permissions) ── */
+exports.createProjectForDN = onCall(
+  { region: "asia-southeast1" },
+  async (request) => {
+    // 1. Xác thực
+    if (!request.auth) throw new HttpsError("unauthenticated", "Chưa đăng nhập");
+    const dnUid = request.auth.uid;
+
+    // 2. Kiểm tra role DN (hoặc founder)
+    const userSnap = await db.collection("users").doc(dnUid).get();
+    if (!userSnap.exists) throw new HttpsError("not-found", "Không tìm thấy tài khoản");
+    const userRole = (userSnap.data() || {}).role;
+    if (userRole !== "dn" && userRole !== "founder") {
+      throw new HttpsError("permission-denied", "Chỉ tài khoản DN mới tạo được yêu cầu");
+    }
+
+    // 3. Validate dữ liệu đầu vào
+    const p = request.data || {};
+    if (!p.projectName || typeof p.projectName !== "string" || !p.projectName.trim()) {
+      throw new HttpsError("invalid-argument", "Thiếu tên công trình");
+    }
+
+    // 4. Xác định frame type: white-label → navy, ALN-direct → gold
+    const isWhiteLabel = !!(p.projectType === "whitelabel" || (userSnap.data() || {}).whitelabel);
+    const frameType = isWhiteLabel ? "navy" : "gold";
+    const resolvedProjectType = isWhiteLabel ? "whitelabel" : (p.projectType || "aln_direct");
+
+    // 5. Ghi vào matchingRequests bằng Admin SDK (không bị chặn bởi security rules)
+    const docRef = await db.collection("matchingRequests").add({
+      dnId:                   dnUid,
+      dnName:                 (userSnap.data() || {}).name || "",
+      projectName:            p.projectName.trim(),
+      projectType:            resolvedProjectType,
+      projectConstructionType:p.projectConstructionType || "",
+      areaSqm:                p.areaSqm || "",
+      projectProvince:        p.projectProvince || "",
+      meetingProvince:        p.meetingProvince || "",
+      stylePrefs:             Array.isArray(p.stylePrefs) ? p.stylePrefs : [],
+      budgetTier:             p.budgetTier || "",
+      ktsPreference: {
+        gender:     p.ktsPreference && p.ktsPreference.gender     || "",
+        experience: p.ktsPreference && p.ktsPreference.experience || "",
+        note:       p.ktsPreference && p.ktsPreference.note       || "",
+      },
+      priority:    p.priority || "normal",
+      expressFee:  p.priority === "express" ? 2500000 : 0,
+      frameType,
+      status:      "pending_founder",
+      createdAt:   admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // 6. Express: đặt deadline cho Founder
+    if (p.priority === "express") {
+      await docRef.update({
+        founderDeadline: new Date(Date.now() + 4 * 3600 * 1000),
+      });
+    }
+
+    // 7. Thông báo Founder
+    await notifyFounder(
+      p.priority === "express" ? "⚡ Yêu cầu Express mới!" : "📋 Yêu cầu ghép KTS mới",
+      `${(userSnap.data() || {}).name || "DN"} — ${p.projectName.trim()}`,
+      { type: "NEW_PROJECT_REQUEST", projectId: docRef.id, priority: p.priority || "normal" }
+    );
+
+    return { ok: true, projectId: docRef.id };
+  }
+);
+
 /* ── KTS upload tài liệu → thông báo CN/DN ── */
 exports.onDocUploaded = functions
   .region("asia-southeast1")
