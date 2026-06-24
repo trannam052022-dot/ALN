@@ -2,7 +2,7 @@
    ALN PLATFORM — Firebase Config (dùng chung 5 trang)
 ════════════════════════════════════════════════ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js";
+// App Check được import động (dynamic) để debug token được set trước khi SDK load
 import {
   getAuth, initializeAuth,
   indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence, inMemoryPersistence,
@@ -33,9 +33,14 @@ const firebaseConfig = {
 
 const app  = initializeApp(firebaseConfig);
 
+// BƯỚC 1 — Set debug token TRƯỚC KHI load App Check SDK
 if (typeof self !== 'undefined') {
   self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 }
+// BƯỚC 2 — Dynamic import để đảm bảo token đã được set
+const { initializeAppCheck, ReCaptchaV3Provider } = await import(
+  "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js"
+);
 initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider('6LeuZi8tAAAAMfnZOHxH_xnLM8C0OpnexVgKFPb'),
   isTokenAutoRefreshEnabled: true
