@@ -387,6 +387,347 @@ exports.createProjectForDN = onCall(
   }
 );
 
+/* ════════════════════════════════════════════════════════════════
+   MyMy Agent Loop — DN
+   ════════════════════════════════════════════════════════════════ */
+
+const MYMY_MAX_ITER = 8;
+const MYMY_ALLOWLIST = [
+  "check_dn_exists","get_dn_profile","check_project_requirements",
+  "determine_frame_type","ask_user","request_confirmation",
+  "save_dn_profile","submit_new_project",
+];
+const MYMY_WRITE_TOOLS = ["save_dn_profile","submit_new_project"];
+
+const MYMY_TOOLS = [
+  {
+    name:"check_dn_exists",
+    description:"Kiểm tra DN đã có hồ sơ trên ALN hay chưa. Gọi đầu phiên để quyết định pha onboarding hay per-project. Chỉ đọc.",
+    input_schema:{type:"object",properties:{dn_id:{type:"string"}},required:["dn_id"]}
+  },
+  {
+    name:"get_dn_profile",
+    description:"Lấy hồ sơ DN đã lưu. Gọi khi cần thông tin DN để tạo project hoặc cá nhân hoá hội thoại. Chỉ đọc.",
+    input_schema:{type:"object",properties:{dn_id:{type:"string"}},required:["dn_id"]}
+  },
+  {
+    name:"check_project_requirements",
+    description:"Validate bản nháp project. Trả danh sách trường còn thiếu. Gọi sau khi thu thập brief, TRƯỚC khi xin xác nhận.",
+    input_schema:{type:"object",properties:{draft:{type:"object",properties:{title:{type:"string"},project_type:{type:"string"},scope:{type:"string"},budget_range:{type:"string"}}}},required:["draft"]}
+  },
+  {
+    name:"determine_frame_type",
+    description:"Xác định loại khung bản vẽ: white-label B2B → 'navy'; ALN-direct → 'gold'. LUÔN gọi tool này thay vì tự suy. Chỉ đọc.",
+    input_schema:{type:"object",properties:{is_white_label:{type:"boolean"}},required:["is_white_label"]}
+  },
+  {
+    name:"ask_user",
+    description:"Hỏi DN một thông tin còn thiếu. Mỗi lần hỏi một ý, tiếng Việt thân thiện. Kết thúc lượt sau khi gọi.",
+    input_schema:{type:"object",properties:{question:{type:"string"},field:{type:"string"}},required:["question"]}
+  },
+  {
+    name:"request_confirmation",
+    description:"BẮT BUỘC gọi trước mọi thao tác ghi. Hiển thị tóm tắt dữ liệu + badge frame + nút Xác nhận/Sửa lại. KHÔNG tự gọi tool ghi khi chưa được DN xác nhận. Kết thúc lượt.",
+    input_schema:{type:"object",properties:{action:{type:"string",enum:["save_dn_profile","submit_new_project"]},summary:{type:"string"},frame:{type:"string",enum:["gold","navy"]},payload:{type:"object"}},required:["action","summary","payload"]}
+  },
+  {
+    name:"save_dn_profile",
+    description:"Lưu hồ sơ DN khi kết thúc onboarding. CHỈ gọi sau khi đã qua request_confirmation và DN đã xác nhận.",
+    input_schema:{type:"object",properties:{dn_id:{type:"string"},profile:{type:"object",properties:{business_name:{type:"string"},industry:{type:"string"},contact_name:{type:"string"},contact_phone:{type:"string"},is_white_label:{type:"boolean"}},required:["business_name","contact_name"]}},required:["dn_id","profile"]}
+  },
+  {
+    name:"submit_new_project",
+    description:"Tạo project mới cho DN vào matchingRequests. CHỈ gọi sau khi đã qua request_confirmation và DN đã xác nhận. Nếu lỗi permission-denied, giải thích bằng tiếng Việt, không trả màn hình rỗng.",
+    input_schema:{type:"object",properties:{dn_id:{type:"string"},project:{type:"object",properties:{title:{type:"string"},project_type:{type:"string"},scope:{type:"string"},budget_range:{type:"string"},notes:{type:"string"}},required:["title","project_type"]}},required:["dn_id","project"]}
+  },
+];
+
+function mymyBuildSystemPrompt(dnName, state) {
+  const phase = state.onboarding_complete ? "per-project" : "onboarding";
+  return `Bạn là MyMy, trợ lý AI của ALN (App Làm Nhà) — nền tảng quản lý công trình xây dựng cao cấp.
+Bạn đang hỗ trợ Doanh nghiệp (DN) tên: ${dnName}.
+Pha hiện tại: ${phase}.
+
+${!state.onboarding_complete ? `PHa ONBOARDING: Thu thập thông tin hồ sơ DN (tên DN, lĩnh vực, người liên hệ, số điện thoại). Sau khi đủ, dùng request_confirmation → save_dn_profile.` : `PHA PER-PROJECT: Thu thập brief dự án (tên, loại, phạm vi, ngân sách). Sau khi đủ, dùng check_project_requirements → determine_frame_type → request_confirmation → submit_new_project.`}
+
+QUY TẮC BẮT BUỘC:
+1. Luôn gọi check_dn_exists ĐẦU phiên để biết pha.
+2. Trước khi ghi (save_dn_profile / submit_new_project): BẮT BUỘC gọi request_confirmation trước.
+3. KHÔNG tự ghi khi chưa có xác nhận của DN.
+4. Trả lời tiếng Việt, thân thiện, ngắn gọn như nhắn tin.
+5. Nếu thiếu thông tin, dùng ask_user hỏi từng ý một.
+6. Nếu lỗi permission-denied, giải thích cho DN và đề nghị thử lại — không trả trống.`;
+}
+
+async function mymySaveMessage(dnUid, role, text) {
+  await db.collection("mymy_sessions").doc(dnUid).collection("messages").add({
+    role, text, createdAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+async function mymyCallClaude(apiKey, systemPrompt, messages, tools) {
+  const resp = await fetch("https://api.anthropic.com/v1/messages", {
+    method:"POST",
+    headers:{
+      "x-api-key":apiKey,
+      "anthropic-version":"2023-06-01",
+      "content-type":"application/json",
+    },
+    body:JSON.stringify({
+      model:"claude-sonnet-4-6",
+      max_tokens:1024,
+      system:systemPrompt,
+      messages,
+      tools,
+    }),
+  });
+  if (!resp.ok) {
+    const err = await resp.text();
+    console.error("[runMyMyTurn] Claude error:", err);
+    throw new HttpsError("internal","Lỗi kết nối AI");
+  }
+  return resp.json();
+}
+
+async function mymyExecCheckDnExists(dnUid) {
+  const snap = await db.collection("users").doc(dnUid).get();
+  if (!snap.exists) return { ok:true, exists:false };
+  const d = snap.data() || {};
+  const onboarded = !!(d.mymy_dn_onboarded || (d.dn_profile && d.dn_profile.business_name));
+  return { ok:true, exists:onboarded };
+}
+
+async function mymyExecGetDnProfile(dnUid) {
+  const snap = await db.collection("users").doc(dnUid).get();
+  if (!snap.exists) return { ok:false, error:{ code:"not-found", message:"Không tìm thấy hồ sơ DN" } };
+  const d = snap.data() || {};
+  return { ok:true, profile:{ name:d.name||"", business_name:d.dn_profile&&d.dn_profile.business_name||d.name||"", industry:d.dn_profile&&d.dn_profile.industry||"", contact_name:d.dn_profile&&d.dn_profile.contact_name||d.name||"", is_white_label:!!(d.assignedStudioId), assignedStudioId:d.assignedStudioId||null } };
+}
+
+function mymyExecCheckProjectRequirements(draft) {
+  const required = ["title","project_type"];
+  const missing = required.filter(k => !draft[k] || String(draft[k]).trim()==="");
+  return { ok:true, valid:missing.length===0, missing };
+}
+
+async function mymyExecSaveDnProfile(dnUid, profile) {
+  try {
+    await db.collection("users").doc(dnUid).set({
+      dn_profile:{
+        business_name: profile.business_name||"",
+        industry:      profile.industry||"",
+        contact_name:  profile.contact_name||"",
+        contact_phone: profile.contact_phone||"",
+        is_white_label:!!profile.is_white_label,
+        onboardedAt:   admin.firestore.FieldValue.serverTimestamp(),
+      },
+      mymy_dn_onboarded: true,
+    },{ merge:true });
+    return { ok:true, dn_id:dnUid };
+  } catch(e) {
+    console.error("[mymyExecSaveDnProfile]",e);
+    return { ok:false, error:{ code:"internal", message:e.message } };
+  }
+}
+
+async function mymyExecSubmitNewProject(dnUid, project) {
+  try {
+    const userSnap = await db.collection("users").doc(dnUid).get();
+    const user = userSnap.exists ? userSnap.data() : {};
+    const isWhiteLabel = !!(user.assignedStudioId);
+    const frameType = isWhiteLabel ? "navy" : "gold";
+
+    const docRef = await db.collection("matchingRequests").add({
+      dnId:        dnUid,
+      dnName:      user.name||"",
+      projectName: (project.title||"").trim(),
+      projectType: project.project_type||"",
+      scope:       project.scope||"",
+      budget:      project.budget_range||"",
+      notes:       project.notes||"",
+      whitelabel:  isWhiteLabel,
+      frameType,
+      status:      "pending_founder",
+      created_via: "mymy",
+      createdAt:   admin.firestore.FieldValue.serverTimestamp(),
+    });
+    await notifyFounder(
+      "📋 Yêu cầu dự án mới từ MyMy",
+      `${user.name||"DN"} — ${(project.title||"").trim()}`,
+      { type:"NEW_PROJECT_REQUEST", projectId:docRef.id }
+    );
+    return { ok:true, projectId:docRef.id };
+  } catch(e) {
+    console.error("[mymyExecSubmitNewProject]",e);
+    const code = e.code==="permission-denied"?"permission-denied":"internal";
+    return { ok:false, error:{ code, message:e.message } };
+  }
+}
+
+exports.runMyMyTurn = onCall(
+  { region:"asia-southeast1", secrets:[ANTHROPIC_KEY] },
+  async (request) => {
+    if (!request.auth) throw new HttpsError("unauthenticated","Chưa đăng nhập");
+    const dnUid = request.auth.uid;
+    const { userMessage, confirmAction } = request.data || {};
+
+    const sessionRef = db.collection("mymy_sessions").doc(dnUid);
+    const sessionSnap = await sessionRef.get();
+    let state = sessionSnap.exists ? sessionSnap.data() : {
+      dn_id:dnUid, phase:"onboarding", onboarding_complete:false,
+      current_project_draft:{ title:null, project_type:null, is_white_label:false, scope:null, budget_range:null },
+      iteration_count:0, pending_confirmation:null, updated_at:null,
+    };
+
+    // Handle confirmation button (true = xác nhận, false = sửa lại)
+    if (confirmAction === true && state.pending_confirmation) {
+      const pc = state.pending_confirmation;
+      let result;
+      if (pc.action==="save_dn_profile") {
+        result = await mymyExecSaveDnProfile(dnUid, pc.payload.profile||pc.payload);
+      } else if (pc.action==="submit_new_project") {
+        result = await mymyExecSubmitNewProject(dnUid, pc.payload.project||pc.payload);
+      } else {
+        result = { ok:false, error:{ code:"unknown", message:"Hành động không xác định" } };
+      }
+      state.pending_confirmation = null;
+      let replyText;
+      if (result.ok) {
+        if (pc.action==="save_dn_profile") {
+          replyText = "Đã lưu hồ sơ thành công! ✅\n\nBây giờ bạn muốn tạo yêu cầu dự án mới không?";
+          state.onboarding_complete = true;
+          state.phase = "project";
+        } else {
+          replyText = `Đã tạo yêu cầu dự án thành công! 🎉\n\nFounder ALN sẽ xem xét và ghép KTS phù hợp cho bạn sớm nhất có thể. Bạn có thể theo dõi trạng thái trên dashboard nhé!`;
+          state.current_project_draft = { title:null, project_type:null, is_white_label:false, scope:null, budget_range:null };
+        }
+      } else {
+        if (result.error && result.error.code==="permission-denied") {
+          replyText = "Xin lỗi bạn, có lỗi quyền truy cập khi tạo dự án. Bạn thử lại được không ạ? Nếu vẫn lỗi, nhóm ALN sẽ hỗ trợ bạn trực tiếp.";
+        } else {
+          replyText = `Xin lỗi, có lỗi xảy ra: ${result.error&&result.error.message||"Lỗi không xác định"}. Bạn thử lại sau được không ạ?`;
+        }
+      }
+      await mymySaveMessage(dnUid,"assistant",replyText);
+      await sessionRef.set({ ...state, updated_at:admin.firestore.FieldValue.serverTimestamp() },{ merge:true });
+      return { reply:replyText, pending_confirmation:null };
+    }
+
+    if (confirmAction === false) {
+      state.pending_confirmation = null;
+      const cancelReply = "Được rồi bạn! Mình cùng xem lại thông tin và chỉnh sửa nhé. Bạn muốn thay đổi gì ạ?";
+      await mymySaveMessage(dnUid,"assistant",cancelReply);
+      await sessionRef.set({ ...state, pending_confirmation:null, updated_at:admin.firestore.FieldValue.serverTimestamp() },{ merge:true });
+      return { reply:cancelReply, pending_confirmation:null };
+    }
+
+    // Regular user message
+    if (!userMessage || !String(userMessage).trim()) {
+      throw new HttpsError("invalid-argument","Tin nhắn không được để trống");
+    }
+    await mymySaveMessage(dnUid,"user",userMessage);
+    state.iteration_count = 0;
+
+    // Load recent messages (N=20)
+    const msgsSnap = await db.collection("mymy_sessions").doc(dnUid)
+      .collection("messages").orderBy("createdAt","desc").limit(20).get();
+    const apiMessages = msgsSnap.docs.reverse().map(d => {
+      const m = d.data();
+      return { role:m.role, content:m.text||"" };
+    }).filter(m => m.role==="user"||m.role==="assistant");
+
+    const userSnap = await db.collection("users").doc(dnUid).get();
+    const dnName = (userSnap.exists ? userSnap.data().name : "") || "bạn";
+    const systemPrompt = mymyBuildSystemPrompt(dnName, state);
+    const apiKey = ANTHROPIC_KEY.value();
+
+    let finalReply = null;
+    let pendingConfirmation = null;
+
+    while (state.iteration_count < MYMY_MAX_ITER) {
+      const claudeData = await mymyCallClaude(apiKey, systemPrompt, apiMessages, MYMY_TOOLS);
+      const content = claudeData.content || [];
+      const toolUseBlocks = content.filter(b => b.type==="tool_use");
+      const textBlocks = content.filter(b => b.type==="text");
+
+      if (toolUseBlocks.length === 0) {
+        finalReply = textBlocks.map(b => b.text).join("\n");
+        break;
+      }
+
+      apiMessages.push({ role:"assistant", content });
+      const toolResults = [];
+      let breakLoop = false;
+
+      for (const tu of toolUseBlocks) {
+        const tName = tu.name;
+        const tInput = tu.input || {};
+
+        if (!MYMY_ALLOWLIST.includes(tName)) {
+          toolResults.push({ type:"tool_result", tool_use_id:tu.id, content:JSON.stringify({ ok:false, error:{ code:"not-allowed", message:"Tool không được phép" } }) });
+          continue;
+        }
+
+        if (MYMY_WRITE_TOOLS.includes(tName)) {
+          // Write without confirmation: reject and tell Claude
+          toolResults.push({ type:"tool_result", tool_use_id:tu.id, content:JSON.stringify({ ok:false, error:{ code:"confirmation-required", message:"Cần gọi request_confirmation và chờ người dùng xác nhận trước." } }) });
+          continue;
+        }
+
+        if (tName==="ask_user") {
+          finalReply = tInput.question;
+          breakLoop = true; break;
+        }
+        if (tName==="request_confirmation") {
+          pendingConfirmation = { action:tInput.action, summary:tInput.summary, frame:tInput.frame||null, payload:tInput.payload };
+          breakLoop = true; break;
+        }
+
+        let res;
+        if (tName==="check_dn_exists")            res = await mymyExecCheckDnExists(tInput.dn_id||dnUid);
+        else if (tName==="get_dn_profile")         res = await mymyExecGetDnProfile(tInput.dn_id||dnUid);
+        else if (tName==="check_project_requirements") res = mymyExecCheckProjectRequirements(tInput.draft||{});
+        else if (tName==="determine_frame_type")   res = { ok:true, frame:tInput.is_white_label?"navy":"gold" };
+        else res = { ok:false, error:{ code:"unknown", message:"Tool không xác định" } };
+
+        toolResults.push({ type:"tool_result", tool_use_id:tu.id, content:JSON.stringify(res) });
+      }
+
+      if (breakLoop) break;
+      if (toolResults.length) {
+        apiMessages.push({ role:"user", content:toolResults });
+      }
+      state.iteration_count++;
+    }
+
+    if (state.iteration_count >= MYMY_MAX_ITER && !finalReply && !pendingConfirmation) {
+      finalReply = "MyMy cần chuyển vấn đề này cho người phụ trách xử lý ạ. Bạn vui lòng chờ ALN liên hệ sớm nhé! 🙏";
+      console.warn("[runMyMyTurn] MAX_ITER reached for dn:", dnUid);
+    }
+
+    if (pendingConfirmation) state.pending_confirmation = pendingConfirmation;
+    await sessionRef.set({ ...state, updated_at:admin.firestore.FieldValue.serverTimestamp() },{ merge:true });
+    if (finalReply) await mymySaveMessage(dnUid,"assistant",finalReply);
+
+    return { reply:finalReply||null, pending_confirmation:pendingConfirmation||null };
+  }
+);
+
+exports.saveDnProfile = onCall(
+  { region:"asia-southeast1" },
+  async (request) => {
+    if (!request.auth) throw new HttpsError("unauthenticated","Chưa đăng nhập");
+    const dnUid = request.auth.uid;
+    const { profile } = request.data || {};
+    if (!profile || !profile.business_name || !profile.contact_name) {
+      throw new HttpsError("invalid-argument","Thiếu tên DN hoặc người liên hệ");
+    }
+    const result = await mymyExecSaveDnProfile(dnUid, profile);
+    if (!result.ok) throw new HttpsError("internal", result.error&&result.error.message||"Lỗi lưu hồ sơ");
+    return result;
+  }
+);
+
 /* ── KTS upload tài liệu → thông báo CN/DN ── */
 exports.onDocUploaded = functions
   .region("asia-southeast1")
