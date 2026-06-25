@@ -3650,10 +3650,16 @@ onAuthStateChanged(auth, async (user) => {
     // Lưu profile toàn cục để MyMy truy cập
     window.__ALN_PROFILE = profile;
 
-    // MyMy — hiển thị nút chat góc màn hình (không auto-open)
+    // MyMy — lần đầu chưa onboarded: tự mở; đã onboarded: chỉ hiện nút FAB
     if (profile.role === 'dn') {
       var fab = document.getElementById('mymyFab');
-      if (fab) fab.style.display = 'flex';
+      if (!profile.mymy_dn_onboarded) {
+        // Lần đầu: tự mở MyMy để onboarding
+        setTimeout(function(){ if(window.openMymyAgent) window.openMymyAgent('Chào mừng đến với ALN'); }, 1500);
+      } else {
+        // Đã onboarded: chỉ hiện nút FAB, không tự mở
+        if (fab) fab.style.display = 'flex';
+      }
     }
 
     // ── WEB PUSH (FCM): đăng ký token tự động khi đã có quyền thông báo ──
