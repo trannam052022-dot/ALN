@@ -3650,9 +3650,10 @@ onAuthStateChanged(auth, async (user) => {
     // Lưu profile toàn cục để MyMy truy cập
     window.__ALN_PROFILE = profile;
 
-    // MyMy Onboarding — chạy 1 lần nếu chưa onboarded (dùng Agent Loop)
-    if (!profile.mymy_dn_onboarded && profile.role === 'dn') {
-      setTimeout(function(){ if(window.openMymyAgent) window.openMymyAgent('Chào mừng đến với ALN'); }, 1500);
+    // MyMy — hiển thị nút chat góc màn hình (không auto-open)
+    if (profile.role === 'dn') {
+      var fab = document.getElementById('mymyFab');
+      if (fab) fab.style.display = 'flex';
     }
 
     // ── WEB PUSH (FCM): đăng ký token tự động khi đã có quyền thông báo ──
@@ -4697,6 +4698,12 @@ window.closeMymyBrief = function() {
     <div class="dmm-body" id="dmmBrBody"></div>
     <button class="dmm-done-btn" id="dmmBrDoneBtn" onclick="closeMymyBrief()">Xem dự án →</button>
   </div>
+</div>
+
+<!-- Nút FAB MyMy — góc phải màn hình -->
+<div id="mymyFab" onclick="openMymyAgent('Hỗ trợ ALN')" title="Chat với MyMy" style="display:none;position:fixed;bottom:24px;right:24px;z-index:500;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#c8940e,#e8c44a);box-shadow:0 4px 18px rgba(212,160,23,.45);cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:2px;border:none;transition:transform .18s,box-shadow .18s" onmouseenter="this.style.transform='scale(1.08)'" onmouseleave="this.style.transform='scale(1)'">
+  <span style="font-size:22px;line-height:1">💬</span>
+  <span style="font-size:8px;font-weight:800;color:#fff;letter-spacing:.04em;font-family:sans-serif">MyMy</span>
 </div>
 
 <!-- ══════════════════════════════════════════════════
