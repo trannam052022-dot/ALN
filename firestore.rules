@@ -196,5 +196,15 @@ service cloud.firestore {
         }
       }
     }
+
+    // MyMy Agent Loop — DN chỉ đọc session của chính mình; ghi qua Cloud Function
+    match /mymy_sessions/{dnId} {
+      allow read: if signedIn() && request.auth.uid == dnId;
+      allow write: if false;
+      match /messages/{msgId} {
+        allow read: if signedIn() && request.auth.uid == dnId;
+        allow write: if false;
+      }
+    }
   }
 }

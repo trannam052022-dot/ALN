@@ -3650,9 +3650,9 @@ onAuthStateChanged(auth, async (user) => {
     // Lưu profile toàn cục để MyMy truy cập
     window.__ALN_PROFILE = profile;
 
-    // MyMy Onboarding — chạy 1 lần nếu chưa onboarded
+    // MyMy Onboarding — chạy 1 lần nếu chưa onboarded (dùng Agent Loop)
     if (!profile.mymy_dn_onboarded && profile.role === 'dn') {
-      setTimeout(function(){ if(window.openMymyOnboarding) window.openMymyOnboarding(); }, 1500);
+      setTimeout(function(){ if(window.openMymyAgent) window.openMymyAgent('Chào mừng đến với ALN'); }, 1500);
     }
 
     // ── WEB PUSH (FCM): đăng ký token tự động khi đã có quyền thông báo ──
@@ -3970,7 +3970,7 @@ async function openNewProjectModal(opts){
   if(!(await checkDnEligibility())) return;
   // Nếu đã có đội KTS → dùng MyMy Brief thay vì form cũ
   if(window.__ALN_PROFILE && window.__ALN_PROFILE.assignedStudioId) {
-    openMymyBrief();
+    if(window.openMymyAgent) window.openMymyAgent('Tạo yêu cầu dự án mới');
     return;
   }
   opts = opts || {};
@@ -4698,5 +4698,236 @@ window.closeMymyBrief = function() {
     <button class="dmm-done-btn" id="dmmBrDoneBtn" onclick="closeMymyBrief()">Xem dự án →</button>
   </div>
 </div>
+
+<!-- ══════════════════════════════════════════════════
+     MyMy Agent Loop — Chat UI (DN)
+════════════════════════════════════════════════════ -->
+<style>
+/* Agent chat modal */
+.dma-overlay{position:fixed;inset:0;z-index:600;background:rgba(5,5,14,.85);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:16px}
+.dma-modal{background:var(--ink2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:540px;height:min(680px,90vh);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 28px 90px rgba(0,0,0,.65)}
+.dma-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(212,160,23,.07),transparent);flex-shrink:0}
+.dma-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#c8940e,#e8c44a);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0;box-shadow:0 2px 10px rgba(212,160,23,.28);position:relative}
+.dma-av-dot{position:absolute;bottom:1px;right:1px;width:10px;height:10px;border-radius:50%;background:#16a34a;border:2px solid var(--ink2)}
+.dma-close{margin-left:auto;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;line-height:1;border-radius:6px;transition:color .15s}
+.dma-close:hover{color:var(--text)}
+.dma-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.dma-messages::-webkit-scrollbar{width:3px}
+.dma-messages::-webkit-scrollbar-thumb{background:rgba(212,160,23,.2);border-radius:99px}
+.dma-bubble{max-width:85%;padding:10px 14px;border-radius:14px;font-size:12px;line-height:1.65;white-space:pre-wrap;word-break:break-word;animation:fadeUp .2s ease}
+.dma-bubble.in{background:var(--ink3);border:1px solid var(--border);color:var(--text2);align-self:flex-start;border-bottom-left-radius:4px}
+.dma-bubble.out{background:linear-gradient(135deg,#c8940e,#d4a40f);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;border:none}
+.dma-typing{display:flex;align-items:center;gap:5px;padding:8px 12px;background:var(--ink3);border:1px solid var(--border);border-radius:12px;align-self:flex-start;border-bottom-left-radius:4px}
+.dma-typing span{width:6px;height:6px;border-radius:50%;background:#c8940e;animation:dmaTyping 1.2s infinite}
+.dma-typing span:nth-child(2){animation-delay:.2s}
+.dma-typing span:nth-child(3){animation-delay:.4s}
+@keyframes dmaTyping{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+/* Confirmation gate */
+.dma-confirm-gate{margin:0 14px;padding:14px;background:var(--ink3);border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+.dma-confirm-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub)}
+.dma-confirm-summary{font-size:12px;color:var(--text2);line-height:1.6;white-space:pre-wrap}
+.dma-frame-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.dma-frame-badge.gold{background:rgba(212,160,23,.15);border:1.5px solid rgba(212,160,23,.5);color:#c8940e}
+.dma-frame-badge.navy{background:rgba(30,64,175,.15);border:1.5px solid rgba(30,64,175,.5);color:#60a5fa}
+.dma-confirm-btns{display:flex;gap:8px}
+.dma-btn-confirm{flex:1;padding:8px;border-radius:10px;border:none;background:linear-gradient(135deg,#c8940e,#d4a40f);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.dma-btn-confirm:hover{opacity:.88}
+.dma-btn-edit{flex:1;padding:8px;border-radius:10px;border:1.5px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.dma-btn-edit:hover{border-color:rgba(212,160,23,.5);color:var(--text)}
+/* Input area */
+.dma-input-area{display:flex;align-items:flex-end;gap:8px;padding:12px 14px 14px;border-top:1px solid var(--border);flex-shrink:0}
+.dma-input{flex:1;resize:none;padding:9px 12px;border-radius:10px;border:1.5px solid var(--border2);background:var(--ink);color:var(--text);font-size:12px;font-family:inherit;outline:none;max-height:80px;overflow-y:auto;transition:border-color .15s;line-height:1.5}
+.dma-input:focus{border-color:rgba(212,160,23,.6)}
+.dma-input:disabled{opacity:.5}
+.dma-send-btn{width:36px;height:36px;border-radius:10px;border:none;background:linear-gradient(135deg,#c8940e,#d4a40f);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .15s;flex-shrink:0}
+.dma-send-btn:hover{opacity:.88}
+.dma-send-btn:disabled{opacity:.4;cursor:default}
+@media(prefers-reduced-motion:reduce){.dma-typing span,.dma-bubble{animation:none}}
+</style>
+
+<!-- Modal MyMy Agent Chat -->
+<div class="dma-overlay" id="dmaOverlay" style="display:none" role="dialog" aria-modal="true" aria-label="MyMy Agent Chat">
+  <div class="dma-modal" onclick="event.stopPropagation()">
+    <div class="dma-head">
+      <div class="dma-av">MM<div class="dma-av-dot"></div></div>
+      <div>
+        <div class="dmm-hd-name">MyMy <span class="dmm-badge">Agent</span></div>
+        <div class="dmm-hd-sub" id="dmaSubtitle">Trợ lý AI ALN</div>
+      </div>
+      <button class="dma-close" onclick="closeMymyAgent()" aria-label="Đóng"><i class="ph-duotone ph-x"></i></button>
+    </div>
+    <div class="dma-messages" id="dmaMessages"></div>
+    <div class="dma-confirm-gate" id="dmaConfirmGate" style="display:none">
+      <div class="dma-confirm-title">Xác nhận thông tin</div>
+      <div class="dma-confirm-summary" id="dmaConfirmSummary"></div>
+      <div id="dmaFrameBadgeWrap"></div>
+      <div class="dma-confirm-btns">
+        <button class="dma-btn-confirm" onclick="dmaSendConfirm(true)">✓ Xác nhận</button>
+        <button class="dma-btn-edit" onclick="dmaSendConfirm(false)">✏ Sửa lại</button>
+      </div>
+    </div>
+    <div class="dma-input-area">
+      <textarea class="dma-input" id="dmaInput" rows="1" placeholder="Nhập tin nhắn..." aria-label="Tin nhắn cho MyMy"></textarea>
+      <button class="dma-send-btn" id="dmaSendBtn" onclick="dmaSend()" aria-label="Gửi">
+        <i class="ph-duotone ph-paper-plane-tilt"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── MyMy Agent Loop — Client ── */
+(function(){
+  var _dmaLoading = false;
+  var _dmaInited  = false;
+
+  function _dmaAppend(role, text) {
+    var box = document.getElementById('dmaMessages');
+    if (!box) return;
+    var d = document.createElement('div');
+    d.className = 'dma-bubble ' + (role === 'user' ? 'out' : 'in');
+    d.textContent = text;
+    box.appendChild(d);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function _dmaShowTyping() {
+    var box = document.getElementById('dmaMessages');
+    if (!box) return;
+    var t = document.createElement('div');
+    t.className = 'dma-typing'; t.id = 'dmaTyping';
+    t.innerHTML = '<span></span><span></span><span></span>';
+    box.appendChild(t);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function _dmaHideTyping() {
+    var t = document.getElementById('dmaTyping');
+    if (t) t.remove();
+  }
+
+  function _dmaSetLoading(v) {
+    _dmaLoading = v;
+    var inp = document.getElementById('dmaInput');
+    var btn = document.getElementById('dmaSendBtn');
+    var gate = document.getElementById('dmaConfirmGate');
+    if (inp) inp.disabled = v;
+    if (btn) btn.disabled = v;
+    if (gate) { gate.querySelectorAll('button').forEach(function(b){ b.disabled = v; }); }
+    if (v) _dmaShowTyping(); else _dmaHideTyping();
+  }
+
+  function _dmaShowConfirmGate(pc) {
+    var gate = document.getElementById('dmaConfirmGate');
+    var sumEl = document.getElementById('dmaConfirmSummary');
+    var badgeWrap = document.getElementById('dmaFrameBadgeWrap');
+    if (!gate || !sumEl) return;
+    sumEl.textContent = pc.summary || '';
+    badgeWrap.innerHTML = '';
+    if (pc.frame) {
+      var badge = document.createElement('span');
+      badge.className = 'dma-frame-badge ' + (pc.frame === 'navy' ? 'navy' : 'gold');
+      badge.textContent = pc.frame === 'navy' ? '🏢 White-label B2B' : '⭐ ALN Direct';
+      badgeWrap.appendChild(badge);
+    }
+    gate.style.display = 'flex';
+    gate.querySelector('.dma-btn-confirm').focus();
+  }
+
+  function _dmaHideConfirmGate() {
+    var gate = document.getElementById('dmaConfirmGate');
+    if (gate) gate.style.display = 'none';
+  }
+
+  async function _dmaCallTurn(payload) {
+    _dmaSetLoading(true);
+    try {
+      var { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
+      var { app } = await import('./firebase-config.js');
+      var fns = getFunctions(app, 'asia-southeast1');
+      var fn = httpsCallable(fns, 'runMyMyTurn');
+      var result = await fn(payload);
+      var data = result.data || {};
+      _dmaHideTyping();
+
+      if (data.reply) _dmaAppend('assistant', data.reply);
+
+      if (data.pending_confirmation) {
+        _dmaShowConfirmGate(data.pending_confirmation);
+      } else {
+        _dmaHideConfirmGate();
+      }
+    } catch(e) {
+      _dmaHideTyping();
+      var msg = e.message || 'Lỗi kết nối';
+      _dmaAppend('assistant', 'Xin lỗi, có lỗi xảy ra: ' + msg + '. Bạn thử lại nhé!');
+    }
+    _dmaSetLoading(false);
+  }
+
+  window.openMymyAgent = function(subtitle) {
+    var ov = document.getElementById('dmaOverlay');
+    if (!ov) return;
+    ov.style.display = 'flex';
+    var sub = document.getElementById('dmaSubtitle');
+    if (sub) sub.textContent = subtitle || 'Trợ lý AI ALN';
+
+    if (!_dmaInited) {
+      _dmaInited = true;
+      // Start the session with an empty greeting trigger
+      _dmaCallTurn({ userMessage: 'Xin chào' });
+    }
+    setTimeout(function(){
+      var inp = document.getElementById('dmaInput');
+      if (inp) inp.focus();
+    }, 200);
+  };
+
+  window.closeMymyAgent = function() {
+    var ov = document.getElementById('dmaOverlay');
+    if (ov) ov.style.display = 'none';
+  };
+
+  window.dmaSend = function() {
+    if (_dmaLoading) return;
+    var inp = document.getElementById('dmaInput');
+    if (!inp) return;
+    var text = inp.value.trim();
+    if (!text) return;
+    inp.value = '';
+    inp.style.height = '';
+    _dmaAppend('user', text);
+    _dmaHideConfirmGate();
+    _dmaCallTurn({ userMessage: text });
+  };
+
+  window.dmaSendConfirm = function(confirmed) {
+    if (_dmaLoading) return;
+    _dmaHideConfirmGate();
+    if (confirmed) {
+      _dmaAppend('user', 'Xác nhận ✓');
+    } else {
+      _dmaAppend('user', 'Sửa lại');
+    }
+    _dmaCallTurn({ confirmAction: confirmed });
+  };
+
+  // Auto-resize textarea
+  document.addEventListener('DOMContentLoaded', function() {
+    var inp = document.getElementById('dmaInput');
+    if (!inp) return;
+    inp.addEventListener('input', function() {
+      this.style.height = '';
+      this.style.height = Math.min(this.scrollHeight, 80) + 'px';
+    });
+    inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        window.dmaSend();
+      }
+    });
+  });
+})();
+</script>
 </body>
 </html>
