@@ -689,7 +689,9 @@ function renderDash(){
     setSteps(true,true,false,false);
     document.getElementById('cdMsg').innerHTML='Hồ sơ đã gửi — ALN đang xem xét, bạn sẽ được thông báo sớm.';
   } else {
-    lbl.textContent='Nộp hồ sơ ngay'; cta.onclick=openUploadSheet; cta.disabled=false;
+    lbl.textContent='Nộp hồ sơ ngay';
+    cta.onclick = (r.role==='architect') ? function(){ location.href='../kts-apply.html'; } : openUploadSheet;
+    cta.disabled=false;
     setSteps(true,false,false,false);
   }
 }
