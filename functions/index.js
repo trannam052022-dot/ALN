@@ -413,7 +413,7 @@ const MYMY_TOOLS = [
   {
     name:"check_project_requirements",
     description:"Validate bản nháp project. Trả danh sách trường còn thiếu. Gọi sau khi thu thập brief, TRƯỚC khi xin xác nhận.",
-    input_schema:{type:"object",properties:{draft:{type:"object",properties:{title:{type:"string"},project_type:{type:"string"},scope:{type:"string"},budget_range:{type:"string"}}}},required:["draft"]}
+    input_schema:{type:"object",properties:{draft:{type:"object",properties:{title:{type:"string"},project_type:{type:"string"},client_name:{type:"string"},client_phone:{type:"string"},project_location:{type:"string"},scope:{type:"string"},budget_range:{type:"string"}}}},required:["draft"]}
   },
   {
     name:"determine_frame_type",
@@ -438,25 +438,46 @@ const MYMY_TOOLS = [
   {
     name:"submit_new_project",
     description:"Tạo project mới cho DN vào matchingRequests. CHỈ gọi sau khi đã qua request_confirmation và DN đã xác nhận. Nếu lỗi permission-denied, giải thích bằng tiếng Việt, không trả màn hình rỗng.",
-    input_schema:{type:"object",properties:{dn_id:{type:"string"},project:{type:"object",properties:{title:{type:"string"},project_type:{type:"string"},scope:{type:"string"},budget_range:{type:"string"},notes:{type:"string"}},required:["title","project_type"]}},required:["dn_id","project"]}
+    input_schema:{type:"object",properties:{dn_id:{type:"string"},project:{type:"object",properties:{title:{type:"string"},project_type:{type:"string"},scope:{type:"string"},budget_range:{type:"string"},client_name:{type:"string"},client_phone:{type:"string"},project_location:{type:"string"},notes:{type:"string"}},required:["title","project_type","client_name"]}},required:["dn_id","project"]}
   },
 ];
 
 function mymyBuildSystemPrompt(dnName, state) {
   const phase = state.onboarding_complete ? "per-project" : "onboarding";
-  return `Bạn là MyMy, trợ lý AI của ALN (App Làm Nhà) — nền tảng quản lý công trình xây dựng cao cấp.
-Bạn đang hỗ trợ Doanh nghiệp (DN) tên: ${dnName}.
+  return `Bạn là MyMy, nhân viên chăm sóc khách hàng của ALN (App Làm Nhà) — nền tảng quản lý công trình xây dựng cao cấp.
+Bạn đang hỗ trợ Doanh nghiệp tên: ${dnName}.
 Pha hiện tại: ${phase}.
 
-${!state.onboarding_complete ? `PHa ONBOARDING: Thu thập thông tin hồ sơ DN (tên DN, lĩnh vực, người liên hệ, số điện thoại). Sau khi đủ, dùng request_confirmation → save_dn_profile.` : `PHA PER-PROJECT: Thu thập brief dự án (tên, loại, phạm vi, ngân sách). Sau khi đủ, dùng check_project_requirements → determine_frame_type → request_confirmation → submit_new_project.`}
+THÔNG TIN VỀ BẠN:
+- Tên: MyMy, nữ, khoảng 22 tuổi, nhẹ nhàng, ấm áp, tận tâm
+- XƯNG: "em" — gọi khách: "bạn" (hoặc "anh/chị" nếu khách dùng trước)
+- Ngôn ngữ: "dạ", "ạ", "nha", "á", "vậy hả" — như người thật nhắn tin
+- KHÔNG dùng dấu **, gạch đầu dòng, tiêu đề, đoạn văn dài
+- TUYỆT ĐỐI không nhận là AI hay chatbot
+
+HIỂU VỀ KHÁCH HÀNG DN (QUAN TRỌNG):
+- DN là các công ty xây dựng, thi công, hoặc tư vấn có thương hiệu riêng
+- Họ thuê studio KTS của ALN để có đội thiết kế phục vụ khách hàng của họ
+- Sản phẩm thiết kế vẫn mang THƯƠNG HIỆU của DN — không phải thương hiệu ALN
+- DN không làm thuê cho ai — họ chủ động thuê dịch vụ KTS để phục vụ khách của mình
+
+${!state.onboarding_complete ? `PHA ONBOARDING: Thu thập thông tin hồ sơ DN (tên công ty, lĩnh vực, người liên hệ, số điện thoại). Sau khi đủ, dùng request_confirmation → save_dn_profile.` : `PHA PER-PROJECT: Thu thập brief dự án cho KHÁCH HÀNG CỦA DN (không phải thông tin DN).
+Các thông tin cần có:
+- Tên dự án / công trình
+- Tên khách hàng của DN (chủ đầu tư)
+- Số điện thoại khách hàng
+- Địa điểm công trình
+- Loại công trình (nhà ở, văn phòng, thương mại...)
+- Phạm vi thiết kế
+- Ngân sách dự kiến
+Chỉ hỏi những gì còn thiếu, mỗi lần hỏi một ý. Sau khi đủ: check_project_requirements → determine_frame_type → request_confirmation → submit_new_project.`}
 
 QUY TẮC BẮT BUỘC:
 1. Luôn gọi check_dn_exists ĐẦU phiên để biết pha.
 2. Trước khi ghi (save_dn_profile / submit_new_project): BẮT BUỘC gọi request_confirmation trước.
 3. KHÔNG tự ghi khi chưa có xác nhận của DN.
-4. Trả lời tiếng Việt, thân thiện, ngắn gọn như nhắn tin.
-5. Nếu thiếu thông tin, dùng ask_user hỏi từng ý một.
-6. Nếu lỗi permission-denied, giải thích cho DN và đề nghị thử lại — không trả trống.`;
+4. Hỏi từng ý một bằng ask_user — không hỏi nhiều thứ cùng lúc.
+5. Nếu lỗi permission-denied, giải thích cho DN và đề nghị thử lại — không trả trống.`;
 }
 
 async function mymySaveMessage(dnUid, role, text) {
@@ -505,7 +526,7 @@ async function mymyExecGetDnProfile(dnUid) {
 }
 
 function mymyExecCheckProjectRequirements(draft) {
-  const required = ["title","project_type"];
+  const required = ["title","project_type","client_name"];
   const missing = required.filter(k => !draft[k] || String(draft[k]).trim()==="");
   return { ok:true, valid:missing.length===0, missing };
 }
@@ -538,18 +559,21 @@ async function mymyExecSubmitNewProject(dnUid, project) {
     const frameType = isWhiteLabel ? "navy" : "gold";
 
     const docRef = await db.collection("matchingRequests").add({
-      dnId:        dnUid,
-      dnName:      user.name||"",
-      projectName: (project.title||"").trim(),
-      projectType: project.project_type||"",
-      scope:       project.scope||"",
-      budget:      project.budget_range||"",
-      notes:       project.notes||"",
-      whitelabel:  isWhiteLabel,
+      dnId:            dnUid,
+      dnName:          user.name||"",
+      projectName:     (project.title||"").trim(),
+      projectType:     project.project_type||"",
+      scope:           project.scope||"",
+      budget:          project.budget_range||"",
+      clientName:      project.client_name||"",
+      clientPhone:     project.client_phone||"",
+      projectLocation: project.project_location||"",
+      notes:           project.notes||"",
+      whitelabel:      isWhiteLabel,
       frameType,
-      status:      "pending_founder",
-      created_via: "mymy",
-      createdAt:   admin.firestore.FieldValue.serverTimestamp(),
+      status:          "pending_founder",
+      created_via:     "mymy",
+      createdAt:       admin.firestore.FieldValue.serverTimestamp(),
     });
     await notifyFounder(
       "📋 Yêu cầu dự án mới từ MyMy",
