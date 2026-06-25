@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALN — Khung bản vẽ White-label</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0d1b2a;--navy2:#102030;
+  --gold:#d4a017;--gold2:#f0c040;--gold3:#b8860b;
+  --text:#e0d4b0;--text2:#8aaac8;--text3:#6a8aaa;
+  --border:#1c2a3a;--border2:#2a3d52;
+  --green:#16a34a;--green-bg:rgba(22,163,74,.12);
+  --sans:'Oswald',sans-serif;--syne:'Syne',sans-serif;
+  --wl-dark:#0f2a45;--wl-mid:#1a4060;
+  --wl-light:#e8f0f8;--wl-light2:#f0f6fc;--wl-light3:#f5f8fb;
+  --wl-accent:#1e5fa8;--wl-accent2:#2563eb;--wl-sub:#3a6a9a;
+  --wl-border:#c8daf0;
+}
+body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:13px;line-height:1.5;letter-spacing:.02em}
+
+.header{background:#071220;border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-left{display:flex;align-items:center;gap:14px}
+.header-logo-aln{font-family:var(--syne);font-size:18px;font-weight:800;background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.08em}
+.header-divider{width:1px;height:20px;background:var(--border2)}
+.header-logo-wl{font-family:var(--syne);font-size:14px;font-weight:800;color:var(--wl-accent2);letter-spacing:.06em}
+.header-badge{font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(37,99,235,.12);color:var(--wl-accent2);border:1px solid rgba(37,99,235,.3)}
+
+.tabs{display:flex;border-bottom:1px solid var(--border);background:#071220;padding:0 20px}
+.tab{padding:12px 18px;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;display:flex;align-items:center;gap:6px}
+.tab:hover{color:var(--text2)}
+.tab.active-gold{color:var(--gold);border-bottom-color:var(--gold)}
+.tab.active-blue{color:var(--wl-accent2);border-bottom-color:var(--wl-accent2)}
+
+.section{display:none;padding:20px}
+.section.active{display:block}
+
+/* FORM */
+.form-wrap{background:var(--navy2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.form-title{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;grid-column:1/-1}
+.form-subtitle{font-size:10px;color:var(--text3);grid-column:1/-1;margin-bottom:4px}
+.form-divider{grid-column:1/-1;height:1px;background:var(--border);margin:4px 0}
+.form-group{display:flex;flex-direction:column;gap:3px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
+.form-label span{color:var(--wl-accent2);font-size:9px}
+.form-input{background:var(--navy);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text);font-family:var(--sans);letter-spacing:.04em;outline:none;transition:border .15s;width:100%}
+.form-input:focus{border-color:var(--wl-accent2)}
+.form-select{background:var(--navy);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text);font-family:var(--sans);outline:none;width:100%}
+.update-btn{grid-column:1/-1;padding:9px;background:var(--wl-accent2);border:none;border-radius:8px;font-size:12px;font-weight:600;color:#fff;cursor:pointer;font-family:var(--sans);letter-spacing:.08em;text-transform:uppercase;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.update-btn:hover{opacity:.88}
+
+/* KHUNG BẢN VẼ */
+.bv-wrap{background:#8a8a80;padding:16px;border-radius:12px;display:flex;justify-content:center}
+.paper{background:#f0f0e8;width:100%;max-width:760px;aspect-ratio:420/297;position:relative;box-shadow:3px 3px 12px rgba(0,0,0,.4)}
+.sheet{position:absolute;top:1.68%;bottom:1.68%;left:1.19%;right:1.19%;background:#fff;border:1.5px solid var(--wl-dark)}
+.line-left{position:absolute;top:0;bottom:0;left:3.9%;border-left:.8px dashed #888;z-index:2}
+.line-right{position:absolute;top:0;bottom:0;left:86.59%;border-left:.8px dashed #888;z-index:2}
+.margin-left{position:absolute;top:0;bottom:0;left:0;width:3.9%;display:flex;align-items:center;justify-content:center}
+.margin-lbl{font-size:3.5px;color:#aaa;writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;font-family:'Oswald',sans-serif}
+.draw-area{position:absolute;top:0;bottom:0;left:3.9%;right:13.41%;display:flex;align-items:center;justify-content:center}
+.draw-inner{width:calc(100% - 6px);height:calc(100% - 6px);border:.5px dashed #ddd;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px}
+.draw-txt{font-family:'Oswald',sans-serif;font-size:7px;color:#bbb;text-align:center;line-height:1.8;font-weight:400;letter-spacing:.06em}
+.title-col{position:absolute;top:0;bottom:0;left:86.59%;right:0;display:flex;flex-direction:column;border-left:1.5px solid var(--wl-dark)}
+
+.tc-logo{flex:0 0 auto;border-bottom:1.5px solid var(--wl-dark);background:var(--wl-light);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 5px;gap:1px;min-height:9%}
+.tc-logo-role{font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:500;color:var(--wl-sub);letter-spacing:.16em;text-transform:uppercase;text-align:center}
+.tc-logo-name{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:var(--wl-dark);letter-spacing:.08em;line-height:1;text-align:center}
+.tc-logo-sub{font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:300;color:var(--wl-sub);letter-spacing:.08em;text-transform:uppercase;text-align:center}
+
+.tc-h{padding:2px 5px;border-bottom:.5px solid var(--wl-border);flex-shrink:0}
+.tc-h-gd{background:var(--wl-light2)}
+.tc-h-cdt{background:var(--wl-light3)}
+.tc-h-role{font-family:'Oswald',sans-serif;font-size:4px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--wl-accent)}
+.tc-h-name{font-family:'Oswald',sans-serif;font-size:4.5px;font-weight:400;color:#444;margin-top:1px;letter-spacing:.04em}
+.tc-ky-body{flex:1;padding:2px 4px;display:flex;flex-direction:column;justify-content:space-between}
+.tc-sig-area{flex:1;border:.5px dashed var(--wl-accent2);border-radius:1px;display:flex;align-items:center;justify-content:center;background:rgba(37,99,235,.04);min-height:14px}
+.tc-sig-ph{font-family:'Oswald',sans-serif;font-size:3.5px;color:var(--wl-accent2);letter-spacing:.06em}
+.tc-date{font-family:'Oswald',sans-serif;font-size:3px;color:#aaa;margin-top:1px;letter-spacing:.04em}
+.tc-gd{flex:1.4;border-bottom:1px solid var(--wl-border);background:var(--wl-light2);display:flex;flex-direction:column}
+.tc-cdt{flex:1.1;border-bottom:1px solid var(--wl-border);background:var(--wl-light3);display:flex;flex-direction:column}
+
+.tc-row{border-bottom:1px solid #ccc;display:flex;flex-direction:column;position:relative}
+.tc-row.ct{flex:.82}
+.tc-row.bv{flex:.4}
+.tc-lbl{position:absolute;top:1.5px;left:4px;font-family:'Oswald',sans-serif;font-size:3.8px;font-weight:600;color:#888;letter-spacing:.14em;text-transform:uppercase;z-index:1}
+.tc-val-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:7px 3px 0;text-align:center;position:relative}
+.tc-val-bv{font-family:'Oswald',sans-serif;font-size:5.5px;font-weight:600;color:#1a1a1a;text-transform:uppercase;letter-spacing:.05em;text-align:center;line-height:1.3}
+.tc-val-addr{position:absolute;bottom:2px;left:0;right:0;font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:300;color:#777;text-transform:uppercase;letter-spacing:.06em;text-align:center}
+.tc-grid{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #ccc;flex:.85}
+.tc-cell{padding:2px 4px;border-right:.5px solid #ddd;display:flex;flex-direction:column}
+.tc-cell:last-child{border-right:none}
+.tc-cell:nth-child(3),.tc-cell:nth-child(4){border-top:.5px solid #eee}
+.tc-cell-lbl{font-family:'Oswald',sans-serif;font-size:3.8px;font-weight:600;color:#888;letter-spacing:.12em;text-transform:uppercase;margin-bottom:1px}
+.tc-cell-val{font-family:'Oswald',sans-serif;font-size:6px;font-weight:500;color:#1a1a1a;letter-spacing:.04em}
+
+.sig{border-bottom:1px solid #ccc;flex:1;display:flex;flex-direction:column}
+.sig-h{padding:2px 4px;background:#f5f5f0;border-bottom:.5px solid #ddd;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.sig-role{font-family:'Oswald',sans-serif;font-size:4px;font-weight:600;color:#666;letter-spacing:.1em;text-transform:uppercase}
+.sig-name{font-family:'Oswald',sans-serif;font-size:5px;font-weight:500;color:#1a1a1a;letter-spacing:.03em}
+.sig-b{flex:1;padding:2px 4px;display:flex;flex-direction:column;justify-content:space-between}
+.sig-area{border:.5px dashed #bbb;border-radius:1px;flex:1;display:flex;align-items:center;justify-content:center;min-height:10px;margin-bottom:1px}
+.sig-area-txt{font-family:'Oswald',sans-serif;font-size:3.5px;color:#ccc;letter-spacing:.04em}
+.sig-area-signed{font-style:italic;font-size:7px;color:#1a1a1a;opacity:.65}
+.sig-date{font-family:'Oswald',sans-serif;font-size:3.5px;color:#888;letter-spacing:.04em}
+.sig.signed .sig-h{background:#f0f7f0}
+.sig.signed .sig-role{color:#16a34a}
+
+.sig-cn{flex:1.4;border-bottom:1px solid var(--wl-border);display:flex;flex-direction:column;background:var(--wl-light)}
+.sig-cn-h{padding:2px 5px;background:var(--wl-light);border-bottom:.5px solid var(--wl-border);border-top:.5px solid var(--wl-border);flex-shrink:0;display:flex;flex-direction:column;gap:1.5px}
+.sig-cn-role{font-family:'Oswald',sans-serif;font-size:4px;font-weight:700;color:var(--wl-accent);letter-spacing:.1em;text-transform:uppercase;line-height:1.2}
+.sig-cn-name{font-family:'Oswald',sans-serif;font-size:5px;font-weight:600;color:var(--wl-dark);letter-spacing:.04em}
+.sig-cn-b{flex:1;padding:2px 5px;display:flex;flex-direction:column;justify-content:space-between}
+.sig-cn-area{flex:1;border:.5px dashed var(--wl-accent2);border-radius:1px;display:flex;align-items:center;justify-content:center;background:rgba(37,99,235,.04);min-height:14px;margin-bottom:1px}
+.sig-cn-ph{font-family:'Oswald',sans-serif;font-size:3.5px;color:var(--wl-accent2);letter-spacing:.06em}
+
+.tc-foot{flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--wl-border)}
+.tc-foot-cell{padding:2px 4px;display:flex;flex-direction:column}
+.tc-foot-cell:first-child{border-right:.5px solid var(--wl-border)}
+.tc-foot-lbl{font-family:'Oswald',sans-serif;font-size:3.8px;font-weight:600;color:#888;letter-spacing:.12em;text-transform:uppercase;margin-bottom:1px}
+.tc-foot-val{font-family:'Oswald',sans-serif;font-size:5.5px;font-weight:500;color:#1a1a1a;letter-spacing:.04em}
+
+/* So sánh */
+.compare-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.compare-badge{font-size:11px;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:5px}
+.cb-change{background:rgba(37,99,235,.1);color:var(--wl-accent2);border:1px solid rgba(37,99,235,.25)}
+.cb-fixed{background:var(--green-bg);color:var(--green);border:1px solid rgba(22,163,74,.2)}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.info-card{background:var(--navy2);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.info-card-title{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.info-row{display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border)}
+.info-row:last-child{border:none}
+.info-key{color:var(--text3)}
+.info-val{color:var(--text2);font-weight:500}
+.info-val.blue{color:var(--wl-accent2)}
+.info-val.gold{color:var(--gold)}
+@media(max-width:600px){.info-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo-aln">ALN</div>
+    <div class="header-divider"></div>
+    <div class="header-logo-wl">White-label</div>
+  </div>
+  <div style="font-size:12px;color:var(--text3)">Khung bản vẽ · DN thuê Studio KTS</div>
+  <div class="header-badge">3 trường thay đổi</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active-blue" id="tab-btn-frame" onclick="switchTab('frame',this,'active-blue')">
+    <i class="ti ti-layout"></i>Khung White-label
+  </div>
+  <div class="tab" id="tab-btn-compare" onclick="switchTab('compare',this,'active-gold')">
+    <i class="ti ti-versions"></i>So sánh ALN vs White-label
+  </div>
+</div>
+
+<!-- KHUNG WHITE-LABEL -->
+<div class="section active" id="tab-frame">
+  <div class="form-wrap">
+    <div class="form-title">Thông tin DN thuê Studio KTS</div>
+    <div class="form-subtitle">Chỉ 3 trường thay đổi · Toàn bộ cấu trúc khung giữ nguyên</div>
+
+    <div class="form-group full">
+      <div class="form-label">Tên DN / Studio <span>← thay Logo ALN</span></div>
+      <input class="form-input" id="f-logo" value="SUNRISE STUDIO" placeholder="Tên Studio hoặc DN">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Người đại diện <span>← thay Giám đốc</span></div>
+      <input class="form-input" id="f-gd" value="KTS. Minh Khoa" placeholder="Tên người đại diện">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Chủ trì thiết kế <span>← KTS phân công</span></div>
+      <input class="form-input" id="f-ct-kts" value="KTS. Lan Anh" placeholder="KTS phụ trách">
+    </div>
+
+    <div class="form-divider"></div>
+
+    <div class="form-group">
+      <div class="form-label">Chủ đầu tư</div>
+      <input class="form-input" id="f-cdt" value="Công ty CP Sunrise" placeholder="Tên chủ đầu tư">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Công trình</div>
+      <input class="form-input" id="f-congTrinh" value="Trụ sở Sunrise Group" placeholder="Tên công trình">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Địa chỉ</div>
+      <input class="form-input" id="f-dc" value="Bình Thạnh · TP.HCM" placeholder="Địa chỉ">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Tên bản vẽ</div>
+      <input class="form-input" id="f-bv" value="Mặt bằng tầng 1" placeholder="Tên bản vẽ">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Số hiệu</div>
+      <input class="form-input" id="f-sh" value="KT-01" placeholder="KT-01">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Tỷ lệ</div>
+      <select class="form-select" id="f-tl">
+        <option>1:50</option><option selected>1:100</option><option>1:200</option><option>1:500</option><option>NTS</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <div class="form-label">Mã dự án ALN</div>
+      <input class="form-input" id="f-ma" value="ALN-2089" placeholder="ALN-XXXX">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Tờ số / Tổng</div>
+      <input class="form-input" id="f-to" value="01 / 12" placeholder="01 / 10">
+    </div>
+
+    <button class="update-btn" onclick="updateFrame()">
+      <i class="ti ti-refresh" style="font-size:14px"></i>Cập nhật khung bản vẽ
+    </button>
+  </div>
+
+  <div class="bv-wrap">
+    <div class="paper">
+      <div class="sheet">
+        <div class="line-left"></div>
+        <div class="line-right"></div>
+        <div class="margin-left"><div class="margin-lbl">16mm · đóng quyển</div></div>
+        <div class="draw-area">
+          <div class="draw-inner">
+            <div class="draw-txt" id="d-bv-vung">MẶT BẰNG TẦNG 1</div>
+            <div class="draw-txt" style="font-size:5px">BỘ MÔN THỂ HIỆN NỘI DUNG TẠI ĐÂY</div>
+          </div>
+        </div>
+        <div class="title-col">
+          <div class="tc-logo">
+            <div class="tc-logo-role">Studio thiết kế</div>
+            <div class="tc-logo-name" id="d-logo-name">SUNRISE STUDIO</div>
+            <div class="tc-logo-sub">Kiến trúc · Nội thất</div>
+          </div>
+          <div class="tc-gd">
+            <div class="tc-h tc-h-gd">
+              <div class="tc-h-role">Người đại diện</div>
+              <div class="tc-h-name" id="d-gd">KTS. Minh Khoa</div>
+            </div>
+            <div class="tc-ky-body">
+              <div class="tc-sig-area"><span class="tc-sig-ph">Dấu &amp; Ký</span></div>
+              <div class="tc-date">Ngày: ___/___/______</div>
+            </div>
+          </div>
+          <div class="tc-cdt">
+            <div class="tc-h tc-h-cdt">
+              <div class="tc-h-role">Chủ đầu tư</div>
+              <div class="tc-h-name" id="d-cdt">Công ty CP Sunrise</div>
+            </div>
+            <div class="tc-ky-body">
+              <div class="tc-sig-area"><span class="tc-sig-ph">Dấu &amp; Ký</span></div>
+              <div class="tc-date">Ngày: ___/___/______</div>
+            </div>
+          </div>
+          <div class="tc-row ct">
+            <span class="tc-lbl">Công trình</span>
+            <div class="tc-val-wrap">
+              <div class="tc-val-bv" id="d-ct">TRỤ SỞ SUNRISE GROUP</div>
+              <div class="tc-val-addr" id="d-dc">Bình Thạnh · TP.HCM</div>
+            </div>
+          </div>
+          <div class="tc-row bv">
+            <span class="tc-lbl">Tên bản vẽ</span>
+            <div class="tc-val-wrap">
+              <div class="tc-val-bv" id="d-bv">MẶT BẰNG TẦNG 1</div>
+            </div>
+          </div>
+          <div class="tc-grid">
+            <div class="tc-cell"><div class="tc-cell-lbl">Số hiệu</div><div class="tc-cell-val" id="d-sh">KT-01</div></div>
+            <div class="tc-cell"><div class="tc-cell-lbl">Tỷ lệ</div><div class="tc-cell-val" id="d-tl">1:100</div></div>
+            <div class="tc-cell"><div class="tc-cell-lbl">Rev.</div><div class="tc-cell-val">01</div></div>
+            <div class="tc-cell"><div class="tc-cell-lbl">Ngày</div><div class="tc-cell-val" id="d-ng"></div></div>
+          </div>
+          <div class="sig">
+            <div class="sig-h"><div class="sig-role">Kiến trúc sư</div><div class="sig-name" id="d-kts">KTS. Lan Anh</div></div>
+            <div class="sig-b"><div class="sig-area"><span class="sig-area-txt">Chờ ký</span></div><div class="sig-date"></div></div>
+          </div>
+          <div class="sig">
+            <div class="sig-h"><div class="sig-role">KS. Kết cấu</div><div class="sig-name">KS. Minh Đức</div></div>
+            <div class="sig-b"><div class="sig-area"><span class="sig-area-txt">Chờ ký</span></div><div class="sig-date"></div></div>
+          </div>
+          <div class="sig">
+            <div class="sig-h"><div class="sig-role">KS. M&amp;E</div><div class="sig-name">KS. Thanh Hà</div></div>
+            <div class="sig-b"><div class="sig-area"><span class="sig-area-txt">Chờ ký</span></div><div class="sig-date"></div></div>
+          </div>
+          <div class="sig-cn">
+            <div class="sig-cn-h">
+              <div class="sig-cn-role">Chủ trì thiết kế</div>
+              <div class="sig-cn-name" id="d-ct-kts">KTS. Lan Anh</div>
+            </div>
+            <div class="sig-cn-b">
+              <div class="sig-cn-area"><span class="sig-cn-ph">Ký sau cùng</span></div>
+              <div class="tc-date">Ngày: ___/___/______</div>
+            </div>
+          </div>
+          <div class="tc-foot">
+            <div class="tc-foot-cell"><div class="tc-foot-lbl">Mã dự án</div><div class="tc-foot-val" id="d-ma">ALN-2089</div></div>
+            <div class="tc-foot-cell"><div class="tc-foot-lbl">Tờ số</div><div class="tc-foot-val" id="d-to">01 / 12</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-row">
+    <div class="compare-badge cb-change"><i class="ti ti-refresh" style="font-size:12px"></i>Tên DN / Studio</div>
+    <div class="compare-badge cb-change"><i class="ti ti-refresh" style="font-size:12px"></i>Người đại diện</div>
+    <div class="compare-badge cb-change"><i class="ti ti-refresh" style="font-size:12px"></i>Chủ trì thiết kế</div>
+    <div class="compare-badge cb-fixed"><i class="ti ti-lock" style="font-size:12px"></i>KS Kết cấu · M&E</div>
+    <div class="compare-badge cb-fixed"><i class="ti ti-lock" style="font-size:12px"></i>Cấu trúc khung</div>
+    <div class="compare-badge cb-fixed"><i class="ti ti-lock" style="font-size:12px"></i>Mã dự án ALN ẩn danh</div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-card-title">White-label · Thay đổi</div>
+      <div class="info-row"><span class="info-key">Ô logo</span><span class="info-val blue">Tên DN / Studio thuê</span></div>
+      <div class="info-row"><span class="info-key">Người đại diện</span><span class="info-val blue">GĐ / Đại diện DN thuê</span></div>
+      <div class="info-row"><span class="info-key">Chủ trì thiết kế</span><span class="info-val blue">KTS Founder phân công</span></div>
+      <div class="info-row"><span class="info-key">Màu phối</span><span class="info-val blue">Navy #2563eb</span></div>
+      <div class="info-row"><span class="info-key">ALN xuất hiện</span><span class="info-val">Không — ẩn danh hoàn toàn</span></div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-title">ALN trực tiếp · Giữ nguyên</div>
+      <div class="info-row"><span class="info-key">Ô logo</span><span class="info-val gold">ALN gradient vàng</span></div>
+      <div class="info-row"><span class="info-key">Giám đốc</span><span class="info-val gold">Lý Mỹ Linh</span></div>
+      <div class="info-row"><span class="info-key">Ô cuối</span><span class="info-val gold">Thẩm tra · Chủ nhiệm · Trần Đại Long</span></div>
+      <div class="info-row"><span class="info-key">Màu phối</span><span class="info-val gold">Vàng gold #d4a017</span></div>
+      <div class="info-row"><span class="info-key">ALN xuất hiện</span><span class="info-val gold">Có — đầy đủ pháp nhân</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SO SÁNH -->
+<div class="section" id="tab-compare">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <!-- ALN -->
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;text-align:center;margin-bottom:8px">ALN trực tiếp · Vàng gold</div>
+      <div class="bv-wrap" style="padding:10px">
+        <div class="paper">
+          <div class="sheet" style="border-color:#1a1a1a">
+            <div class="line-left"></div>
+            <div class="line-right"></div>
+            <div class="draw-area"><div class="draw-inner"><div class="draw-txt" style="font-size:6px">VÙNG VẼ</div></div></div>
+            <div class="title-col" style="border-left-color:#1a1a1a">
+              <div style="flex:0 0 auto;border-bottom:1.5px solid #1a1a1a;background:#f5f0e0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 5px;gap:1px;min-height:9%">
+                <div style="font-family:'Oswald',sans-serif;font-size:3px;color:#7a5c10;letter-spacing:.14em;text-transform:uppercase;text-align:center">Tổng thầu thiết kế</div>
+                <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:800;background:linear-gradient(135deg,#b8860b,#d4a017,#f0c040);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.08em;text-align:center">ALN</div>
+                <div style="font-family:'Oswald',sans-serif;font-size:3px;color:#8a6820;letter-spacing:.08em;text-transform:uppercase;text-align:center">App Làm Nhà Corp.</div>
+              </div>
+              <div style="flex:1.4;border-bottom:1px solid #aaa;background:#fffff8;display:flex;flex-direction:column">
+                <div style="padding:2px 5px;background:#fafaf5;border-bottom:.5px solid #ddd"><div style="font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:600;color:#7a5c10;letter-spacing:.1em;text-transform:uppercase">Giám đốc</div><div style="font-family:'Oswald',sans-serif;font-size:4px;color:#555;margin-top:1px">Lý Mỹ Linh</div></div>
+                <div style="flex:1;padding:2px 4px;display:flex;flex-direction:column;justify-content:space-between"><div style="flex:1;border:.5px dashed #c9a84c;border-radius:1px;background:#fffdf5;min-height:10px"></div><div style="font-family:'Oswald',sans-serif;font-size:3px;color:#aaa;margin-top:1px">Ngày: ___/___/______</div></div>
+              </div>
+              <div style="flex:1.1;border-bottom:1px solid #aaa;background:#fafaf7;display:flex;flex-direction:column">
+                <div style="padding:2px 5px;background:#f5f0e5;border-bottom:.5px solid #ddd"><div style="font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:600;color:#6b5a2a;letter-spacing:.1em;text-transform:uppercase">Chủ đầu tư</div><div style="font-family:'Oswald',sans-serif;font-size:4px;color:#555;margin-top:1px">LN Enterprise</div></div>
+                <div style="flex:1;padding:2px 4px;display:flex;flex-direction:column;justify-content:space-between"><div style="flex:1;border:.5px dashed #bbb;border-radius:1px;min-height:10px"></div><div style="font-family:'Oswald',sans-serif;font-size:3px;color:#aaa;margin-top:1px">Ngày: ___/___/______</div></div>
+              </div>
+              <div style="flex:.82;border-bottom:1px solid #aaa;position:relative"><span style="position:absolute;top:1.5px;left:4px;font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:600;color:#888;letter-spacing:.12em;text-transform:uppercase">Công trình</span><div style="flex:1;display:flex;align-items:center;justify-content:center;padding:7px 3px 0"><div style="font-family:'Oswald',sans-serif;font-size:5px;font-weight:600;color:#1a1a1a;text-transform:uppercase;text-align:center">VP LN ENTERPRISE</div></div></div>
+              <div style="flex:.4;border-bottom:1px solid #aaa;position:relative"><span style="position:absolute;top:1.5px;left:4px;font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:600;color:#888;letter-spacing:.12em;text-transform:uppercase">Tên bản vẽ</span><div style="flex:1;display:flex;align-items:center;justify-content:center;padding:7px 3px 0"><div style="font-family:'Oswald',sans-serif;font-size:4.5px;font-weight:600;color:#1a1a1a;text-transform:uppercase;text-align:center">MB KẾT CẤU TẦNG 2</div></div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #aaa;flex:.85">
+                <div style="padding:2px 4px;border-right:.5px solid #ddd"><div style="font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:600;color:#888;text-transform:uppercase;margin-bottom:1px">Số hiệu</div><div style="font-family:'Oswald',sans-serif;font-size:5.5px;font-weight:500;color:#1a1a1a">KC-02</div></div>
+                <div style="padding:2px 4px"><div style="font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:600;color:#888;text-transform:uppercase;margin-bottom:1px">Tỷ lệ</div><div style="font-family:'Oswald',sans-serif;font-size:5.5px;font-weight:500;color:#1a1a1a">1:50</div></div>
+              </div>
+              <div style="flex:1;border-bottom:1px solid #aaa;display:flex;flex-direction:column"><div style="padding:2px 4px;background:#f5f5f0;border-bottom:.5px solid #ddd;display:flex;align-items:center;justify-content:space-between"><div style="font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:600;color:#666;letter-spacing:.08em;text-transform:uppercase">Kiến trúc sư</div><div style="font-family:'Oswald',sans-serif;font-size:4.5px;font-weight:500;color:#1a1a1a">KTS. Lan Anh</div></div><div style="flex:1;padding:2px 4px"><div style="border:.5px dashed #bbb;border-radius:1px;flex:1;min-height:10px;margin-bottom:1px"></div></div></div>
+              <div style="flex:1;border-bottom:1px solid #aaa;display:flex;flex-direction:column"><div style="padding:2px 4px;background:#f5f5f0;border-bottom:.5px solid #ddd;display:flex;align-items:center;justify-content:space-between"><div style="font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:600;color:#666;letter-spacing:.08em;text-transform:uppercase">KS. Kết cấu</div><div style="font-family:'Oswald',sans-serif;font-size:4.5px;font-weight:500;color:#1a1a1a">KS. Minh Đức</div></div><div style="flex:1;padding:2px 4px"><div style="border:.5px dashed #bbb;border-radius:1px;flex:1;min-height:10px;margin-bottom:1px"></div></div></div>
+              <div style="flex:1;border-bottom:1px solid #aaa;display:flex;flex-direction:column"><div style="padding:2px 4px;background:#f5f5f0;border-bottom:.5px solid #ddd;display:flex;align-items:center;justify-content:space-between"><div style="font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:600;color:#666;letter-spacing:.08em;text-transform:uppercase">KS. M&E</div><div style="font-family:'Oswald',sans-serif;font-size:4.5px;font-weight:500;color:#1a1a1a">KS. Thanh Hà</div></div><div style="flex:1;padding:2px 4px"><div style="border:.5px dashed #bbb;border-radius:1px;flex:1;min-height:10px;margin-bottom:1px"></div></div></div>
+              <div style="flex:1.4;border-bottom:1px solid #c9a84c33;display:flex;flex-direction:column;background:#fffff8">
+                <div style="padding:2px 5px;background:#f5f0e0;border-bottom:.5px solid #c9a84c55;display:flex;flex-direction:column;gap:1px">
+                  <div style="font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:700;color:#7a5c10;letter-spacing:.1em;text-transform:uppercase">Thẩm tra · Chủ nhiệm đồ án</div>
+                  <div style="font-family:'Oswald',sans-serif;font-size:4.5px;font-weight:600;color:#1a1a1a">KTS. Trần Đại Long</div>
+                </div>
+                <div style="flex:1;padding:2px 5px;display:flex;flex-direction:column;justify-content:space-between"><div style="flex:1;border:.5px dashed #c9a84c;border-radius:1px;background:#fffdf5;min-height:12px;margin-bottom:1px"></div><div style="font-family:'Oswald',sans-serif;font-size:3px;color:#aaa">Ngày: ___/___/______</div></div>
+              </div>
+              <div style="flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #aaa">
+                <div style="padding:2px 4px;border-right:.5px solid #ddd"><div style="font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:600;color:#888;text-transform:uppercase;margin-bottom:1px">Mã dự án</div><div style="font-family:'Oswald',sans-serif;font-size:5px;font-weight:500;color:#1a1a1a">ALN-1042</div></div>
+                <div style="padding:2px 4px"><div style="font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:600;color:#888;text-transform:uppercase;margin-bottom:1px">Tờ số</div><div style="font-family:'Oswald',sans-serif;font-size:5px;font-weight:500;color:#1a1a1a">03 / 24</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHITE-LABEL -->
+    <div>
+      <div style="font-size:11px;font-weight:700;color:#2563eb;letter-spacing:.08em;text-transform:uppercase;text-align:center;margin-bottom:8px">White-label · Navy nhẹ</div>
+      <div class="bv-wrap" style="padding:10px">
+        <div class="paper">
+          <div class="sheet">
+            <div class="line-left"></div>
+            <div class="line-right"></div>
+            <div class="draw-area"><div class="draw-inner"><div class="draw-txt" style="font-size:6px">VÙNG VẼ</div></div></div>
+            <div class="title-col">
+              <div class="tc-logo" style="min-height:9%">
+                <div class="tc-logo-role">Studio thiết kế</div>
+                <div class="tc-logo-name">SUNRISE STUDIO</div>
+                <div class="tc-logo-sub">Kiến trúc · Nội thất</div>
+              </div>
+              <div class="tc-gd">
+                <div class="tc-h tc-h-gd"><div class="tc-h-role">Người đại diện</div><div class="tc-h-name">KTS. Minh Khoa</div></div>
+                <div class="tc-ky-body"><div class="tc-sig-area"><span class="tc-sig-ph">Dấu &amp; Ký</span></div><div class="tc-date">Ngày: ___/___/______</div></div>
+              </div>
+              <div class="tc-cdt">
+                <div class="tc-h tc-h-cdt"><div class="tc-h-role">Chủ đầu tư</div><div class="tc-h-name">Công ty CP Sunrise</div></div>
+                <div class="tc-ky-body"><div class="tc-sig-area"><span class="tc-sig-ph">Dấu &amp; Ký</span></div><div class="tc-date">Ngày: ___/___/______</div></div>
+              </div>
+              <div class="tc-row ct"><span class="tc-lbl">Công trình</span><div class="tc-val-wrap"><div class="tc-val-bv">TRỤ SỞ SUNRISE</div></div></div>
+              <div class="tc-row bv"><span class="tc-lbl">Tên bản vẽ</span><div class="tc-val-wrap"><div class="tc-val-bv">MẶT BẰNG TẦNG 1</div></div></div>
+              <div class="tc-grid">
+                <div class="tc-cell"><div class="tc-cell-lbl">Số hiệu</div><div class="tc-cell-val">KT-01</div></div>
+                <div class="tc-cell"><div class="tc-cell-lbl">Tỷ lệ</div><div class="tc-cell-val">1:100</div></div>
+              </div>
+              <div class="sig"><div class="sig-h"><div class="sig-role">Kiến trúc sư</div><div class="sig-name">KTS. Lan Anh</div></div><div class="sig-b"><div class="sig-area"></div></div></div>
+              <div class="sig"><div class="sig-h"><div class="sig-role">KS. Kết cấu</div><div class="sig-name">KS. Minh Đức</div></div><div class="sig-b"><div class="sig-area"></div></div></div>
+              <div class="sig"><div class="sig-h"><div class="sig-role">KS. M&amp;E</div><div class="sig-name">KS. Thanh Hà</div></div><div class="sig-b"><div class="sig-area"></div></div></div>
+              <div class="sig-cn">
+                <div class="sig-cn-h"><div class="sig-cn-role">Chủ trì thiết kế</div><div class="sig-cn-name">KTS. Lan Anh</div></div>
+                <div class="sig-cn-b"><div class="sig-cn-area"><span class="sig-cn-ph">Ký sau cùng</span></div><div class="tc-date">Ngày: ___/___/______</div></div>
+              </div>
+              <div class="tc-foot">
+                <div class="tc-foot-cell"><div class="tc-foot-lbl">Mã dự án</div><div class="tc-foot-val">ALN-2089</div></div>
+                <div class="tc-foot-cell"><div class="tc-foot-lbl">Tờ số</div><div class="tc-foot-val">01 / 12</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const today=new Date();
+const dd=String(today.getDate()).padStart(2,'0');
+const mm=String(today.getMonth()+1).padStart(2,'0');
+const yy=String(today.getFullYear()).slice(-2);
+document.getElementById('d-ng').textContent=`${dd}/${mm}/${yy}`;
+
+function updateFrame(){
+  const v=id=>document.getElementById(id).value;
+  document.getElementById('d-logo-name').textContent=v('f-logo').toUpperCase();
+  document.getElementById('d-gd').textContent=v('f-gd');
+  document.getElementById('d-ct-kts').textContent=v('f-ct-kts');
+  document.getElementById('d-cdt').textContent=v('f-cdt');
+  document.getElementById('d-ct').textContent=v('f-congTrinh').toUpperCase();
+  document.getElementById('d-bv-vung').textContent=v('f-bv').toUpperCase();
+  document.getElementById('d-dc').textContent=v('f-dc');
+  document.getElementById('d-bv').textContent=v('f-bv').toUpperCase();
+  document.getElementById('d-sh').textContent=v('f-sh');
+  document.getElementById('d-tl').textContent=v('f-tl');
+  document.getElementById('d-ma').textContent=v('f-ma');
+  document.getElementById('d-to').textContent=v('f-to');
+}
+
+function switchTab(id,el,activeClass){
+  document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active-gold');t.classList.remove('active-blue')});
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  el.classList.add(activeClass);
+  document.getElementById('tab-'+id).classList.add('active');
+}
+</script>
+</body>
+</html>

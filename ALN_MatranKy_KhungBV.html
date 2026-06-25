@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALN — Ma trận ký & Khung bản vẽ</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Oswald:wght@300;400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0d1b2a;--navy2:#102030;--navy3:#1c2a3a;
+  --gold:#d4a017;--gold2:#f0c040;--gold3:#b8860b;
+  --text:#e0d4b0;--text2:#8aaac8;--text3:#6a8aaa;
+  --border:#1c2a3a;--border2:#2a3d52;
+  --green:#16a34a;--green-bg:rgba(22,163,74,.12);
+  --amber:#d97706;--amber-bg:rgba(217,119,6,.12);
+  --red:#dc2626;--red-bg:rgba(220,38,38,.1);
+  --blue:#2563eb;--blue-bg:rgba(37,99,235,.1);
+  --sans:'Oswald',sans-serif;
+  --syne:'Syne',sans-serif;
+}
+body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:13px;line-height:1.5;letter-spacing:.02em}
+
+.header{background:#071220;border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-logo{font-family:var(--syne);font-size:18px;font-weight:800;background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.08em}
+.header-title{font-size:12px;color:var(--text3);letter-spacing:.06em}
+.header-badge{font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(212,160,23,.12);color:var(--gold);border:1px solid rgba(212,160,23,.3)}
+
+.tabs{display:flex;border-bottom:1px solid var(--border);background:#071220;padding:0 20px}
+.tab{padding:12px 18px;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;display:flex;align-items:center;gap:6px}
+.tab:hover{color:var(--text2)}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+.section{display:none;padding:20px}
+.section.active{display:block}
+
+/* MA TRẬN KÝ */
+.matrix-wrap{background:var(--navy2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.matrix-head{display:grid;grid-template-columns:2fr repeat(5,1fr);background:#071220;border-bottom:1px solid var(--border)}
+.mh{padding:8px 6px;font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;text-align:center}
+.mh:first-child{text-align:left;padding-left:14px}
+.mh.kts{color:#60a5fa}.mh.kc{color:#f59e0b}.mh.me{color:#a78bfa}.mh.dt{color:#34d399}.mh.cn{color:var(--gold)}
+.group-lbl{padding:6px 14px;font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;background:#071220;border-bottom:1px solid var(--border);border-top:1px solid var(--border)}
+.mrow{display:grid;grid-template-columns:2fr repeat(5,1fr);border-bottom:1px solid var(--border);transition:background .12s}
+.mrow:last-child{border:none}
+.mrow:hover{background:rgba(255,255,255,.02)}
+.mcell-name{padding:9px 14px;font-size:11px}
+.mcell-name-main{font-weight:500;color:var(--text)}
+.mcell-name-code{font-size:10px;color:var(--text3);margin-top:1px}
+.mcell{display:flex;align-items:center;justify-content:center;padding:9px 4px}
+.dot-yes{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px}
+.dot-kts{background:rgba(96,165,250,.15);color:#60a5fa}
+.dot-kc{background:rgba(245,158,11,.15);color:#f59e0b}
+.dot-me{background:rgba(167,139,250,.15);color:#a78bfa}
+.dot-dt{background:rgba(52,211,153,.15);color:#34d399}
+.dot-cn{background:rgba(212,160,23,.15);color:var(--gold)}
+.dot-no{width:20px;height:20px;border-radius:50%;background:var(--navy3)}
+.dot-opt{width:20px;height:20px;border-radius:50%;background:rgba(106,138,170,.08);border:0.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text3)}
+.filter-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.fchip{font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-family:var(--sans);transition:all .15s}
+.fchip.on{border-color:var(--gold);color:var(--gold);background:rgba(212,160,23,.08)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+.logic-box{background:var(--navy2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px}
+.logic-title{font-size:11px;font-weight:600;color:var(--text);margin-bottom:10px;letter-spacing:.04em}
+.logic-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;font-size:12px;color:var(--text2);line-height:1.6}
+.logic-row:last-child{margin:0}
+.logic-row i{font-size:15px;flex-shrink:0;margin-top:1px}
+
+/* KHUNG BẢN VẼ */
+.bv-controls{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.bv-btn{font-size:11px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-family:var(--sans);transition:all .15s}
+.bv-btn:hover{border-color:var(--border2);color:var(--text2)}
+.bv-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(212,160,23,.08)}
+.bv-wrap{background:#8a8a80;padding:16px;border-radius:12px;display:flex;justify-content:center}
+
+.paper{background:#e8e8e0;width:100%;max-width:760px;aspect-ratio:420/297;position:relative;box-shadow:3px 3px 12px rgba(0,0,0,.4)}
+.sheet{position:absolute;top:1.68%;bottom:1.68%;left:1.19%;right:1.19%;background:#fff;border:1.5px solid #1a1a1a}
+.margin-left-line{position:absolute;top:0;bottom:0;left:3.9%;border-left:.8px dashed #888;z-index:2}
+.margin-right-line{position:absolute;top:0;bottom:0;left:86.59%;border-left:.8px dashed #888;z-index:2}
+.margin-label-el{position:absolute;top:0;bottom:0;left:0;width:3.9%;display:flex;align-items:center;justify-content:center}
+.margin-label-txt{font-size:3.5px;color:#aaa;writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;font-family:'Oswald',sans-serif}
+.draw-area{position:absolute;top:0;bottom:0;left:3.9%;right:13.41%;display:flex;align-items:center;justify-content:center}
+.draw-inner{width:calc(100% - 8px);height:calc(100% - 8px);border:.5px dashed #ddd;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px}
+.draw-txt{font-family:'Oswald',sans-serif;font-size:7px;color:#bbb;text-align:center;line-height:1.8;font-weight:400;letter-spacing:.06em}
+.title-col{position:absolute;top:0;bottom:0;left:86.59%;right:0;display:flex;flex-direction:column;border-left:1.5px solid #1a1a1a}
+
+/* Ô ALN */
+.tc-aln{flex:0 0 auto;border-bottom:1.5px solid #1a1a1a;background:#f5f0e0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 5px;gap:1px;min-height:9%}
+.tc-aln-role{font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:500;color:#7a5c10;letter-spacing:.16em;text-transform:uppercase;text-align:center}
+.tc-aln-logo{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;background:linear-gradient(135deg,#b8860b,#d4a017,#f0c040,#c9921a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.08em;line-height:1;text-align:center}
+.tc-aln-sub{font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:300;color:#8a6820;letter-spacing:.08em;text-transform:uppercase;text-align:center}
+
+/* Header chung */
+.tc-h{padding:2px 5px;border-bottom:.5px solid #ddd;flex-shrink:0}
+.tc-h-gd{background:#fafaf5}
+.tc-h-cdt{background:#f5f0e5}
+.tc-h-role{font-family:'Oswald',sans-serif;font-size:4px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.tc-h-role.gd{color:#7a5c10}
+.tc-h-role.cdt{color:#6b5a2a}
+.tc-h-name{font-family:'Oswald',sans-serif;font-size:4.5px;font-weight:400;color:#555;margin-top:1px;letter-spacing:.04em}
+
+/* Body ký chung */
+.tc-ky-body{flex:1;padding:2px 4px;display:flex;flex-direction:column;justify-content:space-between}
+.tc-sig-area{flex:1;border:.5px dashed #bbb;border-radius:1px;display:flex;align-items:center;justify-content:center;min-height:14px}
+.tc-sig-area.gold{border-color:#c9a84c;background:#fffdf5}
+.tc-sig-ph{font-family:'Oswald',sans-serif;font-size:3.5px;color:#ccc;letter-spacing:.06em}
+.tc-sig-ph.gold{color:#c9a84c}
+.tc-date{font-family:'Oswald',sans-serif;font-size:3px;color:#aaa;margin-top:1px;letter-spacing:.04em}
+
+/* Giám đốc */
+.tc-gd{flex:1.4;border-bottom:1px solid #aaa;background:#fffff8;display:flex;flex-direction:column}
+/* Chủ đầu tư */
+.tc-cdt{flex:1.1;border-bottom:1px solid #aaa;background:#fafaf7;display:flex;flex-direction:column}
+
+/* Ô thông tin */
+.tc-row{border-bottom:1px solid #aaa;display:flex;flex-direction:column;position:relative}
+.tc-row.ct{flex:.82}
+.tc-row.bv{flex:.4}
+.tc-lbl{position:absolute;top:1.5px;left:4px;font-family:'Oswald',sans-serif;font-size:3.8px;font-weight:600;color:#888;letter-spacing:.14em;text-transform:uppercase;z-index:1}
+.tc-val-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:7px 3px 0;text-align:center;position:relative}
+.tc-val-bv{font-family:'Oswald',sans-serif;font-size:5.5px;font-weight:600;color:#1a1a1a;text-transform:uppercase;letter-spacing:.05em;text-align:center;line-height:1.3}
+.tc-val-addr{position:absolute;bottom:2px;left:0;right:0;font-family:'Oswald',sans-serif;font-size:3.5px;font-weight:300;color:#777;text-transform:uppercase;letter-spacing:.06em;text-align:center}
+
+/* Grid */
+.tc-grid{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #aaa;flex:.85}
+.tc-cell{padding:2px 4px;border-right:.5px solid #ddd;display:flex;flex-direction:column}
+.tc-cell:last-child{border-right:none}
+.tc-cell:nth-child(3),.tc-cell:nth-child(4){border-top:.5px solid #eee}
+.tc-cell-lbl{font-family:'Oswald',sans-serif;font-size:3.8px;font-weight:600;color:#888;letter-spacing:.12em;text-transform:uppercase;margin-bottom:1px}
+.tc-cell-val{font-family:'Oswald',sans-serif;font-size:6px;font-weight:500;color:#1a1a1a;letter-spacing:.04em}
+
+/* Ô ký bộ môn */
+.sig{border-bottom:1px solid #aaa;flex:1;display:flex;flex-direction:column}
+.sig-h{padding:2px 4px;background:#f5f5f0;border-bottom:.5px solid #ddd;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.sig-role{font-family:'Oswald',sans-serif;font-size:4px;font-weight:600;color:#666;letter-spacing:.1em;text-transform:uppercase}
+.sig-name{font-family:'Oswald',sans-serif;font-size:5px;font-weight:500;color:#1a1a1a;letter-spacing:.03em}
+.sig-b{flex:1;padding:2px 4px;display:flex;flex-direction:column;justify-content:space-between}
+.sig-area{border:.5px dashed #bbb;border-radius:1px;flex:1;display:flex;align-items:center;justify-content:center;min-height:10px;margin-bottom:1px}
+.sig-area-txt{font-family:'Oswald',sans-serif;font-size:3.5px;color:#ccc;letter-spacing:.04em}
+.sig-area-signed{font-style:italic;font-size:7px;color:#1a1a1a;opacity:.65}
+.sig-date{font-family:'Oswald',sans-serif;font-size:3.5px;color:#888;letter-spacing:.04em}
+.sig.signed .sig-h{background:#f0f7f0}
+.sig.signed .sig-role{color:#16a34a}
+.sig.pending .sig-h{background:#fffbf0}
+.sig.pending .sig-role{color:#d97706}
+
+/* Thẩm tra · Chủ nhiệm */
+.sig-cn{flex:1.4;border-bottom:1px solid #aaa;display:flex;flex-direction:column;background:#fffff8}
+.sig-cn-h{padding:2px 5px;background:#f5f0e0;border-bottom:.5px solid #c9a84c55;flex-shrink:0;display:flex;flex-direction:column;gap:1.5px}
+.sig-cn-role{font-family:'Oswald',sans-serif;font-size:4px;font-weight:700;color:#7a5c10;letter-spacing:.1em;text-transform:uppercase;line-height:1.2}
+.sig-cn-name{font-family:'Oswald',sans-serif;font-size:5px;font-weight:600;color:#1a1a1a;letter-spacing:.04em}
+.sig-cn-b{flex:1;padding:2px 5px;display:flex;flex-direction:column;justify-content:space-between}
+.sig-cn-area{flex:1;border:.5px dashed #c9a84c;border-radius:1px;display:flex;align-items:center;justify-content:center;background:#fffdf5;min-height:14px;margin-bottom:1px}
+.sig-cn-ph{font-family:'Oswald',sans-serif;font-size:3.5px;color:#c9a84c;letter-spacing:.06em}
+
+/* Footer */
+.tc-foot{flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #aaa}
+.tc-foot-cell{padding:2px 4px;display:flex;flex-direction:column}
+.tc-foot-cell:first-child{border-right:.5px solid #ddd}
+.tc-foot-lbl{font-family:'Oswald',sans-serif;font-size:3.8px;font-weight:600;color:#888;letter-spacing:.12em;text-transform:uppercase;margin-bottom:1px}
+.tc-foot-val{font-family:'Oswald',sans-serif;font-size:5.5px;font-weight:500;color:#1a1a1a;letter-spacing:.04em}
+
+/* Status badges */
+.status-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.status-badge{font-size:11px;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:5px;font-weight:500}
+.sb-done{background:var(--green-bg);color:var(--green)}
+.sb-pend{background:var(--amber-bg);color:var(--amber)}
+.sb-wait{background:rgba(106,138,170,.1);color:var(--text3)}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.info-card{background:var(--navy2);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.info-card-title{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.info-row{display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border)}
+.info-row:last-child{border:none}
+.info-key{color:var(--text3)}
+.info-val{color:var(--text2);font-weight:500}
+@media(max-width:600px){.info-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div style="font-size:8px;color:#3a5068;letter-spacing:.2em;font-family:'Oswald',sans-serif">APP LÀM NHÀ CORP.</div>
+    <div class="header-logo">ALN</div>
+  </div>
+  <div class="header-title">Ma trận ký & Khung bản vẽ</div>
+  <div class="header-badge">C3 · Hồ sơ kỹ thuật</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('matrix',this)"><i class="ti ti-table"></i>Ma trận ký</div>
+  <div class="tab" onclick="switchTab('frame',this)"><i class="ti ti-layout"></i>Khung bản vẽ</div>
+</div>
+
+<!-- MA TRẬN KÝ -->
+<div class="section active" id="tab-matrix">
+  <div class="filter-row">
+    <button class="fchip on" onclick="filterMatrix('all',this)">Tất cả</button>
+    <button class="fchip" onclick="filterMatrix('kien_truc',this)">Kiến trúc</button>
+    <button class="fchip" onclick="filterMatrix('ket_cau',this)">Kết cấu</button>
+    <button class="fchip" onclick="filterMatrix('me',this)">M&amp;E</button>
+    <button class="fchip" onclick="filterMatrix('du_toan',this)">Dự toán</button>
+  </div>
+  <div class="matrix-wrap">
+    <div class="matrix-head">
+      <div class="mh" style="text-align:left;padding-left:14px">Loại bản vẽ</div>
+      <div class="mh kts">KTS<br><span style="font-size:8px;font-weight:400">Kiến trúc</span></div>
+      <div class="mh kc">KS<br><span style="font-size:8px;font-weight:400">Kết cấu</span></div>
+      <div class="mh me">KS<br><span style="font-size:8px;font-weight:400">M&amp;E</span></div>
+      <div class="mh dt">KS<br><span style="font-size:8px;font-weight:400">Dự toán</span></div>
+      <div class="mh cn">Thẩm tra<br><span style="font-size:8px;font-weight:400">Chủ nhiệm</span></div>
+    </div>
+    <div id="matrix-body"></div>
+  </div>
+  <div class="legend">
+    <div class="leg"><div class="leg-dot" style="background:rgba(96,165,250,.4)"></div>KTS ký</div>
+    <div class="leg"><div class="leg-dot" style="background:rgba(245,158,11,.4)"></div>KS Kết cấu ký</div>
+    <div class="leg"><div class="leg-dot" style="background:rgba(167,139,250,.4)"></div>KS M&amp;E ký</div>
+    <div class="leg"><div class="leg-dot" style="background:rgba(52,211,153,.4)"></div>KS Dự toán ký</div>
+    <div class="leg"><div class="leg-dot" style="background:rgba(212,160,23,.4)"></div>Thẩm tra · Chủ nhiệm ký</div>
+    <div class="leg"><div class="leg-dot" style="background:rgba(106,138,170,.15);border:0.5px dashed #2a3d52;border-radius:50%"></div>Tùy chọn</div>
+  </div>
+  <div class="logic-box">
+    <div class="logic-title">Quy tắc xuất hồ sơ</div>
+    <div class="logic-row"><i class="ti ti-lock" style="color:var(--red)"></i>Mỗi file bị lock cho đến khi đủ chữ ký theo ma trận — không thể gửi cho DN/CN khi còn thiếu ký</div>
+    <div class="logic-row"><i class="ti ti-folder" style="color:var(--gold)"></i>Hệ thống tự xác định ma trận ký dựa vào folder upload — KT → KTS, KC → KS Kết cấu, ME → KS M&amp;E</div>
+    <div class="logic-row"><i class="ti ti-sort-ascending" style="color:var(--gold)"></i>KTS. Trần Đại Long (Thẩm tra · Chủ nhiệm đồ án) luôn ký sau cùng</div>
+    <div class="logic-row"><i class="ti ti-file-check" style="color:var(--green)"></i>Hồ sơ hoàn công (HC-01) yêu cầu tất cả bộ môn + Giám đốc ALN ký</div>
+    <div class="logic-row"><i class="ti ti-link" style="color:var(--blue)"></i>Đủ ký → ALN tạo Signed URL 15 phút kèm watermark ALN · Hash · Timestamp</div>
+    <div class="logic-row"><i class="ti ti-certificate" style="color:var(--amber)"></i>Chứng chỉ hành nghề hết hạn → tự block không cho ký — Cloud Function kiểm tra mỗi ngày</div>
+  </div>
+</div>
+
+<!-- KHUNG BẢN VẼ -->
+<div class="section" id="tab-frame">
+  <div class="bv-controls">
+    <button class="bv-btn active" onclick="setDrawingState('blank',this)">Trống</button>
+    <button class="bv-btn" onclick="setDrawingState('partial',this)">Đang ký</button>
+    <button class="bv-btn" onclick="setDrawingState('complete',this)">Hoàn chỉnh</button>
+  </div>
+
+  <div class="bv-wrap">
+    <div class="paper">
+      <div class="sheet">
+        <div class="margin-left-line"></div>
+        <div class="margin-right-line"></div>
+        <div class="margin-label-el"><div class="margin-label-txt">16mm · đóng quyển</div></div>
+        <div class="draw-area">
+          <div class="draw-inner">
+            <div class="draw-txt">VÙNG VẼ · 329 × 287MM</div>
+            <div class="draw-txt" style="font-size:5px">BỘ MÔN THỂ HIỆN NỘI DUNG BẢN VẼ TẠI ĐÂY</div>
+          </div>
+        </div>
+
+        <div class="title-col">
+
+          <div class="tc-aln">
+            <div class="tc-aln-role">Tổng thầu thiết kế</div>
+            <div class="tc-aln-logo">ALN</div>
+            <div class="tc-aln-sub">App Làm Nhà Corp.</div>
+          </div>
+
+          <div class="tc-gd">
+            <div class="tc-h tc-h-gd">
+              <div class="tc-h-role gd">Giám đốc</div>
+              <div class="tc-h-name">Lý Mỹ Linh</div>
+            </div>
+            <div class="tc-ky-body">
+              <div class="tc-sig-area gold"><span class="tc-sig-ph gold">Dấu &amp; Ký</span></div>
+              <div class="tc-date">Ngày: ___/___/______</div>
+            </div>
+          </div>
+
+          <div class="tc-cdt">
+            <div class="tc-h tc-h-cdt">
+              <div class="tc-h-role cdt">Chủ đầu tư</div>
+              <div class="tc-h-name" id="cdt-name">LN Enterprise</div>
+            </div>
+            <div class="tc-ky-body">
+              <div class="tc-sig-area"><span class="tc-sig-ph">Dấu &amp; Ký</span></div>
+              <div class="tc-date">Ngày: ___/___/______</div>
+            </div>
+          </div>
+
+          <div class="tc-row ct">
+            <span class="tc-lbl">Công trình</span>
+            <div class="tc-val-wrap">
+              <div class="tc-val-bv">VP LN Enterprise</div>
+              <div class="tc-val-addr">Quận 1 · TP.HCM</div>
+            </div>
+          </div>
+
+          <div class="tc-row bv">
+            <span class="tc-lbl">Tên bản vẽ</span>
+            <div class="tc-val-wrap">
+              <div class="tc-val-bv">MB KẾT CẤU TẦNG 2</div>
+            </div>
+          </div>
+
+          <div class="tc-grid">
+            <div class="tc-cell"><div class="tc-cell-lbl">Số hiệu</div><div class="tc-cell-val">KC-02</div></div>
+            <div class="tc-cell"><div class="tc-cell-lbl">Tỷ lệ</div><div class="tc-cell-val">1:50</div></div>
+            <div class="tc-cell"><div class="tc-cell-lbl">Rev.</div><div class="tc-cell-val">02</div></div>
+            <div class="tc-cell"><div class="tc-cell-lbl">Ngày</div><div class="tc-cell-val">10/06/26</div></div>
+          </div>
+
+          <div class="sig" id="sig-kts">
+            <div class="sig-h">
+              <div class="sig-role">Kiến trúc sư</div>
+              <div class="sig-name">KTS. Lan Anh</div>
+            </div>
+            <div class="sig-b">
+              <div class="sig-area"><span id="sig-kts-ph" class="sig-area-txt">Chờ ký</span></div>
+              <div class="sig-date" id="sig-kts-date"></div>
+            </div>
+          </div>
+
+          <div class="sig" id="sig-kc">
+            <div class="sig-h">
+              <div class="sig-role">KS. Kết cấu</div>
+              <div class="sig-name">KS. Minh Đức</div>
+            </div>
+            <div class="sig-b">
+              <div class="sig-area"><span id="sig-kc-ph" class="sig-area-txt">Chờ ký</span></div>
+              <div class="sig-date" id="sig-kc-date"></div>
+            </div>
+          </div>
+
+          <div class="sig" id="sig-me">
+            <div class="sig-h">
+              <div class="sig-role">KS. M&amp;E</div>
+              <div class="sig-name">KS. Thanh Hà</div>
+            </div>
+            <div class="sig-b">
+              <div class="sig-area" id="sig-me-area"><span id="sig-me-ph" class="sig-area-txt">Chờ ký</span></div>
+              <div class="sig-date" id="sig-me-date"></div>
+            </div>
+          </div>
+
+          <div class="sig-cn" id="sig-cn">
+            <div class="sig-cn-h">
+              <div class="sig-cn-role">Thẩm tra · Chủ nhiệm đồ án</div>
+              <div class="sig-cn-name">KTS. Trần Đại Long</div>
+            </div>
+            <div class="sig-cn-b">
+              <div class="sig-cn-area"><span id="sig-cn-ph" class="sig-cn-ph">Ký sau cùng</span></div>
+              <div class="tc-date" id="sig-cn-date">Ngày: ___/___/______</div>
+            </div>
+          </div>
+
+          <div class="tc-foot">
+            <div class="tc-foot-cell"><div class="tc-foot-lbl">Mã dự án</div><div class="tc-foot-val">ALN-1042</div></div>
+            <div class="tc-foot-cell"><div class="tc-foot-lbl">Tờ số</div><div class="tc-foot-val">03 / 24</div></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-row" id="status-row"></div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-card-title">Kích thước thực (A3)</div>
+      <div class="info-row"><span class="info-key">Tờ giấy</span><span class="info-val">420 × 297mm</span></div>
+      <div class="info-row"><span class="info-key">Lề an toàn in</span><span class="info-val">5mm đều 4 phía</span></div>
+      <div class="info-row"><span class="info-key">Khung bản vẽ</span><span class="info-val">410 × 287mm</span></div>
+      <div class="info-row"><span class="info-key">Lề đóng quyển</span><span class="info-val">16mm (nét đứt trái)</span></div>
+      <div class="info-row"><span class="info-key">Cột khung tên</span><span class="info-val">55mm (nét đứt phải)</span></div>
+      <div class="info-row"><span class="info-key">Vùng vẽ</span><span class="info-val">329 × 287mm</span></div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-title">Chứng chỉ hành nghề</div>
+      <div class="info-row"><span class="info-key">Giám đốc · Lý Mỹ Linh</span><span class="info-val">CCHN Kiến trúc + Thẩm tra</span></div>
+      <div class="info-row"><span class="info-key">Thẩm tra · Chủ nhiệm</span><span class="info-val">KTS. Trần Đại Long</span></div>
+      <div class="info-row"><span class="info-key">Font hồ sơ kỹ thuật</span><span class="info-val">Oswald — duy nhất</span></div>
+      <div class="info-row"><span class="info-key">Chữ ký</span><span class="info-val">Từ profile · tự động chèn</span></div>
+      <div class="info-row"><span class="info-key">Xuất bản in</span><span class="info-val">Đen trắng · nhúng font</span></div>
+      <div class="info-row"><span class="info-key">Watermark</span><span class="info-val">ALN · Hash · Timestamp</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const MATRIX=[
+  {cat:'kien_truc',group:'📐 Hồ sơ Kiến trúc',rows:[
+    {name:'Tổng mặt bằng',code:'KT-01',kts:1,kc:0,me:0,dt:0,cn:1},
+    {name:'Mặt bằng các tầng',code:'KT-02..N',kts:1,kc:0,me:0,dt:0,cn:1},
+    {name:'Mặt đứng · Mặt cắt',code:'KT-MD/MC',kts:1,kc:0,me:0,dt:0,cn:1},
+    {name:'Chi tiết kiến trúc',code:'KT-CT',kts:1,kc:0,me:0,dt:0,cn:1},
+  ]},
+  {cat:'ket_cau',group:'🏗 Hồ sơ Kết cấu',rows:[
+    {name:'Mặt bằng móng',code:'KC-01',kts:0,kc:1,me:0,dt:0,cn:1},
+    {name:'Mặt bằng kết cấu sàn',code:'KC-02..N',kts:0,kc:1,me:0,dt:0,cn:1},
+    {name:'Chi tiết cột · dầm · thang',code:'KC-CT',kts:0,kc:1,me:0,dt:0,cn:1},
+    {name:'Thống kê thép',code:'KC-TK',kts:0,kc:1,me:0,dt:2,cn:1},
+  ]},
+  {cat:'me',group:'⚡ Hồ sơ M&E',rows:[
+    {name:'Sơ đồ điện tổng',code:'ME-D01',kts:0,kc:0,me:1,dt:0,cn:1},
+    {name:'Mặt bằng điện các tầng',code:'ME-D02..N',kts:0,kc:0,me:1,dt:0,cn:1},
+    {name:'Hệ thống cấp thoát nước',code:'ME-N01',kts:0,kc:0,me:1,dt:0,cn:1},
+    {name:'Hệ thống PCCC',code:'ME-P01',kts:0,kc:0,me:1,dt:0,cn:1},
+  ]},
+  {cat:'du_toan',group:'💰 Dự toán & Tổng hợp',rows:[
+    {name:'Bảng dự toán chi phí',code:'DT-01',kts:0,kc:0,me:0,dt:1,cn:1},
+    {name:'Thống kê vật tư',code:'DT-VT',kts:0,kc:2,me:2,dt:1,cn:1},
+    {name:'Hồ sơ nghiệm thu hoàn công',code:'HC-01',kts:1,kc:1,me:1,dt:1,cn:1},
+  ]},
+];
+
+function dotCls(f,v){
+  if(v===2)return`<div class="dot-opt">T</div>`;
+  if(v===0)return`<div class="dot-no"></div>`;
+  const c={kts:'kts',kc:'kc',me:'me',dt:'dt',cn:'cn'}[f];
+  return`<div class="dot-yes dot-${c}"><i class="ti ti-check" style="font-size:11px"></i></div>`;
+}
+
+let currentCat='all';
+function renderMatrix(){
+  let html='';
+  for(const g of MATRIX){
+    if(currentCat!=='all'&&g.cat!==currentCat)continue;
+    html+=`<div class="group-lbl">${g.group}</div>`;
+    for(const r of g.rows){
+      html+=`<div class="mrow">
+        <div class="mcell-name"><div class="mcell-name-main">${r.name}</div><div class="mcell-name-code">${r.code}</div></div>
+        <div class="mcell">${dotCls('kts',r.kts)}</div>
+        <div class="mcell">${dotCls('kc',r.kc)}</div>
+        <div class="mcell">${dotCls('me',r.me)}</div>
+        <div class="mcell">${dotCls('dt',r.dt)}</div>
+        <div class="mcell">${dotCls('cn',r.cn)}</div>
+      </div>`;
+    }
+  }
+  document.getElementById('matrix-body').innerHTML=html;
+}
+function filterMatrix(cat,el){
+  currentCat=cat;
+  document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderMatrix();
+}
+renderMatrix();
+
+function setDrawingState(state,el){
+  document.querySelectorAll('.bv-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const S={
+    blank:{kts:{s:false,ph:'Chờ ký',d:''},kc:{s:false,ph:'Chờ ký',d:''},me:{s:false,p:false,ph:'Chờ ký',d:''},cn:{s:false},
+      badges:[{c:'sb-wait',i:'ti-clock',t:'KTS — chờ ký'},{c:'sb-wait',i:'ti-clock',t:'KS Kết cấu — chờ ký'},{c:'sb-wait',i:'ti-clock',t:'KS M&E — chờ ký'},{c:'sb-wait',i:'ti-lock',t:'Thẩm tra · Chủ nhiệm — chờ đủ BM'}]},
+    partial:{kts:{s:true,ph:'Lan Anh',d:'08/06/2026'},kc:{s:true,ph:'Minh Đức',d:'09/06/2026'},me:{s:false,p:true,ph:'Chờ ký · còn 18h',d:'SLA'},cn:{s:false},
+      badges:[{c:'sb-done',i:'ti-check',t:'KTS ký xong'},{c:'sb-done',i:'ti-check',t:'KS Kết cấu ký xong'},{c:'sb-pend',i:'ti-clock',t:'KS M&E — chờ ký · còn 18h'},{c:'sb-wait',i:'ti-lock',t:'Thẩm tra · Chủ nhiệm — chờ đủ BM'}]},
+    complete:{kts:{s:true,ph:'Lan Anh',d:'08/06/2026'},kc:{s:true,ph:'Minh Đức',d:'09/06/2026'},me:{s:true,p:false,ph:'Thanh Hà',d:'10/06/2026'},cn:{s:true},
+      badges:[{c:'sb-done',i:'ti-check',t:'KTS ký xong'},{c:'sb-done',i:'ti-check',t:'KS Kết cấu ký xong'},{c:'sb-done',i:'ti-check',t:'KS M&E ký xong'},{c:'sb-done',i:'ti-check',t:'Thẩm tra · Chủ nhiệm ký xong · Hồ sơ hoàn chỉnh'}]},
+  };
+  const s=S[state];
+  const sk=document.getElementById('sig-kts');
+  sk.className='sig'+(s.kts.s?' signed':'');
+  const ph_kts=document.getElementById('sig-kts-ph');
+  ph_kts.textContent=s.kts.ph;ph_kts.className=s.kts.s?'sig-area-signed':'sig-area-txt';
+  document.getElementById('sig-kts-date').textContent=s.kts.d;
+  const skc=document.getElementById('sig-kc');
+  skc.className='sig'+(s.kc.s?' signed':'');
+  const ph_kc=document.getElementById('sig-kc-ph');
+  ph_kc.textContent=s.kc.ph;ph_kc.className=s.kc.s?'sig-area-signed':'sig-area-txt';
+  document.getElementById('sig-kc-date').textContent=s.kc.d;
+  const sme=document.getElementById('sig-me');
+  sme.className='sig'+(s.me.s?' signed':s.me.p?' pending':'');
+  const ph_me=document.getElementById('sig-me-ph');
+  ph_me.textContent=s.me.ph;ph_me.className=s.me.s?'sig-area-signed':'sig-area-txt';
+  ph_me.style.color=s.me.p?'#d97706':'';
+  document.getElementById('sig-me-area').style.borderColor=s.me.p?'#fbbf24':'';
+  document.getElementById('sig-me-date').textContent=s.me.d;
+  document.getElementById('sig-me-date').style.color=s.me.p?'#d97706':'';
+  const ph_cn=document.getElementById('sig-cn-ph');
+  ph_cn.textContent=s.cn.s?'Trần Đại Long':'Ký sau cùng';
+  ph_cn.className=s.cn.s?'sig-area-signed':'sig-cn-ph';
+  document.getElementById('sig-cn-date').textContent=s.cn.s?'10/06/2026':'Ngày: ___/___/______';
+  document.getElementById('status-row').innerHTML=s.badges.map(b=>`<div class="status-badge ${b.c}"><i class="ti ${b.i}" style="font-size:13px"></i>${b.t}</div>`).join('');
+}
+setDrawingState('partial',document.querySelector('.bv-btn.active'));
+
+function switchTab(id,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+</script>
+</body>
+</html>
