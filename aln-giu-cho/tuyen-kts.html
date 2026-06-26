@@ -38,17 +38,27 @@ body::before{
 .page{max-width:480px;margin:0 auto;padding:0 20px 72px;position:relative;z-index:1}
 
 /* ── HERO ── */
-.hero{padding:52px 0 28px;text-align:center}
-.hero-eyebrow{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:18px}
-.ey-line{flex:1;max-width:54px;height:1px}
-.ey-line-l{background:linear-gradient(90deg,transparent,rgba(212,160,23,.55))}
-.ey-line-r{background:linear-gradient(270deg,transparent,rgba(212,160,23,.55))}
-.ey-text{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:var(--gold2);opacity:.9}
-.hero-title{font-family:var(--serif);font-size:38px;font-weight:300;line-height:1.12;margin-bottom:12px}
-.hero-title em{font-style:italic;font-weight:600;color:var(--gold2)}
-.hero-sub{font-size:13px;color:var(--text2);max-width:320px;margin:0 auto 24px;line-height:1.7}
-.trust-line{font-size:10px;color:var(--muted);margin-top:10px;letter-spacing:.04em}
-.trust-line span{margin:0 6px}
+.hero{padding:48px 0 32px;text-align:center}
+
+.hero-brand{
+  display:inline-flex;align-items:center;gap:9px;
+  border:1px solid rgba(212,160,23,.28);border-radius:99px;
+  padding:6px 16px 6px 10px;margin-bottom:28px;
+  background:rgba(212,160,23,.06);backdrop-filter:blur(8px)
+}
+.hero-brand-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.8)}}
+.hero-brand-text{font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold2)}
+
+.hero-title{font-family:var(--serif);font-size:42px;font-weight:300;line-height:1.1;margin-bottom:14px}
+.hero-title em{font-style:italic;font-weight:600;color:var(--gold2);display:block}
+.hero-title strong{display:block;font-weight:300}
+
+.hero-rule{width:48px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:18px auto 18px}
+
+.hero-sub{font-size:13px;color:var(--text2);max-width:320px;margin:0 auto 26px;line-height:1.75}
+.trust-line{font-size:10px;color:var(--muted);margin-top:12px;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+.trust-dot{width:3px;height:3px;border-radius:50%;background:rgba(212,160,23,.4);margin:0 8px;display:inline-block;flex-shrink:0}
 
 /* ── BUTTONS ── */
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:11px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:var(--syne);transition:all .22s;letter-spacing:.04em;text-decoration:none}
@@ -122,17 +132,26 @@ details[open] .faq-q i{transform:rotate(180deg)}
 
   <!-- ── KHỐI 1: HERO ── -->
   <header class="hero">
-    <div class="hero-eyebrow">
-      <span class="ey-line ey-line-l"></span>
-      <span class="ey-text">Tuyển Kiến Trúc Sư Toàn Quốc</span>
-      <span class="ey-line ey-line-r"></span>
+    <div class="hero-brand">
+      <span class="hero-brand-dot"></span>
+      <span class="hero-brand-text">Mạng lưới KTS Việt Nam</span>
     </div>
-    <h1 class="hero-title">Khách đã chuyển tiền.<br><em>Chỉ chờ người làm.</em></h1>
+    <h1 class="hero-title">
+      <strong>Khách đã chuyển tiền.</strong>
+      <em>Chỉ chờ người làm.</em>
+    </h1>
+    <div class="hero-rule"></div>
     <p class="hero-sub">ALN kết nối bạn với chủ nhà và dự án thi công thật — khách thanh toán cho ALN trước, bạn làm tới đâu được giải ngân tới đó. Bạn chỉ cần một việc: làm đẹp.</p>
     <a class="btn btn-gold" href="./giu-cho.html?room=architect">
       <i class="ph-duotone ph-bookmark-simple"></i> Giữ chỗ &amp; nộp hồ sơ →
     </a>
-    <p class="trust-line">Thanh toán bảo đảm<span>·</span>Hợp đồng minh bạch<span>·</span>Dự án thi công thực tế</p>
+    <p class="trust-line">
+      Thanh toán bảo đảm
+      <span class="trust-dot"></span>
+      Hợp đồng minh bạch
+      <span class="trust-dot"></span>
+      Dự án thi công thực tế
+    </p>
   </header>
 
   <!-- ── KHỐI 2: NỖI ĐAU ── -->
