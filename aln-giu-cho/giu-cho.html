@@ -161,6 +161,16 @@ document.querySelectorAll('#roomGrid .room').forEach(function(r){
   });
 });
 
+/* ---------- auto-select phòng từ URL ?room=architect ---------- */
+(function(){
+  var param = new URLSearchParams(location.search).get('room');
+  if(!param) return;
+  var match = document.querySelector('#roomGrid input[value="'+param+'"]');
+  if(!match) return;
+  match.checked = true;
+  match.closest('.room').classList.add('on');
+})();
+
 /* ---------- toast ---------- */
 var _tt=null;
 function showToast(msg,err){var el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(err?' err':'');clearTimeout(_tt);_tt=setTimeout(function(){el.className='toast'},3200);}
