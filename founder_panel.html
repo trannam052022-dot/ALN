@@ -4618,7 +4618,7 @@ window.loadMatchingPanel = function() {
   if (_matchUnsub) { _matchUnsub(); _matchUnsub = null; }
 
   _matchUnsub = onSnapshot(
-    query(collection(db, 'matchingRequests'), where('status','==','pending_founder'), orderBy('createdAt','desc')),
+    query(collection(db, 'matchingRequests'), where('status','==','pending_founder')),
     async function(snap) {
       var badge = document.getElementById('matchingBadge');
       if (badge) { badge.textContent = snap.size; badge.style.display = snap.size > 0 ? '' : 'none'; }
@@ -4626,9 +4626,15 @@ window.loadMatchingPanel = function() {
         list.innerHTML = '<div style="color:var(--dim);font-size:13px;text-align:center;padding:60px 0">Không có yêu cầu ghép cặp nào đang chờ duyệt</div>';
         return;
       }
+      // Sort client-side by createdAt desc
+      var sortedDocs = snap.docs.slice().sort(function(a,b){
+        var ta = a.data().createdAt; var tb = b.data().createdAt;
+        var ms = function(t){ return t && t.toMillis ? t.toMillis() : 0; };
+        return ms(tb) - ms(ta);
+      });
       var html = '';
-      for (var i = 0; i < snap.docs.length; i++) {
-        var r = snap.docs[i];
+      for (var i = 0; i < sortedDocs.length; i++) {
+        var r = sortedDocs[i];
         var d = r.data();
         var cnName = d.cnId || '—';
         try {
@@ -4674,6 +4680,9 @@ window.loadMatchingPanel = function() {
         html += '</div></div>';
       }
       list.innerHTML = html;
+    },
+    function(err) {
+      list.innerHTML = '<div style="color:#c85a3a;font-size:12px;text-align:center;padding:40px 0">Lỗi tải dữ liệu: ' + err.message + '</div>';
     }
   );
 };
