@@ -135,12 +135,12 @@
           <h2>Hồ sơ dự án — projects/{code}</h2>
           <div class="row">
             <div class="field"><label for="p-code">Mã dự án (= doc ID)</label>
-              <input id="p-code" value="ALN-9921" /></div>
+              <input id="p-code" placeholder="ALN-XXXX" /></div>
             <div class="field"><label for="p-stage">Chặng hiện tại</label>
               <select id="p-stage"><option>C1</option><option selected>C2</option><option>C3</option><option>C4</option></select></div>
           </div>
           <div class="field"><label for="p-name">Tên dự án</label>
-            <input id="p-name" value="Biệt thự Vườn Tân Cổ Điển" /></div>
+            <input id="p-name" placeholder="Tên dự án" /></div>
           <div class="field"><label for="p-status">Trạng thái</label>
             <select id="p-status">
               <option value="on_track">on_track</option>
@@ -150,14 +150,14 @@
             </select></div>
           <div class="row">
             <div class="field"><label for="p-fee">totalFee (VND)</label>
-              <input id="p-fee" type="number" value="125000000" /></div>
+              <input id="p-fee" type="number" placeholder="125000000" /></div>
             <div class="field"><label for="p-escrow">escrowBalance (VND)</label>
-              <input id="p-escrow" type="number" value="75000000" /></div>
+              <input id="p-escrow" type="number" placeholder="75000000" /></div>
           </div>
           <label>Tiến độ (0 → 1)</label>
           <div class="row">
-            <div class="field"><input id="pg-C1" type="number" step="0.05" min="0" max="1" value="1" /></div>
-            <div class="field"><input id="pg-C2" type="number" step="0.05" min="0" max="1" value="0.4" /></div>
+            <div class="field"><input id="pg-C1" type="number" step="0.05" min="0" max="1" value="0" /></div>
+            <div class="field"><input id="pg-C2" type="number" step="0.05" min="0" max="1" value="0" /></div>
             <div class="field"><input id="pg-C3" type="number" step="0.05" min="0" max="1" value="0" /></div>
             <div class="field"><input id="pg-C4" type="number" step="0.05" min="0" max="1" value="0" /></div>
           </div>
@@ -170,36 +170,36 @@
           <div class="member" data-role="cn">
             <div class="mhead"><span class="tag">CN</span><span style="font-size:12.5px;color:var(--ink-2)">Chủ nhà</span></div>
             <div class="row">
-              <div><label>username</label><input id="cn-username" value="cn.thuannv" /></div>
+              <div><label>username</label><input id="cn-username" placeholder="cn.username" /></div>
               <div style="flex:0 0 auto;display:flex;align-items:flex-end"><button class="mini" data-resolve="cn">Tìm uid</button></div>
             </div>
             <div class="uidline">
               <input id="cn-uid" placeholder="uid (tự điền sau khi Tìm, hoặc dán tay)" />
-              <input id="cn-name" value="Nguyễn Văn Thuận" placeholder="name" />
+              <input id="cn-name" placeholder="name" />
             </div>
           </div>
 
           <div class="member" data-role="kts">
             <div class="mhead"><span class="tag">KTS</span><span style="font-size:12.5px;color:var(--ink-2)">Kiến trúc sư</span></div>
             <div class="row">
-              <div><label>username</label><input id="kts-username" value="kts.minhtran" /></div>
+              <div><label>username</label><input id="kts-username" placeholder="kts.username" /></div>
               <div style="flex:0 0 auto;display:flex;align-items:flex-end"><button class="mini" data-resolve="kts">Tìm uid</button></div>
             </div>
             <div class="uidline">
               <input id="kts-uid" placeholder="uid" />
-              <input id="kts-name" value="KTS. Trần Lê Minh" placeholder="name" />
+              <input id="kts-name" placeholder="name" />
             </div>
           </div>
 
           <div class="member" data-role="dn">
             <div class="mhead"><span class="tag opt">DN</span><span style="font-size:12.5px;color:var(--ink-2)">Đơn vị thi công — có thể bỏ trống</span></div>
             <div class="row">
-              <div><label>username</label><input id="dn-username" value="dn.applamnha" /></div>
+              <div><label>username</label><input id="dn-username" placeholder="dn.username" /></div>
               <div style="flex:0 0 auto;display:flex;align-items:flex-end"><button class="mini" data-resolve="dn">Tìm uid</button></div>
             </div>
             <div class="uidline">
               <input id="dn-uid" placeholder="uid (để trống nếu chưa gán)" />
-              <input id="dn-name" value="Áp Làm Nhà" placeholder="name" />
+              <input id="dn-name" placeholder="name" />
             </div>
           </div>
         </div>
