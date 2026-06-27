@@ -142,12 +142,15 @@ service cloud.firestore {
     }
 
     match /matchingRequests/{id} {
-      allow create: if request.auth != null
-        && request.resource.data.dnId == request.auth.uid;
-      allow read: if request.auth != null
-        && resource.data.dnId == request.auth.uid;
-      allow update: if isFounder();
+      allow read: if isFounder() || (signedIn() && resource.data.cnId == request.auth.uid);
+      allow create: if signedIn();
+      allow update: if isFounder() || (signedIn() && resource.data.cnId == request.auth.uid);
       allow delete: if false;
+    }
+
+    match /locationLogs/{id} {
+      allow read: if isFounder();
+      allow create: if signedIn();
     }
 
     match /projects/{pid} {
