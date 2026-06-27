@@ -367,6 +367,26 @@ async function resolveMember(role){
 document.querySelectorAll('[data-resolve]').forEach(b =>
   b.addEventListener('click', () => resolveMember(b.dataset.resolve)));
 
+// Auto-fetch name khi dán uid trực tiếp vào ô uid
+['cn','kts','dn'].forEach(function(role){
+  var uidInput = $(role+'-uid');
+  if(!uidInput) return;
+  uidInput.addEventListener('blur', async function(){
+    var uid = uidInput.value.trim();
+    var nameInput = $(role+'-name');
+    if(!uid || (nameInput && nameInput.value.trim())) return;
+    try{
+      var snap = await getDoc(doc(db,'users',uid));
+      if(snap.exists() && snap.data().name){
+        nameInput.value = snap.data().name;
+        if(!$(role+'-username').value) $(role+'-username').value = snap.data().username||'';
+        log('ok','['+role.toUpperCase()+'] tự điền name: '+snap.data().name);
+        refreshPreview();
+      }
+    }catch(e){}
+  });
+});
+
 /* ---- đọc form ---- */
 const val = id => $(id).value;
 function readMember(role){
