@@ -245,6 +245,14 @@
     </div>
   </div>
 
+  <!-- Matching Request Sample -->
+  <div class="card" style="margin-top:18px;max-width:560px">
+    <h2>Tạo Matching Request mẫu</h2>
+    <p class="hint">Ghi 1 doc vào <code>matchingRequests/</code> với schema mới để test tab Ghép cặp của Founder.</p>
+    <button class="primary" id="seedMatchBtn" style="margin-top:8px">Tạo matching request mẫu</button>
+    <div id="matchLog" style="margin-top:10px;font-size:12px;color:var(--green)"></div>
+  </div>
+
   <p class="footnote">
     Trang một-lần dùng. Sau khi seed xong có thể xoá file này khỏi hosting.
     Mỗi lần chạy ghi 1 dự án + 4 chặng C1–C4 (+ tuỳ chọn tài liệu/phương án) trong vài <i>writeBatch</i> nguyên khối.
@@ -501,6 +509,50 @@ $('run').addEventListener('click', async () => {
 });
 
 refreshPreview();
+
+/* ── Matching Request mẫu ── */
+import { addDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+document.getElementById('seedMatchBtn').addEventListener('click', async function() {
+  var log = document.getElementById('matchLog');
+  log.textContent = 'Đang ghi...';
+  try {
+    var ref = await addDoc(collection(db, 'matchingRequests'), {
+      cnId: 'G4RhRH5ECMYcE9aFcKYVn5Wdy952', // cn.trannam
+      status: 'pending_founder',
+      createdAt: serverTimestamp(),
+      suggestions: [
+        {
+          ktsId: 'kw5TgVDggIfboEqERS1cAphn3263',
+          rank: 1, score: 82,
+          scoreBreakdown: { style: 75, proximity: 100, budget: 80, rating: 70 },
+          name: 'KTS. Trần Đại Long', tier: 'Senior', homeProvince: 'TP.HCM',
+          capacity: 3, isTemporary: false
+        },
+        {
+          ktsId: 'kts_demo_002',
+          rank: 2, score: 67,
+          scoreBreakdown: { style: 60, proximity: 60, budget: 80, rating: 60 },
+          name: 'KTS. Nguyễn Văn A', tier: 'Junior', homeProvince: 'Bình Dương',
+          capacity: 5, isTemporary: false
+        },
+        {
+          ktsId: 'kts_demo_003',
+          rank: 3, score: 54,
+          scoreBreakdown: { style: 40, proximity: 60, budget: 40, rating: 80 },
+          name: 'KTS. Lê Thị B', tier: 'Mid', homeProvince: 'Đồng Nai',
+          capacity: 2, isTemporary: true
+        }
+      ],
+      selectedKtsId: null, founderNote: '', skippedKts: [],
+      meta: { expanded: false, expandedTo: null, styleIgnored: false, preset: 'can_bang' }
+    });
+    log.textContent = '✓ Đã tạo: ' + ref.id;
+  } catch(e) {
+    log.style.color = 'var(--red)';
+    log.textContent = 'Lỗi: ' + (e.message || e.code);
+  }
+});
 </script>
 </body>
 </html>
