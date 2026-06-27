@@ -924,6 +924,14 @@ body::after {
     style="padding:5px 13px;border:1px solid rgba(167,139,250,.3);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(124,58,237,.1);color:#a78bfa;display:flex;align-items:center;gap:5px">
     <i class="ph-duotone ph-clock-countdown"></i>Phòng chờ<span id="waitRoomBadge" style="display:none;background:#7c3aed;color:#fff;border-radius:99px;font-size:9px;padding:1px 6px;font-weight:800">0</span>
   </button>
+  <button id="tabMatching" onclick="switchTab('matching')"
+    style="padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px">
+    <i class="ph-duotone ph-link"></i>Ghép cặp<span id="matchingBadge" style="display:none;background:var(--gold);color:#08090f;border-radius:99px;font-size:9px;padding:1px 6px;font-weight:800">0</span>
+  </button>
+  <button id="tabC2monitor" onclick="switchTab('c2monitor')"
+    style="padding:5px 13px;border:1px solid rgba(239,68,68,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(239,68,68,.08);color:#ef4444;display:flex;align-items:center;gap:5px">
+    <i class="ph-duotone ph-eye"></i>Giám sát C2<span id="c2AlertBadge" style="display:none;background:#ef4444;color:#fff;border-radius:99px;font-size:9px;padding:1px 6px;font-weight:800">0</span>
+  </button>
 
   <a href="aln_community.html"
     style="padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;text-decoration:none">
@@ -1459,6 +1467,49 @@ body::after {
   </div>
   <div id="wrList" style="padding:16px 20px;display:flex;flex-direction:column;gap:10px">
     <div style="color:var(--dim);font-size:12px;text-align:center;padding:40px 0">Đang tải...</div>
+  </div>
+</div>
+
+<!-- ══ PANEL: DUYỆT GHÉP CẶP ══ -->
+<div id="panelMatching" style="display:none;flex-direction:column;flex:1;overflow-y:auto">
+  <div style="padding:16px 20px 0;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+      <div>
+        <div style="font-family:var(--serif);font-style:italic;font-size:20px;font-weight:500;color:var(--gold)">Duyệt ghép cặp</div>
+        <div style="font-size:11px;color:var(--dim);margin-top:2px">Matching engine đề xuất — Founder quyết định cuối cùng</div>
+      </div>
+      <button onclick="loadMatchingPanel()" style="padding:7px 16px;background:var(--gold-bg);border:1px solid var(--gold-bd);border-radius:7px;color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:6px">
+        <i class="ph-duotone ph-arrow-clockwise"></i> Tải lại
+      </button>
+    </div>
+  </div>
+  <div id="matchingList" style="padding:16px 20px;display:flex;flex-direction:column;gap:16px">
+    <div style="color:var(--dim);font-size:12px;text-align:center;padding:40px 0">Đang tải...</div>
+  </div>
+</div>
+
+<!-- ══ PANEL: GIÁM SÁT C2 ══ -->
+<div id="panelC2monitor" style="display:none;flex-direction:column;flex:1;overflow-y:auto">
+  <div style="padding:16px 20px 0;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+      <div>
+        <div style="font-family:var(--serif);font-style:italic;font-size:20px;font-weight:500;color:var(--gold)">Giám sát C2</div>
+        <div style="font-size:11px;color:var(--dim);margin-top:2px">Theo dõi tín hiệu bất thường trong chặng thiết kế kỹ thuật</div>
+      </div>
+      <button onclick="loadC2MonitorPanel()" style="padding:7px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:7px;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:6px">
+        <i class="ph-duotone ph-arrow-clockwise"></i> Tải lại
+      </button>
+    </div>
+  </div>
+  <div id="c2MonitorList" style="padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px">
+    <div style="color:var(--dim);font-size:12px;text-align:center;padding:40px 0;grid-column:1/-1">Đang tải...</div>
+  </div>
+  <!-- Evidence Modal -->
+  <div id="c2EvidenceModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(7,18,32,.85);backdrop-filter:blur(6px);align-items:center;justify-content:center">
+    <div style="background:#0d1b2a;border:1px solid #1c2a3a;border-radius:14px;width:min(92vw,580px);max-height:88vh;overflow-y:auto;padding:22px 20px;position:relative">
+      <button onclick="document.getElementById('c2EvidenceModal').style.display='none'" style="position:absolute;top:12px;right:12px;background:none;border:none;color:#3a5878;font-size:17px;cursor:pointer;line-height:1">✕</button>
+      <div id="c2EvidenceContent"></div>
+    </div>
   </div>
 </div>
 
@@ -2405,7 +2456,7 @@ window.ALNRealtime = (() => {
 ══════════════════════════════════════════ */
 
 function switchTab(t){
-  var ALL = ['projects','stats','mgKts','mgDn','mgCn','pending','payments','recruit','waitRoom','liveKts','liveDn','liveCn','liveDes'];
+  var ALL = ['projects','stats','mgKts','mgDn','mgCn','pending','payments','recruit','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
   var activeStyle  = 'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.15);color:var(--blue);white-space:nowrap';
   var inactiveStyle= 'padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:var(--raised);color:var(--sub);white-space:nowrap';
   var liveStyles = {
@@ -2415,7 +2466,9 @@ function switchTab(t){
     liveDn:  {active:'padding:5px 13px;border:1px solid rgba(59,130,246,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.2);color:var(--blue);display:flex;align-items:center;gap:5px;white-space:nowrap',   inactive:'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.08);color:var(--blue);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     liveCn:   {active:'padding:5px 13px;border:1px solid rgba(16,185,129,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.2);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     liveDes:  {active:'padding:5px 13px;border:1px solid rgba(124,58,237,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.22);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap',   inactive:'padding:5px 13px;border:1px solid rgba(124,58,237,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.08);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap'},
-    waitRoom: {active:'padding:5px 13px;border:1px solid rgba(167,139,250,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.22);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(167,139,250,.3);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.1);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap'},
+    waitRoom:  {active:'padding:5px 13px;border:1px solid rgba(167,139,250,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.22);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(167,139,250,.3);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.1);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap'},
+    matching:  {active:'padding:5px 13px;border:1px solid rgba(201,168,76,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.2);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap'},
+    c2monitor: {active:'padding:5px 13px;border:1px solid rgba(239,68,68,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.2);color:#ef4444;display:flex;align-items:center;gap:5px;white-space:nowrap',     inactive:'padding:5px 13px;border:1px solid rgba(239,68,68,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.08);color:#ef4444;display:flex;align-items:center;gap:5px;white-space:nowrap'},
     payments: {active:'padding:5px 13px;border:1px solid rgba(16,185,129,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.2);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap'},
   };
 
@@ -2442,6 +2495,8 @@ function switchTab(t){
   if(t==='payments') renderPayments();
   if(t==='recruit')  { if(typeof window._recruitRender==='function') window._recruitRender(); }
   if(t==='waitRoom') loadWaitRoom();
+  if(t==='matching')   loadMatchingPanel();
+  if(t==='c2monitor')  loadC2MonitorPanel();
 
   // LIVE iframes: chỉ tải khi vào tab, rời tab thì giải phóng bộ nhớ
   var IFR = { liveKts:'iframeKts', liveDn:'iframeDn', liveCn:'iframeCn', liveDes:'iframeDes' };
@@ -3870,7 +3925,7 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, query, where, orderBy, limit, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "founder";
 
@@ -4553,6 +4608,328 @@ window.wrReject = async function(uid) {
     try{ toast('Đã từ chối hồ sơ', 'warn'); }catch(e){}
   } catch(e) { alert('Lỗi: '+(e.message||e.code)); }
 };
+
+/* ══ MATCHING PANEL ══ */
+var _matchUnsub = null;
+window.loadMatchingPanel = function() {
+  var list = document.getElementById('matchingList');
+  if (!list) return;
+  list.innerHTML = '<div style="color:var(--dim);font-size:12px;text-align:center;padding:40px 0">Đang tải...</div>';
+  if (_matchUnsub) { _matchUnsub(); _matchUnsub = null; }
+
+  _matchUnsub = onSnapshot(
+    query(collection(db, 'matchingRequests'), where('status','==','pending_founder'), orderBy('createdAt','desc')),
+    async function(snap) {
+      var badge = document.getElementById('matchingBadge');
+      if (badge) { badge.textContent = snap.size; badge.style.display = snap.size > 0 ? '' : 'none'; }
+      if (snap.empty) {
+        list.innerHTML = '<div style="color:var(--dim);font-size:13px;text-align:center;padding:60px 0">Không có yêu cầu ghép cặp nào đang chờ duyệt</div>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < snap.docs.length; i++) {
+        var r = snap.docs[i];
+        var d = r.data();
+        var cnName = d.cnId || '—';
+        try {
+          var cnSnap = await getDoc(doc(db,'users',d.cnId));
+          if (cnSnap.exists()) cnName = cnSnap.data().name || d.cnId;
+        } catch(e) {}
+        var suggs = (d.suggestions || []).filter(function(s){ return !(d.skippedKts||[]).includes(s.ktsId); });
+        html += '<div style="background:#0d1b2a;border:1px solid #1c2a3a;border-radius:14px;overflow:hidden;margin-bottom:4px" id="mreq_' + r.id + '">';
+        html += '<div style="padding:13px 16px;border-bottom:1px solid #1c2a3a;display:flex;justify-content:space-between;align-items:center">';
+        html += '<div><div style="font-size:13px;font-weight:600;color:#e0d4b0">CN: ' + cnName + '</div><div style="font-size:11px;color:#6a8aaa">#' + r.id.slice(0,8) + '…</div></div>';
+        html += '<span style="font-size:10px;color:#c9a84c;background:#12180a;border:1px solid #7a6030;border-radius:20px;padding:2px 9px;font-weight:600">Chờ duyệt</span></div>';
+        html += '<div style="display:flex;gap:10px;padding:13px;overflow-x:auto">';
+        if (!suggs.length) {
+          html += '<div style="color:#6a8aaa;font-size:12px;padding:10px">Tất cả KTS đã bị bỏ qua.</div>';
+        } else {
+          for (var j = 0; j < suggs.length; j++) {
+            var s = suggs[j];
+            var bd = s.scoreBreakdown || {};
+            html += '<div style="min-width:200px;flex:0 0 200px;background:#102030;border:1.5px solid #1c2a3a;border-radius:10px;padding:12px;cursor:pointer;transition:border-color .15s" onclick="selectKts(\'' + r.id + '\',\'' + s.ktsId + '\')" id="kcard_' + r.id + '_' + s.ktsId + '">';
+            html += '<div style="font-size:9px;color:#6a8aaa;background:#1c2a3a;border-radius:20px;padding:1px 7px;display:inline-block;margin-bottom:7px">#' + s.rank + '</div>';
+            html += '<div style="font-size:13px;font-weight:600;color:#e0d4b0;margin-bottom:2px">' + (s.name||s.ktsId) + '</div>';
+            html += '<div style="font-size:10px;color:#6a8aaa;margin-bottom:9px">' + (s.tier||'') + (s.homeProvince?' · '+s.homeProvince:'') + '</div>';
+            html += '<div style="font-size:22px;font-weight:700;color:#e0d4b0;line-height:1">' + Math.round(s.score||0) + '</div>';
+            html += '<div style="font-size:9px;color:#6a8aaa;margin-bottom:9px">Điểm phù hợp</div>';
+            var bars = [['Phong cách',bd.style||0],['Khu vực',bd.proximity||0],['Ngân sách',bd.budget||0],['Đánh giá',bd.rating||0]];
+            bars.forEach(function(b){
+              html += '<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">';
+              html += '<span style="font-size:9px;color:#6a8aaa;width:58px;flex-shrink:0">' + b[0] + '</span>';
+              html += '<div style="flex:1;height:4px;background:#1c2a3a;border-radius:2px;overflow:hidden"><div style="width:' + Math.round(b[1]) + '%;height:100%;background:#c9a84c;border-radius:2px"></div></div>';
+              html += '<span style="font-size:9px;color:#a0b8cc;width:22px;text-align:right">' + Math.round(b[1]) + '</span></div>';
+            });
+            html += '<div style="display:flex;gap:5px;margin-top:9px">';
+            html += '<button style="flex:1;padding:5px 0;font-size:10px;border-radius:6px;border:1px solid #1c2a3a;background:transparent;color:#6a8aaa;cursor:pointer;font-family:var(--sans)" onclick="event.stopPropagation();viewKtsProfile(\'' + s.ktsId + '\')">Hồ sơ</button>';
+            html += '<button style="flex:1;padding:5px 0;font-size:10px;border-radius:6px;border:1px solid rgba(200,90,58,.35);background:#140a0a;color:#c85a3a;cursor:pointer;font-family:var(--sans)" onclick="event.stopPropagation();skipKts(\'' + r.id + '\',\'' + s.ktsId + '\')">Bỏ qua</button>';
+            html += '</div></div>';
+          }
+        }
+        html += '</div>';
+        html += '<div style="padding:12px 16px;border-top:1px solid #1c2a3a;display:flex;align-items:center;gap:10px">';
+        html += '<input placeholder="Ghi chú của Founder (tuỳ chọn)…" id="mnote_' + r.id + '" style="flex:1;background:#102030;border:1px solid #1c2a3a;border-radius:7px;padding:7px 11px;color:#e0d4b0;font-size:12px;font-family:var(--sans);outline:none">';
+        html += '<button onclick="rejectMatchReq(\'' + r.id + '\')" style="padding:8px 12px;border-radius:7px;background:#140a0a;border:1px solid rgba(200,90,58,.3);color:#c85a3a;font-size:11px;cursor:pointer;font-family:var(--sans)">Từ chối</button>';
+        html += '<button id="mconfirm_' + r.id + '" onclick="confirmMatch(\'' + r.id + '\')" style="padding:8px 16px;border-radius:7px;background:#1c2a3a;border:none;color:#6a8aaa;font-size:12px;font-weight:700;cursor:not-allowed;font-family:var(--sans)">Xác nhận ghép cặp</button>';
+        html += '</div></div>';
+      }
+      list.innerHTML = html;
+    }
+  );
+};
+
+var _selectedKts = {};
+window.selectKts = function(reqId, ktsId) {
+  _selectedKts[reqId] = ktsId;
+  var cards = document.querySelectorAll('[id^="kcard_' + reqId + '_"]');
+  cards.forEach(function(c) {
+    var isSelected = c.id === 'kcard_' + reqId + '_' + ktsId;
+    c.style.borderColor = isSelected ? '#c9a84c' : '#1c2a3a';
+    c.style.background  = isSelected ? '#12180a' : '#102030';
+  });
+  var btn = document.getElementById('mconfirm_' + reqId);
+  if (btn) { btn.style.background = '#c9a84c'; btn.style.color = '#071220'; btn.style.cursor = 'pointer'; }
+};
+
+window.skipKts = async function(reqId, ktsId) {
+  try {
+    var reqRef = doc(db, 'matchingRequests', reqId);
+    var s = await getDoc(reqRef);
+    if (!s.exists()) return;
+    var current = s.data().skippedKts || [];
+    await updateDoc(reqRef, { skippedKts: [...current, ktsId] });
+    if (_selectedKts[reqId] === ktsId) delete _selectedKts[reqId];
+  } catch(e) { console.error('[skipKts]', e); }
+};
+
+window.confirmMatch = async function(reqId) {
+  var selectedKtsId = _selectedKts[reqId];
+  if (!selectedKtsId) return;
+  var note = (document.getElementById('mnote_' + reqId) || {}).value || '';
+  var btn = document.getElementById('mconfirm_' + reqId);
+  if (btn) { btn.textContent = 'Đang xử lý…'; btn.style.opacity = '.6'; btn.onclick = null; }
+  try {
+    var reqSnap = await getDoc(doc(db, 'matchingRequests', reqId));
+    if (!reqSnap.exists()) throw new Error('Request không tồn tại');
+    var request = reqSnap.data();
+    var { writeBatch: wb, increment: inc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    var batch = wb(db);
+    batch.update(doc(db, 'matchingRequests', reqId), {
+      status: 'approved', selectedKtsId: selectedKtsId, founderNote: note,
+      approvedAt: serverTimestamp(), approvedBy: auth.currentUser && auth.currentUser.uid
+    });
+    var projectRef = doc(collection(db, 'projects'));
+    var projectId = 'ALN-' + String(Math.floor(1000 + Math.random() * 9000));
+    batch.set(projectRef, {
+      id: projectId, requestId: reqId,
+      cnId: request.cnId, ktsId: selectedKtsId,
+      stage: 'C1', c1StartedAt: serverTimestamp(),
+      locationMonitoring: false, status: 'active',
+      memberUids: [request.cnId, selectedKtsId].filter(Boolean),
+      createdAt: serverTimestamp()
+    });
+    batch.update(doc(db, 'users', selectedKtsId), { capacity: inc(-1) });
+    await batch.commit();
+    if (typeof showFounderToast === 'function') showFounderToast('Ghép cặp thành công! Project ' + projectId + ' đã tạo.', 'green');
+  } catch(e) {
+    console.error('[confirmMatch]', e);
+    try {
+      await updateDoc(doc(db, 'matchingRequests', reqId), {
+        status: 'approved', selectedKtsId: selectedKtsId, founderNote: note, approvedAt: serverTimestamp()
+      });
+    } catch(e2) {}
+    if (typeof showFounderToast === 'function') showFounderToast('Đã duyệt! (Tạo project thủ công nếu cần)', 'amber');
+  }
+};
+
+window.rejectMatchReq = async function(reqId) {
+  if (!confirm('Từ chối toàn bộ yêu cầu này?')) return;
+  try {
+    await updateDoc(doc(db, 'matchingRequests', reqId), { status: 'rejected', rejectedAt: serverTimestamp() });
+  } catch(e) { console.error('[rejectMatchReq]', e); }
+};
+
+window.viewKtsProfile = async function(ktsId) {
+  try {
+    var snap = await getDoc(doc(db, 'users', ktsId));
+    if (!snap.exists()) { alert('Không tìm thấy KTS'); return; }
+    var p = snap.data();
+    var revSnap = await getDocs(query(collection(db, 'reviews'), where('ktsId','==',ktsId), orderBy('createdAt','desc'), limit(3)));
+    var warSnap = await getDocs(query(collection(db, 'warnings'), where('ktsId','==',ktsId)));
+    var revHtml = '';
+    revSnap.docs.forEach(function(r){ var rd = r.data(); revHtml += '<div style="background:#102030;border:1px solid #1c2a3a;border-radius:7px;padding:9px 11px;margin-bottom:7px"><div style="font-size:11px;color:#a0b8cc;margin-bottom:3px">"' + (rd.comment||'Không có nội dung') + '"</div><div style="font-size:10px;color:#6a8aaa">⭐ ' + (rd.rating||'—') + '</div></div>'; });
+    var html = '<div style="font-family:Cormorant Garamond,serif;font-style:italic;font-size:19px;color:#c9a84c;margin-bottom:3px">' + (p.name||ktsId) + '</div>';
+    html += '<div style="font-size:11px;color:#6a8aaa;margin-bottom:14px">' + (p.tier?'Tier '+p.tier+' · ':'') + (p.homeProvince||'') + '</div>';
+    if (p.serviceProvinces && p.serviceProvinces.length) {
+      html += '<div style="font-size:10px;color:#6a8aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px">Khu vực hoạt động</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">' + p.serviceProvinces.map(function(x){ return '<span style="font-size:10px;padding:2px 9px;border-radius:20px;background:#102030;color:#6a8aaa;border:1px solid #1c2a3a">'+x+'</span>'; }).join('') + '</div>';
+    }
+    if (warSnap.size > 0) { html += '<div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#c85a3a;background:#140a0a;border:1px solid rgba(200,90,58,.35);border-radius:7px;padding:4px 10px;margin-bottom:12px">⚠ ' + warSnap.size + ' lần bị nhắc nhở</div>'; }
+    if (revHtml) { html += '<div style="font-size:10px;color:#6a8aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px">Phản hồi gần nhất</div>' + revHtml; }
+    var modal = document.getElementById('c2EvidenceModal');
+    var content = document.getElementById('c2EvidenceContent');
+    content.innerHTML = html;
+    modal.style.display = 'flex';
+  } catch(e) { console.error('[viewKtsProfile]', e); }
+};
+
+/* ══ C2 MONITOR PANEL ══ */
+var _c2Unsub = null;
+window.loadC2MonitorPanel = function() {
+  var list = document.getElementById('c2MonitorList');
+  if (!list) return;
+  list.innerHTML = '<div style="color:var(--dim);font-size:12px;text-align:center;padding:40px 0;grid-column:1/-1">Đang tải...</div>';
+  if (_c2Unsub) { _c2Unsub(); _c2Unsub = null; }
+
+  _c2Unsub = onSnapshot(
+    query(collection(db, 'projects'), where('stage','==','C2'), where('locationMonitoring','==',true), orderBy('suspicionStatus'), orderBy('c2StartedAt','asc')),
+    function(snap) {
+      var alertCount = snap.docs.filter(function(d){ return d.data().suspicionStatus === 'alert'; }).length;
+      var badge = document.getElementById('c2AlertBadge');
+      if (badge) { badge.textContent = alertCount; badge.style.display = alertCount > 0 ? '' : 'none'; }
+      if (snap.empty) {
+        list.innerHTML = '<div style="color:var(--dim);font-size:13px;text-align:center;padding:60px 0;grid-column:1/-1">Không có dự án C2 nào đang theo dõi</div>';
+        return;
+      }
+      var SUSPICION = {
+        alert: { color:'#c85a3a', bg:'#140a0a', label:'Cảnh báo', icon:'⚠' },
+        warn:  { color:'#c9a84c', bg:'#12180a', label:'Chú ý',   icon:'⚡' },
+        ok:    { color:'#5ab87a', bg:'#0a1410', label:'Bình thường', icon:'✓' }
+      };
+      var SIGNAL_ICONS = { location_match:'📍', chat_drop:'💬', c2_overdue:'⏱' };
+      var html = '';
+      snap.docs.forEach(function(d) {
+        var p = d.data();
+        var status = p.suspicionStatus || 'ok';
+        var cfg = SUSPICION[status] || SUSPICION.ok;
+        var signals = p.suspicionSignals || [];
+        var daysInC2 = p.c2StartedAt && p.c2StartedAt.toDate ? Math.floor((Date.now() - p.c2StartedAt.toDate().getTime()) / 86400000) : null;
+        html += '<div style="position:relative;background:#0d1b2a;border:1px solid #1c2a3a;border-radius:12px;padding:16px">';
+        html += '<span style="position:absolute;top:0;left:0;width:12px;height:12px;border-top:1.5px solid #c9a84c55;border-left:1.5px solid #c9a84c55;border-radius:20px 0 0 0"></span>';
+        html += '<span style="position:absolute;top:0;right:0;width:12px;height:12px;border-top:1.5px solid #c9a84c55;border-right:1.5px solid #c9a84c55;border-radius:0 20px 0 0"></span>';
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+        html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600;background:' + cfg.bg + ';color:' + cfg.color + ';border:1px solid ' + cfg.color + '44">' + cfg.icon + ' ' + cfg.label + '</span>';
+        if (daysInC2 !== null) html += '<span style="font-size:10px;color:#6a8aaa">Ngày ' + (daysInC2+1) + ' C2</span>';
+        html += '</div>';
+        html += '<div style="font-size:13px;font-weight:600;color:#e0d4b0;margin-bottom:3px">' + d.id + '</div>';
+        html += '<div style="font-size:11px;color:#6a8aaa;margin-bottom:10px">KTS: <b style="color:#a0b8cc">' + (p.monitoredPair&&p.monitoredPair.ktsId||'—') + '</b> · CN: <b style="color:#a0b8cc">' + (p.monitoredPair&&p.monitoredPair.cnId||'—') + '</b></div>';
+        if (p.locationDenied) html += '<div style="font-size:10px;color:#c85a3a;margin-bottom:6px">⛔ KTS đã từ chối cấp quyền vị trí</div>';
+        if (signals.length) {
+          html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">';
+          signals.forEach(function(s) {
+            var lvlColor = s.level==='red'?'#c85a3a':s.level==='amber'?'#c9a84c':'#5ab87a';
+            var lvlBg    = s.level==='red'?'#140a0a':s.level==='amber'?'#12100a':'#0a1410';
+            html += '<span style="font-size:10px;padding:2px 7px;border-radius:7px;background:'+lvlBg+';color:'+lvlColor+';border:1px solid '+lvlColor+'44">' + (SIGNAL_ICONS[s.type]||'•') + ' ' + (s.label||s.type) + '</span>';
+          });
+          html += '</div>';
+        }
+        html += '<div style="display:flex;gap:7px;margin-top:4px">';
+        html += '<button onclick="openC2Evidence(\'' + d.id + '\')" style="flex:1;padding:7px 0;border-radius:7px;border:1px solid #c9a84c;background:transparent;color:#c9a84c;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)">🔍 Điều tra</button>';
+        html += '<button onclick="alert(\'Liên hệ KTS: \'+(\''+((p.monitoredPair&&p.monitoredPair.ktsId)||'').replace(/'/g,"\\'")+'\'))" style="flex:1;padding:7px 0;border-radius:7px;border:1px solid #1c2a3a;background:#102030;color:#8a9ab0;font-size:11px;cursor:pointer;font-family:var(--sans)">💬 Liên hệ KTS</button>';
+        html += '</div></div>';
+      });
+      list.innerHTML = html;
+    },
+    function(err) {
+      list.innerHTML = '<div style="color:#c85a3a;font-size:12px;text-align:center;padding:40px 0;grid-column:1/-1">Lỗi tải dữ liệu: ' + err.message + '</div>';
+    }
+  );
+};
+
+window.openC2Evidence = async function(projectId) {
+  var modal = document.getElementById('c2EvidenceModal');
+  var content = document.getElementById('c2EvidenceContent');
+  content.innerHTML = '<div style="font-size:12px;color:#6a8aaa;text-align:center;padding:30px">Đang tải...</div>';
+  modal.style.display = 'flex';
+  try {
+    var projSnap = await getDoc(doc(db,'projects',projectId));
+    if (!projSnap.exists()) { content.innerHTML = '<div style="color:#c85a3a">Không tìm thấy dự án</div>'; return; }
+    var p = projSnap.data();
+    var signals = p.suspicionSignals || [];
+    var logSnap = await getDocs(query(collection(db,'locationLogs'), where('projectId','==',projectId), where('stage','==','C2'), orderBy('recordedAt','asc')));
+    var logs = logSnap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+    var SIGNAL_LABEL = { location_match:'Cùng vị trí', chat_drop:'Chat giảm mạnh', c2_overdue:'C2 kéo dài' };
+    var html = '<div style="font-family:Cormorant Garamond,serif;font-style:italic;font-size:19px;color:#c9a84c;margin-bottom:4px">Bằng chứng — ' + projectId + '</div>';
+    var STAT = { alert:{color:'#c85a3a',label:'Cảnh báo'}, warn:{color:'#c9a84c',label:'Chú ý'}, ok:{color:'#5ab87a',label:'Bình thường'} };
+    var sc = STAT[p.suspicionStatus||'ok'];
+    html += '<div style="font-size:11px;color:'+sc.color+';margin-bottom:14px">Trạng thái: '+sc.label+'</div>';
+    html += '<div style="font-size:10px;color:#6a8aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Tín hiệu nghi ngờ</div>';
+    if (!signals.length) {
+      html += '<div style="font-size:12px;color:#6a8aaa;margin-bottom:14px">Không có tín hiệu.</div>';
+    } else {
+      signals.forEach(function(s,i) {
+        var detail = s.count ? '(' + s.count + ' lần)' : s.percent ? '(giảm ' + s.percent + '%)' : s.days ? '(' + s.days + ' ngày)' : '';
+        html += '<div style="font-size:12px;color:#a0b8cc;padding:5px 0;border-bottom:1px solid #1c2a3a">' + (i+1) + '. [' + (s.level==='red'?'<span style="color:#c85a3a">Cảnh báo</span>':s.level==='amber'?'<span style="color:#c9a84c">Chú ý</span>':'<span style="color:#5ab87a">OK</span>') + '] ' + (SIGNAL_LABEL[s.type]||s.type) + ' ' + detail + '</div>';
+      });
+      html += '<div style="margin-bottom:14px"></div>';
+    }
+    html += '<div style="font-size:10px;color:#6a8aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Log vị trí (' + logs.length + ' bản ghi)</div>';
+    if (!logs.length) {
+      html += '<div style="font-size:12px;color:#6a8aaa;margin-bottom:14px">Chưa có dữ liệu vị trí.</div>';
+    } else {
+      logs.forEach(function(l) {
+        var who = l.userId === (p.monitoredPair&&p.monitoredPair.ktsId) ? 'KTS' : 'CN';
+        var t = l.recordedAt && l.recordedAt.toDate ? l.recordedAt.toDate().toLocaleString('vi-VN') : '—';
+        var lat = l.location && l.location.latitude ? l.location.latitude.toFixed(5) : '—';
+        var lng = l.location && l.location.longitude ? l.location.longitude.toFixed(5) : '—';
+        html += '<div style="font-size:11px;color:#a0b8cc;padding:4px 0;border-bottom:1px solid #1c2a3a">' + who + ' · ' + t + ' · ' + lat + ', ' + lng + '</div>';
+      });
+      html += '<div style="margin-bottom:14px"></div>';
+    }
+    html += '<button onclick="exportC2PDF(\'' + projectId + '\')" style="width:100%;padding:10px;border-radius:8px;border:1px solid #1c2a3a;background:#102030;color:#c9a84c;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);margin-top:4px">📄 Xuất báo cáo PDF</button>';
+    content.innerHTML = html;
+  } catch(e) {
+    content.innerHTML = '<div style="color:#c85a3a;font-size:12px">Lỗi: ' + e.message + '</div>';
+  }
+};
+
+window.exportC2PDF = function(projectId) {
+  if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = function() { _doExportC2PDF(projectId); };
+    document.head.appendChild(s);
+  } else {
+    _doExportC2PDF(projectId);
+  }
+};
+async function _doExportC2PDF(projectId) {
+  var jsPDFCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+  if (!jsPDFCtor) { alert('Không tải được jsPDF'); return; }
+  var projSnap = await getDoc(doc(db,'projects',projectId));
+  if (!projSnap.exists()) return;
+  var p = projSnap.data();
+  var logSnap = await getDocs(query(collection(db,'locationLogs'),where('projectId','==',projectId),where('stage','==','C2'),orderBy('recordedAt','asc')));
+  var pdf = new jsPDFCtor({ unit:'mm', format:'a4' });
+  var y = 20; var m = 20;
+  var line = function(text, sz, bold) { pdf.setFontSize(sz||10); pdf.setFont('helvetica', bold?'bold':'normal'); pdf.text(String(text), m, y); y += (sz||10)*0.5+2; };
+  var rule = function() { pdf.setDrawColor(180,160,80); pdf.line(m,y,190,y); y+=4; };
+  pdf.setFillColor(7,18,32); pdf.rect(0,0,210,35,'F');
+  pdf.setTextColor(201,168,76);
+  line('BÁO CÁO BẰNG CHỨNG — DỰ ÁN ' + projectId, 14, true);
+  pdf.setTextColor(160,140,100);
+  line('ALN Platform · Xuất lúc: ' + new Date().toLocaleString('vi-VN'), 9);
+  y = 42; pdf.setTextColor(30,30,30);
+  line('THÔNG TIN DỰ ÁN', 12, true); rule();
+  line('Giai đoạn: C2');
+  if (p.c2StartedAt&&p.c2StartedAt.toDate) line('Bắt đầu C2: '+p.c2StartedAt.toDate().toLocaleString('vi-VN'));
+  y+=4;
+  line('TÍN HIỆU NGHI NGỜ', 12, true); rule();
+  var signals = p.suspicionSignals||[];
+  if (!signals.length) { line('Không phát hiện tín hiệu nghi ngờ.'); }
+  else { signals.forEach(function(s,i){ line((i+1)+'. ['+(s.level==='red'?'Cảnh báo':s.level==='amber'?'Chú ý':'OK')+'] '+(s.label||s.type)); }); }
+  y+=4;
+  line('LOG VỊ TRÍ', 12, true); rule();
+  var logs = logSnap.docs;
+  if (!logs.length) { line('Chưa có dữ liệu vị trí.'); }
+  else { logs.forEach(function(d){ var l=d.data(); var who=l.userId===(p.monitoredPair&&p.monitoredPair.ktsId)?'KTS':'CN'; var t=l.recordedAt&&l.recordedAt.toDate?l.recordedAt.toDate().toLocaleString('vi-VN'):'—'; line(who+' · '+t+' · '+(l.location&&l.location.latitude?l.location.latitude.toFixed(5):'—')+', '+(l.location&&l.location.longitude?l.location.longitude.toFixed(5):'—')); if(y>260){pdf.addPage();y=20;} }); }
+  var conclusionMap = { alert:'⚠ Có dấu hiệu bất thường nghiêm trọng. Founder cần điều tra ngay.', warn:'⚡ Có tín hiệu đáng chú ý. Nên liên hệ xác nhận với KTS.', ok:'✓ Không phát hiện tín hiệu bất thường.' };
+  if(y>240){pdf.addPage();y=20;}
+  y+=4; line('KẾT LUẬN', 12, true); rule();
+  line(conclusionMap[p.suspicionStatus||'ok']);
+  y+=6; pdf.setFontSize(8); pdf.text('Được tạo bởi ALN Platform · Chỉ dành cho nội bộ Founder.', m, y);
+  pdf.save('ALN_Evidence_'+projectId+'_'+Date.now()+'.pdf');
+}
 </script>
 </body>
 </html>
