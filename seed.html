@@ -350,10 +350,11 @@ onAuthStateChanged(auth, async (user) => {
 /* ---- resolve uid từ username ---- */
 async function resolveMember(role){
   const u = $(role+'-username').value.trim();
-  if(!u){ log('warn','['+role.toUpperCase()+'] chưa nhập username'); return; }
+  if(!u){ log('warn','['+role.toUpperCase()+'] chưa nhập username hoặc tên'); return; }
   try{
-    const snap = await getDocs(query(collection(db,'users'), where('username','==',u)));
-    if(snap.empty){ log('warn','['+role.toUpperCase()+'] không thấy user "'+u+'" trong users/'); return; }
+    let snap = await getDocs(query(collection(db,'users'), where('username','==',u)));
+    if(snap.empty) snap = await getDocs(query(collection(db,'users'), where('name','==',u)));
+    if(snap.empty){ log('warn','['+role.toUpperCase()+'] không thấy "'+u+'" (thử cả username lẫn name)'); return; }
     const d = snap.docs[0];
     $(role+'-uid').value = d.id;
     if(d.data().name) $(role+'-name').value = d.data().name;
