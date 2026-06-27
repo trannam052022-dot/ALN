@@ -282,7 +282,7 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
     <div style="position:relative">
       <div class="hero-eyebrow">
         <span class="ey-line ey-line-l"></span>
-        <span class="ey-text">🏆 Founding Member — 100 KTS đầu tiên</span>
+        <span class="ey-text">🏆 Founding Member — Thế hệ KTS đầu tiên</span>
         <span class="ey-line ey-line-r"></span>
       </div>
       <h1 class="hero-title">
@@ -503,14 +503,30 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
     </div>
 
     <div class="field">
-      <label>CV / Portfolio <span class="req">✦</span></label>
-      <div class="upload-zone" id="cvZone">
-        <input type="file" id="f_cv" accept=".pdf,.doc,.docx">
-        <div class="uz-icon"><i class="ph-duotone ph-file-doc"></i></div>
-        <div class="uz-label">Kéo thả hoặc nhấn để chọn</div>
-        <div class="uz-sub">PDF hoặc DOCX · Tối đa 10 MB</div>
+      <label>Nộp hồ sơ năng lực <span class="req">✦</span></label>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.55">Chọn <b style="color:var(--text2)">một trong hai</b> cách nộp bên dưới — không cần nộp cả hai.</div>
+
+      <div style="background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.14);border-radius:11px;padding:16px 14px;margin-bottom:10px">
+        <div style="font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">① Profile năng lực (PDF)</div>
+        <div class="upload-zone" id="cvZone">
+          <input type="file" id="f_cv" accept=".pdf,.doc,.docx">
+          <div class="uz-icon"><i class="ph-duotone ph-file-doc"></i></div>
+          <div class="uz-label">Kéo thả hoặc nhấn để chọn</div>
+          <div class="uz-sub">PDF hoặc DOCX · Tối đa 10 MB</div>
+        </div>
+        <div class="upload-preview" id="cvPreview"></div>
       </div>
-      <div class="upload-preview" id="cvPreview"></div>
+
+      <div style="text-align:center;font-size:10px;color:var(--muted);margin:8px 0">— hoặc —</div>
+
+      <div style="background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.14);border-radius:11px;padding:16px 14px">
+        <div style="font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">② 3 bộ hồ sơ dự án đã thi công (CAD .dwg)</div>
+        <div class="field" style="margin-bottom:0">
+          <label>Link Google Drive <span class="req">✦</span></label>
+          <input type="url" id="f_drive" placeholder="https://drive.google.com/..." style="width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.11);padding:8px 0 10px;color:var(--text);font-size:14px;font-family:var(--sans);outline:none;transition:border-color .2s" onfocus="this.style.borderBottomColor='var(--gold2)'" onblur="this.style.borderBottomColor='rgba(255,255,255,.11)'">
+          <div style="font-size:10px;color:var(--muted);margin-top:6px">Đặt quyền <b>"Ai có link đều xem được"</b> trước khi dán link vào đây</div>
+        </div>
+      </div>
     </div>
 
     <div class="field">
@@ -602,7 +618,7 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
     <div class="success-wrap">
       <div class="success-icon"><i class="ph-duotone ph-check-circle"></i></div>
       <h2 class="success-title">Hồ sơ đã được gửi!</h2>
-      <p class="success-sub">Cảm ơn bạn đã đăng ký. Founder sẽ xem xét hồ sơ và liên hệ trong vòng 1–3 ngày làm việc.</p>
+      <p class="success-sub">Cảm ơn bạn đã đăng ký. ALN xét trong <b>3 ngày làm việc</b> (tối đa 9 ngày nếu cần xét kỹ). Đạt hồ sơ, ALN liên hệ trực tiếp.</p>
       <div class="success-uname" id="successUname">kts.an0000</div>
       <ul class="next-steps">
         <li><i class="ph-duotone ph-clock"></i> Hồ sơ đang chờ xét duyệt từ Founder</li>
@@ -871,6 +887,7 @@ window._doSubmit = async function() {
     var avatarFile = document.getElementById('f_avatar').files[0];
     var cvFile     = window.cvFiles && window.cvFiles[0];
     var certList   = window.certFiles || [];
+    var driveUrl   = (document.getElementById('f_drive').value || '').trim();
 
     var avatarUrl = '', cvUrl = '', certUrls = [];
     if (avatarFile) avatarUrl = await uploadFile('kts-profiles/' + uid + '/avatar.' + (avatarFile.name.split('.').pop() || 'jpg'), avatarFile);
@@ -891,7 +908,7 @@ window._doSubmit = async function() {
       uid: uid, name: name, phone: phone, email: email || '',
       boMon: bomon, years: years, specialties: specs, cchn: cchn, bio: bio,
       province_home: provHome, provinces_work: provWork,
-      avatarUrl: avatarUrl, cvUrl: cvUrl, certUrls: certUrls,
+      avatarUrl: avatarUrl, cvUrl: cvUrl, certUrls: certUrls, driveUrl: driveUrl,
       username: uname, status: 'pending', submittedAt: serverTimestamp()
     });
 
