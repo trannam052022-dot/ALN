@@ -5043,7 +5043,7 @@ async function _doExportC2PDF(projectId) {
   var projSnap = await getDoc(doc(db,'projects',projectId));
   if (!projSnap.exists()) return;
   var p = projSnap.data();
-  var logSnap = await getDocs(query(collection(db,'locationLogs'),where('projectId','==',projectId),where('stage','==','C2'),orderBy('recordedAt','asc')));
+  var logSnap = await getDocs(query(collection(db,'locationLogs'),where('projectId','==',projectId),orderBy('recordedAt','asc')));
   var pdf = new jsPDFCtor({ unit:'mm', format:'a4' });
   var y = 20; var m = 20;
   var line = function(text, sz, bold) { pdf.setFontSize(sz||10); pdf.setFont('helvetica', bold?'bold':'normal'); pdf.text(String(text), m, y); y += (sz||10)*0.5+2; };
