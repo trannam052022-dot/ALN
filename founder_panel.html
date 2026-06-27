@@ -1231,6 +1231,7 @@ body::after {
   </select>
   <div class="tb-actions">
     <button onclick="openCreateProj()" style="padding:6px 14px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green);border-radius:6px;font-size:12px;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;gap:5px"><i class="ph-duotone ph-plus-circle"></i> Tạo dự án mới</button>
+    <button onclick="exportProjectsCSV()" style="padding:7px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--sub);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:5px"><i class="ph-duotone ph-file-csv"></i> Export CSV</button>
     <button class="btn-refresh" onclick="refreshTable()"><i class="ph-duotone ph-arrow-clockwise"></i> Làm mới</button>
   </div>
 </div>
@@ -2042,6 +2043,7 @@ function renderTable(keepShown) {
         <button class="action-btn ${am.cls}" onclick="event.stopPropagation();openDrawer('${r._firestoreId}')">
           ${am.label}
         </button>
+        <button onclick="event.stopPropagation();founderAdvanceStage('${r._firestoreId}')" style="margin-top:4px;padding:4px 10px;border-radius:6px;border:1px solid rgba(90,184,122,.35);background:#0a1410;color:#5ab87a;font-size:11px;cursor:pointer;font-family:var(--sans)">▶ Stage</button>
       </td>
     </tr>`;
   }).join('');
@@ -3264,6 +3266,18 @@ async function saveCreateProj(){
       dn:  dnUser ? { uid: dnUser.uid, name: dnUser.name, username: dnUser.username || dnUser.phone || dnUser.uid } : null,
     });
 
+    // Sau khi tạo project thành công — link matchingRequest nếu có
+    if (window._pendingMatchReqId) {
+      try {
+        await updateDoc(doc(db, 'matchingRequests', window._pendingMatchReqId), {
+          status: 'approved',
+          projectId: pid,
+          approvedAt: serverTimestamp()
+        });
+        window._pendingMatchReqId = null;
+      } catch(e) { console.warn('[match link]', e); }
+    }
+
     closeCreateProj();
     if(typeof showToast === 'function') showToast('✅ Đã tạo dự án ' + pid, 'ok');
     else alert('✅ Đã tạo dự án ' + pid);
@@ -3316,23 +3330,30 @@ function closeAddModal(){
   document.getElementById('addModal').style.display = 'none';
 }
 
-function saveAddModal(){
+async function saveAddModal(){
+  var username = (document.getElementById('af_user')||{}).value||'';
+  username = username.trim();
   var name = document.getElementById('af_name') ? document.getElementById('af_name').value.trim() : '';
-  if(!name){ toast('Vui lòng nhập tên đầy đủ','warn'); return; }
-  if(_addModalType==='kts'){
-    var cchn = document.getElementById('af_cchn') ? document.getElementById('af_cchn').value.trim() : 'KTS-2026-NEW';
-    var tier = document.getElementById('af_tier') ? document.getElementById('af_tier').value : 'Chuẩn';
-    _mgKtsData.push({name:name,cchn:cchn,tier:tier,projects:0,activeProjects:0,rating:0,revenue:0,status:'active'});
-    closeAddModal(); renderMgKts();
-  } else if(_addModalType==='dn'){
-    var type = document.getElementById('af_type') ? document.getElementById('af_type').value : 'Công ty TNHH';
-    _mgDnData.push({name:name,type:type,projects:0,activeProjects:0,totalGtv:0,escrow:0,ktsLinked:0,status:'active'});
-    closeAddModal(); renderMgDn();
-  } else if(_addModalType==='cn'){
-    _mgCnData.push({cn:name,id:'ALN-NEW-'+Date.now().toString().slice(-4),name:'(chưa có dự án)',kts:'—',stage:'C1',status:'on_track',escrow:0,total:0,progress:[0,0,0,0]});
-    closeAddModal(); renderMgCn();
+  var role = _addModalType || 'cn';
+  if(!username || !name){ toast('Nhập đủ username và tên', 'warn'); return; }
+
+  var btn = document.getElementById('saveAddBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Đang tạo...'; }
+
+  try {
+    var { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
+    var fns = getFunctions(app, 'asia-southeast1');
+    var createUserFn = httpsCallable(fns, 'createUserByFounder');
+    var result = await createUserFn({ username: username, name: name, role: role });
+    var data = result.data;
+    alert('Tao thanh cong!\nUID: ' + data.uid + '\nEmail: ' + data.email + '\nMat khau tam: ' + data.tempPassword + '\n\n(Luu lai mat khau nay!)');
+    if (typeof _startFounderMgData === 'function') _startFounderMgData();
+    closeAddModal();
+  } catch(e) {
+    toast('Lỗi: ' + (e.message || e.code), 'warn');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Lưu'; }
   }
-  toast('✅ Đã thêm tài khoản: '+name, 'success');
 }
 
 function mgToggleStatus(type, idx){
@@ -4146,6 +4167,36 @@ window.founderRejectStage = async function(pid, stage) {
   }
 };
 
+window.founderAdvanceStage = async function(pid) {
+  var STAGES = ['C1','C2','C3','C4'];
+  try {
+    var snap = await getDoc(doc(db, 'projects', pid));
+    if (!snap.exists()) { alert('Không tìm thấy dự án'); return; }
+    var p = snap.data();
+    var cur = p.stage || 'C1';
+    var idx = STAGES.indexOf(cur);
+    if (idx < 0 || idx >= STAGES.length - 1) {
+      alert('Dự án đã ở giai đoạn cuối (' + cur + ')'); return;
+    }
+    var next = STAGES[idx + 1];
+    if (!confirm('Advance ' + pid + ' từ ' + cur + ' → ' + next + '?')) return;
+
+    var updates = {};
+    updates['stage'] = next;
+    updates['progress.' + cur] = 1;
+    updates['updatedAt'] = serverTimestamp();
+    updates[next.toLowerCase() + 'StartedAt'] = serverTimestamp();
+
+    await updateDoc(doc(db, 'projects', pid), updates);
+    if (typeof showFounderToast === 'function') showFounderToast('✓ ' + pid + ': ' + cur + ' → ' + next, 'ok');
+    else alert('✓ ' + pid + ': ' + cur + ' → ' + next);
+    if (typeof _startFounderMgData === 'function') _startFounderMgData();
+  } catch(e) {
+    console.error('[founderAdvanceStage]', e);
+    alert('Lỗi: ' + (e.message || e.code));
+  }
+};
+
 function _startFounderListen() {
   var q = query(collection(db,'projects'), orderBy('updatedAt','desc'));
   onSnapshot(q, function(snap){
@@ -4727,39 +4778,47 @@ window.confirmMatch = async function(reqId) {
   var selectedKtsId = _selectedKts[reqId];
   if (!selectedKtsId) return;
   var note = (document.getElementById('mnote_' + reqId) || {}).value || '';
-  var btn = document.getElementById('mconfirm_' + reqId);
-  if (btn) { btn.textContent = 'Đang xử lý…'; btn.style.opacity = '.6'; btn.onclick = null; }
+
   try {
     var reqSnap = await getDoc(doc(db, 'matchingRequests', reqId));
-    if (!reqSnap.exists()) throw new Error('Request không tồn tại');
+    if (!reqSnap.exists()) { alert('Request không tồn tại'); return; }
     var request = reqSnap.data();
-    var { writeBatch: wb, increment: inc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    var batch = wb(db);
-    batch.update(doc(db, 'matchingRequests', reqId), {
-      status: 'approved', selectedKtsId: selectedKtsId, founderNote: note,
-      approvedAt: serverTimestamp(), approvedBy: auth.currentUser && auth.currentUser.uid
+
+    // Đánh dấu request đã chọn KTS (chưa approved — chờ sau khi tạo project)
+    await updateDoc(doc(db, 'matchingRequests', reqId), {
+      selectedKtsId: selectedKtsId,
+      founderNote: note,
+      status: 'creating_project'
     });
-    var projectRef = doc(collection(db, 'projects'));
-    var projectId = 'ALN-' + String(Math.floor(1000 + Math.random() * 9000));
-    batch.set(projectRef, {
-      id: projectId, requestId: reqId,
-      cnId: request.cnId, ktsId: selectedKtsId,
-      stage: 'C1', c1StartedAt: serverTimestamp(),
-      locationMonitoring: false, status: 'active',
-      memberUids: [request.cnId, selectedKtsId].filter(Boolean),
-      createdAt: serverTimestamp()
-    });
-    batch.update(doc(db, 'users', selectedKtsId), { capacity: inc(-1) });
-    await batch.commit();
-    if (typeof showFounderToast === 'function') showFounderToast('Ghép cặp thành công! Project ' + projectId + ' đã tạo.', 'green');
+
+    // Mở modal "Tạo dự án mới" với CN + KTS đã điền sẵn
+    if (typeof openCreateProj === 'function') openCreateProj();
+    else if (typeof window.openCreateProj === 'function') window.openCreateProj();
+
+    // Pre-fill sau khi modal mở (dropdown cần thời gian load)
+    setTimeout(async function() {
+      // Set CN dropdown
+      var cnSel = document.getElementById('cp_cn');
+      if (cnSel) {
+        cnSel.value = request.cnId || '';
+        cnSel.dispatchEvent(new Event('change'));
+      }
+      // Set KTS dropdown
+      var ktsSel = document.getElementById('cp_kts');
+      if (ktsSel) {
+        // Chờ CN change load xong
+        setTimeout(function() {
+          ktsSel.value = selectedKtsId;
+          ktsSel.dispatchEvent(new Event('change'));
+        }, 600);
+      }
+      // Lưu reqId để sau khi tạo project xong, update matchingRequest → approved
+      window._pendingMatchReqId = reqId;
+    }, 400);
+
   } catch(e) {
     console.error('[confirmMatch]', e);
-    try {
-      await updateDoc(doc(db, 'matchingRequests', reqId), {
-        status: 'approved', selectedKtsId: selectedKtsId, founderNote: note, approvedAt: serverTimestamp()
-      });
-    } catch(e2) {}
-    if (typeof showFounderToast === 'function') showFounderToast('Đã duyệt! (Tạo project thủ công nếu cần)', 'amber');
+    alert('Lỗi: ' + (e.message || e.code));
   }
 };
 
@@ -4962,6 +5021,37 @@ async function _doExportC2PDF(projectId) {
   y+=6; pdf.setFontSize(8); pdf.text('Được tạo bởi ALN Platform · Chỉ dành cho nội bộ Founder.', m, y);
   pdf.save('ALN_Evidence_'+projectId+'_'+Date.now()+'.pdf');
 }
+
+window.exportProjectsCSV = async function() {
+  try {
+    var snap = await getDocs(query(collection(db, 'projects'), orderBy('updatedAt', 'desc')));
+    var rows = [['Mã DA','Tên','CN','KTS','DN','Stage','Status','Tổng phí','Escrow','Ngày tạo']];
+    snap.docs.forEach(function(d) {
+      var p = d.data();
+      var fee = p.totalFee || 0;
+      var escrow = p.escrowBalance || p.escrow || 0;
+      var createdAt = p.createdAt && p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString('vi-VN') : '';
+      rows.push([
+        d.id,
+        '"' + (p.name || '').replace(/"/g, '""') + '"',
+        '"' + (p.cn && p.cn.name ? p.cn.name : p.cnId || '') + '"',
+        '"' + (p.kts && p.kts.name ? p.kts.name : p.ktsId || '') + '"',
+        '"' + (p.dn && p.dn.name ? p.dn.name : p.dnId || '') + '"',
+        p.stage || '',
+        p.status || '',
+        fee,
+        escrow,
+        createdAt
+      ]);
+    });
+    var csv = rows.map(function(r){ return r.join(','); }).join('\n');
+    var blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'ALN_projects_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click(); URL.revokeObjectURL(url);
+  } catch(e) { alert('Export lỗi: ' + e.message); }
+};
 </script>
 </body>
 </html>

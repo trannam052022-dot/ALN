@@ -1044,3 +1044,35 @@ exports.scanC2Suspicion = functions
     console.log("[ALN] scanC2Suspicion done for", activeC2.size, "projects");
     return null;
   });
+
+/* ── Founder tạo user mới (CN/KTS/DN) không cần tự đăng ký ── */
+exports.createUserByFounder = onCall(
+  { region: "asia-southeast1" },
+  async (request) => {
+    if (!request.auth) throw new HttpsError("unauthenticated", "Chưa đăng nhập");
+    const FOUNDER_UIDS = ['h4kEguPEyMcwJwl89stc0Q6j2si2'];
+    if (!FOUNDER_UIDS.includes(request.auth.uid)) throw new HttpsError("permission-denied", "Chỉ Founder");
+
+    const { username, name, role, phone } = request.data || {};
+    if (!username || !name || !role) throw new HttpsError("invalid-argument", "Thiếu username/name/role");
+    const validRoles = ['cn','kts','dn','designer'];
+    if (!validRoles.includes(role)) throw new HttpsError("invalid-argument", "Role không hợp lệ");
+
+    const email = username + '@aln.vn';
+    const defaultPw = 'ALN@' + Math.random().toString(36).slice(2,8).toUpperCase();
+
+    try {
+      const userRecord = await admin.auth().createUser({ email, password: defaultPw, displayName: name });
+      await db.doc('users/' + userRecord.uid).set({
+        username, name, role, email, phone: phone || '',
+        status: 'active',
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdBy: 'founder'
+      });
+      return { uid: userRecord.uid, email, tempPassword: defaultPw };
+    } catch(e) {
+      if (e.code === 'auth/email-already-exists') throw new HttpsError("already-exists", "Username đã tồn tại");
+      throw new HttpsError("internal", e.message);
+    }
+  }
+);
