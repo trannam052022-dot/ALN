@@ -2025,10 +2025,17 @@ function renderTable(keepShown) {
   if (!keepShown) _tblShown = _TBL_PAGE;
   const rows = allRows.slice(0, _tblShown);
   const moreCount = allRows.length - rows.length;
-  const moreRow = moreCount > 0
-    ? `<tr><td colspan="7" style="text-align:center;padding:12px"><button onclick="renderTableMore()" style="background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.4);border-radius:8px;padding:9px 22px;color:#C9A84C;font-weight:700;font-size:12px;cursor:pointer">▾ Xem thêm ${moreCount} dự án</button></td></tr>`
-    : '';
-  tbody.innerHTML = rows.map(r => {
+
+  const cnRows = rows.filter(r => !r.id.startsWith('ALN-DN-'));
+  const dnRows = rows.filter(r =>  r.id.startsWith('ALN-DN-'));
+
+  const sectionHeader = (label, color, count) =>
+    `<tr><td colspan="7" style="padding:8px 14px;background:rgba(${color},.06);border-top:1px solid rgba(${color},.2);border-bottom:1px solid rgba(${color},.1)">
+      <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(${color},1);font-family:var(--sans)">${label}</span>
+      <span style="font-size:10px;color:rgba(${color},.6);margin-left:8px">${count} dự án</span>
+    </td></tr>`;
+
+  const renderRows = list => list.map(r => {
     const sm  = STATUS_MAP[r.status] || STATUS_MAP.ok;
     const am  = ACTION_MAP[r.status] || ACTION_MAP.ok;
     const fmtMoney = v => v >= 1000000 ? (v/1000000).toFixed(1).replace('.0','')+'M' : (v/1000).toFixed(0)+'K';
@@ -2040,14 +2047,21 @@ function renderTable(keepShown) {
       <td><div class="col-money">${fmtMoney(r.frozen * 100)}đ</div></td>
       <td><span class="status-badge ${sm.cls}">${sm.label}</span></td>
       <td>
-        <button class="action-btn ${am.cls}" onclick="event.stopPropagation();openDrawer('${r._firestoreId}')">
-          ${am.label}
-        </button>
+        <button class="action-btn ${am.cls}" onclick="event.stopPropagation();openDrawer('${r._firestoreId}')">${am.label}</button>
         <button onclick="event.stopPropagation();founderAdvanceStage('${r._firestoreId}')" style="margin-top:4px;padding:4px 10px;border-radius:6px;border:1px solid rgba(90,184,122,.35);background:#0a1410;color:#5ab87a;font-size:11px;cursor:pointer;font-family:var(--sans)">▶ Stage</button>
       </td>
     </tr>`;
   }).join('');
-  document.getElementById('pageInfo').textContent = `Hiển thị ${rows.length} / ${allRows.length} dự án`;
+
+  const moreRow = moreCount > 0
+    ? `<tr><td colspan="7" style="text-align:center;padding:12px"><button onclick="renderTableMore()" style="background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.4);border-radius:8px;padding:9px 22px;color:#C9A84C;font-weight:700;font-size:12px;cursor:pointer">▾ Xem thêm ${moreCount} dự án</button></td></tr>`
+    : '';
+
+  tbody.innerHTML =
+    (cnRows.length ? sectionHeader('🏠 Chủ nhà', '16,185,129', cnRows.length) + renderRows(cnRows) : '') +
+    (dnRows.length ? sectionHeader('🏢 Doanh nghiệp', '59,130,246', dnRows.length) + renderRows(dnRows) : '') +
+    moreRow;
+  document.getElementById('pageInfo').textContent = `Hiển thị ${rows.length} / ${allRows.length} dự án (${cnRows.length} CN · ${dnRows.length} DN)`;
 }
 
 /* ══════════════════════════════════════════
@@ -5032,8 +5046,11 @@ window.exportProjectsCSV = async function() {
       var fee = p.totalFee || 0;
       var escrow = p.escrowBalance || p.escrow || 0;
       var createdAt = p.createdAt && p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString('vi-VN') : '';
+      // Sinh display ID đúng prefix nếu doc ID chưa có
+      var _isDN = !!(p.dn && p.dn.uid);
+      var displayId = /^ALN-(CN|DN)-/.test(d.id) ? d.id : (_isDN ? 'ALN-DN-' : 'ALN-CN-') + d.id.replace(/^ALN-/,'');
       rows.push([
-        d.id,
+        displayId,
         '"' + (p.name || '').replace(/"/g, '""') + '"',
         '"' + (p.cn && p.cn.name ? p.cn.name : p.cnId || '') + '"',
         '"' + (p.kts && p.kts.name ? p.kts.name : p.ktsId || '') + '"',
