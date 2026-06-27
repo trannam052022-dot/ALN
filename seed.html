@@ -445,6 +445,14 @@ $('run').addEventListener('click', async () => {
 
   if(!code){ showBanner('err','Thiếu mã dự án.'); return; }
   if(!data.cn || !data.kts){ showBanner('err','CN và KTS bắt buộc phải có uid (bấm "Tìm uid" hoặc dán tay).'); return; }
+  // Tự động thêm prefix nếu thiếu
+  if(!/^ALN-(CN|DN)-/.test(code)){
+    const prefix = (data.dn && data.dn.uid && !data.cn) ? 'ALN-DN-' : 'ALN-CN-';
+    const fixed = prefix + code.replace(/^ALN-/i,'');
+    $('p-code').value = fixed;
+    data.code = fixed;
+    log('warn','Mã dự án tự đổi thành: '+fixed);
+  }
 
   $('run').disabled = true;
   log('info','── Bắt đầu seed '+code+' ──');

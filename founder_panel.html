@@ -4069,7 +4069,8 @@ window._cpFb = {
     };
   },
   createProject: async function(data) {
-    const pid = 'ALN-' + (1000 + Math.floor(Math.random() * 8999));
+    const _suffix = String(1000 + Math.floor(Math.random() * 8999));
+    const pid = (data.dn && data.dn.uid && !data.cn) ? 'ALN-DN-' + _suffix : 'ALN-CN-' + _suffix;
     const memberUids = [data.cn.uid, data.kts.uid, data.dn && data.dn.uid].filter(Boolean);
     const projData = {
       code: pid,
