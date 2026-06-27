@@ -4636,12 +4636,24 @@ window.loadMatchingPanel = function() {
       for (var i = 0; i < sortedDocs.length; i++) {
         var r = sortedDocs[i];
         var d = r.data();
-        var cnName = d.cnId || '—';
-        try {
-          var cnSnap = await getDoc(doc(db,'users',d.cnId));
-          if (cnSnap.exists()) cnName = cnSnap.data().name || d.cnId;
-        } catch(e) {}
+        // Tương thích cả schema cũ (dnId) và mới (cnId)
+        var resolvedCnId = d.cnId || d.dnId || null;
+        var cnName = resolvedCnId || '—';
+        if (resolvedCnId) {
+          try {
+            var cnSnap = await getDoc(doc(db,'users',resolvedCnId));
+            if (cnSnap.exists()) cnName = cnSnap.data().name || resolvedCnId;
+          } catch(e) {}
+        }
         var suggs = (d.suggestions || []).filter(function(s){ return !(d.skippedKts||[]).includes(s.ktsId); });
+        // Nếu không có suggestions (doc cũ / rác) — hiện nút xóa
+        if (!d.suggestions || d.suggestions.length === 0) {
+          html += '<div style="background:#0d1b2a;border:1px solid #1c2a3a;border-radius:14px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+          html += '<div><div style="font-size:12px;color:#6a8aaa">#' + r.id.slice(0,8) + '… — Dữ liệu không hợp lệ (schema cũ)</div></div>';
+          html += '<button onclick="deleteMatchReq(\'' + r.id + '\')" style="padding:5px 12px;border-radius:7px;background:#140a0a;border:1px solid rgba(200,90,58,.3);color:#c85a3a;font-size:11px;cursor:pointer;font-family:var(--sans)">Xoá</button>';
+          html += '</div>';
+          continue;
+        }
         html += '<div style="background:#0d1b2a;border:1px solid #1c2a3a;border-radius:14px;overflow:hidden;margin-bottom:4px" id="mreq_' + r.id + '">';
         html += '<div style="padding:13px 16px;border-bottom:1px solid #1c2a3a;display:flex;justify-content:space-between;align-items:center">';
         html += '<div><div style="font-size:13px;font-weight:600;color:#e0d4b0">CN: ' + cnName + '</div><div style="font-size:11px;color:#6a8aaa">#' + r.id.slice(0,8) + '…</div></div>';
@@ -4756,6 +4768,17 @@ window.rejectMatchReq = async function(reqId) {
   try {
     await updateDoc(doc(db, 'matchingRequests', reqId), { status: 'rejected', rejectedAt: serverTimestamp() });
   } catch(e) { console.error('[rejectMatchReq]', e); }
+};
+
+window.deleteMatchReq = async function(reqId) {
+  if (!confirm('Xoá vĩnh viễn request rác này?')) return;
+  try {
+    var { deleteDoc: dd } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await dd(doc(db, 'matchingRequests', reqId));
+  } catch(e) {
+    // Fallback: đánh dấu rejected nếu không xóa được
+    try { await updateDoc(doc(db, 'matchingRequests', reqId), { status: 'rejected' }); } catch(e2) {}
+  }
 };
 
 window.viewKtsProfile = async function(ktsId) {
