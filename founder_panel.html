@@ -4909,8 +4909,19 @@ window.loadC2MonitorPanel = function() {
   if (_c2Unsub) { _c2Unsub(); _c2Unsub = null; }
 
   _c2Unsub = onSnapshot(
-    query(collection(db, 'projects'), where('stage','==','C2'), where('locationMonitoring','==',true), orderBy('suspicionStatus'), orderBy('c2StartedAt','asc')),
+    query(collection(db, 'projects'), where('stage','==','C2')),
     function(snap) {
+      // lọc locationMonitoring client-side, sort theo suspicionStatus + c2StartedAt
+      snap = { docs: snap.docs.filter(function(d){ return d.data().locationMonitoring === true; }) };
+      snap.empty = snap.docs.length === 0;
+      var ORDER = { alert:0, warn:1, ok:2 };
+      snap.docs.sort(function(a,b){
+        var sa = ORDER[a.data().suspicionStatus||'ok']||2, sb = ORDER[b.data().suspicionStatus||'ok']||2;
+        if (sa !== sb) return sa - sb;
+        var ta = a.data().c2StartedAt && a.data().c2StartedAt.seconds || 0;
+        var tb = b.data().c2StartedAt && b.data().c2StartedAt.seconds || 0;
+        return ta - tb;
+      });
       var alertCount = snap.docs.filter(function(d){ return d.data().suspicionStatus === 'alert'; }).length;
       var badge = document.getElementById('c2AlertBadge');
       if (badge) { badge.textContent = alertCount; badge.style.display = alertCount > 0 ? '' : 'none'; }
