@@ -5027,53 +5027,52 @@ window.openC2Evidence = async function(projectId) {
   }
 };
 
-window.exportC2PDF = function(projectId) {
-  if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
-    var s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-    s.onload = function() { _doExportC2PDF(projectId); };
-    document.head.appendChild(s);
-  } else {
-    _doExportC2PDF(projectId);
-  }
-};
-async function _doExportC2PDF(projectId) {
-  var jsPDFCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
-  if (!jsPDFCtor) { alert('Không tải được jsPDF'); return; }
+window.exportC2PDF = async function(projectId) {
   var projSnap = await getDoc(doc(db,'projects',projectId));
   if (!projSnap.exists()) return;
   var p = projSnap.data();
   var logSnap = await getDocs(query(collection(db,'locationLogs'),where('projectId','==',projectId),orderBy('recordedAt','asc')));
-  var pdf = new jsPDFCtor({ unit:'mm', format:'a4' });
-  var y = 20; var m = 20;
-  var line = function(text, sz, bold) { pdf.setFontSize(sz||10); pdf.setFont('helvetica', bold?'bold':'normal'); pdf.text(String(text), m, y); y += (sz||10)*0.5+2; };
-  var rule = function() { pdf.setDrawColor(180,160,80); pdf.line(m,y,190,y); y+=4; };
-  pdf.setFillColor(7,18,32); pdf.rect(0,0,210,35,'F');
-  pdf.setTextColor(201,168,76);
-  line('BÁO CÁO BẰNG CHỨNG — DỰ ÁN ' + projectId, 14, true);
-  pdf.setTextColor(160,140,100);
-  line('ALN Platform · Xuất lúc: ' + new Date().toLocaleString('vi-VN'), 9);
-  y = 42; pdf.setTextColor(30,30,30);
-  line('THÔNG TIN DỰ ÁN', 12, true); rule();
-  line('Giai đoạn: C2');
-  if (p.c2StartedAt&&p.c2StartedAt.toDate) line('Bắt đầu C2: '+p.c2StartedAt.toDate().toLocaleString('vi-VN'));
-  y+=4;
-  line('TÍN HIỆU NGHI NGỜ', 12, true); rule();
-  var signals = p.suspicionSignals||[];
-  if (!signals.length) { line('Không phát hiện tín hiệu nghi ngờ.'); }
-  else { signals.forEach(function(s,i){ line((i+1)+'. ['+(s.level==='red'?'Cảnh báo':s.level==='amber'?'Chú ý':'OK')+'] '+(s.label||s.type)); }); }
-  y+=4;
-  line('LOG VỊ TRÍ', 12, true); rule();
-  var logs = logSnap.docs;
-  if (!logs.length) { line('Chưa có dữ liệu vị trí.'); }
-  else { logs.forEach(function(d){ var l=d.data(); var who=l.userId===(p.monitoredPair&&p.monitoredPair.ktsId)?'KTS':'CN'; var t=l.recordedAt&&l.recordedAt.toDate?l.recordedAt.toDate().toLocaleString('vi-VN'):'—'; line(who+' · '+t+' · '+(l.location&&l.location.latitude?l.location.latitude.toFixed(5):'—')+', '+(l.location&&l.location.longitude?l.location.longitude.toFixed(5):'—')); if(y>260){pdf.addPage();y=20;} }); }
+  var logs = logSnap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+  var signals = p.suspicionSignals || [];
+  var SIGNAL_LABEL = { location_match:'Cùng vị trí', chat_drop:'Chat giảm mạnh', c2_overdue:'C2 kéo dài' };
   var conclusionMap = { alert:'⚠ Có dấu hiệu bất thường nghiêm trọng. Founder cần điều tra ngay.', warn:'⚡ Có tín hiệu đáng chú ý. Nên liên hệ xác nhận với KTS.', ok:'✓ Không phát hiện tín hiệu bất thường.' };
-  if(y>240){pdf.addPage();y=20;}
-  y+=4; line('KẾT LUẬN', 12, true); rule();
-  line(conclusionMap[p.suspicionStatus||'ok']);
-  y+=6; pdf.setFontSize(8); pdf.text('Được tạo bởi ALN Platform · Chỉ dành cho nội bộ Founder.', m, y);
-  pdf.save('ALN_Evidence_'+projectId+'_'+Date.now()+'.pdf');
-}
+  var sigRows = signals.length
+    ? signals.map(function(s,i){ return '<tr><td>'+(i+1)+'</td><td>'+(SIGNAL_LABEL[s.type]||s.type)+'</td><td style="color:'+(s.level==='red'?'#c0392b':s.level==='amber'?'#d4900a':'#27ae60')+'">'+(s.level==='red'?'Cảnh báo':s.level==='amber'?'Chú ý':'Bình thường')+'</td></tr>'; }).join('')
+    : '<tr><td colspan="3" style="color:#666">Không phát hiện tín hiệu nghi ngờ.</td></tr>';
+  var logRows = logs.length
+    ? logs.map(function(l){ var isKts=l.role==='kts'; var t=l.recordedAt&&l.recordedAt.toDate?l.recordedAt.toDate().toLocaleString('vi-VN'):'—'; var lat=l.location&&l.location.latitude?l.location.latitude.toFixed(5):'—'; var lng=l.location&&l.location.longitude?l.location.longitude.toFixed(5):'—'; return '<tr><td style="color:'+(isKts?'#27ae60':'#2980b9')+'">'+(isKts?'KTS':'CN')+'</td><td>'+t+'</td><td>'+lat+', '+lng+'</td></tr>'; }).join('')
+    : '<tr><td colspan="3" style="color:#666">Chưa có dữ liệu vị trí GPS.</td></tr>';
+  var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Báo cáo '+projectId+'</title><style>'
+    + 'body{font-family:Arial,sans-serif;margin:0;padding:0;color:#1a1a1a}'
+    + '.header{background:#071220;color:#c9a84c;padding:24px 30px}'
+    + '.header h1{margin:0;font-size:20px;letter-spacing:1px}'
+    + '.header p{margin:4px 0 0;font-size:11px;color:#a08040}'
+    + '.body{padding:24px 30px}'
+    + 'h2{font-size:13px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:2px solid #c9a84c;padding-bottom:5px;margin-top:22px;color:#071220}'
+    + 'table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}'
+    + 'th{background:#f0e8d0;text-align:left;padding:6px 10px;font-size:11px}'
+    + 'td{padding:5px 10px;border-bottom:1px solid #eee}'
+    + '.conclusion{background:#f8f4e8;border-left:4px solid #c9a84c;padding:10px 14px;margin-top:8px;font-size:13px}'
+    + '.footer{margin-top:30px;font-size:9px;color:#999;text-align:center;border-top:1px solid #eee;padding-top:10px}'
+    + '@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}'
+    + '</style></head><body>'
+    + '<div class="header"><h1>BÁO CÁO BẰNG CHỨNG — DỰ ÁN ' + projectId + '</h1><p>ALN Platform · Xuất lúc: ' + new Date().toLocaleString('vi-VN') + '</p></div>'
+    + '<div class="body">'
+    + '<h2>Thông tin dự án</h2>'
+    + '<table><tr><td><b>Tên dự án:</b></td><td>'+(p.name||'—')+'</td><td><b>Giai đoạn:</b></td><td>'+( p.stage||'C2')+'</td></tr>'
+    + '<tr><td><b>Chủ nhà:</b></td><td>'+(p.cn&&p.cn.name||'—')+'</td><td><b>KTS:</b></td><td>'+(p.kts&&p.kts.name||'—')+'</td></tr>'
+    + (p.c2StartedAt&&p.c2StartedAt.toDate?'<tr><td><b>Bắt đầu C2:</b></td><td colspan="3">'+p.c2StartedAt.toDate().toLocaleString('vi-VN')+'</td></tr>':'')
+    + '</table>'
+    + '<h2>Tín hiệu nghi ngờ</h2><table><tr><th>#</th><th>Loại tín hiệu</th><th>Mức độ</th></tr>' + sigRows + '</table>'
+    + '<h2>Log vị trí</h2><table><tr><th>Vai</th><th>Thời gian</th><th>Tọa độ</th></tr>' + logRows + '</table>'
+    + '<h2>Kết luận</h2><div class="conclusion">' + (conclusionMap[p.suspicionStatus||'ok']) + '</div>'
+    + '<div class="footer">Được tạo bởi ALN Platform · Chỉ dành cho nội bộ Founder · ' + new Date().toLocaleDateString('vi-VN') + '</div>'
+    + '</div></body></html>';
+  var w = window.open('','_blank','width=800,height=900');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(function(){ w.print(); }, 600);
+};
 
 /* ══════════════════════════════════════════
    BẢN ĐỒ VỊ TRÍ C2 (Leaflet + OpenStreetMap)
