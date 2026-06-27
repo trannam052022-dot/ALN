@@ -14,6 +14,33 @@ window.KTS_PROJECT_DATA = null;
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/><style>.ph-spin{animation:phspin 1s linear infinite;display:inline-block}@keyframes phspin{to{transform:rotate(360deg)}}
+/* ── C2 SUBMIT MODAL ── */
+#c2SubmitModal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(7,18,32,.8);backdrop-filter:blur(6px)}
+#c2SubmitModal.open{display:flex}
+.c2m-card{position:relative;background:#0d1b2a;border:1px solid #1c2a3a;border-radius:16px;padding:28px 24px;width:min(92vw,420px);font-family:'DM Sans',sans-serif;color:#e0d4b0;box-shadow:0 24px 80px rgba(0,0,0,.7)}
+.c2m-corner{position:absolute;width:12px;height:12px;border-color:#c9a84c55;border-style:solid}
+.c2m-corner.tl{top:0;left:0;border-width:1.5px 0 0 1.5px;border-radius:20px 0 0 0}
+.c2m-corner.tr{top:0;right:0;border-width:1.5px 1.5px 0 0;border-radius:0 20px 0 0}
+.c2m-corner.bl{bottom:0;left:0;border-width:0 0 1.5px 1.5px;border-radius:0 0 0 20px}
+.c2m-corner.br{bottom:0;right:0;border-width:0 0 1.5px 1.5px;border-radius:0 0 20px 0}
+.c2m-step{font-size:10px;color:#6a8aaa;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.c2m-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:21px;color:#c9a84c;margin-bottom:6px}
+.c2m-desc{font-size:12px;color:#8a9ab0;line-height:1.7;margin-bottom:16px}
+.c2m-notice{font-size:11px;color:#a0b8cc;background:#102030;border:1px solid #1c2a3a;border-radius:8px;padding:9px 11px;margin-bottom:12px;line-height:1.6}
+.c2m-file-row{display:flex;align-items:center;gap:9px;background:#102030;border:1px solid #1c2a3a;border-radius:7px;padding:7px 11px;margin-bottom:7px;font-size:12px}
+.c2m-progress-track{height:6px;background:#1c2a3a;border-radius:3px;margin:14px 0;overflow:hidden}
+.c2m-progress-bar{height:100%;background:#c9a84c;border-radius:3px;transition:width .4s ease;width:0%}
+.c2m-pct{font-size:11px;color:#6a8aaa;text-align:center}
+.c2m-success-icon{font-size:44px;text-align:center;margin-bottom:10px}
+.c2m-success-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;color:#c9a84c;text-align:center;margin-bottom:10px}
+.c2m-divider{height:1px;background:#1c2a3a;margin:12px 0}
+.c2m-confirm-item{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:#8aaac8;margin-bottom:6px}
+.c2m-check{color:#5ab87a;font-weight:700;flex-shrink:0}
+.c2m-btn{width:100%;padding:11px 0;border-radius:9px;border:none;font-weight:700;font-size:13px;cursor:pointer;margin-top:8px;font-family:'DM Sans',sans-serif}
+.c2m-btn-primary{background:#c9a84c;color:#071220}
+.c2m-btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.c2m-btn-ghost{background:transparent;border:1px solid #1c2a3a;color:#8a9ab0}
+.c2m-error{font-size:11px;color:#c85a3a;margin-bottom:8px}
 /* ── DỰ ÁN CỦA TÔI ── */
 .proj-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;cursor:pointer;transition:.18s}
 .proj-card:hover{border-color:rgba(212,160,23,.4);background:rgba(212,160,23,.04)}
@@ -1036,6 +1063,16 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-primary" id="paSubmitBtn" onclick="alnSubmitProposal()"><i class="ph-duotone ph-paper-plane-tilt"></i> Gửi phương án</button>
         <button class="btn btn-ghost btn-sm" onclick="alnResetProposalForm()"><i class="ph-duotone ph-arrow-counter-clockwise"></i> Xóa form</button>
+      </div>
+
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Nộp hồ sơ tài liệu C2 (file PDF/ZIP) kèm xác định vị trí</div>
+        <label class="pa-drop" id="c2FileDrop" for="c2FileInput" style="margin-bottom:8px">
+          <input type="file" id="c2FileInput" multiple style="display:none" onchange="c2HandleFiles(this.files)">
+          <div id="c2DropHint"><i class="ph-duotone ph-file-arrow-up" style="font-size:22px;color:var(--gold)"></i><div style="margin-top:5px;font-size:12px;color:var(--muted)"><b>Kéo &amp; thả</b> hoặc <b>bấm để chọn</b> hồ sơ C2<br>PDF · ZIP · RAR · PNG</div></div>
+        </label>
+        <div id="c2FilePreview" style="margin-bottom:8px"></div>
+        <button class="btn btn-primary" id="submitC2Btn" onclick="c2OpenModal()"><i class="ph-duotone ph-map-pin"></i> Nộp Hồ sơ C2</button>
       </div>
 
       <div style="margin-top:16px">
@@ -3420,6 +3457,23 @@ window.alnSubmitProposal = async function(){
   }; // end _paDoUpload
 }; // end alnSubmitProposal
 
+/* ── C2 file picker helpers ── */
+window._c2PickedFiles = [];
+window.c2HandleFiles = function(fileList) {
+  window._c2PickedFiles = Array.from(fileList || []);
+  var preview = document.getElementById('c2FilePreview');
+  if (!preview) return;
+  if (!window._c2PickedFiles.length) { preview.innerHTML = ''; return; }
+  preview.innerHTML = window._c2PickedFiles.map(function(f) {
+    return '<div style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text2);padding:4px 0;border-bottom:1px solid var(--border)"><i class="ph-duotone ph-file" style="color:var(--gold)"></i>' + f.name + '</div>';
+  }).join('');
+};
+window.c2OpenModal = function() {
+  if (typeof window.openC2Modal === 'function') {
+    window.openC2Modal(window._c2PickedFiles || []);
+  }
+};
+
 /* Danh sách phương án đã gửi (theo chặng đang chọn) — cập nhật trực tiếp */
 function paWatch(stage){
   const box=document.getElementById('paSentList');
@@ -3772,6 +3826,171 @@ window.submitRev = async function() {
     if (typeof showToast === 'function') showToast('Lỗi upload: ' + ((e && e.code) || (e && e.message) || e), 't-red');
   }
 };
+/* ══ C2 SUBMIT MODAL — locationService + upload ══ */
+window._c2mFiles = []; // files cần upload cho C2
+
+window.openC2Modal = function(files) {
+  window._c2mFiles = files || [];
+  var modal = document.getElementById('c2SubmitModal');
+  var fileList = document.getElementById('c2mFileList');
+  if (!window._c2mFiles.length) {
+    fileList.innerHTML = '<div style="font-size:11px;color:#c85a3a;padding:6px 0">⚠ Chưa có file đính kèm</div>';
+  } else {
+    fileList.innerHTML = window._c2mFiles.map(function(f) {
+      return '<div class="c2m-file-row"><span style="font-size:15px;color:#c9a84c">📄</span><span style="flex:1;font-size:12px;color:#e0d4b0">' + f.name + '</span></div>';
+    }).join('');
+  }
+  document.getElementById('c2mStep1').style.display = '';
+  document.getElementById('c2mStep2').style.display = 'none';
+  document.getElementById('c2mStep3').style.display = 'none';
+  document.getElementById('c2mErr').style.display = 'none';
+  document.getElementById('c2mConfirmBtn').disabled = false;
+  modal.classList.add('open');
+};
+
+window.closeC2Modal = function() {
+  document.getElementById('c2SubmitModal').classList.remove('open');
+};
+
+function c2mSetProgress(pct, label) {
+  document.getElementById('c2mBar').style.width = pct + '%';
+  document.getElementById('c2mPct').textContent = label;
+}
+
+window.c2mDoSubmit = async function() {
+  var pid = window.KTS_PROJECT_ID;
+  if (!pid) return;
+  var uid = (auth.currentUser && auth.currentUser.uid) || '';
+
+  document.getElementById('c2mStep1').style.display = 'none';
+  document.getElementById('c2mStep2').style.display = '';
+  c2mSetProgress(15, 'Đang xác định vị trí…');
+
+  var locResult = null;
+  var locDenied = false;
+  var locTime   = '';
+
+  try {
+    locResult = await new Promise(function(resolve, reject) {
+      if (!navigator.geolocation) { reject(new Error('no-geo')); return; }
+      navigator.geolocation.getCurrentPosition(
+        async function(pos) {
+          var lat = pos.coords.latitude;
+          var lng = pos.coords.longitude;
+          try {
+            await updateDoc(doc(db, 'users', uid), {
+              lastSeenLocation: { latitude: lat, longitude: lng },
+              lastSeenAt: serverTimestamp()
+            });
+            await addDoc(collection(db, 'locationLogs'), {
+              userId: uid, projectId: pid, stage: 'C2',
+              location: { latitude: lat, longitude: lng },
+              recordedAt: serverTimestamp(), action: 'c2_submit'
+            });
+          } catch(e) {}
+          locTime = new Date().toLocaleString('vi-VN');
+          resolve({ latitude: lat, longitude: lng });
+        },
+        function(err) { reject(err); },
+        { timeout: 10000, maximumAge: 60000 }
+      );
+    });
+  } catch(e) {
+    locDenied = true;
+    try { await updateDoc(doc(db, 'projects', pid), { locationDenied: true, locationDeniedAt: serverTimestamp() }); } catch(e2) {}
+  }
+
+  c2mSetProgress(55, 'Đang tải hồ sơ lên…');
+
+  var files = window._c2mFiles || [];
+  var uploaderName = (window.KTS_USER && window.KTS_USER.name) || 'KTS';
+  var today = new Date().toLocaleDateString('vi-VN');
+  var uploadedNames = [];
+  for (var i = 0; i < files.length; i++) {
+    var f = files[i];
+    try {
+      var ref = storageRef(storage, 'projects/' + pid + '/c2/' + Date.now() + '_' + f.name);
+      await uploadBytes(ref, f);
+      var url = await getDownloadURL(ref);
+      await addDoc(collection(db, 'projects', pid, 'documents'), {
+        name: f.name, folder: 'c2', label: 'Hồ sơ C2',
+        url: url, stage: 'C2',
+        uploader: { uid: uid, name: uploaderName, role: 'kts' },
+        date: today
+      });
+      uploadedNames.push(f.name);
+    } catch(e) { console.error('[C2 upload]', f.name, e); }
+  }
+
+  try {
+    await updateDoc(doc(db, 'projects', pid), {
+      locationMonitoring: true,
+      c2StartedAt: serverTimestamp(),
+      monitoredPair: { ktsId: uid, cnId: (window.KTS_PROJECT_DATA && window.KTS_PROJECT_DATA.cn && window.KTS_PROJECT_DATA.cn.uid) || '' },
+      suspicionStatus: 'ok',
+      suspicionSignals: []
+    });
+  } catch(e) {}
+
+  c2mSetProgress(100, 'Hoàn tất!');
+  await new Promise(function(r){ setTimeout(r, 350); });
+
+  document.getElementById('c2mStep2').style.display = 'none';
+  document.getElementById('c2mStep3').style.display = '';
+
+  var items = '';
+  if (locResult && !locDenied) {
+    items += '<div class="c2m-confirm-item"><span class="c2m-check">✓</span><span>Vị trí đã ghi · ' + locTime + '<br><span style="font-size:10px;color:#3a5878">' + locResult.latitude.toFixed(5) + ', ' + locResult.longitude.toFixed(5) + '</span></span></div>';
+  } else {
+    items += '<div class="c2m-confirm-item" style="color:#c85a3a"><span>⛔</span><span>Vị trí không được cấp phép — đã ghi nhận</span></div>';
+  }
+  uploadedNames.forEach(function(n) {
+    items += '<div class="c2m-confirm-item"><span class="c2m-check">✓</span><span>' + n + ' đã gửi</span></div>';
+  });
+  if (!uploadedNames.length) {
+    items += '<div class="c2m-confirm-item"><span style="color:#c9a84c">•</span><span>Không có file được upload</span></div>';
+  }
+  document.getElementById('c2mSuccessItems').innerHTML = items;
+};
 </script>
+
+<!-- ══ C2 SUBMIT MODAL ══ -->
+<div id="c2SubmitModal">
+  <div class="c2m-card">
+    <span class="c2m-corner tl"></span><span class="c2m-corner tr"></span>
+    <span class="c2m-corner bl"></span><span class="c2m-corner br"></span>
+
+    <!-- Bước 1: Xác nhận -->
+    <div id="c2mStep1">
+      <div class="c2m-step">Bước 1 / 3 — Xác nhận</div>
+      <div class="c2m-title">Nộp bản C2</div>
+      <div class="c2m-desc">Xem lại hồ sơ và vị trí trước khi nộp chính thức cho Chủ nhà.</div>
+      <div style="font-size:11px;color:#6a8aaa;margin-bottom:7px">Hồ sơ đính kèm</div>
+      <div id="c2mFileList"></div>
+      <div class="c2m-notice">📍 ALN sẽ xác định vị trí của bạn để hoàn tất C2.<br>Vị trí chỉ được dùng để bảo vệ quyền lợi hợp pháp của bạn.</div>
+      <div class="c2m-error" id="c2mErr" style="display:none"></div>
+      <button class="c2m-btn c2m-btn-primary" id="c2mConfirmBtn" onclick="c2mDoSubmit()">Xác nhận nộp bản</button>
+      <button class="c2m-btn c2m-btn-ghost" onclick="closeC2Modal()" style="margin-top:6px">Huỷ</button>
+    </div>
+
+    <!-- Bước 2: Đang xử lý -->
+    <div id="c2mStep2" style="display:none">
+      <div class="c2m-step">Bước 2 / 3 — Đang xử lý</div>
+      <div class="c2m-title">Đang gửi…</div>
+      <div class="c2m-desc">ALN đang xác định vị trí và hồ sơ của bạn để hoàn tất C2.</div>
+      <div class="c2m-progress-track"><div class="c2m-progress-bar" id="c2mBar"></div></div>
+      <div class="c2m-pct" id="c2mPct">Đang xác định vị trí…</div>
+    </div>
+
+    <!-- Bước 3: Hoàn tất -->
+    <div id="c2mStep3" style="display:none">
+      <div class="c2m-success-icon">🏠</div>
+      <div class="c2m-success-title">Bản 3D đã chạm tay Chủ nhà rồi!</div>
+      <div class="c2m-divider"></div>
+      <div id="c2mSuccessItems"></div>
+      <button class="c2m-btn c2m-btn-primary" onclick="closeC2Modal()" style="margin-top:14px">Về trang dự án</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

@@ -798,3 +798,249 @@ exports.onDocUploaded = functions
     await Promise.all(notifs);
     return null;
   });
+
+/* ── Matching Engine: ghép cặp CN–KTS theo tỉnh/thành (Spec Mục 3 + 10) ── */
+exports.matchKts = onCall(
+  { region: "asia-southeast1" },
+  async (request) => {
+    if (!request.auth) throw new HttpsError("unauthenticated", "Chưa đăng nhập");
+    const { cnId } = request.data || {};
+    if (!cnId) throw new HttpsError("invalid-argument", "Thiếu cnId");
+
+    const cnSnap = await db.doc(`users/${cnId}`).get();
+    if (!cnSnap.exists) throw new HttpsError("not-found", "CN không tồn tại");
+    const cn = cnSnap.data();
+
+    // Preset trọng số
+    const PRESETS = {
+      hop_gu:   { style: 45, proximity: 15, budget: 25, rating: 15 },
+      can_bang: { style: 30, proximity: 25, budget: 25, rating: 20 },
+      kts_gan:  { style: 15, proximity: 45, budget: 25, rating: 15 }
+    };
+    const NEARBY_MAP = {
+      "TP.HCM":             ["Bình Dương", "Đồng Nai", "Long An", "Bà Rịa - Vũng Tàu", "Tiền Giang"],
+      "Bà Rịa - Vũng Tàu": ["TP.HCM", "Đồng Nai", "Bình Thuận"],
+      "Bình Dương":         ["TP.HCM", "Đồng Nai", "Bình Phước"],
+      "Đồng Nai":           ["TP.HCM", "Bình Dương", "Bà Rịa - Vũng Tàu"],
+      "Hà Nội":             ["Hưng Yên", "Bắc Ninh", "Hà Nam", "Vĩnh Phúc", "Hải Phòng"],
+      "Đà Nẵng":            ["Quảng Nam", "Thừa Thiên Huế", "Quảng Ngãi"],
+      "Cần Thơ":            ["Vĩnh Long", "Hậu Giang", "An Giang", "Kiên Giang", "Đồng Tháp"]
+    };
+    const ALL_PROVINCES = [
+      "TP.HCM","Hà Nội","Đà Nẵng","Bình Dương","Đồng Nai","Bà Rịa - Vũng Tàu",
+      "Long An","Tiền Giang","Cần Thơ","Khánh Hòa","Lâm Đồng","Bình Thuận",
+      "Hải Phòng","Nghệ An","Thừa Thiên Huế","Quảng Nam","Bình Định"
+    ];
+
+    // Đọc preset từ config doc (fallback can_bang)
+    let weights = PRESETS.can_bang;
+    try {
+      const cfgSnap = await db.doc("config/matchingWeights").get();
+      if (cfgSnap.exists) {
+        const preset = (cfgSnap.data().activePreset) || "can_bang";
+        weights = PRESETS[preset] || PRESETS.can_bang;
+      }
+    } catch (e) {}
+
+    const meetProvince = cn.meetingProvince || cn.province || "";
+
+    async function queryByProvinces(provinces) {
+      const chunks = [];
+      for (let i = 0; i < provinces.length; i += 10) chunks.push(provinces.slice(i, i + 10));
+      const seen = new Set(); const results = [];
+      for (const chunk of chunks) {
+        const snap = await db.collection("users")
+          .where("role", "==", "kts")
+          .where("available", "==", true)
+          .where("serviceProvinces", "array-contains-any", chunk)
+          .get();
+        snap.docs.forEach(d => { if (!seen.has(d.id)) { seen.add(d.id); results.push({ id: d.id, ...d.data() }); }});
+      }
+      return results;
+    }
+
+    async function getTempKts(province) {
+      const snap = await db.collection("users")
+        .where("role", "==", "kts")
+        .where("available", "==", true)
+        .where("temporaryLocation.province", "==", province)
+        .where("temporaryLocation.availableUntil", ">", admin.firestore.Timestamp.now())
+        .get();
+      return snap.docs.map(d => ({ id: d.id, ...d.data(), isTemporary: true }));
+    }
+
+    function dedup(arr) {
+      const seen = new Set();
+      return arr.filter(k => seen.has(k.id) ? false : (seen.add(k.id), true));
+    }
+
+    function overlap(a = [], b = []) {
+      if (!a.length || !b.length) return 0;
+      return a.filter(x => b.includes(x)).length / Math.max(a.length, b.length);
+    }
+
+    function scoreKts(kts, weights) {
+      const hasStyle = cn.stylePrefs && cn.stylePrefs.length > 0;
+      const w = hasStyle ? weights : { ...weights, style: 0 };
+      const total = (w.style + w.proximity + w.budget + w.rating) || 1;
+      const proximity = Math.max(0, 1 - (kts.distKm || 30) / 50);
+      const style     = hasStyle ? overlap(kts.styles || [], cn.stylePrefs || []) : 0;
+      const budget    = kts.priceTier === cn.budgetTier ? 1 : 0.4;
+      const rating    = (kts.rating || 0) / 5;
+      return Math.round((w.style * style + w.proximity * proximity + w.budget * budget + w.rating * rating) / total * 100);
+    }
+
+    // Fallback 3 bước
+    let candidates = [];
+    let expanded = false;
+    let expandedTo = null;
+
+    if (meetProvince) {
+      const [main, temp] = await Promise.all([queryByProvinces([meetProvince]), getTempKts(meetProvince)]);
+      candidates = dedup([...main, ...temp]);
+    }
+    if (candidates.length < 3) {
+      const nearby = NEARBY_MAP[meetProvince] || [];
+      if (nearby.length) {
+        const extra = await queryByProvinces(nearby);
+        candidates = dedup([...candidates, ...extra]);
+        if (candidates.length >= 3) { expanded = true; expandedTo = nearby; }
+      }
+    }
+    if (candidates.length < 3) {
+      const all = await queryByProvinces(ALL_PROVINCES);
+      candidates = dedup([...candidates, ...all]);
+      expanded = true; expandedTo = ["Toàn quốc"];
+    }
+
+    const scored = candidates.map(k => ({ ...k, score: scoreKts(k, weights) }))
+      .sort((a, b) => b.score - a.score);
+
+    const top3 = scored.slice(0, 3).map((k, i) => ({
+      ktsId:  k.id,
+      rank:   i + 1,
+      score:  k.score,
+      scoreBreakdown: {
+        style:     Math.round(overlap(k.styles || [], cn.stylePrefs || []) * 100),
+        proximity: Math.round(Math.max(0, 1 - (k.distKm || 30) / 50) * 100),
+        budget:    k.priceTier === cn.budgetTier ? 100 : 40,
+        rating:    Math.round((k.rating || 0) / 5 * 100)
+      },
+      name:         k.name || "",
+      tier:         k.tier || "",
+      homeProvince: k.homeProvince || "",
+      capacity:     k.capacity !== undefined ? k.capacity : null,
+      isTemporary:  k.isTemporary || false
+    }));
+
+    // Ghi vào matchingRequests
+    const reqRef = db.collection("matchingRequests").doc();
+    await reqRef.set({
+      cnId,
+      status:      "pending_founder",
+      createdAt:   admin.firestore.FieldValue.serverTimestamp(),
+      suggestions: top3,
+      selectedKtsId: null,
+      founderNote:   "",
+      skippedKts:    [],
+      meta: { expanded, expandedTo, styleIgnored: !(cn.stylePrefs && cn.stylePrefs.length), preset: "can_bang" }
+    });
+
+    // Thông báo Founder
+    await notifyFounder(
+      "🔗 Yêu cầu ghép cặp mới",
+      `CN ${cn.name || cnId} — ${top3.length} KTS đề xuất`,
+      { type: "MATCH_REQUEST", requestId: reqRef.id, cnId }
+    );
+
+    return { requestId: reqRef.id, suggestions: top3, meta: { expanded, expandedTo } };
+  }
+);
+
+/* ── C2 Monitoring: quét tín hiệu nghi ngờ mỗi 12 giờ (Spec Mục 4.4) ── */
+exports.scanC2Suspicion = functions
+  .region("asia-southeast1")
+  .pubsub.schedule("every 12 hours")
+  .timeZone("Asia/Ho_Chi_Minh")
+  .onRun(async () => {
+    const activeC2 = await db.collection("projects")
+      .where("stage", "==", "C2")
+      .where("locationMonitoring", "==", true)
+      .get();
+
+    if (activeC2.empty) return null;
+
+    for (const projDoc of activeC2.docs) {
+      const p = projDoc.data();
+      const ktsId = p.monitoredPair && p.monitoredPair.ktsId;
+      const cnId  = p.monitoredPair && p.monitoredPair.cnId;
+      if (!ktsId || !cnId) continue;
+
+      const signals = [];
+
+      // Tín hiệu 1: cùng vị trí < 500m trong vòng 1h
+      const logs = await db.collection("locationLogs")
+        .where("projectId", "==", projDoc.id)
+        .where("stage", "==", "C2")
+        .get();
+
+      const ktsLogs = logs.docs.filter(d => d.data().userId === ktsId);
+      const cnLogs  = logs.docs.filter(d => d.data().userId === cnId);
+      let nearCount = 0;
+
+      for (const kLog of ktsLogs) {
+        for (const cLog of cnLogs) {
+          const kd = kLog.data(); const cd = cLog.data();
+          if (!kd.location || !cd.location) continue;
+          const dLat = kd.location.latitude  - cd.location.latitude;
+          const dLng = kd.location.longitude - cd.location.longitude;
+          const distM = Math.sqrt(dLat * dLat + dLng * dLng) * 111000;
+          const timeDiff = Math.abs(kd.recordedAt.toMillis() - cd.recordedAt.toMillis());
+          if (distM < 500 && timeDiff < 3600000) nearCount++;
+        }
+      }
+      if (nearCount >= 3)      signals.push({ type: "location_match", level: "red",   count: nearCount, label: "Cùng vị trí nhiều lần" });
+      else if (nearCount >= 1) signals.push({ type: "location_match", level: "amber", count: nearCount, label: "Có thể gặp nhau" });
+
+      // Tín hiệu 2: chat giảm mạnh (tuần 1 vs tuần 2)
+      if (p.c2StartedAt) {
+        const w1Start = p.c2StartedAt;
+        const w1End   = new admin.firestore.Timestamp(p.c2StartedAt.seconds + 7 * 86400, 0);
+        const w2End   = new admin.firestore.Timestamp(p.c2StartedAt.seconds + 14 * 86400, 0);
+        const [snap1, snap2] = await Promise.all([
+          db.collection("messages").where("projectId","==",projDoc.id).where("createdAt",">=",w1Start).where("createdAt","<",w1End).get(),
+          db.collection("messages").where("projectId","==",projDoc.id).where("createdAt",">=",w1End).where("createdAt","<",w2End).get()
+        ]);
+        const w1 = snap1.size; const w2 = snap2.size;
+        const chatDrop = w1 > 0 ? Math.round(Math.max(0, (w1 - w2) / w1) * 100) : 0;
+        if (chatDrop > 70)      signals.push({ type: "chat_drop", level: "red",   percent: chatDrop, label: "Chat giảm " + chatDrop + "%" });
+        else if (chatDrop > 40) signals.push({ type: "chat_drop", level: "amber", percent: chatDrop, label: "Chat giảm " + chatDrop + "%" });
+      }
+
+      // Tín hiệu 3: C2 kéo dài hơn 10 ngày
+      if (p.c2StartedAt) {
+        const daysInC2 = (Date.now() - p.c2StartedAt.toMillis()) / 86400000;
+        if (daysInC2 > 10) signals.push({ type: "c2_overdue", level: "amber", days: Math.round(daysInC2), label: "C2 đã " + Math.round(daysInC2) + " ngày" });
+      }
+
+      const redCount = signals.filter(s => s.level === "red").length;
+      const status = redCount >= 2 ? "alert" : redCount === 1 ? "warn" : "ok";
+
+      await projDoc.ref.update({
+        suspicionStatus:  status,
+        suspicionSignals: signals,
+        lastScannedAt:    admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      // Alert → thông báo Founder ngay
+      if (status === "alert") {
+        await notifyFounder(
+          "⚠ C2 Cảnh báo — " + (p.name || projDoc.id),
+          signals.map(s => s.label).join(" · "),
+          { type: "C2_ALERT", pid: projDoc.id }
+        );
+      }
+    }
+    console.log("[ALN] scanC2Suspicion done for", activeC2.size, "projects");
+    return null;
+  });
