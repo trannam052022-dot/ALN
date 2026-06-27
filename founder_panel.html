@@ -4973,7 +4973,7 @@ window.openC2Evidence = async function(projectId) {
     if (!projSnap.exists()) { content.innerHTML = '<div style="color:#c85a3a">Không tìm thấy dự án</div>'; return; }
     var p = projSnap.data();
     var signals = p.suspicionSignals || [];
-    var logSnap = await getDocs(query(collection(db,'locationLogs'), where('projectId','==',projectId), where('stage','==','C2'), orderBy('recordedAt','asc')));
+    var logSnap = await getDocs(query(collection(db,'locationLogs'), where('projectId','==',projectId), orderBy('recordedAt','asc')));
     var logs = logSnap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
     var SIGNAL_LABEL = { location_match:'Cùng vị trí', chat_drop:'Chat giảm mạnh', c2_overdue:'C2 kéo dài' };
     var html = '<div style="font-family:Cormorant Garamond,serif;font-style:italic;font-size:19px;color:#c9a84c;margin-bottom:4px">Bằng chứng — ' + projectId + '</div>';
