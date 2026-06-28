@@ -99,6 +99,17 @@ window.KTS_PROJECT_DATA = null;
 .profile-save-btn{width:100%;padding:11px;background:linear-gradient(135deg,#d4a017,#e8c44a);border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer;margin-top:4px}
 .profile-view-btn{width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(212,160,23,.45);background:rgba(212,160,23,.07);color:#b8860b;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;transition:all .15s;box-sizing:border-box}
 .profile-view-btn:hover{background:rgba(212,160,23,.15);border-color:rgba(212,160,23,.7);color:#d4a017}
+/* -- THU VIEN NOI THAT -- */
+.lib-cat-btn{padding:5px 12px;border-radius:99px;border:1px solid var(--border);background:var(--ink3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
+.lib-cat-btn.on{background:var(--amber);color:#1a1000;border-color:var(--amber)}
+.lib-item{background:var(--ink2);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .18s;display:flex;flex-direction:column}
+.lib-item:hover{border-color:rgba(212,160,23,.5);transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.lib-item-thumb{width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;font-size:52px;background:var(--ink3)}
+.lib-item-body{padding:12px}
+.lib-item-cat{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:4px}
+.lib-item-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.lib-item-size{font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:6px}
+.lib-item-price{font-size:12px;font-weight:700;color:var(--green)}
 </style>
 <style>
 :root {
@@ -601,6 +612,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   <a class="nav-item" data-tab="review"><span class="icon"><i class="ph-duotone ph-clipboard-text"></i></span> Bảng Review <span class="nav-badge" id="reviewBadge" style="display:none">0</span></a>
   <a class="nav-item" data-tab="c3"><span class="icon"><i class="ph-duotone ph-upload-simple"></i></span> Nộp hồ sơ</a>
 
+  <a class="nav-item" data-tab="library"><span class="icon"><i class="ph-duotone ph-couch"></i></span> Thư viện nội thất</a>
   <div class="nav-sep"></div>
   <div class="nav-section">Cá nhân</div>
   <a class="nav-item" data-tab="myprofile"><span class="icon"><i class="ph-duotone ph-user-circle"></i></span> Hồ sơ</a>
@@ -1405,6 +1417,47 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       </div>
     </div>
 
+
+    <!-- THU VIEN NOI THAT -->
+    <div class="sec-label library-section"><i class="ph-duotone ph-couch" style="font-size:13px"></i> Thư viện nội thất</div>
+    <div class="card" style="padding:14px 16px;margin-bottom:14px"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div style="position:relative;flex:1;min-width:180px"><i class="ph-duotone ph-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px"></i><input id="libSearch" type="text" placeholder="Tìm bàn, ghế, tủ..." oninput="filterLibrary()" style="width:100%;box-sizing:border-box;padding:8px 10px 8px 32px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text);font-size:12px;font-family:inherit;outline:none"></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="lib-cat-btn on" onclick="setLibCat('all',this)">Tất cả</button><button class="lib-cat-btn" onclick="setLibCat('living',this)">Phòng khách</button><button class="lib-cat-btn" onclick="setLibCat('bedroom',this)">Phòng ngủ</button><button class="lib-cat-btn" onclick="setLibCat('kitchen',this)">Bếp &amp; Ăn</button><button class="lib-cat-btn" onclick="setLibCat('office',this)">Làm việc</button><button class="lib-cat-btn" onclick="setLibCat('outdoor',this)">Sân vườn</button></div></div></div>
+    <div id="libGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px"></div>
+    <div id="libEmpty" style="display:none;text-align:center;padding:40px;color:var(--muted);font-size:13px">Không tìm thấy sản phẩm</div>
+    <div id="libModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center"><div style="background:var(--ink2);border:1px solid var(--border);border-radius:16px;width:min(92vw,480px);max-height:85vh;overflow-y:auto;padding:24px;position:relative"><button onclick="document.getElementById('libModal').style.display='none'" style="position:absolute;top:14px;right:14px;background:var(--ink3);border:1px solid var(--border);border-radius:8px;width:30px;height:30px;cursor:pointer;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center"><i class="ph-duotone ph-x"></i></button><div id="libModalContent"></div></div></div>
+<script>
+var LIB_DATA=[
+  {id:'l01',cat:'living',emoji:'\ud83d\udecb\ufe0f',name:'Sofa g\u00f3c L',size:'280\xd7160\xd785 cm',mat:'V\u1ea3i b\u1ecdc / Da t\u1ed5ng h\u1ee3p',price:'8\u201335 tr',note:'Ph\u00f9 h\u1ee3p ph\u00f2ng kh\u00e1ch t\u1eeb 18m\xb2.',tags:['sofa','gh\u1ebf']},
+  {id:'l02',cat:'living',emoji:'\ud83e\ude91',name:'Gh\u1ebf \u0111\u01a1n armchair',size:'80\xd785\xd790 cm',mat:'G\u1ed7 + v\u1ea3i b\u1ecdc',price:'3\u201312 tr',note:'\u0110\u1eb7t g\u00f3c ph\u00f2ng kh\u00e1ch \u0111\u1ec3 t\u1ea1o \u0111i\u1ec3m nh\u1ea5n.',tags:['gh\u1ebf']},
+  {id:'l03',cat:'living',emoji:'\ud83e\udeb5',name:'B\u00e0n tr\u00e0',size:'120\xd760\xd745 cm',mat:'G\u1ed7 s\u1ed3i / \u0110\u00e1 marble',price:'2\u201318 tr',note:'Chi\u1ec1u cao l\u00fd t\u01b0\u1edfng b\u1eb1ng m\u1eb7t ng\u1ed3i sofa -5cm.',tags:['b\u00e0n']},
+  {id:'l04',cat:'living',emoji:'\ud83d\udcfa',name:'K\u1ec7 TV',size:'160\xd740\xd750 cm',mat:'G\u1ed7 MDF / G\u1ed7 t\u1ef1 nhi\u00ean',price:'3\u201320 tr',note:'Ch\u1ecdn m\u00e0u t\u01b0\u01a1ng ph\u1ea3n nh\u1eb9 v\u1edbi t\u01b0\u1eddng.',tags:['k\u1ec7']},
+  {id:'l05',cat:'living',emoji:'\ud83e\udeb4',name:'K\u1ec7 trang tr\u00ed \u0111\u1ee9ng',size:'40\xd730\xd7180 cm',mat:'G\u1ed7 / S\u1eaft',price:'1.5\u20138 tr',note:'D\u00f9ng \u0111\u1ec3 \u0111\u1eb7t c\u00e2y c\u1ea3nh, s\u00e1ch.',tags:['k\u1ec7']},
+  {id:'l06',cat:'living',emoji:'\ud83d\udca1',name:'\u0110\u00e8n s\u00e0n',size:'Cao 150\u2013180 cm',mat:'S\u1eaft s\u01a1n t\u0129nh \u0111i\u1ec7n',price:'1.2\u20136 tr',note:'Th\u00eam \u00e1nh s\u00e1ng \u1ea5m g\u00f3c gh\u1ebf.',tags:['\u0111\u00e8n']},
+  {id:'b01',cat:'bedroom',emoji:'\ud83d\udecd\ufe0f',name:'Gi\u01b0\u1eddng Queen',size:'160\xd7200\xd735 cm',mat:'G\u1ed7 t\u1ef1 nhi\u00ean / MDF',price:'5\u201328 tr',note:'Kho\u1ea3ng c\u00e1ch 2 b\u00ean gi\u01b0\u1eddng t\u1ed1i thi\u1ec3u 60 cm.',tags:['gi\u01b0\u1eddng']},
+  {id:'b02',cat:'bedroom',emoji:'\ud83d\udecc',name:'Gi\u01b0\u1eddng King',size:'180\xd7200\xd735 cm',mat:'G\u1ed7 s\u1ed3i / G\u1ed7 \u00f3c ch\u00f3',price:'10\u201345 tr',note:'C\u1ea7n ph\u00f2ng t\u1ed1i thi\u1ec3u 4\xd74m.',tags:['gi\u01b0\u1eddng']},
+  {id:'b03',cat:'bedroom',emoji:'\ud83d\uddc4\ufe0f',name:'T\u1ee7 qu\u1ea7n \u00e1o 2 c\u00e1nh',size:'100\xd760\xd7200 cm',mat:'MDF ph\u1ee7 melamine',price:'4\u201315 tr',note:'Ch\u1ecdn c\u00e1nh l\u00f9a n\u1ebfu ph\u00f2ng nh\u1ecf h\u01a1n 12m\xb2.',tags:['t\u1ee7']},
+  {id:'b04',cat:'bedroom',emoji:'\ud83d\udeaa',name:'T\u1ee7 qu\u1ea7n \u00e1o 4 c\u00e1nh',size:'200\xd760\xd7220 cm',mat:'MDF / G\u1ed7 t\u1ef1 nhi\u00ean',price:'8\u201330 tr',note:'T\u00edch h\u1ee3p g\u01b0\u01a1ng v\u00e0 ng\u0103n k\u00e9o.',tags:['t\u1ee7']},
+  {id:'b05',cat:'bedroom',emoji:'\ud83e\udee6',name:'B\u00e0n ph\u1ea5n / Vanity',size:'90\xd745\xd7140 cm',mat:'G\u1ed7 + G\u01b0\u01a1ng',price:'3\u201312 tr',note:'\u0110\u1eb7t c\u1ea1nh c\u1eeda s\u1ed5 t\u1eadn d\u1ee5ng \u00e1nh s\u00e1ng.',tags:['b\u00e0n']},
+  {id:'b06',cat:'bedroom',emoji:'\ud83c\udf19',name:'\u0110\u00e8n \u0111\u1ea7u gi\u01b0\u1eddng',size:'Cao 55\u201370 cm',mat:'S\u1ee9 / V\u1ea3i / Kim lo\u1ea1i',price:'0.5\u20133 tr',note:'Ch\u1ecdn nhi\u1ec7t \u0111\u1ed9 m\u00e0u 2700\u20133000K.',tags:['\u0111\u00e8n']},
+  {id:'k01',cat:'kitchen',emoji:'\ud83c\udf7d\ufe0f',name:'B\u00e0n \u0103n 4 ng\u01b0\u1eddi',size:'120\xd770\xd775 cm',mat:'G\u1ed7 / \u0110\u00e1 / K\u00ednh',price:'3\u201316 tr',note:'Kho\u1ea3ng c\u00e1ch t\u1ed1i thi\u1ec3u \u0111\u1ebfn t\u01b0\u1eddng: 90 cm.',tags:['b\u00e0n']},
+  {id:'k02',cat:'kitchen',emoji:'\ud83e\ude91',name:'Gh\u1ebf \u0103n',size:'45\xd750\xd788 cm',mat:'G\u1ed7 / Nh\u1ef1a / \u0110\u1ec7m b\u1ecdc',price:'0.8\u20134 tr',note:'Chi\u1ec1u cao m\u1eb7t gh\u1ebf chu\u1ea9n 45 cm.',tags:['gh\u1ebf']},
+  {id:'k03',cat:'kitchen',emoji:'\ud83c\udfe0',name:'T\u1ee7 b\u1ebfp d\u01b0\u1edbi',size:'60\xd760\xd785 cm/module',mat:'G\u1ed7 c\u00f4ng nghi\u1ec7p + Acrylic',price:'2\u20138 tr/module',note:'Module 60 cm l\u00e0 chu\u1ea9n ph\u1ed5 bi\u1ebfn.',tags:['t\u1ee7','b\u1ebfp']},
+  {id:'k04',cat:'kitchen',emoji:'\ud83d\uddc3\ufe0f',name:'T\u1ee7 b\u1ebfp tr\u00ean',size:'60\xd730\xd770 cm/module',mat:'MDF ph\u1ee7 melamine / Acrylic',price:'1.5\u20135 tr/module',note:'Kho\u1ea3ng c\u00e1ch m\u1eb7t b\u1ebfp \u2192 t\u1ee7 tr\u00ean t\u1ed1i thi\u1ec3u 55 cm.',tags:['t\u1ee7','b\u1ebfp']},
+  {id:'k05',cat:'kitchen',emoji:'\ud83e\ude91',name:'Gh\u1ebf qu\u1ea7y / Bar stool',size:'45\xd745\xd765\u201375 cm',mat:'S\u1eaft / G\u1ed7 / Da',price:'1.2\u20136 tr',note:'Ph\u00f9 h\u1ee3p \u0111\u1ea3o b\u1ebfp ho\u1eb7c qu\u1ea7y bar mini.',tags:['gh\u1ebf','b\u1ebfp']},
+  {id:'o01',cat:'office',emoji:'\ud83d\udcbc',name:'B\u00e0n l\u00e0m vi\u1ec7c',size:'120\xd760\xd775 cm',mat:'MDF / G\u1ed7 s\u1ed3i / S\u1eaft',price:'2\u201312 tr',note:'Chi\u1ec1u cao chu\u1ea9n 72\u201375 cm.',tags:['b\u00e0n']},
+  {id:'o02',cat:'office',emoji:'\ud83e\ude91',name:'Gh\u1ebf ergonomic',size:'65\xd765\xd790\u2013105 cm',mat:'L\u01b0\u1edbi tho\u00e1t nhi\u1ec7t / \u0110\u1ec7m foam',price:'3\u201320 tr',note:'Ch\u1ecdn gh\u1ebf c\u00f3 \u0111i\u1ec1u ch\u1ec9nh l\u01b0ng t\u1ef1a.',tags:['gh\u1ebf']},
+  {id:'o03',cat:'office',emoji:'\ud83d\udcda',name:'K\u1ec7 s\u00e1ch',size:'80\xd730\xd7180 cm',mat:'G\u1ed7 / S\u1eaft',price:'2\u201310 tr',note:'K\u1ebft h\u1ee3p \u0111\u00e8n chi\u1ebfu s\u00e1ng k\u1ec7.',tags:['k\u1ec7']},
+  {id:'o04',cat:'office',emoji:'\ud83d\uddc4\ufe0f',name:'T\u1ee7 h\u1ed3 s\u01a1',size:'45\xd760\xd7132 cm',mat:'S\u1eaft s\u01a1n t\u0129nh \u0111i\u1ec7n',price:'2\u20137 tr',note:'4 ng\u0103n k\u00e9o, c\u00f3 kh\u00f3a b\u1ea3o m\u1eadt.',tags:['t\u1ee7']},
+  {id:'g01',cat:'outdoor',emoji:'\ud83c\udf3f',name:'B\u1ed9 b\u00e0n gh\u1ebf s\u00e2n v\u01b0\u1eddn',size:'B\u00e0n 120\xd770 cm, 4 gh\u1ebf',mat:'Nh\u00f4m / G\u1ed7 teak / M\u00e2y nh\u1ef1a',price:'5\u201325 tr',note:'Ch\u1ecdn ch\u1ea5t li\u1ec7u ch\u1ecbu n\u1eafng m\u01b0a.',tags:['b\u00e0n','gh\u1ebf']},
+  {id:'g02',cat:'outdoor',emoji:'\ud83d\udecb\ufe0f',name:'Sofa ngo\u00e0i tr\u1eddi',size:'220\xd790\xd780 cm',mat:'M\u00e2y nh\u1ef1a / \u0110\u1ec7m ch\u1ed1ng n\u01b0\u1edbc',price:'8\u201335 tr',note:'\u0110\u1ec7m c\u1ea7n tho\u00e1t n\u01b0\u1edbc v\u00e0 ch\u1ed1ng n\u1ea5m m\u1ed1c.',tags:['sofa']},
+  {id:'g03',cat:'outdoor',emoji:'\ud83e\ude91',name:'X\u00edch \u0111u / Swing chair',size:'R\u1ed9ng 90 cm',mat:'M\u00e2y nh\u1ef1a / V\u1ea3i ch\u1ed1ng UV',price:'3\u201312 tr',note:'C\u1ea7n \u0111i\u1ec3m treo ch\u1ecbu t\u1ea3i t\u1ed1i thi\u1ec3u 150 kg.',tags:['gh\u1ebf']},
+  {id:'g04',cat:'outdoor',emoji:'\u2602\ufe0f',name:'\u00d4 che n\u1eafng (Parasol)',size:'\u0110\u01b0\u1eddng k\u00ednh 250\u2013300 cm',mat:'V\u1ea3i polyester ch\u1ed1ng UV / Tr\u1ee5 nh\u00f4m',price:'2\u20138 tr',note:'Ch\u1ecdn lo\u1ea1i \u0111i\u1ec1u ch\u1ec9nh g\u00f3c nghi\u00eang.',tags:['\u00f4']},
+];
+var _libCat='all';
+function setLibCat(cat,btn){_libCat=cat;document.querySelectorAll('.lib-cat-btn').forEach(function(b){b.classList.remove('on');});if(btn)btn.classList.add('on');filterLibrary();}
+function filterLibrary(){var q=(document.getElementById('libSearch').value||'').toLowerCase();var items=LIB_DATA.filter(function(d){return(_libCat==='all'||d.cat===_libCat)&&(!q||d.name.toLowerCase().includes(q)||(d.tags&&d.tags.some(function(t){return t.includes(q);})));});var grid=document.getElementById('libGrid');var empty=document.getElementById('libEmpty');if(!items.length){grid.innerHTML='';empty.style.display='block';return;}empty.style.display='none';var CL={living:'Ph\u00f2ng kh\u00e1ch',bedroom:'Ph\u00f2ng ng\u1ee7',kitchen:'B\u1ebfp & \u0102n',office:'L\u00e0m vi\u1ec7c',outdoor:'S\u00e2n v\u01b0\u1eddn'};grid.innerHTML=items.map(function(d){return'<div class="lib-item" onclick="openLibItem(\\''+d.id+'\\')"><div class="lib-item-thumb">'+d.emoji+'</div><div class="lib-item-body"><div class="lib-item-cat">'+(CL[d.cat]||d.cat)+'</div><div class="lib-item-name">'+d.name+'</div><div class="lib-item-size">\ud83d\udcd0 '+d.size+'</div><div class="lib-item-price">'+d.price+'</div></div></div>';}).join('');}
+function openLibItem(id){var d=LIB_DATA.find(function(x){return x.id===id;});if(!d)return;var CL={living:'Ph\u00f2ng kh\u00e1ch',bedroom:'Ph\u00f2ng ng\u1ee7',kitchen:'B\u1ebfp & \u0102n',office:'L\u00e0m vi\u1ec7c',outdoor:'S\u00e2n v\u01b0\u1eddn'};document.getElementById('libModalContent').innerHTML='<div style="text-align:center;font-size:64px;margin-bottom:12px">'+d.emoji+'</div><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:14px">'+d.name+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"><div style="background:var(--ink3);border-radius:8px;padding:10px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">K\u00cdCH TH\u01af\u1edcC</div><div style="font-size:12px;font-weight:600;color:var(--text)">'+d.size+'</div></div><div style="background:var(--ink3);border-radius:8px;padding:10px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">GI\u00c1 THAM KH\u1ea2O</div><div style="font-size:13px;font-weight:700;color:var(--green)">'+d.price+'</div></div><div style="background:var(--ink3);border-radius:8px;padding:10px;grid-column:1/-1"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">CH\u1ea4T LI\u1ec6U G\u1ee2I \u00dd</div><div style="font-size:12px;color:var(--text)">'+d.mat+'</div></div></div><div style="background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);line-height:1.7"><span style="color:var(--amber);font-weight:700">\ud83d\udca1 L\u01b0u \u00fd thi\u1ebft k\u1ebf:</span> '+d.note+'</div>';var modal=document.getElementById('libModal');modal.style.display='flex';modal.onclick=function(e){if(e.target===modal)modal.style.display='none';};}  
+(function(){function tryInit(){var g=document.getElementById('libGrid');if(g){filterLibrary();}else{setTimeout(tryInit,200);}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tryInit);else tryInit();})();
+<\/script>
     <!-- PAGE FOOTER -->
     <footer class="page-footer">
       <div class="pf-copy">© 2026 STUDIO KTS ALN. All rights reserved.</div>
@@ -2481,7 +2534,7 @@ function alnNotify(title, body){
     if(!first) return;
     var cont = first.parentElement;
     var SKIP = /modal|toast|popup|fab|veil|overlay|aln|chat/i;
-    var MARK = [['wallet-section','wallet'],['proposal-section','proposal'],['review-section','review'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip'],['myproj-section','myproj'],['myprofile-section','myprofile'],['reputation-section','reputation'],['settings-section','settings']];
+    var MARK = [['wallet-section','wallet'],['proposal-section','proposal'],['review-section','review'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip'],['myproj-section','myproj'],['myprofile-section','myprofile'],['reputation-section','reputation'],['settings-section','settings'],['library-section','library']];
     var groups = { dashboard: [] };
     var cur = 'dashboard';
     Array.prototype.forEach.call(cont.children, function(k){
