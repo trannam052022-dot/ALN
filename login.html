@@ -303,6 +303,11 @@ input::placeholder{color:var(--muted)}
       <div class="rt-label">Designer NT</div>
       <div class="rt-dot"></div>
     </div>
+    <div class="role-tab" data-role="ks" onclick="switchRole('ks')">
+      <div class="rt-icon"><i class="ph-duotone ph-map-pin-area"></i></div>
+      <div class="rt-label">KS Vùng</div>
+      <div class="rt-dot"></div>
+    </div>
   </div>
 
   <!-- ── LOGIN CARD ── -->
@@ -372,6 +377,13 @@ input::placeholder{color:var(--muted)}
       <div>
         <div class="reg-btn-title">Bạn là Designer?</div>
         <div class="reg-btn-sub">Đăng ký thiết kế nội thất</div>
+      </div>
+    </a>
+    <a href="ks-apply.html" class="reg-btn" style="border-color:rgba(201,168,76,.25)">
+      <i class="ph-duotone ph-map-pin-area" style="color:rgba(201,168,76,.6)"></i>
+      <div>
+        <div class="reg-btn-title">Bạn là KS Vùng?</div>
+        <div class="reg-btn-sub">Quản lý mạng lưới KTS địa phương</div>
       </div>
     </a>
   </div>
@@ -470,6 +482,7 @@ const ROLE_META = {
   dn:      { icon:'<i class="ph-duotone ph-building"></i>', title:'Doanh nghiệp', desc:'Tổng quan danh mục & đội ngũ KTS', color:'var(--blue)', bg:'rgba(91,143,255,.1)' },
   cn:       { icon:'<i class="ph-duotone ph-user"></i>', title:'Chủ nhà', desc:'Theo dõi công trình & trao đổi KTS', color:'var(--green)', bg:'rgba(61,214,140,.1)' },
   designer: { icon:'<i class="ph-duotone ph-paint-brush-household"></i>', title:'Designer Nội thất', desc:'Quản lý dự án & hồ sơ nội thất', color:'#7c3aed', bg:'rgba(124,58,237,.1)' },
+  ks:       { icon:'<i class="ph-duotone ph-map-pin-area"></i>', title:'KS Vùng', desc:'Xét duyệt KTS & quản lý mạng lưới địa phương', color:'var(--gold)', bg:'rgba(201,168,76,.08)' },
   founder:  { icon:'<i class="ph-duotone ph-crown"></i>', title:'Hội đồng Sáng lập', desc:'Toàn quyền quản trị hệ thống ALN', color:'var(--gold)', bg:'rgba(201,168,76,.12)' },
 };
 
@@ -533,7 +546,7 @@ function showError(msg){
   setTimeout(()=>{ card.style.animation='shake .35s ease'; },10);
 }
 
-const FILE_BY_ROLE = { kts:'kts_dashboard.html', dn:'client_DN.html', cn:'client_CN.html', designer:'designer_dashboard.html', founder:'founder_panel.html', ctv:'ctv_dashboard.html' };
+const FILE_BY_ROLE = { kts:'kts_dashboard.html', dn:'client_DN.html', cn:'client_CN.html', designer:'designer_dashboard.html', founder:'founder_panel.html', ks:'ks_dashboard.html' };
 
 function resetLoginBtn(){
   const btn = document.getElementById('btnLogin');
