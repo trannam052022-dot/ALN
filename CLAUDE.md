@@ -19,10 +19,12 @@ Nền tảng theo dõi công trình xây dựng. **Frontend tĩnh** (HTML/JS thu
 | `client_DN.html` | Trang Doanh nghiệp (DN) |
 | `kts_dashboard.html` | Trang Kiến trúc sư (KTS) |
 | `designer_dashboard.html` | Trang Designer Nội thất — violet accent, collection `designProjects/` |
-| `founder_panel.html` | Trang quản trị founder — dark luxury, tab Duyệt đăng ký KTS/DN/Designer |
+| `founder_panel.html` | Trang quản trị founder — dark luxury, nav nhóm: DỰ ÁN / THÀNH VIÊN / VẬN HÀNH / LIVE, tab Duyệt đăng ký KTS/DN/Designer/KS |
 | `kts-apply.html` | Form đăng ký KTS (dark luxury) → ghi `ktsApplications/{uid}` |
 | `dn-studio.html` | Form đăng ký DN (dark luxury) → ghi `dnApplications/{uid}` |
 | `designer-apply.html` | Form đăng ký Designer NT (dark luxury, violet) → ghi `designerApplications/{uid}` |
+| `ks-apply.html` | Form đăng ký KS Vùng (dark luxury, gold) → ghi `ksApplications/{uid}`, role `ks`, username prefix `ks.` |
+| `ks_dashboard.html` | Trang KS Vùng — xét duyệt sơ bộ hồ sơ KTS theo tỉnh, gửi nhận xét lên `ktsApplications/{uid}.ksNote` |
 | `seed.html` | Nạp dữ liệu mẫu lên Firestore |
 | `firebase-config.js` | Khởi tạo Firebase + export hàm dùng chung |
 | `firebase-messaging-sw.js` | Service worker cho web push |
@@ -46,6 +48,9 @@ Quy ước: `username + "@aln.vn"` = email đăng nhập (email ảo).
 | `designer` | `designer_dashboard.html` | `designProjects/` (DES-XXXX) | violet `#7c3aed` |
 | `dn` | `client_DN.html` | — (xem projects + designProjects) | blue |
 | `cn` | `client_CN.html` | — (xem projects của mình) | green |
+| `ks` | `ks_dashboard.html` | — (xét duyệt KTS theo tỉnh) | gold |
+
+**KS Vùng (Kỹ sư Vùng):** username prefix `ks.`, đăng ký qua `ks-apply.html` → `ksApplications/{uid}`, chờ founder duyệt. Sau khi active, login vào `ks_dashboard.html`, xem KTS pending trong tỉnh và gửi nhận xét (`ksNote`) lên `ktsApplications/{uid}`. Founder xem nhận xét này khi duyệt KTS.
 
 ## 4 tài khoản thật (Auth + Firestore `users/{uid}`)
 

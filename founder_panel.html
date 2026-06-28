@@ -889,38 +889,25 @@ body::after {
 </header>
 
 <!-- ══ MODULE NAV TABS ══ -->
-<div id="moduleNav" style="background:rgba(8,12,20,.88);backdrop-filter:blur(16px);border-bottom:1px solid rgba(201,168,76,.12);padding:0 20px;display:flex;align-items:center;gap:6px;height:42px;flex-shrink:0;overflow-x:auto;scrollbar-width:none">
+<div id="moduleNav" style="background:rgba(8,12,20,.88);backdrop-filter:blur(16px);border-bottom:1px solid rgba(201,168,76,.12);padding:0 16px;display:flex;align-items:center;gap:4px;height:42px;flex-shrink:0;overflow-x:auto;scrollbar-width:none">
+
+  <!-- TỔNG QUAN -->
   <button id="tabStats" onclick="switchTab('stats')"
     style="padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:var(--raised);color:var(--sub)">
-    <i class="ph-duotone ph-chart-pie" style="margin-right:5px"></i>Thống kê Tổng quan
+    <i class="ph-duotone ph-chart-pie" style="margin-right:5px"></i>Thống kê
   </button>
+
+  <!-- GROUP: DỰ ÁN -->
+  <div style="width:1px;height:20px;background:var(--border);flex-shrink:0;margin:0 4px"></div>
+  <span style="font-size:9px;font-family:var(--mono);color:var(--dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;flex-shrink:0">DỰ ÁN</span>
+
   <button id="tabProjects" onclick="switchTab('projects')"
     style="padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(59,130,246,.15);color:var(--blue)">
-    <i class="ph-duotone ph-rows" style="margin-right:5px"></i>Quản lý Dự án
+    <i class="ph-duotone ph-rows" style="margin-right:5px"></i>Dự án
   </button>
-  <button id="tabMgKts" onclick="switchTab('mgKts')"
-    style="padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:var(--raised);color:var(--sub)">
-    <i class="ph-duotone ph-pencil-ruler" style="margin-right:5px"></i>Kiến trúc sư
-  </button>
-  <button id="tabMgDn" onclick="switchTab('mgDn')"
-    style="padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:var(--raised);color:var(--sub)">
-    <i class="ph-duotone ph-buildings" style="margin-right:5px"></i>Doanh nghiệp
-  </button>
-  <button id="tabMgCn" onclick="switchTab('mgCn')"
-    style="padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:var(--raised);color:var(--sub)">
-    <i class="ph-duotone ph-house-line" style="margin-right:5px"></i>Chủ nhà
-  </button>
-  <button id="tabPending" onclick="switchTab('pending')"
-    style="padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px">
-    <i class="ph-duotone ph-user-plus"></i>Duyệt đăng ký<span id="pendingBadge" style="display:none;background:var(--gold);color:#08090f;border-radius:99px;font-size:9px;padding:1px 6px;font-weight:800">0</span>
-  </button>
-  <button id="tabPayments" onclick="switchTab('payments')"
-    style="padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px">
-    <i class="ph-duotone ph-money"></i>Thanh toán<span id="paymentsBadge" style="display:none;background:var(--green);color:#fff;border-radius:99px;font-size:9px;padding:1px 6px;font-weight:800">0</span>
-  </button>
-  <button id="tabRecruit" onclick="switchTab('recruit')"
-    style="padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px">
-    <i class="ph-duotone ph-megaphone"></i>Tuyển dụng
+  <button id="tabC2monitor" onclick="switchTab('c2monitor')"
+    style="padding:5px 13px;border:1px solid rgba(239,68,68,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(239,68,68,.08);color:#ef4444;display:flex;align-items:center;gap:5px">
+    <i class="ph-duotone ph-eye"></i>C2<span id="c2AlertBadge" style="display:none;background:#ef4444;color:#fff;border-radius:99px;font-size:9px;padding:1px 6px;font-weight:800">0</span>
   </button>
   <button id="tabWaitRoom" onclick="switchTab('waitRoom')"
     style="padding:5px 13px;border:1px solid rgba(167,139,250,.3);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(124,58,237,.1);color:#a78bfa;display:flex;align-items:center;gap:5px">
@@ -930,34 +917,68 @@ body::after {
     style="padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px">
     <i class="ph-duotone ph-link"></i>Ghép cặp<span id="matchingBadge" style="display:none;background:var(--gold);color:#08090f;border-radius:99px;font-size:9px;padding:1px 6px;font-weight:800">0</span>
   </button>
-  <button id="tabC2monitor" onclick="switchTab('c2monitor')"
-    style="padding:5px 13px;border:1px solid rgba(239,68,68,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(239,68,68,.08);color:#ef4444;display:flex;align-items:center;gap:5px">
-    <i class="ph-duotone ph-eye"></i>Giám sát C2<span id="c2AlertBadge" style="display:none;background:#ef4444;color:#fff;border-radius:99px;font-size:9px;padding:1px 6px;font-weight:800">0</span>
+
+  <!-- GROUP: THÀNH VIÊN -->
+  <div style="width:1px;height:20px;background:var(--border);flex-shrink:0;margin:0 4px"></div>
+  <span style="font-size:9px;font-family:var(--mono);color:var(--dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;flex-shrink:0">THÀNH VIÊN</span>
+
+  <button id="tabMgKts" onclick="switchTab('mgKts')"
+    style="padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:var(--raised);color:var(--sub)">
+    <i class="ph-duotone ph-pencil-ruler" style="margin-right:5px"></i>KTS
+  </button>
+  <button id="tabMgDn" onclick="switchTab('mgDn')"
+    style="padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:var(--raised);color:var(--sub)">
+    <i class="ph-duotone ph-buildings" style="margin-right:5px"></i>Doanh nghiệp
+  </button>
+  <button id="tabMgCn" onclick="switchTab('mgCn')"
+    style="padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:var(--raised);color:var(--sub)">
+    <i class="ph-duotone ph-house-line" style="margin-right:5px"></i>Chủ nhà
+  </button>
+  <button id="tabMgKs" onclick="switchTab('mgKs')"
+    style="padding:5px 13px;border:1px solid rgba(201,168,76,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(201,168,76,.06);color:var(--gold)">
+    <i class="ph-duotone ph-map-pin-area" style="margin-right:5px"></i>KS Vùng
+  </button>
+  <button id="tabPending" onclick="switchTab('pending')"
+    style="padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px">
+    <i class="ph-duotone ph-user-plus"></i>Duyệt đăng ký<span id="pendingBadge" style="display:none;background:var(--gold);color:#08090f;border-radius:99px;font-size:9px;padding:1px 6px;font-weight:800">0</span>
   </button>
 
+  <!-- GROUP: VẬN HÀNH -->
+  <div style="width:1px;height:20px;background:var(--border);flex-shrink:0;margin:0 4px"></div>
+  <span style="font-size:9px;font-family:var(--mono);color:var(--dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;flex-shrink:0">VẬN HÀNH</span>
+
+  <button id="tabPayments" onclick="switchTab('payments')"
+    style="padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px">
+    <i class="ph-duotone ph-money"></i>Thanh toán<span id="paymentsBadge" style="display:none;background:var(--green);color:#fff;border-radius:99px;font-size:9px;padding:1px 6px;font-weight:800">0</span>
+  </button>
+  <button id="tabRecruit" onclick="switchTab('recruit')"
+    style="padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px">
+    <i class="ph-duotone ph-megaphone"></i>Tuyển dụng
+  </button>
   <a href="aln_community.html"
     style="padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;text-decoration:none">
-    <i class="ph-duotone ph-campfire"></i>Nhịp sống ALN
+    <i class="ph-duotone ph-campfire"></i>Nhịp sống
   </a>
 
-  <!-- ── DIVIDER ── -->
-  <div style="width:1px;height:20px;background:var(--border);flex-shrink:0"></div>
+  <!-- GROUP: LIVE PREVIEW -->
+  <div style="width:1px;height:20px;background:var(--border);flex-shrink:0;margin:0 4px"></div>
+  <span style="font-size:9px;font-family:var(--mono);color:var(--dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;flex-shrink:0">LIVE</span>
 
   <button id="tabLiveKts" onclick="switchTab('liveKts')"
     style="padding:5px 13px;border:1px solid rgba(245,158,11,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(245,158,11,.08);color:var(--amber);display:flex;align-items:center;gap:5px">
-    <span style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0"></span>Trang KTS
+    <span style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0"></span>KTS
   </button>
   <button id="tabLiveDn" onclick="switchTab('liveDn')"
     style="padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(59,130,246,.08);color:var(--blue);display:flex;align-items:center;gap:5px">
-    <span style="width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0"></span>Trang DN
+    <span style="width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0"></span>DN
   </button>
   <button id="tabLiveCn" onclick="switchTab('liveCn')"
     style="padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px">
-    <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></span>Trang Chủ nhà
+    <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></span>Chủ nhà
   </button>
   <button id="tabLiveDes" onclick="switchTab('liveDes')"
     style="padding:5px 13px;border:1px solid rgba(124,58,237,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(124,58,237,.08);color:#a78bfa;display:flex;align-items:center;gap:5px">
-    <span style="width:6px;height:6px;border-radius:50%;background:#a78bfa;flex-shrink:0"></span>Trang Designer
+    <span style="width:6px;height:6px;border-radius:50%;background:#a78bfa;flex-shrink:0"></span>Designer
   </button>
 
   <div style="margin-left:auto;font-size:10px;color:var(--dim);font-family:var(--mono)">
@@ -1384,6 +1405,45 @@ body::after {
   </div>
 </div>
 
+<!-- ══ PANEL: KS VÙNG ══ -->
+<div id="panelMgKs" style="display:none;flex-direction:column;flex:1;overflow-y:auto;padding:20px;gap:16px">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px">
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:3px">QUẢN LÝ THÀNH VIÊN</div>
+      <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1)">KS Vùng</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px">
+    <div class="dn-kpi"><div class="dk-l">Tổng KS Vùng</div><div class="dk-v" id="mgKsV0">0</div></div>
+    <div class="dn-kpi"><div class="dk-l">🟢 Đang hoạt động</div><div class="dk-v" style="color:var(--green)" id="mgKsV1">0</div></div>
+    <div class="dn-kpi"><div class="dk-l">⏳ Chờ duyệt</div><div class="dk-v" style="color:var(--amber)" id="mgKsV2">0</div></div>
+    <div class="dn-kpi"><div class="dk-l">📍 Số tỉnh quản lý</div><div class="dk-v" style="color:var(--gold)" id="mgKsV3">0</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px">
+    <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:200px;background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:6px 12px">
+      <i class="ph-duotone ph-magnifying-glass" style="color:var(--dim)"></i>
+      <input type="text" id="mgKsSearch" placeholder="Tên KS, tỉnh..." oninput="renderMgKs()" style="background:none;border:none;outline:none;font-family:var(--sans);font-size:12px;color:var(--text1);width:100%">
+    </div>
+    <select id="mgKsFilterStatus" onchange="renderMgKs()" style="background:var(--raised);border:1px solid var(--border);color:var(--text2);font-family:var(--sans);font-size:11px;padding:6px 10px;border-radius:6px;outline:none">
+      <option value="">Tất cả trạng thái</option>
+      <option value="active">Đang hoạt động</option>
+      <option value="pending">Chờ duyệt</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr>
+        <th>Tên KS Vùng</th>
+        <th>Username</th>
+        <th>Tỉnh quản lý</th>
+        <th>Trạng thái</th>
+        <th>Đăng ký</th>
+      </tr></thead>
+      <tbody id="mgKsBody"></tbody>
+    </table>
+  </div>
+</div>
+
 <!-- ══ PANEL: DUYỆT ĐĂNG KÝ ══ -->
 <div id="panelPending" style="display:none;flex-direction:column;flex:1;overflow:hidden">
   <!-- Header -->
@@ -1414,10 +1474,10 @@ body::after {
         <i class="ph-duotone ph-paint-brush-household"></i> Designer NT
         <span id="pendingCountDes" style="background:rgba(124,58,237,.1);color:var(--purple);border:1px solid rgba(124,58,237,.25);border-radius:99px;font-size:9px;padding:1px 7px;font-weight:700">0</span>
       </button>
-      <button id="pendingTabCtv" onclick="switchPendingTab('ctv')"
+      <button id="pendingTabKs" onclick="switchPendingTab('ks')"
         style="padding:7px 18px;border-radius:7px 7px 0 0;border:1px solid var(--border);border-bottom:none;font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;background:var(--card);color:var(--sub)">
-        <i class="ph-duotone ph-map-pin-area"></i> CTV Trưởng nhóm
-        <span id="pendingCountCtv" style="background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.25);border-radius:99px;font-size:9px;padding:1px 7px;font-weight:700">0</span>
+        <i class="ph-duotone ph-map-pin-area"></i> KS Vùng
+        <span id="pendingCountKs" style="background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.25);border-radius:99px;font-size:9px;padding:1px 7px;font-weight:700">0</span>
       </button>
     </div>
   </div>
@@ -2493,7 +2553,7 @@ window.ALNRealtime = (() => {
 ══════════════════════════════════════════ */
 
 function switchTab(t){
-  var ALL = ['projects','stats','mgKts','mgDn','mgCn','pending','payments','recruit','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
+  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','pending','payments','recruit','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
   var activeStyle  = 'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.15);color:var(--blue);white-space:nowrap';
   var inactiveStyle= 'padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:var(--raised);color:var(--sub);white-space:nowrap';
   var liveStyles = {
@@ -2528,6 +2588,7 @@ function switchTab(t){
   if(t==='mgKts')   renderMgKts();
   if(t==='mgDn')    renderMgDn();
   if(t==='mgCn')    renderMgCn();
+  if(t==='mgKs')    renderMgKs();
   if(t==='pending')  renderPending();
   if(t==='payments') renderPayments();
   if(t==='recruit')  { if(typeof window._recruitRender==='function') window._recruitRender(); }
@@ -2972,6 +3033,55 @@ function renderMgCn(){
     }).join('');
 }
 
+/* ── KS VÙNG ── */
+var _mgKsData = null;
+function renderMgKs() {
+  if(window._mgKsData) _mgKsData = window._mgKsData;
+  if(!_mgKsData) {
+    _loadKsUsers();
+    return;
+  }
+  var q   = (document.getElementById('mgKsSearch') ? document.getElementById('mgKsSearch').value : '').toLowerCase();
+  var fs  = document.getElementById('mgKsFilterStatus') ? document.getElementById('mgKsFilterStatus').value : '';
+  var PROV = {HCM:'TP. HCM',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'Vũng Tàu',LA:'Long An',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TH:'Thanh Hóa',TG:'Tiền Giang',OTHER:'Tỉnh khác'};
+  var rows = _mgKsData.filter(function(k){
+    if(fs && k.status !== fs) return false;
+    if(q && !(k.name||'').toLowerCase().includes(q) && !(k.province||'').toLowerCase().includes(q) && !(k.username||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  var total   = _mgKsData.length;
+  var active  = _mgKsData.filter(function(k){ return k.status==='active'; }).length;
+  var pending = _mgKsData.filter(function(k){ return k.status==='pending'; }).length;
+  var provs   = new Set(_mgKsData.map(function(k){ return k.province; }).filter(Boolean)).size;
+  document.getElementById('mgKsV0').textContent = total;
+  document.getElementById('mgKsV1').textContent = active;
+  document.getElementById('mgKsV2').textContent = pending;
+  document.getElementById('mgKsV3').textContent = provs;
+  var tbody = document.getElementById('mgKsBody');
+  if(!tbody) return;
+  if(!rows.length){ tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:28px">Không có dữ liệu</td></tr>'; return; }
+  tbody.innerHTML = rows.map(function(k){
+    var provName = PROV[k.province] || k.province || '—';
+    var sColor = k.status==='active' ? 'var(--green)' : k.status==='pending' ? 'var(--amber)' : 'var(--dim)';
+    var sLabel = k.status==='active' ? '🟢 Hoạt động' : k.status==='pending' ? '⏳ Chờ duyệt' : k.status||'—';
+    var ts = k.createdAt ? (k.createdAt.toDate ? k.createdAt.toDate().toLocaleDateString('vi-VN') : k.createdAt) : '—';
+    return '<tr>'
+      +'<td style="font-weight:700;color:var(--text1)">'+( k.name||'—')+'</td>'
+      +'<td style="font-family:var(--mono);font-size:11px;color:var(--sub)">'+( k.username||'—')+'</td>'
+      +'<td><span style="font-size:10px;font-weight:700;padding:2px 8px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.22);border-radius:5px;color:var(--gold)">'+provName+'</span></td>'
+      +'<td style="color:'+sColor+';font-size:11px;font-weight:700">'+sLabel+'</td>'
+      +'<td style="font-size:11px;color:var(--dim)">'+ts+'</td>'
+    +'</tr>';
+  }).join('');
+}
+
+function _loadKsUsers() {
+  var tbody = document.getElementById('mgKsBody');
+  if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:28px"><i class="ph-duotone ph-spinner ph-spin"></i> Đang tải…</td></tr>';
+  if(window._ksLoadFromModule) { window._ksLoadFromModule(); }
+  else { if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:28px">Module chưa sẵn sàng, thử lại sau</td></tr>'; }
+}
+
 /* ── DUYỆT ĐĂNG KÝ ── */
 var PENDING_USERS = [];
 window.PENDING_USERS = PENDING_USERS;
@@ -2982,11 +3092,11 @@ function switchPendingTab(role){
   var tabKts = document.getElementById('pendingTabKts');
   var tabDn  = document.getElementById('pendingTabDn');
   var tabDes = document.getElementById('pendingTabDes');
-  var tabCtv = document.getElementById('pendingTabCtv');
+  var tabKs  = document.getElementById('pendingTabKs');
   if(tabKts){ tabKts.style.background = role==='kts'      ? 'var(--raised)' : 'var(--card)'; tabKts.style.color = role==='kts'      ? 'var(--amber)'  : 'var(--sub)'; }
   if(tabDn) { tabDn.style.background  = role==='dn'       ? 'var(--raised)' : 'var(--card)'; tabDn.style.color  = role==='dn'       ? 'var(--blue)'   : 'var(--sub)'; }
   if(tabDes){ tabDes.style.background = role==='designer' ? 'var(--raised)' : 'var(--card)'; tabDes.style.color = role==='designer' ? 'var(--purple)' : 'var(--sub)'; }
-  if(tabCtv){ tabCtv.style.background = role==='ctv'      ? 'var(--raised)' : 'var(--card)'; tabCtv.style.color = role==='ctv'      ? 'var(--gold)'   : 'var(--sub)'; }
+  if(tabKs) { tabKs.style.background  = role==='ks'       ? 'var(--raised)' : 'var(--card)'; tabKs.style.color  = role==='ks'       ? 'var(--gold)'   : 'var(--sub)'; }
   renderPending();
 }
 
@@ -2998,23 +3108,23 @@ function renderPending(){
   var nKts = all.filter(function(u){ return u.role==='kts'; }).length;
   var nDn  = all.filter(function(u){ return u.role==='dn';  }).length;
   var nDes = all.filter(function(u){ return u.role==='designer'; }).length;
-  var nCtv = all.filter(function(u){ return u.role==='ctv'; }).length;
+  var nKs  = all.filter(function(u){ return u.role==='ks'; }).length;
   var elK = document.getElementById('pendingCountKts'); if(elK) elK.textContent = nKts;
   var elD = document.getElementById('pendingCountDn');  if(elD) elD.textContent = nDn;
   var elDes = document.getElementById('pendingCountDes'); if(elDes) elDes.textContent = nDes;
-  var elCtv = document.getElementById('pendingCountCtv'); if(elCtv) elCtv.textContent = nCtv;
+  var elKs  = document.getElementById('pendingCountKs');  if(elKs)  elKs.textContent  = nKs;
   // Lọc theo tab đang chọn
   var users = all.filter(function(u){ return u.role === _pendingActiveTab; });
   if(users.length === 0){
-    var emptyLabel = _pendingActiveTab==='kts' ? 'Không có KTS nào đang chờ duyệt' : _pendingActiveTab==='designer' ? 'Không có Designer nào đang chờ duyệt' : _pendingActiveTab==='ctv' ? 'Không có CTV nào đang chờ duyệt' : 'Không có Doanh nghiệp nào đang chờ duyệt';
+    var emptyLabel = _pendingActiveTab==='kts' ? 'Không có KTS nào đang chờ duyệt' : _pendingActiveTab==='designer' ? 'Không có Designer nào đang chờ duyệt' : _pendingActiveTab==='ks' ? 'Không có KS Vùng nào đang chờ duyệt' : 'Không có Doanh nghiệp nào đang chờ duyệt';
     list.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--dim);font-size:13px">'
       +'<i class="ph-duotone ph-check-circle" style="font-size:36px;display:block;margin-bottom:12px;color:var(--green)"></i>'
       +emptyLabel+'</div>';
     return;
   }
-  var ROLE_COLOR = {kts:'var(--amber)', dn:'var(--blue)', cn:'var(--green)', designer:'var(--purple)', ctv:'var(--gold)'};
-  var ROLE_LABEL = {kts:'Kiến trúc sư', dn:'Doanh nghiệp', cn:'Chủ nhà', designer:'Designer NT', ctv:'CTV Trưởng nhóm'};
-  var ROLE_ICON  = {kts:'ph-pencil-ruler', dn:'ph-buildings', cn:'ph-house-line', designer:'ph-paint-brush-household', ctv:'ph-map-pin-area'};
+  var ROLE_COLOR = {kts:'var(--amber)', dn:'var(--blue)', cn:'var(--green)', designer:'var(--purple)', ks:'var(--gold)'};
+  var ROLE_LABEL = {kts:'Kiến trúc sư', dn:'Doanh nghiệp', cn:'Chủ nhà', designer:'Designer NT', ks:'KS Vùng'};
+  var ROLE_ICON  = {kts:'ph-pencil-ruler', dn:'ph-buildings', cn:'ph-house-line', designer:'ph-paint-brush-household', ks:'ph-map-pin-area'};
   list.innerHTML = users.map(function(u){
     var app = u.app || {};
     var ts  = u.createdAt ? (u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString('vi-VN') : u.createdAt) : '—';
@@ -3118,12 +3228,12 @@ function renderPending(){
         +'</div>'
       +'</div>';
     }
-    if(u.role === 'ctv'){
-      var PROV_NAME_CTV = {HCM:'TP. HCM',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'Vũng Tàu',LA:'Long An',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TH:'Thanh Hóa',TG:'Tiền Giang',OTHER:'Tỉnh khác'};
+    if(u.role === 'ks'){
+      var PROV_NAME_KS = {HCM:'TP. HCM',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'Vũng Tàu',LA:'Long An',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TH:'Thanh Hóa',TG:'Tiền Giang',OTHER:'Tỉnh khác'};
       var IND_LABEL = {kts:'Kiến trúc sư',construction:'Xây dựng / Thầu',realestate:'Bất động sản',interior:'Nội thất',other:'Ngành khác'};
-      var provName = PROV_NAME_CTV[app.province] || app.province || '—';
-      var ctvNote = app.ctvNote || {};
-      var noteHtml = ctvNote.recommendation ? '<div style="padding:8px 12px;border-radius:7px;font-size:11px;'+(ctvNote.recommendation==='recommended' ? 'background:rgba(61,214,140,.07);border:1px solid rgba(61,214,140,.2);color:var(--green)' : 'background:rgba(240,96,96,.07);border:1px solid rgba(240,96,96,.2);color:#f09898')+'">'+(ctvNote.recommendation==='recommended' ? '✓ ' : '✗ ')+'<strong>CTV tự đánh giá:</strong> '+(ctvNote.note||'')+'</div>' : '';
+      var provName = PROV_NAME_KS[app.province] || app.province || '—';
+      var ksNote = app.ksNote || app.ctvNote || {};
+      var noteHtml = ksNote.recommendation ? '<div style="padding:8px 12px;border-radius:7px;font-size:11px;'+(ksNote.recommendation==='recommended' ? 'background:rgba(61,214,140,.07);border:1px solid rgba(61,214,140,.2);color:var(--green)' : 'background:rgba(240,96,96,.07);border:1px solid rgba(240,96,96,.2);color:#f09898')+'">'+(ksNote.recommendation==='recommended' ? '✓ ' : '✗ ')+'<strong>KS tự đánh giá:</strong> '+(ksNote.note||'')+'</div>' : '';
       details = '<div style="padding:14px 20px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--border)">'
         +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
           +'<div style="background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">'
@@ -4058,7 +4168,7 @@ window.founderConfirmPayment = async function(projId, stage) {
 window.founderApprovePending = async function(uid, role) {
   try {
     var userUpdate = { status:'active', approvedNotified: false };
-    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : role==='ctv' ? 'ctvApplications' : null;
+    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : role==='ks' ? 'ksApplications' : null;
     if(role==='kts' && appColl) {
       try {
         var appSnap = await getDoc(doc(db,appColl,uid));
@@ -4084,7 +4194,7 @@ window.founderRejectPending = async function(uid, role) {
   if(!confirm('Xác nhận từ chối tài khoản này?')) return;
   try {
     await updateDoc(doc(db,'users',uid), { status:'rejected' });
-    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : role==='ctv' ? 'ctvApplications' : null;
+    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : role==='ks' ? 'ksApplications' : null;
     if(appColl){ try{ await updateDoc(doc(db,appColl,uid), { status:'rejected', reviewedAt:serverTimestamp() }); }catch(e){} }
     window.PENDING_USERS = (window.PENDING_USERS||[]).filter(function(u){ return u.uid!==uid; });
     renderPending(); _updatePendingBadge();
@@ -4163,7 +4273,7 @@ async function _startPendingListen() {
       var base = snap.docs.map(function(d){ return Object.assign({uid:d.id}, d.data()); });
       var enriched = await Promise.all(base.map(async function(u) {
         try {
-          var appColl = u.role==='kts' ? 'ktsApplications' : u.role==='dn' ? 'dnApplications' : u.role==='designer' ? 'designerApplications' : u.role==='ctv' ? 'ctvApplications' : null;
+          var appColl = u.role==='kts' ? 'ktsApplications' : u.role==='dn' ? 'dnApplications' : u.role==='designer' ? 'designerApplications' : u.role==='ks' ? 'ksApplications' : null;
           if(appColl){
             var aSnap = await getDoc(doc(db, appColl, u.uid));
             if(aSnap.exists()) return Object.assign({}, u, {app: aSnap.data()});
@@ -4474,6 +4584,19 @@ window.alnLogout = async function(){
   try { await signOut(auth); } catch(e){}
   try { localStorage.removeItem("aln_user"); sessionStorage.removeItem("aln_user"); } catch(e){}
   window.location.replace("login.html");
+};
+
+/* ── KS VÙNG — load từ module ── */
+window._ksLoadFromModule = async function() {
+  try {
+    const snap = await getDocs(query(collection(db, 'users'), where('role', '==', 'ks')));
+    window._mgKsData = snap.docs.map(function(d){ return Object.assign({uid:d.id}, d.data()); });
+    if(typeof renderMgKs === 'function') renderMgKs();
+  } catch(e) {
+    console.error('[mgKs load]', e);
+    var tbody = document.getElementById('mgKsBody');
+    if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--red);padding:28px">Lỗi tải dữ liệu: ' + (e.message||e.code) + '</td></tr>';
+  }
 };
 
 /* ══════════════════════════════════════════

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Đăng ký CTV Trưởng nhóm — App Làm Nhà</title>
+<title>Đăng ký KS Vùng — App Làm Nhà</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
@@ -144,13 +144,13 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
         <span class="ey-text">App Làm Nhà Corp.</span>
         <span class="ey-line ey-line-r"></span>
       </div>
-      <h1 class="hero-title">Trở thành<br><em>Trưởng nhóm CTV</em></h1>
-      <p class="hero-sub">Xây dựng mạng lưới KTS tại địa phương — đại diện thương hiệu ALN — nhận hoa hồng từ mỗi dự án trong nhóm bạn gây dựng</p>
+      <h1 class="hero-title">Trở thành<br><em>KS Vùng ALN</em></h1>
+      <p class="hero-sub">Xây dựng mạng lưới KTS tại địa phương — đại diện thương hiệu ALN — nhận hoa hồng từ mỗi dự án trong vùng bạn phụ trách</p>
       <div class="benefit-grid">
         <div class="benefit-card">
           <div class="benefit-icon">🏆</div>
           <div class="benefit-title">Đại diện thương hiệu</div>
-          <div class="benefit-desc">Badge CTV chính thức, ALN hỗ trợ tài liệu pitch tại địa phương</div>
+          <div class="benefit-desc">Badge KS Vùng chính thức, ALN hỗ trợ tài liệu pitch tại địa phương</div>
         </div>
         <div class="benefit-card">
           <div class="benefit-icon">💰</div>
@@ -259,7 +259,7 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
       </div>
     </div>
     <div class="field">
-      <label>Giới thiệu bản thân & lý do muốn làm CTV <span class="req">✦</span></label>
+      <label>Giới thiệu bản thân & lý do muốn làm KS Vùng <span class="req">✦</span></label>
       <textarea id="f_bio" placeholder="Kinh nghiệm trong ngành, mạng lưới quen biết, lý do muốn đại diện ALN tại địa phương…" maxlength="500"></textarea>
       <div class="char-count"><span id="bioCount">0</span> / 500</div>
     </div>
@@ -278,10 +278,10 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
       </div>
     </div>
     <div class="contract-box">
-      <div class="contract-title">📋 Điều khoản CTV Trưởng nhóm ALN</div>
+      <div class="contract-title">📋 Điều khoản KS Vùng ALN</div>
       <div class="contract-row">
         <span class="contract-key">Vai trò</span>
-        <span class="contract-val">Đại diện thương hiệu ALN tại tỉnh đã chọn</span>
+        <span class="contract-val">KS Vùng ALN — đại diện thương hiệu tại tỉnh đã chọn</span>
       </div>
       <div class="contract-row">
         <span class="contract-key">Nhiệm vụ</span>
@@ -305,7 +305,7 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
       <div class="uname-card">
         <div class="uname-left">
           <div class="uname-eyebrow">Tên đăng nhập</div>
-          <div class="uname-val" id="unameDisplay">ctv.an0000</div>
+          <div class="uname-val" id="unameDisplay">ks.an0000</div>
           <div class="uname-domain">@aln.vn</div>
         </div>
         <button class="uname-regen" onclick="regenUsername()">
@@ -323,7 +323,7 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
     </div>
     <div class="agree-row" style="margin-top:4px">
       <input type="checkbox" id="f_agree">
-      <span>Tôi đã đọc và đồng ý với tất cả điều khoản CTV Trưởng nhóm ALN nêu trên.</span>
+      <span>Tôi đã đọc và đồng ý với tất cả điều khoản KS Vùng ALN nêu trên.</span>
     </div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="goStep(1)"><i class="ph-duotone ph-arrow-left"></i> Quay lại</button>
@@ -406,7 +406,7 @@ function validateStep(n) {
     var pw2 = document.getElementById('f_pw2').value;
     if (pw.length < 8) { showToast('Mật khẩu tối thiểu 8 ký tự', true); return false; }
     if (pw !== pw2) { showToast('Mật khẩu xác nhận không khớp', true); return false; }
-    if (!document.getElementById('f_agree').checked) { showToast('Vui lòng đồng ý với điều khoản', true); return false; }
+    if (!document.getElementById('f_agree').checked) { showToast('Vui lòng đồng ý với điều khoản KS Vùng', true); return false; }
     return true;
   }
   return true;
@@ -428,7 +428,7 @@ function genUsername(fullName) {
   var slug = removeVietnameseTones(fullName || 'ctv');
   var parts = slug.split(/\s+/).filter(function(p){ return p.length > 0; });
   var given = parts.length > 0 ? parts[parts.length - 1] : 'ctv';
-  return 'ctv.' + given + String(Math.floor(1000 + Math.random() * 9000));
+  return 'ks.' + given + String(Math.floor(1000 + Math.random() * 9000));
 }
 function regenUsername() {
   generatedUsername = genUsername(document.getElementById('f_name').value.trim() || 'ctv');
@@ -480,11 +480,11 @@ window._doSubmit = async function() {
     var uid  = cred.user.uid;
 
     await setDoc(doc(db, 'users', uid), {
-      username: uname, name: name, role: 'ctv',
+      username: uname, name: name, role: 'ks',
       email: email || (uname + '@aln.vn'),
       province: province, status: 'pending', createdAt: serverTimestamp()
     });
-    await setDoc(doc(db, 'ctvApplications', uid), {
+    await setDoc(doc(db, 'ksApplications', uid), {
       uid: uid, name: name, phone: phone, email: email || '',
       province: province, industry: industry, numKts: numkts, bio: bio,
       username: uname, status: 'pending', submittedAt: serverTimestamp()

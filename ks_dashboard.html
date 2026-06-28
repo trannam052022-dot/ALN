@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ALN — CTV Dashboard</title>
+<title>ALN — KS Vùng Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
@@ -149,7 +149,7 @@ textarea::placeholder{color:rgba(228,212,176,.22)}
 <div class="topbar">
   <span class="topbar-logo">ALN</span>
   <div class="topbar-sep"></div>
-  <span class="topbar-title">CTV Dashboard</span>
+  <span class="topbar-title">KS Vùng Dashboard</span>
   <div class="topbar-grow"></div>
   <span class="topbar-prov" id="topProvince">…</span>
   <span class="topbar-name" id="topName"></span>
@@ -363,7 +363,7 @@ var CTV = null;
 onAuthStateChanged(auth, async function(user) {
   if (!user) { location.href = 'login.html'; return; }
   var snap = await getDoc(doc(db, 'users', user.uid));
-  if (!snap.exists() || snap.data().role !== 'ctv') { location.href = 'login.html'; return; }
+  if (!snap.exists() || snap.data().role !== 'ks') { location.href = 'login.html'; return; }
 
   CTV = snap.data();
   CTV.uid = user.uid;
