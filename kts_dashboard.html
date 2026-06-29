@@ -2932,6 +2932,10 @@ function renderMyProjects(projects) {
           <div class="kwc-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-paper-plane-tilt"></i></div>
           <div class="kwc-label">Gửi phương án</div>
         </div>
+        <div class="kts-work-card" onclick="window.switchKtsProject&&window.switchKtsProject('${pid}');window.openBoardEditor()">
+          <div class="kwc-icon" style="background:rgba(201,168,76,.08);color:var(--gold)"><i class="ph-duotone ph-layout"></i></div>
+          <div class="kwc-label">Tạo Board PA</div>
+        </div>
         <div class="kts-work-card" onclick="window.switchKtsProject&&window.switchKtsProject('${pid}');window.ktsShowTab('review')">
           <div class="kwc-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-clipboard-text"></i></div>
           <div class="kwc-label">Bảng Review</div>
