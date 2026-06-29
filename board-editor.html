@@ -334,8 +334,8 @@ input[type=file]{display:none}
     <img id="logo-side-img" src="" style="display:none">
     <div id="logo-side-txt">
       <div class="logo-a">A</div>
-      <div class="logo-studio">STUDIO</div>
-      <div class="logo-name">APP LÀM NHÀ</div>
+      <div class="logo-studio" id="bd-logo-studio">STUDIO</div>
+      <div class="logo-name" id="bd-logo-name">APP LÀM NHÀ</div>
     </div>
     <div class="logo-upload-hint">UPLOAD LOGO</div>
   </div>
@@ -524,22 +524,22 @@ input[type=file]{display:none}
         <span id="logo-ft-txt" class="ft-logo-a">A</span>
       </div>
       <div>
-        <div class="ft-name">APP LÀM NHÀ</div>
-        <div class="ft-sub">ARCHITECTURE STUDIO</div>
+        <div class="ft-name" id="bd-ft-name">APP LÀM NHÀ</div>
+        <div class="ft-sub" id="bd-ft-sub">ARCHITECTURE STUDIO</div>
       </div>
     </div>
     <div style="height:0.5px;background:var(--gold);opacity:.45;margin:.2em 0"></div>
-    <div class="ft-tagline">WE DESIGN – YOU ENJOY</div>
+    <div class="ft-tagline" id="bd-ft-tagline">WE DESIGN – YOU ENJOY</div>
   </div>
 
   <div class="ft-div"></div>
 
   <div class="ft-col">
     <div class="ft-head">CONTACT</div>
-    <div class="ft-row"><span class="ft-icon">📞</span><span class="ft-txt" contenteditable="true">(+84) 333 999 136</span></div>
-    <div class="ft-row"><span class="ft-icon">✉</span><span class="ft-txt" contenteditable="true">info@applamnha.com</span></div>
-    <div class="ft-row"><span class="ft-icon">🌐</span><span class="ft-txt" contenteditable="true">www.applamnha.com</span></div>
-    <div class="ft-row"><span class="ft-icon">📍</span><span class="ft-txt" contenteditable="true">16 Năm Cao, Đà Nẵng, Việt Nam</span></div>
+    <div class="ft-row"><span class="ft-icon">📞</span><span id="bd-phone" class="ft-txt" contenteditable="true">(+84) 333 999 136</span></div>
+    <div class="ft-row"><span class="ft-icon">✉</span><span id="bd-email" class="ft-txt" contenteditable="true">info@applamnha.com</span></div>
+    <div class="ft-row"><span class="ft-icon">🌐</span><span id="bd-website" class="ft-txt" contenteditable="true">www.applamnha.com</span></div>
+    <div class="ft-row"><span class="ft-icon">📍</span><span id="bd-address" class="ft-txt" contenteditable="true">16 Năm Cao, Đà Nẵng, Việt Nam</span></div>
   </div>
 
   <div class="ft-div"></div>
@@ -566,8 +566,8 @@ input[type=file]{display:none}
 
   <div class="ft-sig">
     <div>
-      <div class="ft-sig-text">App Làm Nhà</div>
-      <div class="ft-sig-small">ARCHITECTURE STUDIO</div>
+      <div class="ft-sig-text" id="bd-sig-name">App Làm Nhà</div>
+      <div class="ft-sig-small" id="bd-sig-sub">ARCHITECTURE STUDIO</div>
     </div>
   </div>
 
@@ -675,10 +675,44 @@ document.querySelectorAll('[contenteditable]').forEach(el => {
 </script>
 
 <script type="module">
-import { auth, db, storage, storageRef, uploadBytes, getDownloadURL, collection, addDoc, serverTimestamp, onAuthStateChanged } from './firebase-config.js';
+import { auth, db, storage, storageRef, uploadBytes, getDownloadURL, collection, addDoc, serverTimestamp, onAuthStateChanged, doc, getDoc } from './firebase-config.js';
+
+function _set(id, val) { if (!val) return; const el = document.getElementById(id); if (el) el.textContent = val; }
 
 let _fbAuth = null;
-onAuthStateChanged(auth, u => { _fbAuth = u; });
+onAuthStateChanged(auth, async u => {
+  _fbAuth = u;
+  if (!u) return;
+  const role = window._BOARD_ROLE || 'kts';
+  const col  = role === 'designer' ? 'designerApplications' : 'ktsApplications';
+  try {
+    const snap = await getDoc(doc(db, col, u.uid));
+    if (!snap.exists()) return;
+    const d = snap.data();
+    const studioName = (d.name || '').toUpperCase();
+    // Sidebar logo
+    _set('bd-logo-name',   studioName);
+    _set('bd-logo-studio', role === 'designer' ? 'INTERIOR STUDIO' : 'ARCHITECTURE STUDIO');
+    // Footer logo block
+    _set('bd-ft-name', studioName);
+    _set('bd-ft-sub',  role === 'designer' ? 'INTERIOR STUDIO' : 'ARCHITECTURE STUDIO');
+    // Footer sig
+    _set('bd-sig-name', d.name || '');
+    _set('bd-sig-sub',  role === 'designer' ? 'INTERIOR STUDIO' : 'ARCHITECTURE STUDIO');
+    // Contact
+    if (d.phone)   _set('bd-phone',   d.phone);
+    if (d.email)   _set('bd-email',   d.email);
+    if (d.website) _set('bd-website', d.website);
+    if (d.province_home) _set('bd-address', d.province_home + ', Việt Nam');
+    // Avatar làm logo nếu có
+    if (d.avatarUrl) {
+      const img = document.getElementById('logo-side-img');
+      if (img) { img.src = d.avatarUrl; img.style.display = 'block'; }
+      const txt = document.getElementById('logo-side-txt');
+      if (txt) txt.style.display = 'none';
+    }
+  } catch(e) { console.warn('Auto-fill profile:', e); }
+});
 
 window.submitBoardPA = async function(btn) {
   if (!_fbAuth) { alert('Bạn chưa đăng nhập — mở trang này từ KTS Dashboard.'); return; }
