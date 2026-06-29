@@ -1022,25 +1022,51 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       .pa-thumb .pa-x:hover{background:var(--red)}
       .pa-thumb .pa-nm{position:absolute;left:0;right:0;bottom:0;font-size:8px;color:#fff;background:rgba(0,0,0,.55);padding:2px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     </style>
-    <div class="sec-label proposal-section">📐 Gửi phương án thiết kế (ảnh) cho Chủ nhà</div>
+    <div class="sec-label proposal-section">📐 Gửi phương án thiết kế cho Chủ nhà</div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
         <div>
-          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-image-square"></i></div>Gửi phương án — <span id="paProjTitle">#ALN-9921</span></div>
-          <div style="font-size:11px;color:var(--muted)">Chọn chặng · chọn ảnh JPG/PNG · điền tên &amp; mô tả → Chủ nhà xem ảnh rồi chốt qua chat ALN</div>
+          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-image-square"></i></div>Phương án — <span id="paProjTitle">#ALN-9921</span></div>
+          <div style="font-size:11px;color:var(--muted)">Chặng C1 &amp; C2 yêu cầu trình bày qua <b style="color:var(--gold)">ALN Board PA</b> — chuẩn hóa chất lượng trình bày cho khách hàng</div>
         </div>
       </div>
 
-      <div class="pa-grid">
-        <div>
-          <label class="pa-lbl">Chặng</label>
-          <select id="paStage" class="pa-inp">
+      <!-- PRIMARY: Board PA -->
+      <div style="background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.25);border-radius:10px;padding:14px 16px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <i class="ph-duotone ph-layout" style="font-size:20px;color:var(--gold)"></i>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)">Tạo Board PA <span style="font-size:10px;background:var(--gold);color:#080c14;border-radius:4px;padding:1px 7px;font-weight:800;margin-left:4px">BẮT BUỘC C1 · C2</span></div>
+            <div style="font-size:11px;color:var(--muted);margin-top:1px">Upload ảnh phối cảnh · điền thông tin công trình · export &amp; nộp trong 1 bước</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <label class="pa-lbl" style="margin:0;white-space:nowrap">Chặng</label>
+          <select id="paStage" class="pa-inp" style="width:auto;flex:0 0 auto">
             <option value="C1">C1 — Ý tưởng 2D</option>
             <option value="C2" selected>C2 — Phối cảnh 3D</option>
             <option value="C3">C3 — Hồ sơ KT</option>
             <option value="C4">C4 — Dự toán &amp; BH</option>
           </select>
+          <button class="btn btn-primary" onclick="window.openBoardEditor()" style="background:var(--gold);border-color:var(--gold);color:#080c14;font-weight:800">
+            <i class="ph-duotone ph-layout"></i> Mở Board PA →
+          </button>
         </div>
+      </div>
+
+      <!-- FALLBACK: ảnh rời -->
+      <div style="margin-bottom:8px">
+        <button onclick="this.parentElement.nextElementSibling.style.display=this.parentElement.nextElementSibling.style.display==='none'?'block':'none'" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:0;font-family:var(--sans);display:flex;align-items:center;gap:4px">
+          <i class="ph-duotone ph-warning" style="color:var(--amber)"></i> Dự phòng: Gửi ảnh rời (chỉ dùng khi Board PA lỗi kỹ thuật)
+          <i class="ph-duotone ph-caret-down" style="font-size:10px"></i>
+        </button>
+      </div>
+      <div style="display:none">
+        <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--amber)">
+          ⚠️ Chỉ sử dụng khi Board PA không load được. Ảnh rời không đạt chuẩn trình bày ALN.
+        </div>
+
+      <div class="pa-grid">
         <div>
           <label class="pa-lbl">Loại phương án</label>
           <select id="paFolder" class="pa-inp">
@@ -1086,6 +1112,8 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <div id="c2FilePreview" style="margin-bottom:8px"></div>
         <button class="btn btn-primary" id="submitC2Btn" onclick="c2OpenModal()"><i class="ph-duotone ph-map-pin"></i> Nộp Hồ sơ C2</button>
       </div>
+
+      </div><!-- /fallback collapse -->
 
       <div style="margin-top:16px">
         <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Phương án đã gửi (chặng <span id="paListStageLbl">C2</span>)</div>
