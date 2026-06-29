@@ -201,12 +201,13 @@ body{
 /* Thumbnails */
 .thumbs{
   grid-column:2;grid-row:3;
-  display:grid;grid-template-columns:repeat(6,1fr);
+  display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:100%;
   border-top:0.5px solid var(--gold);
+  height:100%;
 }
 .thumb{
   border-right:0.5px solid var(--gold);
-  position:relative;
+  position:relative;height:100%;
   background:var(--bg4);overflow:hidden;
 }
 .thumb:last-child{border-right:none}

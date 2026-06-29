@@ -21,11 +21,12 @@ service firebase.storage {
         firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in ['kts', 'designer', 'founder'];
     }
 
-    // Tài liệu dự án — chỉ thành viên dự án mới upload được
+    // Tài liệu dự án — thành viên dự án hoặc KTS/Designer/Founder
     match /projects/{pid}/{allPaths=**} {
       allow read:  if request.auth != null;
       allow write: if request.auth != null && (
         request.auth.uid == 'h4kEguPEyMcwJwl89stc0Q6j2si2' ||
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in ['kts', 'designer', 'founder'] ||
         (firestore.exists(/databases/(default)/documents/projects/$(pid)) &&
          request.auth.uid in firestore.get(/databases/(default)/documents/projects/$(pid)).data.memberUids) ||
         (firestore.exists(/databases/(default)/documents/designProjects/$(pid)) &&
