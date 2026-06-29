@@ -719,6 +719,13 @@ window.submitBoardPA = async function(btn) {
   const role  = window._BOARD_ROLE;
   if (!pid || !stage) { alert('Thiếu thông tin dự án — mở lại từ Dashboard.'); return; }
 
+  // Kiểm tra ít nhất ảnh phối cảnh chính đã upload
+  const heroImg = document.getElementById('hero-img-el');
+  if (!heroImg || heroImg.style.display === 'none' || !heroImg.src || heroImg.src === window.location.href) {
+    alert('⚠️ Vui lòng upload ảnh phối cảnh chính trước khi nộp Board PA.');
+    return;
+  }
+
   const board = document.querySelector('.board');
   const status = document.getElementById('submitStatus');
   const origLabel = btn.textContent;
