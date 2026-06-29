@@ -415,7 +415,7 @@ input[type=file]{display:none}
 <!-- HERO -->
 <div class="hero" onclick="document.getElementById('f-hero').click()">
   <div class="no-img" id="hero-placeholder">[ CLICK ĐỂ UPLOAD ẢNH PHỐI CẢNH CHÍNH ]</div>
-  <img id="hero-img-el" src="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none">
+  <img id="hero-img-el" src="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:none">
   <div class="hero-overlay"></div>
   <div class="hero-text">
     <span class="hero-tag" contenteditable="true" onclick="event.stopPropagation()">KIẾN TẠO</span>
@@ -424,6 +424,8 @@ input[type=file]{display:none}
     <div class="hero-desc" contenteditable="true" onclick="event.stopPropagation()">Mỗi công trình là một câu chuyện riêng,<br>mỗi không gian là một trải nghiệm sống khác biệt.</div>
   </div>
   <div class="hero-upload"><div class="hero-upload-inner">CLICK ĐỂ UPLOAD ẢNH</div></div>
+  <!-- Nút toggle fit ảnh — chỉ hiện sau khi upload -->
+  <div id="hero-fit-toggle" onclick="event.stopPropagation();toggleHeroFit()" style="display:none;position:absolute;top:6px;right:8px;background:rgba(8,12,20,.75);border:1px solid rgba(201,168,76,.5);border-radius:4px;padding:3px 9px;font-size:10px;font-weight:700;color:#C9A84C;cursor:pointer;letter-spacing:1px;z-index:10">⇔ COVER</div>
   <div class="hero-view">
     <div class="hero-line"></div>
     <span class="hero-view-text" contenteditable="true" onclick="event.stopPropagation()">VIEW 01 – FRONT ELEVATION</span>
@@ -634,6 +636,27 @@ function setImg(input, imgId, phId) {
     img.style.position='absolute';
     img.parentElement.querySelectorAll('.qr-cell').forEach(c=>c.style.display='none');
   }
+  if (imgId === 'hero-img-el') {
+    // Tự động detect ảnh đứng → chuyển sang contain
+    const tmp = new Image();
+    tmp.onload = function() {
+      const isPortrait = tmp.naturalHeight > tmp.naturalWidth;
+      img.style.objectFit = isPortrait ? 'contain' : 'cover';
+      const tog = document.getElementById('hero-fit-toggle');
+      if (tog) { tog.style.display='block'; tog.textContent = isPortrait ? '⇔ CONTAIN' : '⇔ COVER'; }
+    };
+    tmp.src = url;
+  }
+}
+
+var _heroFitMode = 'cover';
+function toggleHeroFit() {
+  const img = document.getElementById('hero-img-el');
+  const tog = document.getElementById('hero-fit-toggle');
+  if (!img) return;
+  _heroFitMode = _heroFitMode === 'cover' ? 'contain' : 'cover';
+  img.style.objectFit = _heroFitMode;
+  tog.textContent = _heroFitMode === 'cover' ? '⇔ COVER' : '⇔ CONTAIN';
 }
 
 function setLogo(input, imgId, txtId) {
@@ -743,9 +766,7 @@ window.submitBoardPA = async function(btn) {
     const ts = Date.now();
     const projName = (document.querySelector('.info-main') || {}).textContent || pid;
     const safe = projName.trim().replace(/[^a-zA-Z0-9À-ỹ]+/g,'_').slice(0,40);
-    const storagePath = role === 'designer'
-      ? 'designProposals/' + pid + '/' + stage + '/' + ts + '_board_' + safe + '.png'
-      : 'proposals/'       + pid + '/' + stage + '/' + ts + '_board_' + safe + '.png';
+    const storagePath = 'projects/' + pid + '/board-pa/' + stage + '/' + ts + '_board_' + safe + '.png';
 
     const ref = storageRef(storage, storagePath);
     await uploadBytes(ref, blob, { contentType: 'image/png' });
