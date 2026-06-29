@@ -2570,6 +2570,10 @@ window.openKtsWork = function(pid, uid) {
         + '<div class="kwc-icon" style="background:rgba(124,58,237,.14);color:var(--gold)"><i class="ph-duotone ph-paper-plane-tilt"></i></div>'
         + '<div class="kwc-label">Gửi phương án</div>'
       + '</div>'
+    + '<div class="kts-work-card" onclick="window.openBoardEditor()">'
+        + '<div class="kwc-icon" style="background:rgba(201,168,76,.08);color:var(--gold)"><i class="ph-duotone ph-layout"></i></div>'
+        + '<div class="kwc-label">Tạo Board PA</div>'
+      + '</div>'
     + '<div class="kts-work-card" onclick="window.ktsShowTab(\'review\')">'
         + '<div class="kwc-icon" style="background:rgba(37,99,235,.12);color:var(--blue)"><i class="ph-duotone ph-clipboard-text"></i></div>'
         + '<div class="kwc-label">Bảng Review</div>'
@@ -2580,6 +2584,17 @@ window.openKtsWork = function(pid, uid) {
       + '</div>'
     + '</div>';
 };
+window.openBoardEditor = function() {
+  var pid   = window.DES_PROJECT_ID || '';
+  var stage = 'C1';
+  var data  = window.DES_PROJECT_DATA || {};
+  var name  = ((data.name || '')).toUpperCase();
+  var loc   = ((data.location || data.address || '')).toUpperCase();
+  var type  = ((data.projectType || 'INTERIOR DESIGN')).toUpperCase();
+  var params = new URLSearchParams({ pid: pid, stage: stage, role: 'designer', name: name, location: loc, type: type });
+  window.open('board-editor.html?' + params.toString(), '_blank');
+};
+
 window.switchKtsProject = function(pid) {
   const pr = (window._DES_ALL_PROJECTS||[]).find(function(p){ return p.id===pid; });
   if (!pr) return;
@@ -2836,6 +2851,10 @@ function renderMyProjects(projects) {
         <div class="kts-work-card" onclick="window.switchKtsProject&&window.switchKtsProject('${pid}');window.ktsShowTab('proposal')">
           <div class="kwc-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-paper-plane-tilt"></i></div>
           <div class="kwc-label">Gửi phương án</div>
+        </div>
+        <div class="kts-work-card" onclick="window.switchKtsProject&&window.switchKtsProject('${pid}');window.openBoardEditor()">
+          <div class="kwc-icon" style="background:rgba(201,168,76,.08);color:var(--gold)"><i class="ph-duotone ph-layout"></i></div>
+          <div class="kwc-label">Tạo Board PA</div>
         </div>
         <div class="kts-work-card" onclick="window.switchKtsProject&&window.switchKtsProject('${pid}');window.ktsShowTab('review')">
           <div class="kwc-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-clipboard-text"></i></div>
