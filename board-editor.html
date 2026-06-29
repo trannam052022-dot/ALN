@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALN Master Board v2.0 — Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#C9A84C;--gold2:#E2C06A;
+  --bg:#080C14;--bg2:#0A0F1C;--bg3:#0D1422;--bg4:#111827;--bgf:#05080F;
+  --t1:#DCE6F4;--t2:#BCC8DC;--sub:#8090AE;--dim:#4A5A72;
+}
+body{
+  background:#1a1f2e;
+  font-family:'Oswald',sans-serif;
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  padding:20px;gap:16px;
+}
+
+/* Toolbar */
+.toolbar{
+  display:flex;gap:10px;align-items:center;
+  background:#0D1422;border:0.5px solid #4A5A72;
+  border-radius:10px;padding:10px 18px;
+  width:100%;max-width:1280px;
+}
+.toolbar-title{color:#C9A84C;font-size:13px;font-weight:600;letter-spacing:2px;flex:1;}
+.btn{
+  background:transparent;border:1px solid #C9A84C;color:#C9A84C;
+  padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;
+  letter-spacing:1px;font-weight:600;transition:all .2s;
+}
+.btn:hover{background:#C9A84C;color:#080C14}
+.btn-dim{border-color:#4A5A72;color:#8090AE}
+.btn-dim:hover{background:#4A5A72;color:#DCE6F4}
+.hint{color:#4A5A72;font-size:11px}
+
+/* Board wrapper */
+.board-wrap{width:100%;max-width:1280px;aspect-ratio:1330/750;position:relative;}
+
+.board{
+  width:100%;height:100%;
+  background:var(--bg);
+  display:grid;
+  grid-template-rows:5.1% 63% 18% 13.9%;
+  grid-template-columns:15.8% 1fr;
+  font-size:clamp(8px,1vw,13px);
+  border:0.5px solid #2a3545;
+  border-radius:2px;
+  overflow:hidden;
+  position:relative;
+  font-family:'Oswald',sans-serif;
+}
+
+/* Header */
+.hdr{
+  grid-column:1/-1;grid-row:1;
+  background:#060A12;
+  display:flex;align-items:center;
+  border-bottom:0.5px solid var(--gold);
+  padding:0 1.2em;gap:1em;
+}
+.hdr-brand{color:var(--gold);font-size:.88em;font-weight:600;letter-spacing:.28em;white-space:nowrap;}
+.hdr-spacer{flex:1}
+.hdr-nav{color:var(--sub);font-size:.72em;letter-spacing:.18em;font-weight:400;}
+.hdr-sep{color:var(--dim);margin:0 .5em}
+
+/* Gold accent line under header right side */
+.board::after{
+  content:'';position:absolute;
+  left:15.8%;top:5.1%;right:0;height:1px;
+  background:var(--gold);z-index:2;
+}
+
+/* Sidebar */
+.sidebar{
+  grid-column:1;grid-row:2/-1;
+  background:var(--bg2);
+  border-right:0.5px solid var(--gold);
+  display:flex;flex-direction:column;
+  padding:.8em .7em;gap:.5em;
+  position:relative;overflow:hidden;
+}
+.sidebar::after{
+  content:'';position:absolute;right:-1px;top:0;bottom:0;
+  width:1px;background:var(--gold);z-index:3;
+}
+
+/* Logo box — clickable to upload */
+.logo-box{
+  border:1px solid var(--gold);
+  text-align:center;flex-shrink:0;
+  background:#0C1020;
+  border-radius:1px;
+  cursor:pointer;position:relative;overflow:hidden;
+  min-height:5.5em;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:.35em .3em;
+}
+.logo-box:hover .logo-upload-hint{opacity:1}
+.logo-upload-hint{
+  position:absolute;inset:0;background:rgba(8,12,20,.88);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:.2s;
+  color:var(--gold);font-size:.52em;letter-spacing:.1em;
+  border:1px dashed var(--gold);margin:4px;border-radius:1px;
+}
+.logo-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:2px;}
+.logo-a{color:var(--gold);font-size:2.6em;font-weight:700;font-family:'Oswald',sans-serif;line-height:1;}
+.logo-studio{color:var(--sub);font-size:.52em;letter-spacing:.38em;margin:.08em 0 .04em;font-weight:300;}
+.logo-name{color:var(--gold);font-size:.65em;font-weight:600;letter-spacing:.12em;}
+
+.arch-studio{text-align:center;color:var(--sub);font-size:.55em;letter-spacing:.22em;font-weight:300;}
+.divider{height:0.5px;background:var(--gold);margin:0 -.1em;flex-shrink:0;opacity:.45}
+
+/* Info */
+.info-label{color:var(--gold);font-size:.5em;font-weight:600;letter-spacing:.28em;}
+.info-main{
+  color:var(--t1);font-size:1.15em;font-weight:700;
+  font-family:'Oswald',sans-serif;line-height:1.1;
+  cursor:text;min-height:1.2em;
+}
+.info-sub{color:var(--sub);font-size:.62em;letter-spacing:.08em;cursor:text;min-height:.9em;font-weight:300;}
+.info-row{display:flex;align-items:center;gap:.3em}
+.info-icon{color:var(--gold);font-size:.7em;flex-shrink:0}
+
+/* Features */
+.feat-list{display:flex;flex-direction:column;gap:.2em}
+.feat-item{display:flex;align-items:center;gap:.3em}
+.feat-dot{width:.45em;height:.45em;background:var(--gold);border-radius:50%;flex-shrink:0}
+.feat-text{color:var(--t2);font-size:.62em;letter-spacing:.06em;cursor:text;min-height:.8em;font-weight:400;}
+
+/* Rating */
+.rating-row{display:flex;align-items:baseline;gap:.4em}
+.rating-num{color:var(--t1);font-size:2em;font-weight:700;font-family:'Oswald',sans-serif;line-height:1}
+.stars{color:var(--gold);font-size:.85em;letter-spacing:.05em}
+.rating-text{color:var(--sub);font-size:.6em;font-weight:500;cursor:text;min-height:.8em;}
+
+/* QR */
+.qr-row{display:flex;align-items:center;gap:.5em;margin-top:auto}
+.qr-box{
+  width:2.8em;height:2.8em;border:0.5px solid var(--gold);
+  background:var(--bg3);display:grid;
+  grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
+  padding:.25em;gap:.15em;flex-shrink:0;border-radius:1px;
+  cursor:pointer;position:relative;overflow:hidden;
+}
+.qr-cell{background:var(--dim);border-radius:1px}
+.qr-label{color:var(--sub);font-size:.5em;line-height:1.5;cursor:text;font-weight:300;}
+.qr-label b{color:var(--gold);font-weight:600;}
+
+/* Hero */
+.hero{
+  grid-column:2;grid-row:2;
+  background:var(--bg3);position:relative;overflow:hidden;cursor:pointer;
+}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to right,rgba(8,12,20,.72) 0%,transparent 52%);
+  pointer-events:none;
+}
+.hero-text{
+  position:absolute;left:2.2%;bottom:14%;
+  display:flex;flex-direction:column;gap:.28em;
+}
+.hero-tag{color:var(--t2);font-size:.75em;letter-spacing:.32em;font-weight:300;}
+.hero-title{
+  color:#fff;font-size:3.4em;font-weight:700;font-family:'Oswald',sans-serif;
+  line-height:1.02;cursor:text;min-height:1.2em;text-transform:uppercase;
+}
+.hero-subtitle{
+  color:var(--gold);font-size:1.35em;font-weight:600;font-family:'Oswald',sans-serif;
+  cursor:text;min-height:1em;text-transform:uppercase;
+}
+.hero-desc{
+  color:var(--sub);font-size:.66em;line-height:1.65;max-width:36%;
+  cursor:text;min-height:1em;font-weight:300;
+}
+.hero-upload{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(13,20,34,.85);opacity:0;transition:.25s;cursor:pointer;
+}
+.hero:hover .hero-upload{opacity:1}
+.hero-upload-inner{
+  border:1px dashed var(--gold);border-radius:6px;
+  padding:1.2em 2.5em;text-align:center;
+  color:var(--gold);font-size:.75em;letter-spacing:.12em;
+}
+.hero-view{position:absolute;bottom:.75em;left:2%;display:flex;align-items:center;gap:.5em;}
+.hero-line{width:1.6em;height:1.5px;background:var(--gold)}
+.hero-view-text{color:var(--sub);font-size:.56em;letter-spacing:.22em;font-weight:300;}
+.no-img{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  background:var(--bg3);color:var(--dim);font-size:.55em;letter-spacing:.1em;
+}
+
+/* Thumbnails */
+.thumbs{
+  grid-column:2;grid-row:3;
+  display:grid;grid-template-columns:repeat(6,1fr);
+  border-top:0.5px solid var(--gold);
+}
+.thumb{
+  border-right:0.5px solid var(--gold);
+  display:flex;flex-direction:column;
+  background:var(--bg4);overflow:hidden;
+}
+.thumb:last-child{border-right:none}
+.thumb-img-wrap{flex:1;position:relative;overflow:hidden;cursor:pointer;min-height:0;}
+.thumb-upload{
+  position:absolute;inset:0;background:rgba(5,8,15,.8);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:.2s;cursor:pointer;
+}
+.thumb-img-wrap:hover .thumb-upload{opacity:1}
+.thumb-upload-txt{
+  color:var(--gold);font-size:.5em;letter-spacing:.1em;
+  border:0.5px dashed var(--gold);padding:.3em .6em;border-radius:3px;
+}
+.thumb-info{padding:.32em .42em;display:flex;flex-direction:column;gap:.15em}
+.thumb-num{color:var(--gold);font-weight:700;font-size:.72em;}
+.thumb-lbl{color:var(--sub);font-size:.54em;letter-spacing:.14em;font-weight:300;}
+.thumb-title{color:var(--gold);font-size:.64em;font-weight:600;cursor:text;min-height:.8em;}
+.thumb-desc{color:var(--sub);font-size:.54em;letter-spacing:.04em;cursor:text;min-height:.8em;font-weight:300;}
+
+/* Footer */
+.footer{
+  grid-column:1/-1;grid-row:4;
+  background:var(--bgf);
+  border-top:1px solid var(--gold);
+  display:grid;
+  grid-template-columns:20% 0.5px 24% 0.5px 24% 0.5px 20% 1fr;
+  align-items:start;
+  padding:.55em 0;
+}
+.ft-div{background:var(--gold);opacity:.45;height:70%;margin-top:10%;align-self:center}
+.ft-col{padding:.12em .9em;display:flex;flex-direction:column;gap:.28em}
+
+/* Footer col 1 logo */
+.ft-logo-row{display:flex;align-items:center;gap:.6em}
+.ft-logo-box{
+  width:2.5em;height:2.5em;border:1px solid var(--gold);
+  background:#0C1020;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;cursor:pointer;position:relative;overflow:hidden;border-radius:1px;
+}
+.ft-logo-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:2px;}
+.ft-logo-a{color:var(--gold);font-size:1.5em;font-weight:700;font-family:'Oswald',sans-serif;}
+.ft-name{color:var(--t1);font-size:.95em;font-weight:700;font-family:'Oswald',sans-serif;letter-spacing:.06em;}
+.ft-sub{color:var(--sub);font-size:.62em;letter-spacing:.14em;font-weight:300;}
+.ft-tagline{color:var(--gold);font-size:.64em;font-style:italic;letter-spacing:.1em;font-weight:400;}
+
+/* Footer cols 2-4 */
+.ft-head{color:var(--gold);font-size:.65em;font-weight:600;letter-spacing:.24em;margin-bottom:.1em;}
+.ft-row{display:flex;align-items:center;gap:.3em}
+.ft-icon{color:var(--t2);font-size:.65em;flex-shrink:0}
+.ft-txt{color:var(--t2);font-size:.72em;cursor:text;min-height:.8em;font-weight:400;}
+
+.ft-data{display:grid;grid-template-columns:auto 1fr;gap:.18em .5em;align-items:center;}
+.ft-data-label{color:var(--sub);font-size:.67em;font-weight:300;letter-spacing:.06em;}
+.ft-data-val{color:var(--t2);font-size:.67em;cursor:text;min-height:.8em;font-weight:500;}
+
+.ft-commit-row{display:flex;align-items:center;gap:.3em}
+.ft-commit-icon{color:var(--gold);font-size:.65em}
+.ft-commit-txt{color:var(--t2);font-size:.72em;cursor:text;min-height:.8em;font-weight:400;}
+
+.ft-sig{display:flex;align-items:center;justify-content:center;padding:.3em 1em;}
+.ft-sig-text{
+  color:var(--gold);font-size:1.3em;font-style:italic;font-weight:700;
+  font-family:'Oswald',sans-serif;text-align:center;line-height:1.25;
+}
+.ft-sig-small{color:var(--sub);font-size:.56em;letter-spacing:.14em;text-align:center;font-weight:300;}
+
+/* Editable */
+[contenteditable]{outline:none;transition:background .15s;border-radius:2px}
+[contenteditable]:focus{background:rgba(201,168,76,.1)}
+[contenteditable]:hover:not(:focus){background:rgba(201,168,76,.05)}
+input[type=file]{display:none}
+
+@media print{
+  body{background:none;padding:0}
+  .toolbar{display:none}
+  .board-wrap{max-width:100%;page-break-inside:avoid}
+  .board{border:none;font-size:10px}
+  [contenteditable]:hover,[contenteditable]:focus{background:none}
+  .hero-upload,.thumb-upload,.logo-upload-hint{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <span class="toolbar-title">ALN MASTER BOARD v2.0 — EDITOR</span>
+  <span class="hint">Click text để chỉnh · Click ô ảnh / logo để upload</span>
+  <button class="btn btn-dim" onclick="resetBoard()">↺ Reset</button>
+  <button class="btn btn-dim" onclick="window.print()">🖨 In / PDF</button>
+  <button class="btn" onclick="exportImg('png',this)">⬇ Export PNG</button>
+  <button class="btn" onclick="exportImg('jpg',this)">⬇ Export JPG</button>
+  <button id="btnSubmitPA" onclick="submitBoardPA(this)" style="display:none;background:#C9A84C;color:#080C14;border:1px solid #C9A84C;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;letter-spacing:1px;font-weight:600">📤 Nộp Board PA</button>
+</div>
+<div id="submitStatus" style="width:100%;max-width:1280px;font-size:12px;min-height:20px;color:#C9A84C;font-family:'Oswald',sans-serif;letter-spacing:1px;padding:0 4px"></div>
+
+<!-- File inputs -->
+<input type="file" id="f-logo-side" accept="image/*" onchange="setLogo(this,'logo-side-img','logo-side-txt')">
+<input type="file" id="f-logo-ft" accept="image/*" onchange="setLogo(this,'logo-ft-img','logo-ft-txt')">
+<input type="file" id="f-hero" accept="image/*" onchange="setImg(this,'hero-img-el','hero-placeholder')">
+<input type="file" id="f-t0" accept="image/*" onchange="setImg(this,'ti0','ti0-ph')">
+<input type="file" id="f-t1" accept="image/*" onchange="setImg(this,'ti1','ti1-ph')">
+<input type="file" id="f-t2" accept="image/*" onchange="setImg(this,'ti2','ti2-ph')">
+<input type="file" id="f-t3" accept="image/*" onchange="setImg(this,'ti3','ti3-ph')">
+<input type="file" id="f-t4" accept="image/*" onchange="setImg(this,'ti4','ti4-ph')">
+<input type="file" id="f-t5" accept="image/*" onchange="setImg(this,'ti5','ti5-ph')">
+<input type="file" id="f-qr" accept="image/*" onchange="setImg(this,'qr-img-el',null)">
+
+<!-- Board -->
+<div class="board-wrap"><div class="board">
+
+<!-- HEADER -->
+<div class="hdr">
+  <span class="hdr-brand">ALN MASTER BOARD v2.0</span>
+  <div class="hdr-spacer"></div>
+  <span class="hdr-nav">ARCHITECTURE<span class="hdr-sep">|</span>INTERIOR<span class="hdr-sep">|</span>LANDSCAPE</span>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+  <!-- Logo sidebar — click to upload -->
+  <div class="logo-box" onclick="document.getElementById('f-logo-side').click()" title="Click để upload logo">
+    <img id="logo-side-img" src="" style="display:none">
+    <div id="logo-side-txt">
+      <div class="logo-a">A</div>
+      <div class="logo-studio">STUDIO</div>
+      <div class="logo-name">APP LÀM NHÀ</div>
+    </div>
+    <div class="logo-upload-hint">UPLOAD LOGO</div>
+  </div>
+  <div class="arch-studio">ARCHITECTURE STUDIO</div>
+
+  <div class="divider"></div>
+
+  <div>
+    <div class="info-label">PROJECT</div>
+    <div class="info-main" contenteditable="true">THE HORIZON</div>
+    <div class="info-sub" contenteditable="true">PRIVATE RESIDENCE</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div>
+    <div class="info-label">LOCATION</div>
+    <div class="info-row">
+      <span class="info-icon">📍</span>
+      <span class="info-sub" contenteditable="true">DA NANG, VIETNAM</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div>
+    <div class="info-label">PROJECT TYPE</div>
+    <div class="info-row">
+      <span class="info-icon">🏠</span>
+      <span class="info-sub" contenteditable="true">PRIVATE VILLA</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div>
+    <div class="info-label">CONCEPT</div>
+    <div class="info-main" style="font-size:.92em" contenteditable="true">MODERN LUXURY</div>
+    <div class="info-sub" contenteditable="true">TỐI GIẢN – TINH TẾ – BỀN VỮNG</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div>
+    <div class="info-label">KEY FEATURES</div>
+    <div class="feat-list" style="margin-top:.22em">
+      <div class="feat-item"><span class="feat-dot"></span><span class="feat-text" contenteditable="true">TỐI ƯU CÔNG NĂNG</span></div>
+      <div class="feat-item"><span class="feat-dot"></span><span class="feat-text" contenteditable="true">KẾT NỐI THIÊN NHIÊN</span></div>
+      <div class="feat-item"><span class="feat-dot"></span><span class="feat-text" contenteditable="true">VẬT LIỆU CAO CẤP</span></div>
+      <div class="feat-item"><span class="feat-dot"></span><span class="feat-text" contenteditable="true">ÁNH SÁNG TỰ NHIÊN</span></div>
+      <div class="feat-item"><span class="feat-dot"></span><span class="feat-text" contenteditable="true">KHÔNG GIAN MỞ</span></div>
+      <div class="feat-item"><span class="feat-dot"></span><span class="feat-text" contenteditable="true">THIẾT KẾ BỀN VỮNG</span></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div>
+    <div class="info-label">CLIENT RATING</div>
+    <div class="rating-row">
+      <span class="rating-num">5.0</span>
+      <span class="stars">★★★★★</span>
+    </div>
+    <div class="rating-text" contenteditable="true">RẤT HÀI LÒNG!</div>
+  </div>
+
+  <div class="qr-row">
+    <div class="qr-box" onclick="document.getElementById('f-qr').click()" title="Click để upload QR" style="position:relative">
+      <img id="qr-img-el" src="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;border-radius:1px">
+      <div class="qr-cell"></div><div class="qr-cell"></div>
+      <div class="qr-cell"></div><div class="qr-cell"></div>
+    </div>
+    <div class="qr-label">SCAN TO VIEW<br><b>PROJECT GALLERY</b></div>
+  </div>
+
+</div>
+
+<!-- HERO -->
+<div class="hero" onclick="document.getElementById('f-hero').click()">
+  <div class="no-img" id="hero-placeholder">[ CLICK ĐỂ UPLOAD ẢNH PHỐI CẢNH CHÍNH ]</div>
+  <img id="hero-img-el" src="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none">
+  <div class="hero-overlay"></div>
+  <div class="hero-text">
+    <span class="hero-tag" contenteditable="true" onclick="event.stopPropagation()">KIẾN TẠO</span>
+    <div class="hero-title" contenteditable="true" onclick="event.stopPropagation()">KHÔNG GIAN SỐNG</div>
+    <div class="hero-subtitle" contenteditable="true" onclick="event.stopPropagation()">ĐẲNG CẤP & BỀN VỮNG</div>
+    <div class="hero-desc" contenteditable="true" onclick="event.stopPropagation()">Mỗi công trình là một câu chuyện riêng,<br>mỗi không gian là một trải nghiệm sống khác biệt.</div>
+  </div>
+  <div class="hero-upload"><div class="hero-upload-inner">CLICK ĐỂ UPLOAD ẢNH</div></div>
+  <div class="hero-view">
+    <div class="hero-line"></div>
+    <span class="hero-view-text" contenteditable="true" onclick="event.stopPropagation()">VIEW 01 – FRONT ELEVATION</span>
+  </div>
+</div>
+
+<!-- THUMBNAILS -->
+<div class="thumbs">
+
+  <div class="thumb">
+    <div class="thumb-img-wrap" onclick="document.getElementById('f-t0').click()">
+      <div class="no-img" id="ti0-ph">IMAGE</div>
+      <img id="ti0" src="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none">
+      <div class="thumb-upload"><span class="thumb-upload-txt">UPLOAD</span></div>
+    </div>
+    <div class="thumb-info">
+      <div><span class="thumb-num">01</span> <span class="thumb-lbl">ARCHITECTURE</span></div>
+      <div class="thumb-title" contenteditable="true">NGÔN NGỮ KIẾN TRÚC</div>
+      <div class="thumb-desc" contenteditable="true">HIỆN ĐẠI & TINH TẾ</div>
+    </div>
+  </div>
+
+  <div class="thumb">
+    <div class="thumb-img-wrap" onclick="document.getElementById('f-t1').click()">
+      <div class="no-img" id="ti1-ph">IMAGE</div>
+      <img id="ti1" src="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none">
+      <div class="thumb-upload"><span class="thumb-upload-txt">UPLOAD</span></div>
+    </div>
+    <div class="thumb-info">
+      <div><span class="thumb-num">02</span> <span class="thumb-lbl">MATERIAL</span></div>
+      <div class="thumb-title" contenteditable="true">VẬT LIỆU CAO CẤP</div>
+      <div class="thumb-desc" contenteditable="true">BỀN VỮNG & THẨM MỸ</div>
+    </div>
+  </div>
+
+  <div class="thumb">
+    <div class="thumb-img-wrap" onclick="document.getElementById('f-t2').click()">
+      <div class="no-img" id="ti2-ph">IMAGE</div>
+      <img id="ti2" src="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none">
+      <div class="thumb-upload"><span class="thumb-upload-txt">UPLOAD</span></div>
+    </div>
+    <div class="thumb-info">
+      <div><span class="thumb-num">03</span> <span class="thumb-lbl">LANDSCAPE</span></div>
+      <div class="thumb-title" contenteditable="true">CẢNH QUAN XANH</div>
+      <div class="thumb-desc" contenteditable="true">KẾT NỐI THIÊN NHIÊN</div>
+    </div>
+  </div>
+
+  <div class="thumb">
+    <div class="thumb-img-wrap" onclick="document.getElementById('f-t3').click()">
+      <div class="no-img" id="ti3-ph">IMAGE</div>
+      <img id="ti3" src="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none">
+      <div class="thumb-upload"><span class="thumb-upload-txt">UPLOAD</span></div>
+    </div>
+    <div class="thumb-info">
+      <div><span class="thumb-num">04</span> <span class="thumb-lbl">INTERIOR</span></div>
+      <div class="thumb-title" contenteditable="true">NỘI THẤT TỐI GIẢN</div>
+      <div class="thumb-desc" contenteditable="true">SANG TRỌNG & ẤM CÚNG</div>
+    </div>
+  </div>
+
+  <div class="thumb">
+    <div class="thumb-img-wrap" onclick="document.getElementById('f-t4').click()">
+      <div class="no-img" id="ti4-ph">IMAGE</div>
+      <img id="ti4" src="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none">
+      <div class="thumb-upload"><span class="thumb-upload-txt">UPLOAD</span></div>
+    </div>
+    <div class="thumb-info">
+      <div><span class="thumb-num">05</span> <span class="thumb-lbl">LIGHTING</span></div>
+      <div class="thumb-title" contenteditable="true">ÁNH SÁNG KIẾN TRÚC</div>
+      <div class="thumb-desc" contenteditable="true">TẠO CẢM XÚC & ĐIỂM NHẤN</div>
+    </div>
+  </div>
+
+  <div class="thumb">
+    <div class="thumb-img-wrap" onclick="document.getElementById('f-t5').click()">
+      <div class="no-img" id="ti5-ph">IMAGE</div>
+      <img id="ti5" src="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none">
+      <div class="thumb-upload"><span class="thumb-upload-txt">UPLOAD</span></div>
+    </div>
+    <div class="thumb-info">
+      <div><span class="thumb-num">06</span> <span class="thumb-lbl">NIGHT VIEW</span></div>
+      <div class="thumb-title" contenteditable="true">VẺ ĐẸP VỀ ĐÊM</div>
+      <div class="thumb-desc" contenteditable="true">THANH LỊCH & ẤN TƯỢNG</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+
+  <div class="ft-col">
+    <div class="ft-logo-row">
+      <div class="ft-logo-box" onclick="document.getElementById('f-logo-ft').click()" title="Click để upload logo">
+        <img id="logo-ft-img" src="" style="display:none">
+        <span id="logo-ft-txt" class="ft-logo-a">A</span>
+      </div>
+      <div>
+        <div class="ft-name">APP LÀM NHÀ</div>
+        <div class="ft-sub">ARCHITECTURE STUDIO</div>
+      </div>
+    </div>
+    <div style="height:0.5px;background:var(--gold);opacity:.45;margin:.2em 0"></div>
+    <div class="ft-tagline">WE DESIGN – YOU ENJOY</div>
+  </div>
+
+  <div class="ft-div"></div>
+
+  <div class="ft-col">
+    <div class="ft-head">CONTACT</div>
+    <div class="ft-row"><span class="ft-icon">📞</span><span class="ft-txt" contenteditable="true">(+84) 333 999 136</span></div>
+    <div class="ft-row"><span class="ft-icon">✉</span><span class="ft-txt" contenteditable="true">info@applamnha.com</span></div>
+    <div class="ft-row"><span class="ft-icon">🌐</span><span class="ft-txt" contenteditable="true">www.applamnha.com</span></div>
+    <div class="ft-row"><span class="ft-icon">📍</span><span class="ft-txt" contenteditable="true">16 Năm Cao, Đà Nẵng, Việt Nam</span></div>
+  </div>
+
+  <div class="ft-div"></div>
+
+  <div class="ft-col">
+    <div class="ft-head">PROJECT INFORMATION</div>
+    <div class="ft-data">
+      <span class="ft-data-label">SITE AREA</span><span class="ft-data-val" contenteditable="true">350 m²</span>
+      <span class="ft-data-label">FLOOR AREA</span><span class="ft-data-val" contenteditable="true">520 m²</span>
+      <span class="ft-data-label">FLOORS</span><span class="ft-data-val" contenteditable="true">3</span>
+      <span class="ft-data-label">YEAR</span><span class="ft-data-val" contenteditable="true">2024</span>
+    </div>
+  </div>
+
+  <div class="ft-div"></div>
+
+  <div class="ft-col">
+    <div class="ft-head">OUR COMMITMENT</div>
+    <div class="ft-commit-row"><span class="ft-commit-icon">✓</span><span class="ft-commit-txt" contenteditable="true">TẬN TÂM</span></div>
+    <div class="ft-commit-row"><span class="ft-commit-icon">✓</span><span class="ft-commit-txt" contenteditable="true">CHUYÊN NGHIỆP</span></div>
+    <div class="ft-commit-row"><span class="ft-commit-icon">✓</span><span class="ft-commit-txt" contenteditable="true">SÁNG TẠO</span></div>
+    <div class="ft-commit-row"><span class="ft-commit-icon">✓</span><span class="ft-commit-txt" contenteditable="true">ĐỒNG HÀNH</span></div>
+  </div>
+
+  <div class="ft-sig">
+    <div>
+      <div class="ft-sig-text">App Làm Nhà</div>
+      <div class="ft-sig-small">ARCHITECTURE STUDIO</div>
+    </div>
+  </div>
+
+</div>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+async function exportImg(fmt, btn) {
+  const board = document.querySelector('.board');
+  const origLabel = btn.textContent;
+  btn.textContent = '⏳ Đang xuất...';
+  btn.disabled = true;
+  try {
+    if (typeof html2canvas === 'undefined') {
+      throw new Error('Thư viện chưa tải — kiểm tra internet rồi F5 lại.');
+    }
+    const canvas = await html2canvas(board, {
+      scale: 3,
+      allowTaint: true,
+      useCORS: false,
+      backgroundColor: '#080C14',
+      logging: false,
+      imageTimeout: 0,
+      removeContainer: true,
+    });
+    const mime = fmt === 'jpg' ? 'image/jpeg' : 'image/png';
+    const quality = fmt === 'jpg' ? 0.95 : 1;
+    const url = canvas.toDataURL(mime, quality);
+    const name = (document.querySelector('.info-main') && document.querySelector('.info-main').textContent.trim() || 'ALN-BOARD').replace(/\s+/g,'-');
+    const a = document.createElement('a');
+    a.download = 'ALN_BOARD_' + name + '.' + fmt;
+    a.href = url;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch(e) {
+    console.error(e);
+    alert('Lỗi xuất ảnh: ' + (e && e.message ? e.message : String(e)));
+  }
+  btn.textContent = origLabel;
+  btn.disabled = false;
+}
+
+function setImg(input, imgId, phId) {
+  if (!input.files || !input.files[0]) return;
+  const url = URL.createObjectURL(input.files[0]);
+  const img = document.getElementById(imgId);
+  img.src = url; img.style.display = 'block';
+  if (phId) { const ph = document.getElementById(phId); if(ph) ph.style.display='none'; }
+  if (imgId === 'qr-img-el') {
+    img.style.position='absolute';
+    img.parentElement.querySelectorAll('.qr-cell').forEach(c=>c.style.display='none');
+  }
+}
+
+function setLogo(input, imgId, txtId) {
+  if (!input.files || !input.files[0]) return;
+  const url = URL.createObjectURL(input.files[0]);
+  const img = document.getElementById(imgId);
+  img.src = url; img.style.display = 'block';
+  const txt = document.getElementById(txtId);
+  if (txt) txt.style.display = 'none';
+}
+
+function resetBoard() {
+  if (!confirm('Reset về nội dung mặc định?')) return;
+  location.reload();
+}
+
+document.querySelectorAll('[contenteditable]').forEach(el => {
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); el.blur(); }
+  });
+});
+
+// Đọc URL params và tự điền
+(function(){
+  const p = new URLSearchParams(location.search);
+  window._BOARD_PID   = p.get('pid')   || '';
+  window._BOARD_STAGE = p.get('stage') || '';
+  window._BOARD_ROLE  = p.get('role')  || 'kts';
+  if (p.get('pid')) document.getElementById('btnSubmitPA').style.display = 'inline-block';
+  function fill(sel, val){ if(!val) return; const el=document.querySelector(sel); if(el) el.textContent=val; }
+  fill('.info-main',        p.get('name'));
+  fill('.info-sub',         p.get('sub'));
+  // location là phần tử .info-sub thứ 2
+  const subs = document.querySelectorAll('.info-sub');
+  if(p.get('location') && subs[1]) subs[1].textContent = p.get('location').toUpperCase();
+  if(p.get('type')     && subs[2]) subs[2].textContent = p.get('type').toUpperCase();
+})();
+</script>
+
+<script type="module">
+import { auth, db, storage, storageRef, uploadBytes, getDownloadURL, collection, addDoc, serverTimestamp, onAuthStateChanged } from './firebase-config.js';
+
+let _fbAuth = null;
+onAuthStateChanged(auth, u => { _fbAuth = u; });
+
+window.submitBoardPA = async function(btn) {
+  if (!_fbAuth) { alert('Bạn chưa đăng nhập — mở trang này từ KTS Dashboard.'); return; }
+  const pid   = window._BOARD_PID;
+  const stage = window._BOARD_STAGE;
+  const role  = window._BOARD_ROLE;
+  if (!pid || !stage) { alert('Thiếu thông tin dự án — mở lại từ Dashboard.'); return; }
+
+  const board = document.querySelector('.board');
+  const status = document.getElementById('submitStatus');
+  const origLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ Đang xử lý...';
+  status.textContent = 'Đang xuất ảnh board...';
+
+  try {
+    const canvas = await html2canvas(board, {
+      scale: 3, allowTaint: true, useCORS: false,
+      backgroundColor: '#080C14', logging: false, imageTimeout: 0
+    });
+    status.textContent = 'Đang upload lên hệ thống...';
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/png', 1));
+    const ts = Date.now();
+    const projName = (document.querySelector('.info-main') || {}).textContent || pid;
+    const safe = projName.trim().replace(/[^a-zA-Z0-9À-ỹ]+/g,'_').slice(0,40);
+    const storagePath = role === 'designer'
+      ? 'designProposals/' + pid + '/' + stage + '/' + ts + '_board_' + safe + '.png'
+      : 'proposals/'       + pid + '/' + stage + '/' + ts + '_board_' + safe + '.png';
+
+    const ref = storageRef(storage, storagePath);
+    await uploadBytes(ref, blob, { contentType: 'image/png' });
+    const url = await getDownloadURL(ref);
+
+    const colPath = role === 'designer'
+      ? 'designProjects/' + pid + '/stages/' + stage + '/proposals'
+      : 'projects/'       + pid + '/stages/' + stage + '/proposals';
+
+    await addDoc(collection(db, colPath), {
+      name:        projName.trim(),
+      type:        'board',
+      boardUrl:    url,
+      uid:         _fbAuth.uid,
+      role:        role,
+      stage:       stage,
+      submittedAt: serverTimestamp(),
+    });
+
+    status.textContent = '✅ Đã nộp Board PA lên dự án ' + pid + ' – ' + stage;
+    btn.textContent = '✅ Đã nộp';
+    btn.style.background = 'transparent';
+    btn.style.color = '#22c97a';
+    btn.style.borderColor = '#22c97a';
+  } catch(e) {
+    console.error(e);
+    status.textContent = '❌ Lỗi: ' + (e.message || String(e));
+    btn.textContent = origLabel;
+    btn.disabled = false;
+  }
+};
+</script>
+</body>
+</html>
