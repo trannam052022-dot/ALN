@@ -575,6 +575,18 @@ input[type=file]{display:none}
 
 </div></div>
 
+<script type="module">
+import { auth, db, onAuthStateChanged, doc, getDoc } from './firebase-config.js';
+onAuthStateChanged(auth, async function(user) {
+  if (!user) { location.replace('login.html'); return; }
+  const snap = await getDoc(doc(db, 'users', user.uid));
+  if (!snap.exists()) { location.replace('login.html'); return; }
+  const role = snap.data().role;
+  if (role !== 'kts' && role !== 'designer' && role !== 'founder') {
+    location.replace('login.html');
+  }
+});
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 async function exportImg(fmt, btn) {
