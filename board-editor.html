@@ -709,9 +709,15 @@ import { auth, db, storage, storageRef, uploadBytes, getDownloadURL, collection,
 function _set(id, val) { if (!val) return; const el = document.getElementById(id); if (el) el.textContent = val; }
 
 let _fbAuth = null;
+let _fbKtsName = '';
 onAuthStateChanged(auth, async u => {
   _fbAuth = u;
   if (!u) return;
+  // Đọc tên user từ Firestore
+  try {
+    const uSnap = await getDoc(doc(db, 'users', u.uid));
+    if (uSnap.exists()) _fbKtsName = uSnap.data().name || '';
+  } catch(e) {}
   // Đọc settings/company do Founder cấu hình
   try {
     const cSnap = await getDoc(doc(db, 'settings', 'company'));
@@ -787,10 +793,17 @@ window.submitBoardPA = async function(btn) {
       name:        projName.trim(),
       type:        'board',
       boardUrl:    url,
+      imageURL:    url,
+      folder:      'pc_ngoai',
+      version:     'Board PA',
+      status:      'pending',
+      order:       Date.now(),
       uid:         _fbAuth.uid,
       role:        role,
       stage:       stage,
+      createdAt:   serverTimestamp(),
       submittedAt: serverTimestamp(),
+      createdBy:   { uid: _fbAuth.uid, name: _fbAuth.displayName || _fbKtsName || '' },
     });
 
     status.textContent = '✅ Đã nộp Board PA lên dự án ' + pid + ' – ' + stage;
