@@ -3289,19 +3289,24 @@ window._cnSubProposals = function(pid) {
   var BG_MAP = {mb:'linear-gradient(135deg,#0e1418,#0a1020)',pc_ngoai:'linear-gradient(135deg,#0a140e,#081008)',pc_noi:'linear-gradient(135deg,#1a1410,#120e08)'};
   ['C1','C2','C3','C4'].forEach(function(stage) {
     // Nghe danh sách proposals của chặng này
-    var q = query(collection(db,'projects',pid,'stages',stage,'proposals'), orderBy('order','asc'));
+    var q = collection(db,'projects',pid,'stages',stage,'proposals');
     var unsub = onSnapshot(q, function(snap) {
       if (!window.REVIEW_DATA[pid]) window.REVIEW_DATA[pid] = {};
       if (!window.REVIEW_DATA[pid][stage]) window.REVIEW_DATA[pid][stage] = {status:'pending',submittedAt:'',approvedAt:null,revisions:0,maxRevisions:3,paList:[],comments:[]};
-      window.REVIEW_DATA[pid][stage].paList = snap.docs.map(function(d) {
+      var docs = snap.docs.slice().sort(function(a,b){
+        return ((a.data().order||a.data().submittedAt&&a.data().submittedAt.seconds*1000||0)
+              - (b.data().order||b.data().submittedAt&&b.data().submittedAt.seconds*1000||0));
+      });
+      window.REVIEW_DATA[pid][stage].paList = docs.map(function(d) {
         var dd = d.data();
-        var ts = dd.createdAt && dd.createdAt.seconds ? new Date(dd.createdAt.seconds*1000) : null;
+        var ts = (dd.createdAt||dd.submittedAt);
+        ts = ts && ts.seconds ? new Date(ts.seconds*1000) : null;
         return {
           id: d.id,
           name: dd.name || d.id,
-          version: dd.version || 'v1.0',
+          version: dd.version || (dd.type==='board'?'Board PA':'v1.0'),
           date: ts ? ts.toISOString().slice(0,10) : '',
-          imageURL: dd.imageURL || '',
+          imageURL: dd.imageURL || dd.boardUrl || '',
           folder: dd.folder || 'pc_ngoai',
           status: dd.status || 'pending',
           desc: dd.desc || '',
