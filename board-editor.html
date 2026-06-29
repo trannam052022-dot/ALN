@@ -295,7 +295,7 @@ input[type=file]{display:none}
 <!-- Toolbar -->
 <div class="toolbar">
   <span class="toolbar-title">ALN MASTER BOARD v2.0 — EDITOR</span>
-  <span class="hint">Click text để chỉnh · Click ô ảnh / logo để upload</span>
+  <span class="hint">✏️ Click text <b style="color:#C9A84C">vàng</b> để chỉnh · 🖼 Click ô ảnh để upload · 🔒 Logo & liên hệ do Founder quản lý</span>
   <button class="btn btn-dim" onclick="resetBoard()">↺ Reset</button>
   <button class="btn btn-dim" onclick="window.print()">🖨 In / PDF</button>
   <button class="btn" onclick="exportImg('png',this)">⬇ Export PNG</button>
@@ -329,15 +329,14 @@ input[type=file]{display:none}
 <!-- SIDEBAR -->
 <div class="sidebar">
 
-  <!-- Logo sidebar — click to upload -->
-  <div class="logo-box" onclick="document.getElementById('f-logo-side').click()" title="Click để upload logo">
-    <img id="logo-side-img" src="" style="display:none">
+  <!-- Logo sidebar — do founder quản lý -->
+  <div class="logo-box" id="logo-box-side" style="cursor:default">
+    <img id="logo-side-img" src="" style="display:none;width:100%;height:100%;object-fit:contain">
     <div id="logo-side-txt">
       <div class="logo-a">A</div>
       <div class="logo-studio" id="bd-logo-studio">STUDIO</div>
       <div class="logo-name" id="bd-logo-name">APP LÀM NHÀ</div>
     </div>
-    <div class="logo-upload-hint">UPLOAD LOGO</div>
   </div>
   <div class="arch-studio">ARCHITECTURE STUDIO</div>
 
@@ -519,8 +518,8 @@ input[type=file]{display:none}
 
   <div class="ft-col">
     <div class="ft-logo-row">
-      <div class="ft-logo-box" onclick="document.getElementById('f-logo-ft').click()" title="Click để upload logo">
-        <img id="logo-ft-img" src="" style="display:none">
+      <div class="ft-logo-box" style="cursor:default">
+        <img id="logo-ft-img" src="" style="display:none;width:100%;height:100%;object-fit:contain">
         <span id="logo-ft-txt" class="ft-logo-a">A</span>
       </div>
       <div>
@@ -536,10 +535,10 @@ input[type=file]{display:none}
 
   <div class="ft-col">
     <div class="ft-head">CONTACT</div>
-    <div class="ft-row"><span class="ft-icon">📞</span><span id="bd-phone" class="ft-txt" contenteditable="true">(+84) 333 999 136</span></div>
-    <div class="ft-row"><span class="ft-icon">✉</span><span id="bd-email" class="ft-txt" contenteditable="true">info@applamnha.com</span></div>
-    <div class="ft-row"><span class="ft-icon">🌐</span><span id="bd-website" class="ft-txt" contenteditable="true">www.applamnha.com</span></div>
-    <div class="ft-row"><span class="ft-icon">📍</span><span id="bd-address" class="ft-txt" contenteditable="true">16 Năm Cao, Đà Nẵng, Việt Nam</span></div>
+    <div class="ft-row"><span class="ft-icon">📞</span><span id="bd-phone" class="ft-txt">(+84) 333 999 136</span></div>
+    <div class="ft-row"><span class="ft-icon">✉</span><span id="bd-email" class="ft-txt">info@applamnha.com</span></div>
+    <div class="ft-row"><span class="ft-icon">🌐</span><span id="bd-website" class="ft-txt">www.applamnha.com</span></div>
+    <div class="ft-row"><span class="ft-icon">📍</span><span id="bd-address" class="ft-txt">16 Năm Cao, Đà Nẵng, Việt Nam</span></div>
   </div>
 
   <div class="ft-div"></div>
@@ -683,35 +682,34 @@ let _fbAuth = null;
 onAuthStateChanged(auth, async u => {
   _fbAuth = u;
   if (!u) return;
-  const role = window._BOARD_ROLE || 'kts';
-  const col  = role === 'designer' ? 'designerApplications' : 'ktsApplications';
+  // Đọc settings/company do Founder cấu hình
   try {
-    const snap = await getDoc(doc(db, col, u.uid));
-    if (!snap.exists()) return;
-    const d = snap.data();
-    const studioName = (d.name || '').toUpperCase();
-    // Sidebar logo
-    _set('bd-logo-name',   studioName);
-    _set('bd-logo-studio', role === 'designer' ? 'INTERIOR STUDIO' : 'ARCHITECTURE STUDIO');
-    // Footer logo block
-    _set('bd-ft-name', studioName);
-    _set('bd-ft-sub',  role === 'designer' ? 'INTERIOR STUDIO' : 'ARCHITECTURE STUDIO');
-    // Footer sig
-    _set('bd-sig-name', d.name || '');
-    _set('bd-sig-sub',  role === 'designer' ? 'INTERIOR STUDIO' : 'ARCHITECTURE STUDIO');
-    // Contact
-    if (d.phone)   _set('bd-phone',   d.phone);
-    if (d.email)   _set('bd-email',   d.email);
-    if (d.website) _set('bd-website', d.website);
-    if (d.province_home) _set('bd-address', d.province_home + ', Việt Nam');
-    // Avatar làm logo nếu có
-    if (d.avatarUrl) {
-      const img = document.getElementById('logo-side-img');
-      if (img) { img.src = d.avatarUrl; img.style.display = 'block'; }
-      const txt = document.getElementById('logo-side-txt');
-      if (txt) txt.style.display = 'none';
+    const cSnap = await getDoc(doc(db, 'settings', 'company'));
+    if (cSnap.exists()) {
+      const c = cSnap.data();
+      _set('bd-logo-name',  c.name  || '');
+      _set('bd-ft-name',    c.name  || '');
+      _set('bd-sig-name',   c.name  || '');
+      _set('bd-logo-studio', c.sub  || 'ARCHITECTURE STUDIO');
+      _set('bd-ft-sub',      c.sub  || 'ARCHITECTURE STUDIO');
+      _set('bd-sig-sub',     c.sub  || 'ARCHITECTURE STUDIO');
+      _set('bd-ft-tagline',  c.tagline || '');
+      _set('bd-phone',   c.phone   || '');
+      _set('bd-email',   c.email   || '');
+      _set('bd-website', c.website || '');
+      _set('bd-address', c.address || '');
+      if (c.logoUrl) {
+        ['logo-side-img','logo-ft-img'].forEach(function(id) {
+          const img = document.getElementById(id);
+          if (img) { img.src = c.logoUrl; img.style.display = 'block'; }
+        });
+        const txt = document.getElementById('logo-side-txt');
+        if (txt) txt.style.display = 'none';
+        const ftxt = document.getElementById('logo-ft-txt');
+        if (ftxt) ftxt.style.display = 'none';
+      }
     }
-  } catch(e) { console.warn('Auto-fill profile:', e); }
+  } catch(e) { console.warn('settings/company:', e); }
 });
 
 window.submitBoardPA = async function(btn) {

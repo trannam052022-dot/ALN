@@ -955,6 +955,10 @@ body::after {
     style="padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px">
     <i class="ph-duotone ph-megaphone"></i>Tuyển dụng
   </button>
+  <button id="tabCompany" onclick="switchTab('company')"
+    style="padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px">
+    <i class="ph-duotone ph-buildings"></i>Cài đặt CTY
+  </button>
   <a href="aln_community.html"
     style="padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;text-decoration:none">
     <i class="ph-duotone ph-campfire"></i>Nhịp sống
@@ -1676,6 +1680,59 @@ body::after {
 </div>
 
 <!-- ══ PANEL: TUYỂN DỤNG ══ -->
+<div id="panelCompany" style="display:none;flex-direction:column;flex:1;overflow:auto;padding:24px 28px">
+  <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px">VẬN HÀNH</div>
+  <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1);margin-bottom:20px">Cài đặt thông tin Công ty</div>
+  <div style="max-width:540px;display:flex;flex-direction:column;gap:14px">
+
+    <div style="background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:12px 14px;font-size:11px;color:var(--sub)">
+      Thông tin này sẽ tự động điền vào <b style="color:var(--gold)">Board PA</b> của tất cả KTS & Designer — KTS không tự sửa được.
+    </div>
+
+    <div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:5px;font-weight:600">LOGO CÔNG TY</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div id="cpLogoPreview" style="width:64px;height:64px;background:var(--raised);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--dim);overflow:hidden">
+          <img id="cpLogoImg" src="" style="display:none;width:100%;height:100%;object-fit:contain">
+          <span id="cpLogoPlh">🏢</span>
+        </div>
+        <div>
+          <input type="file" id="cpLogoFile" accept="image/*" style="display:none" onchange="cpPreviewLogo(this)">
+          <button onclick="document.getElementById('cpLogoFile').click()" style="padding:6px 14px;background:var(--raised);border:1px solid var(--border);border-radius:6px;color:var(--text1);font-size:12px;cursor:pointer;font-family:var(--sans)">Chọn logo</button>
+          <div style="font-size:10px;color:var(--dim);margin-top:4px">PNG/SVG nền trong, tối đa 1MB</div>
+        </div>
+      </div>
+    </div>
+
+    <div><div style="font-size:11px;color:var(--sub);margin-bottom:5px;font-weight:600">TÊN CÔNG TY</div>
+      <input id="cpName" type="text" placeholder="VD: APP LÀM NHÀ" style="width:100%;padding:8px 12px;background:var(--raised);border:1px solid var(--border);border-radius:6px;color:var(--text1);font-size:13px;font-family:var(--sans)">
+    </div>
+    <div><div style="font-size:11px;color:var(--sub);margin-bottom:5px;font-weight:600">LOẠI HÌNH (dòng nhỏ dưới tên)</div>
+      <input id="cpSub" type="text" placeholder="VD: ARCHITECTURE STUDIO" style="width:100%;padding:8px 12px;background:var(--raised);border:1px solid var(--border);border-radius:6px;color:var(--text1);font-size:13px;font-family:var(--sans)">
+    </div>
+    <div><div style="font-size:11px;color:var(--sub);margin-bottom:5px;font-weight:600">TAGLINE</div>
+      <input id="cpTagline" type="text" placeholder="VD: WE DESIGN – YOU ENJOY" style="width:100%;padding:8px 12px;background:var(--raised);border:1px solid var(--border);border-radius:6px;color:var(--text1);font-size:13px;font-family:var(--sans)">
+    </div>
+    <div><div style="font-size:11px;color:var(--sub);margin-bottom:5px;font-weight:600">HOTLINE</div>
+      <input id="cpPhone" type="text" placeholder="VD: (+84) 333 999 136" style="width:100%;padding:8px 12px;background:var(--raised);border:1px solid var(--border);border-radius:6px;color:var(--text1);font-size:13px;font-family:var(--sans)">
+    </div>
+    <div><div style="font-size:11px;color:var(--sub);margin-bottom:5px;font-weight:600">EMAIL</div>
+      <input id="cpEmail" type="text" placeholder="VD: info@applamnha.com" style="width:100%;padding:8px 12px;background:var(--raised);border:1px solid var(--border);border-radius:6px;color:var(--text1);font-size:13px;font-family:var(--sans)">
+    </div>
+    <div><div style="font-size:11px;color:var(--sub);margin-bottom:5px;font-weight:600">WEBSITE</div>
+      <input id="cpWebsite" type="text" placeholder="VD: www.applamnha.com" style="width:100%;padding:8px 12px;background:var(--raised);border:1px solid var(--border);border-radius:6px;color:var(--text1);font-size:13px;font-family:var(--sans)">
+    </div>
+    <div><div style="font-size:11px;color:var(--sub);margin-bottom:5px;font-weight:600">ĐỊA CHỈ VĂN PHÒNG</div>
+      <input id="cpAddress" type="text" placeholder="VD: 16 Năm Cao, Đà Nẵng, Việt Nam" style="width:100%;padding:8px 12px;background:var(--raised);border:1px solid var(--border);border-radius:6px;color:var(--text1);font-size:13px;font-family:var(--sans)">
+    </div>
+
+    <div id="cpStatus" style="font-size:12px;color:var(--sub);min-height:18px"></div>
+    <button onclick="saveCompanySettings()" style="padding:9px 24px;background:var(--gold);color:#080c14;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);align-self:flex-start">
+      💾 Lưu & Áp dụng
+    </button>
+  </div>
+</div>
+
 <div id="panelRecruit" style="display:none;flex-direction:column;flex:1;overflow:hidden">
   <div style="padding:16px 20px 0;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
@@ -2553,7 +2610,7 @@ window.ALNRealtime = (() => {
 ══════════════════════════════════════════ */
 
 function switchTab(t){
-  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','pending','payments','recruit','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
+  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','pending','payments','recruit','company','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
   var activeStyle  = 'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.15);color:var(--blue);white-space:nowrap';
   var inactiveStyle= 'padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:var(--raised);color:var(--sub);white-space:nowrap';
   var liveStyles = {
@@ -2567,6 +2624,7 @@ function switchTab(t){
     matching:  {active:'padding:5px 13px;border:1px solid rgba(201,168,76,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.2);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     c2monitor: {active:'padding:5px 13px;border:1px solid rgba(239,68,68,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.2);color:#ef4444;display:flex;align-items:center;gap:5px;white-space:nowrap',     inactive:'padding:5px 13px;border:1px solid rgba(239,68,68,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.08);color:#ef4444;display:flex;align-items:center;gap:5px;white-space:nowrap'},
     payments: {active:'padding:5px 13px;border:1px solid rgba(16,185,129,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.2);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap'},
+    company:  {active:'padding:5px 13px;border:1px solid rgba(201,168,76,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.2);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap'},
   };
 
   ALL.forEach(function(tab){
@@ -2592,6 +2650,7 @@ function switchTab(t){
   if(t==='pending')  renderPending();
   if(t==='payments') renderPayments();
   if(t==='recruit')  { if(typeof window._recruitRender==='function') window._recruitRender(); }
+  if(t==='company')  loadCompanySettings();
   if(t==='waitRoom') loadWaitRoom();
   if(t==='matching')   loadMatchingPanel();
   if(t==='c2monitor')  loadC2MonitorPanel();
@@ -4091,7 +4150,7 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, query, where, orderBy, limit, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
+import { auth, db, storage, storageRef, uploadBytes, getDownloadURL, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, query, where, orderBy, limit, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "founder";
 
@@ -4596,6 +4655,67 @@ window._ksLoadFromModule = async function() {
     console.error('[mgKs load]', e);
     var tbody = document.getElementById('mgKsBody');
     if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--red);padding:28px">Lỗi tải dữ liệu: ' + (e.message||e.code) + '</td></tr>';
+  }
+};
+
+/* ══════════════════════════════════════════
+   CÀI ĐẶT CÔNG TY — settings/company
+══════════════════════════════════════════ */
+var _cpLogoFile = null;
+
+window.cpPreviewLogo = function(input) {
+  if (!input.files || !input.files[0]) return;
+  _cpLogoFile = input.files[0];
+  const url = URL.createObjectURL(_cpLogoFile);
+  const img = document.getElementById('cpLogoImg');
+  img.src = url; img.style.display = 'block';
+  document.getElementById('cpLogoPlh').style.display = 'none';
+};
+
+window.loadCompanySettings = async function() {
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'company'));
+    if (!snap.exists()) return;
+    const c = snap.data();
+    ['Name','Sub','Tagline','Phone','Email','Website','Address'].forEach(function(f) {
+      const el = document.getElementById('cp'+f);
+      if (el && c[f.toLowerCase()]) el.value = c[f.toLowerCase()];
+    });
+    if (c.logoUrl) {
+      const img = document.getElementById('cpLogoImg');
+      img.src = c.logoUrl; img.style.display = 'block';
+      document.getElementById('cpLogoPlh').style.display = 'none';
+    }
+  } catch(e) { console.warn('loadCompanySettings:', e); }
+};
+
+window.saveCompanySettings = async function() {
+  const status = document.getElementById('cpStatus');
+  status.textContent = 'Đang lưu...'; status.style.color = 'var(--sub)';
+  try {
+    var data = {
+      name:    document.getElementById('cpName').value.trim(),
+      sub:     document.getElementById('cpSub').value.trim(),
+      tagline: document.getElementById('cpTagline').value.trim(),
+      phone:   document.getElementById('cpPhone').value.trim(),
+      email:   document.getElementById('cpEmail').value.trim(),
+      website: document.getElementById('cpWebsite').value.trim(),
+      address: document.getElementById('cpAddress').value.trim(),
+    };
+    if (_cpLogoFile) {
+      const ref = storageRef(storage, 'settings/company_logo_' + Date.now());
+      await uploadBytes(ref, _cpLogoFile, { contentType: _cpLogoFile.type });
+      data.logoUrl = await getDownloadURL(ref);
+    } else {
+      const snap = await getDoc(doc(db, 'settings', 'company'));
+      if (snap.exists() && snap.data().logoUrl) data.logoUrl = snap.data().logoUrl;
+    }
+    await setDoc(doc(db, 'settings', 'company'), data);
+    status.textContent = '✅ Đã lưu — Board PA của KTS sẽ tự cập nhật khi mở lại.';
+    status.style.color = 'var(--green)';
+  } catch(e) {
+    status.textContent = '❌ Lỗi: ' + (e.message || e);
+    status.style.color = 'var(--red)';
   }
 };
 
