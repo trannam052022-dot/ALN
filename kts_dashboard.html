@@ -2116,6 +2116,7 @@ function fmtShort(n) {
 let toastTimer;
 function showToast(msg, type='t-blue') {
   const t = document.getElementById('toast');
+  if (!t) return;
   t.textContent = msg; t.className = 'show '+type;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>t.className='', 4000);
@@ -2660,6 +2661,10 @@ window.openKtsWork = function(pid, uid) {
     + '<div class="kts-work-card" onclick="window.ktsShowTab(\'proposal\')">'
         + '<div class="kwc-icon" style="background:rgba(212,160,23,.14);color:var(--gold)"><i class="ph-duotone ph-paper-plane-tilt"></i></div>'
         + '<div class="kwc-label">Gửi phương án</div>'
+      + '</div>'
+    + '<div class="kts-work-card" onclick="window.openBoardEditor()">'
+        + '<div class="kwc-icon" style="background:rgba(212,160,23,.08);color:var(--gold)"><i class="ph-duotone ph-layout"></i></div>'
+        + '<div class="kwc-label">Tạo Board PA</div>'
       + '</div>'
     + '<div class="kts-work-card" onclick="window.ktsShowTab(\'review\')">'
         + '<div class="kwc-icon" style="background:rgba(37,99,235,.12);color:var(--blue)"><i class="ph-duotone ph-clipboard-text"></i></div>'
