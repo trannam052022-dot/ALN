@@ -311,44 +311,56 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
           <div class="sig" id="sig-kts">
             <div class="sig-h">
               <div class="sig-role">Kiến trúc sư</div>
-              <div class="sig-name">KTS. Lan Anh</div>
+              <div class="sig-name" id="sig-kts-name">KTS. Lan Anh</div>
             </div>
             <div class="sig-b">
-              <div class="sig-area"><span id="sig-kts-ph" class="sig-area-txt">Chờ ký</span></div>
-              <div class="sig-date" id="sig-kts-date"></div>
+              <div class="sig-area" id="sig-kts-area"><span id="sig-kts-ph" class="sig-area-txt">Chờ ký</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px">
+                <div class="sig-date" id="sig-kts-date"></div>
+                <button id="btn-sign-kts" onclick="doSign('kts')" style="display:none;font-size:3.5px;padding:1.5px 5px;background:#c9a84c;color:#fff;border:none;border-radius:2px;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:.06em">KÝ</button>
+              </div>
             </div>
           </div>
 
           <div class="sig" id="sig-kc">
             <div class="sig-h">
               <div class="sig-role">KS. Kết cấu</div>
-              <div class="sig-name">KS. Minh Đức</div>
+              <div class="sig-name" id="sig-kc-name">KS. Minh Đức</div>
             </div>
             <div class="sig-b">
-              <div class="sig-area"><span id="sig-kc-ph" class="sig-area-txt">Chờ ký</span></div>
-              <div class="sig-date" id="sig-kc-date"></div>
+              <div class="sig-area" id="sig-kc-area"><span id="sig-kc-ph" class="sig-area-txt">Chờ ký</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px">
+                <div class="sig-date" id="sig-kc-date"></div>
+                <button id="btn-sign-kc" onclick="doSign('kc')" style="display:none;font-size:3.5px;padding:1.5px 5px;background:#c9a84c;color:#fff;border:none;border-radius:2px;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:.06em">KÝ</button>
+              </div>
             </div>
           </div>
 
           <div class="sig" id="sig-me">
             <div class="sig-h">
               <div class="sig-role">KS. M&amp;E</div>
-              <div class="sig-name">KS. Thanh Hà</div>
+              <div class="sig-name" id="sig-me-name">KS. Thanh Hà</div>
             </div>
             <div class="sig-b">
               <div class="sig-area" id="sig-me-area"><span id="sig-me-ph" class="sig-area-txt">Chờ ký</span></div>
-              <div class="sig-date" id="sig-me-date"></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px">
+                <div class="sig-date" id="sig-me-date"></div>
+                <button id="btn-sign-me" onclick="doSign('me')" style="display:none;font-size:3.5px;padding:1.5px 5px;background:#c9a84c;color:#fff;border:none;border-radius:2px;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:.06em">KÝ</button>
+              </div>
             </div>
           </div>
 
           <div class="sig-cn" id="sig-cn">
             <div class="sig-cn-h">
               <div class="sig-cn-role">Thẩm tra · Chủ nhiệm đồ án</div>
-              <div class="sig-cn-name">KTS. Trần Đại Long</div>
+              <div class="sig-cn-name" id="sig-cn-name">KTS. Trần Đại Long</div>
             </div>
             <div class="sig-cn-b">
-              <div class="sig-cn-area"><span id="sig-cn-ph" class="sig-cn-ph">Ký sau cùng</span></div>
-              <div class="tc-date" id="sig-cn-date">Ngày: ___/___/______</div>
+              <div class="sig-cn-area" id="sig-cn-area"><span id="sig-cn-ph" class="sig-cn-ph">Ký sau cùng</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px">
+                <div class="tc-date" id="sig-cn-date">Ngày: ___/___/______</div>
+                <button id="btn-sign-cn" onclick="doSign('cn')" style="display:none;font-size:3.5px;padding:1.5px 5px;background:#c9a84c;color:#fff;border:none;border-radius:2px;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:.06em">KÝ</button>
+              </div>
             </div>
           </div>
 
@@ -528,6 +540,94 @@ function switchTab(id,el){
     document.title='Khung BV · '+pid+' · '+stage;
   }
 })();
+</script>
+
+<script type="module">
+import { auth, db, onAuthStateChanged, doc, getDoc, setDoc, serverTimestamp }
+  from './firebase-config.js';
+
+var _uid = null, _role = null, _sigUrl = null, _userName = null;
+var _pid = new URLSearchParams(location.search).get('pid') || '';
+var _stage = new URLSearchParams(location.search).get('stage') || 'C3';
+
+// Map role → key ô ký
+var ROLE_SIGN_KEY = { kts: 'kts', designer: 'kts', founder: 'cn' };
+
+onAuthStateChanged(auth, async function(user) {
+  if (!user) return;
+  _uid = user.uid;
+  var snap = await getDoc(doc(db, 'users', _uid));
+  if (!snap.exists()) return;
+  var data = snap.data();
+  _role = data.role || '';
+  _sigUrl = data.signatureUrl || '';
+  _userName = data.name || '';
+
+  // Hiện nút Ký cho role phù hợp
+  var key = ROLE_SIGN_KEY[_role];
+  if (key && _sigUrl) {
+    var btn = document.getElementById('btn-sign-' + key);
+    if (btn) btn.style.display = 'block';
+  }
+
+  // Load chữ ký đã ký (nếu có pid)
+  if (_pid) await _loadExistingSigs();
+});
+
+async function _loadExistingSigs() {
+  try {
+    var snap = await getDoc(doc(db, 'projects', _pid, 'stages', _stage));
+    if (!snap.exists()) return;
+    var data = snap.data();
+    var sigs = data.sigRecord || {};
+    ['kts','kc','me','cn'].forEach(function(k) {
+      if (sigs[k] && sigs[k].url) _applySig(k, sigs[k].url, sigs[k].name, sigs[k].date);
+    });
+  } catch(e) { /* ignore */ }
+}
+
+function _applySig(key, url, name, dateStr) {
+  var area = document.getElementById('sig-' + key + '-area') || document.getElementById('sig-cn-area');
+  if (!area) return;
+  var ph = area.querySelector('span');
+  if (ph) ph.style.display = 'none';
+  var img = area.querySelector('img');
+  if (!img) { img = document.createElement('img'); area.appendChild(img); }
+  img.src = url;
+  img.style.cssText = 'max-width:90%;max-height:90%;object-fit:contain';
+
+  var dateEl = document.getElementById('sig-' + key + '-date') || document.getElementById('sig-cn-date');
+  if (dateEl) dateEl.textContent = dateStr || '';
+
+  var cell = document.getElementById('sig-' + key) || document.getElementById('sig-cn');
+  if (cell) cell.classList.add('signed');
+
+  // Ẩn nút Ký sau khi đã ký
+  var btn = document.getElementById('btn-sign-' + key);
+  if (btn) btn.style.display = 'none';
+}
+
+window.doSign = async function(key) {
+  if (!_sigUrl) {
+    alert('Bạn chưa upload chữ ký. Vào Hồ sơ → Chữ ký điện tử để upload trước.');
+    return;
+  }
+  var now = new Date();
+  var dateStr = now.getDate().toString().padStart(2,'0') + '/' + (now.getMonth()+1).toString().padStart(2,'0') + '/' + now.getFullYear();
+  _applySig(key, _sigUrl, _userName, dateStr);
+
+  // Lưu vào Firestore nếu có pid
+  if (_pid) {
+    try {
+      var update = {};
+      update['sigRecord.' + key] = { url: _sigUrl, name: _userName, uid: _uid, date: dateStr, signedAt: serverTimestamp() };
+      await setDoc(
+        doc(db, 'projects', _pid, 'stages', _stage),
+        update, { merge: true }
+      );
+    } catch(e) { /* ignore */ }
+  }
+};
 </script>
 </body>
 </html>

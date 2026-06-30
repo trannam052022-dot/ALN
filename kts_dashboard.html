@@ -1258,6 +1258,22 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <input type="file" id="profileAvatarInput" accept="image/*" style="display:none" onchange="uploadProfileAvatar(this)">
       <div id="profileUploadStatus" style="font-size:11px;color:var(--muted)"></div>
     </div>
+
+    <!-- Chữ ký số -->
+    <div style="background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:10px">CHỮ KÝ ĐIỆN TỬ</div>
+      <div id="sigPreviewWrap" style="background:#fff;border-radius:6px;height:72px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;overflow:hidden;border:1px dashed #ccc">
+        <span id="sigPreviewEmpty" style="font-size:11px;color:#aaa">Chưa có chữ ký</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <label class="profile-upload-btn" for="sigInput" style="margin:0">
+          <i class="ph-duotone ph-pen-nib"></i> Upload chữ ký scan
+        </label>
+        <input type="file" id="sigInput" accept="image/*" style="display:none" onchange="uploadSignature(this)">
+        <span id="sigUploadStatus" style="font-size:11px;color:var(--muted)"></span>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:7px">Ảnh PNG/JPG nền trắng · Tỷ lệ 3:1 · Dùng khi ký khung bản vẽ C3</div>
+    </div>
     <div class="profile-field">
       <label>Họ tên</label>
       <input type="text" id="profileName" placeholder="KTS. Trần Đại Long">
@@ -3066,6 +3082,39 @@ window.uploadProfileAvatar = async function uploadProfileAvatar(input) {
   }
 }
 
+window.uploadSignature = async function(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const status = document.getElementById('sigUploadStatus');
+  status.textContent = 'Đang upload...';
+  try {
+    const uid = window.__ALN_UID;
+    const ref = storageRef(storage, `avatars/${uid}/signature.png`);
+    await uploadBytes(ref, file);
+    const url = await getDownloadURL(ref);
+    await setDoc(doc(db,'users',uid), {signatureUrl: url}, {merge:true});
+    _showSignature(url);
+    status.textContent = '✓ Đã lưu chữ ký';
+    showToast('Đã cập nhật chữ ký điện tử','t-green');
+  } catch(e) {
+    status.textContent = 'Lỗi: ' + e.message;
+    showToast('Upload thất bại','t-red');
+  }
+};
+
+function _showSignature(url) {
+  const wrap = document.getElementById('sigPreviewWrap');
+  const empty = document.getElementById('sigPreviewEmpty');
+  if (!wrap) return;
+  if (url) {
+    if (empty) empty.style.display = 'none';
+    let img = wrap.querySelector('img');
+    if (!img) { img = document.createElement('img'); wrap.appendChild(img); }
+    img.src = url;
+    img.style.cssText = 'max-width:100%;max-height:68px;object-fit:contain;padding:4px';
+  }
+}
+
 function _showAvatar(url) {
   const wrap = document.getElementById('profileAvatarWrap');
   if (!wrap) return;
@@ -3180,6 +3229,7 @@ function _fillProfileForm(profile) {
   if (hpEl && (profile.homeProvince || profile.province)) hpEl.value = profile.homeProvince || profile.province;
   _updateTempLocUI(profile.temporaryLocation);
   if (profile.avatarURL) _showAvatar(profile.avatarURL);
+  if (profile.signatureUrl) _showSignature(profile.signatureUrl);
 }
 
 function _updateTempLocUI(tl) {
