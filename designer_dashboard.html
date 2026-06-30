@@ -1114,9 +1114,13 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <!-- Scan result (shown after submit) -->
       <div class="scan-result" id="scanResult"></div>
 
-      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center">
         <button class="btn btn-ghost btn-sm" onclick="simUploadDemo()"><i class="ph-duotone ph-lightning"></i> [Demo] Upload 6 file mẫu</button>
         <button class="btn btn-ghost btn-sm" onclick="simUploadError()"><i class="ph-duotone ph-bug"></i> [Demo] File Excel lỗi hàm</button>
+        <div style="flex:1"></div>
+        <button class="btn btn-ghost btn-sm" onclick="window.openKhungBV()" style="border-color:rgba(167,139,250,.4);color:#a78bfa">
+          <i class="ph-duotone ph-frame-corners"></i> Khung bản vẽ &amp; Ma trận ký
+        </button>
         <button class="btn btn-primary" id="submitC3Btn" disabled onclick="submitC3()"><i class="ph-duotone ph-cloud-arrow-up"></i> Nộp Hồ sơ C3</button>
       </div>
     </div>
@@ -2595,6 +2599,16 @@ window.openBoardEditor = function() {
   var cnuid  = (data.cn && data.cn.uid) || '';
   var params = new URLSearchParams({ pid: pid, stage: stage, role: 'designer', name: name, location: loc, type: type, client: client, cnuid: cnuid });
   window.open('board-editor.html?' + params.toString(), '_blank');
+};
+
+window.openKhungBV = function() {
+  var pid    = window.DES_PROJECT_ID || '';
+  var data   = window.DES_PROJECT_DATA || {};
+  var name   = (data.name || '').toUpperCase();
+  var addr   = (data.location || data.address || '').toUpperCase();
+  var client = (data.cn && (data.cn.name || data.cn.username) || '').toUpperCase();
+  var params = new URLSearchParams({ pid: pid, stage: 'C3', role: 'designer', name: name, address: addr, client: client, code: 'NT-01' });
+  window.open('ALN_MatranKy_KhungBV.html?' + params.toString(), '_blank');
 };
 
 window.switchKtsProject = function(pid) {
