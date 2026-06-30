@@ -3676,9 +3676,13 @@ window.cnInitMymyFlow = function(){
   var hintt = document.getElementById('cnMymyHintT');
   if(!bdy) return;
 
-  // Lấy tên + giới tính: đọc sidebar trước (đã set từ profile Firestore ngay sau auth),
-  // fallback sessionStorage (đã lưu từ auth flow)
-  var rawName = window.__cnAuthName || (function(){ try{ return JSON.parse(sessionStorage.getItem('aln_user')||'{}').name||''; }catch(e){ return ''; } })();
+  // Đọc tên từ sidebar DOM (đã set từ Firestore), bỏ qua placeholder mặc định
+  var _sbEl = document.getElementById('cnSidebarName');
+  var _sbTxt = _sbEl ? _sbEl.textContent.trim() : '';
+  if (_sbTxt === 'App Làm Nhà Corp.') _sbTxt = '';
+  var rawName = _sbTxt
+    || window.__cnAuthName
+    || (function(){ try{ return JSON.parse(sessionStorage.getItem('aln_user')||'{}').name||''; }catch(e){ return ''; } })();
   var firstName = rawName ? rawName.split(' ').pop() : '';
   var _gEl = document.getElementById('sidebarGender');
   var gender = window.__cnAuthGender || (_gEl && _gEl.value) || ''; // 'nam' | 'nu' | ''
