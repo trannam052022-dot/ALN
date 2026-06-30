@@ -3089,7 +3089,7 @@ window.uploadSignature = async function(input) {
   status.textContent = 'Đang upload...';
   try {
     const uid = window.__ALN_UID;
-    const ref = storageRef(storage, `avatars/${uid}/signature.png`);
+    const ref = storageRef(storage, `kts-profiles/${uid}/signature.png`);
     await uploadBytes(ref, file);
     const url = await getDownloadURL(ref);
     await setDoc(doc(db,'users',uid), {signatureUrl: url}, {merge:true});
