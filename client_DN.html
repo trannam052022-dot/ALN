@@ -2545,6 +2545,7 @@ function renderMain(){
 function selectProj(id){
   window.activeProj=id; activeFolder='ALL';
   window._dnSubPid = null; // reset lazy-load flag khi đổi project
+  if (typeof window._dnSubDocs === 'function') window._dnSubDocs(id);
   renderSidebar(); renderMain();
   document.querySelector('.sidebar-cn').classList.remove('open');
   // Sync Zalo widget to new KTS
@@ -2646,9 +2647,25 @@ function drawPortrait(canvas,opts){
 }
 
 function downloadDoc(id,name){
+  // Tìm url từ DOCS
+  var found = null;
+  Object.values(DOCS).flat().forEach(function(d){ if(d.id===id) found=d; });
+  var url = found && found.url;
+  if(!url){
+    showToast('⚠ Không tìm thấy URL file — thử tải lại trang','t-red');
+    return;
+  }
+  // Tạo link tải xuống
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = name || 'file';
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
   showToast(`📥 Đang tải: ${name}`,'t-blue');
   // Mark as read
-  Object.values(DOCS).flat().forEach(d=>{if(d.id===id)d.isNew=false});
+  Object.values(DOCS).flat().forEach(function(d){ if(d.id===id) d.isNew=false; });
   renderSidebar();
 }
 
@@ -3468,8 +3485,41 @@ window._dnLoadKtsAvatar = async function(ktsUid) {
   } catch(e) { console.warn('[DN ktsAvatar]', e.code); }
 };
 
+/* ══ DOCS LISTENER: load projects/{pid}/documents/ khi chọn project ══ */
+window._dnDocsUnsub = null;
+window._dnSubDocs = function(pid) {
+  if (window._dnDocsUnsub) { try { window._dnDocsUnsub(); } catch(e){} }
+  window._dnDocsUnsub = null;
+  if (!pid) return;
+  var q = query(collection(db,'projects',pid,'documents'), orderBy('createdAt','desc'));
+  window._dnDocsUnsub = onSnapshot(q, function(snap) {
+    window.DOCS = window.DOCS || {};
+    window.DOCS[pid] = snap.docs.map(function(d) {
+      var dd = d.data();
+      var ts = dd.createdAt && dd.createdAt.seconds ? new Date(dd.createdAt.seconds*1000) : null;
+      return {
+        id: d.id,
+        name: dd.name || d.id,
+        folder: dd.folder || dd.stage || 'C1',
+        url: dd.url || '',
+        kts: (dd.uploader && dd.uploader.name) || 'KTS',
+        date: ts ? ts.toLocaleDateString('vi-VN') : (dd.date || ''),
+        size: dd.size || '—',
+        type: dd.type || (dd.name && dd.name.match(/\.pdf$/i) ? 'pdf' : 'file'),
+        status: dd.status || 'pending',
+        isNew: ts ? (Date.now() - ts.getTime() < 48*3600*1000) : false,
+        sigRecord: dd.sigRecord || null
+      };
+    });
+    if (window.activeProj === pid && typeof window.renderMain === 'function') {
+      try { window.renderMain(); } catch(e) {}
+    }
+  }, function(err){ console.warn('[DN docs]', err.code); });
+};
+
 window._dnPropUnsubs = [];
 window._dnSubProposals = function(pid) {
+  window._dnSubDocs(pid);
   window._dnPropUnsubs.forEach(function(u){ try{ u(); }catch(e){} });
   window._dnPropUnsubs = [];
   if (!pid) return;

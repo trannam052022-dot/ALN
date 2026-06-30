@@ -1159,6 +1159,7 @@ window.rvSubmitToFirebase = async function(pages) {
           name: p.name,
           folder: _stage,
           kts: _userName,
+          url: url,
           date: today,
           size: p.file ? (p.file.size ? (p.file.size/1024/1024).toFixed(1)+'MB' : '—') : '—',
           type: p.name.match(/\.pdf$/i) ? 'pdf' : 'file',
