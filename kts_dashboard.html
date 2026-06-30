@@ -716,7 +716,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <div>
           <div style="font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:baseline;gap:6px">
             <span id="slaProjName">Biệt thự Vườn Tân Cổ Điển</span>
-            <span style="font-size:10px;font-weight:500;color:var(--muted)" id="slaProjId">#ALN-9921</span>
+            <span style="font-size:10px;font-weight:500;color:var(--muted)" id="slaProjId"></span>
           </div>
           <div style="font-size:11px;color:var(--muted);margin-top:3px">Chủ nhà gửi <span id="revLabel">yêu cầu sửa lần 2</span></div>
         </div>
@@ -1026,7 +1026,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
         <div>
-          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-image-square"></i></div>Phương án — <span id="paProjTitle">#ALN-9921</span></div>
+          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-image-square"></i></div>Phương án — <span id="paProjTitle"></span></div>
           <div style="font-size:11px;color:var(--muted)">Chặng C1 &amp; C2 yêu cầu trình bày qua <b style="color:var(--gold)">ALN Board PA</b> — chuẩn hóa chất lượng trình bày cho khách hàng</div>
         </div>
       </div>
@@ -1163,7 +1163,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
         <div>
-          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-folder-open"></i></div>Cổng nộp Hồ sơ C3 — <span id="c3ProjId">#ALN-9921</span></div>
+          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-folder-open"></i></div>Cổng nộp Hồ sơ C3 — <span id="c3ProjId"></span></div>
           <div style="font-size:11px;color:var(--muted)">3 hạng mục bắt buộc · 3 tùy chọn (bật khi cần) · Auto-scan · Excel 0% lỗi hàm</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
@@ -1552,7 +1552,7 @@ function openLibItem(id){var d=LIB_DATA.find(function(x){return x.id===id;});if(
 <div class="modal-bg" id="chatModal">
   <div class="modal" style="max-width:480px;width:100%">
     <div class="modal-head">
-      <h3><i class="ph-duotone ph-chats-circle" style="color:var(--blue)"></i> Chat — Dự án <span id="chatModalProjId">ALN-9921</span></h3>
+      <h3><i class="ph-duotone ph-chats-circle" style="color:var(--blue)"></i> Chat — Dự án <span id="chatModalProjId"></span></h3>
       <div style="display:flex;align-items:center;gap:6px;margin-left:auto;margin-right:10px">
         <div id="chatStatusDot" style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div>
         <span id="chatStatusTxt" style="font-size:10px;color:var(--sub)">Kết nối</span>
@@ -2186,7 +2186,7 @@ ALNRealtime.init({
   },
   onMessage: (d) => {
     // Tranh chấp
-    if(d.type==='DISPUTE_OPENED' && d.projectId===(window.KTS_PROJECT_ID||'ALN-9921')) {
+    if(d.type==='DISPUTE_OPENED' && d.projectId===(window.KTS_PROJECT_ID||'')) {
       showToast('⚠️ Chủ nhà đã mở tranh chấp C3 — dòng tiền bị đóng băng!', 't-red');
       try{document.getElementById('lockedWallet').style.borderColor='var(--red)';}catch(e){}
       try{document.getElementById('lockedAmount').style.color='var(--red)';}catch(e){}
@@ -2291,7 +2291,7 @@ function ktsSendChat() {
   const msg = {
     type: 'ALN_CHAT',
     audience: ['cn'],
-    projectId: window.KTS_PROJECT_ID || 'ALN-9921',
+    projectId: window.KTS_PROJECT_ID ,
     text,
     senderName: _ktsName,
     senderRole: 'kts',
@@ -2320,7 +2320,7 @@ window.submitC3_realtime = function() {
     if(!f) return;
     ALNRealtime.send({
       type: 'KTS_DOC_UPLOAD',
-      projectId: window.KTS_PROJECT_ID || 'ALN-9921',
+      projectId: window.KTS_PROJECT_ID ,
       ktsName: _ktsName,
       doc: {
         id: 'D_' + Date.now() + '_' + s.id,
@@ -2338,7 +2338,7 @@ window.submitC3_realtime = function() {
   // Thông báo tổng hợp
   ALNRealtime.send({
     type: 'KTS_C3_SUBMITTED',
-    projectId: window.KTS_PROJECT_ID || 'ALN-9921',
+    projectId: window.KTS_PROJECT_ID ,
     ktsName: _ktsName,
     fileCount: Object.keys(uploadedFiles).length,
   });
@@ -2476,12 +2476,12 @@ function alnSendMsg(){
   const inp = document.getElementById('alnInput'); const txt = (inp?inp.value.trim():''); if(!txt) return;
   const DANGER=['zalo riêng','số điện thoại','ngoài sàn','tiền mặt','chuyển khoản trực tiếp','không qua sàn','tài khoản cá nhân','liên hệ riêng','nhắn riêng','giá riêng','phí ngoài','thanh toán ngoài','giao dịch ngoài','hợp đồng riêng'];
   const matched = DANGER.find(kw=>txt.toLowerCase().includes(kw));
-  if(matched){ showToast(`⚠️ Tin nhắn bị chặn — vi phạm: "${matched}". Mọi giao dịch phải qua sàn ALN.`, 't-red'); inp.value=''; try{ALNRealtime.send({type:'NLP_ALERT',projectId: window.KTS_PROJECT_ID || 'ALN-9921',keyword:matched,msg:txt})}catch(e){} return; }
+  if(matched){ showToast(`⚠️ Tin nhắn bị chặn — vi phạm: "${matched}". Mọi giao dịch phải qua sàn ALN.`, 't-red'); inp.value=''; try{ALNRealtime.send({type:'NLP_ALERT',projectId: window.KTS_PROJECT_ID ,keyword:matched,msg:txt})}catch(e){} return; }
   alnThreads[_alnThread].push({ mine:true, text:txt, ts:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}) });
   _alnRender(); inp.value='';
   // Đồng bộ luồng Chủ nhà vào modal "Chat — Dự án" cũ
   if(_alnThread === 'cn'){ try{ _ktsRenderMsg({ senderName:_ktsName, text:txt, ts:Date.now() }, true); }catch(e){} }
-  ALNRealtime.send({ type:'ALN_CHAT', audience:[_alnThread], projectId: window.KTS_PROJECT_ID || 'ALN-9921', text:txt, senderName:_ktsName, senderRole:'kts' });
+  ALNRealtime.send({ type:'ALN_CHAT', audience:[_alnThread], projectId: window.KTS_PROJECT_ID , text:txt, senderName:_ktsName, senderRole:'kts' });
 }
 </script>
 
@@ -3509,7 +3509,7 @@ window.alnSubmitProposal = async function(){
   const desc  =((document.getElementById('paDesc')   ||{}).value||'').trim();
   const btn = document.getElementById('paSubmitBtn');
 
-  const PID = window.KTS_PROJECT_ID || 'ALN-9921';
+  const PID = window.KTS_PROJECT_ID ;
 
   // Mục 1: bắt buộc nhập tên
   if(!name){
@@ -3648,7 +3648,7 @@ function paWatch(stage){
   if(!box) return;
   if(_paUnsub){ try{_paUnsub();}catch(e){} _paUnsub=null; }
   box.innerHTML='<div style="color:var(--muted);font-size:12px">Đang tải...</div>';
-  const PID = window.KTS_PROJECT_ID || 'ALN-9921';
+  const PID = window.KTS_PROJECT_ID ;
   try{
     const qy=query(collection(db,'projects',PID,'stages',stage,'proposals'), orderBy('order','desc'));
     _paUnsub=onSnapshot(qy, snap=>{

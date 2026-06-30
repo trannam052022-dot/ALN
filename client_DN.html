@@ -2637,12 +2637,7 @@ function downloadDoc(id,name){
 }
 
 /* Notifications */
-const NOTIFS=[
-  {icon:'<i class="ph-duotone ph-folder"></i>',body:'<b>KTS. Trần Đại Long</b> vừa upload <b>Phối cảnh 3D ngoại thất</b>',proj:'ALN-9921',ts:'5 phút trước',unread:true},
-  {icon:'<i class="ph-duotone ph-alarm"></i>',body:'SLA Chặng C2 — <b>KTS. Phạm Hoài Nam</b> còn 8h phản hồi',proj:'ALN-9521',ts:'12 phút trước',unread:true},
-  {icon:'<i class="ph-duotone ph-warning"></i>',body:'Tranh chấp <b>ALN-9834</b> đang chờ Hội đồng Trọng tài phán quyết',proj:'ALN-9834',ts:'30 phút trước',unread:true},
-  {icon:'<i class="ph-duotone ph-check-circle"></i>',body:'<b>Giải ngân C1</b> đã hoàn tất — +11,162,500đ về KTS',proj:'ALN-9921',ts:'2 giờ trước',unread:false},
-];
+const NOTIFS=[];
 function renderNotifs(){
   document.getElementById('notifList').innerHTML=NOTIFS.map(n=>{
     const tabAction = n.tab ? `setTimeout(function(){try{cur='${n.tab}';window.cnApplyTabs();}catch(e){}},180);` : '';
