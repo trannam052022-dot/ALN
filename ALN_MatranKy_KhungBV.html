@@ -796,7 +796,7 @@ function _rvFitPaper() {
   var availH = (rvMain ? rvMain.clientHeight : window.innerHeight - 96)
              - (rvTopbar ? rvTopbar.offsetHeight : 44) - 16;
   if (availW <= 0 || availH <= 0) return;
-  var scale = Math.min(availW / BASE_W, availH / BASE_H);
+  var scale = Math.min(availW / BASE_W, availH / BASE_H, 1.0);
   paper.style.transform = 'scale(' + scale + ')';
   paper.style.transformOrigin = 'top left';
   paper.style.marginRight  = (BASE_W * scale - BASE_W) + 'px';
@@ -937,24 +937,24 @@ function rvSignCell(key) {
   }
   var p = _rvPages[_rvCur];
   if (!p) return;
-  if (p.sigs[key]) return; // đã ký rồi
 
-  // Bước 1: chưa pending → highlight + chờ click lần 2
-  if (!_rvPendingSign || _rvPendingSign.key !== key) {
-    _rvClearPending();
-    var cellEl = document.getElementById('rv-sc-' + key);
-    if (cellEl) cellEl.setAttribute('data-pending', '1');
-    _rvPendingSign = { key: key, timer: setTimeout(_rvClearPending, 4000) };
-    return;
-  }
-
-  // Nếu đã ký → hỏi thu hồi
+  // Đã ký → click 1 lần = hỏi thu hồi ngay
   if (p.sigs[key]) {
+    _rvClearPending();
     var LABEL = {kts:'Kiến trúc sư', kc:'KS. Kết cấu', me:'KS. M&E', cn:'Chủ đầu tư'};
     if (window.confirm('Thu hồi chữ ký tại ô "' + (LABEL[key]||key) + '"?')) {
       delete p.sigs[key];
       rvGoto(_rvCur);
     }
+    return;
+  }
+
+  // Chưa ký — Bước 1: chưa pending → highlight + chờ click lần 2
+  if (!_rvPendingSign || _rvPendingSign.key !== key) {
+    _rvClearPending();
+    var cellEl = document.getElementById('rv-sc-' + key);
+    if (cellEl) cellEl.setAttribute('data-pending', '1');
+    _rvPendingSign = { key: key, timer: setTimeout(_rvClearPending, 4000) };
     return;
   }
 
