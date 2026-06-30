@@ -235,10 +235,10 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
 .rv-prog-bar{width:80px;height:4px;background:var(--navy3);border-radius:2px;overflow:hidden}
 .rv-prog-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s}
 .rv-prog-txt{font-size:10px;color:var(--text3);font-family:'Oswald',sans-serif;white-space:nowrap}
-.rv-content{flex:1;overflow:auto;padding:12px 16px;display:flex;align-items:flex-start;justify-content:flex-start}
-/* A3 sheet trong Tab 3: chiều cao = viewport - topbars, width tự tính từ aspect-ratio */
-#rv-viewer-area .bv-wrap{background:transparent;padding:0;border-radius:0;width:auto;display:flex;justify-content:flex-start}
-#rv-viewer-area .paper{width:auto;max-width:none;height:calc((100vh - 140px) * 0.81415);aspect-ratio:420/297}
+.rv-content{flex:1;overflow:hidden;padding:8px;display:flex;align-items:flex-start;justify-content:flex-start}
+/* A3 sheet Tab 3: kích thước chuẩn, scale bằng JS _rvFitPaper() */
+#rv-viewer-area .bv-wrap{background:transparent;padding:0;border-radius:0;width:100%;overflow:visible;display:flex;justify-content:flex-start;align-items:flex-start}
+#rv-viewer-area .paper{flex-shrink:0;transform-origin:top left;width:1090px;height:770px;aspect-ratio:unset}
 .rv-frame-aln{background:#f5f0e0;padding:12px 16px;border-bottom:2px solid #1a1a1a;display:flex;flex-direction:column;align-items:center;gap:3px}
 .rv-frame-logo{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;background:linear-gradient(135deg,#b8860b,#d4a017,#f0c040,#c9921a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.08em;line-height:1}
 .rv-frame-sub{font-family:'Oswald',sans-serif;font-size:9px;font-weight:300;color:#8a6820;letter-spacing:.1em;text-transform:uppercase}
@@ -778,7 +778,22 @@ function rvLoadFiles(input) {
   document.getElementById('rv-viewer-area').style.display = 'block';
   _rvRenderStrip();
   rvGoto(existing > 0 ? existing : 0);
+  _rvFitPaper();
 }
+
+function _rvFitPaper() {
+  var paper = document.querySelector('#rv-viewer-area .paper');
+  var content = document.querySelector('#rv-viewer-area .rv-content');
+  if (!paper || !content) return;
+  var BASE_W = 1090, BASE_H = 770;
+  var availW = content.clientWidth - 16;
+  var availH = window.innerHeight - 148;
+  if (availW <= 0 || availH <= 0) return;
+  var scale = Math.min(availW / BASE_W, availH / BASE_H);
+  paper.style.transform = 'scale(' + scale + ')';
+  content.style.height = (BASE_H * scale + 16) + 'px';
+}
+window.addEventListener('resize', _rvFitPaper);
 
 function _rvRenderStrip() {
   var strip = document.getElementById('rv-strip');
@@ -881,15 +896,6 @@ function _rvRenderPdf(url, container) {
     container.innerHTML = '';
     container.appendChild(canvas);
     page.render({ canvasContext: canvas.getContext('2d'), viewport: vp });
-    // Sau khi layout tính xong, resize paper khớp đúng chiều cao canvas
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() {
-        var paper = container.closest('.paper');
-        if (!paper) return;
-        var h = canvas.offsetHeight;
-        if (h > 0) { paper.style.height = h + 'px'; paper.style.aspectRatio = 'unset'; }
-      });
-    });
   }).catch(function(err) {
     container.innerHTML = '<div class="draw-txt">Không đọc được PDF</div>';
   });
