@@ -83,7 +83,8 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
 .margin-label-el{position:absolute;top:0;bottom:0;left:0;width:3.9%;display:flex;align-items:center;justify-content:center}
 .margin-label-txt{font-size:3.5px;color:#aaa;writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;font-family:'Oswald',sans-serif}
 .draw-area{position:absolute;top:0;bottom:0;left:3.9%;right:15.85%;display:flex;align-items:center;justify-content:center}
-.draw-inner{width:calc(100% - 8px);height:calc(100% - 8px);border:.5px dashed #ddd;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px}
+.draw-inner{width:100%;height:100%;border:.5px dashed #ddd;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;overflow:hidden}
+.draw-inner img,.draw-inner embed{width:100%;height:100%;object-fit:contain}
 .draw-txt{font-family:'Oswald',sans-serif;font-size:7px;color:#bbb;text-align:center;line-height:1.8;font-weight:400;letter-spacing:.06em}
 .title-col{position:absolute;top:0;bottom:0;left:84.15%;right:0;display:flex;flex-direction:column;border-left:1.5px solid #1a1a1a}
 
@@ -718,8 +719,7 @@ function rvLoadFiles(input) {
   if (!files.length) return;
   var existing = _rvPages.length;
   files.forEach(function(f) {
-    var url = f.type.startsWith('image/') ? URL.createObjectURL(f) : '';
-    _rvPages.push({ name: f.name, url: url, sigs: {} });
+    _rvPages.push({ name: f.name, url: URL.createObjectURL(f), type: f.type, sigs: {} });
   });
   document.getElementById('rv-upload-area').style.display = 'none';
   document.getElementById('rv-viewer-area').style.display = 'block';
@@ -756,10 +756,14 @@ function rvGoto(idx) {
   document.querySelectorAll('.rv-item').forEach(function(t,i){ t.classList.toggle('active', i===idx); });
   var it = document.getElementById('rv-it-'+idx); if(it) it.scrollIntoView({block:'nearest'});
 
-  // Hiển thị file ảnh vào vùng vẽ
+  // Hiển thị file vào vùng vẽ
   var drawInner = document.getElementById('rv-draw-inner');
   if (drawInner && p.url) {
-    drawInner.innerHTML = '<img src="'+p.url+'" style="max-width:100%;max-height:100%;object-fit:contain;display:block">';
+    if (p.type && p.type.startsWith('image/')) {
+      drawInner.innerHTML = '<img src="'+p.url+'" style="width:100%;height:100%;object-fit:contain;display:block">';
+    } else {
+      drawInner.innerHTML = '<embed src="'+p.url+'" type="application/pdf" style="width:100%;height:100%;display:block">';
+    }
   }
 
   // Tên bản vẽ tự điền
