@@ -917,42 +917,7 @@ const FOLDERS = [
     desc:'Dự toán hạng mục · Đơn giá tham chiếu · Tổng chi phí xây dựng' },
 ];
 
-var DOCS = {
-  'ALN-9921': [
-    {id:'D001',name:'Mặt bằng phương án C1',         folder:'kien_truc',kts:'KTS. Trần Đại Long',  date:'2026-05-10',size:'2.4MB',type:'pdf', status:'approved',isNew:false},
-    {id:'D002',name:'Phối cảnh 3D ngoại thất',       folder:'kien_truc',kts:'KTS. Trần Đại Long',  date:'2026-05-28',size:'8.1MB',type:'img', status:'pending', isNew:true},
-    {id:'D003',name:'Phối cảnh 3D nội thất',         folder:'kien_truc',kts:'KTS. Trần Đại Long',  date:'2026-05-29',size:'6.3MB',type:'img', status:'pending', isNew:true},
-  ],
-  'ALN-9834': [
-    {id:'D004',name:'Mặt bằng phương án C1',         folder:'kien_truc',kts:'KTS. Nguyễn Thị Lan',date:'2026-04-15',size:'1.2MB',type:'pdf', status:'approved',isNew:false},
-    {id:'D005',name:'Phối cảnh 3D chính diện',       folder:'kien_truc',kts:'KTS. Nguyễn Thị Lan',date:'2026-04-28',size:'9.5MB',type:'img', status:'approved',isNew:false},
-    {id:'D006',name:'Hồ sơ kiến trúc thi công',      folder:'kien_truc',kts:'KTS. Nguyễn Thị Lan',date:'2026-05-20',size:'12.8MB',type:'pdf',status:'dispute', isNew:true},
-    {id:'D007',name:'Hồ sơ kết cấu móng + sàn',      folder:'ket_cau',  kts:'KTS. Nguyễn Thị Lan',date:'2026-05-20',size:'4.1MB',type:'dwg', status:'dispute', isNew:true},
-    {id:'D016',name:'Thống kê thép toàn công trình', folder:'thep',     kts:'KTS. Nguyễn Thị Lan',date:'2026-05-21',size:'0.9MB',type:'xlsx',status:'dispute', isNew:true},
-  ],
-  'ALN-9756': [
-    {id:'D008',name:'Mặt bằng phương án C1',         folder:'kien_truc',kts:'KTS. Vũ Minh Khoa',  date:'2026-03-12',size:'2.1MB',type:'pdf', status:'approved',isNew:false},
-    {id:'D009',name:'Phối cảnh 3D villa full option',folder:'kien_truc',kts:'KTS. Vũ Minh Khoa',  date:'2026-03-28',size:'15.2MB',type:'img',status:'approved',isNew:false},
-    {id:'D010',name:'Hồ sơ kiến trúc thi công',      folder:'kien_truc',kts:'KTS. Vũ Minh Khoa',  date:'2026-04-10',size:'18.6MB',type:'pdf',status:'approved',isNew:false},
-    {id:'D017',name:'Hồ sơ kết cấu đầy đủ',          folder:'ket_cau',  kts:'KTS. Vũ Minh Khoa',  date:'2026-04-12',size:'22.4MB',type:'pdf',status:'approved',isNew:false},
-    {id:'D018',name:'Sơ đồ điện + nước + PCCC',      folder:'me',       kts:'KTS. Vũ Minh Khoa',  date:'2026-04-15',size:'8.3MB',type:'pdf', status:'approved',isNew:false},
-    {id:'D019',name:'Thống kê thép chi tiết',         folder:'thep',     kts:'KTS. Vũ Minh Khoa',  date:'2026-04-18',size:'1.2MB',type:'xlsx',status:'approved',isNew:false},
-    {id:'D020',name:'Bảng vật tư xây dựng',           folder:'vat_tu',   kts:'KTS. Vũ Minh Khoa',  date:'2026-04-20',size:'0.7MB',type:'xlsx',status:'approved',isNew:false},
-    {id:'D011',name:'Dự toán chi phí toàn công trình',folder:'du_toan',  kts:'KTS. Vũ Minh Khoa',  date:'2026-05-02',size:'0.8MB',type:'xlsx',status:'pending', isNew:true},
-  ],
-  'ALN-9648': [
-    {id:'D012',name:'Mặt bằng phương án C1',         folder:'kien_truc',kts:'KTS. Lê Hoàng Nam',  date:'2026-05-05',size:'1.8MB',type:'pdf', status:'approved',isNew:false},
-    {id:'D013',name:'Phối cảnh 3D góc phố',          folder:'kien_truc',kts:'KTS. Lê Hoàng Nam',  date:'2026-05-22',size:'7.4MB',type:'img', status:'pending', isNew:true},
-  ],
-  'ALN-9590': [
-    {id:'D014',name:'Mặt bằng + phối cảnh hoàn công',folder:'kien_truc',kts:'KTS. Vũ Minh Khoa',  date:'2026-02-10',size:'28.2MB',type:'pdf',status:'approved',isNew:false},
-    {id:'D021',name:'Hồ sơ kết cấu hoàn công',       folder:'ket_cau',  kts:'KTS. Vũ Minh Khoa',  date:'2026-02-10',size:'31.4MB',type:'pdf',status:'approved',isNew:false},
-    {id:'D022',name:'Hồ sơ M&E hoàn công',            folder:'me',       kts:'KTS. Vũ Minh Khoa',  date:'2026-02-10',size:'12.1MB',type:'pdf',status:'approved',isNew:false},
-    {id:'D023',name:'Thống kê thép nghiệm thu',       folder:'thep',     kts:'KTS. Vũ Minh Khoa',  date:'2026-02-12',size:'1.5MB',type:'xlsx',status:'approved',isNew:false},
-    {id:'D024',name:'Bảng vật tư nghiệm thu',         folder:'vat_tu',   kts:'KTS. Vũ Minh Khoa',  date:'2026-02-12',size:'0.9MB',type:'xlsx',status:'approved',isNew:false},
-    {id:'D015',name:'Dự toán nghiệm thu',             folder:'du_toan',  kts:'KTS. Vũ Minh Khoa',  date:'2026-02-15',size:'1.1MB',type:'xlsx',status:'approved',isNew:false},
-  ],
-};
+var DOCS = {};
 
 window.activeProj = window.activeProj || null;
 let activeFolder = 'ALL';
