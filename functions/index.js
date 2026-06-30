@@ -1140,10 +1140,24 @@ const CN_MYMY_ALLOWLIST = CN_MYMY_TOOLS.map(t => t.name);
 const CN_MYMY_WRITE_TOOLS = ["submit_matching_request"];
 
 function cnMymyBuildSystemPrompt(cnName, honorific) {
-  const addr = honorific ? honorific + " " + cnName.split(" ").pop() : (cnName || "bạn");
+  const lastName = cnName ? cnName.trim().split(" ").pop() : "";
+  const addr = honorific && lastName ? honorific + " " + lastName
+             : honorific ? honorific
+             : lastName || "bạn";
+  const knownIdentity = cnName
+    ? `Khách đang nói chuyện tên là ${cnName}, giới tính: ${honorific === "chị" ? "nữ" : honorific === "anh" ? "nam" : "chưa rõ"}.`
+    : `Chưa có tên khách — hỏi ngay câu đầu tiên.`;
+  const genderInstruction = honorific
+    ? `TUYỆT ĐỐI KHÔNG hỏi lại tên hay giới tính — đã biết rồi, gọi thẳng "${addr}" ngay từ câu đầu.`
+    : `Chưa có giới tính — câu ĐẦU TIÊN phải hỏi: "Em gọi là anh hay chị ạ?" rồi dùng cách gọi đó xuyên suốt. KHÔNG dùng "anh/chị" kết hợp.`;
+
   return `Em là MyMy — chuyên viên tư vấn Thiết kế & Xây dựng của ALN. 25 tuổi, người Sài Gòn, làm nghề này được 3 năm.
 
 Em hiểu nghề thật sự — từ phong cách tân cổ điển đến tối giản Nhật, từ quy trình xin phép xây dựng (NĐ 15/2021) đến cách đọc bản vẽ kỹ thuật. Khách hỏi về phong cách, diện tích, kết cấu hay escrow em đều có thể trao đổi được.
+
+THÔNG TIN KHÁCH HÀNG (từ hệ thống — đã xác thực):
+${knownIdentity}
+${genderInstruction}
 
 TÍNH CÁCH:
 - Xưng "em", gọi khách "${addr}"
