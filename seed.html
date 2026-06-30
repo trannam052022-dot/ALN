@@ -137,7 +137,8 @@
             <div class="field"><label for="p-code">Mã dự án (= doc ID)</label>
               <div style="display:flex;gap:8px">
                 <input id="p-code" placeholder="ALN-XXXX" style="flex:1" />
-                <button class="mini" id="gen-code" type="button">Tự sinh</button>
+                <button class="mini" id="gen-cn" type="button">Tự sinh CN</button>
+                <button class="mini" id="gen-dn" type="button">Tự sinh DN</button>
               </div>
             </div>
             <div class="field"><label for="p-stage">Chặng hiện tại</label>
@@ -447,8 +448,8 @@ $('run').addEventListener('click', async () => {
   const data = buildProjectData(true);
   const code = data.code;
 
-  if(!code){ showBanner('err','Thiếu mã dự án. Bấm "Tự sinh" hoặc nhập tay.'); return; }
-  if(!/^ALN-\d{4}$/.test(code)){ showBanner('err','Mã dự án phải đúng định dạng ALN-XXXX (4 chữ số). Bấm "Tự sinh".'); return; }
+  if(!code){ showBanner('err','Thiếu mã dự án. Bấm "Tự sinh CN" hoặc "Tự sinh DN".'); return; }
+  if(!/^ALN-(CN|DN)-\d{4}$/.test(code)){ showBanner('err','Mã dự án phải đúng định dạng ALN-CN-XXXX hoặc ALN-DN-XXXX. Bấm nút Tự sinh.'); return; }
   if(!data.cn || !data.kts){ showBanner('err','CN và KTS bắt buộc phải có uid (bấm "Tìm uid" hoặc dán tay).'); return; }
 
   $('run').disabled = true;
@@ -534,12 +535,14 @@ $('run').addEventListener('click', async () => {
   }
 });
 
-/* ---- tự sinh mã ALN-XXXX ---- */
-$('gen-code').addEventListener('click', function(){
+/* ---- tự sinh mã ---- */
+function genCode(prefix){
   const n = String(Math.floor(Math.random() * 9000) + 1000);
-  $('p-code').value = 'ALN-' + n;
+  $('p-code').value = prefix + n;
   refreshPreview();
-});
+}
+$('gen-cn').addEventListener('click', function(){ genCode('ALN-CN-'); });
+$('gen-dn').addEventListener('click', function(){ genCode('ALN-DN-'); });
 
 refreshPreview();
 
