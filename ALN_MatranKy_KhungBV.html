@@ -202,7 +202,7 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
 .rv-prog-txt{font-size:10px;color:var(--text3);font-family:'Oswald',sans-serif;white-space:nowrap}
 .rv-content{flex:1;overflow-y:auto;display:flex;justify-content:center;align-items:flex-start;padding:24px}
 /* Khung tên to — hiển thị cột ký A3 scale lớn */
-.rv-frame-wrap{background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.5);width:min(480px,90%);border:1.5px solid #1a1a1a;border-radius:2px}
+.rv-frame-wrap{background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.5);width:min(560px,90%);border:1.5px solid #1a1a1a;border-radius:2px}
 .rv-frame-aln{background:#f5f0e0;padding:12px 16px;border-bottom:2px solid #1a1a1a;display:flex;flex-direction:column;align-items:center;gap:3px}
 .rv-frame-logo{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;background:linear-gradient(135deg,#b8860b,#d4a017,#f0c040,#c9921a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.08em;line-height:1}
 .rv-frame-sub{font-family:'Oswald',sans-serif;font-size:9px;font-weight:300;color:#8a6820;letter-spacing:.1em;text-transform:uppercase}
@@ -740,9 +740,11 @@ function _rvRenderStrip() {
   var CHECK = '<svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
   strip.innerHTML = _rvPages.map(function(p, i) {
     var allSigned = Object.keys(p.sigs).length >= 1;
+    var baseName = p.name.replace(/\.[^.]+$/,'');
+    var label = isNaN(Number(baseName)) ? _rvShortName(baseName, 18) : ('Tờ ' + baseName);
     return '<div class="rv-item'+(i===_rvCur?' active':'')+(allSigned?' signed':'')+'" onclick="rvGoto('+i+')" id="rv-it-'+i+'">'
       + '<div class="rv-item-num">'+(i+1)+'</div>'
-      + '<div class="rv-item-name">'+_rvShortName(p.name.replace(/\.[^.]+$/,''),22)+'</div>'
+      + '<div class="rv-item-name">'+label+'</div>'
       + '<div class="rv-item-tick">'+CHECK+'</div>'
       + '</div>';
   }).join('');
