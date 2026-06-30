@@ -747,6 +747,7 @@ document.querySelectorAll('[contenteditable]').forEach(el => {
   if(p.get('location') && subs[1]) subs[1].textContent = p.get('location').toUpperCase();
   if(p.get('type')     && subs[2]) subs[2].textContent = p.get('type').toUpperCase();
   if(p.get('client')) { const el=document.getElementById('bd-client-name'); if(el) el.textContent=p.get('client').toUpperCase(); }
+  window._BOARD_CNUID = p.get('cnuid') || '';
 })();
 </script>
 
@@ -764,6 +765,18 @@ onAuthStateChanged(auth, async u => {
   try {
     const uSnap = await getDoc(doc(db, 'users', u.uid));
     if (uSnap.exists()) _fbKtsName = uSnap.data().name || '';
+  } catch(e) {}
+  // Đọc tên CN từ Firestore nếu client param trống
+  try {
+    const cnuid = window._BOARD_CNUID;
+    const clientEl = document.getElementById('bd-client-name');
+    if (cnuid && clientEl && (!clientEl.textContent.trim() || clientEl.textContent.trim() === 'CHỦ ĐẦU TƯ')) {
+      const cnSnap = await getDoc(doc(db, 'users', cnuid));
+      if (cnSnap.exists()) {
+        const cnName = cnSnap.data().name || cnSnap.data().username || '';
+        if (cnName) clientEl.textContent = cnName.toUpperCase();
+      }
+    }
   } catch(e) {}
   // Đọc settings/company do Founder cấu hình
   try {

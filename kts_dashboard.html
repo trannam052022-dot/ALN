@@ -3554,8 +3554,9 @@ window.openBoardEditor = function() {
   var name   = (data.name || '').toUpperCase();
   var loc    = (data.location || data.address || '').toUpperCase();
   var type   = (data.projectType || 'PRIVATE RESIDENCE').toUpperCase();
-  var client = (data.cn && data.cn.name || data.clientName || '').toUpperCase();
-  var params = new URLSearchParams({ pid: pid, stage: stage, role: 'kts', name: name, location: loc, type: type, client: client });
+  var client = (data.cn && (data.cn.name || data.cn.username) || data.clientName || '').toUpperCase();
+  var cnuid  = (data.cn && data.cn.uid) || '';
+  var params = new URLSearchParams({ pid: pid, stage: stage, role: 'kts', name: name, location: loc, type: type, client: client, cnuid: cnuid });
   window.open('board-editor.html?' + params.toString(), '_blank');
 };
 
