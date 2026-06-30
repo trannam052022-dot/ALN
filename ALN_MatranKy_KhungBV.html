@@ -521,7 +521,7 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
                   </div>
                 </div>
 
-                <!-- Cột ký -->
+                <!-- Cột ký — ĐÚNG cấu trúc đã duyệt (giống Tab 2) -->
                 <div class="title-col">
 
                   <div class="tc-aln">
@@ -530,10 +530,32 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
                     <div class="tc-aln-sub">App Làm Nhà Corp.</div>
                   </div>
 
+                  <div class="tc-gd">
+                    <div class="tc-h tc-h-gd">
+                      <div class="tc-h-role gd">Giám đốc</div>
+                      <div class="tc-h-name">Lý Mỹ Linh</div>
+                    </div>
+                    <div class="tc-ky-body">
+                      <div class="tc-sig-area gold"><span class="tc-sig-ph gold">Dấu &amp; Ký</span></div>
+                      <div class="tc-date">Ngày: ___/___/______</div>
+                    </div>
+                  </div>
+
+                  <div class="tc-cdt">
+                    <div class="tc-h tc-h-cdt">
+                      <div class="tc-h-role cdt">Chủ đầu tư</div>
+                      <div class="tc-h-name" id="rv-ct-name">—</div>
+                    </div>
+                    <div class="tc-ky-body">
+                      <div class="tc-sig-area"><span class="tc-sig-ph">Dấu &amp; Ký</span></div>
+                      <div class="tc-date">Ngày: ___/___/______</div>
+                    </div>
+                  </div>
+
                   <div class="tc-row ct">
                     <span class="tc-lbl">Công trình</span>
                     <div class="tc-val-wrap">
-                      <div class="tc-val-bv" id="rv-ct-name">—</div>
+                      <div class="tc-val-bv" id="rv-ct-proj">—</div>
                       <div class="tc-val-addr" id="rv-ct-addr"></div>
                     </div>
                   </div>
@@ -552,7 +574,6 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
                     <div class="tc-cell"><div class="tc-cell-lbl">Ngày</div><div class="tc-cell-val" id="rv-date-val">—</div></div>
                   </div>
 
-                  <!-- Ô ký KTS -->
                   <div class="sig" id="rv-sc-kts" onclick="rvSignCell('kts')" style="cursor:pointer" title="Click để ký">
                     <div class="sig-h">
                       <div class="sig-role">Kiến trúc sư</div>
@@ -564,7 +585,6 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
                     </div>
                   </div>
 
-                  <!-- Ô ký KS KC -->
                   <div class="sig" id="rv-sc-kc" onclick="rvSignCell('kc')" style="cursor:pointer" title="Click để ký">
                     <div class="sig-h">
                       <div class="sig-role">KS. Kết cấu</div>
@@ -576,7 +596,6 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
                     </div>
                   </div>
 
-                  <!-- Ô ký KS M&E -->
                   <div class="sig" id="rv-sc-me" onclick="rvSignCell('me')" style="cursor:pointer" title="Click để ký">
                     <div class="sig-h">
                       <div class="sig-role">KS. M&amp;E</div>
@@ -588,7 +607,6 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
                     </div>
                   </div>
 
-                  <!-- Ô ký Thẩm tra -->
                   <div class="sig-cn" id="rv-sc-cn" onclick="rvSignCell('cn')" style="cursor:pointer" title="Click để ký">
                     <div class="sig-cn-h">
                       <div class="sig-cn-role">Thẩm tra · Chủ nhiệm đồ án</div>
