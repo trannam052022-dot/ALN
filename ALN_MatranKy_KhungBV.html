@@ -865,14 +865,13 @@ function _rvRenderPdf(url, container) {
     return pdf.getPage(1);
   }).then(function(page) {
     var vp0 = page.getViewport({ scale: 1 });
-    var cw = container.clientWidth || 800;
-    var ch = container.clientHeight || 560;
-    var scale = Math.min(cw / vp0.width, ch / vp0.height) * 2;
+    var cw = container.clientWidth || 900;
+    var scale = (cw / vp0.width) * 2;   // fill width, overflow height bị clip
     var vp = page.getViewport({ scale: scale });
     var canvas = document.createElement('canvas');
     canvas.width = vp.width;
     canvas.height = vp.height;
-    canvas.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;display:block';
+    canvas.style.cssText = 'width:100%;height:auto;display:block';
     container.innerHTML = '';
     container.appendChild(canvas);
     page.render({ canvasContext: canvas.getContext('2d'), viewport: vp });
