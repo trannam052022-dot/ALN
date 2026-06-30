@@ -236,6 +236,8 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
 .rv-prog-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s}
 .rv-prog-txt{font-size:10px;color:var(--text3);font-family:'Oswald',sans-serif;white-space:nowrap}
 .rv-content{flex:1;overflow:hidden;padding:8px;display:flex;align-items:flex-start;justify-content:flex-start}
+.sig[data-pending]{outline:2.5px solid #c9a84c;background:rgba(201,168,76,.1)}
+.sig[data-pending] .sig-h::after{content:'↩ Nhấn lại để ký';font-size:8px;color:#c9a84c;margin-left:6px;font-family:'Oswald',sans-serif;letter-spacing:.04em}
 /* A3 sheet Tab 3: kích thước chuẩn, scale bằng JS _rvFitPaper() */
 #rv-viewer-area .bv-wrap{background:transparent;padding:0;border-radius:0;width:100%;overflow:visible;display:flex;justify-content:flex-start;align-items:flex-start}
 #rv-viewer-area .paper{flex-shrink:0;transform-origin:top left;width:1090px;height:770px;aspect-ratio:unset}
@@ -786,18 +788,20 @@ function _rvFitPaper() {
   var content = document.querySelector('#rv-viewer-area .rv-content');
   if (!paper || !content) return;
   var BASE_W = 1090, BASE_H = 770;
+  // Đo từ DOM thực tế, không dùng window.innerHeight cứng
+  var rvMain   = paper.closest('.rv-main');
+  var rvTopbar = rvMain && rvMain.querySelector('.rv-topbar');
   var availW = content.clientWidth - 16;
-  var availH = window.innerHeight - 148;
+  var availH = (rvMain ? rvMain.clientHeight : window.innerHeight - 96)
+             - (rvTopbar ? rvTopbar.offsetHeight : 44) - 16;
   if (availW <= 0 || availH <= 0) return;
   var scale = Math.min(availW / BASE_W, availH / BASE_H);
   paper.style.transform = 'scale(' + scale + ')';
   paper.style.transformOrigin = 'top left';
-  // transform không ảnh hưởng layout → bù margin âm để layout khớp visual size
   paper.style.marginRight  = (BASE_W * scale - BASE_W) + 'px';
   paper.style.marginBottom = (BASE_H * scale - BASE_H) + 'px';
-  content.style.height = 'auto';
 }
-window.addEventListener('resize', _rvFitPaper);
+window.addEventListener('resize', function() { requestAnimationFrame(_rvFitPaper); });
 
 function _rvRenderStrip() {
   var strip = document.getElementById('rv-strip');
@@ -917,6 +921,14 @@ function _rvHighlightMyCell() {
   });
 }
 
+var _rvPendingSign = null;
+function _rvClearPending() {
+  if (!_rvPendingSign) return;
+  clearTimeout(_rvPendingSign.timer);
+  var cell = document.getElementById('rv-sc-' + _rvPendingSign.key);
+  if (cell) cell.removeAttribute('data-pending');
+  _rvPendingSign = null;
+}
 function rvSignCell(key) {
   if (!_rvSigUrl) {
     document.getElementById('rv-no-sig-warn').className = 'rv-no-sig-warn show';
@@ -925,6 +937,18 @@ function rvSignCell(key) {
   var p = _rvPages[_rvCur];
   if (!p) return;
   if (p.sigs[key]) return; // đã ký rồi
+
+  // Bước 1: chưa pending → highlight + chờ click lần 2
+  if (!_rvPendingSign || _rvPendingSign.key !== key) {
+    _rvClearPending();
+    var cellEl = document.getElementById('rv-sc-' + key);
+    if (cellEl) cellEl.setAttribute('data-pending', '1');
+    _rvPendingSign = { key: key, timer: setTimeout(_rvClearPending, 4000) };
+    return;
+  }
+
+  // Bước 2: đã pending đúng key → xác nhận ký
+  _rvClearPending();
   var now = new Date();
   var d = now.getDate().toString().padStart(2,'0')+'/'+(now.getMonth()+1).toString().padStart(2,'0')+'/'+now.getFullYear();
   p.sigs[key] = { url: _rvSigUrl, name: _rvUserName, date: d };
