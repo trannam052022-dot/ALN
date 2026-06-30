@@ -882,6 +882,15 @@ function _rvRenderPdf(url, container) {
     container.innerHTML = '';
     container.appendChild(canvas);
     page.render({ canvasContext: canvas.getContext('2d'), viewport: vp });
+    // Sau khi layout tính xong, resize paper khớp đúng chiều cao canvas
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        var paper = container.closest('.paper');
+        if (!paper) return;
+        var h = canvas.offsetHeight;
+        if (h > 0) { paper.style.height = h + 'px'; paper.style.aspectRatio = 'unset'; }
+      });
+    });
   }).catch(function(err) {
     container.innerHTML = '<div class="draw-txt">Không đọc được PDF</div>';
   });
