@@ -786,21 +786,28 @@ function rvLoadFiles(input) {
 
 function _rvFitPaper() {
   var paper = document.querySelector('#rv-viewer-area .paper');
+  var wrap  = paper && paper.closest('.bv-wrap');
   var content = document.querySelector('#rv-viewer-area .rv-content');
-  if (!paper || !content) return;
+  if (!paper || !wrap || !content) return;
   var BASE_W = 1090, BASE_H = 770;
-  // Đo từ DOM thực tế, không dùng window.innerHeight cứng
   var rvMain   = paper.closest('.rv-main');
   var rvTopbar = rvMain && rvMain.querySelector('.rv-topbar');
   var availW = content.clientWidth - 16;
   var availH = (rvMain ? rvMain.clientHeight : window.innerHeight - 96)
              - (rvTopbar ? rvTopbar.offsetHeight : 44) - 16;
   if (availW <= 0 || availH <= 0) return;
-  var scale = Math.min(availW / BASE_W, availH / BASE_H, 1.0);
-  paper.style.transform = 'scale(' + scale + ')';
+  var scale  = Math.min(availW / BASE_W, availH / BASE_H, 1.0);
+  var visW   = Math.round(BASE_W * scale);
+  var visH   = Math.round(BASE_H * scale);
+  // bv-wrap = clip container với đúng kích thước hiển thị
+  wrap.style.width    = visW + 'px';
+  wrap.style.height   = visH + 'px';
+  wrap.style.overflow = 'hidden';
+  wrap.style.flexShrink = '0';
+  // paper scale từ góc trái trên, không dùng margin âm
+  paper.style.transform       = 'scale(' + scale + ')';
   paper.style.transformOrigin = 'top left';
-  paper.style.marginRight  = (BASE_W * scale - BASE_W) + 'px';
-  paper.style.marginBottom = (BASE_H * scale - BASE_H) + 'px';
+  paper.style.margin          = '0';
 }
 window.addEventListener('resize', function() { requestAnimationFrame(_rvFitPaper); });
 
@@ -1136,6 +1143,28 @@ window.rvSubmitToFirebase = async function(pages) {
         date: today,
         sigRecord: p.sigs,
         createdAt: serverTimestamp()
+      });
+      // Gửi ALNRealtime message để DN/CN nhận real-time
+      await addDoc(collection(db, 'messages'), {
+        type: 'KTS_DOC_UPLOAD',
+        projectId: _pid,
+        ktsName: _userName,
+        doc: {
+          id: 'D_' + Date.now() + '_' + i,
+          name: p.name,
+          folder: _stage,
+          kts: _userName,
+          date: today,
+          size: p.file ? (p.file.size ? (p.file.size/1024/1024).toFixed(1)+'MB' : '—') : '—',
+          type: p.name.match(/\.pdf$/i) ? 'pdf' : 'file',
+          status: 'pending',
+          isNew: true
+        },
+        _from: _uid,
+        _role: 'kts',
+        _uid: _uid,
+        ts: Date.now(),
+        _cid: 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2,8)
       });
       done++;
     } catch(e) { console.error('[rvSubmit]', p.name, e); }
