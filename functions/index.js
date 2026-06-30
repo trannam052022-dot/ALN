@@ -1045,6 +1045,332 @@ exports.scanC2Suspicion = functions
     return null;
   });
 
+/* ════════════════════════════════════════════════════════════════
+   MyMy Agent Loop — CN (B2C Chủ nhà) — tư vấn & chốt giá
+   ════════════════════════════════════════════════════════════════ */
+
+/* Giá demo — Founder ghi đè qua config/pricing_bands */
+const CN_DEMO_PRICING = {
+  "nha-pho":    { label:"Nhà phố",             floor:180000, mkt:220000, ceil:320000, minFee:18000000 },
+  "biet-thu":   { label:"Biệt thự",             floor:250000, mkt:320000, ceil:500000, minFee:30000000 },
+  "chung-cu":   { label:"Căn hộ / Chung cư",    floor:150000, mkt:180000, ceil:260000, minFee:12000000 },
+  "van-phong":  { label:"Văn phòng / Thương mại",floor:200000, mkt:240000, ceil:350000, minFee:20000000 },
+  "nha-vuon":   { label:"Nhà vườn / Nghỉ dưỡng",floor:220000, mkt:280000, ceil:420000, minFee:25000000 },
+};
+
+async function cnGetPricingBands(category) {
+  try {
+    const snap = await db.collection("config").doc("pricing_bands").get();
+    const data = snap.exists ? snap.data() : {};
+    const bands = Object.keys(data).length ? data : CN_DEMO_PRICING;
+    if (category && bands[category]) return { ok:true, band:bands[category], category };
+    return { ok:true, bands };
+  } catch(e) {
+    const bands = category ? { band:CN_DEMO_PRICING[category]||null } : { bands:CN_DEMO_PRICING };
+    return { ok:true, ...bands };
+  }
+}
+
+function cnComputeQuote(category, area, unitPrice) {
+  const demo = CN_DEMO_PRICING[category] || {};
+  const floor = demo.floor || 0;
+  const ceil  = demo.ceil  || Infinity;
+  const clampedUnit = Math.max(floor, Math.min(ceil, unitPrice));
+  const minFee = demo.minFee || 0;
+  const rawTotal = area * clampedUnit;
+  const total = Math.max(rawTotal, minFee);
+  const minFeeApplied = total > rawTotal;
+  return {
+    ok:true, unitPrice:clampedUnit, total,
+    breakdown:{ C1:Math.round(total*.10), C2:Math.round(total*.20), C3:Math.round(total*.60), C4:Math.round(total*.10) },
+    minFeeApplied, minFee,
+  };
+}
+
+function cnProposePrice(category, unitPrice, reason) {
+  const demo = CN_DEMO_PRICING[category] || {};
+  const floor = demo.floor || 0;
+  const ceil  = demo.ceil  || Infinity;
+  const mkt   = demo.mkt   || unitPrice;
+  const clamped = Math.max(floor, Math.min(ceil, unitPrice));
+  return {
+    ok:true, unitPrice:clamped,
+    clamped: clamped !== unitPrice,
+    vsMkt: Math.round((clamped - mkt) / mkt * 100),
+    vsFloor: Math.round((clamped - floor) / floor * 100),
+    vsCeil: Math.round((ceil - clamped) / ceil * 100),
+    reason,
+  };
+}
+
+const CN_MYMY_TOOLS = [
+  {
+    name:"get_pricing_bands",
+    description:"Lấy khung giá [Sàn, Tiếp thị, Trần] theo thể loại công trình. Gọi TRƯỚC khi báo bất kỳ con số giá nào. category tùy chọn: nha-pho | biet-thu | chung-cu | van-phong | nha-vuon",
+    input_schema:{type:"object",properties:{category:{type:"string"}},required:[]}
+  },
+  {
+    name:"compute_quote",
+    description:"Tính tổng báo giá từ thể loại + diện tích + đơn giá. unitPrice sẽ bị kẹp [Sàn, Trần] trong tool. Trả về total và 4 mốc C1-C4.",
+    input_schema:{type:"object",properties:{category:{type:"string"},area:{type:"number"},unitPrice:{type:"number"}},required:["category","area","unitPrice"]}
+  },
+  {
+    name:"propose_price",
+    description:"Đề xuất đơn giá và kiểm tra có trong khung hay không. Chỉ đề xuất — không ghi. Trả về vsMkt, vsFloor để biết khoảng cách so với Tiếp thị và Sàn.",
+    input_schema:{type:"object",properties:{category:{type:"string"},unitPrice:{type:"number"},reason:{type:"string"}},required:["category","unitPrice"]}
+  },
+  {
+    name:"ask_user",
+    description:"Hỏi khách hàng một thông tin. Mỗi lần hỏi một ý. chips là gợi ý nhanh (tùy chọn). Kết thúc lượt sau khi gọi.",
+    input_schema:{type:"object",properties:{question:{type:"string"},field:{type:"string"},hint:{type:"string"},chips:{type:"array",items:{type:"string"}}},required:["question"]}
+  },
+  {
+    name:"request_confirmation",
+    description:"BẮT BUỘC gọi trước khi submit. Hiển thị tóm tắt: thể loại / diện tích / đơn giá / tổng / 4 mốc. Nhớ thêm note: 'tổng cuối xác nhận sau KTS khảo sát'. Kết thúc lượt.",
+    input_schema:{type:"object",properties:{summary:{type:"string"},payload:{type:"object"}},required:["summary","payload"]}
+  },
+  {
+    name:"submit_matching_request",
+    description:"Ghi yêu cầu vào matchingRequests sau khi khách xác nhận. CHỈ gọi sau request_confirmation đã được xác nhận.",
+    input_schema:{type:"object",properties:{projectName:{type:"string"},projectType:{type:"string"},scope:{type:"string"},notes:{type:"string"},clientPhone:{type:"string"},pricingCategory:{type:"string"},unitPriceLocked:{type:"number"},quotedTotal:{type:"number"},area:{type:"number"}},required:["projectName","clientPhone","pricingCategory","unitPriceLocked","quotedTotal"]}
+  },
+];
+
+const CN_MYMY_ALLOWLIST = CN_MYMY_TOOLS.map(t => t.name);
+const CN_MYMY_WRITE_TOOLS = ["submit_matching_request"];
+
+function cnMymyBuildSystemPrompt(cnName, honorific) {
+  const addr = honorific ? honorific + " " + cnName.split(" ").pop() : (cnName || "bạn");
+  return `Em là MyMy — chuyên viên tư vấn Thiết kế & Xây dựng của ALN. 25 tuổi, người Sài Gòn, làm nghề này được 3 năm.
+
+Em hiểu nghề thật sự — từ phong cách tân cổ điển đến tối giản Nhật, từ quy trình xin phép xây dựng (NĐ 15/2021) đến cách đọc bản vẽ kỹ thuật. Khách hỏi về phong cách, diện tích, kết cấu hay escrow em đều có thể trao đổi được.
+
+TÍNH CÁCH:
+- Xưng "em", gọi khách "${addr}"
+- Giọng ấm, gọn, tự tin — không cần rào đón nhiều
+- Thỉnh thoảng dùng "hehe", "thật ra...", "ư..." khi phù hợp — tự nhiên thôi
+- KHÔNG dùng dấu **, gạch đầu dòng, đoạn văn dài, nhiều emoji
+- TUYỆT ĐỐI không nhận là AI hay chatbot
+- Không biết chắc → "để em kiểm tra lại rồi báo ${addr} ngay nha"
+
+NHIỆM VỤ CHÍNH — TƯ VẤN & CHỐT GIÁ:
+Thu thập theo thứ tự (hỏi từng ý một):
+1. Loại công trình (nhà phố / biệt thự / căn hộ / văn phòng / nhà vườn)
+2. Diện tích sàn dự kiến (m²)
+3. Phong cách mong muốn
+4. Ngân sách dự kiến
+5. Yêu cầu đặc biệt (hồ sơ xin phép, hoàn công, gấp...)
+6. SỐ ĐIỆN THOẠI — bắt buộc trước khi chốt
+
+SAU KHI ĐỦ THÔNG TIN → BÁO GIÁ:
+1. Gọi get_pricing_bands(category) lấy khung giá
+2. NEO GIÁ TRỊ TRƯỚC: nhắc quy trình C1–C4, tiền giữ trên sàn ALN, hồ sơ có dấu thẩm tra
+3. Chào ở giá Tiếp thị — tự tin, KHÔNG xin lỗi vì giá
+4. Gọi compute_quote để tính tổng
+5. Trình bày: "đơn giá X đ/m² × Ym² = tổng khoảng Z triệu, chia 4 mốc 10/20/60/10"
+
+KHI BỊ CHÊ ĐẮT — KHÔNG GIẢM NGAY:
+1. Tái khẳng định giá trị (trách nhiệm pháp lý, KTS thẩm định, an toàn thanh toán)
+2. Hỏi ngân sách thật của khách
+3. Nếu cần nhượng: đổi lấy điều gì đó (ký sớm / bỏ bớt hạng mục) — propose_price trước khi đề xuất
+4. TỐI ĐA 2 lần nhượng. Chạm Sàn → "đây là mức tốt nhất em có thể xin được"
+5. Giá luôn trong [Sàn, Trần] — không phá Sàn dù khách nài
+
+TRƯỚC KHI CHỐT:
+- Bắt buộc có số điện thoại
+- Gọi request_confirmation: tóm tắt thể loại / diện tích / đơn giá / tổng / 4 mốc / ghi chú "tổng cuối xác nhận sau KTS khảo sát"
+- Chờ khách Xác nhận → submit_matching_request
+
+GIỚI HẠN:
+- Không hứa kết cấu / vật liệu / thời gian thi công cụ thể — đó là việc KTS sau khảo sát
+- Giữ mọi trao đổi trong chat ALN
+- Luôn kết bằng một bước tiếp theo cụ thể
+
+Nói chuyện như người thật đang nhắn tin — gọn, tự tin, ấm. Nếu cuộc hội thoại đang diễn ra thì không cần chào lại.`;
+}
+
+async function cnMymySaveMessage(cnUid, role, text) {
+  await db.collection("mymy_cn_sessions").doc(cnUid).collection("messages").add({
+    role, text, createdAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+exports.runMyMyTurnCN = onCall(
+  { region:"asia-southeast1", secrets:[ANTHROPIC_KEY] },
+  async (request) => {
+    if (!request.auth) throw new HttpsError("unauthenticated","Chưa đăng nhập");
+    const cnUid = request.auth.uid;
+    const { userMessage, confirmAction, cnName, honorific } = request.data || {};
+
+    const sessionRef = db.collection("mymy_cn_sessions").doc(cnUid);
+    const sessionSnap = await sessionRef.get();
+    let state = sessionSnap.exists ? sessionSnap.data() : {
+      cn_id:cnUid, concession_count:0, client_phone:null,
+      pricing_phase:"tiep_thi", current_quote_draft:null,
+      pending_confirmation:null, iteration_count:0,
+    };
+
+    /* ── Xác nhận / Huỷ ── */
+    if (confirmAction === true && state.pending_confirmation) {
+      const pc = state.pending_confirmation;
+      const p = pc.payload || {};
+      let replyText, result;
+      try {
+        const userSnap = await db.collection("users").doc(cnUid).get();
+        const user = userSnap.exists ? userSnap.data() : {};
+        const docRef = await db.collection("matchingRequests").add({
+          cnId:           cnUid,
+          cnName:         user.name || cnName || "",
+          projectName:    p.projectName || "",
+          projectType:    p.pricingCategory || p.projectType || "",
+          scope:          p.scope || "",
+          notes:          p.notes || "",
+          clientPhone:    p.clientPhone || "",
+          areaSqm:        p.area || "",
+          pricingCategory:p.pricingCategory || "",
+          unitPriceLocked:p.unitPriceLocked || 0,
+          quotedTotal:    p.quotedTotal || 0,
+          priceStatus:    "chot",
+          status:         "pending_founder",
+          created_via:    "mymy_cn",
+          createdAt:      admin.firestore.FieldValue.serverTimestamp(),
+        });
+        await notifyFounder(
+          "🏠 Chủ nhà chốt giá qua MyMy",
+          `${user.name||"CN"} — ${p.projectName||""} — ${(p.quotedTotal/1000000).toFixed(0)}tr`,
+          { type:"NEW_PROJECT_REQUEST_CN", projectId:docRef.id }
+        );
+        replyText = `Đã gửi yêu cầu thành công rồi ạ 🎉 Founder ALN sẽ ghép KTS phù hợp cho ${honorific ? honorific + " " + (cnName||"").split(" ").pop() : "bạn"} trong vòng 24–48 giờ. ${honorific ? honorific.charAt(0).toUpperCase() + honorific.slice(1) : "Bạn"} theo dõi trạng thái trên trang này nhé!`;
+        result = { ok:true };
+      } catch(e) {
+        console.error("[runMyMyTurnCN] submit error:", e);
+        replyText = "Xin lỗi, có lỗi khi gửi yêu cầu. " + (e.message||"") + " Bạn thử lại sau được không ạ?";
+        result = { ok:false };
+      }
+      state.pending_confirmation = null;
+      await cnMymySaveMessage(cnUid,"assistant",replyText);
+      await sessionRef.set({ ...state, updated_at:admin.firestore.FieldValue.serverTimestamp() },{ merge:true });
+      return { reply:replyText, pending_confirmation:null };
+    }
+
+    if (confirmAction === false) {
+      state.pending_confirmation = null;
+      const cancelReply = "Được rồi ạ, mình xem lại nhé. Bạn muốn chỉnh thông tin nào?";
+      await cnMymySaveMessage(cnUid,"assistant",cancelReply);
+      await sessionRef.set({ ...state, pending_confirmation:null, updated_at:admin.firestore.FieldValue.serverTimestamp() },{ merge:true });
+      return { reply:cancelReply, pending_confirmation:null };
+    }
+
+    /* ── Tin nhắn thường ── */
+    // userMessage có thể null khi mở phiên lần đầu (greet) — chỉ throw nếu session đã có và gửi tin trống
+    if (!userMessage && sessionSnap.exists && !confirmAction && confirmAction !== false) {
+      // existing session, no message, no confirm action → lấy lịch sử và tiếp tục
+    }
+
+    if (userMessage && String(userMessage).trim()) await cnMymySaveMessage(cnUid,"user",userMessage);
+    state.iteration_count = 0;
+
+    /* Load recent messages */
+    const msgsSnap = await db.collection("mymy_cn_sessions").doc(cnUid)
+      .collection("messages").orderBy("createdAt","desc").limit(20).get();
+    const apiMessages = msgsSnap.docs.reverse().map(d => {
+      const m = d.data();
+      return { role:m.role, content:m.text||"" };
+    }).filter(m => m.role==="user"||m.role==="assistant");
+
+    if (!apiMessages.length && !userMessage) {
+      apiMessages.push({ role:"user", content:"[Bắt đầu phiên]" });
+    }
+
+    const systemPrompt = cnMymyBuildSystemPrompt(cnName||"", honorific||"");
+    const apiKey = ANTHROPIC_KEY.value();
+
+    let finalReply = null;
+    let chips = [];
+    let pendingConfirmation = null;
+
+    const MAX_ITER = 8;
+    while (state.iteration_count < MAX_ITER) {
+      const resp = await fetch("https://api.anthropic.com/v1/messages", {
+        method:"POST",
+        headers:{ "x-api-key":apiKey, "anthropic-version":"2023-06-01", "content-type":"application/json" },
+        body:JSON.stringify({
+          model:"claude-sonnet-4-6",
+          max_tokens:1024,
+          system:systemPrompt,
+          messages:apiMessages,
+          tools:CN_MYMY_TOOLS,
+        }),
+      });
+      if (!resp.ok) {
+        const err = await resp.text();
+        console.error("[runMyMyTurnCN] Claude error:", err);
+        throw new HttpsError("internal","Lỗi kết nối AI");
+      }
+      const claudeData = await resp.json();
+      const content = claudeData.content || [];
+      const toolUseBlocks = content.filter(b => b.type==="tool_use");
+      const textBlocks    = content.filter(b => b.type==="text");
+
+      if (!toolUseBlocks.length) {
+        finalReply = textBlocks.map(b => b.text).join("\n");
+        break;
+      }
+
+      apiMessages.push({ role:"assistant", content });
+      const toolResults = [];
+      let breakLoop = false;
+
+      for (const tu of toolUseBlocks) {
+        const tName  = tu.name;
+        const tInput = tu.input || {};
+
+        if (!CN_MYMY_ALLOWLIST.includes(tName)) {
+          toolResults.push({ type:"tool_result", tool_use_id:tu.id, content:JSON.stringify({ ok:false, error:"not-allowed" }) });
+          continue;
+        }
+
+        if (CN_MYMY_WRITE_TOOLS.includes(tName)) {
+          toolResults.push({ type:"tool_result", tool_use_id:tu.id, content:JSON.stringify({ ok:false, error:"Cần gọi request_confirmation trước." }) });
+          continue;
+        }
+
+        if (tName === "ask_user") {
+          finalReply = tInput.question;
+          chips = tInput.chips || [];
+          breakLoop = true; break;
+        }
+        if (tName === "request_confirmation") {
+          pendingConfirmation = { summary:tInput.summary, payload:tInput.payload||{} };
+          breakLoop = true; break;
+        }
+
+        let res;
+        if      (tName==="get_pricing_bands") res = await cnGetPricingBands(tInput.category);
+        else if (tName==="compute_quote")     res = cnComputeQuote(tInput.category, tInput.area, tInput.unitPrice);
+        else if (tName==="propose_price")     res = cnProposePrice(tInput.category, tInput.unitPrice, tInput.reason);
+        else res = { ok:false, error:"unknown" };
+
+        toolResults.push({ type:"tool_result", tool_use_id:tu.id, content:JSON.stringify(res) });
+      }
+
+      if (breakLoop) break;
+      if (toolResults.length) apiMessages.push({ role:"user", content:toolResults });
+      state.iteration_count++;
+    }
+
+    if (state.iteration_count >= MAX_ITER && !finalReply && !pendingConfirmation) {
+      finalReply = "Để em chuyển vấn đề này cho bộ phận phụ trách xử lý ạ. ALN sẽ liên hệ lại sớm nhé! 🙏";
+    }
+
+    if (pendingConfirmation) state.pending_confirmation = pendingConfirmation;
+    await sessionRef.set({ ...state, updated_at:admin.firestore.FieldValue.serverTimestamp() },{ merge:true });
+    if (finalReply) await cnMymySaveMessage(cnUid,"assistant",finalReply);
+
+    return { reply:finalReply||null, chips, pending_confirmation:pendingConfirmation||null };
+  }
+);
+
 /* ── Founder tạo user mới (CN/KTS/DN) không cần tự đăng ký ── */
 exports.createUserByFounder = onCall(
   { region: "asia-southeast1" },
