@@ -600,14 +600,10 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     </div>
     <div class="topbar-right">
       <div class="topbar-date" id="ktsTopbarClock">05/06/2026 · 09:42</div>
-      <div class="notif-btn" onclick="toggleNotif()"><i class="ph-duotone ph-bell"></i><div class="notif-dot"></div></div>
+      <div class="notif-btn" onclick="toggleNotif()"><i class="ph-duotone ph-bell"></i><div class="notif-dot" id="notifDot" style="display:none"></div></div>
       <div id="notifPanel" style="display:none;position:fixed;top:56px;right:8px;width:min(300px,calc(100vw - 16px));background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:12px;box-shadow:var(--sh-lg);z-index:50;max-height:70vh;overflow-y:auto">
-        <div style="font-family:var(--serif);font-weight:600;font-style:italic;font-size:14px;color:var(--text);margin-bottom:8px">Thông báo mới</div>
-        <div class="notif-list">
-          <div class="notif-item ni-red"><div class="ni-icon"><i class="ph-duotone ph-clock-countdown"></i></div><div><div class="ni-text"><b>SLA cảnh báo</b> — Chủ nhà Nguyễn Văn A vừa gửi yêu cầu sửa C2 lần 2. Bạn có 48h!</div><div class="ni-time">5 phút trước</div></div></div>
-          <div class="notif-item ni-amber"><div class="ni-icon"><i class="ph-duotone ph-lock"></i></div><div><div class="ni-text"><b>Ví tạm ứng</b> — 1,920,000đ đã được ghi nhận (40% C2). Chờ CN duyệt để mở khóa.</div><div class="ni-time">12 phút trước</div></div></div>
-          <div class="notif-item ni-green"><div class="ni-icon"><i class="ph-duotone ph-money"></i></div><div><div class="ni-text"><b>Giải ngân C1</b> — +1,878,220đ đã về ví chính.</div><div class="ni-time">2 ngày trước</div></div></div>
-        </div>
+        <div style="font-family:var(--serif);font-weight:600;font-style:italic;font-size:14px;color:var(--text);margin-bottom:8px">Thông báo</div>
+        <div class="notif-list" id="notifList"><div style="font-size:12px;color:var(--muted);text-align:center;padding:14px 0">Chưa có thông báo</div></div>
       </div>
       <div style="font-size:10px;font-weight:700;background:var(--green-bg);color:var(--green);border:1px solid rgba(34,201,122,.3);padding:3px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0"><i class="ph-duotone ph-circle" style="font-size:6px;margin-right:3px"></i>Online</div>
     </div>
@@ -2022,9 +2018,29 @@ function confirmWithdraw() {
   showToast('🏦 Yêu cầu rút tiền đã gửi! OTP sẽ được gửi về SĐT đăng ký.', 't-green');
 }
 
+var _DES_NOTIFS = [];
+function _addNotif(icon, body, projId) {
+  _DES_NOTIFS.unshift({ icon, body, projId, ts: 'Vừa xong', unread: true });
+  var dot = document.getElementById('notifDot');
+  if (dot) dot.style.display = 'block';
+  var list = document.getElementById('notifList');
+  if (list) list.innerHTML = _DES_NOTIFS.map(function(n) {
+    return '<div class="notif-item' + (n.unread ? ' ni-amber' : '') + '">'
+      + '<div class="ni-icon">' + n.icon + '</div>'
+      + '<div><div class="ni-text">' + n.body + '</div><div class="ni-time">' + n.ts + '</div></div></div>';
+  }).join('');
+}
 function toggleNotif() {
   const p = document.getElementById('notifPanel');
-  p.style.display = p.style.display==='none' ? '' : 'none';
+  const show = p.style.display === 'none';
+  p.style.display = show ? '' : 'none';
+  if (show) {
+    _DES_NOTIFS.forEach(function(n){ n.unread = false; });
+    var dot = document.getElementById('notifDot');
+    if (dot) dot.style.display = 'none';
+    var list = document.getElementById('notifList');
+    if (list && _DES_NOTIFS.length === 0) list.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:14px 0">Chưa có thông báo</div>';
+  }
 }
 document.addEventListener('click', e => {
   if(!e.target.closest('.notif-btn') && !e.target.closest('#notifPanel'))
@@ -2067,9 +2083,10 @@ ALNRealtime.init({
     document.getElementById('chatStatusTxt').textContent = mode;
   },
   onMessage: (d) => {
+    const _isReplay = !!d._replay;
     // Tranh chấp
     if(d.type==='DISPUTE_OPENED' && d.projectId===(window.DES_PROJECT_ID||'')) {
-      showToast('⚠️ Chủ nhà đã mở tranh chấp C3 — dòng tiền bị đóng băng!', 't-red');
+      if(!_isReplay){ showToast('⚠️ Chủ nhà đã mở tranh chấp C3 — dòng tiền bị đóng băng!', 't-red'); _addNotif('<i class="ph-duotone ph-warning"></i>','<b>Tranh chấp</b> — Chủ nhà mở tranh chấp. Dòng tiền bị đóng băng!', d.projectId); }
       try{document.getElementById('lockedWallet').style.borderColor='var(--red)';}catch(e){}
       try{document.getElementById('lockedAmount').style.color='var(--red)';}catch(e){}
     }
@@ -2100,7 +2117,7 @@ ALNRealtime.init({
     // DN gửi tài liệu cho Designer
     if(d.type==='DN_FILE_UPLOADED' && Array.isArray(d.audience) && d.audience.includes('designer')) {
       const _dnMsg = `📁 ${d.senderName||'Doanh nghiệp'} gửi ${d.count||1} tài liệu — dự án ${d.projectId||''} · Xem: Bảng Review → Tài liệu`;
-      showToast(_dnMsg, 't-blue');
+      if(!_isReplay){ showToast(_dnMsg, 't-blue'); _addNotif('<i class="ph-duotone ph-folder"></i>',`<b>${d.senderName||'DN'}</b> gửi ${d.count||1} tài liệu`,d.projectId); }
       _alnReceive({ text: _dnMsg, senderName: d.senderName||'Doanh nghiệp', _role:'dn', ts: Date.now(), _replay: d._replay });
       if(!d._replay && typeof window._alnWatchDocs === 'function') {
         window._alnWatchDocs(d.projectId);
@@ -2112,7 +2129,7 @@ ALNRealtime.init({
     // CN gửi tài liệu cho Designer
     if(d.type==='CN_FILE_UPLOADED' && Array.isArray(d.audience) && d.audience.includes('designer')) {
       const _cnMsg = `📁 ${d.senderName||'Chủ nhà'} gửi ${d.count||1} tài liệu — dự án ${d.projectId||''} · Xem: Bảng Review → Tài liệu`;
-      showToast(_cnMsg, 't-blue');
+      if(!_isReplay){ showToast(_cnMsg, 't-blue'); _addNotif('<i class="ph-duotone ph-folder"></i>',`<b>${d.senderName||'Chủ nhà'}</b> gửi ${d.count||1} tài liệu`,d.projectId); }
       _alnReceive({ text: _cnMsg, senderName: d.senderName||'Chủ nhà', _role:'cn', ts: Date.now(), _replay: d._replay });
       if(!d._replay && typeof window._alnWatchDocs === 'function') {
         window._alnWatchDocs(d.projectId);
@@ -2122,12 +2139,14 @@ ALNRealtime.init({
       }
     }
     // Rating nhận được
-    if(d.type==='DESIGNER_RATED') {
+    if(d.type==='DESIGNER_RATED' && !_isReplay) {
       showToast(`⭐ Bạn nhận được đánh giá ${d.score}/5 sao cho Chặng ${d.stage} — ${d.projName}`, 't-green');
+      _addNotif('⭐',`<b>${d.projName}</b>: Chặng ${d.stage} được đánh giá ${d.score}/5 sao`,d.projectId);
     }
     // Stage approved
-    if(d.type==='STAGE_APPROVED') {
+    if(d.type==='STAGE_APPROVED' && !_isReplay) {
       showToast(`✅ Chặng ${d.stage} đã được phê duyệt — giải ngân đang xử lý`, 't-green');
+      _addNotif('<i class="ph-duotone ph-check-circle"></i>',`<b>Giải ngân Chặng ${d.stage}</b> được duyệt — đang xử lý`,d.projectId);
       try {
         var _sMsg = '✅ Chủ nhà DUYỆT Chặng ' + (d.stage||'') + ' — dự án ' + (d.projName||d.projectId||'') + '. Giải ngân đang xử lý.';
         alnThreads.cn.push({ mine:false, text:_sMsg, senderName:'Hệ thống ALN', ts:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}) });
