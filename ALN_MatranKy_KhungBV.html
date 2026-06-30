@@ -799,15 +799,20 @@ function _rvFitPaper() {
   var scale  = Math.min(availW / BASE_W, availH / BASE_H, 1.0);
   var visW   = Math.round(BASE_W * scale);
   var visH   = Math.round(BASE_H * scale);
+  // paper phải đúng BASE_W×BASE_H trước khi scale (override inline style)
+  paper.style.width  = BASE_W + 'px';
+  paper.style.height = BASE_H + 'px';
+  paper.style.maxWidth = 'none';
+  paper.style.flexShrink = '0';
+  paper.style.transform       = 'scale(' + scale + ')';
+  paper.style.transformOrigin = 'top left';
+  paper.style.margin          = '0';
   // bv-wrap = clip container với đúng kích thước hiển thị
   wrap.style.width    = visW + 'px';
   wrap.style.height   = visH + 'px';
   wrap.style.overflow = 'hidden';
   wrap.style.flexShrink = '0';
-  // paper scale từ góc trái trên, không dùng margin âm
-  paper.style.transform       = 'scale(' + scale + ')';
-  paper.style.transformOrigin = 'top left';
-  paper.style.margin          = '0';
+  wrap.style.display  = 'block';
 }
 window.addEventListener('resize', function() { requestAnimationFrame(_rvFitPaper); });
 
