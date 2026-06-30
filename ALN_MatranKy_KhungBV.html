@@ -774,8 +774,9 @@ function rvLoadFiles(input) {
   if (!files.length) return;
   var existing = _rvPages.length;
   files.forEach(function(f) {
-    _rvPages.push({ name: f.name, url: URL.createObjectURL(f), type: f.type, sigs: {} });
+    _rvPages.push({ name: f.name, url: URL.createObjectURL(f), type: f.type, file: f, sigs: {} });
   });
+  window._rvPages = _rvPages;
   document.getElementById('rv-upload-area').style.display = 'none';
   document.getElementById('rv-viewer-area').style.display = 'block';
   _rvRenderStrip();
@@ -947,6 +948,16 @@ function rvSignCell(key) {
     return;
   }
 
+  // Nếu đã ký → hỏi thu hồi
+  if (p.sigs[key]) {
+    var LABEL = {kts:'Kiến trúc sư', kc:'KS. Kết cấu', me:'KS. M&E', cn:'Chủ đầu tư'};
+    if (window.confirm('Thu hồi chữ ký tại ô "' + (LABEL[key]||key) + '"?')) {
+      delete p.sigs[key];
+      rvGoto(_rvCur);
+    }
+    return;
+  }
+
   // Bước 2: đã pending đúng key → xác nhận ký
   _rvClearPending();
   var now = new Date();
@@ -982,7 +993,14 @@ function _rvUpdateProgress() {
 function rvSubmitAll() {
   if (window.doSign) window.doSign(_rvRole==='founder'?'cn':'kts');
   var t = document.getElementById('rv-submit-btn');
-  if (t) { t.textContent = '✓ ĐÃ NỘP'; t.style.background='#16a34a'; t.disabled=true; }
+  if (t) { t.textContent = '⏳ Đang gửi...'; t.disabled=true; }
+  if (window.rvSubmitToFirebase) {
+    window.rvSubmitToFirebase(_rvPages).then(function(ok) {
+      if (t) { t.textContent = ok ? '✓ ĐÃ GỬI DN' : '⚠ Lỗi — thử lại'; t.style.background = ok ? '#16a34a' : '#dc2626'; t.disabled = ok; }
+    });
+  } else {
+    if (t) { t.textContent = '✓ ĐÃ NỘP'; t.style.background='#16a34a'; }
+  }
 }
 
 // Phím tắt ← →
@@ -1027,7 +1045,8 @@ document.addEventListener('keydown', function(e) {
 </script>
 
 <script type="module">
-import { auth, db, onAuthStateChanged, doc, getDoc, setDoc, serverTimestamp }
+import { auth, db, onAuthStateChanged, doc, getDoc, setDoc, serverTimestamp,
+         addDoc, collection, storage, storageRef, uploadBytes, getDownloadURL }
   from './firebase-config.js';
 
 var _uid = null, _role = null, _sigUrl = null, _userName = null;
@@ -1093,6 +1112,36 @@ function _applySig(key, url, name, dateStr) {
   var btn = document.getElementById('btn-sign-' + key);
   if (btn) btn.style.display = 'none';
 }
+
+window.rvSubmitToFirebase = async function(pages) {
+  if (!_pid || !_uid) return false;
+  var today = new Date().toLocaleDateString('vi-VN');
+  var done = 0;
+  for (var i = 0; i < pages.length; i++) {
+    var p = pages[i];
+    try {
+      var url = p.url;
+      if (p.file) {
+        var ref = storageRef(storage, 'projects/' + _pid + '/stage-signed/' + _stage + '/' + Date.now() + '_' + p.name);
+        await uploadBytes(ref, p.file);
+        url = await getDownloadURL(ref);
+      }
+      await addDoc(collection(db, 'projects', _pid, 'documents'), {
+        name: p.name,
+        folder: _stage,
+        label: p.name.replace(/\.[^.]+$/, ''),
+        url: url,
+        stage: _stage,
+        uploader: { uid: _uid, name: _userName, role: 'kts' },
+        date: today,
+        sigRecord: p.sigs,
+        createdAt: serverTimestamp()
+      });
+      done++;
+    } catch(e) { console.error('[rvSubmit]', p.name, e); }
+  }
+  return done > 0;
+};
 
 window.doSign = async function(key) {
   if (!_sigUrl) {
