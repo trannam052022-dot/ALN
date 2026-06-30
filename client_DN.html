@@ -2674,107 +2674,81 @@ ALNRealtime.init({
   userId: DN_USER.userId || 'dn.applamnha',
   onReady: (mode) => { console.log('ALN Realtime (DN):', mode); },
   onMessage: (d) => {
-    // KTS upload bản vẽ
+    const _isReplay = !!d._replay;
+
     if(d.type==='KTS_DOC_UPLOAD' && d.doc){
       if(!DOCS[d.projectId]) DOCS[d.projectId]=[];
-      const newDoc={...d.doc, isNew:true, kts:d.ktsName||d.doc.kts||'KTS'};
-      DOCS[d.projectId].unshift(newDoc);
-      _addNotif('📁', `<b>${d.ktsName||'KTS'}</b> vừa upload <b>${d.doc.name}</b>`, d.projectId);
+      DOCS[d.projectId].unshift({...d.doc, isNew:!_isReplay, kts:d.ktsName||d.doc.kts||'KTS'});
+      if(!_isReplay){
+        _addNotif('📁',`<b>${d.ktsName||'KTS'}</b> vừa upload <b>${d.doc.name}</b>`,d.projectId);
+        showToast(`📁 File mới từ KTS: ${d.doc.name}`,'t-green');
+      }
       renderSidebar();
       if(window.activeProj===d.projectId) renderMain();
-      showToast(`📁 File mới từ KTS: ${d.doc.name}`, 't-green');
     }
 
-    // KTS nộp C3
-    if(d.type==='KTS_C3_SUBMITTED'){
-      _addNotif('📋', `<b>${d.ktsName}</b> vừa nộp Hồ sơ C3 (${d.fileCount} file)`, d.projectId);
-      showToast(`📋 ${d.ktsName} đã nộp Hồ sơ C3!`, 't-amber');
+    if(d.type==='KTS_C3_SUBMITTED' && !_isReplay){
+      _addNotif('📋',`<b>${d.ktsName}</b> vừa nộp Hồ sơ C3 (${d.fileCount} file)`,d.projectId);
+      showToast(`📋 ${d.ktsName} đã nộp Hồ sơ C3!`,'t-amber');
     }
 
-    // KTS gửi phương án ảnh → hiện trong chuông thông báo + chat (nếu live)
-    if(d.type==='PROPOSAL_SENT' && Array.isArray(d.audience) && d.audience.includes('dn')) {
-      const _pCid = d._cid || (d.projectId + '_' + d.stage + '_' + (d.count||0));
-      if(!window._dnSeenProposalNotifs) window._dnSeenProposalNotifs = new Set();
-      if(!window._dnSeenProposalNotifs.has(_pCid)){
-        window._dnSeenProposalNotifs.add(_pCid);
-        _addNotif('<i class="ph-duotone ph-image"></i>', `<b>${d.senderName||'KTS'}</b> vừa gửi ${d.count||1} phương án chặng <b>${d.stage||''}</b> — Bấm để xem`, d.projectId||window.activeProj, 'rv');
-        renderNotifs();
-      }
-      if(!d._replay) {
-        const _pMsg = d.text || ('KTS vừa gửi phương án chặng ' + (d.stage||'') + '. Xem trong trang dự án.');
-        _alnReceive({ text:_pMsg, senderName:d.senderName||'KTS', _role:'kts', ts:Date.now() });
-        showToast('KTS ' + (d.senderName||'') + ' vừa gửi phương án chặng ' + (d.stage||''), 't-green');
+    if(d.type==='PROPOSAL_SENT' && Array.isArray(d.audience) && d.audience.includes('dn')){
+      if(!_isReplay){
+        const _pCid = d._cid||(d.projectId+'_'+d.stage+'_'+(d.count||0));
+        if(!window._dnSeenProposalNotifs) window._dnSeenProposalNotifs = new Set();
+        if(!window._dnSeenProposalNotifs.has(_pCid)){
+          window._dnSeenProposalNotifs.add(_pCid);
+          _addNotif('<i class="ph-duotone ph-image"></i>',`<b>${d.senderName||'KTS'}</b> vừa gửi ${d.count||1} phương án chặng <b>${d.stage||''}</b> — Bấm để xem`,d.projectId||window.activeProj,'rv');
+        }
+        _alnReceive({text:d.text||('KTS vừa gửi phương án chặng '+(d.stage||'')),senderName:d.senderName||'KTS',_role:'kts',ts:Date.now()});
+        showToast('KTS '+(d.senderName||'')+' vừa gửi phương án chặng '+(d.stage||''),'t-green');
       }
     }
 
-    // Nhận chat từ KTS hoặc CN
-    if(d.type==='ALN_CHAT' && d._role !== 'dn' && Array.isArray(d.audience) && d.audience.includes('dn')) {
-      const projId = d.projectId || window.activeProj;
-      // Kênh thống nhất -> hộp nổi + đồng bộ luồng chat dự án
+    if(d.type==='ALN_CHAT' && !_isReplay && d._role!=='dn' && Array.isArray(d.audience) && d.audience.includes('dn')){
+      const projId=d.projectId||window.activeProj;
       _alnReceive(d);
-      if(!_dnChatMsgs[projId]) _dnChatMsgs[projId] = [];
-      _dnChatMsgs[projId].push({ from: d._role, text: d.text, senderName: d.senderName, ts: d.ts || Date.now(), mine: false });
+      if(!_dnChatMsgs[projId]) _dnChatMsgs[projId]=[];
+      _dnChatMsgs[projId].push({from:d._role,text:d.text,senderName:d.senderName,ts:d.ts||Date.now(),mine:false});
       _dnRenderChat(projId);
     }
 
-    // DOC_UPLOADED admin
     if(d.type==='DOC_UPLOADED' && d.doc){
       if(!DOCS[d.projectId]) DOCS[d.projectId]=[];
-      const folder = d.doc.folder || 'kien_truc';
-      const newDoc={id:d.doc.id||('DA'+Date.now()),name:d.doc.name,folder,
+      DOCS[d.projectId].unshift({id:d.doc.id||('DA'+Date.now()),name:d.doc.name,folder:d.doc.folder||'kien_truc',
         kts:d.doc.kts||'Admin',date:d.doc.date||new Date().toISOString().slice(0,10),
-        size:d.doc.size||'—',type:d.doc.type||'pdf',status:'pending',isNew:true};
-      DOCS[d.projectId].unshift(newDoc);
-      _addNotif('📁', `<b>Admin</b> đã đăng tải <b>${d.doc.name}</b>`, d.projectId);
+        size:d.doc.size||'—',type:d.doc.type||'pdf',status:'pending',isNew:!_isReplay});
+      if(!_isReplay){
+        _addNotif('📁',`<b>Admin</b> đã đăng tải <b>${d.doc.name}</b>`,d.projectId);
+        showToast(`📁 Tài liệu mới: ${d.doc.name}`,'t-green');
+      }
       renderSidebar();
       if(window.activeProj===d.projectId) renderMain();
-      showToast(`📁 Tài liệu mới: ${d.doc.name}`, 't-green');
     }
 
-    if(d.type==='STAGE_APPROVED'){
+    if(d.type==='STAGE_APPROVED' && !_isReplay){
       const p=window.PROJECTS_CLIENT.find(x=>x.id===d.projectId);
-      if(p){ _addNotif('✅',`<b>Giải ngân ${d.stage||''}</b> được duyệt — ${p.name}`,d.projectId); }
+      if(p) _addNotif('✅',`<b>Giải ngân ${d.stage||''}</b> được duyệt — ${p.name}`,d.projectId);
       showToast(`✅ Chặng ${d.stage||''} đã được duyệt giải ngân`,'t-green');
     }
-    if(d.type==='DISPUTE_OPENED'){
+    if(d.type==='DISPUTE_OPENED' && !_isReplay){
       const p=window.PROJECTS_CLIENT.find(x=>x.id===d.projectId);
-      if(p){ _addNotif('⚠️',`<b>Tranh chấp kích hoạt</b> — ${p.name}`,d.projectId); }
+      if(p) _addNotif('⚠️',`<b>Tranh chấp kích hoạt</b> — ${p.name}`,d.projectId);
       showToast(`⚠️ Tranh chấp mở: ${d.projectId}`,'t-amber');
     }
-
-    // Rating
-    if(d.type==='KTS_RATED'){
-      _addNotif('⭐',`<b>${d.projName}</b>: Chặng ${d.stage} được đánh giá ${d.score}/5 sao`, d.projectId);
+    if(d.type==='KTS_RATED' && !_isReplay){
+      _addNotif('⭐',`<b>${d.projName}</b>: Chặng ${d.stage} được đánh giá ${d.score}/5 sao`,d.projectId);
     }
-
-    // Founder đã ghép cặp thành công (ALN_SPEC_DN_EXTENSION Mục 8)
-    if(d.type==='MATCH_CONFIRMED'){
-      _addNotif(
-        '<i class="ph-duotone ph-handshake"></i>',
-        `Founder đã ghép <b>${d.ktsName||'KTS'}</b> cho dự án <b>${d.projectName||d.projectId}</b>`,
-        d.projectId
-      );
-      showToast(`✅ KTS ${d.ktsName||''} đã được ghép cặp!`, 't-green');
-      // Cập nhật UI từ pending_founder → active
-      updateProjectStatus(d.projectId, 'active', d.ktsId, d.ktsName);
+    if(d.type==='MATCH_CONFIRMED' && !_isReplay){
+      _addNotif('<i class="ph-duotone ph-handshake"></i>',`Founder đã ghép <b>${d.ktsName||'KTS'}</b> cho dự án <b>${d.projectName||d.projectId}</b>`,d.projectId);
+      showToast(`✅ KTS ${d.ktsName||''} đã được ghép cặp!`,'t-green');
+      updateProjectStatus(d.projectId,'active',d.ktsId,d.ktsName);
     }
-
-    // Express timeout — không tìm được KTS trong 4h (ALN_SPEC_DN_EXTENSION Mục 8)
-    if(d.type==='EXPRESS_TIMEOUT'){
-      _addNotif(
-        '<i class="ph-duotone ph-warning"></i>',
-        `Dự án Gấp <b>${d.projectName||d.projectId}</b> không ghép được KTS trong 4h — phí ưu tiên sẽ được hoàn`,
-        d.projectId
-      );
-      showToast(`⚠️ Dự án Gấp chuyển về Bình thường`, 't-amber');
-      // Hạ priority về normal, giữ nguyên pending_founder
-      const _epProj = window.PROJECTS_CLIENT.find(x=>x.id===d.projectId);
-      if(_epProj){
-        _epProj.priority = 'normal';
-        delete _epProj.founderDeadline;
-        renderSidebar();
-        if(window.activeProj===d.projectId) renderMain();
-      }
+    if(d.type==='EXPRESS_TIMEOUT' && !_isReplay){
+      _addNotif('<i class="ph-duotone ph-warning"></i>',`Dự án Gấp <b>${d.projectName||d.projectId}</b> không ghép được KTS trong 4h — phí ưu tiên sẽ được hoàn`,d.projectId);
+      showToast(`⚠️ Dự án Gấp chuyển về Bình thường`,'t-amber');
+      const _epProj=window.PROJECTS_CLIENT.find(x=>x.id===d.projectId);
+      if(_epProj){ _epProj.priority='normal'; delete _epProj.founderDeadline; renderSidebar(); if(window.activeProj===d.projectId) renderMain(); }
     }
   }
 });
