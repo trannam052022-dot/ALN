@@ -126,7 +126,8 @@ body{
 }
 .info-sub{color:var(--sub);font-size:.62em;letter-spacing:.08em;cursor:text;min-height:.9em;font-weight:300;}
 .info-row{display:flex;align-items:center;gap:.3em}
-.info-icon{color:var(--gold);font-size:.7em;flex-shrink:0}
+.info-icon{color:var(--gold);flex-shrink:0;width:.85em;height:.85em;display:inline-flex;align-items:center;justify-content:center}
+.info-icon svg{width:100%;height:100%;stroke:currentColor}
 
 /* Features */
 .feat-list{display:flex;flex-direction:column;gap:.2em}
@@ -263,7 +264,8 @@ body{
 /* Footer cols 2-4 */
 .ft-head{color:var(--gold);font-size:.65em;font-weight:600;letter-spacing:.24em;margin-bottom:.1em;}
 .ft-row{display:flex;align-items:center;gap:.3em}
-.ft-icon{color:var(--t2);font-size:.65em;flex-shrink:0}
+.ft-icon{color:var(--t2);flex-shrink:0;width:.8em;height:.8em;display:inline-flex;align-items:center}
+.ft-icon svg{width:100%;height:100%;stroke:currentColor;fill:none}
 .ft-txt{color:var(--t2);font-size:.72em;cursor:text;min-height:.8em;font-weight:400;}
 
 .ft-data{display:grid;grid-template-columns:auto 1fr;gap:.18em .5em;align-items:center;}
@@ -271,7 +273,8 @@ body{
 .ft-data-val{color:var(--t2);font-size:.67em;cursor:text;min-height:.8em;font-weight:500;}
 
 .ft-commit-row{display:flex;align-items:center;gap:.3em}
-.ft-commit-icon{color:var(--gold);font-size:.65em}
+.ft-commit-icon{color:var(--gold);width:.72em;height:.72em;display:inline-flex;align-items:center;flex-shrink:0}
+.ft-commit-icon svg{width:100%;height:100%;stroke:currentColor;fill:none}
 .ft-commit-txt{color:var(--t2);font-size:.72em;cursor:text;min-height:.8em;font-weight:400;}
 
 .ft-sig{display:flex;align-items:center;justify-content:center;padding:.3em 1em;}
@@ -361,7 +364,7 @@ input[type=file]{display:none}
   <div>
     <div class="info-label">LOCATION</div>
     <div class="info-row">
-      <span class="info-icon">📍</span>
+      <span class="info-icon"><svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-7.5-7-12a7 7 0 0114 0c0 4.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
       <span class="info-sub" contenteditable="true">DA NANG, VIETNAM</span>
     </div>
   </div>
@@ -371,7 +374,7 @@ input[type=file]{display:none}
   <div>
     <div class="info-label">PROJECT TYPE</div>
     <div class="info-row">
-      <span class="info-icon">🏠</span>
+      <span class="info-icon"><svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M9 21V12h6v9M1 9l11-7 11 7"/></svg></span>
       <span class="info-sub" contenteditable="true">PRIVATE VILLA</span>
     </div>
   </div>
@@ -381,7 +384,7 @@ input[type=file]{display:none}
   <div>
     <div class="info-label">CLIENT</div>
     <div class="info-row">
-      <span class="info-icon">👤</span>
+      <span class="info-icon"><svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
       <span class="info-sub" id="bd-client-name" contenteditable="true">CHỦ ĐẦU TƯ</span>
     </div>
   </div>
@@ -555,10 +558,10 @@ input[type=file]{display:none}
 
   <div class="ft-col">
     <div class="ft-head">CONTACT</div>
-    <div class="ft-row"><span class="ft-icon">📞</span><span id="bd-phone" class="ft-txt">(+84) 333 999 136</span></div>
-    <div class="ft-row"><span class="ft-icon">✉</span><span id="bd-email" class="ft-txt">info@applamnha.com</span></div>
-    <div class="ft-row"><span class="ft-icon">🌐</span><span id="bd-website" class="ft-txt">www.applamnha.com</span></div>
-    <div class="ft-row"><span class="ft-icon">📍</span><span id="bd-address" class="ft-txt">16 Năm Cao, Đà Nẵng, Việt Nam</span></div>
+    <div class="ft-row"><span class="ft-icon"><svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 10.8a15.5 15.5 0 006.6 6.6l2.2-2.2c.28-.28.7-.37 1.06-.25a12 12 0 003.74 1.2c.4.07.74.42.74.84V21a1 1 0 01-1 1C10.6 22 2 13.4 2 3a1 1 0 011-1h3.5c.42 0 .77.34.84.74a12 12 0 001.2 3.74c.12.36.03.78-.25 1.06L6.6 10.8z"/></svg></span><span id="bd-phone" class="ft-txt">(+84) 333 999 136</span></div>
+    <div class="ft-row"><span class="ft-icon"><svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg></span><span id="bd-email" class="ft-txt">info@applamnha.com</span></div>
+    <div class="ft-row"><span class="ft-icon"><svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></span><span id="bd-website" class="ft-txt">www.applamnha.com</span></div>
+    <div class="ft-row"><span class="ft-icon"><svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-7.5-7-12a7 7 0 0114 0c0 4.5-7 12-7 12z"/><circle cx="12" cy="9" r="2"/></svg></span><span id="bd-address" class="ft-txt">16 Năm Cao, Đà Nẵng, Việt Nam</span></div>
   </div>
 
   <div class="ft-div"></div>
@@ -577,10 +580,10 @@ input[type=file]{display:none}
 
   <div class="ft-col">
     <div class="ft-head">OUR COMMITMENT</div>
-    <div class="ft-commit-row"><span class="ft-commit-icon">✓</span><span class="ft-commit-txt" contenteditable="true">TẬN TÂM</span></div>
-    <div class="ft-commit-row"><span class="ft-commit-icon">✓</span><span class="ft-commit-txt" contenteditable="true">CHUYÊN NGHIỆP</span></div>
-    <div class="ft-commit-row"><span class="ft-commit-icon">✓</span><span class="ft-commit-txt" contenteditable="true">SÁNG TẠO</span></div>
-    <div class="ft-commit-row"><span class="ft-commit-icon">✓</span><span class="ft-commit-txt" contenteditable="true">ĐỒNG HÀNH</span></div>
+    <div class="ft-commit-row"><span class="ft-commit-icon"><svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ft-commit-txt" contenteditable="true">TẬN TÂM</span></div>
+    <div class="ft-commit-row"><span class="ft-commit-icon"><svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ft-commit-txt" contenteditable="true">CHUYÊN NGHIỆP</span></div>
+    <div class="ft-commit-row"><span class="ft-commit-icon"><svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ft-commit-txt" contenteditable="true">SÁNG TẠO</span></div>
+    <div class="ft-commit-row"><span class="ft-commit-icon"><svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ft-commit-txt" contenteditable="true">ĐỒNG HÀNH</span></div>
   </div>
 
   <div class="ft-sig">
