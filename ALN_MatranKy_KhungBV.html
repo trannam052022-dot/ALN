@@ -200,9 +200,7 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
 .rv-prog-bar{width:80px;height:4px;background:var(--navy3);border-radius:2px;overflow:hidden}
 .rv-prog-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s}
 .rv-prog-txt{font-size:10px;color:var(--text3);font-family:'Oswald',sans-serif;white-space:nowrap}
-.rv-content{flex:1;overflow-y:auto;display:flex;justify-content:center;align-items:flex-start;padding:24px}
-/* Khung tên to — hiển thị cột ký A3 scale lớn */
-.rv-frame-wrap{background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.5);width:min(560px,90%);border:1.5px solid #1a1a1a;border-radius:2px}
+.rv-content{flex:1;overflow-y:auto;padding:12px 16px}
 .rv-frame-aln{background:#f5f0e0;padding:12px 16px;border-bottom:2px solid #1a1a1a;display:flex;flex-direction:column;align-items:center;gap:3px}
 .rv-frame-logo{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;background:linear-gradient(135deg,#b8860b,#d4a017,#f0c040,#c9921a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.08em;line-height:1}
 .rv-frame-sub{font-family:'Oswald',sans-serif;font-size:9px;font-weight:300;color:#8a6820;letter-spacing:.1em;text-transform:uppercase}
@@ -475,116 +473,106 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
             Bạn chưa upload chữ ký. Vào <b>Hồ sơ → Chữ ký điện tử</b> để upload trước khi ký.
           </div>
 
-          <!-- Khung tên đầy đủ, to, clickable -->
-          <div class="rv-frame-wrap">
-            <!-- ALN Header -->
-            <div class="rv-frame-aln">
-              <div class="rv-frame-role">Tổng thầu thiết kế</div>
-              <div class="rv-frame-logo">ALN</div>
-              <div class="rv-frame-sub">App Làm Nhà Corp.</div>
-            </div>
+          <!-- Full A3 sheet — vùng vẽ + cột ký -->
+          <div class="bv-wrap" style="background:transparent;padding:0;border-radius:0;width:100%">
+            <div class="paper" style="max-width:none;width:100%">
+              <div class="sheet">
+                <div class="margin-left-line"></div>
+                <div class="margin-right-line"></div>
 
-            <!-- Tên công trình -->
-            <div class="rv-frame-section">
-              <div class="rv-frame-lbl">Công trình</div>
-              <div class="rv-frame-val" id="rv-ct-name">—</div>
-            </div>
-
-            <!-- Tên bản vẽ -->
-            <div class="rv-frame-section">
-              <div class="rv-frame-lbl">Tên bản vẽ</div>
-              <div class="rv-frame-val" id="rv-bv-name" contenteditable="true" spellcheck="false" style="outline:none;cursor:text">—</div>
-            </div>
-
-            <!-- Grid thông tin -->
-            <div class="rv-frame-grid">
-              <div class="rv-frame-cell">
-                <div class="rv-frame-lbl">Số hiệu</div>
-                <div class="rv-frame-val" id="rv-code" contenteditable="true" spellcheck="false" style="outline:none;cursor:text">KT-01</div>
-              </div>
-              <div class="rv-frame-cell">
-                <div class="rv-frame-lbl">Tỷ lệ</div>
-                <div class="rv-frame-val" contenteditable="true" spellcheck="false" style="outline:none;cursor:text">1:50</div>
-              </div>
-              <div class="rv-frame-cell">
-                <div class="rv-frame-lbl">Rev.</div>
-                <div class="rv-frame-val" contenteditable="true" spellcheck="false" style="outline:none;cursor:text">01</div>
-              </div>
-              <div class="rv-frame-cell">
-                <div class="rv-frame-lbl">Ngày</div>
-                <div class="rv-frame-val" id="rv-date-val">—</div>
-              </div>
-            </div>
-
-            <!-- Ô ký KTS — click để ký -->
-            <div class="rv-sig-cell" id="rv-sc-kts" onclick="rvSignCell('kts')" title="Click để ký">
-              <div class="rv-sig-cell-head">
-                <div>
-                  <div class="rv-sig-cell-role">Kiến trúc sư</div>
-                  <div class="rv-sig-cell-name" id="rv-sn-kts">—</div>
+                <!-- Vùng vẽ: hiển thị file upload -->
+                <div class="draw-area" id="rv-draw-area">
+                  <div class="draw-inner" id="rv-draw-inner">
+                    <div class="draw-txt">CHỌN FILE BẢN VẼ ĐỂ HIỂN THỊ</div>
+                    <div class="draw-txt" style="font-size:5px">Upload PNG · JPG từ danh sách bên trái</div>
+                  </div>
                 </div>
-                <div class="rv-sig-cell-hint" id="rv-hint-kts">↙ Click để ký</div>
-              </div>
-              <div class="rv-sig-area" id="rv-sa-kts">
-                <span class="rv-sig-area-ph" id="rv-sp-kts">Chờ ký</span>
-              </div>
-              <div class="rv-sig-date" id="rv-sd-kts"></div>
-            </div>
 
-            <!-- Ô ký KS KC -->
-            <div class="rv-sig-cell" id="rv-sc-kc" onclick="rvSignCell('kc')" title="Click để ký">
-              <div class="rv-sig-cell-head">
-                <div>
-                  <div class="rv-sig-cell-role">KS. Kết cấu</div>
-                  <div class="rv-sig-cell-name" id="rv-sn-kc">—</div>
+                <!-- Cột ký -->
+                <div class="title-col">
+
+                  <div class="tc-aln">
+                    <div class="tc-aln-role">Tổng thầu thiết kế</div>
+                    <div class="tc-aln-logo">ALN</div>
+                    <div class="tc-aln-sub">App Làm Nhà Corp.</div>
+                  </div>
+
+                  <div class="tc-row ct">
+                    <span class="tc-lbl">Công trình</span>
+                    <div class="tc-val-wrap">
+                      <div class="tc-val-bv" id="rv-ct-name">—</div>
+                      <div class="tc-val-addr" id="rv-ct-addr"></div>
+                    </div>
+                  </div>
+
+                  <div class="tc-row bv">
+                    <span class="tc-lbl">Tên bản vẽ</span>
+                    <div class="tc-val-wrap">
+                      <div class="tc-val-bv" id="rv-bv-name" contenteditable="true" spellcheck="false" style="outline:none;cursor:text">—</div>
+                    </div>
+                  </div>
+
+                  <div class="tc-grid">
+                    <div class="tc-cell"><div class="tc-cell-lbl">Số hiệu</div><div class="tc-cell-val" id="rv-code" contenteditable="true" spellcheck="false" style="outline:none;cursor:text">KT-01</div></div>
+                    <div class="tc-cell"><div class="tc-cell-lbl">Tỷ lệ</div><div class="tc-cell-val" contenteditable="true" spellcheck="false" style="outline:none;cursor:text">1:50</div></div>
+                    <div class="tc-cell"><div class="tc-cell-lbl">Rev.</div><div class="tc-cell-val" contenteditable="true" spellcheck="false" style="outline:none;cursor:text">01</div></div>
+                    <div class="tc-cell"><div class="tc-cell-lbl">Ngày</div><div class="tc-cell-val" id="rv-date-val">—</div></div>
+                  </div>
+
+                  <!-- Ô ký KTS -->
+                  <div class="sig" id="rv-sc-kts" onclick="rvSignCell('kts')" style="cursor:pointer" title="Click để ký">
+                    <div class="sig-h">
+                      <div class="sig-role">Kiến trúc sư</div>
+                      <div class="sig-name" id="rv-sn-kts">—</div>
+                    </div>
+                    <div class="sig-b">
+                      <div class="sig-area" id="rv-sa-kts"><span id="rv-sp-kts" class="sig-area-txt">Chờ ký</span></div>
+                      <div class="sig-date" id="rv-sd-kts"></div>
+                    </div>
+                  </div>
+
+                  <!-- Ô ký KS KC -->
+                  <div class="sig" id="rv-sc-kc" onclick="rvSignCell('kc')" style="cursor:pointer" title="Click để ký">
+                    <div class="sig-h">
+                      <div class="sig-role">KS. Kết cấu</div>
+                      <div class="sig-name" id="rv-sn-kc">—</div>
+                    </div>
+                    <div class="sig-b">
+                      <div class="sig-area" id="rv-sa-kc"><span id="rv-sp-kc" class="sig-area-txt">Chờ ký</span></div>
+                      <div class="sig-date" id="rv-sd-kc"></div>
+                    </div>
+                  </div>
+
+                  <!-- Ô ký KS M&E -->
+                  <div class="sig" id="rv-sc-me" onclick="rvSignCell('me')" style="cursor:pointer" title="Click để ký">
+                    <div class="sig-h">
+                      <div class="sig-role">KS. M&amp;E</div>
+                      <div class="sig-name" id="rv-sn-me">—</div>
+                    </div>
+                    <div class="sig-b">
+                      <div class="sig-area" id="rv-sa-me"><span id="rv-sp-me" class="sig-area-txt">Chờ ký</span></div>
+                      <div class="sig-date" id="rv-sd-me"></div>
+                    </div>
+                  </div>
+
+                  <!-- Ô ký Thẩm tra -->
+                  <div class="sig-cn" id="rv-sc-cn" onclick="rvSignCell('cn')" style="cursor:pointer" title="Click để ký">
+                    <div class="sig-cn-h">
+                      <div class="sig-cn-role">Thẩm tra · Chủ nhiệm đồ án</div>
+                      <div class="sig-cn-name" id="rv-sn-cn">KTS. Trần Đại Long</div>
+                    </div>
+                    <div class="sig-cn-b">
+                      <div class="sig-cn-area" id="rv-sa-cn"><span id="rv-sp-cn" class="sig-cn-ph">Ký sau cùng</span></div>
+                      <div class="tc-date" id="rv-sd-cn"></div>
+                    </div>
+                  </div>
+
+                  <div class="tc-foot">
+                    <div class="tc-foot-cell"><div class="tc-foot-lbl">Mã dự án</div><div class="tc-foot-val" id="rv-pid-val">—</div></div>
+                    <div class="tc-foot-cell"><div class="tc-foot-lbl">Tờ số</div><div class="tc-foot-val" id="rv-sheet-val">01 / —</div></div>
+                  </div>
+
                 </div>
-                <div class="rv-sig-cell-hint" id="rv-hint-kc">↙ Click để ký</div>
-              </div>
-              <div class="rv-sig-area" id="rv-sa-kc">
-                <span class="rv-sig-area-ph" id="rv-sp-kc">Chờ ký</span>
-              </div>
-              <div class="rv-sig-date" id="rv-sd-kc"></div>
-            </div>
-
-            <!-- Ô ký KS M&E -->
-            <div class="rv-sig-cell" id="rv-sc-me" onclick="rvSignCell('me')" title="Click để ký">
-              <div class="rv-sig-cell-head">
-                <div>
-                  <div class="rv-sig-cell-role">KS. M&amp;E</div>
-                  <div class="rv-sig-cell-name" id="rv-sn-me">—</div>
-                </div>
-                <div class="rv-sig-cell-hint" id="rv-hint-me">↙ Click để ký</div>
-              </div>
-              <div class="rv-sig-area" id="rv-sa-me">
-                <span class="rv-sig-area-ph" id="rv-sp-me">Chờ ký</span>
-              </div>
-              <div class="rv-sig-date" id="rv-sd-me"></div>
-            </div>
-
-            <!-- Ô ký Thẩm tra (Founder) -->
-            <div class="rv-sig-cell rv-sig-cell--cn" id="rv-sc-cn" onclick="rvSignCell('cn')" title="Click để ký" style="background:#fffff8">
-              <div class="rv-sig-cell-head">
-                <div>
-                  <div class="rv-sig-cell-role" style="color:#7a5c10">Thẩm tra · Chủ nhiệm</div>
-                  <div class="rv-sig-cell-name" id="rv-sn-cn" style="font-weight:700">KTS. Trần Đại Long</div>
-                </div>
-                <div class="rv-sig-cell-hint" id="rv-hint-cn" style="color:#c9a84c">↙ Ký sau cùng</div>
-              </div>
-              <div class="rv-sig-area" id="rv-sa-cn" style="border-color:#c9a84c;background:#fffdf5">
-                <span class="rv-sig-area-ph" id="rv-sp-cn" style="color:#c9a84c">Ký sau cùng</span>
-              </div>
-              <div class="rv-sig-date" id="rv-sd-cn"></div>
-            </div>
-
-            <!-- Footer -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #aaa">
-              <div style="padding:8px 14px;border-right:.5px solid #ddd">
-                <div class="rv-frame-lbl">Mã dự án</div>
-                <div class="rv-frame-val" id="rv-pid-val" style="font-size:11px">—</div>
-              </div>
-              <div style="padding:8px 14px">
-                <div class="rv-frame-lbl">Tờ số</div>
-                <div class="rv-frame-val" id="rv-sheet-val" contenteditable="true" spellcheck="false" style="outline:none;cursor:text;font-size:11px">01 / —</div>
               </div>
             </div>
           </div>
@@ -727,7 +715,8 @@ function rvLoadFiles(input) {
   if (!files.length) return;
   var existing = _rvPages.length;
   files.forEach(function(f) {
-    _rvPages.push({ name: f.name, sigs: {} });
+    var url = f.type.startsWith('image/') ? URL.createObjectURL(f) : '';
+    _rvPages.push({ name: f.name, url: url, sigs: {} });
   });
   document.getElementById('rv-upload-area').style.display = 'none';
   document.getElementById('rv-viewer-area').style.display = 'block';
@@ -764,6 +753,12 @@ function rvGoto(idx) {
   document.querySelectorAll('.rv-item').forEach(function(t,i){ t.classList.toggle('active', i===idx); });
   var it = document.getElementById('rv-it-'+idx); if(it) it.scrollIntoView({block:'nearest'});
 
+  // Hiển thị file ảnh vào vùng vẽ
+  var drawInner = document.getElementById('rv-draw-inner');
+  if (drawInner && p.url) {
+    drawInner.innerHTML = '<img src="'+p.url+'" style="max-width:100%;max-height:100%;object-fit:contain;display:block">';
+  }
+
   // Tên bản vẽ tự điền
   var bvEl = document.getElementById('rv-bv-name');
   if (bvEl) bvEl.textContent = p.name.replace(/\.[^.]+$/,'').toUpperCase();
@@ -782,22 +777,19 @@ function rvGoto(idx) {
     var ph   = document.getElementById('rv-sp-'+k);
     var dt   = document.getElementById('rv-sd-'+k);
     var cell = document.getElementById('rv-sc-'+k);
-    var hint = document.getElementById('rv-hint-'+k);
     if (!area) return;
     if (sig) {
       if (ph) ph.style.display = 'none';
-      var img = area.querySelector('img');
-      if (!img) { img = document.createElement('img'); img.style.cssText='max-width:80%;max-height:46px;object-fit:contain'; area.appendChild(img); }
+      var img = area.querySelector('img.rv-sig-img');
+      if (!img) { img = document.createElement('img'); img.className='rv-sig-img'; img.style.cssText='max-width:90%;max-height:80%;object-fit:contain'; area.appendChild(img); }
       img.src = sig.url;
       if (dt) dt.textContent = sig.name + ' · ' + sig.date;
-      if (cell) cell.classList.add('rv-sig-cell--signed');
-      if (hint) hint.textContent = '✓ Đã ký';
+      if (cell) cell.classList.add('signed');
     } else {
       if (ph) ph.style.display = '';
-      var oldImg = area.querySelector('img'); if(oldImg) oldImg.remove();
+      var oldImg = area.querySelector('img.rv-sig-img'); if(oldImg) oldImg.remove();
       if (dt) dt.textContent = '';
-      if (cell) cell.classList.remove('rv-sig-cell--signed');
-      if (hint) hint.textContent = k==='cn' ? '↙ Ký sau cùng' : '↙ Click để ký';
+      if (cell) cell.classList.remove('signed');
     }
   });
 
@@ -809,20 +801,14 @@ function rvGo(delta) { rvGoto(_rvCur + delta); }
 function _rvShortName(n, max) { return n.length > max ? n.slice(0,max-1)+'…' : n; }
 
 function _rvHighlightMyCell() {
-  // Map role → key ô ký
   var key = {kts:'kts', designer:'kts', founder:'cn', ks:'kc'}[_rvRole] || '';
   ['kts','kc','me','cn'].forEach(function(k) {
-    var hint = document.getElementById('rv-hint-'+k);
     var cell = document.getElementById('rv-sc-'+k);
     if (!cell) return;
     var p = _rvPages[_rvCur];
     var signed = p && p.sigs[k];
-    if (k === key && !signed) {
-      cell.style.boxShadow = _rvSigUrl ? '0 0 0 2px #c9a84c' : 'none';
-      if (hint && !signed) hint.style.color = '#c9a84c';
-    } else {
-      cell.style.boxShadow = '';
-    }
+    cell.style.outline = (k === key && !signed && _rvSigUrl) ? '2px solid #c9a84c' : '';
+    cell.classList.toggle('pending', k === key && !signed);
   });
 }
 
