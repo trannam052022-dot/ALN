@@ -622,6 +622,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="aln-tokens.css">
   <script src="https://www.google.com/recaptcha/api.js?render=6LeuZi8tAAAAMfnZOHxH_xnLM8C0OpnexVgKFPb"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.7.52/dist/zip.min.js"></script>
 </head>
 <body>
 <!-- ═══ ALN AUTH VEIL — che trang đến khi xác thực xong ═══ -->
@@ -2527,6 +2528,7 @@ function renderMain(){
         <div class="ct">
           <i class="ph-duotone ph-folder-open"></i> Kho Tài liệu & Bản vẽ
           <span class="pill p-blue" style="margin-left:auto;font-size:10px">${totalDocs} file</span>
+          ${totalDocs>0?`<button onclick="event.stopPropagation();window._dnDownloadZip('${p.id}')" style="margin-left:8px;padding:4px 10px;border-radius:6px;border:1px solid rgba(201,168,76,.4);background:rgba(201,168,76,.08);color:var(--gold);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:4px"><i class="ph-duotone ph-lock-key"></i> Tải gói ZIP</button>`:''}
         </div>
         ${folderDescHTML}
         <div class="folder-grid">${folderGridHTML}</div>
@@ -3593,6 +3595,51 @@ window._dnSubProposals = function(pid) {
     }, function(err){ console.warn('[DN stage doc]', stage, err.code); });
     window._dnPropUnsubs.push(unsubSt);
   });
+};
+
+/* Tải gói ZIP có mật khẩu — chỉ Founder biết pass */
+window._dnDownloadZip = async function(pid) {
+  var docs = (window.DOCS && window.DOCS[pid]) || [];
+  var validDocs = docs.filter(function(d){ return d.url; });
+  if (!validDocs.length) { if(typeof showToast==='function') showToast('⚠ Chưa có file để tải','t-red'); return; }
+
+  // Lấy zipPassword từ Firestore (members đọc được nhưng không hiển thị)
+  var btn = document.querySelector('button[onclick*="_dnDownloadZip"]');
+  if (btn) { btn.textContent = '⏳ Đang tạo ZIP...'; btn.disabled = true; }
+  try {
+    var projSnap = await getDoc(doc(db, 'projects', pid));
+    var zipPass = projSnap.exists() ? projSnap.data().zipPassword : null;
+    if (!zipPass) {
+      if(typeof showToast==='function') showToast('⚠ Founder chưa tạo mã ZIP cho dự án này — liên hệ ALN để nhận file','t-red');
+      if (btn) { btn.innerHTML = '<i class="ph-duotone ph-lock-key"></i> Tải gói ZIP'; btn.disabled = false; }
+      return;
+    }
+
+    if(typeof showToast==='function') showToast('📦 Đang đóng gói ' + validDocs.length + ' file...','t-blue');
+
+    var zipFileWriter = new zip.BlobWriter('application/zip');
+    var zipWriter = new zip.ZipWriter(zipFileWriter, { password: zipPass, encryptionStrength: 3 });
+    var failed = 0;
+    for (var i = 0; i < validDocs.length; i++) {
+      var d = validDocs[i];
+      try {
+        var blob = await fetch(d.url).then(function(r){ return r.blob(); });
+        await zipWriter.add(d.name || ('file_' + (i+1) + '.pdf'), new zip.BlobReader(blob));
+      } catch(e) { console.warn('[ZIP] skip:', d.name, e); failed++; }
+    }
+    var zipBlob = await zipWriter.close();
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(zipBlob);
+    a.download = pid + '_BanVe.zip';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    var msg = failed ? '⚠ Tải xong — ' + failed + ' file lỗi' : '✅ Đã tải ' + (validDocs.length - failed) + ' file (cần mật khẩu để giải nén)';
+    if(typeof showToast==='function') showToast(msg, failed ? 't-red' : 't-green');
+  } catch(e) {
+    console.error('[ZIP]', e);
+    if(typeof showToast==='function') showToast('⚠ Lỗi tạo ZIP: ' + e.message,'t-red');
+  }
+  if (btn) { btn.innerHTML = '<i class="ph-duotone ph-lock-key"></i> Tải gói ZIP'; btn.disabled = false; }
 };
 
 /* Ghi approval lên Firestore */

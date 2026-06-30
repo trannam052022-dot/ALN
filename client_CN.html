@@ -603,6 +603,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="aln-tokens.css">
   <script src="https://www.google.com/recaptcha/api.js?render=6LeuZi8tAAAAMfnZOHxH_xnLM8C0OpnexVgKFPb"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.7.52/dist/zip.min.js"></script>
 </head>
 <body>
 <!-- ═══ ALN AUTH VEIL — che trang đến khi xác thực xong ═══ -->
@@ -2368,6 +2369,7 @@ function renderMain(){
         <div class="ct">
           <i class="ph-duotone ph-folder-open"></i> Kho Tài liệu & Bản vẽ
           <span class="pill p-blue" style="margin-left:auto;font-size:10px">${totalDocs} file</span>
+          ${totalDocs>0?`<button onclick="event.stopPropagation();window._cnDownloadZip('${p.id}')" style="margin-left:8px;padding:4px 10px;border-radius:6px;border:1px solid rgba(201,168,76,.4);background:rgba(201,168,76,.08);color:var(--gold);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:4px"><i class="ph-duotone ph-lock-key"></i> Tải gói ZIP</button>`:''}
         </div>
         ${folderDescHTML}
         <div class="folder-grid">${folderGridHTML}</div>
@@ -2383,15 +2385,6 @@ function renderMain(){
   }
 }
 
-function selectProj(id){
-  window.activeProj=id; activeFolder='ALL';
-  window._cnSubPid = null; // reset lazy-load flag khi đổi project
-  renderSidebar(); renderMain();
-  document.querySelector('.sidebar-cn').classList.remove('open');
-  // Sync Zalo widget to new KTS
-  const p2 = window.PROJECTS_CLIENT.find(x=>x.id===id);
-  if(p2){ zpKts=p2.kts; if(zpOpen) _zpInit(); }
-}
 
 
 /* C4 Signed URL download */
@@ -2487,10 +2480,26 @@ function drawPortrait(canvas,opts){
 }
 
 function downloadDoc(id,name){
+  var found = null;
+  Object.values(DOCS).flat().forEach(function(d){ if(d.id===id) found=d; });
+  var url = found && found.url;
+  if(!url){ showToast('⚠ Không tìm thấy URL file — thử tải lại trang','t-red'); return; }
+  var a = document.createElement('a');
+  a.href = url; a.download = name||'file'; a.target = '_blank';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
   showToast(`📥 Đang tải: ${name}`,'t-blue');
-  // Mark as read
-  Object.values(DOCS).flat().forEach(d=>{if(d.id===id)d.isNew=false});
+  Object.values(DOCS).flat().forEach(function(d){ if(d.id===id) d.isNew=false; });
   renderSidebar();
+}
+
+function selectProj(id){
+  window.activeProj=id; activeFolder='ALL';
+  window._cnSubPid = null;
+  if (typeof window._cnSubDocs === 'function') window._cnSubDocs(id);
+  renderSidebar(); renderMain();
+  document.querySelector('.sidebar-cn').classList.remove('open');
+  const p2 = window.PROJECTS_CLIENT.find(x=>x.id===id);
+  if(p2){ zpKts=p2.kts; if(zpOpen) _zpInit(); }
 }
 
 /* Notifications */
@@ -3354,6 +3363,74 @@ window._cnSubProposals = function(pid) {
     }, function(err){ console.warn('[CN stage doc]', stage, err.code); });
     window._cnPropUnsubs.push(unsubSt);
   });
+};
+
+/* Docs listener — load projects/{pid}/documents/ khi chọn project */
+window._cnDocsUnsub = null;
+window._cnSubDocs = function(pid) {
+  if (window._cnDocsUnsub) { try { window._cnDocsUnsub(); } catch(e){} }
+  window._cnDocsUnsub = null;
+  if (!pid) return;
+  var q = query(collection(db,'projects',pid,'documents'), orderBy('createdAt','desc'));
+  window._cnDocsUnsub = onSnapshot(q, function(snap) {
+    window.DOCS = window.DOCS || {};
+    window.DOCS[pid] = snap.docs.map(function(d) {
+      var dd = d.data();
+      var ts = dd.createdAt && dd.createdAt.seconds ? new Date(dd.createdAt.seconds*1000) : null;
+      return {
+        id: d.id, name: dd.name||d.id, folder: dd.folder||dd.stage||'C1',
+        url: dd.url||'', kts: (dd.uploader&&dd.uploader.name)||'KTS',
+        date: ts ? ts.toLocaleDateString('vi-VN') : (dd.date||''),
+        size: dd.size||'—', type: dd.type||(dd.name&&dd.name.match(/\.pdf$/i)?'pdf':'file'),
+        status: dd.status||'pending', isNew: ts?(Date.now()-ts.getTime()<48*3600*1000):false,
+        sigRecord: dd.sigRecord||null
+      };
+    });
+    if (window.activeProj===pid && typeof window.renderMain==='function') {
+      try { window.renderMain(); } catch(e) {}
+    }
+  }, function(err){ console.warn('[CN docs]', err.code); });
+};
+
+/* Tải gói ZIP có mật khẩu — chỉ Founder biết pass */
+window._cnDownloadZip = async function(pid) {
+  var docs = (window.DOCS && window.DOCS[pid]) || [];
+  var validDocs = docs.filter(function(d){ return d.url; });
+  if (!validDocs.length) { if(typeof showToast==='function') showToast('⚠ Chưa có file để tải','t-red'); return; }
+  var btn = document.querySelector('button[onclick*="_cnDownloadZip"]');
+  if (btn) { btn.textContent = '⏳ Đang tạo ZIP...'; btn.disabled = true; }
+  try {
+    var projSnap = await getDoc(doc(db,'projects',pid));
+    var zipPass = projSnap.exists() ? projSnap.data().zipPassword : null;
+    if (!zipPass) {
+      if(typeof showToast==='function') showToast('⚠ Founder chưa tạo mã ZIP cho dự án này — liên hệ ALN để nhận file','t-red');
+      if (btn) { btn.innerHTML = '<i class="ph-duotone ph-lock-key"></i> Tải gói ZIP'; btn.disabled = false; }
+      return;
+    }
+    if(typeof showToast==='function') showToast('📦 Đang đóng gói ' + validDocs.length + ' file...','t-blue');
+    var zipFileWriter = new zip.BlobWriter('application/zip');
+    var zipWriter = new zip.ZipWriter(zipFileWriter, { password: zipPass, encryptionStrength: 3 });
+    var failed = 0;
+    for (var i = 0; i < validDocs.length; i++) {
+      var d = validDocs[i];
+      try {
+        var blob = await fetch(d.url).then(function(r){ return r.blob(); });
+        await zipWriter.add(d.name||('file_'+(i+1)+'.pdf'), new zip.BlobReader(blob));
+      } catch(e) { console.warn('[ZIP] skip:', d.name, e); failed++; }
+    }
+    var zipBlob = await zipWriter.close();
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(zipBlob);
+    a.download = pid + '_BanVe.zip';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    var msg = failed ? '⚠ Tải xong — '+failed+' file lỗi' : '✅ Đã tải '+(validDocs.length-failed)+' file (cần mật khẩu để giải nén)';
+    if(typeof showToast==='function') showToast(msg, failed?'t-red':'t-green');
+  } catch(e) {
+    console.error('[ZIP]',e);
+    if(typeof showToast==='function') showToast('⚠ Lỗi tạo ZIP: '+e.message,'t-red');
+  }
+  if (btn) { btn.innerHTML = '<i class="ph-duotone ph-lock-key"></i> Tải gói ZIP'; btn.disabled = false; }
 };
 
 /* Ghi approval lên Firestore */
