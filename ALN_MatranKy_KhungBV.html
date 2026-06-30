@@ -180,6 +180,29 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
 .info-val{color:var(--text2);font-weight:500}
 @media(max-width:600px){.info-grid{grid-template-columns:1fr}}
 
+/* XEM & KÝ — font scale cho title-col (to hơn Tab 2) */
+#rv-viewer-area .tc-aln-role{font-size:7px}
+#rv-viewer-area .tc-aln-logo{font-size:28px}
+#rv-viewer-area .tc-aln-sub{font-size:7px}
+#rv-viewer-area .tc-h-role{font-size:8.5px}
+#rv-viewer-area .tc-h-name{font-size:9.5px}
+#rv-viewer-area .tc-lbl{font-size:7.5px}
+#rv-viewer-area .tc-val-bv{font-size:12px}
+#rv-viewer-area .tc-val-addr{font-size:7px}
+#rv-viewer-area .tc-cell-lbl{font-size:7.5px}
+#rv-viewer-area .tc-cell-val{font-size:13px}
+#rv-viewer-area .sig-role{font-size:8.5px}
+#rv-viewer-area .sig-name{font-size:10px}
+#rv-viewer-area .sig-date{font-size:7.5px}
+#rv-viewer-area .sig-area-txt{font-size:7.5px}
+#rv-viewer-area .sig-cn-role{font-size:8.5px}
+#rv-viewer-area .sig-cn-name{font-size:10px}
+#rv-viewer-area .sig-cn-ph{font-size:7.5px}
+#rv-viewer-area .tc-foot-lbl{font-size:7.5px}
+#rv-viewer-area .tc-foot-val{font-size:10px}
+#rv-viewer-area .tc-date{font-size:7px}
+#rv-viewer-area .margin-label-txt{display:none}
+
 /* XEM & KÝ — redesign */
 .rv-layout{display:grid;grid-template-columns:180px 1fr;height:calc(100vh - 96px);overflow:hidden}
 .rv-strip{overflow-y:auto;background:var(--navy);border-right:1px solid var(--border);padding:8px 6px;display:flex;flex-direction:column;gap:4px}
@@ -812,8 +835,8 @@ function rvGo(delta) { rvGoto(_rvCur + delta); }
 function _rvShortName(n, max) { return n.length > max ? n.slice(0,max-1)+'…' : n; }
 
 function _rvRenderPdf(url, container) {
-  var pdfjsLib = window['pdfjs-dist/build/pdf'];
-  if (!pdfjsLib) { container.innerHTML = '<div class="draw-txt">PDF.js chưa tải</div>'; return; }
+  var pdfjsLib = window.pdfjsLib || window['pdfjs-dist/build/pdf'];
+  if (!pdfjsLib) { container.innerHTML = '<div class="draw-txt">PDF.js chưa tải — kiểm tra kết nối mạng</div>'; return; }
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   pdfjsLib.getDocument(url).promise.then(function(pdf) {
     return pdf.getPage(1);
