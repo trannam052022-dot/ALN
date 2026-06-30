@@ -304,6 +304,7 @@ input[type=file]{display:none}
   <span class="toolbar-title">ALN MASTER BOARD v2.0 — EDITOR</span>
   <span class="hint">✏️ Click text <b style="color:#C9A84C">vàng</b> để chỉnh · 🖼 Click ô ảnh để upload · 🔒 Logo & liên hệ do Founder quản lý</span>
   <button class="btn btn-dim" onclick="resetBoard()">↺ Reset</button>
+  <button class="btn btn-dim" onclick="openPreview()">⛶ Preview</button>
   <button class="btn btn-dim" onclick="window.print()">🖨 In / PDF</button>
   <button class="btn" onclick="exportImg('png',this)">⬇ Export PNG</button>
   <button class="btn" onclick="exportImg('jpg',this)">⬇ Export JPG</button>
@@ -633,6 +634,7 @@ async function exportImg(fmt, btn) {
   btn.disabled = false;
 }
 
+var _fitModes = {};
 function setImg(input, imgId, phId) {
   if (!input.files || !input.files[0]) return;
   const url = URL.createObjectURL(input.files[0]);
@@ -642,29 +644,39 @@ function setImg(input, imgId, phId) {
   if (imgId === 'qr-img-el') {
     img.style.position='absolute';
     img.parentElement.querySelectorAll('.qr-cell').forEach(c=>c.style.display='none');
+    return;
   }
-  if (imgId === 'hero-img-el') {
-    // Tự động detect ảnh đứng → chuyển sang contain
-    const tmp = new Image();
-    tmp.onload = function() {
-      const isPortrait = tmp.naturalHeight > tmp.naturalWidth;
-      img.style.objectFit = isPortrait ? 'contain' : 'cover';
-      const tog = document.getElementById('hero-fit-toggle');
-      if (tog) { tog.style.display='block'; tog.textContent = isPortrait ? '⇔ CONTAIN' : '⇔ COVER'; }
-    };
-    tmp.src = url;
-  }
+  const tmp = new Image();
+  tmp.onload = function() {
+    const isPortrait = tmp.naturalHeight > tmp.naturalWidth;
+    const fit = isPortrait ? 'contain' : 'cover';
+    img.style.objectFit = fit;
+    _fitModes[imgId] = fit;
+    const togId = imgId === 'hero-img-el' ? 'hero-fit-toggle' : 'fit-tog-' + imgId;
+    let tog = document.getElementById(togId);
+    if (!tog && imgId !== 'hero-img-el') {
+      tog = document.createElement('div');
+      tog.id = togId;
+      tog.setAttribute('onclick', "event.stopPropagation();toggleFit('" + imgId + "')");
+      tog.style.cssText = 'display:none;position:absolute;top:3px;right:3px;background:rgba(8,12,20,.75);border:1px solid rgba(201,168,76,.5);border-radius:3px;padding:2px 6px;font-size:8px;font-weight:700;color:#C9A84C;cursor:pointer;letter-spacing:1px;z-index:10';
+      img.parentElement.appendChild(tog);
+    }
+    if (tog) { tog.style.display='block'; tog.textContent = isPortrait ? '⇔ CONTAIN' : '⇔ COVER'; }
+  };
+  tmp.src = url;
 }
 
-var _heroFitMode = 'cover';
-function toggleHeroFit() {
-  const img = document.getElementById('hero-img-el');
-  const tog = document.getElementById('hero-fit-toggle');
+function toggleFit(imgId) {
+  const img = document.getElementById(imgId);
   if (!img) return;
-  _heroFitMode = _heroFitMode === 'cover' ? 'contain' : 'cover';
-  img.style.objectFit = _heroFitMode;
-  tog.textContent = _heroFitMode === 'cover' ? '⇔ COVER' : '⇔ CONTAIN';
+  _fitModes[imgId] = _fitModes[imgId] === 'cover' ? 'contain' : 'cover';
+  img.style.objectFit = _fitModes[imgId];
+  const togId = imgId === 'hero-img-el' ? 'hero-fit-toggle' : 'fit-tog-' + imgId;
+  const tog = document.getElementById(togId);
+  if (tog) tog.textContent = _fitModes[imgId] === 'cover' ? '⇔ COVER' : '⇔ CONTAIN';
 }
+
+function toggleHeroFit() { toggleFit('hero-img-el'); }
 
 function setLogo(input, imgId, txtId) {
   if (!input.files || !input.files[0]) return;
@@ -678,6 +690,30 @@ function setLogo(input, imgId, txtId) {
 function resetBoard() {
   if (!confirm('Reset về nội dung mặc định?')) return;
   location.reload();
+}
+
+function openPreview() {
+  let ov = document.getElementById('board-preview-ov');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'board-preview-ov';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(4,6,10,.96);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+    ov.innerHTML = '<div style="position:relative;width:100%;max-width:1400px">'
+      + '<button onclick="document.getElementById(\'board-preview-ov\').remove()" '
+      + 'style="position:absolute;top:-38px;right:0;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);color:#C9A84C;padding:5px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-family:Oswald,sans-serif;letter-spacing:1px">✕ ĐÓNG</button>'
+      + '<div id="board-preview-inner" style="width:100%;border:1px solid rgba(201,168,76,.2);border-radius:4px;overflow:hidden"></div>'
+      + '</div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', function(e){ if(e.target===ov) ov.remove(); });
+  }
+  const inner = document.getElementById('board-preview-inner');
+  const src = document.querySelector('.board-wrap');
+  if (src && inner) {
+    inner.innerHTML = '';
+    const clone = src.cloneNode(true);
+    clone.style.cssText = 'width:100%;pointer-events:none';
+    inner.appendChild(clone);
+  }
 }
 
 document.querySelectorAll('[contenteditable]').forEach(el => {
