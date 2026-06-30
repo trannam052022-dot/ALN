@@ -178,6 +178,44 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
 .info-key{color:var(--text3)}
 .info-val{color:var(--text2);font-weight:500}
 @media(max-width:600px){.info-grid{grid-template-columns:1fr}}
+
+/* XEM & KÝ */
+.rv-layout{display:grid;grid-template-columns:160px 1fr 200px;height:calc(100vh - 100px);gap:0;overflow:hidden}
+.rv-strip{overflow-y:auto;background:var(--navy);border-right:1px solid var(--border);padding:8px 6px;display:flex;flex-direction:column;gap:6px}
+.rv-thumb{position:relative;background:var(--navy2);border:1.5px solid var(--border2);border-radius:6px;cursor:pointer;overflow:hidden;aspect-ratio:210/297;display:flex;align-items:center;justify-content:center;transition:border-color .15s}
+.rv-thumb:hover{border-color:var(--gold3)}
+.rv-thumb.active{border-color:var(--gold);box-shadow:0 0 0 2px rgba(212,160,23,.25)}
+.rv-thumb.signed{border-color:var(--green)}
+.rv-thumb img{width:100%;height:100%;object-fit:cover}
+.rv-thumb-empty{font-size:9px;color:var(--text3);letter-spacing:.04em;text-align:center;padding:4px}
+.rv-thumb-num{position:absolute;bottom:3px;left:4px;font-size:8px;color:var(--text3);background:rgba(7,18,32,.7);padding:1px 4px;border-radius:3px}
+.rv-thumb-check{position:absolute;top:3px;right:3px;width:14px;height:14px;border-radius:50%;background:var(--green);display:none;align-items:center;justify-content:center}
+.rv-thumb.signed .rv-thumb-check{display:flex}
+.rv-main{overflow:hidden;background:#5a5a52;display:flex;flex-direction:column}
+.rv-viewer{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:12px}
+.rv-page-img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:3px 3px 16px rgba(0,0,0,.5);background:#fff}
+.rv-page-empty{color:#aaa;font-size:13px;text-align:center;font-family:'Oswald',sans-serif;letter-spacing:.06em}
+.rv-nav{background:var(--navy);border-top:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.rv-nav-btn{background:var(--navy2);border:1px solid var(--border2);color:var(--text2);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:11px;font-family:'Oswald',sans-serif;transition:all .12s}
+.rv-nav-btn:hover:not(:disabled){border-color:var(--gold3);color:var(--gold)}
+.rv-nav-btn:disabled{opacity:.35;cursor:default}
+.rv-nav-pg{font-size:11px;color:var(--text2);font-family:'Oswald',sans-serif;flex:1;text-align:center}
+.rv-upload-zone{border:1.5px dashed var(--border2);border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:border-color .15s;margin:8px}
+.rv-upload-zone:hover{border-color:var(--gold3)}
+.rv-sidebar{background:var(--navy2);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.rv-sig-panel{padding:10px;flex:1;display:flex;flex-direction:column;gap:8px}
+.rv-sig-title{font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
+.rv-mini-frame{background:#fff;border-radius:4px;overflow:hidden;flex:1;min-height:0}
+.rv-sign-btn{width:100%;padding:9px;background:var(--gold);color:#000;border:none;border-radius:6px;font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em;cursor:pointer;transition:opacity .15s}
+.rv-sign-btn:hover{opacity:.88}
+.rv-sign-btn:disabled{background:var(--navy3);color:var(--text3);cursor:default}
+.rv-sign-btn.signed{background:var(--green);color:#fff}
+.rv-progress{padding:8px 10px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);display:flex;flex-direction:column;gap:4px}
+.rv-prog-bar{height:4px;background:var(--navy3);border-radius:2px;overflow:hidden}
+.rv-prog-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s}
+.rv-submit-btn{margin:8px 10px;padding:9px;background:rgba(22,163,74,.15);color:var(--green);border:1px solid rgba(22,163,74,.3);border-radius:6px;font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:.06em;cursor:pointer;display:none}
+.rv-submit-btn.show{display:block}
+.rv-no-sig-warn{margin:8px 10px;padding:8px;background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.2);border-radius:6px;font-size:10px;color:var(--amber);line-height:1.5;display:none}
 </style>
 </head>
 <body>
@@ -194,6 +232,7 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
 <div class="tabs">
   <div class="tab active" onclick="switchTab('matrix',this)"><i class="ti ti-table"></i>Ma trận ký</div>
   <div class="tab" onclick="switchTab('frame',this)"><i class="ti ti-layout"></i>Khung bản vẽ</div>
+  <div class="tab" onclick="switchTab('review',this)"><i class="ti ti-eye-check"></i>Xem &amp; Ký</div>
 </div>
 
 <!-- MA TRẬN KÝ -->
@@ -377,6 +416,84 @@ body{background:var(--navy);color:var(--text);font-family:var(--sans);font-size:
   <div class="status-row" id="status-row"></div>
 </div>
 
+<!-- XEM & KÝ -->
+<div class="section" id="tab-review">
+
+  <!-- Upload zone (hiện khi chưa có file) -->
+  <div id="rv-upload-area" style="padding:20px">
+    <label class="rv-upload-zone" for="rv-file-input">
+      <div style="font-size:28px;margin-bottom:8px;opacity:.4">📂</div>
+      <div style="font-size:13px;color:var(--text2);font-family:'Oswald',sans-serif;letter-spacing:.06em;margin-bottom:4px">CHỌN FILE BẢN VẼ</div>
+      <div style="font-size:11px;color:var(--text3)">PNG · JPG · PDF — nhiều file cùng lúc</div>
+    </label>
+    <input type="file" id="rv-file-input" accept="image/*,.pdf" multiple style="display:none" onchange="rvLoadFiles(this)">
+  </div>
+
+  <!-- Viewer layout (ẩn cho đến khi có file) -->
+  <div id="rv-viewer-area" style="display:none">
+    <div class="rv-layout">
+
+      <!-- Cột trái: thumbnail strip -->
+      <div class="rv-strip" id="rv-strip"></div>
+
+      <!-- Vùng giữa: viewer + nav -->
+      <div class="rv-main">
+        <div class="rv-viewer" id="rv-viewer">
+          <div class="rv-page-empty">Chọn trang ở bên trái</div>
+        </div>
+        <div class="rv-nav">
+          <button class="rv-nav-btn" id="rv-prev" onclick="rvGo(-1)">◀ Trước</button>
+          <div class="rv-nav-pg" id="rv-nav-pg">— / —</div>
+          <button class="rv-nav-btn" id="rv-next" onclick="rvGo(1)">Tiếp ▶</button>
+          <label class="rv-nav-btn" for="rv-file-input" style="cursor:pointer;margin-left:8px">+ Thêm file</label>
+        </div>
+      </div>
+
+      <!-- Cột phải: khung ký + tiến độ -->
+      <div class="rv-sidebar">
+        <div class="rv-sig-panel">
+          <div class="rv-sig-title" id="rv-pg-label">TRANG 1</div>
+
+          <!-- Mini khung tên -->
+          <div class="rv-mini-frame" id="rv-mini-frame">
+            <div style="background:#f5f0e0;padding:4px 6px;border-bottom:1px solid #ddd;display:flex;flex-direction:column;align-items:center">
+              <div style="font-family:'Syne',sans-serif;font-size:10px;font-weight:800;background:linear-gradient(135deg,#b8860b,#d4a017,#f0c040);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">ALN</div>
+              <div style="font-size:6px;color:#8a6820;font-family:'Oswald',sans-serif;letter-spacing:.08em">App Làm Nhà Corp.</div>
+            </div>
+            <div style="padding:5px 6px;display:flex;flex-direction:column;gap:4px">
+              <div style="font-size:8px;color:#666;font-family:'Oswald',sans-serif;border-bottom:1px solid #eee;padding-bottom:3px" id="rv-doc-name">Tên bản vẽ</div>
+              <!-- Ô chữ ký KTS -->
+              <div style="background:#fffff8;border:0.5px dashed #c9a84c;border-radius:2px;min-height:36px;display:flex;align-items:center;justify-content:center;position:relative" id="rv-sig-box">
+                <span id="rv-sig-placeholder" style="font-size:8px;color:#c9a84c;font-family:'Oswald',sans-serif;letter-spacing:.04em">Ô ký KTS</span>
+              </div>
+              <div style="font-size:7px;color:#999;font-family:'Oswald',sans-serif" id="rv-sig-date"></div>
+            </div>
+          </div>
+
+          <!-- Nút Ký -->
+          <button class="rv-sign-btn" id="rv-sign-btn" onclick="rvSignPage()">✦ KÝ TRANG NÀY</button>
+          <div class="rv-no-sig-warn" id="rv-no-sig-warn">
+            Chưa có chữ ký. Vào <b>Hồ sơ → Chữ ký điện tử</b> để upload trước.
+          </div>
+        </div>
+
+        <!-- Tiến độ ký -->
+        <div class="rv-progress">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+            <span>Tiến độ ký</span>
+            <span id="rv-prog-txt">0 / 0</span>
+          </div>
+          <div class="rv-prog-bar"><div class="rv-prog-fill" id="rv-prog-fill" style="width:0%"></div></div>
+        </div>
+
+        <button class="rv-submit-btn" id="rv-submit-btn" onclick="rvSubmitAll()">
+          ✓ NỘP TOÀN BỘ HỒ SƠ ĐÃ KÝ
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const SVG_KT=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:5px;opacity:.7"><polyline points="3 17 3 3 17 3"/><polyline points="7 17 17 7"/><line x1="3" y1="17" x2="17" y2="17"/><line x1="17" y1="17" x2="17" y2="7"/></svg>`;
 const SVG_KC=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:5px;opacity:.7"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M16 7V5a2 2 0 00-8 0v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>`;
@@ -488,6 +605,165 @@ function switchTab(id,el){
   document.getElementById('tab-'+id).classList.add('active');
 }
 
+/* ═══════════════════════════════════════
+   XEM & KÝ — logic
+═══════════════════════════════════════ */
+var _rvPages = [];      // [{file, url, name, signed, sigTs}]
+var _rvCur   = 0;
+var _rvSigUrl = '';     // chữ ký của user (load từ Firebase module)
+var _rvUserName = '';
+
+// Expose để Firebase module set sau khi auth
+window._rvSetSig = function(url, name) { _rvSigUrl = url; _rvUserName = name; _rvRefreshSignBtn(); };
+
+function rvLoadFiles(input) {
+  var files = Array.from(input.files || []);
+  if (!files.length) return;
+  files.forEach(function(f) {
+    var url = URL.createObjectURL(f);
+    _rvPages.push({ file: f, url: url, name: f.name, signed: false, sigTs: '' });
+  });
+  document.getElementById('rv-upload-area').style.display = 'none';
+  document.getElementById('rv-viewer-area').style.display = 'block';
+  _rvRenderStrip();
+  rvGoto(0);
+}
+
+function _rvRenderStrip() {
+  var strip = document.getElementById('rv-strip');
+  strip.innerHTML = _rvPages.map(function(p, i) {
+    return '<div class="rv-thumb' + (i===_rvCur?' active':'') + (p.signed?' signed':'') + '" onclick="rvGoto('+i+')" id="rv-th-'+i+'">'
+      + (p.url ? '<img src="'+p.url+'" loading="lazy">' : '<div class="rv-thumb-empty">'+p.name+'</div>')
+      + '<div class="rv-thumb-num">'+(i+1)+'</div>'
+      + '<div class="rv-thumb-check"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>'
+      + '</div>';
+  }).join('');
+}
+
+function rvGoto(idx) {
+  if (idx < 0 || idx >= _rvPages.length) return;
+  _rvCur = idx;
+
+  // Highlight thumbnail
+  document.querySelectorAll('.rv-thumb').forEach(function(t,i){ t.classList.toggle('active', i===idx); });
+  // Scroll thumb vào view
+  var th = document.getElementById('rv-th-'+idx);
+  if (th) th.scrollIntoView({block:'nearest'});
+
+  // Hiển thị trang
+  var viewer = document.getElementById('rv-viewer');
+  var p = _rvPages[idx];
+  if (p.url) {
+    var isImg = p.file.type.startsWith('image/');
+    viewer.innerHTML = isImg
+      ? '<img class="rv-page-img" src="'+p.url+'" alt="Trang '+(idx+1)+'">'
+      : '<embed src="'+p.url+'" type="application/pdf" class="rv-page-img" style="min-height:70vh;background:#fff">';
+  }
+
+  // Nav label
+  document.getElementById('rv-nav-pg').textContent = 'Trang ' + (idx+1) + ' / ' + _rvPages.length;
+  document.getElementById('rv-prev').disabled = idx === 0;
+  document.getElementById('rv-next').disabled = idx === _rvPages.length - 1;
+
+  // Sidebar
+  document.getElementById('rv-pg-label').textContent = 'TRANG ' + (idx+1) + ' — ' + _rvShortName(p.name);
+  document.getElementById('rv-doc-name').textContent = _rvShortName(p.name).replace(/\.[^.]+$/,'').toUpperCase();
+
+  // Trạng thái ô ký
+  var box = document.getElementById('rv-sig-box');
+  var ph  = document.getElementById('rv-sig-placeholder');
+  var dt  = document.getElementById('rv-sig-date');
+  if (p.signed && p.sigImg) {
+    ph.style.display = 'none';
+    var existing = box.querySelector('img.rv-sig-img');
+    if (!existing) { existing = document.createElement('img'); existing.className='rv-sig-img'; existing.style.cssText='max-width:90%;max-height:32px;object-fit:contain'; box.appendChild(existing); }
+    existing.src = p.sigImg;
+    dt.textContent = p.sigTs;
+  } else {
+    ph.style.display = '';
+    var old = box.querySelector('img.rv-sig-img'); if(old) old.remove();
+    dt.textContent = '';
+  }
+
+  _rvRefreshSignBtn();
+  _rvUpdateProgress();
+}
+
+function rvGo(delta) { rvGoto(_rvCur + delta); }
+
+function _rvShortName(n) { return n.length > 24 ? n.slice(0,22)+'…' : n; }
+
+function _rvRefreshSignBtn() {
+  var btn = document.getElementById('rv-sign-btn');
+  var warn = document.getElementById('rv-no-sig-warn');
+  if (!btn) return;
+  if (!_rvSigUrl) {
+    btn.style.display = 'none';
+    warn.style.display = 'block';
+    return;
+  }
+  btn.style.display = 'block';
+  warn.style.display = 'none';
+  var p = _rvPages[_rvCur];
+  if (p && p.signed) {
+    btn.textContent = '✓ ĐÃ KÝ';
+    btn.className = 'rv-sign-btn signed';
+    btn.disabled = false;
+  } else {
+    btn.textContent = '✦ KÝ TRANG NÀY';
+    btn.className = 'rv-sign-btn';
+    btn.disabled = false;
+  }
+}
+
+function rvSignPage() {
+  if (!_rvSigUrl) return;
+  var p = _rvPages[_rvCur];
+  if (!p) return;
+  var now = new Date();
+  var d = now.getDate().toString().padStart(2,'0')+'/'+(now.getMonth()+1).toString().padStart(2,'0')+'/'+now.getFullYear();
+  p.signed = true;
+  p.sigImg = _rvSigUrl;
+  p.sigTs  = _rvUserName + ' · ' + d;
+
+  // Cập nhật thumbnail
+  var th = document.getElementById('rv-th-'+_rvCur);
+  if (th) th.classList.add('signed');
+
+  // Cập nhật sidebar
+  rvGoto(_rvCur);
+
+  // Tự sang trang kế nếu có
+  setTimeout(function() {
+    var next = _rvCur + 1;
+    if (next < _rvPages.length && !_rvPages[next].signed) rvGoto(next);
+  }, 600);
+}
+
+function _rvUpdateProgress() {
+  var total  = _rvPages.length;
+  var signed = _rvPages.filter(function(p){ return p.signed; }).length;
+  document.getElementById('rv-prog-txt').textContent = signed + ' / ' + total;
+  document.getElementById('rv-prog-fill').style.width = (total ? Math.round(signed/total*100) : 0) + '%';
+  var sub = document.getElementById('rv-submit-btn');
+  if (sub) sub.className = 'rv-submit-btn' + (signed===total&&total>0?' show':'');
+}
+
+function rvSubmitAll() {
+  // Tích hợp với Firebase — gọi window.doSign('kts') để ghi vào Firestore
+  if (window.doSign) window.doSign('kts');
+  alert('Đã ký ' + _rvPages.length + ' trang · Đang nộp lên hệ thống...');
+}
+
+// Phím tắt ← →
+document.addEventListener('keydown', function(e) {
+  var rv = document.getElementById('tab-review');
+  if (!rv || !rv.classList.contains('active')) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); rvGo(1); }
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); rvGo(-1); }
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); rvSignPage(); }
+});
+
 // Auto-fill từ URL params khi mở từ dashboard
 (function(){
   var p=new URLSearchParams(location.search);
@@ -541,6 +817,9 @@ onAuthStateChanged(auth, async function(user) {
   _role = data.role || '';
   _sigUrl = data.signatureUrl || '';
   _userName = data.name || '';
+
+  // Đồng bộ sang tab Xem & Ký
+  if (window._rvSetSig) window._rvSetSig(_sigUrl, _userName);
 
   // Hiện nút Ký cho role phù hợp
   var key = ROLE_SIGN_KEY[_role];
