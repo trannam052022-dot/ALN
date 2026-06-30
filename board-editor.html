@@ -379,6 +379,16 @@ input[type=file]{display:none}
   <div class="divider"></div>
 
   <div>
+    <div class="info-label">CLIENT</div>
+    <div class="info-row">
+      <span class="info-icon">👤</span>
+      <span class="info-sub" id="bd-client-name" contenteditable="true">CHỦ ĐẦU TƯ</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div>
     <div class="info-label">CONCEPT</div>
     <div class="info-main" style="font-size:.92em" contenteditable="true">MODERN LUXURY</div>
     <div class="info-sub" contenteditable="true">TỐI GIẢN – TINH TẾ – BỀN VỮNG</div>
@@ -736,6 +746,7 @@ document.querySelectorAll('[contenteditable]').forEach(el => {
   const subs = document.querySelectorAll('.info-sub');
   if(p.get('location') && subs[1]) subs[1].textContent = p.get('location').toUpperCase();
   if(p.get('type')     && subs[2]) subs[2].textContent = p.get('type').toUpperCase();
+  if(p.get('client')) { const el=document.getElementById('bd-client-name'); if(el) el.textContent=p.get('client').toUpperCase(); }
 })();
 </script>
 
