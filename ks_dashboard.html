@@ -363,7 +363,12 @@ var CTV = null;
 onAuthStateChanged(auth, async function(user) {
   if (!user) { location.href = 'login.html'; return; }
   var snap = await getDoc(doc(db, 'users', user.uid));
-  if (!snap.exists() || snap.data().role !== 'ks') { location.href = 'login.html'; return; }
+  var _ksRole = snap.exists() ? snap.data().role : '';
+  if (_ksRole !== 'ks' && _ksRole !== 'founder') {
+    var PAGE_BY_ROLE = { founder:'founder_panel.html', kts:'kts_dashboard.html', designer:'designer_dashboard.html', dn:'client_DN.html', cn:'client_CN.html' };
+    location.href = PAGE_BY_ROLE[_ksRole] || 'login.html'; return;
+  }
+  if (_ksRole === 'founder') { CTV = { role:'ks', name:'KTS. Trần Đại Long (Founder)', tinh:'', uid: user.uid }; }
 
   CTV = snap.data();
   CTV.uid = user.uid;
