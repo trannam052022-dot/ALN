@@ -791,7 +791,11 @@ function _rvFitPaper() {
   if (availW <= 0 || availH <= 0) return;
   var scale = Math.min(availW / BASE_W, availH / BASE_H);
   paper.style.transform = 'scale(' + scale + ')';
-  content.style.height = (BASE_H * scale + 16) + 'px';
+  paper.style.transformOrigin = 'top left';
+  // transform không ảnh hưởng layout → bù margin âm để layout khớp visual size
+  paper.style.marginRight  = (BASE_W * scale - BASE_W) + 'px';
+  paper.style.marginBottom = (BASE_H * scale - BASE_H) + 'px';
+  content.style.height = 'auto';
 }
 window.addEventListener('resize', _rvFitPaper);
 
