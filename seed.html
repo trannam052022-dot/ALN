@@ -135,7 +135,11 @@
           <h2>Hồ sơ dự án — projects/{code}</h2>
           <div class="row">
             <div class="field"><label for="p-code">Mã dự án (= doc ID)</label>
-              <input id="p-code" placeholder="ALN-XXXX" /></div>
+              <div style="display:flex;gap:8px">
+                <input id="p-code" placeholder="ALN-XXXX" style="flex:1" />
+                <button class="mini" id="gen-code" type="button">Tự sinh</button>
+              </div>
+            </div>
             <div class="field"><label for="p-stage">Chặng hiện tại</label>
               <select id="p-stage"><option>C1</option><option selected>C2</option><option>C3</option><option>C4</option></select></div>
           </div>
@@ -443,16 +447,9 @@ $('run').addEventListener('click', async () => {
   const data = buildProjectData(true);
   const code = data.code;
 
-  if(!code){ showBanner('err','Thiếu mã dự án.'); return; }
+  if(!code){ showBanner('err','Thiếu mã dự án. Bấm "Tự sinh" hoặc nhập tay.'); return; }
+  if(!/^ALN-\d{4}$/.test(code)){ showBanner('err','Mã dự án phải đúng định dạng ALN-XXXX (4 chữ số). Bấm "Tự sinh".'); return; }
   if(!data.cn || !data.kts){ showBanner('err','CN và KTS bắt buộc phải có uid (bấm "Tìm uid" hoặc dán tay).'); return; }
-  // Tự động thêm prefix nếu thiếu
-  if(!/^ALN-(CN|DN)-/.test(code)){
-    const prefix = (data.dn && data.dn.uid && !data.cn) ? 'ALN-DN-' : 'ALN-CN-';
-    const fixed = prefix + code.replace(/^ALN-/i,'');
-    $('p-code').value = fixed;
-    data.code = fixed;
-    log('warn','Mã dự án tự đổi thành: '+fixed);
-  }
 
   $('run').disabled = true;
   log('info','── Bắt đầu seed '+code+' ──');
@@ -535,6 +532,13 @@ $('run').addEventListener('click', async () => {
   }finally{
     $('run').disabled = false;
   }
+});
+
+/* ---- tự sinh mã ALN-XXXX ---- */
+$('gen-code').addEventListener('click', function(){
+  const n = String(Math.floor(Math.random() * 9000) + 1000);
+  $('p-code').value = 'ALN-' + n;
+  refreshPreview();
 });
 
 refreshPreview();
