@@ -56,6 +56,12 @@ service firebase.storage {
       allow write: if request.auth != null && request.auth.uid == 'h4kEguPEyMcwJwl89stc0Q6j2si2';
     }
 
+    // Kho hồ sơ mẫu (gói kinh tế) — ảnh công khai xem trên home.html, chỉ Founder upload/xoá
+    match /mau/{allPaths=**} {
+      allow read:  if true;
+      allow write: if request.auth != null && request.auth.uid == 'h4kEguPEyMcwJwl89stc0Q6j2si2';
+    }
+
     // Module Giữ chỗ — hồ sơ nộp (giấy phép, portfolio, ảnh công trình)
     match /reservations/{uid}/{file=**} {
       allow read, write: if request.auth != null && request.auth.uid == uid;

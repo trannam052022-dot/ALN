@@ -200,6 +200,12 @@ service cloud.firestore {
       }
     }
 
+    // Kho hồ sơ mẫu (gói kinh tế) — công khai đọc trên home.html, chỉ Founder ghi
+    match /mauNha/{id} {
+      allow read: if true;
+      allow write: if isFounder();
+    }
+
     // MyMy Agent Loop — DN chỉ đọc session của chính mình; ghi qua Cloud Function
     match /mymy_sessions/{dnId} {
       allow read: if signedIn() && request.auth.uid == dnId;

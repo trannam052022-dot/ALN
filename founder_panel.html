@@ -927,6 +927,7 @@ body {
     <button class="fsub" id="tabRecruit"  onclick="switchTab('recruit')" ><i class="ph-duotone ph-megaphone"></i>Tuyển dụng</button>
     <button class="fsub" id="tabCompany"  onclick="switchTab('company')" ><i class="ph-duotone ph-buildings"></i>Cài đặt CTY</button>
     <button class="fsub" id="tabPricing"  onclick="switchTab('pricing')" ><i class="ph-duotone ph-tag"></i>Khung giá</button>
+    <button class="fsub" id="tabKhomau"  onclick="switchTab('khomau')" ><i class="ph-duotone ph-house-line"></i>Kho mẫu</button>
     <a href="aln_community.html" class="fsub" style="text-decoration:none"><i class="ph-duotone ph-campfire"></i>Nhịp sống</a>
   </span>
 
@@ -1805,6 +1806,94 @@ document.addEventListener('DOMContentLoaded', function() {
 
   <div style="margin-top:22px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;font-family:var(--mono);font-size:11.5px;line-height:1.65;color:var(--sub)">
     <b style="color:var(--gold)">Nút "Lưu lên hệ thống":</b> validate Sàn≤Tiếp thị≤Trần trước, rồi ghi thẳng vào Firestore document <b style="color:var(--text2)">settings/pricing_bands</b> — kèm version & updatedAt. Chỉ Founder mới ghi được (rule: <span style="color:var(--dim)">settings/{docId} write: isFounder()</span>).
+  </div>
+</div>
+
+<!-- ══ PANEL: KHO HỒ SƠ MẪU (GÓI KINH TẾ) ══ -->
+<div id="panelKhomau" style="display:none;flex-direction:column;flex:1;overflow-y:auto;padding:24px 28px">
+  <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px">VẬN HÀNH · KHO MẪU</div>
+  <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1);margin-bottom:6px">Kho hồ sơ mẫu — gói kinh tế</div>
+  <div style="font-size:13px;color:var(--sub);margin-bottom:18px;max-width:74ch">Quản lý mẫu hiển thị trên trang chủ (mục "Kho mẫu"). Thêm/sửa/xoá, bật/tắt hiển thị, sắp xếp thứ tự, upload nhiều ảnh mỗi mẫu (ảnh đầu = phối cảnh đại diện).</div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+    <button onclick="khomauOpenForm(null)" style="font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 16px;border-radius:8px;border:none;background:var(--gold);color:#fff;cursor:pointer">➕ Thêm mẫu mới</button>
+    <div id="khomauMsg" style="font-family:var(--mono);font-size:12px;color:var(--gold)"></div>
+  </div>
+
+  <div style="overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--card)">
+    <table style="width:100%;border-collapse:collapse;min-width:900px">
+      <thead><tr>
+        <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--raised);border-bottom:1px solid var(--border);white-space:nowrap">Thứ tự</th>
+        <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--raised);border-bottom:1px solid var(--border);white-space:nowrap">Mã</th>
+        <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--raised);border-bottom:1px solid var(--border);white-space:nowrap">Danh mục</th>
+        <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--raised);border-bottom:1px solid var(--border);white-space:nowrap">m² đất</th>
+        <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--raised);border-bottom:1px solid var(--border);white-space:nowrap">Tầng</th>
+        <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);text-align:left;padding:12px 11px;background:var(--raised);border-bottom:1px solid var(--border);white-space:nowrap">Giá gói kinh tế</th>
+        <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--raised);border-bottom:1px solid var(--border);white-space:nowrap">Ảnh</th>
+        <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--raised);border-bottom:1px solid var(--border);white-space:nowrap">Hiển thị</th>
+        <th style="background:var(--raised);border-bottom:1px solid var(--border);padding:12px 11px"></th>
+      </tr></thead>
+      <tbody id="khomauBody"></tbody>
+    </table>
+  </div>
+  <div style="margin-top:22px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;font-family:var(--mono);font-size:11.5px;line-height:1.65;color:var(--sub)">
+    <b style="color:var(--gold)">Ảnh</b> lưu tại Firebase Storage <span style="color:var(--dim)">mau/&lt;mã&gt;/</span>, ai cũng xem được, chỉ Founder upload/xoá. <b style="color:var(--gold)">Dữ liệu</b> lưu Firestore <span style="color:var(--dim)">mauNha/&lt;mã&gt;</span> — trang chủ chỉ hiện mẫu có <span style="color:var(--text2)">visible = true</span>, sắp theo <span style="color:var(--text2)">order</span>.
+  </div>
+</div>
+
+<!-- ══ MODAL THÊM/SỬA MẪU KHO ══ -->
+<div id="khomauModal" onclick="if(event.target===this)khomauCloseForm()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:220;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:640px;max-width:100%;box-shadow:0 24px 60px rgba(0,0,0,.35)">
+    <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:15px;font-weight:700;color:var(--text1)" id="khomauModalTitle">Thêm mẫu mới</div>
+      <button onclick="khomauCloseForm()" style="background:none;border:none;font-size:20px;color:var(--dim);cursor:pointer">×</button>
+    </div>
+    <div style="padding:22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="display:block;font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Mã (duy nhất)</label>
+          <input id="kmMa" type="text" placeholder="NP-01" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:13px;background:var(--raised);color:var(--text1)">
+        </div>
+        <div>
+          <label style="display:block;font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Danh mục</label>
+          <select id="kmCat" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--sans);font-size:13px;background:var(--raised);color:var(--text1)">
+            <option value="nhapho">Nhà phố</option>
+            <option value="bietthu">Biệt thự</option>
+            <option value="nhavuon">Nhà vườn</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div>
+          <label style="display:block;font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">m² đất</label>
+          <input id="kmDt" type="number" min="0" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:13px;background:var(--raised);color:var(--text1)">
+        </div>
+        <div>
+          <label style="display:block;font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Số tầng</label>
+          <input id="kmTang" type="number" min="0" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:13px;background:var(--raised);color:var(--text1)">
+        </div>
+        <div>
+          <label style="display:block;font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Giá (VNĐ)</label>
+          <input id="kmGia" type="number" min="0" step="100000" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:13px;background:var(--raised);color:var(--text1)">
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input id="kmVisible" type="checkbox" checked style="width:16px;height:16px">
+        <label for="kmVisible" style="font-size:13px;color:var(--text2)">Hiển thị trên trang chủ</label>
+      </div>
+
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <label style="font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)">Ảnh (ảnh đầu = phối cảnh đại diện)</label>
+          <button onclick="khomauAddImageRow()" style="font-family:var(--sans);font-size:12px;font-weight:600;padding:5px 11px;border-radius:6px;border:1px dashed var(--gold-bd);background:var(--gold-bg);color:var(--gold);cursor:pointer">➕ Thêm ảnh</button>
+        </div>
+        <div id="kmImgRows" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+    </div>
+    <div style="padding:16px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px">
+      <button onclick="khomauCloseForm()" style="font-family:var(--sans);font-size:13px;font-weight:600;padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);cursor:pointer">Huỷ</button>
+      <button onclick="khomauSave()" style="font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 18px;border-radius:8px;border:none;background:var(--gold);color:#fff;cursor:pointer">💾 Lưu mẫu</button>
+    </div>
   </div>
 </div>
 
@@ -2688,7 +2777,7 @@ window.ALNRealtime = (() => {
 ══════════════════════════════════════════ */
 
 function switchTab(t){
-  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','pending','payments','recruit','company','pricing','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
+  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','pending','payments','recruit','company','pricing','khomau','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
   var activeStyle  = 'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.15);color:var(--blue);white-space:nowrap';
   var inactiveStyle= 'padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:var(--raised);color:var(--sub);white-space:nowrap';
   var liveStyles = {
@@ -2704,6 +2793,7 @@ function switchTab(t){
     payments: {active:'padding:5px 13px;border:1px solid rgba(16,185,129,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.2);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     company:  {active:'padding:5px 13px;border:1px solid rgba(201,168,76,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.2);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     pricing:  {active:'padding:5px 13px;border:1px solid rgba(201,168,76,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.2);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap'},
+    khomau:   {active:'padding:5px 13px;border:1px solid rgba(201,168,76,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.2);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap'},
   };
 
   ALL.forEach(function(tab){
@@ -2731,6 +2821,7 @@ function switchTab(t){
   if(t==='recruit')  { if(typeof window._recruitRender==='function') window._recruitRender(); }
   if(t==='company')  loadCompanySettings();
   if(t==='pricing')  initPricingPanel();
+  if(t==='khomau')   initKhomauPanel();
   if(t==='waitRoom') loadWaitRoom();
   if(t==='matching')   loadMatchingPanel();
   if(t==='c2monitor')  loadC2MonitorPanel();
@@ -4947,6 +5038,220 @@ window.saveCompanySettings = async function() {
       window.pricingSaveToFirestore(pBuildDoc());
     } else {
       pMsg("❌ Firebase chưa sẵn sàng, thử lại sau vài giây.");
+    }
+  };
+})();
+
+/* ══════════════════════════════════════════
+   KHO HỒ SƠ MẪU (GÓI KINH TẾ) — CRUD Firestore + Storage
+══════════════════════════════════════════ */
+(function(){
+  var KM_CATNAME = { nhapho:'Nhà phố', bietthu:'Biệt thự', nhavuon:'Nhà vườn' };
+  var KM_ITEMS = [];       // toàn bộ mẫu, đã sort theo order
+  var KM_EDIT_MA = null;   // null = đang thêm mới; khác null = đang sửa mã này
+  var KM_IMG_ROWS = [];    // [{ src: '' | existingUrl, cap: '', file: File|null }]
+
+  function kmFmt(n){
+    n = Math.round(n||0);
+    var s = String(n), out = '', c = 0;
+    for(var i=s.length-1;i>=0;i--){ out=s.charAt(i)+out; c++; if(c%3===0 && i>0) out='.'+out; }
+    return out + 'đ';
+  }
+  function kmMsg(t, ok){
+    var el = document.getElementById('khomauMsg');
+    if(!el) return;
+    el.textContent = t || '';
+    el.style.color = ok ? 'var(--green)' : 'var(--red)';
+    if(t) setTimeout(function(){ if(el.textContent===t) el.textContent=''; }, 4000);
+  }
+
+  window.initKhomauPanel = async function(){
+    var body = document.getElementById('khomauBody');
+    if(body) body.innerHTML = '<tr><td colspan="9" style="padding:20px;text-align:center;color:var(--dim);font-family:var(--mono);font-size:12px">Đang tải...</td></tr>';
+    try {
+      var q = query(collection(db, 'mauNha'), orderBy('order'));
+      var snap = await getDocs(q);
+      KM_ITEMS = [];
+      snap.forEach(function(d){ KM_ITEMS.push(d.data()); });
+      kmRenderTable();
+    } catch(e) {
+      if(body) body.innerHTML = '<tr><td colspan="9" style="padding:20px;text-align:center;color:var(--red);font-family:var(--mono);font-size:12px">Lỗi tải dữ liệu: '+(e.message||e)+'</td></tr>';
+    }
+  };
+
+  function kmRenderTable(){
+    var body = document.getElementById('khomauBody');
+    if(!body) return;
+    if(KM_ITEMS.length===0){
+      body.innerHTML = '<tr><td colspan="9" style="padding:24px;text-align:center;color:var(--dim);font-family:var(--sans);font-size:13px">Chưa có mẫu nào. Bấm "Thêm mẫu mới" để bắt đầu.</td></tr>';
+      return;
+    }
+    var html = '';
+    KM_ITEMS.forEach(function(it, idx){
+      var cover = (it.imgs && it.imgs[0] && it.imgs[0].src) ? it.imgs[0].src : '';
+      var thumb = cover
+        ? '<img src="'+cover+'" style="width:44px;height:33px;object-fit:cover;border-radius:5px;border:1px solid var(--border)">'
+        : '<div style="width:44px;height:33px;border-radius:5px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;color:var(--mute)"><i class="ph-duotone ph-image" style="font-size:14px"></i></div>';
+      html += '<tr style="border-bottom:1px solid var(--border)">' +
+        '<td style="padding:10px 11px;font-family:var(--mono);font-size:12px;color:var(--sub)">' +
+          '<button onclick="khomauMove(\''+it.ma+'\',-1)" '+(idx===0?'disabled':'')+' style="background:none;border:none;cursor:pointer;color:var(--dim);padding:2px"><i class="ph-duotone ph-caret-up"></i></button>' +
+          '<button onclick="khomauMove(\''+it.ma+'\',1)" '+(idx===KM_ITEMS.length-1?'disabled':'')+' style="background:none;border:none;cursor:pointer;color:var(--dim);padding:2px"><i class="ph-duotone ph-caret-down"></i></button>' +
+        '</td>' +
+        '<td style="padding:10px 11px;font-family:var(--mono);font-weight:700;font-size:12.5px;color:var(--gold)"># '+it.ma+'</td>' +
+        '<td style="padding:10px 11px;font-size:12.5px;color:var(--text2)">'+(KM_CATNAME[it.cat]||it.cat)+'</td>' +
+        '<td style="padding:10px 11px;font-family:var(--mono);font-size:12.5px;color:var(--text2)">'+it.dt+'</td>' +
+        '<td style="padding:10px 11px;font-family:var(--mono);font-size:12.5px;color:var(--text2)">'+it.tang+'</td>' +
+        '<td style="padding:10px 11px;font-family:var(--mono);font-size:12.5px;color:var(--gold);font-weight:700">'+kmFmt(it.gia)+'</td>' +
+        '<td style="padding:10px 11px">'+thumb+'</td>' +
+        '<td style="padding:10px 11px"><input type="checkbox" '+(it.visible?'checked':'')+' onchange="khomauToggleVisible(\''+it.ma+'\',this.checked)" style="width:16px;height:16px;cursor:pointer"></td>' +
+        '<td style="padding:10px 11px;white-space:nowrap">' +
+          '<button onclick="khomauOpenForm(\''+it.ma+'\')" style="background:none;border:none;cursor:pointer;color:var(--blue);padding:4px;font-size:15px"><i class="ph-duotone ph-pencil-simple"></i></button>' +
+          '<button onclick="khomauDelete(\''+it.ma+'\')" style="background:none;border:none;cursor:pointer;color:var(--red);padding:4px;font-size:15px"><i class="ph-duotone ph-trash"></i></button>' +
+        '</td>' +
+      '</tr>';
+    });
+    body.innerHTML = html;
+  }
+
+  function kmRenderImgRows(){
+    var box = document.getElementById('kmImgRows');
+    if(!box) return;
+    var html = '';
+    KM_IMG_ROWS.forEach(function(row, i){
+      var preview = row.src
+        ? '<img src="'+row.src+'" style="width:38px;height:28px;object-fit:cover;border-radius:4px;border:1px solid var(--border);flex-shrink:0">'
+        : '<div style="width:38px;height:28px;border-radius:4px;border:1px dashed var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--mute)"><i class="ph-duotone ph-image" style="font-size:12px"></i></div>';
+      html += '<div style="display:flex;align-items:center;gap:8px;background:var(--raised);border:1px solid var(--border);border-radius:8px;padding:7px 9px">' +
+        preview +
+        '<input type="text" value="'+(row.cap||'').replace(/"/g,'&quot;')+'" placeholder="Chú thích, vd: Mặt bằng tầng 1" oninput="khomauSetImgCap('+i+',this.value)" style="flex:1;border:none;background:none;font-size:12.5px;color:var(--text1);outline:none">' +
+        '<label style="font-size:11px;color:var(--blue);cursor:pointer;white-space:nowrap"><i class="ph-duotone ph-upload-simple"></i> Ảnh<input type="file" accept="image/*" style="display:none" onchange="khomauSetImgFile('+i+',this)"></label>' +
+        (i>0?'<button onclick="khomauMoveImg('+i+',-1)" style="background:none;border:none;cursor:pointer;color:var(--dim)"><i class="ph-duotone ph-arrow-up"></i></button>':'') +
+        (i<KM_IMG_ROWS.length-1?'<button onclick="khomauMoveImg('+i+',1)" style="background:none;border:none;cursor:pointer;color:var(--dim)"><i class="ph-duotone ph-arrow-down"></i></button>':'') +
+        '<button onclick="khomauRemoveImgRow('+i+')" style="background:none;border:none;cursor:pointer;color:var(--red)"><i class="ph-duotone ph-x"></i></button>' +
+      '</div>';
+    });
+    box.innerHTML = html;
+  }
+
+  window.khomauAddImageRow = function(){
+    KM_IMG_ROWS.push({ src:'', cap:'', file:null });
+    kmRenderImgRows();
+  };
+  window.khomauRemoveImgRow = function(i){ KM_IMG_ROWS.splice(i,1); kmRenderImgRows(); };
+  window.khomauMoveImg = function(i, dir){
+    var j = i+dir;
+    if(j<0 || j>=KM_IMG_ROWS.length) return;
+    var tmp = KM_IMG_ROWS[i]; KM_IMG_ROWS[i]=KM_IMG_ROWS[j]; KM_IMG_ROWS[j]=tmp;
+    kmRenderImgRows();
+  };
+  window.khomauSetImgCap = function(i, v){ if(KM_IMG_ROWS[i]) KM_IMG_ROWS[i].cap = v; };
+  window.khomauSetImgFile = function(i, input){
+    var f = input.files && input.files[0];
+    if(!f || !KM_IMG_ROWS[i]) return;
+    KM_IMG_ROWS[i].file = f;
+    KM_IMG_ROWS[i].src = URL.createObjectURL(f); // preview tạm, sẽ thay bằng downloadURL thật sau khi lưu
+    kmRenderImgRows();
+  };
+
+  window.khomauOpenForm = function(ma){
+    KM_EDIT_MA = ma;
+    var it = ma ? KM_ITEMS.filter(function(x){return x.ma===ma;})[0] : null;
+    document.getElementById('khomauModalTitle').textContent = ma ? ('Sửa mẫu # '+ma) : 'Thêm mẫu mới';
+    document.getElementById('kmMa').value = it ? it.ma : '';
+    document.getElementById('kmMa').disabled = !!it; // không đổi mã khi sửa (mã = doc id)
+    document.getElementById('kmCat').value = it ? it.cat : 'nhapho';
+    document.getElementById('kmDt').value = it ? it.dt : '';
+    document.getElementById('kmTang').value = it ? it.tang : '';
+    document.getElementById('kmGia').value = it ? it.gia : '';
+    document.getElementById('kmVisible').checked = it ? !!it.visible : true;
+    KM_IMG_ROWS = it && it.imgs ? it.imgs.map(function(im){ return { src: im.src||'', cap: im.cap||'', file:null }; }) : [{ src:'', cap:'Phối cảnh mặt tiền', file:null }];
+    kmRenderImgRows();
+    document.getElementById('khomauModal').style.display = 'flex';
+  };
+
+  window.khomauCloseForm = function(){
+    document.getElementById('khomauModal').style.display = 'none';
+  };
+
+  window.khomauSave = async function(){
+    var ma = document.getElementById('kmMa').value.trim();
+    var cat = document.getElementById('kmCat').value;
+    var dt = parseFloat(document.getElementById('kmDt').value);
+    var tang = parseFloat(document.getElementById('kmTang').value);
+    var gia = parseFloat(document.getElementById('kmGia').value);
+    var visible = document.getElementById('kmVisible').checked;
+
+    if(!ma){ kmMsg('❌ Thiếu mã mẫu.'); return; }
+    if(!KM_EDIT_MA && KM_ITEMS.some(function(x){return x.ma===ma;})){ kmMsg('❌ Mã "'+ma+'" đã tồn tại.'); return; }
+    if(isNaN(dt) || isNaN(tang) || isNaN(gia)){ kmMsg('❌ m² đất / số tầng / giá phải là số.'); return; }
+
+    kmMsg('⏳ Đang lưu...', true);
+    try {
+      var imgs = [];
+      for(var i=0;i<KM_IMG_ROWS.length;i++){
+        var row = KM_IMG_ROWS[i];
+        var src = row.src;
+        if(row.file){
+          var ref = storageRef(storage, 'mau/'+ma+'/'+Date.now()+'-'+row.file.name);
+          await uploadBytes(ref, row.file, { contentType: row.file.type });
+          src = await getDownloadURL(ref);
+        }
+        if(src && !src.startsWith('blob:')) imgs.push({ src: src, cap: row.cap || '' });
+      }
+
+      var order = KM_EDIT_MA
+        ? (KM_ITEMS.filter(function(x){return x.ma===ma;})[0]||{}).order
+        : (KM_ITEMS.length ? Math.max.apply(null, KM_ITEMS.map(function(x){return x.order||0;})) + 1 : 1);
+
+      var data = {
+        ma: ma, cat: cat, dt: dt, tang: tang, gia: gia, imgs: imgs,
+        order: order, visible: visible, updatedAt: serverTimestamp()
+      };
+      if(!KM_EDIT_MA) data.createdAt = serverTimestamp();
+
+      await setDoc(doc(db, 'mauNha', ma), data, { merge: true });
+      kmMsg('✅ Đã lưu mẫu # '+ma, true);
+      window.khomauCloseForm();
+      window.initKhomauPanel();
+    } catch(e) {
+      kmMsg('❌ Lỗi: ' + (e.message||e), false);
+    }
+  };
+
+  window.khomauDelete = async function(ma){
+    if(!confirm('Xoá mẫu # '+ma+'? Ảnh trên Storage sẽ không tự xoá theo, cần dọn thủ công nếu cần.')) return;
+    try {
+      await deleteDoc(doc(db, 'mauNha', ma));
+      kmMsg('✅ Đã xoá mẫu # '+ma, true);
+      window.initKhomauPanel();
+    } catch(e) {
+      kmMsg('❌ Lỗi xoá: ' + (e.message||e), false);
+    }
+  };
+
+  window.khomauToggleVisible = async function(ma, val){
+    try {
+      await updateDoc(doc(db, 'mauNha', ma), { visible: val, updatedAt: serverTimestamp() });
+      var it = KM_ITEMS.filter(function(x){return x.ma===ma;})[0];
+      if(it) it.visible = val;
+    } catch(e) {
+      kmMsg('❌ Lỗi: ' + (e.message||e), false);
+    }
+  };
+
+  window.khomauMove = async function(ma, dir){
+    var idx = -1;
+    for(var i=0;i<KM_ITEMS.length;i++){ if(KM_ITEMS[i].ma===ma){ idx=i; break; } }
+    var j = idx + dir;
+    if(idx<0 || j<0 || j>=KM_ITEMS.length) return;
+    var a = KM_ITEMS[idx], b = KM_ITEMS[j];
+    var aOrder = a.order, bOrder = b.order;
+    try {
+      await updateDoc(doc(db, 'mauNha', a.ma), { order: bOrder });
+      await updateDoc(doc(db, 'mauNha', b.ma), { order: aOrder });
+      window.initKhomauPanel();
+    } catch(e) {
+      kmMsg('❌ Lỗi: ' + (e.message||e), false);
     }
   };
 })();

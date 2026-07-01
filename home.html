@@ -38,6 +38,10 @@
   --gold:#98690a;--gold2:#b8860b;--gold-bg:rgba(152,105,10,.09);--gold-glow:rgba(152,105,10,.16);
   --green:#15803d;--red:#dc2626;--amber:#b45309;--blue:#1d4ed8;
   --r:13px;--r-sm:9px;
+  --shadow-sm:0 1px 2px rgba(38,28,8,.04),0 3px 10px rgba(38,28,8,.05);
+  --shadow-md:0 6px 16px rgba(38,28,8,.06),0 18px 42px rgba(38,28,8,.08);
+  --shadow-lg:0 12px 28px rgba(38,28,8,.09),0 34px 76px rgba(38,28,8,.12);
+  --ease:cubic-bezier(.16,1,.3,1);
   --sans:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;
   --syne:'Syne',sans-serif;--serif:'Cormorant Garamond',serif;
 }
@@ -181,6 +185,70 @@ a{color:inherit;text-decoration:none}
 .pc-meta{font-size:var(--text-sm);color:var(--sub);letter-spacing:.02em}
 @media(max-width:760px){.portfolio-grid{grid-template-columns:1fr}}
 
+/* ── KHO HỒ SƠ MẪU (GÓI KINH TẾ) ── */
+.lib-filters{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:34px}
+.lib-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.lib-tab{padding:9px 18px;border-radius:99px;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-family:var(--syne);font-weight:700;font-size:12px;letter-spacing:.03em;cursor:pointer;transition:all .2s;box-shadow:var(--shadow-sm)}
+.lib-tab:hover{border-color:var(--gold);color:var(--text)}
+.lib-tab.on{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a1400;border-color:transparent;box-shadow:0 6px 16px rgba(152,105,10,.22)}
+.lib-area{display:flex;align-items:center;gap:10px}
+.lib-area label{font-family:var(--syne);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.lib-area select{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;font-family:var(--sans);font-size:var(--text-sm);color:var(--text);outline:none;cursor:pointer;transition:border-color .2s}
+.lib-area select:focus{border-color:var(--gold)}
+.lib-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+@media(max-width:1000px){.lib-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:680px){.lib-grid{grid-template-columns:1fr}}
+.lib-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .4s var(--ease),box-shadow .4s var(--ease);display:flex;flex-direction:column}
+.lib-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+.lib-thumb{position:relative;aspect-ratio:4/3;background:var(--bg3);overflow:hidden;cursor:pointer}
+.lib-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.lib-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);background:repeating-linear-gradient(45deg,var(--bg3),var(--bg3) 11px,var(--bg) 11px,var(--bg) 22px)}
+.lib-ph .ph-icon{font-size:30px;color:rgba(152,105,10,.5)}
+.lib-ph .ph-lbl{font-family:var(--mono);font-size:11px;letter-spacing:.04em}
+.lib-cat{position:absolute;top:12px;left:12px;background:rgba(26,20,0,.72);color:#f0e6cc;font-size:11px;font-weight:700;letter-spacing:.05em;padding:5px 12px;border-radius:99px;backdrop-filter:blur(4px)}
+.lib-thumb-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:9px;background:rgba(20,15,4,.46);color:#fff;font-family:var(--syne);font-weight:700;font-size:13px;letter-spacing:.02em;opacity:0;transition:opacity .3s var(--ease)}
+.lib-thumb-hint i{font-size:19px}
+.lib-card:hover .lib-thumb-hint{opacity:1}
+.lib-body{padding:20px 22px 22px;display:flex;flex-direction:column;flex:1}
+.lib-code{font-family:var(--mono);font-weight:700;font-size:12px;color:var(--gold);letter-spacing:.06em;margin-bottom:14px}
+.lib-specs{display:flex;gap:26px;margin-bottom:4px}
+.lib-spec{display:flex;flex-direction:column;gap:3px}
+.lib-spec .v{font-family:var(--serif);font-style:italic;font-weight:700;font-size:24px;color:var(--text);line-height:1}
+.lib-spec .k{font-size:11px;color:var(--muted)}
+.lib-price-row{margin-top:auto;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:16px 0}
+.lib-price-row .k{font-size:12px;color:var(--sub)}
+.lib-price{font-family:var(--mono);font-weight:700;font-size:21px;color:var(--gold)}
+.lib-buy{width:100%;justify-content:center}
+.lib-empty{grid-column:1/-1;text-align:center;padding:50px 0;color:var(--sub);font-size:var(--text-md)}
+.lib-mod{max-width:720px;margin:36px auto 0;background:var(--gold-bg);border:1px solid var(--border2);border-radius:var(--r);padding:20px 26px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:center;text-align:center}
+.lib-mod-info{font-size:var(--text-sm);color:var(--text2);line-height:1.6}
+.lib-mod-calc{display:flex;align-items:center;gap:10px;font-size:var(--text-sm);color:var(--sub)}
+.lib-mod-calc input{width:120px;background:var(--bg2);border:1px solid var(--border2);border-radius:9px;padding:9px 12px;font-family:var(--mono);font-weight:700;font-size:14px;color:var(--text);outline:none;-moz-appearance:textfield}
+.lib-mod-calc .arw{color:var(--gold);font-weight:700}
+.lib-mod-calc b{color:var(--gold);font-family:var(--mono)}
+.lib-modal{position:fixed;inset:0;z-index:200;background:rgba(20,15,4,.60);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:44px 20px;overflow-y:auto}
+.lib-modal.open{display:flex}
+.lib-modal-box{position:relative;background:var(--bg2);border:1px solid var(--border2);border-radius:calc(var(--r) + 4px);max-width:880px;width:100%;box-shadow:0 40px 110px rgba(0,0,0,.42);margin:auto;overflow:hidden}
+.lib-modal-close{position:fixed;top:22px;right:26px;z-index:210;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.94);border:1px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--text);box-shadow:0 6px 20px rgba(0,0,0,.22);transition:background .2s,transform .2s}
+.lib-modal-close:hover{background:#fff;transform:rotate(90deg)}
+.lib-modal-head{padding:32px 36px 24px;border-bottom:1px solid var(--border)}
+.lib-modal-head .mh-cat{display:inline-block;background:var(--gold-bg);color:var(--gold);font-family:var(--syne);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:99px;margin-bottom:12px}
+.lib-modal-head .mh-code{font-family:var(--mono);font-weight:700;font-size:15px;color:var(--gold);letter-spacing:.06em}
+.lib-modal-specs{display:flex;gap:34px;margin-top:14px}
+.lib-modal-gallery{padding:26px 36px;display:flex;flex-direction:column;gap:22px}
+.mg-item{border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;background:var(--bg)}
+.mg-cap{padding:12px 16px;font-family:var(--syne);font-weight:700;font-size:12px;letter-spacing:.05em;color:var(--text2);border-bottom:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;gap:8px}
+.mg-cap i{color:var(--gold);font-size:15px}
+.mg-img{display:block;width:100%;height:auto}
+.mg-ph{aspect-ratio:16/10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:var(--muted);background:repeating-linear-gradient(45deg,var(--bg3),var(--bg3) 12px,var(--bg) 12px,var(--bg) 24px)}
+.mg-ph i{font-size:34px;color:rgba(152,105,10,.5)}
+.mg-ph span{font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+.lib-modal-foot{padding:22px 36px 30px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:var(--bg2);position:sticky;bottom:0}
+.lib-mf-price{display:flex;flex-direction:column;gap:2px}
+.lib-mf-price .k{font-size:12px;color:var(--sub)}
+.lib-loading{grid-column:1/-1;text-align:center;padding:50px 0;color:var(--sub);font-size:var(--text-md)}
+@media(max-width:640px){.lib-modal-head,.lib-modal-gallery,.lib-modal-foot{padding-left:20px;padding-right:20px}.lib-modal-close{top:14px;right:14px}}
+
 /* ── TRUST SEAL ── */
 .seal-box{display:flex;align-items:center;gap:36px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:36px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .seal-icon{flex-shrink:0;width:88px;height:88px;border-radius:50%;background:var(--gold-bg);border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:38px}
@@ -268,6 +336,7 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
       <a class="nav-link" href="#process">Quy trình</a>
       <a class="nav-link" href="#pricing">Bảng giá</a>
       <a class="nav-link" href="#portfolio">Phối cảnh</a>
+      <a class="nav-link" href="#khomau">Kho mẫu</a>
       <a class="nav-link" href="#faq">FAQ</a>
     </div>
     <div class="nav-cta">
@@ -282,6 +351,7 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
     <a href="#process">Quy trình</a>
     <a href="#pricing">Bảng giá</a>
     <a href="#portfolio">Phối cảnh</a>
+    <a href="#khomau">Kho mẫu</a>
     <a href="#faq">FAQ</a>
     <a href="login.html">Đăng nhập</a>
     <a href="register.html">Bắt đầu</a>
@@ -567,6 +637,54 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
   </div>
 </section>
 
+<!-- ═══ KHO HỒ SƠ MẪU (GÓI KINH TẾ) ═══ -->
+<section class="sec" id="khomau">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow"><span class="ln"></span>KHO HỒ SƠ MẪU<span class="ln"></span></div>
+      <h2>Mẫu <em>đã bàn giao</em> — gói kinh tế</h2>
+      <p>Chọn mua hồ sơ thiết kế đã hoàn thiện &amp; bàn giao, tiết kiệm chi phí so với thiết kế mới hoàn toàn.</p>
+    </div>
+    <div class="lib-filters">
+      <div class="lib-tabs" id="libTabs">
+        <button class="lib-tab on" onclick="libSetCat('all',this)">Tất cả</button>
+        <button class="lib-tab" onclick="libSetCat('nhapho',this)">Nhà phố</button>
+        <button class="lib-tab" onclick="libSetCat('bietthu',this)">Biệt thự</button>
+        <button class="lib-tab" onclick="libSetCat('nhavuon',this)">Nhà vườn</button>
+      </div>
+      <div class="lib-area">
+        <label>Diện tích đất</label>
+        <select id="libArea" onchange="libSetArea(this.value)">
+          <option value="">Tất cả</option>
+          <option value="0-100">Dưới 100m²</option>
+          <option value="100-200">100 – 200m²</option>
+          <option value="200-300">200 – 300m²</option>
+          <option value="300-999999">Trên 300m²</option>
+        </select>
+      </div>
+    </div>
+    <div class="lib-grid" id="libGrid"><div class="lib-loading">Đang tải kho mẫu...</div></div>
+    <div class="lib-mod">
+      <div class="lib-mod-info"><i class="ph ph-note-pencil" style="color:var(--gold);margin-right:6px"></i><b>Giá cố định</b> cho hồ sơ có sẵn. Cần chỉnh sửa cho phù hợp lô đất: <b>+20.000đ/m²</b> (100m² = 2.000.000đ).</div>
+      <div class="lib-mod-calc">
+        <input id="modArea" type="number" min="0" inputmode="numeric" placeholder="m² lô đất" oninput="modFeeUpdate()">
+        <span class="arw">→</span>
+        <span>Phí chỉnh sửa: <b id="modFee">0đ</b></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MODAL XEM MẶT BẰNG ═══ -->
+<div id="libModal" class="lib-modal" onclick="libModalBg(event)">
+  <button class="lib-modal-close" onclick="libClose()" aria-label="Đóng"><i class="ph ph-x"></i></button>
+  <div class="lib-modal-box">
+    <div class="lib-modal-head" id="libModalHead"></div>
+    <div class="lib-modal-gallery" id="libModalGallery"></div>
+    <div class="lib-modal-foot" id="libModalFoot"></div>
+  </div>
+</div>
+
 <!-- ═══ TRUST SEAL ═══ -->
 <section class="sec" style="background:var(--bg2)">
   <div class="wrap">
@@ -633,6 +751,7 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
         <a href="#process">Quy trình C1–C4</a>
         <a href="#pricing">Bảng giá</a>
         <a href="#portfolio">Phối cảnh</a>
+        <a href="#khomau">Kho mẫu</a>
         <a href="#faq">FAQ</a>
       </div>
       <div class="foot-col">
@@ -860,6 +979,149 @@ function mymySendClick(){
 }
 </script>
 
+<script>
+/* ═══ Kho hồ sơ mẫu (gói kinh tế) — dữ liệu nạp từ Firestore (window.libLoadFromFirestore) ═══ */
+function alnFmt(n){
+  n = Math.round(n);
+  var s = String(n);
+  var out = '';
+  var c = 0;
+  for(var i = s.length - 1; i >= 0; i--){
+    out = s.charAt(i) + out;
+    c = c + 1;
+    if(c % 3 === 0 && i > 0){ out = '.' + out; }
+  }
+  return out;
+}
+
+var LIB_MOD_RATE = 20000; /* đ/m² — 100m² = 2.000.000đ */
+var LIBRARY = [];
+var LIB_CATNAME = { nhapho: 'Nhà phố', bietthu: 'Biệt thự', nhavuon: 'Nhà vườn' };
+var LIB_CAT = 'all';
+var LIB_AREA = '';
+var LIB_LOADED = false;
+
+function libMoney(n){ return alnFmt(n) + 'đ'; }
+
+function libSetCat(c, btn){
+  LIB_CAT = c;
+  var tabs = document.querySelectorAll('#libTabs .lib-tab');
+  for(var i = 0; i < tabs.length; i++){ tabs[i].classList.remove('on'); }
+  if(btn){ btn.classList.add('on'); }
+  libRender();
+}
+
+function libSetArea(v){ LIB_AREA = v; libRender(); }
+
+function libRender(){
+  var grid = document.getElementById('libGrid');
+  if(!grid){ return; }
+  if(!LIB_LOADED){ grid.innerHTML = '<div class="lib-loading">Đang tải kho mẫu...</div>'; return; }
+  var lo = 0, hi = Infinity;
+  if(LIB_AREA){
+    var p = LIB_AREA.split('-');
+    lo = parseFloat(p[0]); hi = parseFloat(p[1]);
+  }
+  var html = '';
+  var count = 0;
+  for(var i = 0; i < LIBRARY.length; i++){
+    var it = LIBRARY[i];
+    if(LIB_CAT !== 'all' && it.cat !== LIB_CAT){ continue; }
+    if(it.dt < lo || it.dt > hi){ continue; }
+    count = count + 1;
+    var cover = (it.imgs && it.imgs[0] && it.imgs[0].src) ? it.imgs[0].src : '';
+    var imgHtml = cover ? '<img src="' + cover + '" alt="' + it.ma + '" onerror="this.style.display=&quot;none&quot;">' : '';
+    html += '<div class="lib-card">' +
+      '<div class="lib-thumb" onclick="libOpen(\'' + it.ma + '\')">' +
+        '<div class="lib-ph"><i class="ph ph-image ph-icon"></i><span class="ph-lbl">Ảnh phối cảnh</span></div>' +
+        imgHtml +
+        '<span class="lib-cat">' + (LIB_CATNAME[it.cat] || '') + '</span>' +
+        '<div class="lib-thumb-hint"><i class="ph ph-magnifying-glass-plus"></i>Xem mặt bằng &amp; kích thước</div>' +
+      '</div>' +
+      '<div class="lib-body">' +
+        '<div class="lib-code"># ' + it.ma + '</div>' +
+        '<div class="lib-specs">' +
+          '<div class="lib-spec"><span class="v">' + it.dt + '</span><span class="k">m² đất</span></div>' +
+          '<div class="lib-spec"><span class="v">' + it.tang + '</span><span class="k">tầng</span></div>' +
+        '</div>' +
+        '<div class="lib-price-row"><span class="k">Gói kinh tế</span><span class="lib-price">' + libMoney(it.gia) + '</span></div>' +
+        '<button class="btn btn-gold lib-buy" onclick="datMua(\'' + it.ma + '\')"><i class="ph-duotone ph-shopping-cart-simple"></i>Đặt mua gói kinh tế</button>' +
+      '</div>' +
+    '</div>';
+  }
+  if(count === 0){ html = '<div class="lib-empty">Chưa có mẫu phù hợp bộ lọc. Thử chọn danh mục hoặc diện tích khác nhé.</div>'; }
+  grid.innerHTML = html;
+}
+
+function libFind(ma){
+  for(var i = 0; i < LIBRARY.length; i++){ if(LIBRARY[i].ma === ma){ return LIBRARY[i]; } }
+  return null;
+}
+
+function libOpen(ma){
+  var it = libFind(ma);
+  if(!it){ return; }
+  var catName = LIB_CATNAME[it.cat] || '';
+  document.getElementById('libModalHead').innerHTML =
+    '<span class="mh-cat">' + catName + '</span>' +
+    '<div class="mh-code"># ' + it.ma + '</div>' +
+    '<div class="lib-modal-specs">' +
+      '<div class="lib-spec"><span class="v">' + it.dt + '</span><span class="k">m² đất</span></div>' +
+      '<div class="lib-spec"><span class="v">' + it.tang + '</span><span class="k">tầng</span></div>' +
+    '</div>';
+  var imgs = it.imgs || [];
+  if(imgs.length === 0){ imgs = [{ src: '', cap: 'Phối cảnh' }]; }
+  var g = '';
+  for(var i = 0; i < imgs.length; i++){
+    var im = imgs[i];
+    var body = im.src
+      ? '<img class="mg-img" src="' + im.src + '" alt="' + im.cap + '">'
+      : '<div class="mg-ph"><i class="ph ph-image"></i><span>' + im.cap + '</span></div>';
+    var ico = (i === 0) ? 'ph-cube' : 'ph-ruler';
+    g += '<div class="mg-item"><div class="mg-cap"><i class="ph ' + ico + '"></i>' + im.cap + '</div>' + body + '</div>';
+  }
+  document.getElementById('libModalGallery').innerHTML = g;
+  document.getElementById('libModalFoot').innerHTML =
+    '<div class="lib-mf-price"><span class="k">Gói kinh tế</span><span class="lib-price">' + libMoney(it.gia) + '</span></div>' +
+    '<button class="btn btn-gold" onclick="datMua(\'' + it.ma + '\')"><i class="ph-duotone ph-shopping-cart-simple"></i>Đặt mua gói kinh tế</button>';
+  document.getElementById('libModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function libClose(){
+  var m = document.getElementById('libModal');
+  if(m){ m.classList.remove('open'); }
+  document.body.style.overflow = '';
+}
+
+function libModalBg(e){ if(e.target.id === 'libModal'){ libClose(); } }
+
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ libClose(); } });
+
+function datMua(ma){
+  libClose();
+  if(typeof mymyOpen === 'function'){ mymyOpen(); }
+  var inp = document.getElementById('mymy-input');
+  if(inp){
+    inp.value = 'Em muốn đặt gói kinh tế mẫu ' + ma + ', nhờ ALN tư vấn giúp em ạ.';
+    inp.focus();
+  }
+}
+
+function modFeeUpdate(){
+  var a = parseFloat(document.getElementById('modArea').value);
+  if(isNaN(a) || a < 0){ a = 0; }
+  document.getElementById('modFee').textContent = libMoney(a * LIB_MOD_RATE);
+}
+
+// Gọi từ module script sau khi lấy dữ liệu Firestore xong
+window.libApplyData = function(items){
+  LIBRARY = items;
+  LIB_LOADED = true;
+  libRender();
+};
+</script>
+
 <script type="module">
 import { app } from './firebase-config.js';
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
@@ -888,6 +1150,25 @@ window.mymySend = async function(text, history) {
   });
   return res.data.reply;
 };
+</script>
+
+<script type="module">
+/* ═══ Kho hồ sơ mẫu — đọc công khai từ Firestore, không đụng khối MyMy ở trên ═══ */
+import { db, collection, getDocs, query, where, orderBy } from './firebase-config.js';
+
+async function libLoadFromFirestore() {
+  try {
+    const q = query(collection(db, 'mauNha'), where('visible', '==', true), orderBy('order'));
+    const snap = await getDocs(q);
+    const items = [];
+    snap.forEach((d) => items.push(d.data()));
+    if (typeof window.libApplyData === 'function') window.libApplyData(items);
+  } catch (e) {
+    console.error('Kho mẫu lỗi tải dữ liệu:', e);
+    if (typeof window.libApplyData === 'function') window.libApplyData([]);
+  }
+}
+libLoadFromFirestore();
 </script>
 
 </body>
