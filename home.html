@@ -26,6 +26,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
 <link rel="stylesheet" href="aln-tokens.css">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -249,6 +250,46 @@ a{color:inherit;text-decoration:none}
 .lib-loading{grid-column:1/-1;text-align:center;padding:50px 0;color:var(--sub);font-size:var(--text-md)}
 @media(max-width:640px){.lib-modal-head,.lib-modal-gallery,.lib-modal-foot{padding-left:20px;padding-right:20px}.lib-modal-close{top:14px;right:14px}}
 
+/* ── THƯỚC LỖ BAN PHONG THỦY ── */
+.loban-tool{max-width:1060px;margin:0 auto}
+.loban-controls{display:flex;gap:20px;align-items:center;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+.loban-inp{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:7px 7px 7px 20px;box-shadow:var(--shadow-sm)}
+.loban-inp input{width:150px;border:none;background:none;font-family:var(--mono);font-weight:700;font-size:28px;color:var(--text);outline:none;-moz-appearance:textfield}
+.loban-inp input::-webkit-outer-spin-button,.loban-inp input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.unit-toggle{display:flex;background:var(--bg);border-radius:10px;padding:3px}
+.unit-toggle button{border:none;background:none;font-family:var(--syne);font-weight:700;font-size:12px;padding:9px 14px;border-radius:8px;color:var(--muted);cursor:pointer;transition:all .2s}
+.unit-toggle button.on{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a1400}
+.loban-presets{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:36px}
+.loban-preset{padding:8px 15px;border-radius:99px;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-size:var(--text-sm);cursor:pointer;transition:all .2s;box-shadow:var(--shadow-sm)}
+.loban-preset:hover{border-color:var(--gold);color:var(--text);transform:translateY(-1px)}
+.loban-results{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:900px){.loban-results{grid-template-columns:1fr}}
+.lb-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:26px 24px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;transition:box-shadow .3s var(--ease),transform .3s var(--ease)}
+.lb-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px)}
+.lb-card.good{border-color:rgba(21,128,61,.34)}
+.lb-card.bad{border-color:rgba(220,38,38,.26)}
+.lb-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
+.lb-size{font-family:var(--syne);font-weight:800;font-size:20px;color:var(--text);letter-spacing:.01em}
+.lb-use{font-size:var(--text-xs);color:var(--sub);margin-top:4px;line-height:1.45;max-width:158px}
+.lb-badge{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:99px;font-family:var(--syne);font-weight:700;font-size:12px;letter-spacing:.05em}
+.lb-badge i{font-size:14px}
+.lb-badge.good{background:rgba(21,128,61,.12);color:var(--green)}
+.lb-badge.bad{background:rgba(220,38,38,.10);color:var(--red)}
+.lb-cung{font-family:var(--serif);font-style:italic;font-weight:700;font-size:28px;line-height:1.1;margin-bottom:7px}
+.lb-card.good .lb-cung{color:var(--green)}
+.lb-card.bad .lb-cung{color:var(--red)}
+.lb-mean{font-size:var(--text-sm);color:var(--sub);line-height:1.6;min-height:42px;margin-bottom:18px}
+.lb-scale{display:flex;height:12px;border-radius:6px;position:relative;background:var(--bg3)}
+.lb-seg{flex:1}
+.lb-seg.g{background:rgba(152,105,10,.32)}
+.lb-seg.b{background:transparent}
+.lb-seg:first-child{border-radius:6px 0 0 6px}
+.lb-seg:last-child{border-radius:0 6px 6px 0}
+.lb-marker{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--text)}
+.lb-marker::after{content:'';position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--text)}
+.lb-pos{margin-top:11px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.loban-note{text-align:center;font-size:var(--text-sm);color:var(--sub);margin-top:28px}
+
 /* ── TRUST SEAL ── */
 .seal-box{display:flex;align-items:center;gap:36px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:36px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .seal-icon{flex-shrink:0;width:88px;height:88px;border-radius:50%;background:var(--gold-bg);border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:38px}
@@ -337,6 +378,7 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
       <a class="nav-link" href="#pricing">Bảng giá</a>
       <a class="nav-link" href="#portfolio">Phối cảnh</a>
       <a class="nav-link" href="#khomau">Kho mẫu</a>
+      <a class="nav-link" href="#loban">Thước Lỗ Ban</a>
       <a class="nav-link" href="#faq">FAQ</a>
     </div>
     <div class="nav-cta">
@@ -352,6 +394,7 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
     <a href="#pricing">Bảng giá</a>
     <a href="#portfolio">Phối cảnh</a>
     <a href="#khomau">Kho mẫu</a>
+    <a href="#loban">Thước Lỗ Ban</a>
     <a href="#faq">FAQ</a>
     <a href="login.html">Đăng nhập</a>
     <a href="register.html">Bắt đầu</a>
@@ -685,6 +728,31 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
   </div>
 </div>
 
+<!-- ═══ THƯỚC LỖ BAN ═══ -->
+<section class="sec" id="loban" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow"><span class="ln"></span>PHONG THỦY XÂY DỰNG<span class="ln"></span></div>
+      <h2>Thước <em>Lỗ Ban</em> phong thủy</h2>
+      <p>Nhập kích thước để tra cung đẹp – xấu theo ba loại thước Lỗ Ban thông dụng trong xây dựng.</p>
+    </div>
+    <div class="loban-tool">
+      <div class="loban-controls">
+        <div class="loban-inp">
+          <input id="lbInput" type="number" min="0" inputmode="numeric" value="810" oninput="lbUpdate()">
+          <div class="unit-toggle">
+            <button id="lbUnitMm" class="on" onclick="lbSetUnit('mm')">mm</button>
+            <button id="lbUnitCm" onclick="lbSetUnit('cm')">cm</button>
+          </div>
+        </div>
+      </div>
+      <div class="loban-presets" id="lbPresets"></div>
+      <div class="loban-results" id="lbResults"></div>
+      <p class="loban-note"><i class="ph ph-info" style="color:var(--gold);margin-right:5px"></i>Kết quả mang tính tham khảo phong thủy — nên ưu tiên công năng và tư vấn của KTS.</p>
+    </div>
+  </div>
+</section>
+
 <!-- ═══ TRUST SEAL ═══ -->
 <section class="sec" style="background:var(--bg2)">
   <div class="wrap">
@@ -752,6 +820,7 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
         <a href="#pricing">Bảng giá</a>
         <a href="#portfolio">Phối cảnh</a>
         <a href="#khomau">Kho mẫu</a>
+        <a href="#loban">Thước Lỗ Ban</a>
         <a href="#faq">FAQ</a>
       </div>
       <div class="foot-col">
@@ -1120,6 +1189,128 @@ window.libApplyData = function(items){
   LIB_LOADED = true;
   libRender();
 };
+</script>
+
+<script>
+/* ═══ Thước Lỗ Ban phong thủy ═══ */
+var LB_RULERS = [
+  { size: '52.2 cm', cycle: 522, use: 'Thông thủy · cửa đi, cửa sổ, ô thoáng',
+    cung: [
+      { n: 'Quý Nhân', g: 1, m: 'Gặp quý nhân phù trợ, hanh thông may mắn.' },
+      { n: 'Hiểm Họa', g: 0, m: 'Dễ gặp tai họa, rủi ro bất ngờ.' },
+      { n: 'Thiên Tai', g: 0, m: 'Tai ương, trắc trở khó lường.' },
+      { n: 'Thiên Tài', g: 1, m: 'Tài lộc dồi dào, phát đạt.' },
+      { n: 'Nhân Lộc', g: 1, m: 'Phúc lộc, con cháu hưng thịnh.' },
+      { n: 'Cô Độc', g: 0, m: 'Cô quạnh, hao người hao của.' },
+      { n: 'Thiên Tặc', g: 0, m: 'Mất mát, trộm cắp, thị phi.' },
+      { n: 'Tể Tướng', g: 1, m: 'Công danh hiển đạt, quyền quý.' }
+    ] },
+  { size: '42.9 cm', cycle: 429, use: 'Dương trạch · khối xây (bếp, bệ, bậc)',
+    cung: [
+      { n: 'Tài', g: 1, m: 'Tài lộc, tiền của vào nhà.' },
+      { n: 'Bệnh', g: 0, m: 'Bệnh tật, ốm đau, hao tổn.' },
+      { n: 'Ly', g: 0, m: 'Chia lìa, xa cách, bất hòa.' },
+      { n: 'Nghĩa', g: 1, m: 'Nhân nghĩa, phúc đức đầy nhà.' },
+      { n: 'Quan', g: 1, m: 'Công danh, quan lộc thăng tiến.' },
+      { n: 'Kiếp', g: 0, m: 'Tai kiếp, cướp đoạt, trắc trở.' },
+      { n: 'Hại', g: 0, m: 'Tổn hại, thất thoát tài sản.' },
+      { n: 'Bản', g: 1, m: 'Gốc rễ vững, của cải bền lâu.' }
+    ] },
+  { size: '38.8 cm', cycle: 388, use: 'Âm phần · nội thất, bàn thờ, tủ',
+    cung: [
+      { n: 'Đinh', g: 1, m: 'Thêm đinh, con cháu đông vui.' },
+      { n: 'Hại', g: 0, m: 'Tổn hại, điều bất lợi.' },
+      { n: 'Vượng', g: 1, m: 'Hưng vượng, thịnh đạt.' },
+      { n: 'Khổ', g: 0, m: 'Khổ cực, vất vả, hao tâm.' },
+      { n: 'Nghĩa', g: 1, m: 'Nhân nghĩa, phúc lành.' },
+      { n: 'Quan', g: 1, m: 'Công danh, quan lộc.' },
+      { n: 'Tử', g: 0, m: 'Tử biệt, hao tổn, xui rủi.' },
+      { n: 'Hưng', g: 1, m: 'Hưng thịnh, phát đạt.' },
+      { n: 'Thất', g: 0, m: 'Thất thoát, mất mát.' },
+      { n: 'Tài', g: 1, m: 'Tài lộc, phú quý.' }
+    ] }
+];
+
+var LB_UNIT = 'mm';
+var LB_PRESETS = [
+  { label: 'Cửa chính 810', mm: 810 },
+  { label: 'Cửa 2 cánh 1090', mm: 1090 },
+  { label: 'Cửa sổ 880', mm: 880 },
+  { label: 'Cao cửa 2120', mm: 2120 },
+  { label: 'Bàn thờ 1270', mm: 1270 }
+];
+
+function lbCurrentMm(){
+  var raw = parseFloat(document.getElementById('lbInput').value);
+  if(isNaN(raw) || raw < 0){ raw = 0; }
+  return LB_UNIT === 'cm' ? raw * 10 : raw;
+}
+
+function lbSetUnit(u){
+  if(u === LB_UNIT){ return; }
+  var inp = document.getElementById('lbInput');
+  var v = parseFloat(inp.value);
+  if(!isNaN(v)){ inp.value = (u === 'cm') ? (v / 10) : (v * 10); }
+  LB_UNIT = u;
+  document.getElementById('lbUnitMm').classList.toggle('on', u === 'mm');
+  document.getElementById('lbUnitCm').classList.toggle('on', u === 'cm');
+  lbUpdate();
+}
+
+function lbRenderPresets(){
+  var box = document.getElementById('lbPresets');
+  var html = '';
+  for(var i = 0; i < LB_PRESETS.length; i++){
+    html += '<button class="loban-preset" onclick="lbPreset(' + LB_PRESETS[i].mm + ')">' + LB_PRESETS[i].label + '</button>';
+  }
+  box.innerHTML = html;
+}
+
+function lbPreset(mm){
+  LB_UNIT = 'mm';
+  document.getElementById('lbUnitMm').classList.add('on');
+  document.getElementById('lbUnitCm').classList.remove('on');
+  document.getElementById('lbInput').value = mm;
+  lbUpdate();
+}
+
+function lbUpdate(){
+  var mm = lbCurrentMm();
+  var box = document.getElementById('lbResults');
+  var html = '';
+  for(var r = 0; r < LB_RULERS.length; r++){
+    var R = LB_RULERS[r];
+    var n = R.cung.length;
+    var segLen = R.cycle / n;
+    var pos = mm % R.cycle;
+    if(pos < 0){ pos = pos + R.cycle; }
+    var idx = Math.floor(pos / segLen);
+    if(idx >= n){ idx = n - 1; }
+    var cung = R.cung[idx];
+    var good = cung.g === 1;
+    var cycleNo = Math.floor(mm / R.cycle) + 1;
+    var markerPct = (pos / R.cycle) * 100;
+    var segs = '';
+    for(var s = 0; s < n; s++){
+      segs += '<div class="lb-seg ' + (R.cung[s].g === 1 ? 'g' : 'b') + '"></div>';
+    }
+    html += '<div class="lb-card ' + (good ? 'good' : 'bad') + '">' +
+        '<div class="lb-card-top">' +
+          '<div><div class="lb-size">' + R.size + '</div><div class="lb-use">' + R.use + '</div></div>' +
+          '<div class="lb-badge ' + (good ? 'good' : 'bad') + '"><i class="ph ' + (good ? 'ph-check-circle' : 'ph-warning-circle') + '"></i>' + (good ? 'ĐẸP' : 'XẤU') + '</div>' +
+        '</div>' +
+        '<div class="lb-cung">' + cung.n + '</div>' +
+        '<div class="lb-mean">' + cung.m + '</div>' +
+        '<div class="lb-scale">' + segs + '<div class="lb-marker" style="left:' + markerPct.toFixed(1) + '%"></div></div>' +
+        '<div class="lb-pos">Vòng ' + cycleNo + ' · ' + Math.round(pos) + '/' + R.cycle + ' mm trong chu kỳ</div>' +
+      '</div>';
+  }
+  box.innerHTML = html;
+}
+
+window.addEventListener('DOMContentLoaded', function(){
+  if(document.getElementById('lbResults')){ lbRenderPresets(); lbUpdate(); }
+});
 </script>
 
 <script type="module">
