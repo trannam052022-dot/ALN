@@ -214,8 +214,14 @@ service cloud.firestore {
 
     // Lead từ form khảo sát trang chủ — khách (kể cả ẩn danh) tạo được,
     // không đọc lại được (bảo mật), chỉ Founder xem/sửa/xoá.
+    // Chống spam: bắt buộc có App Check token hợp lệ (chặn script/bot gọi
+    // thẳng API ngoài trình duyệt thật) + kiểm tra dữ liệu hợp lệ cơ bản.
     match /landingLeads/{id} {
-      allow create: if signedIn();
+      allow create: if signedIn() && request.app != null
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0 && request.resource.data.name.size() < 100
+        && request.resource.data.phone is string
+        && request.resource.data.phone.size() >= 8 && request.resource.data.phone.size() < 20;
       allow read, update, delete: if isFounder();
     }
 

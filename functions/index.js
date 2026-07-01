@@ -1544,3 +1544,59 @@ exports.scheduledFirestoreBackup = functions
     }
     return null;
   });
+
+/* ── Báo cáo tổng hợp mỗi sáng cho Founder — 08:00 giờ VN ──
+   Gom số liệu cần chú ý: lead mới 24h qua, lead quá hạn chưa liên hệ,
+   đơn KTS/DN/Designer chờ duyệt, yêu cầu ghép dự án chờ xử lý.
+   Nếu tất cả đều 0 thì không gửi (tránh làm phiền không cần thiết). */
+exports.dailyDigest = functions
+  .region("asia-southeast1")
+  .pubsub.schedule("0 8 * * *")
+  .timeZone("Asia/Ho_Chi_Minh")
+  .onRun(async () => {
+    try {
+      const yesterday = admin.firestore.Timestamp.fromMillis(Date.now() - 24 * 3600 * 1000);
+
+      const [leadsSnap, ktsSnap, dnSnap, desSnap, matchSnap] = await Promise.all([
+        db.collection("landingLeads").get(),
+        db.collection("ktsApplications").where("status", "==", "pending").count().get(),
+        db.collection("dnApplications").where("status", "==", "pending").count().get(),
+        db.collection("designerApplications").where("status", "==", "pending").count().get(),
+        db.collection("matchingRequests").where("status", "==", "pending_founder").count().get(),
+      ]);
+
+      let newLeads = 0, staleLeads = 0;
+      leadsSnap.forEach((d) => {
+        const v = d.data();
+        const status = v.status || "moi";
+        const createdMs = v.createdAt && v.createdAt.toMillis ? v.createdAt.toMillis() : 0;
+        if (createdMs >= yesterday.toMillis()) newLeads++;
+        if (status === "moi" && createdMs > 0 && createdMs < Date.now() - 24 * 3600 * 1000) staleLeads++;
+      });
+
+      const ktsPending = ktsSnap.data().count;
+      const dnPending = dnSnap.data().count;
+      const desPending = desSnap.data().count;
+      const matchPending = matchSnap.data().count;
+
+      const total = newLeads + staleLeads + ktsPending + dnPending + desPending + matchPending;
+      if (total === 0) return null; // không có gì cần chú ý, khỏi làm phiền
+
+      const parts = [];
+      if (newLeads) parts.push(`${newLeads} lead mới (24h qua)`);
+      if (staleLeads) parts.push(`⚠️ ${staleLeads} lead quá hạn chưa liên hệ`);
+      if (matchPending) parts.push(`${matchPending} yêu cầu ghép dự án chờ xử lý`);
+      if (ktsPending) parts.push(`${ktsPending} đơn KTS chờ duyệt`);
+      if (dnPending) parts.push(`${dnPending} đơn DN chờ duyệt`);
+      if (desPending) parts.push(`${desPending} đơn Designer chờ duyệt`);
+
+      await notifyFounder(
+        "☀️ Tổng hợp sáng nay",
+        parts.join(" · "),
+        { type: "DAILY_DIGEST" }
+      );
+    } catch (e) {
+      console.error("[dailyDigest] Lỗi:", e);
+    }
+    return null;
+  });
