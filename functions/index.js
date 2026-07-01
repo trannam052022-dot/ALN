@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
+const { v1: firestoreV1 } = require("@google-cloud/firestore");
 
 const ANTHROPIC_KEY = defineSecret("ANTHROPIC_API_KEY");
 
@@ -1510,3 +1511,36 @@ exports.createUserByFounder = onCall(
     }
   }
 );
+
+/* ── Sao lưu Firestore tự động — chạy mỗi Chủ nhật 03:00 giờ VN ──
+   Export toàn bộ database ra Cloud Storage, giữ 8 tuần gần nhất
+   (dọn bản cũ trong onSchedule kế tiếp để không phình dung lượng). */
+const BACKUP_BUCKET = "gs://aln-platform.firebasestorage.app/firestore-backups";
+
+exports.scheduledFirestoreBackup = functions
+  .region("asia-southeast1")
+  .pubsub.schedule("0 3 * * 0")
+  .timeZone("Asia/Ho_Chi_Minh")
+  .onRun(async () => {
+    const client = new firestoreV1.FirestoreAdminClient();
+    const projectId = process.env.GCLOUD_PROJECT || process.env.GCP_PROJECT || "aln-platform";
+    const databaseName = client.databasePath(projectId, "(default)");
+    const stamp = new Date().toISOString().slice(0, 10);
+
+    try {
+      await client.exportDocuments({
+        name: databaseName,
+        outputUriPrefix: `${BACKUP_BUCKET}/${stamp}`,
+        collectionIds: [], // rỗng = export tất cả collection
+      });
+      console.log("[scheduledFirestoreBackup] Đã bắt đầu export tới", `${BACKUP_BUCKET}/${stamp}`);
+    } catch (e) {
+      console.error("[scheduledFirestoreBackup] Lỗi:", e);
+      await notifyFounder(
+        "⚠️ Sao lưu Firestore thất bại",
+        `Lỗi: ${e.message || e}`,
+        { type: "BACKUP_FAILED" }
+      );
+    }
+    return null;
+  });
