@@ -212,6 +212,13 @@ service cloud.firestore {
       allow read, write: if isFounder();
     }
 
+    // Lead từ form khảo sát trang chủ — khách (kể cả ẩn danh) tạo được,
+    // không đọc lại được (bảo mật), chỉ Founder xem/sửa/xoá.
+    match /landingLeads/{id} {
+      allow create: if signedIn();
+      allow read, update, delete: if isFounder();
+    }
+
     // MyMy Agent Loop — DN chỉ đọc session của chính mình; ghi qua Cloud Function
     match /mymy_sessions/{dnId} {
       allow read: if signedIn() && request.auth.uid == dnId;

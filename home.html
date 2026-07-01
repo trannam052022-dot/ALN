@@ -176,6 +176,31 @@ a{color:inherit;text-decoration:none}
 .price-note{margin-top:16px;text-align:center;font-size:var(--text-sm);color:var(--sub)}
 @media(max-width:640px){.price-row{grid-template-columns:1.6fr 1fr;padding:14px 16px}.price-row .price-unit{display:none}}
 
+/* ── KHẢO SÁT NHU CẦU ── */
+.sv-card{max-width:560px;margin:0 auto;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 28px rgba(0,0,0,.08);padding:32px 30px}
+.sv-progress-track{height:4px;border-radius:99px;background:var(--bg3);overflow:hidden;margin-bottom:14px}
+.sv-progress-fill{height:100%;width:25%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:99px;transition:width .35s var(--ease)}
+.sv-step-label{font-family:var(--syne);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+.sv-step{display:none}
+.sv-step.active{display:block;animation:svFadeIn .3s ease}
+@keyframes svFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.sv-q{font-family:var(--serif);font-style:italic;font-weight:600;font-size:20px;color:var(--text);margin-bottom:20px;line-height:1.4}
+.sv-options{display:flex;flex-direction:column;gap:10px}
+.sv-opt{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:10px;border:1px solid var(--border2);background:var(--bg);color:var(--text2);font-size:var(--text-md);font-weight:600;cursor:pointer;transition:all .2s}
+.sv-opt i{font-size:19px;color:var(--gold)}
+.sv-opt:hover{border-color:var(--gold);background:var(--gold-bg)}
+.sv-opt.on{border-color:var(--gold);background:var(--gold-bg);color:var(--text)}
+.sv-input{width:100%;padding:14px 16px;border-radius:10px;border:1px solid var(--border2);background:var(--bg);font-family:var(--sans);font-size:var(--text-md);color:var(--text);outline:none}
+.sv-input:focus{border-color:var(--gold)}
+.sv-error{color:var(--red);font-size:var(--text-sm);margin-top:10px}
+.sv-nav{display:flex;align-items:center;margin-top:26px}
+.sv-success{text-align:center;padding:20px 0}
+.sv-success i{font-size:44px;color:var(--green)}
+.sv-success-title{font-family:var(--serif);font-style:italic;font-weight:700;font-size:22px;color:var(--text);margin:12px 0 8px}
+.sv-success p{font-size:var(--text-md);color:var(--sub)}
+.sv-success a{color:var(--gold);font-weight:700}
+@media(max-width:640px){.sv-card{padding:26px 20px}}
+
 /* ── PORTFOLIO ── */
 .portfolio-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;max-width:1040px;margin:0 auto}
 .portfolio-card{position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);box-shadow:0 8px 28px rgba(0,0,0,.09);background:var(--bg2);transition:box-shadow .2s,transform .2s}
@@ -322,6 +347,22 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
 .foot-bottom{border-top:1px solid rgba(0,0,0,.06);padding-top:20px;text-align:center;font-size:var(--text-xs);color:var(--muted)}
 @media(max-width:960px){.foot-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.foot-grid{grid-template-columns:1fr;gap:24px}}
+
+/* ── NÚT NHẬN BÁO GIÁ NỔI ── */
+.float-cta{position:fixed;bottom:24px;left:24px;z-index:78;display:flex;align-items:center;gap:8px;padding:13px 20px;border-radius:99px;background:var(--bg2);border:1.5px solid var(--gold);color:var(--gold);font-family:var(--syne);font-weight:700;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.12);transition:transform .2s,box-shadow .2s}
+.float-cta:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.16)}
+.float-cta i{font-size:17px}
+@media(max-width:640px){.float-cta{left:14px;bottom:14px;padding:11px 16px;font-size:12px}}
+
+/* ── POPUP KHẢO SÁT ── */
+.sv-popup-overlay{position:fixed;inset:0;z-index:150;background:rgba(20,15,4,.5);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px}
+.sv-popup-overlay.open{display:flex}
+.sv-popup-box{position:relative;background:var(--bg2);border-radius:var(--r);max-width:400px;width:100%;padding:36px 30px 28px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.sv-popup-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer}
+.sv-popup-icon{width:56px;height:56px;border-radius:50%;background:var(--gold-bg);border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--gold);font-size:26px}
+.sv-popup-title{font-family:var(--serif);font-style:italic;font-weight:700;font-size:21px;color:var(--text);margin-bottom:8px}
+.sv-popup-sub{font-size:var(--text-sm);color:var(--sub);margin-bottom:20px;line-height:1.6}
+.sv-popup-skip{display:block;margin:12px auto 0;background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline}
 
 /* ── MYMY WIDGET ── */
 #mymy-btn{position:fixed;bottom:24px;right:24px;z-index:80;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 26px rgba(201,168,76,.4);transition:transform .2s}
@@ -653,6 +694,63 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
   </div>
 </section>
 
+<!-- ═══ KHẢO SÁT NHU CẦU ═══ -->
+<section class="sec" id="khaosat" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow"><span class="ln"></span>NHẬN BÁO GIÁ SƠ BỘ<span class="ln"></span></div>
+      <h2>Trả lời <em>4 câu hỏi</em>, xong trong 30 giây</h2>
+      <p>ALN gọi lại tư vấn chi tiết theo đúng nhu cầu của anh/chị.</p>
+    </div>
+    <div class="sv-card" id="svCard">
+      <div class="sv-progress-track"><div class="sv-progress-fill" id="svProgressFill"></div></div>
+      <div class="sv-step-label" id="svStepLabel">Câu 1 / 4</div>
+
+      <div class="sv-step active" data-step="1">
+        <div class="sv-q">Anh/chị đang cần loại công trình nào?</div>
+        <div class="sv-options" id="svType">
+          <div class="sv-opt" data-val="nhapho" onclick="svPick('type','nhapho',this)"><i class="ph-duotone ph-buildings"></i>Nhà phố</div>
+          <div class="sv-opt" data-val="bietthu" onclick="svPick('type','bietthu',this)"><i class="ph-duotone ph-house-line"></i>Biệt thự</div>
+          <div class="sv-opt" data-val="ntnhapho" onclick="svPick('type','ntnhapho',this)"><i class="ph-duotone ph-armchair"></i>Nội thất nhà phố</div>
+          <div class="sv-opt" data-val="ntbietthu" onclick="svPick('type','ntbietthu',this)"><i class="ph-duotone ph-sofa"></i>Nội thất biệt thự</div>
+        </div>
+      </div>
+
+      <div class="sv-step" data-step="2">
+        <div class="sv-q">Diện tích ước tính khoảng bao nhiêu m²?</div>
+        <input type="number" min="0" class="sv-input" id="svArea" placeholder="VD: 120">
+      </div>
+
+      <div class="sv-step" data-step="3">
+        <div class="sv-q">Anh/chị dự định bắt đầu khi nào?</div>
+        <div class="sv-options" id="svTime">
+          <div class="sv-opt" data-val="ngay" onclick="svPick('time','ngay',this)"><i class="ph-duotone ph-lightning"></i>Ngay bây giờ</div>
+          <div class="sv-opt" data-val="1-3thang" onclick="svPick('time','1-3thang',this)"><i class="ph-duotone ph-calendar"></i>1–3 tháng tới</div>
+          <div class="sv-opt" data-val="timhieu" onclick="svPick('time','timhieu',this)"><i class="ph-duotone ph-magnifying-glass"></i>Đang tìm hiểu</div>
+        </div>
+      </div>
+
+      <div class="sv-step" data-step="4">
+        <div class="sv-q">Để lại thông tin, ALN gọi lại tư vấn nhé</div>
+        <input type="text" class="sv-input" id="svName" placeholder="Họ và tên">
+        <input type="tel" class="sv-input" id="svPhone" placeholder="Số điện thoại" style="margin-top:10px">
+        <p class="sv-error" id="svError" style="display:none">Vui lòng điền đầy đủ họ tên và số điện thoại.</p>
+      </div>
+
+      <div class="sv-success" id="svSuccess" style="display:none">
+        <i class="ph-duotone ph-check-circle"></i>
+        <div class="sv-success-title">Đã ghi nhận!</div>
+        <p>ALN sẽ gọi lại trong giờ hành chính. Cần gấp, gọi ngay <a href="tel:0909829696">0909 82 9696</a>.</p>
+      </div>
+
+      <div class="sv-nav" id="svNav">
+        <button class="btn btn-outline" id="svBack" onclick="svBack()" style="display:none">← Quay lại</button>
+        <button class="btn btn-gold" id="svNext" onclick="svNext()" style="margin-left:auto">Tiếp theo →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ═══ PORTFOLIO ═══ -->
 <section class="sec portfolio-sec" id="portfolio" style="background:var(--bg2)">
   <div class="wrap">
@@ -841,6 +939,23 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
     <div class="foot-bottom">© ALN — App Làm Nhà Corp. · applamnha.vn</div>
   </div>
 </footer>
+
+<!-- ═══ NÚT NHẬN BÁO GIÁ NỔI ═══ -->
+<a href="#khaosat" id="floatCta" class="float-cta" onclick="svTrack('float_cta_click',{})">
+  <i class="ph-duotone ph-file-text"></i>Nhận báo giá
+</a>
+
+<!-- ═══ POPUP KHẢO SÁT TỰ HIỆN ═══ -->
+<div id="svPopup" class="sv-popup-overlay" onclick="if(event.target===this)svClosePopup()">
+  <div class="sv-popup-box">
+    <button class="sv-popup-close" onclick="svClosePopup()" aria-label="Đóng"><i class="ph-duotone ph-x"></i></button>
+    <div class="sv-popup-icon"><i class="ph-duotone ph-file-text"></i></div>
+    <div class="sv-popup-title">Nhận báo giá sơ bộ miễn phí</div>
+    <p class="sv-popup-sub">Trả lời 4 câu hỏi nhanh, ALN gọi lại tư vấn trong ngày.</p>
+    <a href="#khaosat" class="btn btn-gold" style="width:100%;justify-content:center" onclick="svClosePopup()">Bắt đầu ngay →</a>
+    <button class="sv-popup-skip" onclick="svClosePopup()">Để sau</button>
+  </div>
+</div>
 
 <!-- ═══ MYMY WIDGET ═══ -->
 <button id="mymy-btn" onclick="mymyToggle()" aria-label="Trò chuyện với MyMy">
@@ -1192,6 +1307,104 @@ window.libApplyData = function(items){
 </script>
 
 <script>
+/* ═══ Form khảo sát nhu cầu — thu lead có cấu trúc ═══ */
+window.SV_STEP = 1;
+window.SV_TOTAL = 4;
+window.SV_DATA = { type: null, area: null, time: null, name: '', phone: '' };
+window.SV_SUBMITTED = false;
+
+function svTrack(name, params){
+  if(typeof gtag === 'function'){ gtag('event', name, params || {}); }
+}
+
+function svPick(field, val, el){
+  window.SV_DATA[field] = val;
+  var group = el.parentElement;
+  var opts = group.querySelectorAll('.sv-opt');
+  for(var i=0;i<opts.length;i++){ opts[i].classList.remove('on'); }
+  el.classList.add('on');
+  setTimeout(function(){ if(window.SV_STEP < window.SV_TOTAL){ svNext(); } }, 220);
+}
+
+function svRender(){
+  var steps = document.querySelectorAll('.sv-step');
+  for(var i=0;i<steps.length;i++){
+    steps[i].classList.toggle('active', parseInt(steps[i].dataset.step,10) === window.SV_STEP);
+  }
+  document.getElementById('svStepLabel').textContent = 'Câu ' + window.SV_STEP + ' / ' + window.SV_TOTAL;
+  document.getElementById('svProgressFill').style.width = (window.SV_STEP / window.SV_TOTAL * 100) + '%';
+  document.getElementById('svBack').style.display = window.SV_STEP > 1 ? 'inline-flex' : 'none';
+  document.getElementById('svNext').textContent = window.SV_STEP === window.SV_TOTAL ? 'Gửi thông tin →' : 'Tiếp theo →';
+}
+
+function svNext(){
+  if(window.SV_STEP === 1 && !window.SV_DATA.type){ return; }
+  if(window.SV_STEP === 3 && !window.SV_DATA.time){ return; }
+  if(window.SV_STEP === 2){ window.SV_DATA.area = document.getElementById('svArea').value; }
+  if(window.SV_STEP < window.SV_TOTAL){
+    window.SV_STEP = window.SV_STEP + 1;
+    svRender();
+    svTrack('survey_step', { step: window.SV_STEP });
+    return;
+  }
+  svSubmit();
+}
+
+function svBack(){
+  if(window.SV_STEP > 1){ window.SV_STEP = window.SV_STEP - 1; svRender(); }
+}
+
+function svSubmit(){
+  var name = document.getElementById('svName').value.trim();
+  var phone = document.getElementById('svPhone').value.trim();
+  var err = document.getElementById('svError');
+  if(!name || phone.length < 8){ err.style.display = 'block'; return; }
+  err.style.display = 'none';
+  window.SV_DATA.name = name;
+  window.SV_DATA.phone = phone;
+  if(window.SV_SUBMITTED){ return; }
+  window.SV_SUBMITTED = true;
+  document.getElementById('svNext').textContent = 'Đang gửi...';
+  document.getElementById('svNext').disabled = true;
+  if(typeof window.svSaveLead === 'function'){
+    window.svSaveLead(window.SV_DATA).then(function(){
+      svShowSuccess();
+    }).catch(function(e){
+      console.error('Lỗi lưu khảo sát:', e);
+      svShowSuccess(); // vẫn báo thành công cho khách, log lỗi để kiểm tra sau
+    });
+  } else {
+    svShowSuccess();
+  }
+}
+
+function svShowSuccess(){
+  document.getElementById('svCard').querySelectorAll('.sv-step').forEach(function(s){ s.style.display = 'none'; });
+  document.getElementById('svNav').style.display = 'none';
+  document.getElementById('svSuccess').style.display = 'block';
+  svTrack('generate_lead', { form: 'survey', loai: window.SV_DATA.type, time: window.SV_DATA.time });
+}
+window.addEventListener('DOMContentLoaded', svRender);
+
+function svClosePopup(){
+  document.getElementById('svPopup').classList.remove('open');
+  try{ sessionStorage.setItem('aln_sv_popup_shown', '1'); }catch(e){}
+}
+
+window.addEventListener('load', function(){
+  var already = false;
+  try{ already = sessionStorage.getItem('aln_sv_popup_shown') === '1'; }catch(e){}
+  if(already){ return; }
+  setTimeout(function(){
+    if(window.MYMY_OPENED){ return; } // đang chat MyMy thì khỏi làm phiền
+    document.getElementById('svPopup').classList.add('open');
+    svTrack('survey_popup_shown', {});
+    try{ sessionStorage.setItem('aln_sv_popup_shown', '1'); }catch(e){}
+  }, 8000);
+});
+</script>
+
+<script>
 /* ═══ Thước Lỗ Ban phong thủy ═══ */
 var LB_RULERS = [
   { size: '52.2 cm', cycle: 522, use: 'Thông thủy · cửa đi, cửa sổ, ô thoáng',
@@ -1360,6 +1573,34 @@ async function libLoadFromFirestore() {
   }
 }
 libLoadFromFirestore();
+</script>
+
+<script type="module">
+/* ═══ Form khảo sát — ghi lead vào Firestore (create-only, public không đọc lại được) ═══ */
+import { app, db, collection, addDoc, serverTimestamp } from './firebase-config.js';
+import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+const svAuth = getAuth(app);
+let svAuthReady = false;
+signInAnonymously(svAuth).catch((e) => console.error('Khảo sát anon-auth lỗi:', e));
+onAuthStateChanged(svAuth, (u) => { svAuthReady = !!u; });
+
+window.svSaveLead = async function(data) {
+  if (!svAuthReady) {
+    await new Promise((resolve) => {
+      const unsub = onAuthStateChanged(svAuth, (u) => { if (u) { unsub(); resolve(); } });
+    });
+  }
+  await addDoc(collection(db, 'landingLeads'), {
+    type: data.type || null,
+    area: data.area || null,
+    time: data.time || null,
+    name: data.name || '',
+    phone: data.phone || '',
+    source: 'survey_home',
+    createdAt: serverTimestamp()
+  });
+};
 </script>
 
 </body>
