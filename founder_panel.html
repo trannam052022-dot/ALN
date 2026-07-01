@@ -1815,10 +1815,12 @@ document.addEventListener('DOMContentLoaded', function() {
   <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1);margin-bottom:6px">Kho hồ sơ mẫu — gói kinh tế</div>
   <div style="font-size:13px;color:var(--sub);margin-bottom:18px;max-width:74ch">Quản lý mẫu hiển thị trên trang chủ (mục "Kho mẫu"). Thêm/sửa/xoá, bật/tắt hiển thị, sắp xếp thứ tự, upload nhiều ảnh mỗi mẫu (ảnh đầu = phối cảnh đại diện).</div>
 
-  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
     <button onclick="khomauOpenForm(null)" style="font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 16px;border-radius:8px;border:none;background:var(--gold);color:#fff;cursor:pointer">➕ Thêm mẫu mới</button>
     <div id="khomauMsg" style="font-family:var(--mono);font-size:12px;color:var(--gold)"></div>
   </div>
+
+  <div id="khomauCatTabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px"></div>
 
   <div style="overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--card)">
     <table style="width:100%;border-collapse:collapse;min-width:900px">
@@ -5057,6 +5059,8 @@ window.saveCompanySettings = async function() {
 (function(){
   var KM_CATNAME = { nhapho:'Nhà phố', bietthu:'Biệt thự', nhavuon:'Nhà vườn' };
   var KM_ITEMS = [];       // toàn bộ mẫu, đã sort theo order
+  var KM_FILTERED = [];    // mẫu đang hiện trong bảng, theo tab danh mục đã chọn
+  var KM_CAT_FILTER = 'all';
   var KM_EDIT_MA = null;   // null = đang thêm mới; khác null = đang sửa mã này
   var KM_IMG_ROWS = [];    // [{ src: '' | existingUrl, cap: '', file: File|null }]
 
@@ -5125,21 +5129,43 @@ window.saveCompanySettings = async function() {
       var snap = await getDocs(q);
       KM_ITEMS = [];
       snap.forEach(function(d){ KM_ITEMS.push(d.data()); });
+      kmRenderCatTabs();
       kmRenderTable();
     } catch(e) {
       if(body) body.innerHTML = '<tr><td colspan="9" style="padding:20px;text-align:center;color:var(--red);font-family:var(--mono);font-size:12px">Lỗi tải dữ liệu: '+(e.message||e)+'</td></tr>';
     }
   };
 
+  function kmRenderCatTabs(){
+    var box = document.getElementById('khomauCatTabs');
+    if(!box) return;
+    var cats = [['all','Tất cả']].concat(Object.keys(KM_CATNAME).map(function(k){ return [k, KM_CATNAME[k]]; }));
+    var html = '';
+    cats.forEach(function(c){
+      var key = c[0], label = c[1];
+      var count = key==='all' ? KM_ITEMS.length : KM_ITEMS.filter(function(x){return x.cat===key;}).length;
+      var on = KM_CAT_FILTER === key;
+      html += '<button onclick="khomauSetCatFilter(\''+key+'\')" style="padding:7px 14px;border-radius:99px;font-family:var(--sans);font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid '+(on?'transparent':'var(--border)')+';background:'+(on?'var(--gold)':'var(--raised)')+';color:'+(on?'#fff':'var(--text2)')+'">'+label+' <span style="opacity:.75">('+count+')</span></button>';
+    });
+    box.innerHTML = html;
+  }
+
+  window.khomauSetCatFilter = function(cat){
+    KM_CAT_FILTER = cat;
+    kmRenderCatTabs();
+    kmRenderTable();
+  };
+
   function kmRenderTable(){
     var body = document.getElementById('khomauBody');
     if(!body) return;
-    if(KM_ITEMS.length===0){
-      body.innerHTML = '<tr><td colspan="9" style="padding:24px;text-align:center;color:var(--dim);font-family:var(--sans);font-size:13px">Chưa có mẫu nào. Bấm "Thêm mẫu mới" để bắt đầu.</td></tr>';
+    KM_FILTERED = KM_CAT_FILTER === 'all' ? KM_ITEMS : KM_ITEMS.filter(function(x){return x.cat===KM_CAT_FILTER;});
+    if(KM_FILTERED.length===0){
+      body.innerHTML = '<tr><td colspan="9" style="padding:24px;text-align:center;color:var(--dim);font-family:var(--sans);font-size:13px">Chưa có mẫu nào trong danh mục này. Bấm "Thêm mẫu mới" để bắt đầu.</td></tr>';
       return;
     }
     var html = '';
-    KM_ITEMS.forEach(function(it, idx){
+    KM_FILTERED.forEach(function(it, idx){
       var cover = (it.imgs && it.imgs[0] && it.imgs[0].src) ? it.imgs[0].src : '';
       var thumb = cover
         ? '<img src="'+cover+'" style="width:44px;height:33px;object-fit:cover;border-radius:5px;border:1px solid var(--border)">'
@@ -5147,7 +5173,7 @@ window.saveCompanySettings = async function() {
       html += '<tr style="border-bottom:1px solid var(--border)">' +
         '<td style="padding:10px 11px;font-family:var(--mono);font-size:12px;color:var(--sub)">' +
           '<button onclick="khomauMove(\''+it.ma+'\',-1)" '+(idx===0?'disabled':'')+' style="background:none;border:none;cursor:pointer;color:var(--dim);padding:2px"><i class="ph-duotone ph-caret-up"></i></button>' +
-          '<button onclick="khomauMove(\''+it.ma+'\',1)" '+(idx===KM_ITEMS.length-1?'disabled':'')+' style="background:none;border:none;cursor:pointer;color:var(--dim);padding:2px"><i class="ph-duotone ph-caret-down"></i></button>' +
+          '<button onclick="khomauMove(\''+it.ma+'\',1)" '+(idx===KM_FILTERED.length-1?'disabled':'')+' style="background:none;border:none;cursor:pointer;color:var(--dim);padding:2px"><i class="ph-duotone ph-caret-down"></i></button>' +
         '</td>' +
         '<td style="padding:10px 11px;font-family:var(--mono);font-weight:700;font-size:12.5px;color:var(--gold)"># '+it.ma+'</td>' +
         '<td style="padding:10px 11px;font-size:12.5px;color:var(--text2)">'+(KM_CATNAME[it.cat]||it.cat)+'</td>' +
@@ -5358,10 +5384,10 @@ window.saveCompanySettings = async function() {
 
   window.khomauMove = async function(ma, dir){
     var idx = -1;
-    for(var i=0;i<KM_ITEMS.length;i++){ if(KM_ITEMS[i].ma===ma){ idx=i; break; } }
+    for(var i=0;i<KM_FILTERED.length;i++){ if(KM_FILTERED[i].ma===ma){ idx=i; break; } }
     var j = idx + dir;
-    if(idx<0 || j<0 || j>=KM_ITEMS.length) return;
-    var a = KM_ITEMS[idx], b = KM_ITEMS[j];
+    if(idx<0 || j<0 || j>=KM_FILTERED.length) return;
+    var a = KM_FILTERED[idx], b = KM_FILTERED[j];
     var aOrder = a.order, bOrder = b.order;
     try {
       await updateDoc(doc(db, 'mauNha', a.ma), { order: bOrder });
