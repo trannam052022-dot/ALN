@@ -206,6 +206,12 @@ service cloud.firestore {
       allow write: if isFounder();
     }
 
+    // File gốc Kho hồ sơ mẫu — CHỈ Founder đọc/ghi, tách riêng khỏi mauNha để
+    // link file gốc không bao giờ lộ ra qua document mà public đọc được.
+    match /mauNhaGoc/{id} {
+      allow read, write: if isFounder();
+    }
+
     // MyMy Agent Loop — DN chỉ đọc session của chính mình; ghi qua Cloud Function
     match /mymy_sessions/{dnId} {
       allow read: if signedIn() && request.auth.uid == dnId;
