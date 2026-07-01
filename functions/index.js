@@ -116,6 +116,40 @@ exports.onDnApply = functions
     );
   });
 
+/* ── Lead mới từ form khảo sát trang chủ (home.html) ── */
+exports.onLandingLeadCreated = functions
+  .region("asia-southeast1")
+  .firestore.document("landingLeads/{id}")
+  .onCreate(async (snap) => {
+    const d = snap.data() || {};
+    const loaiLabel = {
+      nhapho: "Nhà phố", bietthu: "Biệt thự",
+      ntnhapho: "Nội thất nhà phố", ntbietthu: "Nội thất biệt thự",
+    }[d.type] || d.type || "";
+    const detail = [loaiLabel, d.area ? d.area + "m²" : ""].filter(Boolean).join(" · ");
+
+    await notifyFounder(
+      "📋 Lead mới từ form khảo sát",
+      `${d.name || "Khách"} — ${d.phone || "?"} ${detail ? "· " + detail : ""}`,
+      { type: "NEW_LANDING_LEAD", id: snap.id, phone: d.phone || "" }
+    );
+  });
+
+/* ── Yêu cầu ghép dự án mới (MyMy / DN tạo) → thông báo Founder ── */
+exports.onMatchingRequestCreated = functions
+  .region("asia-southeast1")
+  .firestore.document("matchingRequests/{id}")
+  .onCreate(async (snap) => {
+    const d = snap.data() || {};
+    const detail = [d.projectType, d.budget].filter(Boolean).join(" · ");
+
+    await notifyFounder(
+      "🔔 Yêu cầu dự án mới cần ghép KTS",
+      `${d.projectName || "Dự án mới"} ${detail ? "— " + detail : ""}`,
+      { type: "NEW_MATCHING_REQUEST", id: snap.id }
+    );
+  });
+
 /* ── Chặng được CN/DN duyệt → thông báo KTS ── */
 exports.onStageAdvanced = functions
   .region("asia-southeast1")
