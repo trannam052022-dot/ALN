@@ -254,6 +254,68 @@ Nói chuyện như người thật đang nhắn tin. Nếu cuộc hội thoại 
   }
 );
 
+/* ── Trợ lý Marketing AI — chỉ Founder dùng, giọng văn khác hẳn MyMy ── */
+exports.generateMarketingContent = onCall(
+  { region: "asia-southeast1", secrets: [ANTHROPIC_KEY] },
+  async (request) => {
+    if (!request.auth || request.auth.uid !== FOUNDER_UID) {
+      throw new HttpsError("permission-denied", "Chỉ Founder mới dùng được công cụ này");
+    }
+    const { prompt } = request.data || {};
+    if (!prompt || typeof prompt !== "string") {
+      throw new HttpsError("invalid-argument", "prompt required");
+    }
+
+    const apiKey = ANTHROPIC_KEY.value();
+    const system = `Bạn là chuyên viên marketing chuyên nghiệp, viết nội dung cho ALN (App Làm Nhà Corp.).
+
+THÔNG TIN CÔNG TY (chỉ dùng đúng số liệu này, không bịa thêm):
+- ALN là tổng thầu xây dựng, phối hợp KTS và đơn vị thi công đối tác đã thẩm định qua 4 giai đoạn C1 (10%, ký hợp đồng) → C2 (20%, chốt phương án) → C3 (60%, triển khai) → C4 (10%, nghiệm thu bàn giao)
+- Chủ nhà thanh toán trực tiếp cho ALN theo từng giai đoạn — KHÔNG có bên thứ ba giữ tiền hộ
+- Hotline: 0909 82 9696 | Website: applamnha.vn | Email: contact@applamnha.vn
+- Bảng giá tham khảo: Nhà phố (kiến trúc) 120.000đ/m² sàn, Biệt thự (kiến trúc) 160.000đ/m² sàn, Nội thất nhà phố 120.000đ/m² sử dụng, Nội thất biệt thự 180.000đ/m² sử dụng — giá chưa gồm VAT
+- KTS đối tác có Chứng chỉ hành nghề (CCHN), bản vẽ được thẩm tra trước khi thi công
+
+QUY TẮC:
+- Viết tiếng Việt tự nhiên, chuyên nghiệp, đúng văn phong ngành kiến trúc/xây dựng cao cấp
+- Không bịa số liệu, chứng nhận, hay lời chứng thực khách hàng ngoài thông tin trên
+- Định dạng rõ ràng, dễ copy dùng ngay (không cần giải thích thêm ngoài nội dung được yêu cầu)`;
+
+    try {
+      const resp = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1200,
+          system,
+          messages: [{ role: "user", content: prompt }],
+        }),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.text();
+        console.error("[generateMarketingContent] Anthropic:", err);
+        throw new HttpsError("internal", "Lỗi kết nối AI");
+      }
+
+      const data = await resp.json();
+      const reply = data.content && data.content[0] && data.content[0].text;
+      if (!reply) throw new HttpsError("internal", "Phản hồi rỗng");
+      return { reply };
+
+    } catch (e) {
+      if (e instanceof HttpsError) throw e;
+      console.error("[generateMarketingContent]", e);
+      throw new HttpsError("internal", e.message || "Lỗi xử lý");
+    }
+  }
+);
+
 /* ── Bài mới trong Nhịp sống ALN → thông báo Founder + KTS + Designer ── */
 exports.onCommunityPost = functions
   .region("asia-southeast1")

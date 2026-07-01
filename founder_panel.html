@@ -929,6 +929,7 @@ body {
     <button class="fsub" id="tabCompany"  onclick="switchTab('company')" ><i class="ph-duotone ph-buildings"></i>Cài đặt CTY</button>
     <button class="fsub" id="tabPricing"  onclick="switchTab('pricing')" ><i class="ph-duotone ph-tag"></i>Khung giá</button>
     <button class="fsub" id="tabKhomau"  onclick="switchTab('khomau')" ><i class="ph-duotone ph-house-line"></i>Kho mẫu</button>
+    <button class="fsub" id="tabMkt"  onclick="switchTab('mkt')" ><i class="ph-duotone ph-magic-wand"></i>Trợ lý Marketing</button>
     <a href="aln_community.html" class="fsub" style="text-decoration:none"><i class="ph-duotone ph-campfire"></i>Nhịp sống</a>
   </span>
 
@@ -1539,6 +1540,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--raised);border-bottom:1px solid var(--border);white-space:nowrap">Thời điểm</th>
         <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--raised);border-bottom:1px solid var(--border);white-space:nowrap">Ngày gửi</th>
         <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--raised);border-bottom:1px solid var(--border);white-space:nowrap">Trạng thái</th>
+        <th style="background:var(--raised);border-bottom:1px solid var(--border);padding:12px 11px"></th>
       </tr></thead>
       <tbody id="leadsBody"></tbody>
     </table>
@@ -1839,6 +1841,94 @@ document.addEventListener('DOMContentLoaded', function() {
 
   <div style="margin-top:22px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;font-family:var(--mono);font-size:11.5px;line-height:1.65;color:var(--sub)">
     <b style="color:var(--gold)">Nút "Lưu lên hệ thống":</b> validate Sàn≤Tiếp thị≤Trần trước, rồi ghi thẳng vào Firestore document <b style="color:var(--text2)">settings/pricing_bands</b> — kèm version & updatedAt. Chỉ Founder mới ghi được (rule: <span style="color:var(--dim)">settings/{docId} write: isFounder()</span>).
+  </div>
+</div>
+
+<!-- ══ PANEL: TRỢ LÝ MARKETING AI ══ -->
+<div id="panelMkt" style="display:none;flex-direction:column;flex:1;overflow-y:auto;padding:24px 28px">
+  <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px">MARKETING · TRỢ LÝ AI</div>
+  <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1);margin-bottom:6px">Trợ lý Marketing AI</div>
+  <div style="font-size:13px;color:var(--sub);margin-bottom:18px;max-width:74ch">Tạo nội dung bằng AI theo đúng thông tin thật của ALN (giá, quy trình C1–C4, liên hệ) — chỉ Founder dùng được. Nội dung do AI tạo, luôn đọc lại trước khi đăng/gửi.</div>
+
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px" id="mktKindTabs">
+    <button class="fsub" onclick="mktSetKind('fanpage',this)" style="background:var(--gold);color:#fff;border-color:transparent"><i class="ph-duotone ph-pencil-simple-line"></i> Bài Fanpage</button>
+    <button class="fsub" onclick="mktSetKind('ads',this)"><i class="ph-duotone ph-megaphone"></i> Kịch bản quảng cáo</button>
+    <button class="fsub" onclick="mktSetKind('reply',this)"><i class="ph-duotone ph-chats"></i> Script/Tin nhắn</button>
+    <button class="fsub" onclick="mktSetKind('free',this)"><i class="ph-duotone ph-sparkle"></i> Hỏi tự do</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px" id="mktGrid">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px">
+      <div id="mktFieldsFanpage" class="mkt-fields">
+        <label style="display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Loại nội dung</label>
+        <select id="mktPostType" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:13px;margin-bottom:14px">
+          <option value="Before & After công trình">Before &amp; After công trình</option>
+          <option value="Kiến thức xây dựng">Kiến thức xây dựng</option>
+          <option value="Phản hồi khách hàng">Phản hồi khách hàng</option>
+          <option value="Khuyến mãi ưu đãi">Khuyến mãi / Ưu đãi</option>
+          <option value="Lễ bàn giao công trình">Lễ bàn giao công trình</option>
+        </select>
+        <label style="display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Mô tả công trình / nội dung</label>
+        <textarea id="mktPostDesc" placeholder="VD: Nhà phố 5x18m, 4 tầng, Q.Bình Thạnh, phong cách hiện đại..." style="width:100%;min-height:70px;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:13px;margin-bottom:14px;resize:vertical;font-family:var(--sans)"></textarea>
+        <label style="display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Tone giọng văn</label>
+        <select id="mktPostTone" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:13px;margin-bottom:14px">
+          <option value="chuyên nghiệp và đáng tin">Chuyên nghiệp &amp; Tin cậy</option>
+          <option value="thân thiện gần gũi">Thân thiện &amp; Gần gũi</option>
+          <option value="thuyết phục và kêu gọi hành động">Bán hàng &amp; Thuyết phục</option>
+        </select>
+      </div>
+
+      <div id="mktFieldsAds" class="mkt-fields" style="display:none">
+        <label style="display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Mục tiêu quảng cáo</label>
+        <select id="mktAdGoal" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:13px;margin-bottom:14px">
+          <option value="có khách gọi điện ngay">Có khách gọi điện</option>
+          <option value="thu thập số điện thoại qua form">Thu thập số điện thoại</option>
+          <option value="tăng traffic website">Tăng traffic website</option>
+        </select>
+        <label style="display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Dịch vụ quảng cáo</label>
+        <select id="mktAdService" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:13px;margin-bottom:14px">
+          <option value="xây nhà trọn gói">Xây nhà trọn gói</option>
+          <option value="thiết kế nội thất">Thiết kế nội thất</option>
+          <option value="thiết kế kiến trúc">Thiết kế kiến trúc</option>
+          <option value="cải tạo sửa chữa">Cải tạo, sửa chữa</option>
+        </select>
+        <label style="display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Điểm mạnh muốn nhấn mạnh</label>
+        <textarea id="mktAdUsp" placeholder="VD: KTS có CCHN, thẩm tra bản vẽ trước thi công..." style="width:100%;min-height:70px;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:13px;margin-bottom:14px;resize:vertical;font-family:var(--sans)"></textarea>
+      </div>
+
+      <div id="mktFieldsReply" class="mkt-fields" style="display:none">
+        <label style="display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Tình huống</label>
+        <select id="mktReplyType" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:13px;margin-bottom:14px">
+          <option value="script gọi điện cho lead mới vừa để lại thông tin">Script gọi điện lead mới</option>
+          <option value="trả lời khách hỏi giá xây nhà">Khách hỏi giá</option>
+          <option value="thuyết phục khách đang so sánh nhiều nhà thầu chọn ALN">So sánh nhiều nhà thầu</option>
+          <option value="trấn an khách lo ngại về tiến độ thi công">Lo sợ chậm tiến độ</option>
+          <option value="tin nhắn follow up khách chưa quyết định sau 3-5 ngày">Follow up chưa quyết định</option>
+          <option value="xin đánh giá 5 sao Google và Facebook">Xin đánh giá 5 sao</option>
+        </select>
+        <label style="display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Thông tin khách (tuỳ chọn)</label>
+        <textarea id="mktReplyInfo" placeholder="VD: Anh Minh, đất 100m² Q.7, ngân sách 3 tỷ..." style="width:100%;min-height:70px;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:13px;margin-bottom:14px;resize:vertical;font-family:var(--sans)"></textarea>
+        <label style="display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Kênh liên lạc</label>
+        <select id="mktReplyChannel" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:13px;margin-bottom:14px">
+          <option value="cuộc gọi điện thoại">Gọi điện</option>
+          <option value="tin nhắn Zalo">Zalo / SMS</option>
+          <option value="reply comment công khai">Reply comment</option>
+        </select>
+      </div>
+
+      <div id="mktFieldsFree" class="mkt-fields" style="display:none">
+        <label style="display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Hỏi bất cứ điều gì về marketing</label>
+        <textarea id="mktFreeQ" placeholder="VD: Ngân sách 100k/ngày nên chạy quảng cáo gì?" style="width:100%;min-height:110px;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:13px;margin-bottom:14px;resize:vertical;font-family:var(--sans)"></textarea>
+      </div>
+
+      <button onclick="mktGenerate()" id="mktGenBtn" style="width:100%;padding:11px 16px;border-radius:8px;border:none;background:var(--gold);color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-magic-wand"></i> Tạo nội dung với AI</button>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;display:flex;flex-direction:column">
+      <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Kết quả AI</div>
+      <div id="mktOutput" style="flex:1;background:var(--raised);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:13px;line-height:1.75;color:var(--text2);white-space:pre-wrap;min-height:220px">Nội dung sẽ hiện ở đây sau khi bấm "Tạo nội dung với AI"...</div>
+      <button onclick="mktCopy()" style="margin-top:12px;padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-copy"></i> Copy</button>
+    </div>
   </div>
 </div>
 
@@ -2833,7 +2923,7 @@ window.ALNRealtime = (() => {
 ══════════════════════════════════════════ */
 
 function switchTab(t){
-  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','pending','payments','leads','recruit','company','pricing','khomau','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
+  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','pending','payments','leads','recruit','company','pricing','khomau','mkt','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
   var activeStyle  = 'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.15);color:var(--blue);white-space:nowrap';
   var inactiveStyle= 'padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:var(--raised);color:var(--sub);white-space:nowrap';
   var liveStyles = {
@@ -5470,7 +5560,7 @@ window.saveCompanySettings = async function() {
 
   window.initLeadsPanel = async function(){
     var body = document.getElementById('leadsBody');
-    if(body) body.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--dim);font-family:var(--mono);font-size:12px">Đang tải...</td></tr>';
+    if(body) body.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--dim);font-family:var(--mono);font-size:12px">Đang tải...</td></tr>';
     try {
       var q = query(collection(db, 'landingLeads'), orderBy('createdAt', 'desc'));
       var snap = await getDocs(q);
@@ -5481,7 +5571,7 @@ window.saveCompanySettings = async function() {
       var badge = document.getElementById('leadsBadge');
       if(badge){ badge.textContent = staleCount; badge.style.display = staleCount > 0 ? 'inline' : 'none'; }
     } catch(e) {
-      if(body) body.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--red)">Lỗi tải dữ liệu: '+(e.message||e)+'</td></tr>';
+      if(body) body.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--red)">Lỗi tải dữ liệu: '+(e.message||e)+'</td></tr>';
     }
   };
 
@@ -5497,7 +5587,7 @@ window.saveCompanySettings = async function() {
     if(!body) return;
     var items = LD_FILTER === 'all' ? LD_ITEMS : LD_ITEMS.filter(function(x){ return (x.status||'moi') === LD_FILTER; });
     if(items.length === 0){
-      body.innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:var(--dim);font-family:var(--sans);font-size:13px">Chưa có lead nào ở trạng thái này.</td></tr>';
+      body.innerHTML = '<tr><td colspan="6" style="padding:24px;text-align:center;color:var(--dim);font-family:var(--sans);font-size:13px">Chưa có lead nào ở trạng thái này.</td></tr>';
       return;
     }
     var html = '';
@@ -5520,10 +5610,18 @@ window.saveCompanySettings = async function() {
         '<td style="padding:10px 11px">' +
           '<select onchange="leadsUpdateStatus(\''+it._id+'\',this.value)" style="padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--raised);color:'+LD_COLOR[status]+';font-weight:700;font-size:11.5px;font-family:var(--sans);cursor:pointer">'+optHtml+'</select>' +
         '</td>' +
+        '<td style="padding:10px 11px">' +
+          '<button onclick="leadsAiSuggest(\''+it._id+'\')" style="padding:6px 10px;border-radius:6px;border:1px solid var(--gold-bd);background:var(--gold-bg);color:var(--gold);font-weight:700;font-size:11px;cursor:pointer;font-family:var(--sans);white-space:nowrap"><i class="ph-duotone ph-magic-wand"></i> Gợi ý AI</button>' +
+        '</td>' +
       '</tr>';
     });
     body.innerHTML = html;
   }
+
+  window.leadsGetById = function(id){
+    var found = LD_ITEMS.filter(function(x){ return x._id === id; });
+    return found.length ? found[0] : null;
+  };
 
   window.leadsUpdateStatus = async function(id, status){
     try {
@@ -5537,6 +5635,96 @@ window.saveCompanySettings = async function() {
     } catch(e) {
       alert('Lỗi cập nhật trạng thái: ' + (e.message||e));
     }
+  };
+})();
+
+/* ══════════════════════════════════════════
+   TRỢ LÝ MARKETING AI — Cloud Function generateMarketingContent
+══════════════════════════════════════════ */
+(function(){
+  var MKT_KIND = 'fanpage';
+  var _mktGenFn = null;
+
+  async function mktGetFn(){
+    if(_mktGenFn) return _mktGenFn;
+    var mod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
+    var fns = mod.getFunctions(app, 'asia-southeast1');
+    _mktGenFn = mod.httpsCallable(fns, 'generateMarketingContent');
+    return _mktGenFn;
+  }
+
+  window.mktSetKind = function(kind, btn){
+    MKT_KIND = kind;
+    document.querySelectorAll('#mktKindTabs .fsub').forEach(function(b){ b.style.background='var(--raised)'; b.style.color='var(--sub)'; b.style.borderColor='var(--border)'; });
+    if(btn){ btn.style.background='var(--gold)'; btn.style.color='#fff'; btn.style.borderColor='transparent'; }
+    document.querySelectorAll('.mkt-fields').forEach(function(el){ el.style.display = 'none'; });
+    var map = { fanpage:'mktFieldsFanpage', ads:'mktFieldsAds', reply:'mktFieldsReply', free:'mktFieldsFree' };
+    var box = document.getElementById(map[kind]);
+    if(box) box.style.display = 'block';
+  };
+
+  function mktBuildPrompt(){
+    if(MKT_KIND === 'fanpage'){
+      var type = document.getElementById('mktPostType').value;
+      var desc = document.getElementById('mktPostDesc').value.trim();
+      var tone = document.getElementById('mktPostTone').value;
+      return 'Viết 1 bài đăng Facebook loại "'+type+'" cho ALN. Thông tin: '+(desc || 'Công trình điển hình của ALN')+'. Giọng văn: '+tone+'. Yêu cầu: 150-250 từ, CTA gọi 0909 82 9696 hoặc nhắn MyMy trên applamnha.vn, 3-5 hashtag cuối bài.';
+    }
+    if(MKT_KIND === 'ads'){
+      var goal = document.getElementById('mktAdGoal').value;
+      var svc = document.getElementById('mktAdService').value;
+      var usp = document.getElementById('mktAdUsp').value.trim();
+      return 'Tạo kịch bản quảng cáo Facebook/Google cho ALN:\n- Mục tiêu: '+goal+'\n- Dịch vụ: '+svc+'\n- Điểm mạnh: '+(usp || 'tổng thầu trách nhiệm, KTS có CCHN, thanh toán minh bạch theo C1–C4')+'\nYêu cầu:\n1. Primary text (150-200 từ)\n2. Headline (tối đa 40 ký tự)\n3. Description (30 ký tự)\n4. Gợi ý loại nút CTA nên dùng';
+    }
+    if(MKT_KIND === 'reply'){
+      var rtype = document.getElementById('mktReplyType').value;
+      var info = document.getElementById('mktReplyInfo').value.trim();
+      var channel = document.getElementById('mktReplyChannel').value;
+      return 'Viết '+rtype+' cho ALN qua kênh '+channel+'.'+(info ? '\nThông tin khách: '+info : '')+'\nYêu cầu: tự nhiên, thuyết phục, chuyên nghiệp, đúng chất tổng thầu trách nhiệm.';
+    }
+    return document.getElementById('mktFreeQ').value.trim();
+  }
+
+  window.mktGenerate = async function(){
+    var prompt = mktBuildPrompt();
+    if(!prompt){ alert('Vui lòng nhập đủ thông tin trước khi tạo.'); return; }
+    var out = document.getElementById('mktOutput');
+    var btn = document.getElementById('mktGenBtn');
+    out.textContent = '⏳ AI đang tạo nội dung...';
+    btn.disabled = true;
+    try {
+      var fn = await mktGetFn();
+      var res = await fn({ prompt: prompt });
+      out.textContent = (res.data && res.data.reply) || 'Không có phản hồi.';
+    } catch(e) {
+      out.textContent = '❌ Lỗi: ' + (e.message || e);
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  window.mktCopy = function(){
+    var text = document.getElementById('mktOutput').textContent;
+    navigator.clipboard.writeText(text);
+    var btn = event.currentTarget;
+    var old = btn.innerHTML;
+    btn.innerHTML = '<i class="ph-duotone ph-check"></i> Đã copy';
+    setTimeout(function(){ btn.innerHTML = old; }, 1500);
+  };
+
+  // Gợi ý AI theo từng lead — gọi từ tab "Lead"
+  window.leadsAiSuggest = async function(id){
+    var it = (typeof window.leadsGetById === 'function') ? window.leadsGetById(id) : null;
+    if(!it){ alert('Không tìm thấy dữ liệu lead.'); return; }
+    var typeMap = { nhapho:'Nhà phố', bietthu:'Biệt thự', ntnhapho:'Nội thất nhà phố', ntbietthu:'Nội thất biệt thự' };
+    var timeMap = { ngay:'Ngay bây giờ', '1-3thang':'1–3 tháng tới', timhieu:'Đang tìm hiểu' };
+    var prompt = 'Khách hàng '+(it.name||'')+', nhu cầu: '+(typeMap[it.type]||it.type||'')+
+      (it.area ? ', diện tích ~'+it.area+'m²' : '')+', thời điểm: '+(timeMap[it.time]||it.time||'')+'.\n'+
+      'Gợi ý cho ALN:\n1. Script gọi điện ngắn (3-4 câu mở đầu)\n2. Điểm cần khai thác thêm khi gọi\n3. Gói dịch vụ phù hợp nhất\n4. 1 cách chốt lịch hẹn khảo sát';
+    switchTab('mkt');
+    mktSetKind('free', document.querySelector('#mktKindTabs .fsub:last-child'));
+    document.getElementById('mktFreeQ').value = prompt;
+    window.mktGenerate();
   };
 })();
 
