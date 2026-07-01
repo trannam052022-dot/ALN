@@ -947,6 +947,7 @@ body::after {
     <button class="fsub" id="tabPayments" onclick="switchTab('payments')"><i class="ph-duotone ph-money"></i>Thanh toán<span id="paymentsBadge" style="display:none;background:var(--green);color:#fff;border-radius:99px;font-size:9px;padding:1px 5px;margin-left:2px;font-weight:800">0</span></button>
     <button class="fsub" id="tabRecruit"  onclick="switchTab('recruit')" ><i class="ph-duotone ph-megaphone"></i>Tuyển dụng</button>
     <button class="fsub" id="tabCompany"  onclick="switchTab('company')" ><i class="ph-duotone ph-buildings"></i>Cài đặt CTY</button>
+    <button class="fsub" id="tabPricing"  onclick="switchTab('pricing')" ><i class="ph-duotone ph-tag"></i>Khung giá</button>
     <a href="aln_community.html" class="fsub" style="text-decoration:none"><i class="ph-duotone ph-campfire"></i>Nhịp sống</a>
   </span>
 
@@ -1779,6 +1780,51 @@ document.addEventListener('DOMContentLoaded', function() {
     <div style="text-align:center;padding:40px;color:var(--dim);font-family:var(--mono);font-size:12px">
       <i class="ph-duotone ph-spinner-gap ph-spin" style="font-size:24px;margin-bottom:10px;display:block"></i>Đang tải...
     </div>
+  </div>
+</div>
+
+<!-- ══ PANEL KHUNG GIÁ ══ -->
+<div id="panelPricing" style="display:none;flex-direction:column;flex:1;overflow-y:auto;padding:24px 28px">
+  <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px">VẬN HÀNH · BẢO MẬT</div>
+  <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1);margin-bottom:6px">Khung giá Sàn · Tiếp thị · Trần</div>
+  <div style="font-size:13px;color:var(--sub);margin-bottom:18px;max-width:74ch">Dữ liệu gốc MyMy dùng để chốt giá. MyMy chỉ được chốt trong khoảng <b style="color:var(--text2)">Sàn–Trần</b> của mỗi thể loại. Sửa trực tiếp, thêm thể loại, rồi <b style="color:var(--gold)">Xuất JSON</b> để nạp vào <span style="font-family:var(--mono);font-size:12px;color:var(--dim)">config/pricing_bands</span>.</div>
+
+  <div style="display:flex;align-items:center;gap:10px;background:rgba(180,82,26,.10);border:1px solid rgba(180,82,26,.28);border-radius:10px;padding:11px 15px;margin-bottom:20px;font-size:13px;color:#f8a67c">
+    🔒 <span><b style="color:#f97316">Bảo mật:</b> Sàn/Trần chỉ hiển thị tại đây (Founder). Không xuất hiện ở trang chủ nhà hay bất kỳ phiên công khai nào của MyMy.</span>
+  </div>
+
+  <div style="overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--card)">
+    <table id="pricingTable" style="width:100%;border-collapse:collapse;min-width:860px">
+      <thead><tr>
+        <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap">Thể loại</th>
+        <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap">Đơn vị</th>
+        <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap">Sàn (đ/m²)</th>
+        <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);text-align:left;padding:12px 11px;background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap">Tiếp thị (đ/m²)</th>
+        <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap">Trần (đ/m²)</th>
+        <th style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:12px 11px;background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap">Phí tối thiểu (đ)</th>
+        <th style="background:var(--surface);border-bottom:1px solid var(--border);padding:12px 11px"></th>
+      </tr></thead>
+      <tbody id="pricingBody"></tbody>
+    </table>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap">
+    <button onclick="pricingAddCat()" style="font-family:var(--sans);font-size:13px;font-weight:600;padding:9px 16px;border-radius:8px;border:1px dashed rgba(201,168,76,.5);background:rgba(201,168,76,.06);color:var(--gold);cursor:pointer">➕ Thêm thể loại</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button onclick="document.getElementById('pricingImportFile').click()" style="font-family:var(--sans);font-size:13px;font-weight:600;padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);cursor:pointer">⬆ Nhập JSON</button>
+      <button onclick="pricingExport()" style="font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 16px;border-radius:8px;border:none;background:var(--gold);color:#08090f;cursor:pointer">⬇ Xuất JSON (seed Firestore)</button>
+      <input type="file" id="pricingImportFile" accept="application/json,.json" style="display:none">
+    </div>
+  </div>
+  <div id="pricingMsg" style="margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--gold);min-height:18px"></div>
+  <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--dim)">
+    <span>Quy tắc: <b style="color:var(--text2)">Sàn ≤ Tiếp thị ≤ Trần</b> (ô đỏ = sai)</span>
+    <span>Tiếp thị = mức mềm hiện cho khách</span>
+    <span>Tỷ lệ mốc: <b style="color:var(--text2)">C1 10 · C2 20 · C3 60 · C4 10</b></span>
+  </div>
+
+  <div style="margin-top:22px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;font-family:var(--mono);font-size:11.5px;line-height:1.65;color:var(--sub)">
+    <b style="color:var(--gold)">Nạp vào hệ thống:</b> Xuất JSON → seed vào Firestore document <b style="color:var(--text2)">config/pricing_bands</b> qua Cloud Function <b style="color:var(--text2)">updatePricingBands</b> (verify Founder → validate Sàn≤Tiếp thị≤Trần ở server → đóng dấu version/updatedAt). Rule: chỉ Founder đọc/ghi; MyMy đọc bằng Admin SDK ở server.
   </div>
 </div>
 
@@ -2662,7 +2708,7 @@ window.ALNRealtime = (() => {
 ══════════════════════════════════════════ */
 
 function switchTab(t){
-  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','pending','payments','recruit','company','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
+  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','pending','payments','recruit','company','pricing','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
   var activeStyle  = 'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.15);color:var(--blue);white-space:nowrap';
   var inactiveStyle= 'padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:var(--raised);color:var(--sub);white-space:nowrap';
   var liveStyles = {
@@ -2677,6 +2723,7 @@ function switchTab(t){
     c2monitor: {active:'padding:5px 13px;border:1px solid rgba(239,68,68,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.2);color:#ef4444;display:flex;align-items:center;gap:5px;white-space:nowrap',     inactive:'padding:5px 13px;border:1px solid rgba(239,68,68,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.08);color:#ef4444;display:flex;align-items:center;gap:5px;white-space:nowrap'},
     payments: {active:'padding:5px 13px;border:1px solid rgba(16,185,129,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.2);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     company:  {active:'padding:5px 13px;border:1px solid rgba(201,168,76,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.2);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap'},
+    pricing:  {active:'padding:5px 13px;border:1px solid rgba(201,168,76,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.2);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap'},
   };
 
   ALL.forEach(function(tab){
@@ -2703,6 +2750,7 @@ function switchTab(t){
   if(t==='payments') renderPayments();
   if(t==='recruit')  { if(typeof window._recruitRender==='function') window._recruitRender(); }
   if(t==='company')  loadCompanySettings();
+  if(t==='pricing')  initPricingPanel();
   if(t==='waitRoom') loadWaitRoom();
   if(t==='matching')   loadMatchingPanel();
   if(t==='c2monitor')  loadC2MonitorPanel();
@@ -4791,6 +4839,111 @@ window.saveCompanySettings = async function() {
     status.style.color = 'var(--red)';
   }
 };
+
+/* ══════════════════════════════════════════
+   KHUNG GIÁ — Pricing Bands
+══════════════════════════════════════════ */
+(function(){
+  var PRICING_DEFAULT = [
+    { id:"nha_pho",  label:"Nhà phố",  unit:"m² sàn xây dựng", floor:180000, mkt:220000, ceil:280000, min:15000000 },
+    { id:"biet_thu", label:"Biệt thự", unit:"m² sàn xây dựng", floor:220000, mkt:260000, ceil:340000, min:25000000 },
+    { id:"noi_that", label:"Nội thất", unit:"m² sử dụng",      floor:230000, mkt:280000, ceil:400000, min:12000000 },
+  ];
+  var PCATS = [];
+  var _initialized = false;
+
+  function pSlug(s){ return (s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/g,"d").replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"")||("loai_"+Date.now()); }
+  function pMsg(t){ var el=document.getElementById('pricingMsg'); if(el) el.textContent=t||""; }
+
+  var PRICING_KEY="aln_price_bands_v1";
+  function pSave(){ try{ if(window.storage&&window.storage.set) window.storage.set(PRICING_KEY,JSON.stringify(PCATS),false); }catch(e){} }
+  function pLoad(){ try{ if(window.storage&&window.storage.get){ var r=window.storage.get(PRICING_KEY,false); if(r&&r.value) return JSON.parse(r.value);} }catch(e){} return null; }
+
+  function pValidate(tr,i){
+    var c=PCATS[i];
+    var ok=c.floor>0 && c.floor<=c.mkt && c.mkt<=c.ceil;
+    ["floor","mkt","ceil"].forEach(function(f){
+      var el=tr.querySelector('[data-f="'+f+'"]');
+      if(el){ el.style.borderColor=ok?'transparent':'#ef4444'; el.style.background=ok?'':'rgba(239,68,68,.08)'; }
+    });
+  }
+
+  function pRender(){
+    var tbody=document.getElementById('pricingBody');
+    if(!tbody) return;
+    var tdBase='padding:7px 9px;border-bottom:1px solid var(--border);vertical-align:middle';
+    var inBase='width:100%;border:1px solid transparent;border-radius:7px;padding:7px 9px;font-family:var(--sans);font-size:13px;color:var(--text1);background:var(--raised);outline:none';
+    var inNum=inBase+';font-family:var(--mono);font-weight:600;text-align:right';
+    tbody.innerHTML=PCATS.map(function(c,i){
+      return '<tr data-i="'+i+'">'
+        +'<td style="'+tdBase+'"><input class="pin" data-f="label" value="'+((c.label||"").replace(/"/g,'&quot;'))+'" placeholder="Tên thể loại" style="'+inBase+'"></td>'
+        +'<td style="'+tdBase+'"><input class="pin" data-f="unit" value="'+((c.unit||"").replace(/"/g,'&quot;'))+'" placeholder="m² sàn" style="'+inBase+'"></td>'
+        +'<td style="'+tdBase+'"><input class="pin pnum" data-f="floor" type="number" step="5000" value="'+c.floor+'" style="'+inNum+'"></td>'
+        +'<td style="'+tdBase+'"><input class="pin pnum pmkt" data-f="mkt" type="number" step="5000" value="'+c.mkt+'" style="'+inNum+';color:var(--gold)"></td>'
+        +'<td style="'+tdBase+'"><input class="pin pnum" data-f="ceil" type="number" step="5000" value="'+c.ceil+'" style="'+inNum+'"></td>'
+        +'<td style="'+tdBase+'"><input class="pin pnum" data-f="min" type="number" step="1000000" value="'+c.min+'" style="'+inNum+'"></td>'
+        +'<td style="'+tdBase+';text-align:center"><button class="pdel" title="Xóa" style="border:0;background:none;color:#f97316;cursor:pointer;font-size:15px;padding:5px 8px;border-radius:6px">✕</button></td>'
+        +'</tr>';
+    }).join("");
+    tbody.querySelectorAll("tr").forEach(function(tr){
+      var i=+tr.dataset.i;
+      tr.querySelectorAll(".pin").forEach(function(inp){
+        inp.addEventListener("input",function(){
+          var f=inp.dataset.f;
+          PCATS[i][f]=(f==="label"||f==="unit")?inp.value:(+inp.value||0);
+          if(f==="label"&&!PCATS[i].id) PCATS[i].id=pSlug(inp.value);
+          pValidate(tr,i); pSave();
+        });
+        inp.addEventListener("focus",function(){ this.style.borderColor='var(--gold)'; this.style.background='rgba(201,168,76,.06)'; });
+        inp.addEventListener("blur",function(){ pValidate(tr,i); });
+      });
+      tr.querySelector(".pdel").addEventListener("click",function(){
+        if(PCATS.length<=1){ pMsg("Giữ ít nhất 1 thể loại."); return; }
+        PCATS.splice(i,1); pRender(); pSave(); pMsg("Đã xóa thể loại.");
+      });
+      pValidate(tr,i);
+    });
+  }
+
+  window.initPricingPanel = function(){
+    if(_initialized){ pRender(); return; }
+    _initialized = true;
+    var stored = pLoad();
+    PCATS = (stored && stored.length) ? stored : JSON.parse(JSON.stringify(PRICING_DEFAULT));
+    PCATS.forEach(function(c){ if(!c.id) c.id=pSlug(c.label); });
+    pRender();
+    document.getElementById('pricingImportFile').addEventListener('change',function(e){
+      var f=e.target.files[0]; if(!f) return;
+      var r=new FileReader();
+      r.onload=function(){ try{
+        var d=JSON.parse(r.result); var arr=Array.isArray(d)?d:(d.categories||[]);
+        var next=arr.map(function(c){ return { id:c.id||pSlug(c.label), label:c.label||"", unit:c.unit||"m² sàn", floor:+c.floor||0, mkt:+c.mkt||0, ceil:+c.ceil||0, min:+((c.minFee!=null?c.minFee:c.min))||0 }; });
+        if(!next.length) throw 0;
+        PCATS=next; pRender(); pSave(); pMsg("Đã nhập "+PCATS.length+" thể loại.");
+      }catch(err){ pMsg("File JSON không hợp lệ."); } };
+      r.readAsText(f); e.target.value="";
+    });
+  };
+
+  window.pricingAddCat = function(){
+    PCATS.push({ id:"loai_"+Date.now(), label:"", unit:"m² sàn", floor:150000, mkt:180000, ceil:240000, min:15000000 });
+    pRender(); pSave();
+    var rows=document.getElementById('pricingBody').querySelectorAll("tr");
+    var last=rows[rows.length-1];
+    if(last){ var f=last.querySelector('[data-f="label"]'); if(f) f.focus(); }
+    pMsg("Đã thêm thể loại — đặt tên & nhập khung giá.");
+  };
+
+  window.pricingExport = function(){
+    var doc2={ version:1, updatedAt:new Date().toISOString(), currency:"VND", vatIncluded:false,
+      ratios:{C1:0.10,C2:0.20,C3:0.60,C4:0.10},
+      categories:PCATS.map(function(c){ return { id:(c.id||pSlug(c.label)), label:c.label, unit:c.unit, floor:c.floor, mkt:c.mkt, ceil:c.ceil, minFee:c.min }; }) };
+    var blob=new Blob([JSON.stringify(doc2,null,2)],{type:"application/json"});
+    var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="aln_pricing_bands.json"; a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); },1000);
+    pMsg("Đã xuất JSON — seed vào config/pricing_bands.");
+  };
+})();
 
 /* ══════════════════════════════════════════
    TUYỂN DỤNG — Firestore CRUD (module scope)
