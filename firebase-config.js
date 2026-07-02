@@ -33,8 +33,11 @@ const firebaseConfig = {
 
 const app  = initializeApp(firebaseConfig);
 
-// BƯỚC 1 — Set debug token TRƯỚC KHI load App Check SDK
-if (typeof self !== 'undefined') {
+// BƯỚC 1 — Debug token CHỈ khi chạy localhost (dev). Trên domain thật phải dùng
+// reCAPTCHA v3 thật — nếu bật debug cho mọi người, mỗi khách sinh một debug token
+// chưa đăng ký → App Check 403 → đăng nhập/ghi dữ liệu gãy toàn bộ.
+if (typeof self !== 'undefined' && typeof location !== 'undefined' &&
+    (location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
   self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 }
 // BƯỚC 2 — Dynamic import để đảm bảo token đã được set
@@ -42,7 +45,7 @@ const { initializeAppCheck, ReCaptchaV3Provider } = await import(
   "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js"
 );
 initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider('6LeuZi8tAAAAMfnZOHxH_xnLM8C0OpnexVgKFPb'),
+  provider: new ReCaptchaV3Provider('6LeuZi8tAAAAAMfnZOHxH_xnLM8C0OpnexVgKFPb'),
   isTokenAutoRefreshEnabled: true
 });
 

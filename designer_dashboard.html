@@ -540,7 +540,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 <meta name="theme-color" content="#f0f4f8">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="aln-tokens.css">
-  <script src="https://www.google.com/recaptcha/api.js?render=6LeuZi8tAAAAMfnZOHxH_xnLM8C0OpnexVgKFPb"></script>
+  <script src="https://www.google.com/recaptcha/api.js?render=6LeuZi8tAAAAAMfnZOHxH_xnLM8C0OpnexVgKFPb"></script>
 </head>
 <body>
 <!-- ═══ ALN AUTH VEIL — che trang đến khi xác thực xong ═══ -->
@@ -632,7 +632,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       </div>
       <div class="stat-card s-green">
         <div class="stat-label"><i class="ph-duotone ph-wallet"></i> Ví khả dụng</div>
-        <div class="stat-val" id="heroWallet">3.87M</div>
+        <div class="stat-val" id="heroWallet">0đ</div>
         <div class="stat-sub">Tổng số dư VND</div>
         <svg class="stat-spark" viewBox="0 0 64 24" width="64" height="24" xmlns="http://www.w3.org/2000/svg">
           <polyline points="0,18 10,14 20,16 30,12 40,8 52,10 64,4" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -735,15 +735,15 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <div style="display:flex;flex-direction:column">
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
             <span style="font-size:12px;color:var(--text2)">Ví chính (khả dụng)</span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--green)">3.87M</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--green)" id="quickWalletMain">0đ</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
             <span style="font-size:12px;color:var(--text2)">Chờ giải ngân <span style="color:var(--amber);font-size:10px;font-weight:700;background:var(--amber-bg);padding:1px 5px;border-radius:4px">C3</span></span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--amber)">18.75M</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--amber)" id="quickWalletPending">0đ</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
             <span style="font-size:12px;color:var(--text2)">Thuế TNCN tích lũy</span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--red)">297K</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--red)" id="quickWalletTax">0đ</span>
           </div>
         </div>
         <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px;justify-content:center;border-color:var(--border)" onclick="window.ktsShowTab('wallet')">
@@ -875,7 +875,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <!-- ══════════════════════════════════
          MODULE 2 — WALLET
     ══════════════════════════════════ -->
-    <div class="sec-label wallet-section"><i class="ph-duotone ph-wallet" style="font-size:13px"></i> Ví thu nhập & Payout Lock</div>
+    <div class="sec-label wallet-section"><i class="ph-duotone ph-wallet" style="font-size:13px"></i> Ví thu nhập</div>
     <div class="grid2-3" style="gap:12px">
       <div class="card">
         <div class="card-title"><div class="ct-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-wallet"></i></div>Tổng quan Ví</div>
@@ -890,75 +890,45 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
           <!-- Ví tạm ứng — PAYOUT LOCK -->
           <div class="wallet-pocket wp-locked" id="lockedWallet">
-            <div class="wp-label"><i class="ph-duotone ph-lock" style="font-size:7px"></i> Ví tạm ứng (C2)</div>
-            <div class="wp-amount" id="lockedAmount">1,920,000đ</div>
-            <div class="wp-sub">40% C2 · 8% tổng HĐ</div>
+            <div class="wp-label"><i class="ph-duotone ph-lock" style="font-size:7px"></i> Chờ giải ngân</div>
+            <div class="wp-amount" id="lockedAmount">0đ</div>
+            <div class="wp-sub">Chặng đã duyệt · chờ chuyển khoản</div>
             <div class="lock-seal">
               <i class="ph-duotone ph-lock"></i>
-              PAYOUT LOCK · Chờ CN duyệt
+              Chờ Founder xác nhận
             </div>
           </div>
 
           <!-- Chờ giải ngân -->
           <div class="wallet-pocket wp-pending">
-            <div class="wp-label"><i class="ph-duotone ph-hourglass-medium" style="font-size:7px"></i> Chờ giải ngân</div>
-            <div class="wp-amount">0đ</div>
-            <div class="wp-sub">Maker→Checker xử lý</div>
+            <div class="wp-label"><i class="ph-duotone ph-hourglass-medium" style="font-size:7px"></i> Tổng gốc theo chặng</div>
+            <div class="wp-amount" id="walletGrossAmt">0đ</div>
+            <div class="wp-sub">Giá trị chặng đã duyệt (trước khấu trừ)</div>
           </div>
 
           <!-- Thuế đã khấu trừ -->
           <div class="wallet-pocket wp-tax">
-            <div class="wp-label"><i class="ph-duotone ph-receipt" style="font-size:7px"></i> Thuế đã KT</div>
-            <div class="wp-amount" style="color:var(--muted)">297,780đ</div>
-            <div class="wp-sub">7% · Sàn nộp hộ</div>
+            <div class="wp-label"><i class="ph-duotone ph-receipt" style="font-size:7px"></i> Đã khấu trừ</div>
+            <div class="wp-amount" style="color:var(--muted)" id="walletDeductAmt">0đ</div>
+            <div class="wp-sub">20% phí sàn + 7% thuế TNCN</div>
           </div>
         </div>
 
         <div class="dv"></div>
-        <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">Phân tích thu nhập Chặng 2</div>
-        <div style="font-size:11px;color:var(--muted);background:var(--ink3);border-radius:var(--r-sm);padding:10px;border:1px solid var(--border)">
-          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>CN nạp C2 (20% HĐ)</span><span style="color:var(--text);font-weight:600;font-family:var(--mono)">4,800,000đ</span></div>
-          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Phí sàn (13%)</span><span style="color:var(--red);font-family:var(--mono)">−624,000đ</span></div>
-          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Thuế 7% (GTGT+TNCN)</span><span style="color:var(--red);font-family:var(--mono)">−297,780đ</span></div>
-          <div style="display:flex;justify-content:space-between;padding:6px 0 0;font-weight:700;color:var(--green)"><span>Designer nhận NET</span><span style="font-family:var(--mono);font-size:13px">3,878,220đ</span></div>
-        </div>
+        <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">Phân tích thu nhập</div>
+        <div id="walletBreakdown" style="font-size:11px;color:var(--muted);background:var(--ink3);border-radius:var(--r-sm);padding:10px;border:1px solid var(--border)">Chưa có giao dịch nào.</div>
         <div style="margin-top:8px;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:6px;background:var(--amber-bg);border:1px solid rgba(255,170,51,.2);border-radius:5px;padding:7px 10px">
           <i class="ph-duotone ph-info" style="color:var(--amber)"></i>
-          <span><b style="color:var(--amber)">1,920,000đ (tạm ứng)</b> sẽ tự động gộp vào ví chính khi Chủ nhà bấm Duyệt C2. Không thể rút trước.</span>
+          <span>Khoản <b style="color:var(--amber)">chờ giải ngân</b> sẽ vào Ví chính khi Founder xác nhận đã chuyển tiền. Số hiển thị là thực nhận sau khấu trừ.</span>
         </div>
       </div>
 
       <!-- TX history -->
       <div class="card">
         <div class="card-title"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-list-bullets"></i></div>Lịch sử giao dịch</div>
-        <div id="walletTxList">
-          <div class="tx-row">
-            <div class="tx-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ph-duotone ph-lock"></i></div>
-            <div class="tx-info"><div class="tx-title">Ví tạm ứng C2 kích hoạt</div><div class="tx-meta">#9921 · 05/06 09:42</div></div>
-            <div class="tx-amount tx-lock">+1,920,000đ</div>
-          </div>
-          <div class="tx-row">
-            <div class="tx-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-money"></i></div>
-            <div class="tx-info"><div class="tx-title">Giải ngân C1 — #9921</div><div class="tx-meta">Checker APPROVE · 03/06</div></div>
-            <div class="tx-amount tx-pos">+1,878,220đ</div>
-          </div>
-          <div class="tx-row">
-            <div class="tx-icon" style="background:var(--red-bg);color:var(--red)"><i class="ph-duotone ph-receipt"></i></div>
-            <div class="tx-info"><div class="tx-title">Thuế khấu trừ C1</div><div class="tx-meta">5% GTGT + 2% TNCN · 03/06</div></div>
-            <div class="tx-amount tx-neg">−141,780đ</div>
-          </div>
-          <div class="tx-row">
-            <div class="tx-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-money"></i></div>
-            <div class="tx-info"><div class="tx-title">Giải ngân C2 — #9834</div><div class="tx-meta">Checker APPROVE · 28/05</div></div>
-            <div class="tx-amount tx-pos">+8,040,000đ</div>
-          </div>
-          <div class="tx-row">
-            <div class="tx-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-bank"></i></div>
-            <div class="tx-info"><div class="tx-title">Rút về Vietcombank</div><div class="tx-meta">**** 4521 · 25/05</div></div>
-            <div class="tx-amount tx-neg">−6,000,000đ</div>
-          </div>
-        </div>
-        <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:8px" onclick="showToast('Xem toàn bộ lịch sử GD','t-blue')">Xem thêm <i class="ph-duotone ph-caret-down"></i></button>
+        $1
+          <div style="text-align:center;padding:20px;font-size:11px;color:var(--muted)">Đang tải lịch sử giao dịch...</div>
+        $2 style="width:100%;margin-top:8px" onclick="showToast('Xem toàn bộ lịch sử GD','t-blue')">Xem thêm <i class="ph-duotone ph-caret-down"></i></button>
       </div>
     </div>
 
@@ -1147,7 +1117,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           <div class="card-title" style="margin-bottom:2px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-crown"></i></div>Gói nâng cấp hiển thị & Đẩy tin</div>
           <div style="font-size:11px;color:var(--muted)">Thanh toán bằng Ví chính · Có hiệu lực ngay lập tức</div>
         </div>
-        <div style="font-size:12px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(34,201,122,.3);padding:5px 12px;border-radius:99px"><i class="ph-duotone ph-wallet"></i> Ví: 3,878,220đ</div>
+        <div style="font-size:12px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(34,201,122,.3);padding:5px 12px;border-radius:99px"><i class="ph-duotone ph-wallet"></i> <span id="vipWalletPill">Ví: 0đ</span></div>
       </div>
 
       <div class="vip-grid" id="vipGrid"><!-- injected by JS --></div>
@@ -1493,19 +1463,18 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="modal-head"><h3><i class="ph-duotone ph-bank" style="color:var(--green)"></i> Rút tiền về ngân hàng</h3><button class="modal-close" onclick="closeModal('withdrawModal')">✕</button></div>
     <div class="modal-body">
       <div class="form-info" style="margin-bottom:12px">
-        <div class="fi-row"><span class="k">Ngân hàng</span><span class="v">Vietcombank ****4521</span></div>
-        <div class="fi-row"><span class="k">Chủ TK</span><span class="v">TRAN LE MINH</span></div>
-        <div class="fi-row"><span class="k">Ví chính</span><span class="v" style="color:var(--green)">3,878,220đ</span></div>
-        <div class="fi-row"><span class="k">Ví tạm ứng</span><span class="v" style="color:var(--amber)">1,920,000đ 🔒</span></div>
+        <div class="fi-row"><span class="k">Ngân hàng</span><span class="v" id="wdBank">Chưa cập nhật — vào Hồ sơ để thêm</span></div>
+        <div class="fi-row"><span class="k">Chủ TK</span><span class="v" id="wdHolder">—</span></div>
+        <div class="fi-row"><span class="k">Ví chính</span><span class="v" style="color:var(--green)" id="wdAvail">0đ</span></div>
       </div>
       <div class="form-row">
-        <label class="form-label">Số tiền muốn rút (tối đa 3,878,220đ)</label>
-        <input type="number" style="background:var(--ink3);border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-family:inherit;font-size:15px;font-weight:700;outline:none;width:100%" id="withdrawAmt" value="3878220" max="3878220" oninput="updateWithdraw(this.value)">
+        <label class="form-label">Số tiền muốn rút</label>
+        $10$20$3 oninput="updateWithdraw(this.value)">
       </div>
       <div class="form-info">
-        <div class="fi-row"><span class="k">Số tiền rút</span><span class="v" id="wAmt">3,878,220đ</span></div>
+        <div class="fi-row"><span class="k">Số tiền rút</span><span class="v" id="wAmt">0đ</span></div>
         <div class="fi-row"><span class="k">Phí chuyển khoản</span><span class="v" style="color:var(--red)">0đ (miễn phí)</span></div>
-        <div class="fi-row total"><span class="k" style="font-weight:700">Thực nhận</span><span class="v" id="wNet">3,878,220đ</span></div>
+        <div class="fi-row total"><span class="k" style="font-weight:700">Thực nhận</span><span class="v" id="wNet">0đ</span></div>
       </div>
       <div style="font-size:10px;color:var(--muted);margin-top:8px"><i class="ph-duotone ph-info"></i> Xử lý trong 1-2 giờ làm việc. Cần OTP xác thực.</div>
     </div>
@@ -1661,7 +1630,7 @@ window.ALNRealtime = (() => {
 
 </script>
 <script>
-let walletBalance = 3878220;
+let walletBalance = 0; // cập nhật từ payments thật trong _updateWallet
 let slaSeconds = 31*3600 + 22*60 + 45;
 let bonusSeconds = 7*3600 + 22*60 + 45;
 const totalSla = 48*3600;
@@ -3162,7 +3131,7 @@ window.saveProfile = async function saveProfile() {
 
 // Cập nhật Ví thu nhập từ dữ liệu Firestore thật
 function _updateWallet(allProjs) {
-  var paid = 0, pending = 0, txItems = [];
+  var paid = 0, pending = 0, grossPaid = 0, grossPending = 0, txItems = [];
   var fmtVN = function(v) { return v.toLocaleString('vi-VN') + 'đ'; };
   // Số hiển thị là THỰC NHẬN — đã trừ 20% phí sàn + 7% thuế TNCN trên số gốc mỗi chặng
   var _netOf = function(pay) { return pay.netAmount != null ? pay.netAmount : Math.round((pay.amount || 0) * 0.73); };
@@ -3176,10 +3145,12 @@ function _updateWallet(allProjs) {
       var dateStr = '';
       if (pay.status === 'paid') {
         paid += net;
+        grossPaid += (pay.amount || 0);
         dateStr = pay.paidAt && pay.paidAt.toDate ? pay.paidAt.toDate().toLocaleDateString('vi-VN') : '';
         txItems.push({ type:'paid', label:'Giải ngân ' + stage + ' — ' + projCode, sub:'Founder đã xác nhận' + (dateStr ? ' · ' + dateStr : ''), amount: net });
       } else if (pay.status === 'pending') {
         pending += net;
+        grossPending += (pay.amount || 0);
         dateStr = pay.stagedAt && pay.stagedAt.toDate ? pay.stagedAt.toDate().toLocaleDateString('vi-VN') : '';
         txItems.push({ type:'lock', label:'Chờ xác nhận ' + stage + ' — ' + projCode, sub:'Chờ Founder chuyển tiền' + (dateStr ? ' · ' + dateStr : ''), amount: net });
       }
@@ -3189,6 +3160,38 @@ function _updateWallet(allProjs) {
   if (mainEl) mainEl.textContent = fmtVN(paid);
   var lockEl = document.getElementById('lockedAmount');
   if (lockEl) lockEl.textContent = pending > 0 ? fmtVN(pending) : '0đ';
+  var grossAll = grossPaid + grossPending;
+  var gEl = document.getElementById('walletGrossAmt');
+  if (gEl) gEl.textContent = fmtVN(grossAll);
+  var dEl = document.getElementById('walletDeductAmt');
+  if (dEl) dEl.textContent = fmtVN(grossAll - paid - pending);
+  var bEl = document.getElementById('walletBreakdown');
+  if (bEl) {
+    if (grossAll > 0) {
+      bEl.innerHTML = ''
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Giá trị chặng đã duyệt (gốc)</span><span style="color:var(--text);font-weight:600;font-family:var(--mono)">' + fmtVN(grossAll) + '</span></div>'
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Phí sàn (20%)</span><span style="color:var(--red);font-family:var(--mono)">−' + fmtVN(Math.round(grossAll*0.20)) + '</span></div>'
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Thuế TNCN (7%)</span><span style="color:var(--red);font-family:var(--mono)">−' + fmtVN(Math.round(grossAll*0.07)) + '</span></div>'
+        + '<div style="display:flex;justify-content:space-between;padding:6px 0 0;font-weight:700;color:var(--green)"><span>Thực nhận NET</span><span style="font-family:var(--mono);font-size:13px">' + fmtVN(paid + pending) + '</span></div>';
+    } else {
+      bEl.textContent = 'Chưa có giao dịch nào.';
+    }
+  }
+  var wdA = document.getElementById('wdAvail');
+  if (wdA) wdA.textContent = fmtVN(paid);
+  var wdI = document.getElementById('withdrawAmt');
+  if (wdI) { wdI.max = paid; wdI.value = paid; }
+  try { walletBalance = paid; } catch(e) {}
+  var heroW = document.getElementById('heroWallet');
+  if (heroW) heroW.textContent = paid >= 1e6 ? (paid/1e6).toFixed(2) + 'M' : fmtVN(paid);
+  var qwM = document.getElementById('quickWalletMain');
+  if (qwM) qwM.textContent = fmtVN(paid);
+  var qwP = document.getElementById('quickWalletPending');
+  if (qwP) qwP.textContent = fmtVN(pending);
+  var vipP = document.getElementById('vipWalletPill');
+  if (vipP) vipP.textContent = 'Ví: ' + fmtVN(paid);
+  var qwT = document.getElementById('quickWalletTax');
+  if (qwT) qwT.textContent = fmtVN(Math.round(grossAll * 0.07));
   var txEl = document.getElementById('walletTxList');
   if (txEl) {
     if (!txItems.length) {
@@ -3226,6 +3229,10 @@ function _fillProfileForm(profile) {
   set('bankAccountNumber',   ba.accountNumber);
   set('bankAccountHolder',   ba.accountHolder);
   if (profile.qrCodeUrl) _showQr(profile.qrCodeUrl);
+  const wdB = document.getElementById('wdBank');
+  if (wdB) wdB.textContent = ba.bankName ? (ba.bankName + (ba.accountNumber ? ' · ' + ba.accountNumber : '')) : 'Chưa cập nhật — vào Hồ sơ để thêm';
+  const wdH = document.getElementById('wdHolder');
+  if (wdH) wdH.textContent = ba.accountHolder || '—';
 }
 
 function _updateTempLocUI(tl) {
@@ -3954,7 +3961,7 @@ window.submitRev = async function() {
 <style>
 @keyframes hkPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,160,23,.55)}50%{box-shadow:0 0 0 14px rgba(212,160,23,0)}}
 .hk-live-btn{animation:hkPulse 1.6s infinite;background:linear-gradient(135deg,#98690a,#b8860b);color:#fff;border:none;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px}
-.hk-idle-btn{background:var(--ink2,#101623);color:var(--muted,#8090ae);border:1px solid var(--border,rgba(255,255,255,.1));border-radius:10px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.hk-idle-btn{background:linear-gradient(135deg,#b8860b,#98690a);color:#fff;border:none;border-radius:99px;padding:12px 20px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px rgba(152,105,10,.4);display:flex;align-items:center;gap:7px}.hk-idle-btn:hover{filter:brightness(1.12)}
 .hk-pick{background:var(--ink2,#0d1320);border:1px solid var(--border,rgba(255,255,255,.12));border-radius:12px;padding:10px;margin-bottom:8px;max-height:300px;overflow-y:auto;min-width:280px;box-shadow:0 12px 34px rgba(0,0,0,.5)}
 .hk-pick-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:8px}
 .hk-pick-row:hover{background:rgba(255,255,255,.04)}
@@ -4061,6 +4068,9 @@ window.hkJoin = function(roomId, label){
   var pk = document.getElementById('hkPicker');
   if (pk) pk.style.display = 'none';
 };
+
+// Dữ liệu dự án có thể đã về TRƯỚC khi module này nạp — vẽ dock ngay nếu có sẵn
+if (Array.isArray(window._DES_ALL_PROJECTS)) { HK_LIST = window._DES_ALL_PROJECTS; hkRenderDock(); } else { hkRenderDock(); }
 
 window.hkLeave = function(){
   document.getElementById('hkFrame').src = 'about:blank';
