@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
 <script>
@@ -70,43 +70,45 @@ window.DES_PROJECT_DATA = null;
 .profile-field input{width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box}
 .profile-field input:focus{outline:none;border-color:rgba(152,105,10,.5)}
 .profile-save-btn{width:100%;padding:11px;background:linear-gradient(135deg,#98690a,#b8860b);border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer;margin-top:4px}
-.profile-view-btn{width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(152,105,10,.45);background:rgba(152,105,10,.07);color:#b8860b;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;transition:all .15s;box-sizing:border-box}
+.profile-view-btn{width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(152,105,10,.45);background:rgba(152,105,10,.07);color:#7a5408;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;transition:all .15s;box-sizing:border-box}
 .profile-view-btn:hover{background:rgba(152,105,10,.15);border-color:rgba(152,105,10,.7);color:#98690a}
 </style>
 <style>
 :root {
-  --ink: #f0f4f8;
+  --ink: #f7f9fb;
   --ink2: #ffffff;
-  --ink3: #f8fafc;
-  --border: #e2e8f0;
-  --border2: #cbd5e1;
-  --muted: #94a3b8;
+  --ink3: #eef2f6;
+  --border: #e1e7ee;
+  --border2: #c9d3de;
+  --muted: #5b6b7f;
   --sub: rgba(0,0,0,.05);
-  --text: #1e293b;
-  --text2: #475569;
+  --text: #1a2634;
+  --text2: #3d4b5c;
   --accent: #98690a;
   --accent2: #b8860b;
   --accent-bg: rgba(152,105,10,.12);
   --gold: #98690a;
   --gold-bg: rgba(152,105,10,.11);
-  --purple: #7c3aed;
-  --purple-bg: rgba(124,58,237,.1);
-  --green: #16a34a;
+  --purple: #98690a;
+  --purple-bg: rgba(152,105,10,.1);
+  --green: #15803d;
   --green-bg: rgba(22,163,74,.1);
   --red: #dc2626;
   --red-bg: rgba(220,38,38,.1);
-  --amber: #d97706;
-  --amber-bg: rgba(217,119,6,.1);
-  --blue: #2563eb;
-  --blue-bg: rgba(37,99,235,.1);
-  --r: 10px;
-  --r-sm: 7px;
+  --amber: #98690a;
+  --amber-bg: rgba(152,105,10,.10);
+  --blue: #98690a;
+  --blue-bg: rgba(152,105,10,.10);
+  --r: 14px;
+  --r-sm: 10px;
   --sh: 0 1px 2px rgba(38,28,8,.04), 0 3px 10px rgba(38,28,8,.05);
   --sh-lg: 0 6px 16px rgba(38,28,8,.06), 0 18px 42px rgba(38,28,8,.08);
   --serif: 'Cormorant Garamond', serif;
   --sans: 'DM Sans', sans-serif;
   --mono: 'JetBrains Mono', monospace;
-  --syne: 'Syne', sans-serif;
+  --syne: 'Cormorant Garamond', serif;
+  --gold2: #b8860b;
+  --ease: cubic-bezier(.16,1,.3,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:13px;scroll-behavior:smooth}
@@ -540,15 +542,122 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 <meta name="theme-color" content="#f0f4f8">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="aln-tokens.css">
-  <script src="https://www.google.com/recaptcha/api.js?render=6LeuZi8tAAAAAMfnZOHxH_xnLM8C0OpnexVgKFPb"></script>
+  <script src="https://www.google.com/recaptcha/api.js?render=6LeuZi8tAAAAMfnZOHxH_xnLM8C0OpnexVgKFPb"></script>
+<style id="aln-polish">
+/* ============================================================
+   ALN DESIGNER WORKSPACE — he thiet ke chuyen nghiep (studio)
+   Font: serif (tieu de/so lon) + sans (noi dung) + mono (con so)
+   Mau: VANG la nhan duy nhat; kem/muc nen+chu; xanh la/do chi cho tien
+   ============================================================ */
+
+/* ---- FONT ---- */
+.stat-val,.wp-amount,.vip-name,.logo-text,.sidebar-av,.kts-av{font-family:var(--serif)!important}
+.stat-val{font-weight:600!important;font-style:italic;letter-spacing:0!important;color:var(--text)!important}
+.wp-amount{font-weight:700!important;font-style:italic;font-size:19px!important}
+.logo-text{font-weight:700!important;font-style:italic;letter-spacing:0!important}
+
+/* ---- LAYOUT / SPACING ---- */
+.layout{background:var(--ink)}
+.main{margin-left:240px}
+.content{max-width:1200px;margin:0 auto;padding:34px 40px 80px}
+@media(max-width:1100px){.main{margin-left:0}}
+@media(max-width:640px){.content{padding:22px 18px 64px}}
+
+/* ---- SIDEBAR: premium studio rail ---- */
+.sidebar{width:240px;background:var(--ink2);border-right:1px solid var(--border);box-shadow:1px 0 0 rgba(38,28,8,.02)}
+.sidebar-brand{padding:26px 22px 20px}
+.sidebar-brand-top{font-size:9px;letter-spacing:.22em;color:var(--muted)}
+.sidebar-brand-name{font-family:var(--serif);font-style:italic;font-weight:700;font-size:21px;letter-spacing:-.01em;margin-top:5px;color:var(--text)}
+.sidebar-brand-name::after{content:"";display:block;width:26px;height:2px;background:var(--gold);margin-top:10px;border-radius:2px}
+.sidebar-profile{padding:16px 22px;gap:12px}
+.sidebar-av{width:42px!important;height:42px!important;font-size:17px!important;color:#fff!important;box-shadow:0 4px 12px rgba(152,105,10,.25)}
+.sidebar-nm{font-family:var(--serif);font-style:italic;font-weight:700;font-size:15px;color:var(--text)}
+.sidebar-rank{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.rank-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 2px rgba(21,128,61,.2)}
+.nav-section{padding:18px 22px 6px;font-size:9px;letter-spacing:.16em}
+.nav-item{padding:10px 22px;margin:1px 10px;border-radius:9px;border-left:none!important;font-size:13.5px;font-weight:500;color:var(--text2);gap:11px;transition:background .2s var(--ease),color .2s}
+.nav-item .icon{opacity:.6;font-size:15px}
+.nav-item:hover{background:rgba(152,105,10,.06);color:var(--text)}
+.nav-item.active{background:var(--gold-bg)!important;color:var(--gold)!important;font-weight:700!important}
+.nav-item.active .icon{opacity:1;color:var(--gold)}
+.nav-badge{background:var(--border2);color:var(--text);font-weight:700}
+.nav-item.active .nav-badge{background:var(--gold)!important;color:#fff!important}
+.nav-sep{margin:12px 22px}
+
+/* ---- TOPBAR ---- */
+.topbar{height:64px;background:rgba(255,255,255,.86);backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2);border-bottom:1px solid var(--border);padding:0 22px}
+.page-title{font-family:var(--serif);font-style:italic;font-weight:700;font-size:18px;max-width:none}
+#ktsTopbarLogo{background:var(--gold-bg)!important;color:var(--gold)!important;border:1px solid var(--border2)!important;letter-spacing:.08em!important}
+.notif-btn{border-radius:10px;padding:8px 11px}
+
+/* ---- CARDS ---- */
+.card{border-radius:16px;padding:22px 24px;box-shadow:var(--sh);border:1px solid var(--border);transition:box-shadow .4s var(--ease),transform .4s var(--ease),border-color .4s}
+.card:hover{box-shadow:var(--sh-lg);border-color:var(--border2)}
+.card-sm{padding:18px 20px}
+.card-title{font-family:var(--serif);font-style:italic;font-weight:700;font-size:19px;margin-bottom:16px;gap:10px;color:var(--text)}
+.card-title .ct-icon{width:30px;height:30px;border-radius:9px;font-size:14px;background:var(--gold-bg)!important;color:var(--gold)!important}
+
+/* ---- KPI STAT CARDS: clean editorial ---- */
+.stat-spark{display:none!important}
+.stat-card{padding:22px 24px 20px;border-radius:16px;box-shadow:var(--sh);transition:transform .4s var(--ease),box-shadow .4s var(--ease),border-color .4s}
+.stat-card::before{display:none!important}
+.stat-card:hover{transform:translateY(-4px);box-shadow:var(--sh-lg);border-color:var(--border2)}
+.stat-label{font-size:10px;letter-spacing:.12em;color:var(--muted);margin-bottom:14px;font-weight:700}
+.stat-label i{color:var(--gold)!important;font-size:15px}
+.stat-val{font-size:34px!important;line-height:1.05}
+.stat-sub{font-size:11.5px;color:var(--muted);margin-top:8px}
+.stat-badge{margin-top:10px;background:var(--gold-bg)!important;color:var(--gold)!important;font-weight:700}
+.stat-badge.sb-green{background:var(--green-bg)!important;color:var(--green)!important}
+
+/* ---- SECTION LABELS ---- */
+.sec-label{font-family:var(--syne);font-size:12.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);margin:36px 0 15px;gap:11px}
+.sec-label::before{content:"";width:20px;height:3px;background:var(--gold);border-radius:2px;flex:none}
+.sec-label::after{background:var(--border)}
+
+/* ---- SLA / PRIORITY CARD ---- */
+.sla-card{border-radius:16px;border:1px solid var(--border);border-left:3px solid var(--gold);padding:24px;box-shadow:var(--sh)}
+.sla-card.normal{border-left-color:var(--gold)}
+#slaDisplay{font-size:44px!important}
+
+/* ---- BUTTONS ---- */
+.btn{border-radius:10px;font-weight:600;transition:transform .25s var(--ease),background .2s,color .2s,border-color .2s,box-shadow .25s;letter-spacing:.01em}
+.btn-primary{background:var(--text)!important;color:#fff!important}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 24px rgba(38,28,8,.18)}
+.btn-gold{background:linear-gradient(135deg,var(--gold2),var(--gold))!important;color:#1a1400!important;box-shadow:0 4px 12px rgba(152,105,10,.2)}
+.btn-gold:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 26px rgba(152,105,10,.3)}
+.btn-ghost:hover:not(:disabled){transform:translateY(-1px)}
+.quick-action{transition:transform .3s var(--ease),border-color .3s,box-shadow .3s}
+.quick-action:hover{transform:translateY(-3px)}
+.qa-icon{background:var(--gold-bg)!important;color:var(--gold)!important}
+
+/* ---- misc cleanup ---- */
+.sla-demo-row{display:none!important}
+.ct-icon,.card-title i{color:var(--gold)!important}
+</style>
 </head>
 <body>
 <!-- ═══ ALN AUTH VEIL — che trang đến khi xác thực xong ═══ -->
-<div id="alnAuthVeil" style="position:fixed;inset:0;background:#f0f4f8;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
-  <div style="width:38px;height:38px;border:3px solid rgba(37,99,235,.15);border-top-color:#2563eb;border-radius:50%;animation:alnspin .8s linear infinite"></div>
-  <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:#64748b">Đang xác thực...</div>
+<div id="alnAuthVeil" style="position:fixed;inset:0;background:#f7f9fb;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+  <div style="width:38px;height:38px;border:3px solid rgba(152,105,10,.15);border-top-color:#98690a;border-radius:50%;animation:alnspin .8s linear infinite"></div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:#5b6b7f">Đang xác thực...</div>
   <style>@keyframes alnspin{to{transform:rotate(360deg)}}</style>
 </div>
+<script>
+/* Xem thu giao dien: chi go man che khi KHONG chay tren ten mien that (localhost/preview). Tren applamnha.vn giu nguyen bao mat - khong dung logic dang nhap. */
+(function(){
+  var h = location.hostname || "";
+  var isProd = /(^|\.)applamnha\.vn$/i.test(h);
+  if(!isProd){
+    setTimeout(function(){
+      var v = document.getElementById("alnAuthVeil");
+      if(v){
+        v.innerHTML = '<div style="font-family:\'Cormorant Garamond\',serif;font-style:italic;font-size:16px;color:#5b6b7f;text-align:center;padding:0 24px;max-width:360px">Che do xem thu giao dien · chua ket noi du lieu that.<br>Tren applamnha.vn se hien thi day du sau khi dang nhap.</div>';
+        setTimeout(function(){ if(v){ v.remove(); if(document.body){document.body.style.overflow="auto";} } }, 1400);
+      }
+    }, 1600);
+  }
+})();
+</script>
 
 <div class="layout">
 
@@ -595,7 +704,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <i class="ph-duotone ph-list"></i>
     </button>
     <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
-      <div id="ktsTopbarLogo" style="background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(96,165,250,.12));color:#60a5fa;padding:4px 10px;border-radius:var(--r-sm);border:1.5px solid rgba(96,165,250,.45);font-family:var(--syne);font-size:11px;font-weight:800;letter-spacing:.06em;white-space:nowrap;flex-shrink:0">App Làm Nhà Corp.</div>
+      <div id="ktsTopbarLogo" style="background:var(--gold-bg);color:var(--gold);padding:4px 11px;border-radius:var(--r-sm);border:1px solid var(--border2);font-family:var(--syne);font-size:11px;font-weight:800;letter-spacing:.06em;white-space:nowrap;flex-shrink:0">App Làm Nhà Corp.</div>
       <div class="page-title">Bảng Designer</div>
     </div>
     <div class="topbar-right">
@@ -612,12 +721,14 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   <div class="content">
 
     <!-- GREETING -->
-    <div style="margin-bottom:22px">
-      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:10px">
+    <div style="margin-bottom:30px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:12px">
         <span id="greetingDate">—</span>
-        <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(22,163,74,.2);padding:2px 9px;border-radius:99px"><span style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block"></span>Online</span>
+        <span style="width:14px;height:1px;background:var(--border2)"></span>
+        <span style="display:inline-flex;align-items:center;gap:6px;color:var(--green);letter-spacing:.02em;text-transform:none;font-size:11px"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 2px rgba(21,128,61,.2)"></span>Trực tuyến</span>
       </div>
-      <div style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--text);letter-spacing:-.4px;line-height:1.15" id="greetingName">DES. —</div>
+      <div style="font-family:var(--serif);font-size:40px;font-weight:400;color:var(--text);letter-spacing:-.01em;line-height:1.1"><span style="font-style:italic;color:var(--muted);font-weight:400">Xin chào,</span> <span id="greetingName" style="font-style:italic;font-weight:700">DES. —</span></div>
+      <div style="font-size:14px;color:var(--muted);margin-top:10px;line-height:1.6;max-width:520px">Tổng quan công việc, thu nhập và nhiệm vụ ưu tiên của bạn hôm nay.</div>
     </div>
 
     <!-- 4 HERO CARDS -->
@@ -625,14 +736,14 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <div class="stat-card s-purple">
         <div class="stat-label"><i class="ph-duotone ph-chart-bar"></i> Doanh thu <span id="heroMonthLabel">T6</span></div>
         <div class="stat-val" id="heroRevenue">—</div>
-        <div class="stat-badge sb-purple" id="heroRevenueBadge"><i class="ph-duotone ph-arrow-up" style="font-size:8px"></i> đang tính</div>
+        <div class="stat-sub" id="heroRevenueBadge">Tổng thu nhập tháng</div>
         <svg class="stat-spark" viewBox="0 0 64 24" width="64" height="24" xmlns="http://www.w3.org/2000/svg">
           <polyline points="0,20 10,16 20,18 30,10 40,12 52,4 64,2" fill="none" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <div class="stat-card s-green">
         <div class="stat-label"><i class="ph-duotone ph-wallet"></i> Ví khả dụng</div>
-        <div class="stat-val" id="heroWallet">0đ</div>
+        <div class="stat-val" id="heroWallet">3.87M</div>
         <div class="stat-sub">Tổng số dư VND</div>
         <svg class="stat-spark" viewBox="0 0 64 24" width="64" height="24" xmlns="http://www.w3.org/2000/svg">
           <polyline points="0,18 10,14 20,16 30,12 40,8 52,10 64,4" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -649,7 +760,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <div class="stat-card s-blue">
         <div class="stat-label"><i class="ph-duotone ph-briefcase"></i> Dự án đang chạy</div>
         <div class="stat-val" id="heroActiveProj">—</div>
-        <div class="stat-badge sb-blue" id="heroProjBadge"><i class="ph-duotone ph-arrow-up" style="font-size:8px"></i> đang tải</div>
+        <div class="stat-sub" id="heroProjBadge">Đang thực hiện</div>
         <svg class="stat-spark" viewBox="0 0 64 24" width="64" height="24" xmlns="http://www.w3.org/2000/svg">
           <polyline points="0,20 10,20 20,16 30,16 40,12 52,8 64,8" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -704,7 +815,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <div style="display:flex;flex-direction:column;gap:7px">
         <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="openUploadRevModal()"><i class="ph-duotone ph-cloud-arrow-up"></i> Nộp bản đã sửa</button>
         <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="openChatModal()"><i class="ph-duotone ph-chat"></i> Nhắn tin chủ nhà</button>
-        <div style="display:flex;gap:6px">
+        <div class="sla-demo-row" style="display:flex;gap:6px">
           <button class="btn btn-ghost btn-sm" style="flex:1;justify-content:center" id="simSlaBonusBtn" onclick="simSlaBonus()"><i class="ph-duotone ph-lightning"></i> [Demo] Nộp sớm</button>
           <button class="btn btn-ghost btn-sm" style="flex:1;justify-content:center" onclick="simSlaExpire()"><i class="ph-duotone ph-clock"></i> [Demo] Quá hạn</button>
         </div>
@@ -735,15 +846,15 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <div style="display:flex;flex-direction:column">
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
             <span style="font-size:12px;color:var(--text2)">Ví chính (khả dụng)</span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--green)" id="quickWalletMain">0đ</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--green)">3.87M</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
             <span style="font-size:12px;color:var(--text2)">Chờ giải ngân <span style="color:var(--amber);font-size:10px;font-weight:700;background:var(--amber-bg);padding:1px 5px;border-radius:4px">C3</span></span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--amber)" id="quickWalletPending">0đ</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--amber)">18.75M</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
             <span style="font-size:12px;color:var(--text2)">Thuế TNCN tích lũy</span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--red)" id="quickWalletTax">0đ</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--red)">297K</span>
           </div>
         </div>
         <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px;justify-content:center;border-color:var(--border)" onclick="window.ktsShowTab('wallet')">
@@ -758,7 +869,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
          SECTION A — DỰ ÁN ĐANG THỰC HIỆN (cards)
     ══════════════════════════════════════════ -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin:32px 0 14px">
-      <div style="font-size:13px;font-weight:600;color:var(--text)">Dự án đang thực hiện</div>
+      <div style="font-family:var(--serif);font-style:italic;font-size:22px;font-weight:700;color:var(--text)">Dự án đang thực hiện</div>
       <a onclick="window.ktsShowTab('myproj')" style="font-size:12px;color:var(--blue);cursor:pointer;font-weight:500;display:flex;align-items:center;gap:4px">Xem tất cả <i class="ph-duotone ph-arrow-right" style="font-size:11px"></i></a>
     </div>
     <div id="projCards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px">
@@ -823,7 +934,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <!-- Thông báo gần đây -->
       <div class="card" style="padding:20px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-          <div style="font-size:13px;font-weight:600;color:var(--text)">Thông báo</div>
+          <div style="font-family:var(--serif);font-style:italic;font-size:19px;font-weight:700;color:var(--text)">Thông báo</div>
           <span style="font-size:10px;font-weight:600;color:var(--blue);background:var(--blue-bg);padding:2px 8px;border-radius:99px">3 mới</span>
         </div>
         <div style="display:flex;flex-direction:column">
@@ -859,7 +970,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
          SECTION C — THAO TÁC NHANH (in card)
     ══════════════════════════════════════════ -->
     <div class="card" style="padding:20px 24px;margin-bottom:32px">
-      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:18px">Thao tác nhanh</div>
+      <div style="font-family:var(--serif);font-style:italic;font-size:22px;font-weight:700;color:var(--text);margin-bottom:18px">Thao tác nhanh</div>
       <div class="qa-grid">
         <div class="quick-action" onclick="window.ktsShowTab('c3')"><div class="qa-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-upload-simple"></i></div><div class="qa-label">Nộp hồ sơ</div></div>
         <div class="quick-action" onclick="window.ktsShowTab('asset')"><div class="qa-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ph-duotone ph-storefront"></i></div><div class="qa-label">Kho tài sản</div></div>
@@ -875,7 +986,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <!-- ══════════════════════════════════
          MODULE 2 — WALLET
     ══════════════════════════════════ -->
-    <div class="sec-label wallet-section"><i class="ph-duotone ph-wallet" style="font-size:13px"></i> Ví thu nhập</div>
+    <div class="sec-label wallet-section"><i class="ph-duotone ph-wallet" style="font-size:13px"></i> Ví thu nhập & Payout Lock</div>
     <div class="grid2-3" style="gap:12px">
       <div class="card">
         <div class="card-title"><div class="ct-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-wallet"></i></div>Tổng quan Ví</div>
@@ -890,45 +1001,75 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
           <!-- Ví tạm ứng — PAYOUT LOCK -->
           <div class="wallet-pocket wp-locked" id="lockedWallet">
-            <div class="wp-label"><i class="ph-duotone ph-lock" style="font-size:7px"></i> Chờ giải ngân</div>
-            <div class="wp-amount" id="lockedAmount">0đ</div>
-            <div class="wp-sub">Chặng đã duyệt · chờ chuyển khoản</div>
+            <div class="wp-label"><i class="ph-duotone ph-lock" style="font-size:7px"></i> Ví tạm ứng (C2)</div>
+            <div class="wp-amount" id="lockedAmount">1,920,000đ</div>
+            <div class="wp-sub">40% C2 · 8% tổng HĐ</div>
             <div class="lock-seal">
               <i class="ph-duotone ph-lock"></i>
-              Chờ Founder xác nhận
+              PAYOUT LOCK · Chờ CN duyệt
             </div>
           </div>
 
           <!-- Chờ giải ngân -->
           <div class="wallet-pocket wp-pending">
-            <div class="wp-label"><i class="ph-duotone ph-hourglass-medium" style="font-size:7px"></i> Tổng gốc theo chặng</div>
-            <div class="wp-amount" id="walletGrossAmt">0đ</div>
-            <div class="wp-sub">Giá trị chặng đã duyệt (trước khấu trừ)</div>
+            <div class="wp-label"><i class="ph-duotone ph-hourglass-medium" style="font-size:7px"></i> Chờ giải ngân</div>
+            <div class="wp-amount">0đ</div>
+            <div class="wp-sub">Maker→Checker xử lý</div>
           </div>
 
           <!-- Thuế đã khấu trừ -->
           <div class="wallet-pocket wp-tax">
-            <div class="wp-label"><i class="ph-duotone ph-receipt" style="font-size:7px"></i> Đã khấu trừ</div>
-            <div class="wp-amount" style="color:var(--muted)" id="walletDeductAmt">0đ</div>
-            <div class="wp-sub">20% phí sàn + 7% thuế TNCN</div>
+            <div class="wp-label"><i class="ph-duotone ph-receipt" style="font-size:7px"></i> Thuế đã KT</div>
+            <div class="wp-amount" style="color:var(--muted)">297,780đ</div>
+            <div class="wp-sub">7% · Sàn nộp hộ</div>
           </div>
         </div>
 
         <div class="dv"></div>
-        <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">Phân tích thu nhập</div>
-        <div id="walletBreakdown" style="font-size:11px;color:var(--muted);background:var(--ink3);border-radius:var(--r-sm);padding:10px;border:1px solid var(--border)">Chưa có giao dịch nào.</div>
+        <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">Phân tích thu nhập Chặng 2</div>
+        <div style="font-size:11px;color:var(--muted);background:var(--ink3);border-radius:var(--r-sm);padding:10px;border:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>CN nạp C2 (20% HĐ)</span><span style="color:var(--text);font-weight:600;font-family:var(--mono)">4,800,000đ</span></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Phí sàn (13%)</span><span style="color:var(--red);font-family:var(--mono)">−624,000đ</span></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Thuế 7% (GTGT+TNCN)</span><span style="color:var(--red);font-family:var(--mono)">−297,780đ</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0 0;font-weight:700;color:var(--green)"><span>Designer nhận NET</span><span style="font-family:var(--mono);font-size:13px">3,878,220đ</span></div>
+        </div>
         <div style="margin-top:8px;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:6px;background:var(--amber-bg);border:1px solid rgba(255,170,51,.2);border-radius:5px;padding:7px 10px">
           <i class="ph-duotone ph-info" style="color:var(--amber)"></i>
-          <span>Khoản <b style="color:var(--amber)">chờ giải ngân</b> sẽ vào Ví chính khi Founder xác nhận đã chuyển tiền. Số hiển thị là thực nhận sau khấu trừ.</span>
+          <span><b style="color:var(--amber)">1,920,000đ (tạm ứng)</b> sẽ tự động gộp vào ví chính khi Chủ nhà bấm Duyệt C2. Không thể rút trước.</span>
         </div>
       </div>
 
       <!-- TX history -->
       <div class="card">
         <div class="card-title"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-list-bullets"></i></div>Lịch sử giao dịch</div>
-        $1
-          <div style="text-align:center;padding:20px;font-size:11px;color:var(--muted)">Đang tải lịch sử giao dịch...</div>
-        $2 style="width:100%;margin-top:8px" onclick="showToast('Xem toàn bộ lịch sử GD','t-blue')">Xem thêm <i class="ph-duotone ph-caret-down"></i></button>
+        <div id="walletTxList">
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ph-duotone ph-lock"></i></div>
+            <div class="tx-info"><div class="tx-title">Ví tạm ứng C2 kích hoạt</div><div class="tx-meta">#9921 · 05/06 09:42</div></div>
+            <div class="tx-amount tx-lock">+1,920,000đ</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-money"></i></div>
+            <div class="tx-info"><div class="tx-title">Giải ngân C1 — #9921</div><div class="tx-meta">Checker APPROVE · 03/06</div></div>
+            <div class="tx-amount tx-pos">+1,878,220đ</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--red-bg);color:var(--red)"><i class="ph-duotone ph-receipt"></i></div>
+            <div class="tx-info"><div class="tx-title">Thuế khấu trừ C1</div><div class="tx-meta">5% GTGT + 2% TNCN · 03/06</div></div>
+            <div class="tx-amount tx-neg">−141,780đ</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-money"></i></div>
+            <div class="tx-info"><div class="tx-title">Giải ngân C2 — #9834</div><div class="tx-meta">Checker APPROVE · 28/05</div></div>
+            <div class="tx-amount tx-pos">+8,040,000đ</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-bank"></i></div>
+            <div class="tx-info"><div class="tx-title">Rút về Vietcombank</div><div class="tx-meta">**** 4521 · 25/05</div></div>
+            <div class="tx-amount tx-neg">−6,000,000đ</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:8px" onclick="showToast('Xem toàn bộ lịch sử GD','t-blue')">Xem thêm <i class="ph-duotone ph-caret-down"></i></button>
       </div>
     </div>
 
@@ -1117,7 +1258,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           <div class="card-title" style="margin-bottom:2px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-crown"></i></div>Gói nâng cấp hiển thị & Đẩy tin</div>
           <div style="font-size:11px;color:var(--muted)">Thanh toán bằng Ví chính · Có hiệu lực ngay lập tức</div>
         </div>
-        <div style="font-size:12px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(34,201,122,.3);padding:5px 12px;border-radius:99px"><i class="ph-duotone ph-wallet"></i> <span id="vipWalletPill">Ví: 0đ</span></div>
+        <div style="font-size:12px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(34,201,122,.3);padding:5px 12px;border-radius:99px"><i class="ph-duotone ph-wallet"></i> Ví: 3,878,220đ</div>
       </div>
 
       <div class="vip-grid" id="vipGrid"><!-- injected by JS --></div>
@@ -1257,36 +1398,6 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       </div>
     </div>
 
-    <!-- ─── Tài khoản nhận thanh toán ─── -->
-    <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:12px 14px;margin-bottom:12px">
-      <div style="font-size:10px;font-weight:700;color:var(--green);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px"><i class="ph-duotone ph-bank"></i> Tài khoản nhận thanh toán</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Founder dùng thông tin này để chuyển tiền mỗi khi bạn được duyệt chặng. Tự cập nhật, không ai khác sửa được.</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <div>
-          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Ngân hàng</div>
-          <input type="text" id="bankName" placeholder="Vietcombank" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
-        </div>
-        <div>
-          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Số tài khoản</div>
-          <input type="text" id="bankAccountNumber" placeholder="0123456789" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
-        </div>
-      </div>
-      <div style="margin-bottom:10px">
-        <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Chủ tài khoản</div>
-        <input type="text" id="bankAccountHolder" placeholder="NGUYEN VAN A" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none;text-transform:uppercase">
-      </div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <div id="qrPreviewWrap" style="width:64px;height:64px;border-radius:8px;background:var(--ink2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">
-          <i class="ph-duotone ph-qr-code" style="font-size:24px;color:var(--muted)" id="qrPlaceholderIcon"></i>
-        </div>
-        <div style="flex:1">
-          <button type="button" onclick="document.getElementById('qrCodeInput').click()" style="padding:7px 12px;border-radius:7px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:var(--green);font-size:11px;font-weight:700;cursor:pointer"><i class="ph-duotone ph-upload-simple"></i> Tải ảnh mã QR</button>
-          <input type="file" id="qrCodeInput" accept="image/*" style="display:none" onchange="uploadPaymentQr(this)">
-          <div id="qrUploadStatus" style="font-size:10px;color:var(--muted);margin-top:4px"></div>
-        </div>
-      </div>
-    </div>
-
     <button class="profile-save-btn" onclick="saveProfile()">
       <i class="ph-duotone ph-floppy-disk"></i> Lưu hồ sơ
     </button>
@@ -1323,7 +1434,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--green-bg);border:1px solid rgba(22,163,74,.2)"><div style="font-size:9px;color:var(--green);font-weight:700">Mới</div><div style="font-size:9px;color:var(--muted)">0–30đ</div></div>
           <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--blue-bg);border:1px solid rgba(37,99,235,.2)"><div style="font-size:9px;color:var(--blue);font-weight:700">Tiêu Chuẩn</div><div style="font-size:9px;color:var(--muted)">30–60</div></div>
           <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--gold-bg);border:1.5px solid rgba(152,105,10,.4)"><div style="font-size:9px;color:var(--gold);font-weight:700">✓ Tiêu Chuẩn</div><div style="font-size:9px;color:var(--muted)">60–100</div></div>
-          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--purple-bg);border:1px solid rgba(124,58,237,.2)"><div style="font-size:9px;color:var(--purple);font-weight:700">PRO</div><div style="font-size:9px;color:var(--muted)">100+</div></div>
+          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--purple-bg);border:1px solid rgba(152,105,10,.2)"><div style="font-size:9px;color:var(--purple);font-weight:700">PRO</div><div style="font-size:9px;color:var(--muted)">100+</div></div>
           <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--ink3);border:1px solid var(--border)"><div style="font-size:9px;color:var(--muted);font-weight:700">VIP Gold</div><div style="font-size:9px;color:var(--muted)">150+</div></div>
         </div>
       </div>
@@ -1463,18 +1574,19 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="modal-head"><h3><i class="ph-duotone ph-bank" style="color:var(--green)"></i> Rút tiền về ngân hàng</h3><button class="modal-close" onclick="closeModal('withdrawModal')">✕</button></div>
     <div class="modal-body">
       <div class="form-info" style="margin-bottom:12px">
-        <div class="fi-row"><span class="k">Ngân hàng</span><span class="v" id="wdBank">Chưa cập nhật — vào Hồ sơ để thêm</span></div>
-        <div class="fi-row"><span class="k">Chủ TK</span><span class="v" id="wdHolder">—</span></div>
-        <div class="fi-row"><span class="k">Ví chính</span><span class="v" style="color:var(--green)" id="wdAvail">0đ</span></div>
+        <div class="fi-row"><span class="k">Ngân hàng</span><span class="v">Vietcombank ****4521</span></div>
+        <div class="fi-row"><span class="k">Chủ TK</span><span class="v">TRAN LE MINH</span></div>
+        <div class="fi-row"><span class="k">Ví chính</span><span class="v" style="color:var(--green)">3,878,220đ</span></div>
+        <div class="fi-row"><span class="k">Ví tạm ứng</span><span class="v" style="color:var(--amber)">1,920,000đ 🔒</span></div>
       </div>
       <div class="form-row">
-        <label class="form-label">Số tiền muốn rút</label>
-        $10$20$3 oninput="updateWithdraw(this.value)">
+        <label class="form-label">Số tiền muốn rút (tối đa 3,878,220đ)</label>
+        <input type="number" style="background:var(--ink3);border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-family:inherit;font-size:15px;font-weight:700;outline:none;width:100%" id="withdrawAmt" value="3878220" max="3878220" oninput="updateWithdraw(this.value)">
       </div>
       <div class="form-info">
-        <div class="fi-row"><span class="k">Số tiền rút</span><span class="v" id="wAmt">0đ</span></div>
+        <div class="fi-row"><span class="k">Số tiền rút</span><span class="v" id="wAmt">3,878,220đ</span></div>
         <div class="fi-row"><span class="k">Phí chuyển khoản</span><span class="v" style="color:var(--red)">0đ (miễn phí)</span></div>
-        <div class="fi-row total"><span class="k" style="font-weight:700">Thực nhận</span><span class="v" id="wNet">0đ</span></div>
+        <div class="fi-row total"><span class="k" style="font-weight:700">Thực nhận</span><span class="v" id="wNet">3,878,220đ</span></div>
       </div>
       <div style="font-size:10px;color:var(--muted);margin-top:8px"><i class="ph-duotone ph-info"></i> Xử lý trong 1-2 giờ làm việc. Cần OTP xác thực.</div>
     </div>
@@ -1630,7 +1742,7 @@ window.ALNRealtime = (() => {
 
 </script>
 <script>
-let walletBalance = 0; // cập nhật từ payments thật trong _updateWallet
+let walletBalance = 3878220;
 let slaSeconds = 31*3600 + 22*60 + 45;
 let bonusSeconds = 7*3600 + 22*60 + 45;
 const totalSla = 48*3600;
@@ -2576,7 +2688,6 @@ function _startKtsProjectListen(uid) {
       return { id:d2.id, ...dd, progress:[pg.C1||0, pg.C2||0, pg.C3||0, pg.C4||0] };
     });
     window._DES_ALL_PROJECTS = allProjs;
-    if (typeof window.hkSync === 'function') window.hkSync(allProjs, 'designProjects');
     renderMyProjects(allProjs);
     _updateWallet(allProjs);
     if (typeof renderDashProjList === 'function') renderDashProjList(allProjs);
@@ -3006,34 +3117,6 @@ window.uploadProfileAvatar = async function uploadProfileAvatar(input) {
   }
 }
 
-// Upload mã QR nhận thanh toán
-window.uploadPaymentQr = async function uploadPaymentQr(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const status = document.getElementById('qrUploadStatus');
-  status.textContent = 'Đang upload...';
-  try {
-    const uid = window.__ALN_UID;
-    const ext = file.name.split('.').pop();
-    const ref = storageRef(storage, `payment-qr/${uid}/qr.${ext}`);
-    await uploadBytes(ref, file);
-    const url = await getDownloadURL(ref);
-    await setDoc(doc(db,'users',uid), {qrCodeUrl: url}, {merge:true});
-    _showQr(url);
-    status.textContent = '✓ Đã cập nhật mã QR';
-    showToast('Đã cập nhật mã QR nhận thanh toán','t-green');
-  } catch(e) {
-    status.textContent = 'Lỗi: ' + e.message;
-    showToast('Upload thất bại: ' + e.code,'t-red');
-  }
-};
-
-function _showQr(url) {
-  const wrap = document.getElementById('qrPreviewWrap');
-  if (!wrap || !url) return;
-  wrap.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
-}
-
 window.uploadSignature = async function(input) {
   const file = input.files[0];
   if (!file) return;
@@ -3099,11 +3182,6 @@ window.saveProfile = async function saveProfile() {
     license:      (document.getElementById('profileLicense')||{}).value.trim() || '',
     gender:       (document.getElementById('profileGender')||{}).value || '',
     homeProvince: (document.getElementById('profileHomeProvince')||{}).value || '',
-    bankAccount: {
-      bankName:       (document.getElementById('bankName')||{}).value.trim() || '',
-      accountNumber:  (document.getElementById('bankAccountNumber')||{}).value.trim() || '',
-      accountHolder:  (document.getElementById('bankAccountHolder')||{}).value.trim().toUpperCase() || '',
-    },
   };
   try {
     await setDoc(doc(db,'users',uid), data, {merge:true});
@@ -3131,28 +3209,23 @@ window.saveProfile = async function saveProfile() {
 
 // Cập nhật Ví thu nhập từ dữ liệu Firestore thật
 function _updateWallet(allProjs) {
-  var paid = 0, pending = 0, grossPaid = 0, grossPending = 0, txItems = [];
+  var paid = 0, pending = 0, txItems = [];
   var fmtVN = function(v) { return v.toLocaleString('vi-VN') + 'đ'; };
-  // Số hiển thị là THỰC NHẬN — đã trừ 20% phí sàn + 7% thuế TNCN trên số gốc mỗi chặng
-  var _netOf = function(pay) { return pay.netAmount != null ? pay.netAmount : Math.round((pay.amount || 0) * 0.73); };
   (allProjs || []).forEach(function(p) {
     var pays = p.payments || {};
     ['C1','C2','C3','C4'].forEach(function(stage) {
       var pay = pays[stage];
       if (!pay) return;
-      var net = _netOf(pay);
       var projCode = p.code || p.id;
       var dateStr = '';
       if (pay.status === 'paid') {
-        paid += net;
-        grossPaid += (pay.amount || 0);
+        paid += (pay.amount || 0);
         dateStr = pay.paidAt && pay.paidAt.toDate ? pay.paidAt.toDate().toLocaleDateString('vi-VN') : '';
-        txItems.push({ type:'paid', label:'Giải ngân ' + stage + ' — ' + projCode, sub:'Founder đã xác nhận' + (dateStr ? ' · ' + dateStr : ''), amount: net });
+        txItems.push({ type:'paid', label:'Giải ngân ' + stage + ' — ' + projCode, sub:'Founder đã xác nhận' + (dateStr ? ' · ' + dateStr : ''), amount: pay.amount || 0 });
       } else if (pay.status === 'pending') {
-        pending += net;
-        grossPending += (pay.amount || 0);
+        pending += (pay.amount || 0);
         dateStr = pay.stagedAt && pay.stagedAt.toDate ? pay.stagedAt.toDate().toLocaleDateString('vi-VN') : '';
-        txItems.push({ type:'lock', label:'Chờ xác nhận ' + stage + ' — ' + projCode, sub:'Chờ Founder chuyển tiền' + (dateStr ? ' · ' + dateStr : ''), amount: net });
+        txItems.push({ type:'lock', label:'Chờ xác nhận ' + stage + ' — ' + projCode, sub:'Chờ Founder chuyển tiền' + (dateStr ? ' · ' + dateStr : ''), amount: pay.amount || 0 });
       }
     });
   });
@@ -3160,38 +3233,6 @@ function _updateWallet(allProjs) {
   if (mainEl) mainEl.textContent = fmtVN(paid);
   var lockEl = document.getElementById('lockedAmount');
   if (lockEl) lockEl.textContent = pending > 0 ? fmtVN(pending) : '0đ';
-  var grossAll = grossPaid + grossPending;
-  var gEl = document.getElementById('walletGrossAmt');
-  if (gEl) gEl.textContent = fmtVN(grossAll);
-  var dEl = document.getElementById('walletDeductAmt');
-  if (dEl) dEl.textContent = fmtVN(grossAll - paid - pending);
-  var bEl = document.getElementById('walletBreakdown');
-  if (bEl) {
-    if (grossAll > 0) {
-      bEl.innerHTML = ''
-        + '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Giá trị chặng đã duyệt (gốc)</span><span style="color:var(--text);font-weight:600;font-family:var(--mono)">' + fmtVN(grossAll) + '</span></div>'
-        + '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Phí sàn (20%)</span><span style="color:var(--red);font-family:var(--mono)">−' + fmtVN(Math.round(grossAll*0.20)) + '</span></div>'
-        + '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Thuế TNCN (7%)</span><span style="color:var(--red);font-family:var(--mono)">−' + fmtVN(Math.round(grossAll*0.07)) + '</span></div>'
-        + '<div style="display:flex;justify-content:space-between;padding:6px 0 0;font-weight:700;color:var(--green)"><span>Thực nhận NET</span><span style="font-family:var(--mono);font-size:13px">' + fmtVN(paid + pending) + '</span></div>';
-    } else {
-      bEl.textContent = 'Chưa có giao dịch nào.';
-    }
-  }
-  var wdA = document.getElementById('wdAvail');
-  if (wdA) wdA.textContent = fmtVN(paid);
-  var wdI = document.getElementById('withdrawAmt');
-  if (wdI) { wdI.max = paid; wdI.value = paid; }
-  try { walletBalance = paid; } catch(e) {}
-  var heroW = document.getElementById('heroWallet');
-  if (heroW) heroW.textContent = paid >= 1e6 ? (paid/1e6).toFixed(2) + 'M' : fmtVN(paid);
-  var qwM = document.getElementById('quickWalletMain');
-  if (qwM) qwM.textContent = fmtVN(paid);
-  var qwP = document.getElementById('quickWalletPending');
-  if (qwP) qwP.textContent = fmtVN(pending);
-  var vipP = document.getElementById('vipWalletPill');
-  if (vipP) vipP.textContent = 'Ví: ' + fmtVN(paid);
-  var qwT = document.getElementById('quickWalletTax');
-  if (qwT) qwT.textContent = fmtVN(Math.round(grossAll * 0.07));
   var txEl = document.getElementById('walletTxList');
   if (txEl) {
     if (!txItems.length) {
@@ -3224,15 +3265,6 @@ function _fillProfileForm(profile) {
   _updateTempLocUI(profile.temporaryLocation);
   if (profile.avatarURL) _showAvatar(profile.avatarURL);
   if (profile.signatureUrl) _showSignature(profile.signatureUrl);
-  const ba = profile.bankAccount || {};
-  set('bankName',            ba.bankName);
-  set('bankAccountNumber',   ba.accountNumber);
-  set('bankAccountHolder',   ba.accountHolder);
-  if (profile.qrCodeUrl) _showQr(profile.qrCodeUrl);
-  const wdB = document.getElementById('wdBank');
-  if (wdB) wdB.textContent = ba.bankName ? (ba.bankName + (ba.accountNumber ? ' · ' + ba.accountNumber : '')) : 'Chưa cập nhật — vào Hồ sơ để thêm';
-  const wdH = document.getElementById('wdHolder');
-  if (wdH) wdH.textContent = ba.accountHolder || '—';
 }
 
 function _updateTempLocUI(tl) {
@@ -3955,126 +3987,6 @@ window.submitRev = async function() {
     if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origLabel; }
     if (typeof showToast === 'function') showToast('Lỗi upload: ' + ((e && e.code) || (e && e.message) || e), 't-red');
   }
-};
-</script>
-<!-- ══ PHÒNG HỘI KIẾN — họp video theo dự án, Jitsi nhúng trong trang ══ -->
-<style>
-@keyframes hkPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,160,23,.55)}50%{box-shadow:0 0 0 14px rgba(212,160,23,0)}}
-.hk-live-btn{animation:hkPulse 1.6s infinite;background:linear-gradient(135deg,#98690a,#b8860b);color:#fff;border:none;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px}
-.hk-idle-btn{background:linear-gradient(135deg,#b8860b,#98690a);color:#fff;border:none;border-radius:99px;padding:12px 20px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px rgba(152,105,10,.4);display:flex;align-items:center;gap:7px}.hk-idle-btn:hover{filter:brightness(1.12)}
-.hk-pick{background:var(--ink2,#0d1320);border:1px solid var(--border,rgba(255,255,255,.12));border-radius:12px;padding:10px;margin-bottom:8px;max-height:300px;overflow-y:auto;min-width:280px;box-shadow:0 12px 34px rgba(0,0,0,.5)}
-.hk-pick-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:8px}
-.hk-pick-row:hover{background:rgba(255,255,255,.04)}
-</style>
-<div id="hkModal" style="display:none;position:fixed;inset:0;z-index:99999;background:#000">
-  <div style="position:absolute;top:0;left:0;right:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:linear-gradient(rgba(0,0,0,.72),transparent)">
-    <div style="color:#e8c44a;font-weight:800;font-size:14px">🏛 Phòng Hội Kiến — <span id="hkRoomLabel"></span></div>
-    <button onclick="hkLeave()" style="background:rgba(239,68,68,.9);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:800;font-size:12px;cursor:pointer">Rời phòng</button>
-  </div>
-  <iframe id="hkFrame" allow="camera; microphone; fullscreen; display-capture; autoplay" style="width:100%;height:100%;border:0"></iframe>
-</div>
-<div id="hkDock" style="display:none;position:fixed;left:16px;bottom:16px;z-index:9000;flex-direction:column;align-items:flex-start;gap:8px"></div>
-
-<script type="module">
-import { db as hkDb, doc as hkDoc, updateDoc as hkUpdateDoc, serverTimestamp as hkTs } from "./firebase-config.js";
-
-var HK_LIST = [];
-var HK_COLL = 'designProjects';
-var HK_CAN_OPEN = true; // Designer NT được mở phòng cho dự án của mình
-
-function hkUser(){
-  var u = {};
-  try { u = JSON.parse(sessionStorage.getItem('aln_user') || localStorage.getItem('aln_user') || '{}'); } catch(e){}
-  return { uid: window.__ALN_UID || u.uid || '', name: u.name || 'Thành viên ALN', role: u.role || 'designer' };
-}
-// Phòng quên đóng quá 4 giờ coi như đã kết thúc
-function hkIsActive(m){
-  if (!m || !m.active) return false;
-  var t = m.openedAt && m.openedAt.toMillis ? m.openedAt.toMillis() : 0;
-  if (t && Date.now() - t > 4*3600*1000) return false;
-  return true;
-}
-window.hkSync = function(list, coll){ HK_LIST = list || []; HK_COLL = coll || HK_COLL; hkRenderDock(); };
-
-function hkRenderDock(){
-  var dock = document.getElementById('hkDock');
-  if (!dock) return;
-  var act = HK_LIST.filter(function(p){ return hkIsActive(p.meeting); });
-  var html = '';
-  html += '<div id="hkPicker" class="hk-pick" style="display:none"></div>';
-  act.forEach(function(p){
-    var label = (p.code || p.id) + '';
-    html += '<button class="hk-live-btn" onclick="hkJoin(\'' + (p.meeting.roomId||'') + '\',\'' + label.replace(/'/g,'') + '\')">🏛 Phiên họp đang diễn ra — Mời vào <span style="font-weight:400;font-size:11px;opacity:.85">(' + label + ')</span></button>';
-  });
-  if (HK_CAN_OPEN) html += '<button class="hk-idle-btn" onclick="hkTogglePicker()">🏛 Phòng Hội Kiến</button>';
-  dock.innerHTML = html;
-  dock.style.display = (act.length || HK_CAN_OPEN) ? 'flex' : 'none';
-}
-
-window.hkTogglePicker = function(){
-  var pk = document.getElementById('hkPicker');
-  if (!pk) return;
-  if (pk.style.display !== 'none') { pk.style.display = 'none'; return; }
-  if (!HK_LIST.length) { pk.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--muted,#8090ae)">Chưa có dự án nào.</div>'; pk.style.display='block'; return; }
-  var rows = '<div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#b8860b;padding:4px 10px 8px">Mở phiên họp cho dự án</div>';
-  HK_LIST.forEach(function(p){
-    var label = (p.code || p.id) + (p.name ? ' — ' + p.name : '');
-    if (label.length > 42) label = label.slice(0,42) + '…';
-    var active = hkIsActive(p.meeting);
-    rows += '<div class="hk-pick-row">'
-      + '<div style="font-size:12px;color:var(--text,#dce6f4);font-weight:600">' + label + '</div>'
-      + (active
-        ? '<span style="display:flex;gap:6px"><button onclick="hkJoin(\'' + (p.meeting.roomId||'') + '\',\'' + (p.code||p.id) + '\')" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:#3dd68c;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">Vào</button>'
-          + '<button onclick="hkClose(\'' + p.id + '\')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f06060;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">Kết thúc</button></span>'
-        : '<button onclick="hkOpen(\'' + p.id + '\')" style="background:rgba(212,160,23,.12);border:1px solid rgba(212,160,23,.35);color:#e8c44a;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">Mở phiên họp</button>')
-      + '</div>';
-  });
-  pk.innerHTML = rows;
-  pk.style.display = 'block';
-};
-
-window.hkOpen = async function(docId){
-  var p = HK_LIST.filter(function(x){ return x.id === docId; })[0];
-  if (!p) return;
-  var u = hkUser();
-  var rand = Math.random().toString(36).slice(2, 8);
-  var roomId = 'ALN-HoiKien-' + String(p.code || p.id).replace(/[^A-Za-z0-9]/g, '') + '-' + rand;
-  try {
-    await hkUpdateDoc(hkDoc(hkDb, HK_COLL, docId), {
-      meeting: { active: true, roomId: roomId, openedBy: { uid: u.uid, name: u.name, role: u.role }, openedAt: hkTs() },
-      updatedAt: hkTs(),
-    });
-    hkJoin(roomId, p.code || p.id);
-  } catch(e) { alert('Lỗi mở phòng: ' + (e.message || e.code)); }
-};
-
-window.hkClose = async function(docId){
-  if (!confirm('Kết thúc phiên họp này? Mọi người sẽ không vào lại được bằng link cũ.')) return;
-  try {
-    await hkUpdateDoc(hkDoc(hkDb, HK_COLL, docId), { 'meeting.active': false, 'meeting.closedAt': hkTs(), updatedAt: hkTs() });
-  } catch(e) { alert('Lỗi đóng phòng: ' + (e.message || e.code)); }
-};
-
-window.hkJoin = function(roomId, label){
-  if (!roomId) return;
-  var u = hkUser();
-  var f = document.getElementById('hkFrame');
-  f.src = 'https://meet.jit.si/' + roomId
-    + '#userInfo.displayName=%22' + encodeURIComponent(u.name) + '%22'
-    + '&config.prejoinPageEnabled=false&config.disableDeepLinking=true';
-  var lb = document.getElementById('hkRoomLabel');
-  if (lb) lb.textContent = label || '';
-  document.getElementById('hkModal').style.display = 'block';
-  var pk = document.getElementById('hkPicker');
-  if (pk) pk.style.display = 'none';
-};
-
-// Dữ liệu dự án có thể đã về TRƯỚC khi module này nạp — vẽ dock ngay nếu có sẵn
-if (Array.isArray(window._DES_ALL_PROJECTS)) { HK_LIST = window._DES_ALL_PROJECTS; hkRenderDock(); } else { hkRenderDock(); }
-
-window.hkLeave = function(){
-  document.getElementById('hkFrame').src = 'about:blank';
-  document.getElementById('hkModal').style.display = 'none';
 };
 </script>
 </body>
