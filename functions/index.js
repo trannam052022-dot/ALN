@@ -176,6 +176,68 @@ exports.onStageAdvanced = functions
     return null;
   });
 
+/* ── Phòng Hội Kiến — họp video theo dự án ──
+   Khi meeting.active chuyển false→true: báo đẩy cho mọi thành viên + LUÔN báo
+   Founder (giám sát). Ghi nhật ký meetingLogs bằng Admin SDK (client không
+   ghi/sửa được). Khi đóng phòng: chốt closedAt vào log đang mở. */
+async function _handleMeetingChange(change, context, coll) {
+  const before = change.before.data() || {};
+  const after  = change.after.data()  || {};
+  const bm = before.meeting || {};
+  const am = after.meeting  || {};
+
+  if (!bm.active && am.active) {
+    const opener   = am.openedBy || {};
+    const projName = after.name || context.params.pid;
+    const uids = new Set(after.memberUids || []);
+    uids.add(FOUNDER_UID);
+    if (opener.uid) uids.delete(opener.uid);
+    await Promise.all(Array.from(uids).map(function(uid){
+      return notifyUser(
+        uid,
+        "🏛 Phiên họp đang diễn ra — Mời vào",
+        `${opener.name || "Ai đó"} mở Phòng Hội Kiến — ${projName}`,
+        { type: "MEETING_OPEN", pid: context.params.pid, coll: coll, roomId: am.roomId || "" },
+        "meeting"
+      );
+    }));
+    await db.collection("meetingLogs").add({
+      coll: coll,
+      pid: context.params.pid,
+      projName: projName,
+      roomId: am.roomId || "",
+      openedBy: { uid: opener.uid || "", name: opener.name || "", role: opener.role || "" },
+      openedAt: admin.firestore.FieldValue.serverTimestamp(),
+      status: "open",
+    });
+  }
+
+  if (bm.active && !am.active) {
+    const snap = await db.collection("meetingLogs")
+      .where("pid", "==", context.params.pid)
+      .where("status", "==", "open")
+      .get();
+    if (!snap.empty) {
+      const batch = db.batch();
+      snap.docs.forEach(function(d){
+        batch.update(d.ref, { status: "closed", closedAt: admin.firestore.FieldValue.serverTimestamp() });
+      });
+      await batch.commit();
+    }
+  }
+  return null;
+}
+
+exports.onMeetingChanged = functions
+  .region("asia-southeast1")
+  .firestore.document("projects/{pid}")
+  .onUpdate((change, context) => _handleMeetingChange(change, context, "projects"));
+
+exports.onDesignMeetingChanged = functions
+  .region("asia-southeast1")
+  .firestore.document("designProjects/{pid}")
+  .onUpdate((change, context) => _handleMeetingChange(change, context, "designProjects"));
+
 /* ── AI Chat — MyMy / Nam ── */
 exports.alnChat = onCall(
   { region: "asia-southeast1", secrets: [ANTHROPIC_KEY] },

@@ -225,6 +225,13 @@ service cloud.firestore {
       allow read, update, delete: if isFounder();
     }
 
+    // Nhật ký Phòng Hội Kiến — Cloud Function ghi (Admin SDK), client không
+    // ghi/sửa/xoá được → nhật ký bất biến. Chỉ Founder đọc để giám sát.
+    match /meetingLogs/{id} {
+      allow read: if isFounder();
+      allow write: if false;
+    }
+
     // Bản nháp bài Marketing tự động (AI soạn hàng tuần) — chỉ Founder xem/sửa/xoá.
     // Ghi tạo mới chỉ qua Cloud Function (Admin SDK, bỏ qua rules) nên không cần allow create.
     match /marketingDrafts/{id} {

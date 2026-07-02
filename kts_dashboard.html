@@ -2727,6 +2727,7 @@ function _startKtsProjectListen(uid) {
       return { id:d2.id, ...dd, progress:[pg.C1||0, pg.C2||0, pg.C3||0, pg.C4||0] };
     });
     window._KTS_ALL_PROJECTS = allProjs;
+    if (typeof window.hkSync === 'function') window.hkSync(allProjs, 'projects');
     renderMyProjects(allProjs);
     _updateWallet(allProjs);
     if (typeof renderDashProjList === 'function') renderDashProjList(allProjs);
@@ -4251,5 +4252,123 @@ window.c2mDoSubmit = async function() {
     </div>
   </div>
 </div>
+
+<!-- ══ PHÒNG HỘI KIẾN — họp video theo dự án, Jitsi nhúng trong trang ══ -->
+<style>
+@keyframes hkPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,160,23,.55)}50%{box-shadow:0 0 0 14px rgba(212,160,23,0)}}
+.hk-live-btn{animation:hkPulse 1.6s infinite;background:linear-gradient(135deg,#98690a,#b8860b);color:#fff;border:none;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px}
+.hk-idle-btn{background:var(--ink2,#101623);color:var(--muted,#8090ae);border:1px solid var(--border,rgba(255,255,255,.1));border-radius:10px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.hk-pick{background:var(--ink2,#0d1320);border:1px solid var(--border,rgba(255,255,255,.12));border-radius:12px;padding:10px;margin-bottom:8px;max-height:300px;overflow-y:auto;min-width:280px;box-shadow:0 12px 34px rgba(0,0,0,.5)}
+.hk-pick-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:8px}
+.hk-pick-row:hover{background:rgba(255,255,255,.04)}
+</style>
+<div id="hkModal" style="display:none;position:fixed;inset:0;z-index:99999;background:#000">
+  <div style="position:absolute;top:0;left:0;right:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:linear-gradient(rgba(0,0,0,.72),transparent)">
+    <div style="color:#e8c44a;font-weight:800;font-size:14px">🏛 Phòng Hội Kiến — <span id="hkRoomLabel"></span></div>
+    <button onclick="hkLeave()" style="background:rgba(239,68,68,.9);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:800;font-size:12px;cursor:pointer">Rời phòng</button>
+  </div>
+  <iframe id="hkFrame" allow="camera; microphone; fullscreen; display-capture; autoplay" style="width:100%;height:100%;border:0"></iframe>
+</div>
+<div id="hkDock" style="display:none;position:fixed;left:16px;bottom:16px;z-index:9000;flex-direction:column;align-items:flex-start;gap:8px"></div>
+
+<script type="module">
+import { db as hkDb, doc as hkDoc, updateDoc as hkUpdateDoc, serverTimestamp as hkTs } from "./firebase-config.js";
+
+var HK_LIST = [];
+var HK_COLL = 'projects';
+var HK_CAN_OPEN = true; // KTS được mở phòng cho dự án của mình
+
+function hkUser(){
+  var u = {};
+  try { u = JSON.parse(sessionStorage.getItem('aln_user') || localStorage.getItem('aln_user') || '{}'); } catch(e){}
+  return { uid: window.__ALN_UID || u.uid || '', name: u.name || 'Thành viên ALN', role: u.role || 'kts' };
+}
+// Phòng quên đóng quá 4 giờ coi như đã kết thúc
+function hkIsActive(m){
+  if (!m || !m.active) return false;
+  var t = m.openedAt && m.openedAt.toMillis ? m.openedAt.toMillis() : 0;
+  if (t && Date.now() - t > 4*3600*1000) return false;
+  return true;
+}
+window.hkSync = function(list, coll){ HK_LIST = list || []; HK_COLL = coll || HK_COLL; hkRenderDock(); };
+
+function hkRenderDock(){
+  var dock = document.getElementById('hkDock');
+  if (!dock) return;
+  var act = HK_LIST.filter(function(p){ return hkIsActive(p.meeting); });
+  var html = '';
+  html += '<div id="hkPicker" class="hk-pick" style="display:none"></div>';
+  act.forEach(function(p){
+    var label = (p.code || p.id) + '';
+    html += '<button class="hk-live-btn" onclick="hkJoin(\'' + (p.meeting.roomId||'') + '\',\'' + label.replace(/'/g,'') + '\')">🏛 Phiên họp đang diễn ra — Mời vào <span style="font-weight:400;font-size:11px;opacity:.85">(' + label + ')</span></button>';
+  });
+  if (HK_CAN_OPEN) html += '<button class="hk-idle-btn" onclick="hkTogglePicker()">🏛 Phòng Hội Kiến</button>';
+  dock.innerHTML = html;
+  dock.style.display = (act.length || HK_CAN_OPEN) ? 'flex' : 'none';
+}
+
+window.hkTogglePicker = function(){
+  var pk = document.getElementById('hkPicker');
+  if (!pk) return;
+  if (pk.style.display !== 'none') { pk.style.display = 'none'; return; }
+  if (!HK_LIST.length) { pk.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--muted,#8090ae)">Chưa có dự án nào.</div>'; pk.style.display='block'; return; }
+  var rows = '<div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#b8860b;padding:4px 10px 8px">Mở phiên họp cho dự án</div>';
+  HK_LIST.forEach(function(p){
+    var label = (p.code || p.id) + (p.name ? ' — ' + p.name : '');
+    if (label.length > 42) label = label.slice(0,42) + '…';
+    var active = hkIsActive(p.meeting);
+    rows += '<div class="hk-pick-row">'
+      + '<div style="font-size:12px;color:var(--text,#dce6f4);font-weight:600">' + label + '</div>'
+      + (active
+        ? '<span style="display:flex;gap:6px"><button onclick="hkJoin(\'' + (p.meeting.roomId||'') + '\',\'' + (p.code||p.id) + '\')" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:#3dd68c;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">Vào</button>'
+          + '<button onclick="hkClose(\'' + p.id + '\')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f06060;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">Kết thúc</button></span>'
+        : '<button onclick="hkOpen(\'' + p.id + '\')" style="background:rgba(212,160,23,.12);border:1px solid rgba(212,160,23,.35);color:#e8c44a;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">Mở phiên họp</button>')
+      + '</div>';
+  });
+  pk.innerHTML = rows;
+  pk.style.display = 'block';
+};
+
+window.hkOpen = async function(docId){
+  var p = HK_LIST.filter(function(x){ return x.id === docId; })[0];
+  if (!p) return;
+  var u = hkUser();
+  var rand = Math.random().toString(36).slice(2, 8);
+  var roomId = 'ALN-HoiKien-' + String(p.code || p.id).replace(/[^A-Za-z0-9]/g, '') + '-' + rand;
+  try {
+    await hkUpdateDoc(hkDoc(hkDb, HK_COLL, docId), {
+      meeting: { active: true, roomId: roomId, openedBy: { uid: u.uid, name: u.name, role: u.role }, openedAt: hkTs() },
+      updatedAt: hkTs(),
+    });
+    hkJoin(roomId, p.code || p.id);
+  } catch(e) { alert('Lỗi mở phòng: ' + (e.message || e.code)); }
+};
+
+window.hkClose = async function(docId){
+  if (!confirm('Kết thúc phiên họp này? Mọi người sẽ không vào lại được bằng link cũ.')) return;
+  try {
+    await hkUpdateDoc(hkDoc(hkDb, HK_COLL, docId), { 'meeting.active': false, 'meeting.closedAt': hkTs(), updatedAt: hkTs() });
+  } catch(e) { alert('Lỗi đóng phòng: ' + (e.message || e.code)); }
+};
+
+window.hkJoin = function(roomId, label){
+  if (!roomId) return;
+  var u = hkUser();
+  var f = document.getElementById('hkFrame');
+  f.src = 'https://meet.jit.si/' + roomId
+    + '#userInfo.displayName=%22' + encodeURIComponent(u.name) + '%22'
+    + '&config.prejoinPageEnabled=false&config.disableDeepLinking=true';
+  var lb = document.getElementById('hkRoomLabel');
+  if (lb) lb.textContent = label || '';
+  document.getElementById('hkModal').style.display = 'block';
+  var pk = document.getElementById('hkPicker');
+  if (pk) pk.style.display = 'none';
+};
+
+window.hkLeave = function(){
+  document.getElementById('hkFrame').src = 'about:blank';
+  document.getElementById('hkModal').style.display = 'none';
+};
+</script>
 </body>
 </html>
