@@ -632,7 +632,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       </div>
       <div class="stat-card s-green">
         <div class="stat-label"><i class="ph-duotone ph-wallet"></i> Ví khả dụng</div>
-        <div class="stat-val" id="heroWallet">3.87M</div>
+        <div class="stat-val" id="heroWallet">0đ</div>
         <div class="stat-sub">Tổng số dư VND</div>
         <svg class="stat-spark" viewBox="0 0 64 24" width="64" height="24" xmlns="http://www.w3.org/2000/svg">
           <polyline points="0,18 10,14 20,16 30,12 40,8 52,10 64,4" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -735,11 +735,11 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <div style="display:flex;flex-direction:column">
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
             <span style="font-size:12px;color:var(--text2)">Ví chính (khả dụng)</span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--green)">3.87M</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--green)" id="quickWalletMain">0đ</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
             <span style="font-size:12px;color:var(--text2)">Chờ giải ngân <span style="color:var(--amber);font-size:10px;font-weight:700;background:var(--amber-bg);padding:1px 5px;border-radius:4px">C3</span></span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--amber)">18.75M</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--amber)" id="quickWalletPending">0đ</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
             <span style="font-size:12px;color:var(--text2)">Thuế TNCN tích lũy</span>
@@ -1117,7 +1117,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           <div class="card-title" style="margin-bottom:2px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-crown"></i></div>Gói nâng cấp hiển thị & Đẩy tin</div>
           <div style="font-size:11px;color:var(--muted)">Thanh toán bằng Ví chính · Có hiệu lực ngay lập tức</div>
         </div>
-        <div style="font-size:12px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(34,201,122,.3);padding:5px 12px;border-radius:99px"><i class="ph-duotone ph-wallet"></i> Ví: 3,878,220đ</div>
+        <div style="font-size:12px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(34,201,122,.3);padding:5px 12px;border-radius:99px"><i class="ph-duotone ph-wallet"></i> <span id="vipWalletPill">Ví: 0đ</span></div>
       </div>
 
       <div class="vip-grid" id="vipGrid"><!-- injected by JS --></div>
@@ -1472,9 +1472,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         $10$20$3 oninput="updateWithdraw(this.value)">
       </div>
       <div class="form-info">
-        <div class="fi-row"><span class="k">Số tiền rút</span><span class="v" id="wAmt">3,878,220đ</span></div>
+        <div class="fi-row"><span class="k">Số tiền rút</span><span class="v" id="wAmt">0đ</span></div>
         <div class="fi-row"><span class="k">Phí chuyển khoản</span><span class="v" style="color:var(--red)">0đ (miễn phí)</span></div>
-        <div class="fi-row total"><span class="k" style="font-weight:700">Thực nhận</span><span class="v" id="wNet">3,878,220đ</span></div>
+        <div class="fi-row total"><span class="k" style="font-weight:700">Thực nhận</span><span class="v" id="wNet">0đ</span></div>
       </div>
       <div style="font-size:10px;color:var(--muted);margin-top:8px"><i class="ph-duotone ph-info"></i> Xử lý trong 1-2 giờ làm việc. Cần OTP xác thực.</div>
     </div>
@@ -1630,7 +1630,7 @@ window.ALNRealtime = (() => {
 
 </script>
 <script>
-let walletBalance = 3878220;
+let walletBalance = 0; // cập nhật từ payments thật trong _updateWallet
 let slaSeconds = 31*3600 + 22*60 + 45;
 let bonusSeconds = 7*3600 + 22*60 + 45;
 const totalSla = 48*3600;
@@ -3181,6 +3181,15 @@ function _updateWallet(allProjs) {
   if (wdA) wdA.textContent = fmtVN(paid);
   var wdI = document.getElementById('withdrawAmt');
   if (wdI) { wdI.max = paid; wdI.value = paid; }
+  try { walletBalance = paid; } catch(e) {}
+  var heroW = document.getElementById('heroWallet');
+  if (heroW) heroW.textContent = paid >= 1e6 ? (paid/1e6).toFixed(2) + 'M' : fmtVN(paid);
+  var qwM = document.getElementById('quickWalletMain');
+  if (qwM) qwM.textContent = fmtVN(paid);
+  var qwP = document.getElementById('quickWalletPending');
+  if (qwP) qwP.textContent = fmtVN(pending);
+  var vipP = document.getElementById('vipWalletPill');
+  if (vipP) vipP.textContent = 'Ví: ' + fmtVN(paid);
   var txEl = document.getElementById('walletTxList');
   if (txEl) {
     if (!txItems.length) {
