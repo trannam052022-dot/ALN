@@ -444,6 +444,23 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
 .hk-badge.b2{top:64px;right:-20px}
 @media(max-width:520px){.hk-badge{display:none}}
 </style>
+
+<!-- Meta Pixel (ALN Pixel) — chỉ dùng cho ALN, tách riêng khỏi TK.HOUSE -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1656666692225878');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel -->
 </head>
 <body>
 
@@ -1015,7 +1032,7 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
       </div>
       <div class="foot-col">
         <h5>Liên hệ</h5>
-        <a href="tel:0909829696"><i class="ph-duotone ph-phone" style="margin-right:6px;color:var(--gold)"></i>0909 82 9696</a>
+        <a href="tel:0909829696" onclick="try{if(window.fbq)fbq('track','Contact',{content_name:'Hotline'});}catch(e){}"><i class="ph-duotone ph-phone" style="margin-right:6px;color:var(--gold)"></i>0909 82 9696</a>
         <a href="https://applamnha.vn" target="_blank" rel="noopener"><i class="ph-duotone ph-globe" style="margin-right:6px;color:var(--gold)"></i>applamnha.vn</a>
         <a href="/cdn-cgi/l/email-protection#c1a2aeafb5a0a2b581a0b1b1ada0acafa9a0efb7af"><i class="ph-duotone ph-envelope-simple" style="margin-right:6px;color:var(--gold)"></i><span class="__cf_email__" data-cfemail="b2d1dddcc6d3d1c6f2d3c2c2ded3dfdcdad39cc4dc">[email&#160;protected]</span></a>
         <p><i class="ph-duotone ph-map-pin" style="margin-right:6px;color:var(--gold)"></i>TP. Hồ Chí Minh</p>
@@ -1219,6 +1236,7 @@ function mymySendClick(){
   // Chế độ công khai: chỉ tư vấn sơ bộ + xin SĐT, không chốt giá, không ghi DB trực tiếp
   if(text.match(/^[0-9 .+-]{8,14}$/) && window.MYMY_ASKED_PHONE){
     mymyAddBot('Dạ em ghi nhận SĐT ' + text + ' rồi ạ. Đội ngũ ALN sẽ liên hệ lại trong giờ hành chính nha!');
+    try { if(window.fbq) fbq('track', 'Lead', { content_name: 'MyMy - Để lại SĐT' }); } catch(e){}
     return;
   }
 
