@@ -3595,7 +3595,7 @@ window._dnFbApprovePA = async function(projId, stage, paId) {
     if (projSnap.exists()) {
       var pd = projSnap.data();
       var pct = PAYMENT_PCT[stage] || 0;
-      var amount = Math.round((pd.totalFee || 0) * pct * 1000000);
+      var amount = Math.round((pd.totalFee || 0) * pct); // totalFee đơn vị đồng
       if (amount > 0 && pd.kts && pd.kts.uid) {
         progressPatch['payments.' + stage] = {
           amount: amount,

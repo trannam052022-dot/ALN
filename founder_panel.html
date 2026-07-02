@@ -924,6 +924,7 @@ body {
   <!-- VẬN HÀNH -->
   <span id="fsubOps" style="display:none;align-items:center;gap:4px">
     <button class="fsub" id="tabPayments" onclick="switchTab('payments')"><i class="ph-duotone ph-money"></i>Thanh toán<span id="paymentsBadge" style="display:none;background:var(--green);color:#fff;border-radius:99px;font-size:9px;padding:1px 5px;margin-left:2px;font-weight:800">0</span></button>
+    <button class="fsub" id="tabReport" onclick="switchTab('report')"><i class="ph-duotone ph-chart-bar"></i>Báo cáo thu nhập</button>
     <button class="fsub" id="tabLeads" onclick="switchTab('leads')"><i class="ph-duotone ph-target"></i>Lead<span id="leadsBadge" style="display:none;background:#ef4444;color:#fff;border-radius:99px;font-size:9px;padding:1px 5px;margin-left:2px;font-weight:800">0</span></button>
     <button class="fsub" id="tabRecruit"  onclick="switchTab('recruit')" ><i class="ph-duotone ph-megaphone"></i>Tuyển dụng</button>
     <button class="fsub" id="tabCompany"  onclick="switchTab('company')" ><i class="ph-duotone ph-buildings"></i>Cài đặt CTY</button>
@@ -1511,6 +1512,43 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <div id="paymentsContent" style="padding:20px;display:flex;flex-direction:column;gap:10px">
     <div style="text-align:center;padding:40px;color:var(--dim);font-size:12px">Đang tải...</div>
+  </div>
+</div>
+
+<!-- ══ PANEL: BÁO CÁO THU NHẬP KTS ══ -->
+<div id="panelReport" style="display:none;flex-direction:column;flex:1;overflow-y:auto;padding:24px 28px">
+  <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px">VẬN HÀNH · TÀI CHÍNH</div>
+  <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1);margin-bottom:6px">Báo cáo Doanh thu & Thu nhập KTS</div>
+  <div style="font-size:13px;color:var(--sub);margin-bottom:18px;max-width:80ch">Doanh thu = tổng giá trị hợp đồng (totalFee) các dự án KTS phụ trách. Thu nhập = số tiền ALN trả lại cho KTS theo từng chặng (đã nhận + đang chờ). Chỉ tính dự án <span style="font-family:var(--mono);color:var(--dim)">projects/</span> — Designer NT chưa có cơ chế tính thanh toán theo chặng.</div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px" id="repSummaryCards">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px"><div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Tổng doanh thu</div><div id="repTotalRevenue" style="font-family:var(--mono);font-size:19px;font-weight:700;color:var(--text1)">0đ</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px"><div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Đã trả KTS</div><div id="repTotalPaid" style="font-family:var(--mono);font-size:19px;font-weight:700;color:var(--green)">0đ</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px"><div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Đang chờ chi trả</div><div id="repTotalPending" style="font-family:var(--mono);font-size:19px;font-weight:700;color:var(--amber)">0đ</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px"><div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Số KTS có doanh thu</div><div id="repTotalKts" style="font-family:var(--mono);font-size:19px;font-weight:700;color:var(--text1)">0</div></div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+    <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text1)">Theo từng KTS</div>
+    <div style="display:flex;gap:8px">
+      <button onclick="renderIncomeReport()" style="padding:7px 14px;background:var(--raised);border:1px solid var(--border);border-radius:7px;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-arrow-clockwise"></i> Tải lại</button>
+      <button onclick="repFixBadAmounts()" style="padding:7px 14px;background:var(--raised);border:1px solid var(--border);border-radius:7px;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-wrench"></i> Rà soát & sửa số tiền sai</button>
+    </div>
+  </div>
+  <div id="repFixMsg" style="display:none;margin-bottom:12px;padding:10px 14px;border-radius:8px;font-size:12px"></div>
+
+  <div style="overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--card)">
+    <table style="width:100%;border-collapse:collapse;min-width:760px">
+      <thead><tr style="border-bottom:1px solid var(--border);background:var(--surface)">
+        <th style="text-align:left;padding:10px 14px;font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em">KTS</th>
+        <th style="text-align:center;padding:10px 14px;font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em">Số dự án</th>
+        <th style="text-align:right;padding:10px 14px;font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em">Doanh thu</th>
+        <th style="text-align:right;padding:10px 14px;font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em">Đã trả</th>
+        <th style="text-align:right;padding:10px 14px;font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em">Đang chờ</th>
+        <th style="text-align:right;padding:10px 14px;font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em">Tổng thu nhập</th>
+      </tr></thead>
+      <tbody id="repBody"><tr><td colspan="6" style="padding:20px;text-align:center;color:var(--dim);font-family:var(--mono);font-size:12px">Đang tải...</td></tr></tbody>
+    </table>
   </div>
 </div>
 
@@ -2932,7 +2970,7 @@ window.ALNRealtime = (() => {
 ══════════════════════════════════════════ */
 
 function switchTab(t){
-  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','pending','payments','leads','recruit','company','pricing','khomau','mkt','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
+  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','pending','payments','report','leads','recruit','company','pricing','khomau','mkt','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
   var activeStyle  = 'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.15);color:var(--blue);white-space:nowrap';
   var inactiveStyle= 'padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:var(--raised);color:var(--sub);white-space:nowrap';
   var liveStyles = {
@@ -2973,6 +3011,7 @@ function switchTab(t){
   if(t==='mgKs')    renderMgKs();
   if(t==='pending')  renderPending();
   if(t==='payments') renderPayments();
+  if(t==='report')   renderIncomeReport();
   if(t==='leads')    initLeadsPanel();
   if(t==='recruit')  { if(typeof window._recruitRender==='function') window._recruitRender(); }
   if(t==='company')  loadCompanySettings();
@@ -4520,6 +4559,101 @@ function _updatePaymentsBadge() {
   var badge = document.getElementById('paymentsBadge');
   if (badge) { badge.textContent = count; badge.style.display = count > 0 ? 'inline' : 'none'; }
 }
+
+/* ── BÁO CÁO DOANH THU & THU NHẬP KTS ── */
+var REPORT_PAYMENT_PCT = { C1:0.20, C2:0.30, C3:0.30, C4:0.20 };
+
+function _fmtVND(v) { return (v||0).toLocaleString('vi-VN') + 'đ'; }
+
+function _buildIncomeReport() {
+  var byKts = {}; // uid -> { name, projects, revenue, paid, pending }
+  (window.DN_PROJECTS || []).forEach(function(p) {
+    var raw = p._raw || {};
+    var kts = raw.kts || {};
+    if (!kts.uid) return;
+    if (!byKts[kts.uid]) byKts[kts.uid] = { name: kts.name || '—', projects: 0, revenue: 0, paid: 0, pending: 0 };
+    var row = byKts[kts.uid];
+    row.projects++;
+    row.revenue += (raw.totalFee || 0);
+    var payments = raw.payments || {};
+    ['C1','C2','C3','C4'].forEach(function(stage) {
+      var pay = payments[stage];
+      if (!pay) return;
+      if (pay.status === 'paid') row.paid += (pay.amount || 0);
+      else if (pay.status === 'pending') row.pending += (pay.amount || 0);
+    });
+  });
+  return Object.keys(byKts).map(function(uid) {
+    var r = byKts[uid];
+    return { uid: uid, name: r.name, projects: r.projects, revenue: r.revenue, paid: r.paid, pending: r.pending, total: r.paid + r.pending };
+  }).sort(function(a,b){ return b.revenue - a.revenue; });
+}
+
+window.renderIncomeReport = function() {
+  var body = document.getElementById('repBody');
+  if (!body) return;
+  var rows = _buildIncomeReport();
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="6" style="padding:24px;text-align:center;color:var(--dim);font-family:var(--sans);font-size:13px">Chưa có dự án nào gán KTS.</td></tr>';
+  } else {
+    body.innerHTML = rows.map(function(r) {
+      return '<tr style="border-bottom:1px solid var(--border)">' +
+        '<td style="padding:10px 14px;font-size:13px;font-weight:600;color:var(--text1)">' + r.name + '</td>' +
+        '<td style="padding:10px 14px;text-align:center;font-family:var(--mono);font-size:12.5px;color:var(--text2)">' + r.projects + '</td>' +
+        '<td style="padding:10px 14px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--text1)">' + _fmtVND(r.revenue) + '</td>' +
+        '<td style="padding:10px 14px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--green)">' + _fmtVND(r.paid) + '</td>' +
+        '<td style="padding:10px 14px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--amber)">' + _fmtVND(r.pending) + '</td>' +
+        '<td style="padding:10px 14px;text-align:right;font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--text1)">' + _fmtVND(r.total) + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+  var totalRevenue = rows.reduce(function(a,r){ return a+r.revenue; }, 0);
+  var totalPaid    = rows.reduce(function(a,r){ return a+r.paid; }, 0);
+  var totalPending = rows.reduce(function(a,r){ return a+r.pending; }, 0);
+  var elR = document.getElementById('repTotalRevenue'); if (elR) elR.textContent = _fmtVND(totalRevenue);
+  var elP = document.getElementById('repTotalPaid');    if (elP) elP.textContent = _fmtVND(totalPaid);
+  var elQ = document.getElementById('repTotalPending'); if (elQ) elQ.textContent = _fmtVND(totalPending);
+  var elK = document.getElementById('repTotalKts');     if (elK) elK.textContent = rows.length;
+};
+
+// Rà soát payments.{stage}.amount đã ghi sai (bug nhân dư *1000000 trong client_CN/client_DN,
+// đã sửa ở code — hàm này chỉ sửa dữ liệu CŨ đã lỡ ghi sai trong Firestore).
+window.repFixBadAmounts = async function() {
+  var msgEl = document.getElementById('repFixMsg');
+  var fixes = [];
+  (window.DN_PROJECTS || []).forEach(function(p) {
+    var raw = p._raw || {};
+    var payments = raw.payments || {};
+    var totalFee = raw.totalFee || 0;
+    ['C1','C2','C3','C4'].forEach(function(stage) {
+      var pay = payments[stage];
+      if (!pay) return;
+      var correct = Math.round(totalFee * (REPORT_PAYMENT_PCT[stage] || 0));
+      if (correct > 0 && pay.amount !== correct) {
+        fixes.push({ projId: p.id, stage: stage, old: pay.amount || 0, correct: correct });
+      }
+    });
+  });
+  if (!fixes.length) {
+    if (msgEl) { msgEl.style.display = 'block'; msgEl.style.background = 'rgba(16,185,129,.08)'; msgEl.style.color = 'var(--green)'; msgEl.textContent = '✓ Không có số tiền nào sai — mọi payments.{stage} đều khớp công thức totalFee × %.'; }
+    return;
+  }
+  var preview = fixes.slice(0,5).map(function(f){ return f.projId+' · '+f.stage+': '+_fmtVND(f.old)+' → '+_fmtVND(f.correct); }).join('\n');
+  var ok = confirm('Tìm thấy ' + fixes.length + ' khoản payments ghi sai số tiền (do lỗi công thức cũ). Sửa lại đúng ngay bây giờ?\n\n' + preview + (fixes.length > 5 ? '\n... và ' + (fixes.length-5) + ' khoản khác' : ''));
+  if (!ok) return;
+  if (msgEl) { msgEl.style.display = 'block'; msgEl.style.background = 'var(--raised)'; msgEl.style.color = 'var(--sub)'; msgEl.textContent = 'Đang sửa...'; }
+  var done = 0;
+  for (var i = 0; i < fixes.length; i++) {
+    var f = fixes[i];
+    try {
+      var patch = {};
+      patch['payments.' + f.stage + '.amount'] = f.correct;
+      await updateDoc(doc(db, 'projects', f.projId), patch);
+      done++;
+    } catch(e) { console.error('[repFixBadAmounts]', f.projId, f.stage, e); }
+  }
+  if (msgEl) { msgEl.style.background = 'rgba(16,185,129,.08)'; msgEl.style.color = 'var(--green)'; msgEl.textContent = '✓ Đã sửa ' + done + '/' + fixes.length + ' khoản.'; }
+};
 
 function renderPayments() {
   var el = document.getElementById('paymentsContent');
