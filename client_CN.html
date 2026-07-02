@@ -3396,6 +3396,8 @@ window._cnDownloadZip = async function(pid) {
 window._cnFbApprovePA = async function(projId, stage, paId) {
   var NEXT = { C1:'C2', C2:'C3', C3:'C4' };
   var PAYMENT_PCT = { C1:0.20, C2:0.30, C3:0.30, C4:0.20 };
+  var PLATFORM_FEE_PCT = 0.20; // phí sàn ALN giữ lại
+  var INCOME_TAX_PCT   = 0.07; // thuế TNCN khấu trừ
   try {
     await updateDoc(doc(db,'projects',projId,'stages',stage,'proposals',paId), {
       status: 'approved', approvedAt: serverTimestamp()
@@ -3409,10 +3411,12 @@ window._cnFbApprovePA = async function(projId, stage, paId) {
     if (projSnap.exists()) {
       var pd = projSnap.data();
       var pct = PAYMENT_PCT[stage] || 0;
-      var amount = Math.round((pd.totalFee || 0) * pct); // totalFee đơn vị đồng
+      var amount = Math.round((pd.totalFee || 0) * pct); // totalFee đơn vị đồng — số gốc theo chặng
+      var netAmount = Math.round(amount * (1 - PLATFORM_FEE_PCT - INCOME_TAX_PCT)); // KTS thực nhận sau phí sàn 20% + thuế TNCN 7%
       if (amount > 0 && pd.kts && pd.kts.uid) {
         progressPatch['payments.' + stage] = {
           amount: amount,
+          netAmount: netAmount,
           status: 'pending',
           ktsUid: pd.kts.uid,
           ktsName: pd.kts.name || '',

@@ -3163,21 +3163,24 @@ window.saveProfile = async function saveProfile() {
 function _updateWallet(allProjs) {
   var paid = 0, pending = 0, txItems = [];
   var fmtVN = function(v) { return v.toLocaleString('vi-VN') + 'đ'; };
+  // Số hiển thị là THỰC NHẬN — đã trừ 20% phí sàn + 7% thuế TNCN trên số gốc mỗi chặng
+  var _netOf = function(pay) { return pay.netAmount != null ? pay.netAmount : Math.round((pay.amount || 0) * 0.73); };
   (allProjs || []).forEach(function(p) {
     var pays = p.payments || {};
     ['C1','C2','C3','C4'].forEach(function(stage) {
       var pay = pays[stage];
       if (!pay) return;
+      var net = _netOf(pay);
       var projCode = p.code || p.id;
       var dateStr = '';
       if (pay.status === 'paid') {
-        paid += (pay.amount || 0);
+        paid += net;
         dateStr = pay.paidAt && pay.paidAt.toDate ? pay.paidAt.toDate().toLocaleDateString('vi-VN') : '';
-        txItems.push({ type:'paid', label:'Giải ngân ' + stage + ' — ' + projCode, sub:'Founder đã xác nhận' + (dateStr ? ' · ' + dateStr : ''), amount: pay.amount || 0 });
+        txItems.push({ type:'paid', label:'Giải ngân ' + stage + ' — ' + projCode, sub:'Founder đã xác nhận' + (dateStr ? ' · ' + dateStr : ''), amount: net });
       } else if (pay.status === 'pending') {
-        pending += (pay.amount || 0);
+        pending += net;
         dateStr = pay.stagedAt && pay.stagedAt.toDate ? pay.stagedAt.toDate().toLocaleDateString('vi-VN') : '';
-        txItems.push({ type:'lock', label:'Chờ xác nhận ' + stage + ' — ' + projCode, sub:'Chờ Founder chuyển tiền' + (dateStr ? ' · ' + dateStr : ''), amount: pay.amount || 0 });
+        txItems.push({ type:'lock', label:'Chờ xác nhận ' + stage + ' — ' + projCode, sub:'Chờ Founder chuyển tiền' + (dateStr ? ' · ' + dateStr : ''), amount: net });
       }
     });
   });

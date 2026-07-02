@@ -1528,7 +1528,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="panelReport" style="display:none;flex-direction:column;flex:1;overflow-y:auto;padding:24px 28px">
   <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px">VẬN HÀNH · TÀI CHÍNH</div>
   <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1);margin-bottom:6px">Báo cáo Doanh thu, Thu nhập & Thanh toán</div>
-  <div style="font-size:13px;color:var(--sub);margin-bottom:18px;max-width:80ch">Doanh thu = tổng giá trị hợp đồng (totalFee) mỗi dự án. Thu nhập cộng tác viên (KTS/Designer NT) = số tiền ALN trả lại theo từng chặng, tính từ khoản DN/Chủ nhà đã đóng.</div>
+  <div style="font-size:13px;color:var(--sub);margin-bottom:18px;max-width:80ch">Doanh thu = tổng giá trị hợp đồng (totalFee) mỗi dự án. Cột "Đã trả/Đang chờ/Tổng thu nhập" là số <b style="color:var(--text2)">KTS/Designer NT thực nhận</b> — đã trừ 20% phí sàn + 7% thuế TNCN trên số gốc theo từng chặng.</div>
 
   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
     <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text1)">Theo từng KTS</div>
@@ -4586,6 +4586,9 @@ function _adaptForFounder(id, d) {
   return { id: d.code||id, name: d.name||'', cn: (d.cn&&d.cn.name)||'', kts: (d.kts&&d.kts.name)||'', dn: (d.dn&&d.dn.name)||'', stage: d.stage||'C1', status: d.status||'on_track', progress: [prog.C1||0, prog.C2||0, prog.C3||0, prog.C4||0], escrow: d.escrowBalance||0, total: d.totalFee||0, _raw: d };
 }
 /* ── THANH TOÁN KTS & DESIGNER NT ── */
+// Bản ghi cũ (trước khi thêm khấu trừ) chưa có netAmount — quy đổi tạm để hiển thị nhất quán.
+function _fallbackNet(amount) { return Math.round((amount || 0) * (1 - PLATFORM_FEE_PCT - INCOME_TAX_PCT)); }
+
 function _pendingPayments() {
   var result = [];
   (window.DN_PROJECTS || []).forEach(function(p) {
@@ -4594,7 +4597,7 @@ function _pendingPayments() {
     ['C1','C2','C3','C4'].forEach(function(stage) {
       var pay = payments[stage];
       if (pay && pay.status === 'pending') {
-        result.push({ coll: 'projects', roleLabel: 'KTS', projId: p.id, projName: p.name || p.id, personName: p.kts || '—', personUid: pay.ktsUid || '', stage: stage, amount: pay.amount || 0, stagedAt: pay.stagedAt });
+        result.push({ coll: 'projects', roleLabel: 'KTS', projId: p.id, projName: p.name || p.id, personName: p.kts || '—', personUid: pay.ktsUid || '', stage: stage, amount: pay.amount || 0, netAmount: (pay.netAmount != null ? pay.netAmount : _fallbackNet(pay.amount)), stagedAt: pay.stagedAt });
       }
     });
   });
@@ -4604,7 +4607,7 @@ function _pendingPayments() {
     ['C1','C2','C3','C4'].forEach(function(stage) {
       var pay = payments[stage];
       if (pay && pay.status === 'pending') {
-        result.push({ coll: 'designProjects', roleLabel: 'Designer', projId: p.id, projName: p.name || p.id, personName: p.designer || '—', personUid: pay.designerUid || '', stage: stage, amount: pay.amount || 0, stagedAt: pay.stagedAt });
+        result.push({ coll: 'designProjects', roleLabel: 'Designer', projId: p.id, projName: p.name || p.id, personName: p.designer || '—', personUid: pay.designerUid || '', stage: stage, amount: pay.amount || 0, netAmount: (pay.netAmount != null ? pay.netAmount : _fallbackNet(pay.amount)), stagedAt: pay.stagedAt });
       }
     });
   });
@@ -4624,6 +4627,7 @@ window.renderDesignApprovals = function renderDesignApprovals() {
     var alreadyStaged = raw.payments && raw.payments[p.stage];
     var pct = Math.round((DESIGN_PAYMENT_PCT[p.stage] || 0) * 100);
     var amount = Math.round((p.total || 0) * (DESIGN_PAYMENT_PCT[p.stage] || 0));
+    var netAmount = Math.round(amount * (1 - PLATFORM_FEE_PCT - INCOME_TAX_PCT));
     return '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:14px">'
       + '<div style="flex:1;min-width:0">'
         + '<div style="font-size:13px;font-weight:600;color:var(--text1)">' + p.id + ' — ' + p.name + '</div>'
@@ -4631,7 +4635,7 @@ window.renderDesignApprovals = function renderDesignApprovals() {
       + '</div>'
       + (alreadyStaged
         ? '<span style="font-size:11px;color:var(--green);font-weight:700"><i class="ph-duotone ph-check-circle"></i> Đã duyệt</span>'
-        : '<button onclick="founderApproveDesignStage(\'' + p.id + '\',\'' + p.stage + '\')" style="padding:7px 14px;background:rgba(167,139,250,.14);border:1.5px solid rgba(167,139,250,.4);border-radius:7px;color:#a78bfa;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap"><i class="ph-duotone ph-check"></i> Duyệt & tính ' + _fmtVND(amount) + '</button>')
+        : '<button onclick="founderApproveDesignStage(\'' + p.id + '\',\'' + p.stage + '\')" style="padding:7px 14px;background:rgba(167,139,250,.14);border:1.5px solid rgba(167,139,250,.4);border-radius:7px;color:#a78bfa;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap"><i class="ph-duotone ph-check"></i> Duyệt & tính ' + _fmtVND(netAmount) + ' <span style="opacity:.6;font-weight:400">(gốc ' + _fmtVND(amount) + ')</span></button>')
     + '</div>';
   }).join('');
 };
@@ -4663,8 +4667,9 @@ function _buildIncomeReportFor(list, personField) {
     ['C1','C2','C3','C4'].forEach(function(stage) {
       var pay = payments[stage];
       if (!pay) return;
-      if (pay.status === 'paid') row.paid += (pay.amount || 0);
-      else if (pay.status === 'pending') row.pending += (pay.amount || 0);
+      var net = pay.netAmount != null ? pay.netAmount : _fallbackNet(pay.amount); // thực nhận sau phí sàn 20% + thuế 7%
+      if (pay.status === 'paid') row.paid += net;
+      else if (pay.status === 'pending') row.pending += net;
     });
   });
   return Object.keys(byPerson).map(function(uid) {
@@ -4765,9 +4770,12 @@ window.repFixBadAmounts = async function() {
       ['C1','C2','C3','C4'].forEach(function(stage) {
         var pay = payments[stage];
         if (!pay) return;
-        var correct = Math.round(totalFee * (REPORT_PAYMENT_PCT[stage] || 0));
-        if (correct > 0 && pay.amount !== correct) {
-          fixes.push({ coll: coll, projId: p.id, stage: stage, old: pay.amount || 0, correct: correct });
+        var correctAmount = Math.round(totalFee * (REPORT_PAYMENT_PCT[stage] || 0));
+        var correctNet = Math.round(correctAmount * (1 - PLATFORM_FEE_PCT - INCOME_TAX_PCT));
+        var badAmount = correctAmount > 0 && pay.amount !== correctAmount;
+        var badNet = correctAmount > 0 && pay.netAmount !== correctNet;
+        if (badAmount || badNet) {
+          fixes.push({ coll: coll, projId: p.id, stage: stage, oldAmount: pay.amount || 0, correctAmount: correctAmount, oldNet: pay.netAmount != null ? pay.netAmount : 0, correctNet: correctNet });
         }
       });
     });
@@ -4775,11 +4783,11 @@ window.repFixBadAmounts = async function() {
   _scan(window.DN_PROJECTS, 'projects');
   _scan(window.DESIGN_PROJECTS, 'designProjects');
   if (!fixes.length) {
-    if (msgEl) { msgEl.style.display = 'block'; msgEl.style.background = 'rgba(16,185,129,.08)'; msgEl.style.color = 'var(--green)'; msgEl.textContent = '✓ Không có số tiền nào sai — mọi payments.{stage} đều khớp công thức totalFee × %.'; }
+    if (msgEl) { msgEl.style.display = 'block'; msgEl.style.background = 'rgba(16,185,129,.08)'; msgEl.style.color = 'var(--green)'; msgEl.textContent = '✓ Không có số tiền nào sai — mọi payments.{stage} đều khớp công thức totalFee × % và số thực nhận sau khấu trừ.'; }
     return;
   }
-  var preview = fixes.slice(0,5).map(function(f){ return f.projId+' · '+f.stage+': '+_fmtVND(f.old)+' → '+_fmtVND(f.correct); }).join('\n');
-  var ok = confirm('Tìm thấy ' + fixes.length + ' khoản payments ghi sai số tiền (do lỗi công thức cũ). Sửa lại đúng ngay bây giờ?\n\n' + preview + (fixes.length > 5 ? '\n... và ' + (fixes.length-5) + ' khoản khác' : ''));
+  var preview = fixes.slice(0,5).map(function(f){ return f.projId+' · '+f.stage+': gốc '+_fmtVND(f.oldAmount)+' → '+_fmtVND(f.correctAmount)+' · thực nhận '+_fmtVND(f.oldNet)+' → '+_fmtVND(f.correctNet); }).join('\n');
+  var ok = confirm('Tìm thấy ' + fixes.length + ' khoản payments ghi sai (số gốc hoặc số thực nhận sau khấu trừ 20% phí sàn + 7% thuế). Sửa lại đúng ngay bây giờ?\n\n' + preview + (fixes.length > 5 ? '\n... và ' + (fixes.length-5) + ' khoản khác' : ''));
   if (!ok) return;
   if (msgEl) { msgEl.style.display = 'block'; msgEl.style.background = 'var(--raised)'; msgEl.style.color = 'var(--sub)'; msgEl.textContent = 'Đang sửa...'; }
   var done = 0;
@@ -4787,7 +4795,8 @@ window.repFixBadAmounts = async function() {
     var f = fixes[i];
     try {
       var patch = {};
-      patch['payments.' + f.stage + '.amount'] = f.correct;
+      patch['payments.' + f.stage + '.amount'] = f.correctAmount;
+      patch['payments.' + f.stage + '.netAmount'] = f.correctNet;
       await updateDoc(doc(db, f.coll, f.projId), patch);
       done++;
     } catch(e) { console.error('[repFixBadAmounts]', f.projId, f.stage, e); }
@@ -4816,7 +4825,8 @@ window.renderPayments = function renderPayments() {
         + '<div id="' + bankId + '" style="font-size:10.5px;color:var(--dim);margin-top:4px;font-family:var(--mono)">Đang tải TK ngân hàng...</div>'
       + '</div>'
       + '<div style="text-align:right;flex-shrink:0">'
-        + '<div style="font-family:var(--mono);font-size:17px;font-weight:700;color:var(--green)">' + fmtAmt(pay.amount) + 'đ</div>'
+        + '<div style="font-family:var(--mono);font-size:17px;font-weight:700;color:var(--green)">' + fmtAmt(pay.netAmount) + 'đ</div>'
+        + '<div style="font-size:9.5px;color:var(--dim);font-family:var(--mono)">gốc ' + fmtAmt(pay.amount) + 'đ · trừ 27%</div>'
         + '<button onclick="founderConfirmPayment(\'' + pay.coll + '\',\'' + pay.projId + '\',\'' + pay.stage + '\')" style="margin-top:6px;padding:6px 14px;background:rgba(16,185,129,.14);border:1.5px solid rgba(16,185,129,.4);border-radius:7px;color:var(--green);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap"><i class="ph-duotone ph-check"></i> Đã chuyển</button>'
       + '</div>'
     + '</div>';
@@ -5109,6 +5119,8 @@ function _startFounderDesignListen() {
 // Founder duyệt 1 chặng cho dự án Designer NT — vì Chủ nhà/DN chưa có UI duyệt
 // đề xuất Designer trên trang riêng, Founder thao tác thay để tính tiền đúng lúc.
 var DESIGN_PAYMENT_PCT = { C1:0.20, C2:0.30, C3:0.30, C4:0.20 };
+var PLATFORM_FEE_PCT = 0.20; // phí sàn ALN giữ lại
+var INCOME_TAX_PCT   = 0.07; // thuế TNCN khấu trừ
 window.founderApproveDesignStage = async function(pid, stage) {
   var NEXT = { C1:'C2', C2:'C3', C3:'C4' };
   try {
@@ -5120,10 +5132,12 @@ window.founderApproveDesignStage = async function(pid, stage) {
     patch.stage = NEXT[stage] || 'done';
     patch.updatedAt = serverTimestamp();
     var pct = DESIGN_PAYMENT_PCT[stage] || 0;
-    var amount = Math.round((d.totalFee || 0) * pct);
+    var amount = Math.round((d.totalFee || 0) * pct); // số gốc theo chặng
+    var netAmount = Math.round(amount * (1 - PLATFORM_FEE_PCT - INCOME_TAX_PCT)); // Designer thực nhận sau phí sàn 20% + thuế TNCN 7%
     if (amount > 0 && d.designer && d.designer.uid) {
       patch['payments.' + stage] = {
         amount: amount,
+        netAmount: netAmount,
         status: 'pending',
         designerUid: d.designer.uid,
         designerName: d.designer.name || '',
