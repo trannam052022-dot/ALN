@@ -5106,6 +5106,9 @@ window.hkJoin = function(roomId, label){
   if (pk) pk.style.display = 'none';
 };
 
+// Dữ liệu dự án có thể đã về TRƯỚC khi module này nạp — vẽ dock ngay nếu có sẵn
+if (Array.isArray(window.PROJECTS_CLIENT)) { HK_LIST = window.PROJECTS_CLIENT.map(function(p){ return { id: p.id, code: p.code, name: p.name, meeting: p._raw && p._raw.meeting }; }); } hkRenderDock();
+
 window.hkLeave = function(){
   document.getElementById('hkFrame').src = 'about:blank';
   document.getElementById('hkModal').style.display = 'none';
