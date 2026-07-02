@@ -5295,6 +5295,8 @@ window.hkFounderTick = function() {
   var act = hkAllProjects().filter(function(p){ return hkIsActive(p.meeting); });
   var badge = document.getElementById('hoikienBadge');
   if (badge) { badge.textContent = act.length; badge.style.display = act.length ? 'inline' : 'none'; }
+  var fBadge = document.getElementById('hkFloatBadge');
+  if (fBadge) { fBadge.textContent = act.length; fBadge.style.display = act.length ? 'inline' : 'none'; }
   var panel = document.getElementById('panelHoikien');
   if (panel && panel.style.display !== 'none') window.hkFounderRender();
 };
@@ -7153,6 +7155,12 @@ window.exportProjectsCSV = async function() {
   } catch(e) { alert('Export lỗi: ' + e.message); }
 };
 </script>
+
+<!-- ══ PHÒNG HỘI KIẾN — nút vàng nổi (trên nút Giám sát push) ══ -->
+<button onclick="switchGroup('ops');switchTab('hoikien')"
+  style="position:fixed;bottom:66px;left:20px;z-index:499;background:linear-gradient(135deg,#b8860b,#98690a);color:#fff;border:none;border-radius:99px;padding:12px 20px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px rgba(152,105,10,.4);display:flex;align-items:center;gap:7px">
+  🏛 Phòng Hội Kiến<span id="hkFloatBadge" style="display:none;background:#ef4444;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;font-weight:800">0</span>
+</button>
 
 <!-- ══ PHÒNG HỘI KIẾN — modal họp video nhúng ══ -->
 <div id="hkModal" style="display:none;position:fixed;inset:0;z-index:99999;background:#000">
