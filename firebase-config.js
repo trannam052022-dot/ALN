@@ -45,7 +45,7 @@ const { initializeAppCheck, ReCaptchaV3Provider } = await import(
   "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js"
 );
 initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider('6LeuZi8tAAAAMfnZOHxH_xnLM8C0OpnexVgKFPb'),
+  provider: new ReCaptchaV3Provider('6LeuZi8tAAAAAMfnZOHxH_xnLM8C0OpnexVgKFPb'),
   isTokenAutoRefreshEnabled: true
 });
 
