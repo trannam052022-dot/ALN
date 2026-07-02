@@ -1287,6 +1287,36 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       </div>
     </div>
 
+    <!-- ─── Tài khoản nhận thanh toán ─── -->
+    <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:12px 14px;margin-bottom:12px">
+      <div style="font-size:10px;font-weight:700;color:var(--green);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px"><i class="ph-duotone ph-bank"></i> Tài khoản nhận thanh toán</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Founder dùng thông tin này để chuyển tiền mỗi khi bạn được duyệt chặng. Tự cập nhật, không ai khác sửa được.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div>
+          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Ngân hàng</div>
+          <input type="text" id="bankName" placeholder="Vietcombank" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Số tài khoản</div>
+          <input type="text" id="bankAccountNumber" placeholder="0123456789" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+        </div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Chủ tài khoản</div>
+        <input type="text" id="bankAccountHolder" placeholder="NGUYEN VAN A" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none;text-transform:uppercase">
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div id="qrPreviewWrap" style="width:64px;height:64px;border-radius:8px;background:var(--ink2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">
+          <i class="ph-duotone ph-qr-code" style="font-size:24px;color:var(--muted)" id="qrPlaceholderIcon"></i>
+        </div>
+        <div style="flex:1">
+          <button type="button" onclick="document.getElementById('qrCodeInput').click()" style="padding:7px 12px;border-radius:7px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:var(--green);font-size:11px;font-weight:700;cursor:pointer"><i class="ph-duotone ph-upload-simple"></i> Tải ảnh mã QR</button>
+          <input type="file" id="qrCodeInput" accept="image/*" style="display:none" onchange="uploadPaymentQr(this)">
+          <div id="qrUploadStatus" style="font-size:10px;color:var(--muted);margin-top:4px"></div>
+        </div>
+      </div>
+    </div>
+
     <button class="profile-save-btn" onclick="saveProfile()">
       <i class="ph-duotone ph-floppy-disk"></i> Lưu hồ sơ
     </button>
@@ -3006,6 +3036,34 @@ window.uploadProfileAvatar = async function uploadProfileAvatar(input) {
   }
 }
 
+// Upload mã QR nhận thanh toán
+window.uploadPaymentQr = async function uploadPaymentQr(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const status = document.getElementById('qrUploadStatus');
+  status.textContent = 'Đang upload...';
+  try {
+    const uid = window.__ALN_UID;
+    const ext = file.name.split('.').pop();
+    const ref = storageRef(storage, `payment-qr/${uid}/qr.${ext}`);
+    await uploadBytes(ref, file);
+    const url = await getDownloadURL(ref);
+    await setDoc(doc(db,'users',uid), {qrCodeUrl: url}, {merge:true});
+    _showQr(url);
+    status.textContent = '✓ Đã cập nhật mã QR';
+    showToast('Đã cập nhật mã QR nhận thanh toán','t-green');
+  } catch(e) {
+    status.textContent = 'Lỗi: ' + e.message;
+    showToast('Upload thất bại: ' + e.code,'t-red');
+  }
+};
+
+function _showQr(url) {
+  const wrap = document.getElementById('qrPreviewWrap');
+  if (!wrap || !url) return;
+  wrap.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
+}
+
 window.uploadSignature = async function(input) {
   const file = input.files[0];
   if (!file) return;
@@ -3071,6 +3129,11 @@ window.saveProfile = async function saveProfile() {
     license:      (document.getElementById('profileLicense')||{}).value.trim() || '',
     gender:       (document.getElementById('profileGender')||{}).value || '',
     homeProvince: (document.getElementById('profileHomeProvince')||{}).value || '',
+    bankAccount: {
+      bankName:       (document.getElementById('bankName')||{}).value.trim() || '',
+      accountNumber:  (document.getElementById('bankAccountNumber')||{}).value.trim() || '',
+      accountHolder:  (document.getElementById('bankAccountHolder')||{}).value.trim().toUpperCase() || '',
+    },
   };
   try {
     await setDoc(doc(db,'users',uid), data, {merge:true});
@@ -3154,6 +3217,11 @@ function _fillProfileForm(profile) {
   _updateTempLocUI(profile.temporaryLocation);
   if (profile.avatarURL) _showAvatar(profile.avatarURL);
   if (profile.signatureUrl) _showSignature(profile.signatureUrl);
+  const ba = profile.bankAccount || {};
+  set('bankName',            ba.bankName);
+  set('bankAccountNumber',   ba.accountNumber);
+  set('bankAccountHolder',   ba.accountHolder);
+  if (profile.qrCodeUrl) _showQr(profile.qrCodeUrl);
 }
 
 function _updateTempLocUI(tl) {

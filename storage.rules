@@ -69,6 +69,13 @@ service firebase.storage {
       allow read, write: if request.auth != null && request.auth.uid == 'h4kEguPEyMcwJwl89stc0Q6j2si2';
     }
 
+    // Mã QR nhận thanh toán (KTS/Designer NT tự cập nhật) — Founder cần đọc để
+    // biết chuyển khoản đúng người, chủ tài khoản chỉ ghi được ảnh của chính mình.
+    match /payment-qr/{uid}/{allPaths=**} {
+      allow read:  if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+
     // Module Giữ chỗ — hồ sơ nộp (giấy phép, portfolio, ảnh công trình)
     match /reservations/{uid}/{file=**} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
