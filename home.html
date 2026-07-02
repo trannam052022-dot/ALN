@@ -38,6 +38,9 @@
 <link rel="stylesheet" href="aln-tokens.css">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#98690a">
+<meta name="mobile-web-app-capable" content="yes">
 
 <style>
 :root{
@@ -502,8 +505,9 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
       <a class="nav-link" href="#faq">FAQ</a>
     </div>
     <div class="nav-cta">
+      <button class="btn btn-outline pwa-install-btn" onclick="alnInstallApp()"><i class="ph-duotone ph-download-simple"></i> Tải app</button>
       <a class="btn btn-outline" href="login.html">Đăng nhập</a>
-      <a class="btn btn-gold" href="register.html">Bắt đầu</a>
+      <a class="btn btn-gold" href="aln-giu-cho/phong-cho.html">Bắt đầu</a>
     </div>
     <button id="hamburger" onclick="toggleMobileNav()"><i class="ph-duotone ph-list"></i></button>
   </div>
@@ -518,8 +522,9 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
     <a href="#portfolio">Phối cảnh</a>
     <a href="#khomau">Kho mẫu</a>
     <a href="#faq">FAQ</a>
+    <a href="#" onclick="alnInstallApp();return false;"><i class="ph-duotone ph-download-simple"></i> Tải app về máy</a>
     <a href="login.html">Đăng nhập</a>
-    <a href="register.html">Bắt đầu</a>
+    <a href="aln-giu-cho/phong-cho.html">Bắt đầu</a>
   </div>
 </nav>
 
@@ -1600,6 +1605,59 @@ window.mymySend = async function(text, history) {
   });
   return res.data.reply;
 };
+</script>
+
+<!-- PWA: cài "App Làm Nhà" về máy để dùng lần sau -->
+<script>
+(function(){
+  var deferredPrompt = null;
+
+  // Đã cài rồi (đang chạy dạng app) → ẩn nút Tải app
+  function _isInstalled(){
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+  if(_isInstalled()){
+    document.querySelectorAll('.pwa-install-btn').forEach(function(b){ b.style.display='none'; });
+  }
+
+  // Chrome/Android/Edge: bắt sự kiện cài đặt sẵn có
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+
+  window.addEventListener('appinstalled', function(){
+    deferredPrompt = null;
+    document.querySelectorAll('.pwa-install-btn').forEach(function(b){ b.style.display='none'; });
+    try { if(window.gtag) gtag('event', 'app_installed'); } catch(e){}
+    try { if(window.fbq) fbq('trackCustom', 'AppInstalled'); } catch(e){}
+  });
+
+  window.alnInstallApp = function(){
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(){ deferredPrompt = null; });
+      return;
+    }
+    // iOS Safari (không hỗ trợ cài tự động) hoặc trình duyệt khác → hướng dẫn thủ công
+    var ua = navigator.userAgent || '';
+    var isIOS = /iPhone|iPad|iPod/i.test(ua);
+    if(isIOS){
+      alert('📲 Cài App Làm Nhà trên iPhone/iPad:\n\n1. Bấm nút Chia sẻ ⬆️ ở thanh dưới Safari\n2. Kéo xuống chọn "Thêm vào MH chính"\n3. Bấm "Thêm" — biểu tượng ALN sẽ hiện trên màn hình chính');
+    } else {
+      alert('📲 Cài App Làm Nhà:\n\n• Android (Chrome): bấm menu ⋮ góc phải → "Cài đặt ứng dụng" hoặc "Thêm vào MH chính"\n• Máy tính (Chrome/Edge): bấm biểu tượng cài đặt ⊕ ở cuối thanh địa chỉ\n\nSau khi cài, mở app là vào thẳng App Làm Nhà, không cần gõ lại địa chỉ.');
+    }
+  };
+
+  // Đăng ký service worker (bắt buộc để cài được PWA). Cần HTTPS hợp lệ.
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(err){
+        console.warn('[PWA] Không đăng ký được service worker:', err);
+      });
+    });
+  }
+})();
 </script>
 
 </body>

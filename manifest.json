@@ -1,13 +1,15 @@
 {
-  "name": "ALN \u2014 S\u00e0n Thi\u1ebft k\u1ebf X\u00e2y d\u1ef1ng",
-  "short_name": "ALN",
-  "start_url": "./login.html",
+  "name": "App Làm Nhà — Nền tảng xây dựng minh bạch",
+  "short_name": "App Làm Nhà",
+  "description": "Tổng thầu xây dựng, KTS thẩm định, theo dõi công trình minh bạch C1–C4.",
+  "lang": "vi",
+  "start_url": "./home.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0a0a0c",
-  "theme_color": "#0a0a0c",
+  "background_color": "#f7f9fb",
+  "theme_color": "#98690a",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
   ]
 }
