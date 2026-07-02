@@ -225,6 +225,12 @@ service cloud.firestore {
       allow read, update, delete: if isFounder();
     }
 
+    // Bản nháp bài Marketing tự động (AI soạn hàng tuần) — chỉ Founder xem/sửa/xoá.
+    // Ghi tạo mới chỉ qua Cloud Function (Admin SDK, bỏ qua rules) nên không cần allow create.
+    match /marketingDrafts/{id} {
+      allow read, update, delete: if isFounder();
+    }
+
     // MyMy Agent Loop — DN chỉ đọc session của chính mình; ghi qua Cloud Function
     match /mymy_sessions/{dnId} {
       allow read: if signedIn() && request.auth.uid == dnId;

@@ -1930,6 +1930,15 @@ document.addEventListener('DOMContentLoaded', function() {
       <button onclick="mktCopy()" style="margin-top:12px;padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-copy"></i> Copy</button>
     </div>
   </div>
+
+  <div style="margin-top:28px;padding-top:22px;border-top:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+      <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1)">Bài chờ duyệt</div>
+      <span id="mktDraftCount" style="font-size:11px;font-weight:700;color:var(--gold);background:rgba(152,105,10,.12);padding:2px 9px;border-radius:99px"></span>
+    </div>
+    <div style="font-size:13px;color:var(--sub);margin-bottom:16px;max-width:74ch">Mỗi sáng Thứ 2, hệ thống tự soạn 2-3 bản nháp mới ở đây. Đọc lại, sửa nếu cần rồi tự tay copy đăng lên Fanpage — <b style="color:var(--text2)">không có bước tự động đăng</b>.</div>
+    <div id="mktDraftsList" style="display:flex;flex-direction:column;gap:12px"></div>
+  </div>
 </div>
 
 <!-- ══ PANEL: KHO HỒ SƠ MẪU (GÓI KINH TẾ) ══ -->
@@ -2969,6 +2978,7 @@ function switchTab(t){
   if(t==='company')  loadCompanySettings();
   if(t==='pricing')  initPricingPanel();
   if(t==='khomau')   initKhomauPanel();
+  if(t==='mkt')      initMktDrafts();
   if(t==='waitRoom') loadWaitRoom();
   if(t==='matching')   loadMatchingPanel();
   if(t==='c2monitor')  loadC2MonitorPanel();
@@ -5719,6 +5729,79 @@ window.saveCompanySettings = async function() {
     mktSetKind('free', document.querySelector('#mktKindTabs .fsub:last-child'));
     document.getElementById('mktFreeQ').value = prompt;
     window.mktGenerate();
+  };
+
+  // Bài chờ duyệt — bản nháp do weeklyMarketingDrafts (Cloud Function) tạo tự động
+  var MD_ITEMS = [];
+
+  function mdFmtDate(ts){
+    if(!ts || !ts.toDate) return '—';
+    var d = ts.toDate();
+    return d.toLocaleDateString('vi-VN') + ' ' + d.toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit'});
+  }
+
+  window.initMktDrafts = async function(){
+    var list = document.getElementById('mktDraftsList');
+    var count = document.getElementById('mktDraftCount');
+    if(list) list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--dim);font-family:var(--mono);font-size:12px">Đang tải...</div>';
+    try {
+      var q = query(collection(db, 'marketingDrafts'), where('status', '==', 'draft'), orderBy('createdAt', 'desc'));
+      var snap = await getDocs(q);
+      MD_ITEMS = [];
+      snap.forEach(function(d){ var it = d.data(); it._id = d.id; MD_ITEMS.push(it); });
+      mdRender();
+    } catch(e) {
+      if(list) list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--red)">Lỗi tải bản nháp: '+(e.message||e)+'</div>';
+    }
+  };
+
+  function mdRender(){
+    var list = document.getElementById('mktDraftsList');
+    var count = document.getElementById('mktDraftCount');
+    if(!list) return;
+    if(count){ count.textContent = MD_ITEMS.length ? MD_ITEMS.length + ' chờ duyệt' : ''; count.style.display = MD_ITEMS.length ? 'inline' : 'none'; }
+    if(MD_ITEMS.length === 0){
+      list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--dim);font-family:var(--sans);font-size:13px">Chưa có bản nháp nào chờ duyệt.</div>';
+      return;
+    }
+    var html = '';
+    MD_ITEMS.forEach(function(it){
+      html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+          '<span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em">'+(it.label||it.kind||'Bài viết')+'</span>' +
+          '<span style="font-family:var(--mono);font-size:10.5px;color:var(--dim)">'+mdFmtDate(it.createdAt)+'</span>' +
+        '</div>' +
+        '<div style="font-size:13px;line-height:1.7;color:var(--text2);white-space:pre-wrap;margin-bottom:10px">'+(it.content||'')+'</div>' +
+        '<div style="display:flex;gap:8px">' +
+          '<button onclick="mdCopy(\''+it._id+'\',event)" style="padding:6px 12px;border-radius:7px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:11.5px;font-weight:600;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-copy"></i> Copy</button>' +
+          '<button onclick="mdDelete(\''+it._id+'\')" style="padding:6px 12px;border-radius:7px;border:1px solid var(--border);background:var(--raised);color:#ef4444;font-size:11.5px;font-weight:600;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-trash"></i> Xoá</button>' +
+        '</div>' +
+      '</div>';
+    });
+    list.innerHTML = html;
+  }
+
+  window.mdCopy = function(id, evt){
+    var it = MD_ITEMS.filter(function(x){ return x._id === id; })[0];
+    if(!it) return;
+    navigator.clipboard.writeText(it.content||'');
+    var btn = evt && evt.currentTarget;
+    if(btn){
+      var old = btn.innerHTML;
+      btn.innerHTML = '<i class="ph-duotone ph-check"></i> Đã copy';
+      setTimeout(function(){ btn.innerHTML = old; }, 1500);
+    }
+  };
+
+  window.mdDelete = async function(id){
+    if(!confirm('Xoá bản nháp này?')) return;
+    try {
+      await deleteDoc(doc(db, 'marketingDrafts', id));
+      MD_ITEMS = MD_ITEMS.filter(function(x){ return x._id !== id; });
+      mdRender();
+    } catch(e) {
+      alert('Lỗi xoá: ' + (e.message||e));
+    }
   };
 })();
 

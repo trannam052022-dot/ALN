@@ -256,19 +256,7 @@ Nói chuyện như người thật đang nhắn tin. Nếu cuộc hội thoại 
 );
 
 /* ── Trợ lý Marketing AI — chỉ Founder dùng, giọng văn khác hẳn MyMy ── */
-exports.generateMarketingContent = onCall(
-  { region: "asia-southeast1", secrets: [ANTHROPIC_KEY] },
-  async (request) => {
-    if (!request.auth || request.auth.uid !== FOUNDER_UID) {
-      throw new HttpsError("permission-denied", "Chỉ Founder mới dùng được công cụ này");
-    }
-    const { prompt } = request.data || {};
-    if (!prompt || typeof prompt !== "string") {
-      throw new HttpsError("invalid-argument", "prompt required");
-    }
-
-    const apiKey = ANTHROPIC_KEY.value();
-    const system = `Bạn là chuyên viên marketing chuyên nghiệp, viết nội dung cho ALN (App Làm Nhà Corp.).
+const MARKETING_SYSTEM_PROMPT = `Bạn là chuyên viên marketing chuyên nghiệp, viết nội dung cho ALN (App Làm Nhà Corp.).
 
 THÔNG TIN CÔNG TY (chỉ dùng đúng số liệu này, không bịa thêm):
 - ALN là tổng thầu xây dựng, phối hợp KTS và đơn vị thi công đối tác đã thẩm định qua 4 giai đoạn C1 (10%, ký hợp đồng) → C2 (20%, chốt phương án) → C3 (60%, triển khai) → C4 (10%, nghiệm thu bàn giao)
@@ -282,40 +270,108 @@ QUY TẮC:
 - Không bịa số liệu, chứng nhận, hay lời chứng thực khách hàng ngoài thông tin trên
 - Định dạng rõ ràng, dễ copy dùng ngay (không cần giải thích thêm ngoài nội dung được yêu cầu)`;
 
+async function callMarketingAI(apiKey, prompt) {
+  const resp = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1200,
+      system: MARKETING_SYSTEM_PROMPT,
+      messages: [{ role: "user", content: prompt }],
+    }),
+  });
+
+  if (!resp.ok) {
+    const err = await resp.text();
+    console.error("[callMarketingAI] Anthropic:", err);
+    throw new Error("Lỗi kết nối AI");
+  }
+
+  const data = await resp.json();
+  const reply = data.content && data.content[0] && data.content[0].text;
+  if (!reply) throw new Error("Phản hồi rỗng");
+  return reply;
+}
+
+exports.generateMarketingContent = onCall(
+  { region: "asia-southeast1", secrets: [ANTHROPIC_KEY] },
+  async (request) => {
+    if (!request.auth || request.auth.uid !== FOUNDER_UID) {
+      throw new HttpsError("permission-denied", "Chỉ Founder mới dùng được công cụ này");
+    }
+    const { prompt } = request.data || {};
+    if (!prompt || typeof prompt !== "string") {
+      throw new HttpsError("invalid-argument", "prompt required");
+    }
+
     try {
-      const resp = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 1200,
-          system,
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
-
-      if (!resp.ok) {
-        const err = await resp.text();
-        console.error("[generateMarketingContent] Anthropic:", err);
-        throw new HttpsError("internal", "Lỗi kết nối AI");
-      }
-
-      const data = await resp.json();
-      const reply = data.content && data.content[0] && data.content[0].text;
-      if (!reply) throw new HttpsError("internal", "Phản hồi rỗng");
+      const reply = await callMarketingAI(ANTHROPIC_KEY.value(), prompt);
       return { reply };
-
     } catch (e) {
-      if (e instanceof HttpsError) throw e;
       console.error("[generateMarketingContent]", e);
       throw new HttpsError("internal", e.message || "Lỗi xử lý");
     }
   }
 );
+
+/* ── Tự động tạo bản nháp bài Marketing hàng tuần — sáng Thứ 2, 07:00 giờ VN ──
+   AI chỉ SOẠN NHÁP, lưu status "draft" vào marketingDrafts. Founder tự xem,
+   sửa, copy và tự tay đăng — KHÔNG có bước tự động đăng lên Facebook/kênh nào. */
+const MARKETING_DRAFT_KINDS = [
+  {
+    kind: "before_after",
+    label: "Before/After",
+    prompt: "Viết 1 bài đăng Facebook giới thiệu quy trình ALN biến một khu đất trống/nhà cũ thành công trình hoàn thiện, nhấn vào sự an tâm khi có tổng thầu đồng hành từ ký hợp đồng đến bàn giao. Có mở bài thu hút, 3-4 đoạn ngắn, kết bài kêu gọi để lại số điện thoại hoặc gọi hotline.",
+  },
+  {
+    kind: "kien_thuc",
+    label: "Kiến thức xây dựng",
+    prompt: "Viết 1 bài đăng Facebook dạng chia sẻ kiến thức hữu ích cho người chuẩn bị xây nhà (chọn 1 chủ đề: cách đọc hợp đồng xây dựng, những khoản phát sinh thường gặp, hoặc cách chọn KTS phù hợp). Giọng văn tư vấn chân thành, không quảng cáo lộ liễu, cuối bài gợi ý nhẹ nhàng về dịch vụ ALN.",
+  },
+  {
+    kind: "gioi_thieu",
+    label: "Giới thiệu dịch vụ",
+    prompt: "Viết 1 bài đăng Facebook giới thiệu mô hình 4 giai đoạn C1-C4 của ALN, nhấn mạnh sự minh bạch (thanh toán trực tiếp, không qua trung gian giữ tiền) và đội ngũ KTS có chứng chỉ hành nghề. Ngắn gọn, dễ đọc trên di động, có emoji vừa phải.",
+  },
+];
+
+exports.weeklyMarketingDrafts = functions
+  .region("asia-southeast1")
+  .runWith({ secrets: ["ANTHROPIC_API_KEY"] })
+  .pubsub.schedule("0 7 * * 1")
+  .timeZone("Asia/Ho_Chi_Minh")
+  .onRun(async () => {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    let created = 0;
+    for (const item of MARKETING_DRAFT_KINDS) {
+      try {
+        const reply = await callMarketingAI(apiKey, item.prompt);
+        await db.collection("marketingDrafts").add({
+          kind: item.kind,
+          label: item.label,
+          content: reply,
+          status: "draft",
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        created++;
+      } catch (e) {
+        console.error("[weeklyMarketingDrafts]", item.kind, e);
+      }
+    }
+    if (created > 0) {
+      await notifyFounder(
+        "📝 Bài nháp Marketing tuần mới",
+        `${created} bản nháp đang chờ duyệt trong tab Trợ lý Marketing`,
+        { type: "MARKETING_DRAFTS_READY" }
+      );
+    }
+    return null;
+  });
 
 /* ── Bài mới trong Nhịp sống ALN → thông báo Founder + KTS + Designer ── */
 exports.onCommunityPost = functions
