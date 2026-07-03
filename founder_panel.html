@@ -1015,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div style="height:3px;background:linear-gradient(90deg,var(--amber),var(--gold))"></div>
       <div style="padding:16px 18px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="width:36px;height:36px;border-radius:8px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;font-size:16px"><i class="ph-duotone ph-palette"></i></div>
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;font-size:18px;color:rgb(245,158,11)"><i class="ph-duotone ph-pencil-ruler"></i></div>
           <span style="font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--amber);text-transform:uppercase;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);padding:2px 8px;border-radius:99px">Kiến trúc sư</span>
         </div>
         <div style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--text1);line-height:1" id="stat-kts-total">0</div>
@@ -1047,7 +1047,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div style="height:3px;background:linear-gradient(90deg,var(--blue),var(--cyan))"></div>
       <div style="padding:16px 18px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="width:36px;height:36px;border-radius:8px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2);display:flex;align-items:center;justify-content:center;font-size:16px"><i class="ph-duotone ph-buildings"></i></div>
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2);display:flex;align-items:center;justify-content:center;font-size:18px;color:rgb(59,130,246)"><i class="ph-duotone ph-buildings"></i></div>
           <span style="font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--blue);text-transform:uppercase;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);padding:2px 8px;border-radius:99px">Doanh nghiệp</span>
         </div>
         <div style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--text1);line-height:1" id="stat-dn-total">0</div>
@@ -1079,7 +1079,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div style="height:3px;background:linear-gradient(90deg,var(--green),#34d399)"></div>
       <div style="padding:16px 18px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;font-size:16px"><i class="ph-duotone ph-house-line"></i></div>
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;font-size:18px;color:rgb(16,185,129)"><i class="ph-duotone ph-house-line"></i></div>
           <span style="font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--green);text-transform:uppercase;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);padding:2px 8px;border-radius:99px">Chủ nhà</span>
         </div>
         <div style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--text1);line-height:1" id="stat-cn-total">0</div>
@@ -2621,8 +2621,8 @@ function renderTable(keepShown) {
     : '';
 
   tbody.innerHTML =
-    (cnRows.length ? sectionHeader('🏠 Chủ nhà', '16,185,129', cnRows.length) + renderRows(cnRows) : '') +
-    (dnRows.length ? sectionHeader('🏢 Doanh nghiệp', '59,130,246', dnRows.length) + renderRows(dnRows) : '') +
+    (cnRows.length ? sectionHeader('<i class="ph-duotone ph-house-line"></i> Chủ nhà', '16,185,129', cnRows.length) + renderRows(cnRows) : '') +
+    (dnRows.length ? sectionHeader('<i class="ph-duotone ph-buildings"></i> Doanh nghiệp', '59,130,246', dnRows.length) + renderRows(dnRows) : '') +
     moreRow;
   document.getElementById('pageInfo').textContent = `Hiển thị ${rows.length} / ${allRows.length} dự án (${cnRows.length} CN · ${dnRows.length} DN)`;
 }
