@@ -2467,7 +2467,7 @@ function _adaptDNtoRow(p) {
   var rowSt = st==='sla_warn'?'sla':st==='on_track'?'ok':st;
   var next = {C1:'C2',C2:'C3',C3:'C4',C4:'C4'}[p.stage]||'C4';
   var _isDN = !!(p._raw && p._raw.dn && p._raw.dn.uid);
-  var _displayId = (_isDN ? 'ALN-DN-' : 'ALN-CN-') + p.id.replace(/^ALN-/,'');
+  var _displayId = (/^ALN-(CN|DN)-/.test(p.id) ? p.id : (_isDN ? 'ALN-DN-' : 'ALN-CN-') + p.id.replace(/^ALN-/,''));
   var _customer = _isDN ? (p.dn||'—') : (p.cn||'—');
   var _customerSub = _isDN ? (p.cn ? p.cn : p.name||'') : (p.name||'');
   var cmds = [];
@@ -3542,7 +3542,7 @@ function renderMgCn(){
         +' onmouseover="if(_activeRowId!==\''+rid+'\')this.style.background=\'var(--raised)\'"'
         +' onmouseout="if(_activeRowId!==\''+rid+'\')this.style.background=\'\'">'
         +'<td style="padding:10px 14px"><div class="row-name" style="font-size:12px;font-weight:600;color:var(--text1);transition:color .12s">'+p.cn+'</div></td>'
-        +'<td style="padding:10px 14px"><div style="font-size:11px;color:var(--text2);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+p.name+'</div><div style="font-size:9px;color:var(--dim);font-family:var(--mono)">ALN-CN-'+p.id.replace(/^ALN-/,'')+'</div></td>'
+        +'<td style="padding:10px 14px"><div style="font-size:11px;color:var(--text2);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+p.name+'</div><div style="font-size:9px;color:var(--dim);font-family:var(--mono)">'+(/^ALN-(CN|DN)-/.test(p.id) ? p.id : 'ALN-CN-'+p.id.replace(/^ALN-/,''))+'</div></td>'
         +'<td style="padding:10px 14px;font-size:11px;color:var(--text2)">'+p.kts+'</td>'
         +'<td style="padding:10px 14px;text-align:center"><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:'+(_stgColors[si]||'var(--sub)')+'">'+p.stage+'</span></td>'
         +'<td style="padding:10px 14px"><div style="display:flex;height:5px;border-radius:3px;overflow:hidden;gap:1px;width:80px">'+mini+'</div></td>'
