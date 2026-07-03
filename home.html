@@ -235,6 +235,20 @@ a{color:inherit;text-decoration:none}
 .cta-band p{font-size:var(--text-md);color:var(--text2);margin-bottom:26px}
 
 /* ── FOOTER ── */
+/* ═══ CẨM NANG LÀM NHÀ (trang chủ) ═══ */
+.cn-home-track{display:flex;flex-wrap:wrap;justify-content:center;gap:26px}
+.cn-home-card{display:block;flex:0 1 340px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .4s var(--ease),box-shadow .4s var(--ease),border-color .4s var(--ease)}
+.cn-home-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-md);border-color:rgba(152,105,10,.34)}
+.cn-home-img{aspect-ratio:16/9;background:linear-gradient(135deg,var(--bg3),var(--bg4));display:flex;align-items:center;justify-content:center;color:var(--sub);font-family:var(--syne);font-size:12px;letter-spacing:.03em}
+.cn-home-img img{width:100%;height:100%;object-fit:cover}
+.cn-home-body{padding:22px 22px 26px}
+.cn-home-tag{display:inline-block;background:var(--gold-bg);color:var(--gold);font-family:var(--syne);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:99px;margin-bottom:12px}
+.cn-home-body h3{font-family:var(--syne);font-weight:700;font-size:var(--text-md);color:var(--text);line-height:1.35;margin:0}
+@media(max-width:768px){
+  .cn-home-track{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;justify-content:flex-start;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+  .cn-home-card{flex:0 0 100%;scroll-snap-align:start}
+}
+
 footer{border-top:1px solid var(--border);padding:44px 0 28px}
 .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:28px;margin-bottom:32px}
 .foot-brand p{font-size:var(--text-sm);color:var(--sub);margin-top:10px;line-height:1.6;max-width:320px}
@@ -498,6 +512,7 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
       <a class="nav-link" href="#why">Vì sao chọn ALN</a>
       <a class="nav-link" href="#process">Quy trình</a>
       <a class="nav-link" href="#pricing">Bảng giá</a>
+      <a class="nav-link" href="cam-nang/">Cẩm nang</a>
       <a class="nav-link" href="#uoctinh">Ước tính</a>
       <a class="nav-link" href="#loban">Thước Lỗ Ban</a>
       <a class="nav-link" href="#portfolio">Phối cảnh</a>
@@ -517,6 +532,7 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
     <a href="#why">Vì sao chọn ALN</a>
     <a href="#process">Quy trình</a>
     <a href="#pricing">Bảng giá</a>
+    <a href="cam-nang/">Cẩm nang</a>
     <a href="#uoctinh">Ước tính chi phí</a>
     <a href="#loban">Thước Lỗ Ban</a>
     <a href="#portfolio">Phối cảnh</a>
@@ -1030,6 +1046,30 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
   </div>
 </section>
 
+<!-- ═══ CẨM NANG LÀM NHÀ ═══ -->
+<section class="sec" id="camnang">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow"><span class="ln"></span>CẨM NANG LÀM NHÀ<span class="ln"></span></div>
+      <h2>Kiến thức thực tế từ <em>Kiến trúc sư ALN</em></h2>
+    </div>
+    <div class="cn-home-track" id="cnHomeTrack">
+<!-- CAM_NANG_CARDS_START -->
+      <a class="cn-home-card" href="cam-nang/chi-phi-thiet-ke-nha-pho/">
+        <div class="cn-home-img">Ảnh minh hoạ 16:9</div>
+        <div class="cn-home-body">
+          <span class="cn-home-tag">Chi phí & Báo giá</span>
+          <h3>Chi phí thiết kế nhà phố 2026: Bảng giá chi tiết theo m²</h3>
+        </div>
+      </a>
+<!-- CAM_NANG_CARDS_END -->
+    </div>
+    <div style="text-align:center;margin-top:36px">
+      <a class="btn btn-outline" href="cam-nang/">Xem tất cả bài viết <i class="ph-duotone ph-arrow-right"></i></a>
+    </div>
+  </div>
+</section>
+
 <!-- ═══ FOOTER ═══ -->
 <footer>
   <div class="wrap">
@@ -1211,6 +1251,21 @@ function mymyOpen(){
   var win = document.getElementById('mymy-win');
   if(!win.classList.contains('open')){ mymyToggle(); }
 }
+
+/* Mở khung chat MyMy tự động khi khách bấm "Chat với MyMy" từ bài Cẩm nang
+   (link dạng home.html?mymy=1#pricing). */
+function mymyAutoOpenFromQuery(){
+  var params = new URLSearchParams(window.location.search);
+  if(params.get('mymy') === '1'){
+    mymyOpen();
+    if(window.history && window.history.replaceState){
+      var url = new URL(window.location.href);
+      url.searchParams.delete('mymy');
+      window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+    }
+  }
+}
+window.addEventListener('DOMContentLoaded', mymyAutoOpenFromQuery);
 
 function mymyToggle(){
   var win = document.getElementById('mymy-win');

@@ -132,16 +132,58 @@ function buildRobots() {
   return writeFileIfChanged(path.join(ROOT, 'robots.txt'), txt);
 }
 
+// ── Section "Cẩm nang làm nhà" trên home.html — CHỈ ghi đè phần nằm giữa
+// 2 marker dưới đây (danh sách thẻ 3 bài mới nhất). Không đụng gì khác
+// trong home.html. Nếu marker không tồn tại (home.html chưa có section
+// Cẩm nang — ví dụ trước Pass 4), bỏ qua bước này thay vì lỗi.
+var HOME_CARDS_START = '<!-- CAM_NANG_CARDS_START -->';
+var HOME_CARDS_END = '<!-- CAM_NANG_CARDS_END -->';
+
+function renderHomeCard(article) {
+  var img = article.image
+    ? '<img src="' + article.image + '" alt="' + (article.imageAlt || article.title) + '">'
+    : 'Ảnh minh hoạ 16:9';
+  return (
+    '      <a class="cn-home-card" href="cam-nang/' + article.slug + '/">\n' +
+    '        <div class="cn-home-img">' + img + '</div>\n' +
+    '        <div class="cn-home-body">\n' +
+    '          <span class="cn-home-tag">' + templates.categoryLabel(article.category) + '</span>\n' +
+    '          <h3>' + article.title + '</h3>\n' +
+    '        </div>\n' +
+    '      </a>'
+  );
+}
+
+function buildHomeSection(articles) {
+  var homePath = path.join(ROOT, 'home.html');
+  if (!fs.existsSync(homePath)) return false;
+  var html = fs.readFileSync(homePath, 'utf8');
+  var startIdx = html.indexOf(HOME_CARDS_START);
+  var endIdx = html.indexOf(HOME_CARDS_END);
+  if (startIdx === -1 || endIdx === -1) return false;
+
+  var top3 = articles.slice(0, 3);
+  var cards = top3.map(renderHomeCard).join('\n\n');
+  var newHtml =
+    html.slice(0, startIdx + HOME_CARDS_START.length) +
+    '\n' + cards + '\n' +
+    html.slice(endIdx);
+
+  return writeFileIfChanged(homePath, newHtml);
+}
+
 function main() {
   var articles = readArticles();
   var articlesChanged = buildArticles(articles);
   var indexChanged = buildIndex(articles);
   var sitemapChanged = buildSitemap(articles);
   var robotsChanged = buildRobots();
+  var homeChanged = buildHomeSection(articles);
 
   console.log('Cẩm nang build xong — ' + articles.length + ' bài.');
   console.log('  Bài viết đổi: ' + articlesChanged);
   console.log('  Trang danh mục đổi: ' + (indexChanged ? 'có' : 'không'));
+  console.log('  home.html (khối 3 bài mới nhất) đổi: ' + (homeChanged ? 'có' : 'không'));
   console.log('  sitemap.xml đổi: ' + (sitemapChanged ? 'có' : 'không'));
   console.log('  robots.txt đổi: ' + (robotsChanged ? 'có' : 'không'));
 }

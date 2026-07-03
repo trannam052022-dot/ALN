@@ -178,3 +178,40 @@ Sau khi build, chạy lại Chromium headless chụp `cam-nang/` và `cam-nang/c
 ### Việc tiếp theo
 
 → Pass 4: thêm section "Cẩm nang" + mục nav trên `home.html` (thay đổi DUY NHẤT trên trang đang chạy) — bao gồm nối query `?mymy=1` để tự mở khung chat MyMy từ nút CTA trong bài Cẩm nang.
+
+---
+
+## Pass 4 — Section "Cẩm nang" + nav + nối MyMy trên home.html (2026-07-03)
+
+**Trạng thái:** Xong, chưa deploy. Đây là thay đổi DUY NHẤT trên trang đang chạy (`home.html`), đúng nguyên tắc brief mục 5. Không đụng file nào khác đang chạy.
+
+Đã chốt cùng Founder trước khi làm: trang tuyển KTS chính thức là `tuyen-kts.html` (đã có trong `sitemap.xml` từ Pass 3, không đổi). Bản `aln-giu-cho/tuyen-kts.html` giữ nguyên **không** đưa vào sitemap — không cần sửa gì ở Pass 3, đã đúng từ đầu.
+
+### Thay đổi trong `home.html`
+
+1. **CSS mới** (chèn ngay trước rule `footer{...}`, dòng ~238) — toàn bộ dùng lại biến có sẵn (`--bg2/--bg3/--bg4/--border/--r/--shadow-sm/--shadow-md/--gold/--gold-bg/--syne/--ease`), không đặt màu/font mới: `.cn-home-track`, `.cn-home-card`, `.cn-home-img`, `.cn-home-body`, `.cn-home-tag`. Card dùng `flex:0 1 340px` + `justify-content:center` để tự canh giữa dù chỉ có 1-2 thẻ (chưa đủ 3 bài thật) — không cần logic điều kiện riêng cho số lượng thẻ.
+2. **Mục nav "Cẩm nang"** — thêm vào `.nav-links` (desktop) và `#mobile-nav` (mobile), đặt ngay sau "Bảng giá" (`#pricing`) / trước "Ước tính". Brief gốc ghi "giữa Báo giá và Liên hệ" nhưng nav hiện tại không có mục nào tên đúng vậy (đã ghi nhận lệch tên ở Pass 1) — chọn vị trí liền sau "Bảng giá" vì đó là mục gần nghĩa nhất.
+3. **Section `<section class="sec" id="camnang">`** — chèn ngay trước `<!-- FOOTER -->`, dùng đúng pattern `.sec`/`.sec-head`/`.eyebrow` sẵn có (giống các section khác như "Ba bước bắt đầu"). Bên trong danh sách thẻ đặt giữa 2 marker `<!-- CAM_NANG_CARDS_START -->` / `<!-- CAM_NANG_CARDS_END -->` để build script tự cập nhật (xem mục dưới). Nút "Xem tất cả bài viết →" dùng class `.btn.btn-outline` có sẵn, trỏ `cam-nang/`.
+4. **Mobile "trượt ngang 1 thẻ/màn hình"** — `@media(max-width:768px)`: `.cn-home-track` chuyển `overflow-x:auto` + `scroll-snap-type:x mandatory`, `.cn-home-card{flex:0 0 100%}`. Hiện chỉ có 1 bài nên thẻ chiếm trọn màn hình, không có gì để trượt — hành vi trượt sẽ thấy rõ khi Pass 5 có ≥2 bài.
+5. **Nối `?mymy=1`** — thêm hàm `mymyAutoOpenFromQuery()` gọi `mymyOpen()` (hàm có sẵn) khi `URLSearchParams(location.search).get('mymy') === '1'`, đăng ký qua `window.addEventListener('DOMContentLoaded', ...)`. Sau khi mở, dùng `history.replaceState` xoá `?mymy=1` khỏi URL (tránh mở lại khi bấm back/reload). Đặt trong `<script>` thường (không phải `type="module"`) — đã kiểm tra không dùng optional chaining/object shorthand, đúng quy ước CLAUDE.md mục 3.
+
+### Build script — tự động hoá khối 3 bài mới nhất (đúng yêu cầu brief "Tự động lấy 3 bài mới nhất")
+
+Thêm `buildHomeSection()` vào `scripts/build-cam-nang.js`: đọc `home.html`, tìm 2 marker `CAM_NANG_CARDS_START/END`, thay nội dung giữa bằng danh sách tối đa 3 bài mới nhất (từ `readArticles()`, đã sort theo `updated`/`date`) — chỉ ghi đè phần đó, không đụng gì khác trong file. Nếu marker chưa tồn tại (trường hợp trước Pass 4), bước này tự bỏ qua thay vì lỗi — script vẫn chạy được ở các repo chưa có section này.
+
+Đã kiểm chứng: sau khi tự tay viết section + card đầu tiên trong `home.html`, chạy `node scripts/build-cam-nang.js` lần đầu báo **"home.html (khối 3 bài mới nhất) đổi: không"** — tức bản tay viết khớp 100% với bản script tự sinh, không cần script ghi đè gì thêm. Từ Pass 5 trở đi, mỗi lần thêm bài mới chỉ cần chạy lại script, khối này tự cập nhật.
+
+### Kiểm tra hiển thị
+
+Dùng Chromium headless (đã cài sẵn, chạy qua `NODE_PATH=/opt/node22/lib/node_modules`):
+- Desktop 1440px: nav có "Cẩm nang" giữa "Bảng giá"/"Ước tính"; section hiện đúng 1 thẻ (card) canh giữa, tag gold "CHI PHÍ & BÁO GIÁ", nút "Xem tất cả bài viết →".
+- Mobile 390px: section co đúng, thẻ chiếm 100% chiều rộng; menu hamburger mở ra có "Cẩm nang" đúng vị trí.
+- `home.html?mymy=1`: khung chat MyMy tự mở kèm lời chào + nút chọn xưng hô, URL tự dọn về `home.html` (không còn query).
+- Chạy `node scripts/build-cam-nang.js` 2 lần liên tiếp sau khi sửa tay xong: cả 2 lần đều báo "không đổi" ở mọi mục — vẫn giữ tính idempotent.
+- `</head></body></html>` đủ, không đụng file nào khác ngoài `home.html`.
+
+**Lưu ý môi trường (không phải lỗi trang):** lúc chụp ảnh, `networkidle` bị treo vì Google Fonts/Phosphor CDN/Firebase CDN bị chặn trong sandbox — đã đổi sang chờ `load` + khung hình `requestAnimationFrame` để chụp ổn định. Không liên quan đến code trang, ngoài production các CDN này tải bình thường.
+
+### Việc tiếp theo
+
+→ Pass 5: đăng 5 bài Đợt 1 (nội dung do Founder cung cấp) — mỗi bài thêm 1 file `content/cam-nang/{slug}.md`, chạy `node scripts/build-cam-nang.js`, khối 3 bài mới nhất trên `home.html` và trang danh mục tự cập nhật theo cơ chế đã dựng ở Pass 3-4. Cần Founder cung cấp ảnh đại diện 16:9 cho từng bài (chưa có thì vẫn hiện placeholder, không chặn).
