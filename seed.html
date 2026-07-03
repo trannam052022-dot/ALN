@@ -142,7 +142,7 @@
               </div>
             </div>
             <div class="field"><label for="p-stage">Chặng hiện tại</label>
-              <select id="p-stage"><option>C1</option><option selected>C2</option><option>C3</option><option>C4</option></select></div>
+              <select id="p-stage"><option selected>C1</option><option>C2</option><option>C3</option><option>C4</option></select></div>
           </div>
           <div class="field"><label for="p-name">Tên dự án</label>
             <input id="p-name" placeholder="Tên dự án" /></div>
@@ -434,12 +434,15 @@ $('refresh-preview').addEventListener('click', refreshPreview);
 /* ---- chặng C1–C4 ---- */
 function daysAgo(n){ return Timestamp.fromDate(new Date(Date.now() - n*86400000)); }
 function buildStages(){
-  return {
-    C1: { status:'approved', submittedAt:daysAgo(20), approvedAt:daysAgo(18), revisions:0, maxRevisions:3 },
-    C2: { status:'pending',  submittedAt:daysAgo(3),  approvedAt:null,        revisions:1, maxRevisions:3 },
-    C3: { status:'locked',   submittedAt:null,        approvedAt:null,        revisions:0, maxRevisions:3 },
-    C4: { status:'locked',   submittedAt:null,        approvedAt:null,        revisions:0, maxRevisions:3 },
-  };
+  const order = ['C1','C2','C3','C4'];
+  const ci = Math.max(0, order.indexOf(val('p-stage')));
+  const out = {};
+  order.forEach(function(sid, i){
+    if(i < ci)        out[sid] = { status:'approved', submittedAt:daysAgo(20-i*4), approvedAt:daysAgo(18-i*4), revisions:0, maxRevisions:3 };
+    else if(i === ci) out[sid] = { status:'pending',  submittedAt:daysAgo(2),      approvedAt:null,           revisions:0, maxRevisions:3 };
+    else              out[sid] = { status:'locked',   submittedAt:null,            approvedAt:null,           revisions:0, maxRevisions:3 };
+  });
+  return out;
 }
 
 /* ---- SEED ---- */
@@ -499,12 +502,13 @@ $('run').addEventListener('click', async () => {
       }
 
       if(wantProp){
-        const propRef = doc(collection(db,'projects',code,'stages','C2','proposals'));
+        const st = data.stage;
+        const propRef = doc(collection(db,'projects',code,'stages',st,'proposals'));
         b2.set(propRef, {
           name:'3D Phối cảnh ngoại thất — Góc chính',
           desc:'View từ cổng chính. Phong cách tân cổ điển, mái dốc, cột tròn.',
           version:'v1.0', folder:'pc_ngoai', status:'pending',
-          imagePath:`projects/${code}/proposals/PA_C2_1.jpg`, imageURL:'', order:1,
+          imagePath:`projects/${code}/proposals/PA_${st}_1.jpg`, imageURL:'', order:1,
           createdBy:{ uid:kts.uid, name:kts.name }, createdAt:serverTimestamp()
         });
         b2.set(doc(collection(propRef,'pins')), {
@@ -512,11 +516,11 @@ $('run').addEventListener('click', async () => {
           author:{ uid:cn.uid, name:cn.name, role:'cn' },
           resolved:false, createdAt:serverTimestamp()
         });
-        b2.set(doc(collection(db,'projects',code,'stages','C2','comments')), {
-          text:'Đã cập nhật vị trí cổng vào. Xin phê duyệt để tiến hành Chặng 2.',
+        b2.set(doc(collection(db,'projects',code,'stages',st,'comments')), {
+          text:'Đã cập nhật phương án. Xin phê duyệt để tiến hành chặng '+st+'.',
           author:{ uid:kts.uid, name:kts.name, role:'kts' }, createdAt:serverTimestamp()
         });
-        log('info','+ 1 phương án · 1 pin · 1 comment (stages/C2)');
+        log('info','+ 1 phương án · 1 pin · 1 comment (stages/'+st+')');
       }
 
       await b2.commit();
