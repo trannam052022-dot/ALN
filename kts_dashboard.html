@@ -592,7 +592,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .content{max-width:1200px;margin:0 auto;padding:34px 40px 80px}
 @media(max-width:640px){.content{padding:22px 18px 64px}}
 /* SIDEBAR */
-.sidebar{width:240px;box-shadow:1px 0 0 rgba(38,28,8,.02)}
+.sidebar{width:240px;background:var(--ink2);border-right:1px solid var(--border);box-shadow:1px 0 0 rgba(38,28,8,.02)}
 .main{margin-left:240px}
 @media(max-width:768px){.main{margin-left:0}.sidebar{width:240px}}
 .sidebar-brand{padding:24px 22px 18px}
@@ -607,13 +607,14 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .nav-item.active .icon{opacity:1;color:var(--gold)}
 .nav-item.active .nav-badge{background:var(--gold)!important;color:#fff!important}
 /* TOPBAR */
-.topbar{height:64px;padding:0 22px}
-.page-title{font-size:18px;max-width:none}
+.topbar{height:64px;padding:0 22px;background:rgba(255,255,255,.86);backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2)}
+.page-title{font-family:var(--serif);font-style:italic;font-weight:700;font-size:18px;max-width:none}
 #ktsTopbarLogo{background:var(--gold-bg)!important;color:var(--gold)!important;border:1px solid var(--border2)!important;letter-spacing:.08em!important}
+.notif-btn{border-radius:10px;padding:8px 11px}
 /* CARDS */
-.card{border-radius:16px;padding:22px 24px;box-shadow:var(--sh);transition:box-shadow .4s var(--ease),transform .4s var(--ease),border-color .4s}
+.card{border-radius:16px;padding:22px 24px;box-shadow:var(--sh);border:1px solid var(--border);transition:box-shadow .4s var(--ease),transform .4s var(--ease),border-color .4s}
 .card:hover{box-shadow:var(--sh-lg);border-color:var(--border2)}
-.card-title{font-size:19px;color:var(--text)}
+.card-title{font-family:var(--serif);font-style:italic;font-weight:700;font-size:19px;color:var(--text)}
 .card-title .ct-icon{width:30px;height:30px;border-radius:9px;font-size:14px;background:var(--gold-bg)!important;color:var(--gold)!important}
 .card-title i,.ct-icon{color:var(--gold)!important}
 /* KPI */
@@ -632,10 +633,14 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .sec-label::after{background:var(--border)}
 /* SLA */
 .sla-card{border-radius:16px;border-left:3px solid var(--gold);padding:24px;box-shadow:var(--sh)}
+.sla-card.normal{border-left-color:var(--gold)}
+#slaDisplay{font-size:44px!important}
 /* BUTTONS */
 .btn{border-radius:10px;font-weight:600;transition:transform .25s var(--ease),background .2s,color .2s,border-color .2s,box-shadow .25s}
+.btn-primary{background:var(--text)!important;color:#fff!important}
 .btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 24px rgba(38,28,8,.18)}
-.btn-gold:hover:not(:disabled){transform:translateY(-2px)}
+.btn-gold{background:linear-gradient(135deg,var(--gold2),var(--gold))!important;color:#1a1400!important;box-shadow:0 4px 12px rgba(152,105,10,.2)}
+.btn-gold:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 26px rgba(152,105,10,.3)}
 .quick-action:hover{transform:translateY(-3px)}
 .qa-icon{background:var(--gold-bg)!important;color:var(--gold)!important}
 .sla-demo-row{display:none!important}
