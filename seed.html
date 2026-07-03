@@ -541,7 +541,12 @@ function genCode(prefix){
   $('p-code').value = prefix + n;
   refreshPreview();
 }
-$('gen-cn').addEventListener('click', function(){ genCode('ALN-CN-'); });
+function clearDnFields(){
+  ['dn-username','dn-uid','dn-name'].forEach(function(id){ if($(id)) $(id).value=''; });
+  refreshPreview();
+}
+// Dự án Chủ nhà (CN) → không có DN: tự xoá ô DN để tránh dính DN cũ từ lần seed trước
+$('gen-cn').addEventListener('click', function(){ genCode('ALN-CN-'); clearDnFields(); });
 $('gen-dn').addEventListener('click', function(){ genCode('ALN-DN-'); });
 
 refreshPreview();
