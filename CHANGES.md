@@ -122,3 +122,59 @@ Icon: Phosphor Duotone (đúng CDN home.html dùng: `@phosphor-icons/web@2.1.1`)
 ### Việc tiếp theo
 
 → Founder duyệt giao diện (đối chiếu bảng màu/font ở trên). Sau khi duyệt: Pass 3 — viết build script Markdown → HTML (Node thuần, Claude Code tự chạy) dùng lại đúng template Pass 2 + sinh `sitemap.xml`/`robots.txt` toàn site.
+
+---
+
+## Pass 3 — Build script Markdown → HTML + sitemap.xml + robots.txt (2026-07-03)
+
+**Trạng thái:** Xong, chưa deploy. Giao diện Pass 2 đã được Founder duyệt.
+
+### File đã tạo
+
+- `scripts/lib/frontmatter.js` — parser YAML tối giản (chỉ tập con cần dùng: chuỗi/quote, số, bool, mảng inline `[a,b]`, mảng khối `- item`, không hỗ trợ map lồng nhau). Không dùng thư viện ngoài (không `js-yaml`).
+- `scripts/lib/markdown.js` — Markdown → HTML tối giản: H2/H3, đoạn văn, `**đậm**`, `[link](url)`, danh sách `- item`, bảng GFM (`| ... |`), khối HTML thô (dòng bắt đầu bằng `<`, truyền thẳng không xử lý), và marker `[[CTA_MID]]` để chèn khối CTA giữa bài tại đúng vị trí tác giả đặt (không tính % cứng theo độ dài bài).
+- `scripts/lib/templates.js` — lắp trang từ dữ liệu frontmatter + HTML nội dung đã render: `renderIndexPage()` (trang danh mục) và `renderArticlePage()` (trang bài viết) — markup/class giữ nguyên 100% so với bản Pass 2 tay viết đã duyệt. Có `renderRelated()` tự động lấy tối đa 3 bài cùng chuyên mục (thật, nếu có), thiếu thì lấp bằng `relatedUpcoming` (placeholder "Sắp ra mắt") khai báo trong frontmatter — không cần logic phức tạp hơn vì hiện chỉ có 1 bài thật.
+- `scripts/build-cam-nang.js` — script chính, chạy `node scripts/build-cam-nang.js`:
+  1. Đọc mọi `content/cam-nang/*.md`
+  2. Sinh `cam-nang/{slug}/index.html` cho từng bài
+  3. Sinh `cam-nang/index.html` (danh mục, bài mới nhất trước theo `updated`/`date`)
+  4. Sinh `sitemap.xml` (gốc repo)
+  5. Sinh `robots.txt` (gốc repo)
+  6. Mỗi bước chỉ ghi đè file khi nội dung thực sự đổi (`writeFileIfChanged`) — nền tảng cho tính **idempotent**.
+- `content/cam-nang/chi-phi-thiet-ke-nha-pho.md` — bài mẫu Pass 2 chuyển thành nguồn Markdown + frontmatter đầy đủ (title, slug, category, description, date, updated, readTime, author, keywords, summary, ctaMid, relatedUpcoming, imageCaption). Trường `image`/`imageAlt` để trống — vẫn hiện ô placeholder "chờ Founder cung cấp ảnh thật" cho tới khi có ảnh + đường dẫn thật.
+
+### Sitemap — phạm vi "toàn site" đã diễn giải thành danh sách tường minh
+
+`STATIC_PUBLIC_PAGES` trong `build-cam-nang.js` là **mảng liệt kê tay**, không quét toàn bộ `*.html` trong repo. Lý do: repo có nhiều trang nội bộ/admin yêu cầu đăng nhập hoặc là công cụ vận hành, đưa vào sitemap sẽ khiến Google index nhầm trang không dành cho public:
+
+- **Loại trừ có chủ đích:** `client_CN.html`, `client_DN.html`, `kts_dashboard.html`, `designer_dashboard.html`, `founder_panel.html`, `ks_dashboard.html`, `profile.html` (có `onAuthStateChanged` gate), `aln_community.html` (có `authVeil`/gate), `seed.html`, `kho-du-an.html`, `board-editor.html`, `aln_patch.html`, toàn bộ `PUBLIC/`, `features/` (nội bộ/demo/admin).
+- **Đưa vào:** `home.html`, `register.html`, `login.html`, `kts-apply.html`, `dn-studio.html`, `designer-apply.html`, `ks-apply.html`, `recruit.html`, `tuyen-kts.html`, `aln-giu-cho/phong-cho.html`, `aln-giu-cho/giu-cho.html`, `privacy.html` — đều là trang public không yêu cầu đăng nhập, đúng tinh thần "trang public" mà brief yêu cầu.
+- **Cân nhắc riêng, đã loại:** `aln-giu-cho/tuyen-kts.html` — nội dung/thiết kế khác bản `tuyen-kts.html` gốc (không phải trùng lặp thuần), nhưng chưa rõ có đang được dẫn link/sử dụng chính thức hay là bản nháp — loại ra để tránh nội dung trùng lặp (duplicate content) ảnh hưởng SEO. Founder xác nhận nếu muốn đưa vào.
+- Danh sách này là 1 mảng JS đơn giản trong `build-cam-nang.js` — Founder/Claude Code sửa trực tiếp khi có trang public mới, không cần đổi kiến trúc.
+
+`robots.txt` sinh ra: `Allow: /` (cho phép crawl toàn site, gồm `/cam-nang/`) + dòng `Sitemap:` trỏ về `sitemap.xml` — tối giản đúng yêu cầu brief, chưa chặn riêng các trang nội bộ (những trang đó vẫn yêu cầu đăng nhập nên không lộ dữ liệu dù có bị crawl tới).
+
+### Kiểm tra idempotent
+
+Chạy `node scripts/build-cam-nang.js` 2 lần liên tiếp:
+
+```
+Lần 1: Bài viết đổi: 1 | Trang danh mục đổi: có | sitemap.xml đổi: có | robots.txt đổi: có
+Lần 2: Bài viết đổi: 0 | Trang danh mục đổi: không | sitemap.xml đổi: không | robots.txt đổi: không
+```
+
+→ Đạt yêu cầu: chạy lại nhiều lần không tạo diff thừa, an toàn để commit lặp lại mỗi khi thêm bài.
+
+### Đối chiếu output với bản Pass 2 tay viết
+
+Sau khi build, chạy lại Chromium headless chụp `cam-nang/` và `cam-nang/chi-phi-thiet-ke-nha-pho/` — bố cục, màu, khối CTA, bảng giá, breadcrumb... giống hệt bản Pass 2 đã duyệt. HTML sinh ra **không byte-identical** với bản tay viết trước đó (khác thứ tự thuộc tính/khoảng trắng ở vài chỗ do qua template) nhưng **tương đương về nội dung/markup/class** — đã phát hiện và bổ sung lại 1 chỗ thiếu so với bản gốc: dòng chú thích ảnh (`<p class="cn-caption">`) bị bỏ sót ở lần build đầu vì thiếu trường `imageCaption` trong frontmatter, đã thêm và build lại khớp 100%.
+
+### Việc còn thiếu / lưu ý cho pass sau
+
+- Chưa test build với bài thứ 2 trở lên (chưa có nội dung thật) — logic `renderRelated()` lấy bài cùng chuyên mục thật sẽ tự kích hoạt khi Pass 5 thêm bài, nhưng chưa kiểm chứng thực tế.
+- Markdown parser hiện không hỗ trợ ảnh chèn giữa bài (`![alt](src)`) hay blockquote — bài mẫu hiện tại không cần, sẽ bổ sung khi có bài thật cần dùng.
+- `functions/package.json` dùng `node: "22"` nhưng `firebase.json` khai `"runtime": "nodejs22"` — không liên quan Cẩm nang, không đụng tới.
+
+### Việc tiếp theo
+
+→ Pass 4: thêm section "Cẩm nang" + mục nav trên `home.html` (thay đổi DUY NHẤT trên trang đang chạy) — bao gồm nối query `?mymy=1` để tự mở khung chat MyMy từ nút CTA trong bài Cẩm nang.
