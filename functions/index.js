@@ -5,6 +5,8 @@ const admin = require("firebase-admin");
 const { v1: firestoreV1 } = require("@google-cloud/firestore");
 
 const ANTHROPIC_KEY = defineSecret("ANTHROPIC_API_KEY");
+const FB_PAGE_TOKEN = defineSecret("FB_PAGE_TOKEN");
+const FB_PAGE_ID = "1244358728751633"; // Trang "App Làm Nhà"
 
 admin.initializeApp();
 
@@ -434,6 +436,49 @@ exports.weeklyMarketingDrafts = functions
     }
     return null;
   });
+
+/* ── Đăng bài lên Trang Facebook ALN — Founder bấm 1 nút từ "Bài chờ duyệt".
+   LUÔN là hành động thủ công của Founder (không tự động đăng), đúng nguyên
+   tắc: AI soạn, người duyệt & đăng. Dùng Page token vĩnh viễn (FB_PAGE_TOKEN). */
+exports.postToFacebook = onCall(
+  { region: "asia-southeast1", secrets: [FB_PAGE_TOKEN] },
+  async (request) => {
+    if (!request.auth || request.auth.uid !== FOUNDER_UID) {
+      throw new HttpsError("permission-denied", "Chỉ Founder mới đăng bài được");
+    }
+    const { message, draftId } = request.data || {};
+    if (!message || typeof message !== "string" || !message.trim()) {
+      throw new HttpsError("invalid-argument", "Thiếu nội dung bài");
+    }
+    const token = FB_PAGE_TOKEN.value();
+    try {
+      const resp = await fetch(`https://graph.facebook.com/v21.0/${FB_PAGE_ID}/feed`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message: message.trim(), access_token: token }),
+      });
+      const data = await resp.json();
+      if (!resp.ok || data.error) {
+        console.error("[postToFacebook] FB error:", JSON.stringify(data.error || data));
+        throw new HttpsError("internal", "Facebook từ chối: " + ((data.error && data.error.message) || ("HTTP " + resp.status)));
+      }
+      if (draftId) {
+        try {
+          await db.collection("marketingDrafts").doc(draftId).update({
+            status: "posted",
+            postedAt: admin.firestore.FieldValue.serverTimestamp(),
+            fbPostId: data.id || "",
+          });
+        } catch (e) { console.warn("[postToFacebook] update draft:", e); }
+      }
+      return { ok: true, postId: data.id || "" };
+    } catch (e) {
+      if (e instanceof HttpsError) throw e;
+      console.error("[postToFacebook]", e);
+      throw new HttpsError("internal", e.message || "Lỗi đăng bài");
+    }
+  }
+);
 
 /* ── Bài mới trong Nhịp sống ALN → thông báo Founder + KTS + Designer ── */
 exports.onCommunityPost = functions
