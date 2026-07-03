@@ -2760,7 +2760,7 @@ function _startKtsProjectListen(uid) {
       return { id:d2.id, ...dd, progress:[pg.C1||0, pg.C2||0, pg.C3||0, pg.C4||0] };
     });
     window._KTS_ALL_PROJECTS = allProjs;
-    if (typeof window.hkSync === 'function') window.hkSync(allProjs, 'projects');
+    try { if (typeof window.hkSync === 'function') window.hkSync(allProjs, 'projects'); } catch(e){ console.warn('[hkSync]', e); }
     renderMyProjects(allProjs);
     _updateWallet(allProjs);
     if (typeof renderDashProjList === 'function') renderDashProjList(allProjs);

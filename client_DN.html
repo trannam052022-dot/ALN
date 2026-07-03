@@ -3392,7 +3392,7 @@ function _startProjectsListenDN() {
       });
     }
     window.PROJECTS_CLIENT = arr;
-    if (typeof window.hkSync === 'function') window.hkSync(arr.map(function(p){ return { id: p.id, code: p.code, name: p.name, meeting: p._raw && p._raw.meeting }; }), 'projects');
+    try { if (typeof window.hkSync === 'function') window.hkSync(arr.map(function(p){ return { id: p.id, code: p.code, name: p.name, meeting: p._raw && p._raw.meeting }; }), 'projects'); } catch(e){ console.warn('[hkSync]', e); }
     if (window.PROJECTS_CLIENT.length > 0) {
       window.activeProj = window.PROJECTS_CLIENT[0].id;
       try { if(typeof window.renderSidebar==='function') window.renderSidebar(); } catch(e){ console.error('[DN render]',e); }
