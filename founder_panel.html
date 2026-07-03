@@ -1015,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div style="height:3px;background:linear-gradient(90deg,var(--amber),var(--gold))"></div>
       <div style="padding:16px 18px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="width:36px;height:36px;border-radius:8px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;font-size:16px">🎨</div>
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;font-size:16px"><i class="ph-duotone ph-palette"></i></div>
           <span style="font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--amber);text-transform:uppercase;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);padding:2px 8px;border-radius:99px">Kiến trúc sư</span>
         </div>
         <div style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--text1);line-height:1" id="stat-kts-total">0</div>
@@ -1047,7 +1047,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div style="height:3px;background:linear-gradient(90deg,var(--blue),var(--cyan))"></div>
       <div style="padding:16px 18px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="width:36px;height:36px;border-radius:8px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2);display:flex;align-items:center;justify-content:center;font-size:16px">🏢</div>
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2);display:flex;align-items:center;justify-content:center;font-size:16px"><i class="ph-duotone ph-buildings"></i></div>
           <span style="font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--blue);text-transform:uppercase;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);padding:2px 8px;border-radius:99px">Doanh nghiệp</span>
         </div>
         <div style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--text1);line-height:1" id="stat-dn-total">0</div>
@@ -1079,7 +1079,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div style="height:3px;background:linear-gradient(90deg,var(--green),#34d399)"></div>
       <div style="padding:16px 18px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;font-size:16px">👤</div>
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;font-size:16px"><i class="ph-duotone ph-house-line"></i></div>
           <span style="font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--green);text-transform:uppercase;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);padding:2px 8px;border-radius:99px">Chủ nhà</span>
         </div>
         <div style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--text1);line-height:1" id="stat-cn-total">0</div>
@@ -1132,7 +1132,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- KTS accordion -->
   <div class="stat-accordion" id="acc-kts" style="display:none">
     <div class="acc-header" onclick="toggleStatCard('kts')">
-      <span>🎨 Danh sách Kiến trúc sư</span>
+      <span><i class="ph-duotone ph-palette"></i> Danh sách Kiến trúc sư</span>
       <span style="display:flex;align-items:center;gap:8px">
         <span style="font-size:10px;font-family:var(--mono);color:var(--dim)" id="kts-count-label"></span>
         <i class="ph-duotone ph-caret-up acc-chevron"></i>
@@ -1153,7 +1153,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- DN accordion -->
   <div class="stat-accordion" id="acc-dn" style="display:none">
     <div class="acc-header" onclick="toggleStatCard('dn')">
-      <span>🏢 Danh sách Doanh nghiệp</span>
+      <span><i class="ph-duotone ph-buildings"></i> Danh sách Doanh nghiệp</span>
       <span style="display:flex;align-items:center;gap:8px">
         <span style="font-size:10px;font-family:var(--mono);color:var(--dim)" id="dn-count-label"></span>
         <i class="ph-duotone ph-caret-up acc-chevron"></i>
@@ -1175,7 +1175,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- CN accordion -->
   <div class="stat-accordion" id="acc-cn" style="display:none">
     <div class="acc-header" onclick="toggleStatCard('cn')">
-      <span>👤 Danh sách Chủ nhà</span>
+      <span><i class="ph-duotone ph-house-line"></i> Danh sách Chủ nhà</span>
       <span style="display:flex;align-items:center;gap:8px">
         <span style="font-size:10px;font-family:var(--mono);color:var(--dim)" id="cn-count-label"></span>
         <i class="ph-duotone ph-caret-up acc-chevron"></i>
@@ -1204,17 +1204,17 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="sc-sub">Tổng dự án</div>
   </div>
   <div class="stat-cell s-run" onclick="setFilter('RUNNING')">
-    <div class="sc-label">🟢 Đang chạy</div>
+    <div class="sc-label"><i class="ph-duotone ph-circle" style="color:var(--green)"></i> Đang chạy</div>
     <div class="sc-val" id="cnt-run">00</div>
     <div class="sc-sub">Trong hạn</div>
   </div>
   <div class="stat-cell s-c3" onclick="setFilter('C3_PENDING')">
-    <div class="sc-label">⚠ Cần duyệt C3</div>
+    <div class="sc-label"><i class="ph-duotone ph-warning" style="color:var(--amber)"></i> Cần duyệt C3</div>
     <div class="sc-val" id="cnt-c3" style="color:var(--amber)">00</div>
     <div class="sc-sub">Chờ Checker ký</div>
   </div>
   <div class="stat-cell s-dispute" onclick="setFilter('DISPUTE')">
-    <div class="sc-label">❌ Tranh chấp</div>
+    <div class="sc-label"><i class="ph-duotone ph-x-circle" style="color:#ef4444"></i> Tranh chấp</div>
     <div class="sc-val" id="cnt-dispute" style="color:var(--red)">00</div>
     <div class="sc-sub">Cần phán xét</div>
   </div>
@@ -1224,7 +1224,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="sc-sub">KTS quá hạn</div>
   </div>
   <div class="stat-cell s-done" onclick="setFilter('DONE')">
-    <div class="sc-label">✓ Hoàn thành</div>
+    <div class="sc-label"><i class="ph-duotone ph-check-circle" style="color:var(--green)"></i> Hoàn thành</div>
     <div class="sc-val" id="cnt-done">00</div>
     <div class="sc-sub">Đã giải ngân</div>
   </div>
@@ -1275,12 +1275,12 @@ document.addEventListener('DOMContentLoaded', function() {
   <table class="data-table" id="dataTable">
     <thead>
       <tr>
-        <th onclick="sortTable('id')">MÃ DỰ ÁN ↕</th>
-        <th onclick="sortTable('cn')">KHÁCH HÀNG ↕</th>
-        <th onclick="sortTable('kts')">CTV THIẾT KẾ ↕</th>
-        <th onclick="sortTable('stage')">CHẶNG HIỆN TẠI ↕</th>
-        <th onclick="sortTable('frozen')">TIỀN ĐÓNG BĂNG ↕</th>
-        <th onclick="sortTable('status')">TRẠNG THÁI ↕</th>
+        <th onclick="sortTable('id')">MÃ DỰ ÁN <i class="ph-duotone ph-arrows-down-up" style="font-size:.85em;opacity:.6"></i></th>
+        <th onclick="sortTable('cn')">KHÁCH HÀNG <i class="ph-duotone ph-arrows-down-up" style="font-size:.85em;opacity:.6"></i></th>
+        <th onclick="sortTable('kts')">CTV THIẾT KẾ <i class="ph-duotone ph-arrows-down-up" style="font-size:.85em;opacity:.6"></i></th>
+        <th onclick="sortTable('stage')">CHẶNG HIỆN TẠI <i class="ph-duotone ph-arrows-down-up" style="font-size:.85em;opacity:.6"></i></th>
+        <th onclick="sortTable('frozen')">TIỀN ĐÓNG BĂNG <i class="ph-duotone ph-arrows-down-up" style="font-size:.85em;opacity:.6"></i></th>
+        <th onclick="sortTable('status')">TRẠNG THÁI <i class="ph-duotone ph-arrows-down-up" style="font-size:.85em;opacity:.6"></i></th>
         <th>HÀNH ĐỘNG</th>
       </tr>
     </thead>
@@ -1299,10 +1299,10 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="panelMgKts" style="display:none;flex-direction:column;flex:1;min-height:calc(100vh - 84px)">
   <div style="display:flex;gap:1px;background:var(--border);flex-shrink:0">
     <div class="dn-kpi"><div class="dk-l">Tổng KTS</div><div class="dk-v" id="mgKtsV0">0</div></div>
-    <div class="dn-kpi"><div class="dk-l">🟢 Đang làm việc</div><div class="dk-v" style="color:var(--green)" id="mgKtsV1">0</div></div>
-    <div class="dn-kpi"><div class="dk-l">👑 VIP Vàng</div><div class="dk-v" style="color:var(--gold)" id="mgKtsV2">0</div></div>
-    <div class="dn-kpi"><div class="dk-l">⭐ Rating TB</div><div class="dk-v" style="color:var(--amber)" id="mgKtsV3">0</div></div>
-    <div class="dn-kpi"><div class="dk-l">⚫ Tạm dừng</div><div class="dk-v" style="color:var(--dim)" id="mgKtsV4">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-circle" style="color:var(--green)"></i> Đang làm việc</div><div class="dk-v" style="color:var(--green)" id="mgKtsV1">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-crown" style="color:var(--gold)"></i> VIP Vàng</div><div class="dk-v" style="color:var(--gold)" id="mgKtsV2">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-star" style="color:var(--gold)"></i> Rating TB</div><div class="dk-v" style="color:var(--amber)" id="mgKtsV3">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-circle" style="color:var(--dim)"></i> Tạm dừng</div><div class="dk-v" style="color:var(--dim)" id="mgKtsV4">0</div></div>
     <div class="dn-kpi" style="flex:2"><div class="dk-l">Tổng doanh thu KTS</div><div class="dk-v" style="color:var(--gold)" id="mgKtsV5">0</div></div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap">
@@ -1339,8 +1339,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="panelMgDn" style="display:none;flex-direction:column;flex:1;min-height:calc(100vh - 84px)">
   <div style="display:flex;gap:1px;background:var(--border);flex-shrink:0">
     <div class="dn-kpi"><div class="dk-l">Tổng tổ chức</div><div class="dk-v" id="mgDnV0">0</div></div>
-    <div class="dn-kpi"><div class="dk-l">🟢 Hoạt động</div><div class="dk-v" style="color:var(--green)" id="mgDnV1">0</div></div>
-    <div class="dn-kpi"><div class="dk-l">📁 Tổng dự án</div><div class="dk-v" style="color:var(--blue)" id="mgDnV2">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-circle" style="color:var(--green)"></i> Hoạt động</div><div class="dk-v" style="color:var(--green)" id="mgDnV1">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-folders"></i> Tổng dự án</div><div class="dk-v" style="color:var(--blue)" id="mgDnV2">0</div></div>
     <div class="dn-kpi"><div class="dk-l">▶ Đang chạy</div><div class="dk-v" style="color:var(--cyan)" id="mgDnV3">0</div></div>
     <div class="dn-kpi" style="flex:2"><div class="dk-l">Tổng GTV</div><div class="dk-v" style="color:var(--gold)" id="mgDnV4">0</div></div>
     <div class="dn-kpi" style="flex:2"><div class="dk-l">Escrow đang giữ</div><div class="dk-v" style="color:var(--amber)" id="mgDnV5">0</div></div>
@@ -1377,10 +1377,10 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="panelMgCn" style="display:none;flex-direction:column;flex:1;min-height:calc(100vh - 84px)">
   <div style="display:flex;gap:1px;background:var(--border);flex-shrink:0">
     <div class="dn-kpi"><div class="dk-l">Tổng chủ nhà</div><div class="dk-v" id="mgCnV0">0</div></div>
-    <div class="dn-kpi"><div class="dk-l">🟢 Đang thi công</div><div class="dk-v" style="color:var(--green)" id="mgCnV1">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-circle" style="color:var(--green)"></i> Đang thi công</div><div class="dk-v" style="color:var(--green)" id="mgCnV1">0</div></div>
     <div class="dn-kpi"><div class="dk-l">⏰ SLA cảnh báo</div><div class="dk-v" style="color:var(--amber)" id="mgCnV2">0</div></div>
-    <div class="dn-kpi"><div class="dk-l">❌ Tranh chấp</div><div class="dk-v" style="color:var(--red)" id="mgCnV3">0</div></div>
-    <div class="dn-kpi"><div class="dk-l">✅ Hoàn thành</div><div class="dk-v" style="color:var(--sub)" id="mgCnV4">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-x-circle" style="color:#ef4444"></i> Tranh chấp</div><div class="dk-v" style="color:var(--red)" id="mgCnV3">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-check-circle" style="color:var(--green)"></i> Hoàn thành</div><div class="dk-v" style="color:var(--sub)" id="mgCnV4">0</div></div>
     <div class="dn-kpi" style="flex:2"><div class="dk-l">Tổng Escrow đóng băng</div><div class="dk-v" style="color:var(--gold)" id="mgCnV5">0</div></div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap">
@@ -1424,9 +1424,9 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px">
     <div class="dn-kpi"><div class="dk-l">Tổng KS Vùng</div><div class="dk-v" id="mgKsV0">0</div></div>
-    <div class="dn-kpi"><div class="dk-l">🟢 Đang hoạt động</div><div class="dk-v" style="color:var(--green)" id="mgKsV1">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-circle" style="color:var(--green)"></i> Đang hoạt động</div><div class="dk-v" style="color:var(--green)" id="mgKsV1">0</div></div>
     <div class="dn-kpi"><div class="dk-l">⏳ Chờ duyệt</div><div class="dk-v" style="color:var(--amber)" id="mgKsV2">0</div></div>
-    <div class="dn-kpi"><div class="dk-l">📍 Số tỉnh quản lý</div><div class="dk-v" style="color:var(--gold)" id="mgKsV3">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-map-pin"></i> Số tỉnh quản lý</div><div class="dk-v" style="color:var(--gold)" id="mgKsV3">0</div></div>
   </div>
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:200px;background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:6px 12px">
@@ -1547,7 +1547,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <input type="number" id="feeTaxInput" min="0" max="50" step="0.5" disabled style="flex:1;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-family:var(--mono);font-size:14px;outline:none;opacity:.7">
           <button type="button" id="feeTaxLockBtn" onclick="feeUnlockTax()" style="padding:9px 12px;border-radius:8px;border:1px solid var(--amber-bd,rgba(245,158,11,.4));background:rgba(245,158,11,.1);color:var(--amber);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap"><i class="ph-duotone ph-lock-open"></i> Mở khoá</button>
         </div>
-        <div id="feeTaxWarn" style="display:none;font-size:10.5px;color:var(--amber);margin-top:4px;font-weight:600">⚠ Chỉ sửa khi luật thuế TNCN thay đổi thật — không dùng để điều chỉnh lợi nhuận.</div>
+        <div id="feeTaxWarn" style="display:none;font-size:10.5px;color:var(--amber);margin-top:4px;font-weight:600"><i class="ph-duotone ph-warning" style="color:var(--amber)"></i> Chỉ sửa khi luật thuế TNCN thay đổi thật — không dùng để điều chỉnh lợi nhuận.</div>
       </div>
     </div>
     <button onclick="feeSaveConfig()" style="padding:9px 18px;border-radius:8px;border:none;background:var(--gold);color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-floppy-disk"></i> Lưu cấu hình</button>
@@ -1626,7 +1626,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- ══ PANEL: PHÒNG HỘI KIẾN — giám sát họp video ══ -->
 <div id="panelHoikien" style="display:none;flex-direction:column;flex:1;overflow-y:auto;padding:24px 28px">
   <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px">VẬN HÀNH · HỌP VIDEO</div>
-  <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1);margin-bottom:6px">🏛 Phòng Hội Kiến</div>
+  <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1);margin-bottom:6px"><i class="ph-duotone ph-bank"></i> Phòng Hội Kiến</div>
   <div style="font-size:13px;color:var(--sub);margin-bottom:18px;max-width:80ch">Họp video nhúng ngay trong ALN (Jitsi, miễn phí, không cần cài đặt trên máy tính). KTS/Designer/DN mở phòng theo dự án — Founder luôn được báo, vào được mọi phòng và đóng cưỡng chế được. Mỗi phiên một mã phòng ngẫu nhiên, kết thúc là link cũ vô hiệu.</div>
 
   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
@@ -1742,7 +1742,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- Evidence Modal -->
   <div id="c2EvidenceModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(7,18,32,.85);backdrop-filter:blur(6px);align-items:center;justify-content:center">
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;width:min(92vw,580px);max-height:88vh;overflow-y:auto;padding:22px 20px;position:relative">
-      <button onclick="document.getElementById('c2EvidenceModal').style.display='none'" style="position:absolute;top:12px;right:12px;background:none;border:none;color:var(--dim);font-size:17px;cursor:pointer;line-height:1">✕</button>
+      <button onclick="document.getElementById('c2EvidenceModal').style.display='none'" style="position:absolute;top:12px;right:12px;background:none;border:none;color:var(--dim);font-size:17px;cursor:pointer;line-height:1"><i class="ph ph-x"></i></button>
       <div id="c2EvidenceContent"></div>
     </div>
   </div>
@@ -1752,13 +1752,13 @@ document.addEventListener('DOMContentLoaded', function() {
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;width:min(95vw,780px);max-height:90vh;overflow:hidden;padding:0;position:relative;display:flex;flex-direction:column">
       <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
         <div>
-          <span style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;color:var(--gold)">🗺️ Bản đồ vị trí</span>
+          <span style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;color:var(--gold)"><i class="ph-duotone ph-map-trifold"></i>️ Bản đồ vị trí</span>
           <span id="c2MapTitle" style="font-size:11px;color:var(--dim);margin-left:10px"></span>
         </div>
         <div style="display:flex;align-items:center;gap:14px">
           <span style="font-size:10px;color:#5ab87a">● KTS</span>
           <span style="font-size:10px;color:#3b82f6">● Chủ nhà</span>
-          <button onclick="closeC2Map()" style="background:none;border:none;color:var(--dim);font-size:17px;cursor:pointer;line-height:1">✕</button>
+          <button onclick="closeC2Map()" style="background:none;border:none;color:var(--dim);font-size:17px;cursor:pointer;line-height:1"><i class="ph ph-x"></i></button>
         </div>
       </div>
       <div id="c2MapContainer" style="flex:1;min-height:420px"></div>
@@ -1862,7 +1862,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div style="display:flex;align-items:center;gap:12px">
         <div id="cpLogoPreview" style="width:64px;height:64px;background:var(--raised);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--dim);overflow:hidden">
           <img id="cpLogoImg" src="" style="display:none;width:100%;height:100%;object-fit:contain">
-          <span id="cpLogoPlh">🏢</span>
+          <span id="cpLogoPlh"><i class="ph-duotone ph-buildings"></i></span>
         </div>
         <div>
           <input type="file" id="cpLogoFile" accept="image/*" style="display:none" onchange="cpPreviewLogo(this)">
@@ -1896,7 +1896,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <div id="cpStatus" style="font-size:12px;color:var(--sub);min-height:18px"></div>
     <button onclick="saveCompanySettings()" style="padding:9px 24px;background:var(--gold);color:#080c14;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);align-self:flex-start">
-      💾 Lưu & Áp dụng
+      <i class="ph-duotone ph-floppy-disk"></i> Lưu & Áp dụng
     </button>
   </div>
 </div>
@@ -1937,7 +1937,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div style="font-size:13px;color:var(--sub);margin-bottom:18px;max-width:74ch">Dữ liệu gốc MyMy dùng để chốt giá. MyMy chỉ được chốt trong khoảng <b style="color:var(--text2)">Sàn–Trần</b> của mỗi thể loại. Sửa trực tiếp, thêm thể loại, rồi <b style="color:var(--gold)">Xuất JSON</b> để nạp vào <span style="font-family:var(--mono);font-size:12px;color:var(--dim)">config/pricing_bands</span>.</div>
 
   <div style="display:flex;align-items:center;gap:10px;background:rgba(180,82,26,.10);border:1px solid rgba(180,82,26,.28);border-radius:10px;padding:11px 15px;margin-bottom:20px;font-size:13px;color:#f8a67c">
-    🔒 <span><b style="color:#f97316">Bảo mật:</b> Sàn/Trần chỉ hiển thị tại đây (Founder). Không xuất hiện ở trang chủ nhà hay bất kỳ phiên công khai nào của MyMy.</span>
+    <i class="ph-duotone ph-lock"></i> <span><b style="color:#f97316">Bảo mật:</b> Sàn/Trần chỉ hiển thị tại đây (Founder). Không xuất hiện ở trang chủ nhà hay bất kỳ phiên công khai nào của MyMy.</span>
   </div>
 
   <div style="overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--card)">
@@ -1956,11 +1956,11 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 
   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap">
-    <button onclick="pricingAddCat()" style="font-family:var(--sans);font-size:13px;font-weight:600;padding:9px 16px;border-radius:8px;border:1px dashed rgba(201,168,76,.5);background:rgba(201,168,76,.06);color:var(--gold);cursor:pointer">➕ Thêm thể loại</button>
+    <button onclick="pricingAddCat()" style="font-family:var(--sans);font-size:13px;font-weight:600;padding:9px 16px;border-radius:8px;border:1px dashed rgba(201,168,76,.5);background:rgba(201,168,76,.06);color:var(--gold);cursor:pointer"><i class="ph-duotone ph-plus"></i> Thêm thể loại</button>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button onclick="document.getElementById('pricingImportFile').click()" style="font-family:var(--sans);font-size:13px;font-weight:600;padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);cursor:pointer">⬆ Nhập JSON</button>
-      <button onclick="pricingExport()" style="font-family:var(--sans);font-size:13px;font-weight:600;padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);cursor:pointer">⬇ Xuất JSON</button>
-      <button onclick="pricingSaveNow()" style="font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 16px;border-radius:8px;border:none;background:var(--gold);color:#08090f;cursor:pointer">☁ Lưu lên hệ thống</button>
+      <button onclick="document.getElementById('pricingImportFile').click()" style="font-family:var(--sans);font-size:13px;font-weight:600;padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);cursor:pointer"><i class="ph-duotone ph-upload-simple"></i> Nhập JSON</button>
+      <button onclick="pricingExport()" style="font-family:var(--sans);font-size:13px;font-weight:600;padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);cursor:pointer"><i class="ph-duotone ph-download-simple"></i> Xuất JSON</button>
+      <button onclick="pricingSaveNow()" style="font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 16px;border-radius:8px;border:none;background:var(--gold);color:#08090f;cursor:pointer"><i class="ph-duotone ph-cloud-arrow-up"></i> Lưu lên hệ thống</button>
       <input type="file" id="pricingImportFile" accept="application/json,.json" style="display:none">
     </div>
   </div>
@@ -2080,7 +2080,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div style="font-size:13px;color:var(--sub);margin-bottom:18px;max-width:74ch">Quản lý mẫu hiển thị trên trang chủ (mục "Kho mẫu"). Thêm/sửa/xoá, bật/tắt hiển thị, sắp xếp thứ tự, upload nhiều ảnh mỗi mẫu (ảnh đầu = phối cảnh đại diện).</div>
 
   <details style="margin-bottom:18px;background:var(--gold-bg);border:1px solid var(--gold-bd);border-radius:10px">
-    <summary style="padding:12px 16px;cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:700;color:var(--gold)">📖 Hướng dẫn sử dụng — bấm để xem</summary>
+    <summary style="padding:12px 16px;cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:700;color:var(--gold)"><i class="ph-duotone ph-book-open"></i> Hướng dẫn sử dụng — bấm để xem</summary>
     <div style="padding:0 16px 16px;font-size:12.5px;color:var(--text2);line-height:1.85">
       <b style="color:var(--text1)">1. Thêm mẫu mới:</b> bấm "➕ Thêm mẫu mới" → điền <b>Mã</b> (duy nhất, vd NP-01, không đổi được sau khi lưu) → chọn <b>Danh mục</b> → điền đủ <b>m² đất / Số tầng / Giá</b> (bắt buộc là số, không được để trống) → bấm <b>💾 Lưu mẫu</b>.<br>
       <b style="color:var(--text1)">2. Ảnh công khai:</b> ảnh <b>đầu tiên</b> trong danh sách là ảnh đại diện (phối cảnh) hiện ở thẻ ngoài trang chủ; các ảnh sau là mặt bằng/chi tiết — khách xem trong modal khi bấm vào ảnh. Ảnh upload ở đây <b>tự động đóng watermark + giảm độ phân giải</b>, không cần chỉnh sửa trước.<br>
@@ -2092,7 +2092,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </details>
 
   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
-    <button onclick="khomauOpenForm(null)" style="font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 16px;border-radius:8px;border:none;background:var(--gold);color:#fff;cursor:pointer">➕ Thêm mẫu mới</button>
+    <button onclick="khomauOpenForm(null)" style="font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 16px;border-radius:8px;border:none;background:var(--gold);color:#fff;cursor:pointer"><i class="ph-duotone ph-plus"></i> Thêm mẫu mới</button>
     <div id="khomauMsg" style="font-family:var(--mono);font-size:12px;color:var(--gold)"></div>
   </div>
 
@@ -2163,14 +2163,14 @@ document.addEventListener('DOMContentLoaded', function() {
       <div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <label style="font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)">Ảnh (ảnh đầu = phối cảnh đại diện)</label>
-          <button onclick="khomauAddImageRow()" style="font-family:var(--sans);font-size:12px;font-weight:600;padding:5px 11px;border-radius:6px;border:1px dashed var(--gold-bd);background:var(--gold-bg);color:var(--gold);cursor:pointer">➕ Thêm ảnh</button>
+          <button onclick="khomauAddImageRow()" style="font-family:var(--sans);font-size:12px;font-weight:600;padding:5px 11px;border-radius:6px;border:1px dashed var(--gold-bd);background:var(--gold-bg);color:var(--gold);cursor:pointer"><i class="ph-duotone ph-plus"></i> Thêm ảnh</button>
         </div>
         <div id="kmImgRows" style="display:flex;flex-direction:column;gap:8px"></div>
       </div>
 
       <div style="border-top:1px dashed var(--border);padding-top:14px;margin-top:4px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <label style="font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)">🔒 File gốc (riêng tư — chỉ Founder)</label>
+          <label style="font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)"><i class="ph-duotone ph-lock"></i> File gốc (riêng tư — chỉ Founder)</label>
           <label style="font-size:12px;color:var(--blue);cursor:pointer"><i class="ph-duotone ph-upload-simple"></i> Upload<input type="file" id="kmGocInput" style="display:none" onchange="khomauUploadGoc(this)"></label>
         </div>
         <div style="font-size:11px;color:var(--dim);margin-bottom:8px">Không watermark, không giảm độ phân giải — chỉ gửi riêng cho khách sau khi đặt mua thật. Cần lưu mẫu (có mã) trước khi upload được.</div>
@@ -2179,7 +2179,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
     <div style="padding:16px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px">
       <button onclick="khomauCloseForm()" style="font-family:var(--sans);font-size:13px;font-weight:600;padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);cursor:pointer">Huỷ</button>
-      <button onclick="khomauSave()" style="font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 18px;border-radius:8px;border:none;background:var(--gold);color:#fff;cursor:pointer">💾 Lưu mẫu</button>
+      <button onclick="khomauSave()" style="font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 18px;border-radius:8px;border:none;background:var(--gold);color:#fff;cursor:pointer"><i class="ph-duotone ph-floppy-disk"></i> Lưu mẫu</button>
     </div>
   </div>
 </div>
@@ -2189,7 +2189,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:600px;max-width:100%;box-shadow:0 24px 60px rgba(0,0,0,.7)">
     <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
       <div style="font-size:15px;font-weight:700;color:var(--text1)" id="recruitModalTitle">Tạo bài tuyển dụng</div>
-      <button onclick="closeRecruitModal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:18px;padding:4px">✕</button>
+      <button onclick="closeRecruitModal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:18px;padding:4px"><i class="ph ph-x"></i></button>
     </div>
     <div style="padding:22px;display:flex;flex-direction:column;gap:16px">
       <!-- Role type -->
@@ -2239,7 +2239,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;width:460px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.6)">
     <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
       <div style="font-size:14px;font-weight:700;color:var(--text1)" id="addModalTitle">Thêm tài khoản</div>
-      <button onclick="closeAddModal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:4px">✕</button>
+      <button onclick="closeAddModal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:4px"><i class="ph ph-x"></i></button>
     </div>
     <div style="padding:20px" id="addModalBody"></div>
     <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">
@@ -2254,7 +2254,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.7)">
     <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
       <div style="font-size:14px;font-weight:700;color:var(--text1);display:flex;align-items:center;gap:8px"><i class="ph-duotone ph-folder-plus" style="color:var(--green)"></i> Tạo dự án mới</div>
-      <button onclick="closeCreateProj()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:4px">✕</button>
+      <button onclick="closeCreateProj()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:4px"><i class="ph ph-x"></i></button>
     </div>
     <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
 
@@ -2358,12 +2358,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   <!-- Header -->
   <div class="drawer-header">
-    <div class="dh-icon" id="dhIcon">🗂️</div>
+    <div class="dh-icon" id="dhIcon"><i class="ph-duotone ph-folders"></i></div>
     <div>
       <div class="dh-title" id="dhTitle">Chi tiết Dự án</div>
       <div class="dh-sub" id="dhSub">ALN_PRJ_XX</div>
     </div>
-    <button class="dh-close" onclick="closeDrawer()">✕</button>
+    <button class="dh-close" onclick="closeDrawer()"><i class="ph ph-x"></i></button>
   </div>
 
   <!-- Body -->
@@ -2416,12 +2416,12 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="drawer-overlay" id="profileOverlay" onclick="closeProfile()" style="display:none"></div>
 <div class="drawer" id="profileDrawer" style="display:none;width:380px">
   <div class="drawer-header">
-    <div class="dh-icon" id="pdIcon">👤</div>
+    <div class="dh-icon" id="pdIcon"><i class="ph-duotone ph-house-line"></i></div>
     <div>
       <div class="dh-title" id="pdTitle">Profile</div>
       <div class="dh-sub" id="pdSub">—</div>
     </div>
-    <button class="dh-close" onclick="closeProfile()">✕</button>
+    <button class="dh-close" onclick="closeProfile()"><i class="ph ph-x"></i></button>
   </div>
   <div class="drawer-body" id="profileBody" style="padding:0"></div>
 </div>
@@ -2710,7 +2710,7 @@ function openDrawer(id) {
   // AI Log
   const scoreColor = row.rubric ? (row.rubric.pass ? 'var(--green)' : 'var(--red)') : 'var(--cyan)';
   document.getElementById('aiScore').innerHTML = row.rubric
-    ? `<span style="color:${scoreColor}">Rubric: ${row.rubric.total}/100 ${row.rubric.pass?'✅ ĐẠT':'❌ KHÔNG ĐẠT'}</span>`
+    ? `<span style="color:${scoreColor}">Rubric: ${row.rubric.total}/100 ${row.rubric.pass?'<i class="ph-duotone ph-check-circle" style="color:var(--green)"></i> ĐẠT':'<i class="ph-duotone ph-x-circle" style="color:#ef4444"></i> KHÔNG ĐẠT'}</span>`
     : '<span style="color:var(--cyan)">Không áp dụng (chưa đến C3)</span>';
 
   document.getElementById('aiLogContent').innerHTML = row.aiLog.map(l => {
@@ -3200,7 +3200,7 @@ function openProfile(type, idx){
     var stL = {active:'Đang hoạt động',inactive:'Tạm dừng',suspended:'Đình chỉ'};
     var projs = _mgCnData.filter(function(p){return p.kts===k.name;});
     html = '<div class="profile-hero">'
-      +'<div class="profile-av" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3)">🎨</div>'
+      +'<div class="profile-av" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3)"><i class="ph-duotone ph-palette"></i></div>'
       +'<div style="flex:1;min-width:0">'
         +'<div class="profile-name">'+k.name+'</div>'
         +'<div class="profile-meta">'+k.cchn+' · Kiến trúc sư</div>'
@@ -3257,7 +3257,7 @@ function openProfile(type, idx){
     var dnStatusColor = {on_track:'var(--green)',sla_warn:'var(--amber)',dispute:'var(--red)',done:'var(--sub)'};
 
     html = '<div class="profile-hero">'
-      +'<div class="profile-av" style="background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.3)">🏢</div>'
+      +'<div class="profile-av" style="background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.3)"><i class="ph-duotone ph-buildings"></i></div>'
       +'<div style="flex:1;min-width:0">'
         +'<div class="profile-name">'+d.name+'</div>'
         +'<div class="profile-meta">'+d.type+' · Doanh nghiệp</div>'
@@ -3325,7 +3325,7 @@ function openProfile(type, idx){
     var stgPct=[10,20,60,10];
     var mini = prog.map(function(v,i){return '<div style="flex:'+stgPct[i]+';height:7px;background:'+(v>0?_stgColors[i]:'var(--mute)')+';opacity:'+(v>0?1:.3)+'"></div>';}).join('');
     html = '<div class="profile-hero">'
-      +'<div class="profile-av" style="background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3)">👤</div>'
+      +'<div class="profile-av" style="background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3)"><i class="ph-duotone ph-house-line"></i></div>'
       +'<div style="flex:1;min-width:0">'
         +'<div class="profile-name">'+c.cn+'</div>'
         +'<div class="profile-meta">'+c.id+' · Chủ đầu tư</div>'
@@ -3354,7 +3354,7 @@ function openProfile(type, idx){
         +['C1','C2','C3','C4'].map(function(s,i){
           var v=prog[i]||0;
           return '<div style="text-align:center;background:var(--raised);border:1px solid '+(v>0?_stgColors[i]+'40':'var(--border)')+';border-radius:5px;padding:6px 4px">'
-            +'<div style="font-size:11px;font-weight:700;color:'+_stgColors[i]+'">'+(v>=1?'✓':v>0?Math.round(v*100)+'%':'—')+'</div>'
+            +'<div style="font-size:11px;font-weight:700;color:'+_stgColors[i]+'">'+(v>=1?'<i class="ph-duotone ph-check-circle" style="color:var(--green)"></i>':v>0?Math.round(v*100)+'%':'—')+'</div>'
             +'<div style="font-size:9px;color:var(--dim)">'+s+'</div>'
           +'</div>';
         }).join('')
@@ -3754,7 +3754,7 @@ function renderPending(){
       var IND_LABEL = {kts:'Kiến trúc sư',construction:'Xây dựng / Thầu',realestate:'Bất động sản',interior:'Nội thất',other:'Ngành khác'};
       var provName = PROV_NAME_KS[app.province] || app.province || '—';
       var ksNote = app.ksNote || app.ctvNote || {};
-      var noteHtml = ksNote.recommendation ? '<div style="padding:8px 12px;border-radius:7px;font-size:11px;'+(ksNote.recommendation==='recommended' ? 'background:rgba(61,214,140,.07);border:1px solid rgba(61,214,140,.2);color:var(--green)' : 'background:rgba(240,96,96,.07);border:1px solid rgba(240,96,96,.2);color:#f09898')+'">'+(ksNote.recommendation==='recommended' ? '✓ ' : '✗ ')+'<strong>KS tự đánh giá:</strong> '+(ksNote.note||'')+'</div>' : '';
+      var noteHtml = ksNote.recommendation ? '<div style="padding:8px 12px;border-radius:7px;font-size:11px;'+(ksNote.recommendation==='recommended' ? 'background:rgba(61,214,140,.07);border:1px solid rgba(61,214,140,.2);color:var(--green)' : 'background:rgba(240,96,96,.07);border:1px solid rgba(240,96,96,.2);color:#f09898')+'">'+(ksNote.recommendation==='recommended' ? '<i class="ph-duotone ph-check-circle" style="color:var(--green)"></i> ' : '✗ ')+'<strong>KS tự đánh giá:</strong> '+(ksNote.note||'')+'</div>' : '';
       details = '<div style="padding:14px 20px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--border)">'
         +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
           +'<div style="background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">'
@@ -3872,7 +3872,7 @@ async function cpSuggestKts(){
         tempActive = untilMs > Date.now() && tl.province !== (k.homeProvince || k.province || '');
       }
       var locBadge = tempActive
-        ? '<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;background:rgba(34,211,238,.15);color:var(--cyan);margin-left:4px">📍 tạm</span>'
+        ? '<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;background:rgba(34,211,238,.15);color:var(--cyan);margin-left:4px"><i class="ph-duotone ph-map-pin"></i> tạm</span>'
         : (isHome ? '<span style="color:var(--green)">Thường trú</span>' : '<span style="color:var(--sub)">Nhận dự án</span>');
       var provName = PROV[effProv] || effProv || '—';
       return '<div onclick="document.getElementById(\'cp_kts\').value=\'' + k.uid + '\';this.style.borderColor=\'var(--amber)\'" style="cursor:pointer;padding:8px 10px;border-radius:6px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;gap:10px" onmouseover="this.style.borderColor=\'rgba(245,158,11,.5)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
@@ -5735,7 +5735,7 @@ window.saveCompanySettings = async function() {
         +'<td style="'+tdBase+'"><input class="pin pnum pmkt" data-f="mkt" type="number" step="5000" value="'+c.mkt+'" style="'+inNum+';color:var(--gold)"></td>'
         +'<td style="'+tdBase+'"><input class="pin pnum" data-f="ceil" type="number" step="5000" value="'+c.ceil+'" style="'+inNum+'"></td>'
         +'<td style="'+tdBase+'"><input class="pin pnum" data-f="min" type="number" step="1000000" value="'+c.min+'" style="'+inNum+'"></td>'
-        +'<td style="'+tdBase+';text-align:center"><button class="pdel" title="Xóa" style="border:0;background:none;color:#f97316;cursor:pointer;font-size:15px;padding:5px 8px;border-radius:6px">✕</button></td>'
+        +'<td style="'+tdBase+';text-align:center"><button class="pdel" title="Xóa" style="border:0;background:none;color:#f97316;cursor:pointer;font-size:15px;padding:5px 8px;border-radius:6px"><i class="ph ph-x"></i></button></td>'
         +'</tr>';
     }).join("");
     tbody.querySelectorAll("tr").forEach(function(tr){
@@ -6563,7 +6563,7 @@ function renderWrList(list) {
       : '<span style="color:'+(hLeft<24?'var(--amber)':'var(--sub)')+'">Còn '+hLeft+'h</span>';
     // status badge
     var statusBadge = isApproved
-      ? '<span style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green);padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700">✓ Đã duyệt</span>'
+      ? '<span style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green);padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700"><i class="ph-duotone ph-check-circle" style="color:var(--green)"></i> Đã duyệt</span>'
       : isSubmitted
         ? '<span style="background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);color:var(--gold);padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700">⏳ Chờ duyệt</span>'
         : '<span style="background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--dim);padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700">Giữ chỗ</span>';
@@ -6832,14 +6832,14 @@ window.viewKtsProfile = async function(ktsId) {
     var revSnap = await getDocs(query(collection(db, 'reviews'), where('ktsId','==',ktsId), orderBy('createdAt','desc'), limit(3)));
     var warSnap = await getDocs(query(collection(db, 'warnings'), where('ktsId','==',ktsId)));
     var revHtml = '';
-    revSnap.docs.forEach(function(r){ var rd = r.data(); revHtml += '<div style="background:#102030;border:1px solid #1c2a3a;border-radius:7px;padding:9px 11px;margin-bottom:7px"><div style="font-size:11px;color:#a0b8cc;margin-bottom:3px">"' + (rd.comment||'Không có nội dung') + '"</div><div style="font-size:10px;color:var(--dim)">⭐ ' + (rd.rating||'—') + '</div></div>'; });
+    revSnap.docs.forEach(function(r){ var rd = r.data(); revHtml += '<div style="background:#102030;border:1px solid #1c2a3a;border-radius:7px;padding:9px 11px;margin-bottom:7px"><div style="font-size:11px;color:#a0b8cc;margin-bottom:3px">"' + (rd.comment||'Không có nội dung') + '"</div><div style="font-size:10px;color:var(--dim)"><i class="ph-duotone ph-star" style="color:var(--gold)"></i> ' + (rd.rating||'—') + '</div></div>'; });
     var html = '<div style="font-family:Cormorant Garamond,serif;font-style:italic;font-size:19px;color:var(--gold);margin-bottom:3px">' + (p.name||ktsId) + '</div>';
     html += '<div style="font-size:11px;color:var(--dim);margin-bottom:14px">' + (p.tier?'Tier '+p.tier+' · ':'') + (p.homeProvince||'') + '</div>';
     if (p.serviceProvinces && p.serviceProvinces.length) {
       html += '<div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px">Khu vực hoạt động</div>';
       html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">' + p.serviceProvinces.map(function(x){ return '<span style="font-size:10px;padding:2px 9px;border-radius:20px;background:#102030;color:var(--dim);border:1px solid #1c2a3a">'+x+'</span>'; }).join('') + '</div>';
     }
-    if (warSnap.size > 0) { html += '<div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#c85a3a;background:#140a0a;border:1px solid rgba(200,90,58,.35);border-radius:7px;padding:4px 10px;margin-bottom:12px">⚠ ' + warSnap.size + ' lần bị nhắc nhở</div>'; }
+    if (warSnap.size > 0) { html += '<div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#c85a3a;background:#140a0a;border:1px solid rgba(200,90,58,.35);border-radius:7px;padding:4px 10px;margin-bottom:12px"><i class="ph-duotone ph-warning" style="color:var(--amber)"></i> ' + warSnap.size + ' lần bị nhắc nhở</div>'; }
     if (revHtml) { html += '<div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px">Phản hồi gần nhất</div>' + revHtml; }
     var modal = document.getElementById('c2EvidenceModal');
     var content = document.getElementById('c2EvidenceContent');
@@ -6965,9 +6965,9 @@ window.openC2Evidence = async function(projectId) {
     var hasLoc = logs.some(function(l){ return l.location && l.location.latitude; });
     html += '<div style="display:flex;gap:8px;margin-top:4px">';
     if (hasLoc) {
-      html += '<button onclick="openC2Map(\'' + projectId + '\')" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1c3a5a;background:#0a1c2e;color:#3b82f6;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)">🗺️ Xem bản đồ</button>';
+      html += '<button onclick="openC2Map(\'' + projectId + '\')" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1c3a5a;background:#0a1c2e;color:#3b82f6;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-map-trifold"></i>️ Xem bản đồ</button>';
     }
-    html += '<button onclick="exportC2PDF(\'' + projectId + '\')" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1c2a3a;background:#102030;color:var(--gold);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)">📄 Xuất PDF</button>';
+    html += '<button onclick="exportC2PDF(\'' + projectId + '\')" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1c2a3a;background:#102030;color:var(--gold);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-file-text"></i> Xuất PDF</button>';
     html += '</div>';
     content.innerHTML = html;
   } catch(e) {
@@ -7159,13 +7159,13 @@ window.exportProjectsCSV = async function() {
 <!-- ══ PHÒNG HỘI KIẾN — nút vàng nổi (trên nút Giám sát push) ══ -->
 <button onclick="switchGroup('ops');switchTab('hoikien')"
   style="position:fixed;bottom:66px;left:20px;z-index:499;background:linear-gradient(135deg,#b8860b,#98690a);color:#fff;border:none;border-radius:99px;padding:12px 20px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px rgba(152,105,10,.4);display:flex;align-items:center;gap:7px">
-  🏛 Phòng Hội Kiến<span id="hkFloatBadge" style="display:none;background:#ef4444;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;font-weight:800">0</span>
+  <i class="ph-duotone ph-bank"></i> Phòng Hội Kiến<span id="hkFloatBadge" style="display:none;background:#ef4444;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;font-weight:800">0</span>
 </button>
 
 <!-- ══ PHÒNG HỘI KIẾN — modal họp video nhúng ══ -->
 <div id="hkModal" style="display:none;position:fixed;inset:0;z-index:99999;background:#000">
   <div style="position:absolute;top:0;left:0;right:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:linear-gradient(rgba(0,0,0,.72),transparent)">
-    <div style="color:#e8c44a;font-weight:800;font-size:14px">🏛 Phòng Hội Kiến — <span id="hkRoomLabel"></span></div>
+    <div style="color:#e8c44a;font-weight:800;font-size:14px"><i class="ph-duotone ph-bank"></i> Phòng Hội Kiến — <span id="hkRoomLabel"></span></div>
     <button onclick="hkLeave()" style="background:rgba(239,68,68,.9);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:800;font-size:12px;cursor:pointer">Rời phòng</button>
   </div>
   <iframe id="hkFrame" allow="camera; microphone; fullscreen; display-capture; autoplay" style="width:100%;height:100%;border:0"></iframe>
