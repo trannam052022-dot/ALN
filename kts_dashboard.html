@@ -77,7 +77,7 @@ window.KTS_PROJECT_DATA = null;
 .mpl-grp{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 12px 4px}
 .mpl-item{padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px;align-items:flex-start;border-left:2px solid transparent;transition:.12s}
 .mpl-item:hover{background:rgba(152,105,10,.05)}
-.mpl-item.on{background:rgba(37,99,235,.07);border-left-color:var(--blue)}
+.mpl-item.on{background:rgba(152,105,10,.07);border-left-color:var(--blue)}
 .mpl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
 .mpl-nm{font-size:12px;font-weight:600;color:var(--text);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .mpl-sub{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:2px}
@@ -131,7 +131,7 @@ window.KTS_PROJECT_DATA = null;
   --purple: #98690a;
   --purple-bg: rgba(152,105,10,.10);
   --green: #15803d;
-  --green-bg: rgba(22,163,74,.1);
+  --green-bg: rgba(21,128,61,.1);
   --red: #dc2626;
   --red-bg: rgba(220,38,38,.1);
   --amber: #98690a;
@@ -176,7 +176,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .nav-section{padding:16px 18px 5px;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
 .nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;margin:1px 0;font-size:13px;font-weight:450;color:var(--text2);cursor:pointer;transition:all .12s;text-decoration:none;border-left:2px solid transparent;background:none}
 .nav-item:hover{background:rgba(0,0,0,.04);color:var(--text)}
-.nav-item.active{background:rgba(37,99,235,.07);color:var(--blue);font-weight:600;border-left-color:var(--blue)}
+.nav-item.active{background:rgba(152,105,10,.07);color:var(--blue);font-weight:600;border-left-color:var(--blue)}
 .nav-item .icon{width:16px;text-align:center;font-size:13px;opacity:.7}
 .nav-item.active .icon{opacity:1}
 .nav-badge{margin-left:auto;background:var(--text2);color:#fff;border-radius:99px;padding:1px 7px;font-size:10px;font-weight:600}
@@ -598,8 +598,8 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .sidebar-brand{padding:24px 22px 18px}
 .sidebar-brand-name{font-family:var(--serif);font-style:italic;font-weight:700;font-size:21px;letter-spacing:-.01em}
 .sidebar-brand-name::after{content:"";display:block;width:26px;height:2px;background:var(--gold);margin-top:10px;border-radius:2px}
-.kts-av{width:42px!important;height:42px!important;font-size:17px!important;color:#fff!important;box-shadow:0 4px 12px rgba(152,105,10,.25)}
-.kts-name{font-size:15px}
+.sidebar-av{width:42px!important;height:42px!important;font-size:17px!important;color:#fff!important;box-shadow:0 4px 12px rgba(152,105,10,.25)}
+.sidebar-nm{font-size:15px}
 .nav-item{padding:10px 22px;margin:1px 10px;border-radius:9px;border-left:none!important;font-size:13.5px;color:var(--text2);gap:11px;transition:background .2s var(--ease),color .2s}
 .nav-item .icon{opacity:.6;font-size:15px}
 .nav-item:hover{background:rgba(152,105,10,.06);color:var(--text)}
@@ -700,7 +700,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <i class="ph-duotone ph-list"></i>
     </button>
     <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
-      <div id="ktsTopbarLogo" style="background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(96,165,250,.12));color:#60a5fa;padding:4px 10px;border-radius:var(--r-sm);border:1.5px solid rgba(96,165,250,.45);font-family:var(--syne);font-size:11px;font-weight:800;letter-spacing:.06em;white-space:nowrap;flex-shrink:0">App Làm Nhà Corp.</div>
+      <div id="ktsTopbarLogo" style="background:linear-gradient(135deg,rgba(184,134,11,.2),rgba(184,134,11,.12));color:#b8860b;padding:4px 10px;border-radius:var(--r-sm);border:1.5px solid rgba(184,134,11,.45);font-family:var(--syne);font-size:11px;font-weight:800;letter-spacing:.06em;white-space:nowrap;flex-shrink:0">App Làm Nhà Corp.</div>
       <div class="page-title">Bảng KTS</div>
     </div>
     <div class="topbar-right">
@@ -720,7 +720,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div style="margin-bottom:22px">
       <div style="font-size:12px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:10px">
         <span id="greetingDate">—</span>
-        <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(22,163,74,.2);padding:2px 9px;border-radius:99px"><span style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block"></span>Online</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(21,128,61,.2);padding:2px 9px;border-radius:99px"><span style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block"></span>Online</span>
       </div>
       <div style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--text);letter-spacing:-.4px;line-height:1.15" id="greetingName">KTS. Trần Đại Long</div>
     </div>
@@ -768,7 +768,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div><!-- LEFT: SLA -->
     <div class="sec-label no-line sla-section" style="justify-content:space-between">
       <span>Nhiệm vụ ưu tiên</span>
-      <span style="font-size:10px;font-weight:600;color:var(--amber);background:var(--amber-bg);border:1px solid rgba(217,119,6,.2);padding:2px 9px;border-radius:99px;letter-spacing:0;text-transform:none">1 đang chờ</span>
+      <span style="font-size:10px;font-weight:600;color:var(--amber);background:var(--amber-bg);border:1px solid rgba(152,105,10,.2);padding:2px 9px;border-radius:99px;letter-spacing:0;text-transform:none">1 đang chờ</span>
     </div>
     <div class="sla-card normal" id="slaCard">
       <div class="sla-glow"></div>
@@ -795,7 +795,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
       <!-- Reward / penalty info -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-        <div style="background:var(--green-bg);border:1px solid rgba(22,163,74,.2);border-radius:var(--r-sm);padding:10px 12px">
+        <div style="background:var(--green-bg);border:1px solid rgba(21,128,61,.2);border-radius:var(--r-sm);padding:10px 12px">
           <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:4px">+0.2 uy tín nếu đúng hạn</div>
           <div style="font-size:10px;color:var(--muted)">Còn <b id="bonusCountdown" style="color:var(--green)">07:22:45</b></div>
         </div>
@@ -1227,7 +1227,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <button class="btn btn-ghost btn-sm" onclick="simUploadDemo()"><i class="ph-duotone ph-lightning"></i> [Demo] Upload 6 file mẫu</button>
         <button class="btn btn-ghost btn-sm" onclick="simUploadError()"><i class="ph-duotone ph-bug"></i> [Demo] File Excel lỗi hàm</button>
         <div style="flex:1"></div>
-        <button class="btn btn-ghost btn-sm" onclick="window.openKhungBV()" style="border-color:rgba(96,165,250,.4);color:#60a5fa">
+        <button class="btn btn-ghost btn-sm" onclick="window.openKhungBV()" style="border-color:rgba(184,134,11,.4);color:#b8860b">
           <i class="ph-duotone ph-frame-corners"></i> Khung bản vẽ &amp; Ma trận ký
         </button>
         <button class="btn btn-primary" id="submitC3Btn" disabled onclick="submitC3()"><i class="ph-duotone ph-cloud-arrow-up"></i> Nộp Hồ sơ C3</button>
@@ -1462,10 +1462,10 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           </div>
         </div>
         <div style="display:flex;gap:6px">
-          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--green-bg);border:1px solid rgba(22,163,74,.2)"><div style="font-size:9px;color:var(--green);font-weight:700">Mới</div><div style="font-size:9px;color:var(--muted)">0–30đ</div></div>
-          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--blue-bg);border:1px solid rgba(37,99,235,.2)"><div style="font-size:9px;color:var(--blue);font-weight:700">Tiêu Chuẩn</div><div style="font-size:9px;color:var(--muted)">30–60</div></div>
+          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--green-bg);border:1px solid rgba(21,128,61,.2)"><div style="font-size:9px;color:var(--green);font-weight:700">Mới</div><div style="font-size:9px;color:var(--muted)">0–30đ</div></div>
+          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--blue-bg);border:1px solid rgba(152,105,10,.2)"><div style="font-size:9px;color:var(--blue);font-weight:700">Tiêu Chuẩn</div><div style="font-size:9px;color:var(--muted)">30–60</div></div>
           <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--gold-bg);border:1.5px solid rgba(152,105,10,.4)"><div style="font-size:9px;color:var(--gold);font-weight:700">✓ Chuẩn KTS</div><div style="font-size:9px;color:var(--muted)">60–100</div></div>
-          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--purple-bg);border:1px solid rgba(124,58,237,.2)"><div style="font-size:9px;color:var(--purple);font-weight:700">PRO</div><div style="font-size:9px;color:var(--muted)">100+</div></div>
+          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--purple-bg);border:1px solid rgba(152,105,10,.2)"><div style="font-size:9px;color:var(--purple);font-weight:700">PRO</div><div style="font-size:9px;color:var(--muted)">100+</div></div>
           <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--ink3);border:1px solid var(--border)"><div style="font-size:9px;color:var(--muted);font-weight:700">VIP Gold</div><div style="font-size:9px;color:var(--muted)">150+</div></div>
         </div>
       </div>
@@ -2799,11 +2799,11 @@ window.openKtsWork = function(pid, uid) {
         + '<div class="kwc-label">Tạo Board PA</div>'
       + '</div>'
     + '<div class="kts-work-card" onclick="window.ktsShowTab(\'review\')">'
-        + '<div class="kwc-icon" style="background:rgba(37,99,235,.12);color:var(--blue)"><i class="ph-duotone ph-clipboard-text"></i></div>'
+        + '<div class="kwc-icon" style="background:rgba(152,105,10,.12);color:var(--blue)"><i class="ph-duotone ph-clipboard-text"></i></div>'
         + '<div class="kwc-label">Bảng Review</div>'
       + '</div>'
     + '<div class="kts-work-card" onclick="window.ktsShowTab(\'c3\')">'
-        + '<div class="kwc-icon" style="background:rgba(22,163,74,.12);color:var(--green)"><i class="ph-duotone ph-upload-simple"></i></div>'
+        + '<div class="kwc-icon" style="background:rgba(21,128,61,.12);color:var(--green)"><i class="ph-duotone ph-upload-simple"></i></div>'
         + '<div class="kwc-label">Nộp hồ sơ</div>'
       + '</div>'
     + '</div>';
@@ -3965,7 +3965,7 @@ function _watchDocs(pid) {
         const isImg = ['JPG','JPEG','PNG','GIF','WEBP'].includes(ext);
         const roleLabel = upRole==='kts' ? 'KTS' : upRole==='dn' ? 'DN' : 'CN';
         const roleColor = upRole==='kts' ? 'var(--gold)' : upRole==='dn' ? 'var(--blue)' : 'var(--green)';
-        const dlBtn = dc.url ? `<a href="${dc.url}" target="_blank" style="flex-shrink:0;width:30px;height:30px;border-radius:7px;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none;border:1px solid rgba(37,99,235,.2)" title="Tải về"><i class="ph-duotone ph-download-simple"></i></a>` : '';
+        const dlBtn = dc.url ? `<a href="${dc.url}" target="_blank" style="flex-shrink:0;width:30px;height:30px;border-radius:7px;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none;border:1px solid rgba(152,105,10,.2)" title="Tải về"><i class="ph-duotone ph-download-simple"></i></a>` : '';
         const meta = `<div style="font-size:10px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:5px"><span style="color:${roleColor};font-weight:700;background:${roleColor}1a;padding:1px 6px;border-radius:4px">${roleLabel}</span><span>${upName}</span><span>·</span><span>${dc.date || ''}</span></div>`;
         if (isImg && dc.url) {
           const _ua = dc.url.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
@@ -4085,7 +4085,7 @@ window.submitC3 = async function() {
   }
 
   if (failed === 0) {
-    if (sr) sr.innerHTML = `<div style="padding:10px 14px;background:var(--green-bg);border:1px solid rgba(22,163,74,.2);border-radius:8px;font-size:12px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:8px">
+    if (sr) sr.innerHTML = `<div style="padding:10px 14px;background:var(--green-bg);border:1px solid rgba(21,128,61,.2);border-radius:8px;font-size:12px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:8px">
       <i class="ph-duotone ph-check-circle" style="font-size:18px"></i>
       <span>Đã upload ${done}/${total} tài liệu C3 thành công — chờ Founder thẩm định</span>
     </div>`;
@@ -4093,7 +4093,7 @@ window.submitC3 = async function() {
     showToast('Đã nộp Hồ sơ C3 thành công!', 't-green');
     if (typeof window._alnWatchDocs === 'function') window._alnWatchDocs(pid);
   } else {
-    if (sr) sr.innerHTML = `<div style="padding:10px 14px;background:var(--amber-bg);border:1px solid rgba(217,119,6,.2);border-radius:8px;font-size:12px;color:var(--amber);font-weight:600;display:flex;align-items:center;gap:8px">
+    if (sr) sr.innerHTML = `<div style="padding:10px 14px;background:var(--amber-bg);border:1px solid rgba(152,105,10,.2);border-radius:8px;font-size:12px;color:var(--amber);font-weight:600;display:flex;align-items:center;gap:8px">
       <i class="ph-duotone ph-warning" style="font-size:18px"></i>
       <span>Upload ${done}/${total} — ${failed} tệp lỗi. Kiểm tra Storage rules rồi thử lại.</span>
     </div>`;
@@ -4327,7 +4327,7 @@ window.c2mDoSubmit = async function() {
 
 <!-- ══ PHÒNG HỘI KIẾN — họp video theo dự án, Jitsi nhúng trong trang ══ -->
 <style>
-@keyframes hkPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,160,23,.55)}50%{box-shadow:0 0 0 14px rgba(212,160,23,0)}}
+@keyframes hkPulse{0%,100%{box-shadow:0 0 0 0 rgba(152,105,10,.55)}50%{box-shadow:0 0 0 14px rgba(152,105,10,0)}}
 .hk-live-btn{animation:hkPulse 1.6s infinite;background:linear-gradient(135deg,#98690a,#b8860b);color:#fff;border:none;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px}
 .hk-idle-btn{background:linear-gradient(135deg,#b8860b,#98690a);color:#fff;border:none;border-radius:99px;padding:12px 20px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px rgba(152,105,10,.4);display:flex;align-items:center;gap:7px}.hk-idle-btn:hover{filter:brightness(1.12)}
 .hk-pick{background:var(--ink2,#0d1320);border:1px solid var(--border,rgba(255,255,255,.12));border-radius:12px;padding:10px;margin-bottom:8px;max-height:300px;overflow-y:auto;min-width:280px;box-shadow:0 12px 34px rgba(0,0,0,.5)}
@@ -4336,7 +4336,7 @@ window.c2mDoSubmit = async function() {
 </style>
 <div id="hkModal" style="display:none;position:fixed;inset:0;z-index:99999;background:#000">
   <div style="position:absolute;top:0;left:0;right:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:linear-gradient(rgba(0,0,0,.72),transparent)">
-    <div style="color:#e8c44a;font-weight:800;font-size:14px">🏛 Phòng Hội Kiến — <span id="hkRoomLabel"></span></div>
+    <div style="color:#b8860b;font-weight:800;font-size:14px">🏛 Phòng Hội Kiến — <span id="hkRoomLabel"></span></div>
     <button onclick="hkLeave()" style="background:rgba(239,68,68,.9);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:800;font-size:12px;cursor:pointer">Rời phòng</button>
   </div>
   <iframe id="hkFrame" allow="camera; microphone; fullscreen; display-capture; autoplay" style="width:100%;height:100%;border:0"></iframe>
@@ -4394,7 +4394,7 @@ window.hkTogglePicker = function(){
       + (active
         ? '<span style="display:flex;gap:6px"><button onclick="hkJoin(\'' + (p.meeting.roomId||'') + '\',\'' + (p.code||p.id) + '\')" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:#3dd68c;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">Vào</button>'
           + '<button onclick="hkClose(\'' + p.id + '\')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f06060;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">Kết thúc</button></span>'
-        : '<button onclick="hkOpen(\'' + p.id + '\')" style="background:rgba(212,160,23,.12);border:1px solid rgba(212,160,23,.35);color:#e8c44a;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">Mở phiên họp</button>')
+        : '<button onclick="hkOpen(\'' + p.id + '\')" style="background:rgba(152,105,10,.12);border:1px solid rgba(152,105,10,.35);color:#b8860b;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">Mở phiên họp</button>')
       + '</div>';
   });
   pk.innerHTML = rows;
