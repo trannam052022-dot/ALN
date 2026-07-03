@@ -6403,10 +6403,11 @@ window.saveCompanySettings = async function() {
     var count = document.getElementById('mktDraftCount');
     if(list) list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--dim);font-family:var(--mono);font-size:12px">Đang tải...</div>';
     try {
-      var q = query(collection(db, 'marketingDrafts'), where('status', '==', 'draft'), orderBy('createdAt', 'desc'));
+      var q = query(collection(db, 'marketingDrafts'), where('status', '==', 'draft'));
       var snap = await getDocs(q);
       MD_ITEMS = [];
       snap.forEach(function(d){ var it = d.data(); it._id = d.id; MD_ITEMS.push(it); });
+      MD_ITEMS.sort(function(a,b){ return (b.createdAt&&b.createdAt.toMillis?b.createdAt.toMillis():0) - (a.createdAt&&a.createdAt.toMillis?a.createdAt.toMillis():0); });
       mdRender();
     } catch(e) {
       if(list) list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--red)">Lỗi tải bản nháp: '+(e.message||e)+'</div>';
