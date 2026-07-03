@@ -90,7 +90,7 @@ tr:hover td{background:var(--raised)}
   <div id="tableWrap"></div>
 
   <div class="foot">
-    <b>Cách dùng:</b> Thêm dự án → hệ thống tự sinh mã <b>ALN-YY-NNN</b>. Kéo-thả ảnh vào để lưu thumbnail xem trước (file gốc vẫn ở thư mục của anh, nên đặt tên theo mã).<br>
+    <b>Cách dùng:</b> Chọn Chủ thể (Chủ nhà / Doanh nghiệp) → hệ thống tự sinh mã <b>ALN-CN-XXXX</b> hoặc <b>ALN-DN-XXXX</b> (khớp đúng hệ thống ALN). Kéo-thả ảnh vào để lưu thumbnail xem trước (file gốc vẫn ở thư mục của anh, nên đặt tên theo mã).<br>
     <b>Sao lưu:</b> Bấm "Xuất file" định kỳ để giữ 1 bản .json — dữ liệu chỉ nằm trong trình duyệt này, xóa cache là mất.<br>
     <b>Đưa lên hệ thống:</b> File .json xuất ra đúng định dạng để sau nạp lên Founder Panel / Kho kinh tế (đánh dấu mục đích = "Kho kinh tế" cho dự án muốn công khai).
   </div>
@@ -100,8 +100,8 @@ tr:hover td{background:var(--raised)}
   <div class="modal">
     <h2 id="mTitle">Thêm dự án</h2>
     <div class="grid2">
-      <div class="fld"><label>Mã dự án</label><input id="mCode" placeholder="ALN-26-001"></div>
-      <div class="fld"><label>Ngày nhận</label><input id="mDate" type="date"></div>
+      <div class="fld"><label>Chủ thể</label><select id="mChuThe" onchange="onChuTheChange()"><option value="CN">Chủ nhà (CN)</option><option value="DN">Doanh nghiệp (DN)</option></select></div>
+      <div class="fld"><label>Mã dự án</label><input id="mCode" placeholder="ALN-CN-0001"></div>
     </div>
     <div class="fld"><label>Tên dự án</label><input id="mName" placeholder="Biệt thự Tân Cổ Điển – A.Nhân, Q10"></div>
     <div class="grid2">
@@ -114,8 +114,9 @@ tr:hover td{background:var(--raised)}
     </div>
     <div class="grid2">
       <div class="fld"><label>KTS phụ trách</label><input id="mKts" placeholder="Tên KTS"></div>
-      <div class="fld"><label>Mục đích</label><select id="mMuc"><option value="nb">Nội bộ</option><option value="pf">Portfolio</option><option value="kt">Kho kinh tế (công khai)</option></select></div>
+      <div class="fld"><label>Ngày nhận</label><input id="mDate" type="date"></div>
     </div>
+    <div class="fld"><label>Mục đích</label><select id="mMuc"><option value="nb">Nội bộ</option><option value="pf">Portfolio</option><option value="kt">Kho kinh tế (công khai)</option></select></div>
     <div class="fld"><label>Ghi chú</label><textarea id="mNote" rows="2" placeholder="Diện tích, số tầng, ghi chú khác..."></textarea></div>
     <div class="fld">
       <label>Ảnh (kéo-thả hoặc bấm chọn)</label>
@@ -143,14 +144,18 @@ function save(){ localStorage.setItem(KEY, JSON.stringify(DB)); }
 
 var MUC={ kt:['Kho kinh tế','p-kt'], pf:['Portfolio','p-pf'], nb:['Nội bộ','p-nb'] };
 
-function nextCode(){
-  var yy=String(new Date().getFullYear()).slice(2);
-  var max=0;
+function nextCode(prefix){
+  prefix=(prefix==='DN')?'DN':'CN';
+  var max=0, re=new RegExp('^ALN-'+prefix+'-(\\d{4})$');
   DB.forEach(function(p){
-    var m=/^ALN-(\d{2})-(\d{3,})$/.exec(p.code||'');
-    if(m && m[1]===yy){ var n=parseInt(m[2],10); if(n>max)max=n; }
+    var m=re.exec(p.code||'');
+    if(m){ var n=parseInt(m[1],10); if(n>max)max=n; }
   });
-  return 'ALN-'+yy+'-'+String(max+1).padStart(3,'0');
+  return 'ALN-'+prefix+'-'+String(max+1).padStart(4,'0');
+}
+function onChuTheChange(){
+  if(editId) return;
+  document.getElementById('mCode').value=nextCode(document.getElementById('mChuThe').value);
 }
 
 function resizeThumb(file, cb){
@@ -184,7 +189,8 @@ drop.addEventListener('drop',function(ev){ if(ev.dataTransfer && ev.dataTransfer
 function openAdd(){
   editId=null; draftImgs=[];
   document.getElementById('mTitle').textContent='Thêm dự án';
-  document.getElementById('mCode').value=nextCode();
+  document.getElementById('mChuThe').value='CN';
+  document.getElementById('mCode').value=nextCode('CN');
   document.getElementById('mDate').value=new Date().toISOString().slice(0,10);
   ['mName','mClient','mAddr','mStyle','mKts','mNote'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('mLoai').value='Nhà phố';
@@ -197,6 +203,7 @@ function openEdit(id){
   var p=DB.filter(function(x){return x.id===id;})[0]; if(!p) return;
   editId=id; draftImgs=(p.imgs||[]).slice();
   document.getElementById('mTitle').textContent='Sửa dự án';
+  document.getElementById('mChuThe').value=p.chuThe||(/^ALN-DN-/.test(p.code||'')?'DN':'CN');
   document.getElementById('mCode').value=p.code||'';
   document.getElementById('mDate').value=p.date||'';
   document.getElementById('mName').value=p.name||'';
@@ -217,10 +224,13 @@ function saveProject(){
   var code=document.getElementById('mCode').value.trim();
   var name=document.getElementById('mName').value.trim();
   if(!code){ alert('Nhập mã dự án'); return; }
+  if(!/^ALN-(CN|DN)-\d{4}$/.test(code)){ alert('Mã phải đúng định dạng hệ thống: ALN-CN-XXXX (chủ nhà) hoặc ALN-DN-XXXX (doanh nghiệp), 4 chữ số.'); return; }
   if(!name){ alert('Nhập tên dự án'); return; }
+  if(DB.some(function(x){ return x.code===code && x.id!==editId; })){ alert('Mã ' + code + ' đã tồn tại trong kho.'); return; }
   var rec={
     id: editId || ('p'+Date.now()+Math.random().toString(36).slice(2,6)),
     code:code, name:name,
+    chuThe:document.getElementById('mChuThe').value,
     client:document.getElementById('mClient').value.trim(),
     addr:document.getElementById('mAddr').value.trim(),
     loai:document.getElementById('mLoai').value,
