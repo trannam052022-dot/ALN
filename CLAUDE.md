@@ -83,7 +83,22 @@ Khi CN duyệt proposal: `projects/{pid}.stage` tự advance C1→C2→C3→C4, 
 | `onStageAdvanced` | `projects/{pid}` onUpdate (stage thay đổi) | Push cho KTS |
 | `onDocUploaded` | `projects/{pid}/documents/{id}` onCreate (uploader.role=kts) | Push cho CN + DN |
 
-Deploy: `firebase deploy --only functions`
+**Cron định kỳ (pubsub.schedule, giờ VN):**
+
+| Function | Lịch | Tác dụng |
+|----------|------|---------|
+| `dailyDigest` | 08:00 | Tổng hợp cho Founder: lead mới/quá hạn + đơn KTS/DN/Designer chờ duyệt |
+| `reservationLifecycle` | 09:00 | Giữ chỗ ≤48h chưa nộp → nhắc (tối đa 3 lần); quá 3 ngày → `expired` + báo Founder |
+| `projectSlaNudge` | 09:10 | Dự án/designProjects đứng bánh >5 ngày (`SLA_STALL_DAYS`, theo `updatedAt`) → cờ `sla_warn` + nhắc KTS/Designer + báo Founder; tự gỡ cờ khi chạy lại |
+| `weeklyMarketingDrafts` | Thứ 2 07:00 | AI soạn bài Marketing tuần |
+| `scanC2Suspicion` | mỗi 12h | Quét dấu hiệu "đi đêm" ở chặng C2 |
+| `clearExpiredTemporaryLocations` | mỗi 6h | Dọn vị trí chia sẻ tạm hết hạn |
+| `scheduledFirestoreBackup` | CN 03:00 | Sao lưu toàn bộ Firestore ra Storage |
+
+> Bảng trên là các hàm đáng chú ý; còn nhiều `onCall`/trigger khác (MyMy chatbot, matchKts, createProjectForDN, onPaymentConfirmed…) — xem `functions/index.js` để đủ.
+
+Deploy tất cả: `firebase deploy --only functions`
+Deploy riêng: `firebase deploy --only "functions:tenHam1,functions:tenHam2" --project aln-platform` (cần `npm install` trong `functions/` trước nếu là worktree mới)
 
 ## Design System (QUAN TRỌNG — đọc trước khi thêm CSS)
 
