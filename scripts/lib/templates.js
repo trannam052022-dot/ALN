@@ -238,7 +238,7 @@ function renderArticlePage(article, contentHtml, allArticles, siteBase) {
     '@type': 'Article',
     headline: article.title,
     description: article.description,
-    image: article.image ? siteBase + '/' + article.image : undefined,
+    image: article.image ? siteBase + article.image : undefined,
     datePublished: article.date,
     dateModified: article.updated || article.date,
     author: { '@type': 'Organization', name: article.author || 'Đội ngũ KTS App Làm Nhà' },
@@ -255,14 +255,14 @@ function renderArticlePage(article, contentHtml, allArticles, siteBase) {
     description: article.description,
     canonical: canonical,
     ogType: 'article',
-    ogImage: article.image ? siteBase + '/' + article.image : undefined,
+    ogImage: article.image ? siteBase + article.image : undefined,
     jsonLd: jsonLd,
     root: paths.root,
     cn: paths.cn,
   });
 
   var heroImg = article.image
-    ? '<img src="' + paths.root + article.image + '" alt="' + (article.imageAlt || article.title) + '">'
+    ? '<img src="' + article.image + '" alt="' + (article.imageAlt || article.title) + '">'
     : 'Ảnh minh hoạ 16:9 — chờ Founder cung cấp ảnh thật';
 
   var summaryItems = (article.summary || []).map(function (s) { return '        <li>' + s + '</li>'; }).join('\n');

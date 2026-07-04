@@ -155,8 +155,12 @@ img{max-width:100%;display:block}
 
 /* CTA giữa bài — nền navy #0e1424, chữ trắng (đã có sẵn trong home.html hero-slider) */
 .cn-cta-mid{background:var(--navy);border-radius:var(--r);padding:30px 32px;margin:40px 0;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;box-shadow:var(--shadow-md)}
-.cn-cta-mid p{color:var(--on-navy);font-family:var(--syne);font-weight:700;font-size:var(--text-md);line-height:1.4;margin:0;max-width:420px}
+.cn-cta-mid p{color:var(--on-navy);font-family:var(--syne);font-weight:700;font-size:var(--text-md);line-height:1.4;margin:0;flex:1;max-width:560px}
+.cn-cta-mid a{color:var(--on-navy);font-weight:800;text-decoration:underline;text-decoration-color:var(--gold);text-underline-offset:3px}
 @media(max-width:560px){.cn-cta-mid{flex-direction:column;align-items:flex-start;text-align:left}}
+
+/* Trích dẫn thường trong bài (blockquote không phải hộp tóm tắt/CTA) */
+.cn-prose blockquote{border-left:3px solid var(--border2);margin:24px 0;padding:4px 20px;font-style:italic;color:var(--text2)}
 
 /* CTA cuối bài — khối lớn nền navy, nút gold */
 .cn-cta-end{background:var(--navy);border-radius:24px;padding:56px 40px;text-align:center;margin:56px 0 20px;position:relative;overflow:hidden}

@@ -215,3 +215,71 @@ Dùng Chromium headless (đã cài sẵn, chạy qua `NODE_PATH=/opt/node22/lib/
 ### Việc tiếp theo
 
 → Pass 5: đăng 5 bài Đợt 1 (nội dung do Founder cung cấp) — mỗi bài thêm 1 file `content/cam-nang/{slug}.md`, chạy `node scripts/build-cam-nang.js`, khối 3 bài mới nhất trên `home.html` và trang danh mục tự cập nhật theo cơ chế đã dựng ở Pass 3-4. Cần Founder cung cấp ảnh đại diện 16:9 cho từng bài (chưa có thì vẫn hiện placeholder, không chặn).
+
+---
+
+## Pass 5 — Đăng 5 bài Đợt 1 (2026-07-04)
+
+**Trạng thái:** Xong, chưa deploy. Chờ Founder duyệt lần cuối.
+
+### File nhận từ Founder
+
+5 bài `.md` + 5 ảnh `.jpg` (gửi qua đính kèm chat dạng zip, không phải đặt vào thư mục gốc máy Founder — máy Founder và môi trường Claude Code chạy tách biệt, phải đính kèm qua khung chat hoặc push git). Đã dọn vào:
+- `content/cam-nang/chi-phi-thiet-ke-biet-thu.md`, `chi-phi-thiet-ke-nha-pho.md` (ghi đè bản mẫu Pass 3), `gia-thiet-ke-noi-that.md`, `phi-thiet-ke-chiem-bao-nhieu-phan-tram.md`, `xay-nha-2026-het-bao-nhieu-tien.md`
+- `images/cam-nang/chi-phi-thiet-ke-biet-thu.jpg`, `chi-phi-thiet-ke-nha-pho.jpg`, `gia-thiet-ke-noi-that.jpg`, `phi-thiet-ke-phan-tram.jpg`, `xay-nha-het-bao-nhieu-tien.jpg`
+
+Đối chiếu tên ảnh với trường `image:` trong từng frontmatter: **khớp 100%, không phải sửa file nào** — kể cả bài `xay-nha-2026-het-bao-nhieu-tien.md` mà Founder lưu ý riêng (frontmatter đã tự đúng `xay-nha-het-bao-nhieu-tien.jpg` dù tên file `.md` dài hơn tên ảnh).
+
+**Sửa 1 chỗ:** `description` của bài "Phí thiết kế chiếm bao nhiêu %..." dài 157 ký tự (vượt giới hạn 155 trong brief) — rút gọn còn 154 ký tự (bỏ chữ "cả" thừa), giữ nguyên nghĩa.
+
+### Nội dung Founder viết khác cấu trúc giả định ở Pass 3 — đã nâng cấp build script để xử lý đúng
+
+Bài Founder viết không dùng frontmatter `summary:`/marker `[[CTA_MID]]` như bài mẫu Pass 3, mà viết tự nhiên trong nội dung Markdown:
+- Mở đầu bằng `# Tiêu đề` (trùng title) rồi blockquote `> **Nội dung chính**` + `> - gạch đầu dòng` — script giờ **tự bỏ H1 trùng lặp** (template đã tự in H1 riêng) và **tự trích blockquote này thành hộp tóm tắt** (không cần frontmatter `summary` nữa, nhưng vẫn giữ tương thích ngược nếu bài nào có).
+- CTA giữa bài viết tự nhiên thành 1 câu có link `**[Chat miễn phí với MyMy →](/home.html?mymy=1)**`, không dùng marker `[[CTA_MID]]` — script giờ **tự nhận diện blockquote có chữ "mymy"** và bọc thành khối `.cn-cta-mid` nền navy, giữ nguyên câu chữ gốc của Founder (không ép về câu mẫu cứng), chỉ tô đậm + gạch chân vàng cho phần link để nổi bật trên nền tối.
+- Cuối bài có `<!-- CTA_BLOCK: [Nhận báo giá ngay] [Chat với MyMy] -->` — đây chỉ là ghi chú của người viết, CTA cuối bài đã tự render cố định (đúng 2 nút này) từ Pass 2 nên script **lặng lẽ bỏ dòng comment này**, không in ra HTML.
+- Nhiều đoạn có **H3/nhãn in đậm dính liền đoạn văn hoặc danh sách theo sau, không cách dòng trống** (ví dụ `### Hồ sơ kết cấu\nBản vẽ...` hoặc `**Nhà phố 5×20m:**\n- Diện tích...`) — parser Pass 3 xử lý theo khối cách nhau bằng dòng trống nên các trường hợp này bị lọt sai định dạng (in ra chữ `###`/`**` thô ngoài giao diện) khi build thử lần đầu. Đã viết lại `renderBlock()` trong `scripts/lib/markdown.js` theo hướng đệ quy: tách dòng tiêu đề/nhãn đầu tiên ra xử lý riêng, phần còn lại tiếp tục được nhận diện đúng loại (đoạn văn/danh sách) — đã build lại và rà soát bằng `grep` toàn bộ 5 bài, không còn cú pháp Markdown nào lọt ra HTML.
+- Thêm hỗ trợ `*nghiêng*` (in nghiêng) và `---`/`***` (gạch ngang `<hr>`) — 2 cú pháp Founder dùng mà Pass 3 chưa hỗ trợ.
+- Câu hỏi FAQ dạng `**Câu hỏi?**\nCâu trả lời` (không cách dòng trống) — tách thành 2 đoạn `<p>` riêng thay vì gộp chung một dòng.
+
+### Sửa lỗi đường dẫn ảnh (phát hiện khi lắp ảnh thật đầu tiên)
+
+Frontmatter `image:` dùng đường dẫn tuyệt đối từ gốc site (`/images/cam-nang/xxx.jpg`), nhưng `templates.js` (Pass 3) lại nối thêm `paths.root` (`../../`) phía trước — chỉ không lộ ra ở Pass 3 vì bài mẫu khi đó chưa có ảnh thật (luôn hiện placeholder). Với ảnh thật lần này, lỗi sẽ tạo đường dẫn hỏng (`../.././images/...`) và ảnh Open Graph bị lặp dấu `/`. Đã sửa 2 chỗ trong `renderArticlePage()`: ảnh đại diện dùng thẳng `article.image` (không cộng `paths.root`), OG/JSON-LD dùng `siteBase + article.image` (bỏ dấu `/` thừa).
+
+### Kết quả build
+
+```
+node scripts/build-cam-nang.js
+Cẩm nang build xong — 5 bài.
+  Bài viết đổi: 5
+  Trang danh mục đổi: có
+  home.html (khối 3 bài mới nhất) đổi: có
+  sitemap.xml đổi: có
+  robots.txt đổi: không
+
+(chạy lại lần 2 — idempotent)
+  Bài viết đổi: 0 | Trang danh mục đổi: không | home.html đổi: không | sitemap.xml đổi: không | robots.txt đổi: không
+```
+
+- `cam-nang/index.html`: hiện đủ 5 thẻ bài, ảnh thật, tag "Chi phí & Báo giá".
+- `home.html` (khối `CAM_NANG_CARDS_START/END`): tự cập nhật 3 bài (không cần sửa tay).
+- `sitemap.xml`: có đủ 5 URL bài viết + `<lastmod>2026-07-06</lastmod>` lấy từ frontmatter `updated`.
+- **"3 bài liên quan"**: hết placeholder "Sắp ra mắt" — mỗi bài giờ hiện 3 bài thật cùng chuyên mục "Chi phí & Báo giá" (5 bài, mỗi bài có đúng 4 bài khác cùng mục nên luôn đủ 3, không cần rơi về `relatedUpcoming`), link nội bộ trỏ đúng thư mục bài (`../{slug}/`).
+- **Marker `<!-- CTA_BLOCK -->`**: xác nhận không xuất hiện trong HTML sinh ra; CTA cuối bài hiện đúng 2 nút "Nhận báo giá ngay" (gold) + "Chat với MyMy" (outline trên nền navy).
+
+### Kiểm tra hiển thị
+
+Chromium headless, cả 5 bài + trang danh mục + khối trên `home.html`, desktop (1440px) và mobile (390px):
+- Trang danh mục: lưới 5 thẻ ảnh thật, đúng bo góc/tag gold, responsive 3→1 cột.
+- Bài viết: bảng giá scroll gọn trong khung riêng ở mobile, không vỡ layout; khối CTA giữa bài (navy, chữ trắng, link gạch chân vàng) hiển thị đúng; FAQ tách rõ câu hỏi/câu trả lời; "Bài liên quan" đủ 3 thẻ thật, không còn "Sắp ra mắt".
+- `home.html`: khối Cẩm nang hiện 3 thẻ ảnh thật ở desktop; mobile đúng "1 thẻ/màn hình" (thẻ đầu chiếm trọn viewport, 2 thẻ còn lại trượt ngang qua scroll-snap).
+- `grep` toàn bộ `cam-nang/*/index.html`: không còn `##`, `**`, `- ` thô lọt ra ngoài thẻ HTML; đủ `</head></body></html>` ở mọi file.
+
+### Việc còn thiếu (không chặn, Founder xử lý sau)
+
+- Google Search Console + gửi sitemap — việc thủ công của Founder sau khi deploy (đã ghi ở mục 9 brief gốc).
+- Chia sẻ bài lên Facebook/LinkedIn sau khi đăng — việc thủ công của Founder.
+
+### Việc tiếp theo
+
+→ Chờ Founder duyệt lần cuối. Sau khi duyệt: Founder xác nhận lệnh deploy (`git push` đã có sẵn trên nhánh, GitHub Pages tự build lại theo cấu hình hiện tại — không cần thao tác gì thêm ngoài merge/deploy nhánh).

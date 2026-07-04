@@ -57,7 +57,12 @@ function readArticles() {
     if (!templates.CATEGORIES[data.category]) {
       throw new Error(file + ': category "' + data.category + '" không hợp lệ. Hợp lệ: ' + Object.keys(templates.CATEGORIES).join(', '));
     }
-    data.bodyHtml = markdown.renderMarkdown(parsed.body, data);
+    var rendered = markdown.renderMarkdown(parsed.body, data);
+    data.bodyHtml = rendered.html;
+    // Ưu tiên hộp tóm tắt trích từ blockquote "> **Nội dung chính**" trong
+    // nội dung bài; fallback về frontmatter "summary" nếu bài không có (ví dụ
+    // bài mẫu Pass 3 cũ dùng frontmatter thay vì blockquote).
+    if (rendered.summary) data.summary = rendered.summary;
     data.sourceFile = file;
     return data;
   });
