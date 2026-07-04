@@ -114,6 +114,26 @@ function writeFileIfChanged(filePath, content) {
   return false;
 }
 
+// Gỡ bài: xoá thư mục cam-nang/{slug}/ của những bài KHÔNG còn nằm trong danh
+// sách xuất bản hiện tại — ví dụ publishDate bị đẩy về tương lai (ẩn lại 1
+// bài đang live), hoặc file .md nguồn bị xoá hẳn. Không đụng cam-nang/index.html
+// hay cam-nang/cam-nang.css (đều là file, không phải thư mục, nên bỏ qua tự
+// nhiên nhờ kiểm tra isDirectory()).
+function cleanupOrphanedArticles(articles) {
+  if (!fs.existsSync(OUT_DIR)) return 0;
+  var validSlugs = {};
+  articles.forEach(function (a) { validSlugs[a.slug] = true; });
+
+  var removed = 0;
+  fs.readdirSync(OUT_DIR, { withFileTypes: true }).forEach(function (entry) {
+    if (!entry.isDirectory() || validSlugs[entry.name]) return;
+    fs.rmSync(path.join(OUT_DIR, entry.name), { recursive: true, force: true });
+    console.log('Đã gỡ bài (không còn xuất bản): ' + entry.name);
+    removed++;
+  });
+  return removed;
+}
+
 function buildArticles(articles) {
   var changed = 0;
   articles.forEach(function (article) {
@@ -208,6 +228,7 @@ function buildHomeSection(articles) {
 
 function main() {
   var articles = readArticles();
+  var removedCount = cleanupOrphanedArticles(articles);
   var articlesChanged = buildArticles(articles);
   var indexChanged = buildIndex(articles);
   var sitemapChanged = buildSitemap(articles);
@@ -216,6 +237,7 @@ function main() {
 
   console.log('Cẩm nang build xong — ' + articles.length + ' bài.');
   console.log('  Bài viết đổi: ' + articlesChanged);
+  console.log('  Bài gỡ (không còn xuất bản): ' + removedCount);
   console.log('  Trang danh mục đổi: ' + (indexChanged ? 'có' : 'không'));
   console.log('  home.html (khối 3 bài mới nhất) đổi: ' + (homeChanged ? 'có' : 'không'));
   console.log('  sitemap.xml đổi: ' + (sitemapChanged ? 'có' : 'không'));

@@ -53,13 +53,15 @@ Repo GitHub public — file `.md` của bài hẹn ngày vẫn đọc được q
 - Xoá bài test, build lại 2 lần → về đúng trạng thái 5 bài ban đầu, idempotent (lần 2 không đổi gì).
 - 5 bài Đợt 1 hiện tại không có `publishDate` → không bị ảnh hưởng, vẫn xuất bản như cũ (đã xác nhận qua diff rỗng).
 
-### Việc còn thiếu (không chặn, ghi nhận để biết)
+### Bổ sung — cơ chế tự gỡ bài (unpublish)
 
-- Chưa có cơ chế "gỡ bài" tự động: nếu sau này đổi `publishDate` của 1 bài đang live sang tương lai (để ẩn lại), file HTML cũ đã sinh ra trước đó sẽ không tự bị xoá (script chỉ ghi thêm/ghi đè, không xoá file). Ngoài phạm vi yêu cầu hiện tại (chỉ cần hẹn ngày *tới*, chưa cần "gỡ bài"), nêu ra để Founder biết nếu sau này cần.
+Đã hoàn thiện nốt hạn chế nêu trên: thêm `cleanupOrphanedArticles()` trong `build-cam-nang.js`, chạy đầu `main()` trước khi build. So khớp danh sách thư mục con trong `cam-nang/` với danh sách bài đang được xuất bản (đã lọc `publishDate`) — thư mục nào không còn trong danh sách (vì `publishDate` bị đẩy về tương lai, hoặc file `.md` nguồn bị xoá hẳn) sẽ bị **xoá thật** (`fs.rmSync recursive`), không chỉ để mặc kệ như trước. Chỉ xoá thư mục con (an toàn với `cam-nang/index.html` và `cam-nang/cam-nang.css` vì đó là file, không phải thư mục).
+
+Đã kiểm tra đủ vòng đời: tạo bài test không `publishDate` → build → có mặt; thêm `publishDate` tương lai → build lại → thư mục bị xoá thật (`ls` báo "No such file or directory"), log đúng "Đã gỡ bài (không còn xuất bản): test-go-bai"; xoá file test → build lại 2 lần → về đúng 5 bài ban đầu, idempotent.
 
 ### Việc tiếp theo
 
-→ Không có việc chờ — tính năng đã sẵn sàng dùng, chỉ cần thêm `publishDate` khi muốn hẹn ngày cho bài mới. Founder nhớ bật "Read and write permissions" cho Actions (mục trên) để workflow hoạt động.
+→ Không có việc chờ — tính năng hẹn ngày đăng + tự gỡ bài đã hoàn thiện đầy đủ cả 2 chiều (xuất bản & thu hồi). Founder nhớ bật "Read and write permissions" cho Actions (mục trên) để workflow hoạt động.
 
 ---
 
