@@ -134,6 +134,16 @@ img{max-width:100%;display:block}
 .cn-summary li{position:relative;padding-left:20px;font-size:var(--text-base);color:var(--text2);line-height:1.6}
 .cn-summary li::before{content:'';position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--gold)}
 
+/* Khối thế mạnh ALN (chỉ trang khu vực) — dẫn bằng điều làm được ngay */
+.cn-aln-strengths{border:1px solid var(--border);border-radius:var(--r-sm);background:linear-gradient(180deg,var(--gold-bg),transparent);padding:24px 26px;margin-bottom:34px}
+.cn-aln-strengths>h2{font-family:var(--syne);font-weight:700;font-size:var(--text-lg);color:var(--gold);margin-bottom:18px}
+.cn-str-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.cn-str-item i{font-size:28px;color:var(--gold)}
+.cn-str-item h3{font-family:var(--syne);font-weight:700;font-size:var(--text-base);color:var(--text);margin:8px 0 5px}
+.cn-str-item p{font-size:var(--text-sm);color:var(--text2);line-height:1.55;margin:0}
+.cn-str-bridge{margin:18px 0 0;font-size:var(--text-sm);font-style:italic;color:var(--sub)}
+@media(max-width:720px){.cn-str-grid{grid-template-columns:1fr;gap:14px}}
+
 /* Nội dung bài */
 .cn-prose{font-size:var(--text-base);color:var(--text2);line-height:1.8}
 .cn-prose h2{font-family:var(--syne);font-weight:700;font-size:var(--text-xl);color:var(--text);margin:44px 0 16px;line-height:1.3}

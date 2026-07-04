@@ -268,6 +268,19 @@ function renderArticlePage(article, contentHtml, allArticles, siteBase) {
 
   var summaryItems = (article.summary || []).map(function (s) { return '        <li>' + s + '</li>'; }).join('\n');
 
+  // Khối thế mạnh ALN — dẫn bằng điều làm được NGAY (chỉ trang khu vực),
+  // rồi mới tới thông tin xây dựng địa phương (tham khảo). Tránh "hứa" thi công.
+  var strengthsBlock = article.category !== 'khu-vuc' ? '' :
+    '    <div class="cn-aln-strengths">\n' +
+    '      <h2>App Làm Nhà đồng hành cùng bạn — làm được ngay hôm nay</h2>\n' +
+    '      <div class="cn-str-grid">\n' +
+    '        <div class="cn-str-item"><i class="ph-duotone ph-users-three"></i><h3>Mạng lưới kiến trúc sư thẩm định</h3><p>Kết nối bạn với KTS được thẩm định, hợp gu và ngân sách — luôn đứng về phía chủ nhà, từ bản vẽ đến giám sát.</p></div>\n' +
+    '        <div class="cn-str-item"><i class="ph-duotone ph-video-camera"></i><h3>Phòng Hội Kiến — làm việc mọi nơi</h3><p>Họp trực tuyến với KTS ngay trên nền tảng, dù bạn ở tỉnh nào hay đang ở nước ngoài. Xem bản vẽ, chốt phương án không cần đi lại.</p></div>\n' +
+    '        <div class="cn-str-item"><i class="ph-duotone ph-steps"></i><h3>Thanh toán theo từng chặng</h3><p>Trả theo tiến độ minh bạch C1–C4 — làm tới đâu trả tới đó, an tâm không ứng trước rủi ro.</p></div>\n' +
+    '      </div>\n' +
+    '      <p class="cn-str-bridge">Dưới đây là thông tin xây dựng tại địa phương, để bạn tham khảo khi lên kế hoạch:</p>\n' +
+    '    </div>\n\n';
+
   var body =
     header(paths) + '\n\n' +
     '<main>\n' +
@@ -291,6 +304,7 @@ function renderArticlePage(article, contentHtml, allArticles, siteBase) {
     '      <div class="cn-hero-img">' + heroImg + '</div>\n' +
     (article.imageCaption ? '      <p class="cn-caption">' + article.imageCaption + '</p>\n' : '') +
     '    </figure>\n\n' +
+    strengthsBlock +
     (summaryItems ?
       '    <div class="cn-summary">\n' +
       '      <h2>Nội dung chính</h2>\n' +
