@@ -2059,6 +2059,16 @@ document.addEventListener('DOMContentLoaded', function() {
     <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;display:flex;flex-direction:column">
       <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Kết quả AI</div>
       <div id="mktOutput" style="flex:1;background:var(--raised);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:13px;line-height:1.75;color:var(--text2);white-space:pre-wrap;min-height:220px">Nội dung sẽ hiện ở đây sau khi bấm "Tạo nội dung với AI"...</div>
+      <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
+        <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:7px"><i class="ph-duotone ph-image"></i> Ảnh kèm bài (không bắt buộc)</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input id="mktImgUrl" type="text" oninput="mktImgPreview()" placeholder="Dán link ảnh (https://…)" style="flex:1;min-width:180px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:12px;font-family:var(--sans)">
+          <button type="button" onclick="document.getElementById('mktImgFile').click()" style="padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);white-space:nowrap"><i class="ph-duotone ph-upload-simple"></i> Tải ảnh từ máy</button>
+          <input id="mktImgFile" type="file" accept="image/*" onchange="mktImgUpload(this)" style="display:none">
+        </div>
+        <div id="mktImgHint" style="font-size:11px;color:var(--dim);margin-top:6px"></div>
+        <img id="mktImgPrev" src="" alt="" style="display:none;max-height:120px;border-radius:8px;margin-top:8px;border:1px solid var(--border)">
+      </div>
       <div style="display:flex;gap:8px;margin-top:12px">
         <button onclick="mktPostFb(event)" style="padding:8px 14px;border-radius:8px;border:none;background:#1877f2;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-facebook-logo"></i> Đăng lên Facebook</button>
         <button onclick="mktCopy()" style="padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-copy"></i> Copy</button>
@@ -6357,7 +6367,11 @@ window.saveCompanySettings = async function() {
   window.mktPostFb = async function(evt){
     var text = (document.getElementById('mktOutput').textContent || '').trim();
     if(!text || text.indexOf('Nội dung sẽ hiện') === 0){ alert('Chưa có nội dung để đăng.'); return; }
-    if(!confirm('Đăng nội dung này lên Trang Facebook "App Làm Nhà"?\n\nBài sẽ hiện CÔNG KHAI ngay. Đọc kỹ lại trước khi đăng.')) return;
+    var imgEl = document.getElementById('mktImgUrl');
+    var imgUrl = imgEl ? (imgEl.value || '').trim() : '';
+    if(imgUrl && !/^https:\/\//.test(imgUrl)){ alert('Link ảnh phải bắt đầu bằng https://'); return; }
+    var msg = 'Đăng nội dung này lên Trang Facebook "App Làm Nhà"?' + (imgUrl ? '\n\n(Có kèm ảnh)' : '') + '\n\nBài sẽ hiện CÔNG KHAI ngay. Đọc kỹ lại trước khi đăng.';
+    if(!confirm(msg)) return;
     var btn = evt && evt.currentTarget;
     var old = btn ? btn.innerHTML : '';
     if(btn){ btn.disabled = true; btn.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin"></i> Đang đăng...'; }
@@ -6365,13 +6379,48 @@ window.saveCompanySettings = async function() {
       var mod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
       var fns = mod.getFunctions(app, 'asia-southeast1');
       var postFn = mod.httpsCallable(fns, 'postToFacebook');
-      var res = await postFn({ message: text });
-      if(res.data && res.data.ok){ alert('✓ Đã đăng lên Trang App Làm Nhà!'); }
+      var res = await postFn({ message: text, imageUrl: imgUrl || undefined });
+      if(res.data && res.data.ok){
+        alert('✓ Đã đăng lên Trang App Làm Nhà!');
+        if(imgEl){ imgEl.value=''; mktImgPreview(); }
+      }
       else throw new Error('Không đăng được');
     } catch(e) {
       alert('❌ Lỗi đăng: ' + (e.message || e.code || e));
     } finally {
       if(btn){ btn.disabled = false; btn.innerHTML = old; }
+    }
+  };
+
+  // Xem trước ảnh khi dán link
+  window.mktImgPreview = function(){
+    var url = (document.getElementById('mktImgUrl').value || '').trim();
+    var prev = document.getElementById('mktImgPrev');
+    if(url && /^https:\/\//.test(url)){ prev.src = url; prev.style.display = 'block'; }
+    else { prev.src = ''; prev.style.display = 'none'; }
+  };
+
+  // Tải ảnh từ máy → Firebase Storage → điền link
+  window.mktImgUpload = async function(input){
+    var file = input && input.files && input.files[0];
+    if(!file) return;
+    if(!/^image\//.test(file.type)){ alert('Vui lòng chọn tệp ảnh.'); input.value=''; return; }
+    if(file.size > 8*1024*1024){ alert('Ảnh quá lớn (>8MB). Chọn ảnh nhỏ hơn.'); input.value=''; return; }
+    var hint = document.getElementById('mktImgHint');
+    if(hint){ hint.textContent = 'Đang tải ảnh lên...'; hint.style.color = 'var(--sub)'; }
+    try {
+      var ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      var path = 'mau/marketing/' + Date.now() + '_' + Math.random().toString(36).slice(2,7) + '.' + ext;
+      var r = storageRef(storage, path);
+      await uploadBytes(r, file);
+      var url = await getDownloadURL(r);
+      document.getElementById('mktImgUrl').value = url;
+      mktImgPreview();
+      if(hint){ hint.textContent = '✓ Đã tải ảnh lên. Sẵn sàng đăng.'; hint.style.color = 'var(--c-green, #16a34a)'; }
+    } catch(e) {
+      if(hint){ hint.textContent = '❌ Lỗi tải ảnh: ' + (e.message || e); hint.style.color = 'var(--red)'; }
+    } finally {
+      input.value = '';
     }
   };
 

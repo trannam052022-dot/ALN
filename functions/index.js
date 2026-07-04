@@ -446,16 +446,22 @@ exports.postToFacebook = onCall(
     if (!request.auth || request.auth.uid !== FOUNDER_UID) {
       throw new HttpsError("permission-denied", "Chỉ Founder mới đăng bài được");
     }
-    const { message, draftId } = request.data || {};
+    const { message, draftId, imageUrl } = request.data || {};
     if (!message || typeof message !== "string" || !message.trim()) {
       throw new HttpsError("invalid-argument", "Thiếu nội dung bài");
     }
+    const hasImg = imageUrl && typeof imageUrl === "string" && /^https:\/\//.test(imageUrl.trim());
     const token = FB_PAGE_TOKEN.value();
     try {
-      const resp = await fetch(`https://graph.facebook.com/v21.0/${FB_PAGE_ID}/feed`, {
+      // Có ảnh → đăng lên /photos (caption = nội dung); không ảnh → /feed
+      const endpoint = hasImg ? "photos" : "feed";
+      const payload = hasImg
+        ? { url: imageUrl.trim(), caption: message.trim(), access_token: token }
+        : { message: message.trim(), access_token: token };
+      const resp = await fetch(`https://graph.facebook.com/v21.0/${FB_PAGE_ID}/${endpoint}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ message: message.trim(), access_token: token }),
+        body: JSON.stringify(payload),
       });
       const data = await resp.json();
       if (!resp.ok || data.error) {
