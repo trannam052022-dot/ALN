@@ -1,6 +1,14 @@
 # CHANGES.md — Khu "Cẩm nang làm nhà"
 
 > Theo dõi tiến độ triển khai `applamnha.vn/cam-nang/` theo brief `CAM_NANG_ALN.md`.
+
+---
+
+## ĐÃ DEPLOY (2026-07-04)
+
+Founder duyệt lần cuối → merge nhánh `claude/cam-nang-aln-pass-1-kyj5ik` vào `main` (commit `c58e6ec`), push lên GitHub. Không có xung đột (main chỉ đổi các trang app nội bộ không liên quan — `client_CN/DN`, `designer_dashboard`, `founder_panel`, `kts_dashboard`, `functions/index.js`). Đã build lại + kiểm tra idempotent trên `main` trước khi push. GitHub Pages tự build lại theo cấu hình hiện tại (~1-2 phút).
+
+Việc thủ công còn lại của Founder (mục 9 brief gốc): đăng ký Google Search Console + gửi sitemap, chia sẻ 5 bài lên Facebook/LinkedIn.
 > Quy trình: mỗi Pass ghi lại đây sau khi hoàn tất, commit riêng.
 
 ---
