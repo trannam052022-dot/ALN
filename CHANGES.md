@@ -75,6 +75,16 @@ Build lại và xác nhận: cả 5 bài đều **chưa hiện** ngày 04/07 (lo
 
 **Lưu ý:** trong lúc làm, một phiên khác đã push thêm khu vực nội dung mới "Xây nhà theo khu vực" (24 tỉnh/thành, category `khu-vuc` mới trong `templates.js`) + tái cấu trúc vài file gốc vào `_archive/`. Đã merge sạch, không xung đột — build lại xác nhận cả 24 bài khu vực + 5 bài Đợt 1 vẫn đúng (29 bài xuất bản), 5 bài Đợt 2 vẫn đúng trạng thái ẩn.
 
+### Khu vực (24 bài) — đưa lý do chọn KTS khu vực lên đầu bài (2026-07-04)
+
+Founder yêu cầu xem cấu trúc trang khu vực rồi đề xuất đưa nội dung "Thiết kế kiến trúc / Mạng lưới KTS" lên đầu bài (dẫn chứng bằng URL `xay-nha-tron-goi-an-giang`). Khảo sát cho thấy mục **"Vì sao nên có kiến trúc sư khu vực đồng hành"** đang nằm gần cuối bài (ngay trước FAQ), sau các phần chi phí/nền đất/giấy phép mang tính chung chung — trong khi đây mới là điểm khác biệt cốt lõi của ALN so với đối thủ.
+
+Viết 1 script một lần (`reorder-differentiator.js`, không thêm vào build pipeline thường trực — chạy 1 lần rồi bỏ) di chuyển mục này lên ngay sau đoạn mở đầu, trước bảng chi phí, áp dụng đồng loạt cho cả 24 bài (cùng heading `## Vì sao nên có kiến trúc sư khu vực đồng hành` ở mọi file nên tự động hoá an toàn). Đã kiểm tra bằng diff theo dòng (sort) xác nhận không mất/đổi nội dung, chỉ đảo vị trí.
+
+**Phát hiện khi xem lại:** một phiên khác vừa thêm khối template `cn-aln-strengths` (lưới 3 ô: Mạng lưới KTS thẩm định / Phòng Hội Kiến / Thanh toán theo chặng) ngay đầu mọi bài `khu-vuc` — cùng mục đích "dẫn bằng thế mạnh ALN". Sau khi tôi chuyển mục "Vì sao..." lên, 2 khối này nằm sát nhau và lặp gần như y hệt ý ("mạng lưới KTS thẩm định", "giám sát", "đứng về phía chủ nhà"). Đã báo Founder, được chọn hướng **giữ vị trí mới nhưng viết lại câu 2** — script thứ 2 (`rewrite-second-para.js`) thay đoạn pitch chung chung bằng câu nhấn vào "am hiểu địa phương giúp phương án khớp thực tế ngay từ đầu, không dùng chung 1 bản vẽ mẫu" (kèm tên tỉnh, lấy tự động từ `title` frontmatter) — giữ nguyên câu 1 (lý do theo địa hình riêng từng tỉnh).
+
+Đã build lại + kiểm tra idempotent + chụp ảnh xác nhận không còn lặp ý. Không ảnh hưởng 5 bài Đợt 2 (vẫn đúng trạng thái ẩn) hay 5 bài Đợt 1.
+
 ---
 
 ## Pass 1 — Khảo sát codebase + xác nhận kiến trúc (2026-07-03)
