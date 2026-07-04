@@ -49,7 +49,7 @@ Giấy phép do **UBND thành phố Biên Hòa/Long Khánh hoặc UBND huyện**
 
 Kiến trúc sư ở Đông Nam Bộ, gần công trình sẽ khảo sát địa chất và hiện trạng, nắm quy hoạch từng khu, tránh phát sinh móng và sai lệch quy hoạch.
 
-Đây là mô hình App Làm Nhà: **mạng lưới kiến trúc sư được thẩm định theo khu vực**, đồng hành cùng bạn từ **thiết kế đến giám sát**; phần thi công kết nối qua **nhà thầu/đối tác xây dựng tại địa phương** — minh bạch theo tiến trình.
+App Làm Nhà là **mạng lưới kiến trúc sư được thẩm định theo khu vực** — KTS đồng hành cùng bạn **xuyên suốt, từ bản vẽ đến giám sát công trình** và luôn **đứng về phía chủ nhà**. Khi thi công, KTS phối hợp và **giám sát chất lượng thay bạn** cùng đội thợ/nhà thầu tại địa phương, thay vì giao khoán rồi thôi. Bạn làm việc trực tiếp, minh bạch từng bước — **không qua trung gian mua bán**.
 
 ## Câu hỏi thường gặp
 
