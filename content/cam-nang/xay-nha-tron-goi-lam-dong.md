@@ -25,6 +25,12 @@ keywords:
 
 Lâm Đồng, đặc biệt Đà Lạt, khác hẳn phần còn lại của Tây Nguyên: khí hậu lạnh ẩm quanh năm và địa hình đồi dốc mạnh. Đây là hai yếu tố chi phối cả thiết kế lẫn chi phí.
 
+## Vì sao nên có kiến trúc sư khu vực đồng hành
+
+Với đất dốc và khí hậu lạnh ẩm, kiến trúc sư giúp thiết kế bám địa hình, chống thấm - giữ ấm và tuân thủ quy hoạch cảnh quan Đà Lạt — yếu tố quyết định nhà đẹp, bền và hợp phép.
+
+Đây cũng là lý do kiến trúc sư trong mạng lưới ALN tại Lâm Đồng (Đà Lạt) không dùng chung một bản vẽ mẫu cho mọi công trình: am hiểu nền đất, khí hậu và quy định cấp phép tại địa phương giúp phương án khớp thực tế ngay từ đầu, hạn chế phát sinh sửa đổi giữa chừng khi thi công.
+
 ## Chi phí xây nhà tại Lâm Đồng 2026
 
 | Hạng mục | Đơn giá 2026 (Lâm Đồng) |
@@ -44,12 +50,6 @@ Chi phí ở Đà Lạt nhích hơn các tỉnh Tây Nguyên khác do **địa h
 ## Giấy phép xây dựng tại Lâm Đồng
 
 Giấy phép do **UBND thành phố Đà Lạt, Bảo Lộc hoặc UBND huyện** cấp cho nhà ở riêng lẻ. Đà Lạt có **quy hoạch kiến trúc cảnh quan chặt** (chiều cao, mật độ, hình thức mái) — cần đối chiếu kỹ, rất nên có kiến trúc sư xử lý hồ sơ.
-
-## Vì sao nên có kiến trúc sư khu vực đồng hành
-
-Với đất dốc và khí hậu lạnh ẩm, kiến trúc sư giúp thiết kế bám địa hình, chống thấm - giữ ấm và tuân thủ quy hoạch cảnh quan Đà Lạt — yếu tố quyết định nhà đẹp, bền và hợp phép.
-
-App Làm Nhà là **mạng lưới kiến trúc sư được thẩm định theo khu vực** — KTS đồng hành cùng bạn **xuyên suốt, từ bản vẽ đến giám sát công trình** và luôn **đứng về phía chủ nhà**. Khi thi công, KTS phối hợp và **giám sát chất lượng thay bạn** cùng đội thợ/nhà thầu tại địa phương, thay vì giao khoán rồi thôi. Bạn làm việc trực tiếp, minh bạch từng bước — **không qua trung gian mua bán**.
 
 ## Câu hỏi thường gặp
 

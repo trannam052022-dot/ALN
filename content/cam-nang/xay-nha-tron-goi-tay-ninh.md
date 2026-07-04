@@ -25,6 +25,12 @@ keywords:
 
 Tây Ninh có địa hình cao ráo, khí hậu khô hơn nhiều tỉnh Nam Bộ, quỹ đất rộng — điều kiện thuận lợi cho nhà vườn và biệt thự sân vườn. Chi phí xây dựng ở đây thuộc nhóm dễ chịu.
 
+## Vì sao nên có kiến trúc sư khu vực đồng hành
+
+Với nhà vườn đất rộng và khí hậu nắng, kiến trúc sư giúp bố cục công năng hợp lý, chống nóng và tận dụng cảnh quan sân vườn — tạo khác biệt lớn về tiện nghi.
+
+Đây cũng là lý do kiến trúc sư trong mạng lưới ALN tại Tây Ninh không dùng chung một bản vẽ mẫu cho mọi công trình: am hiểu nền đất, khí hậu và quy định cấp phép tại địa phương giúp phương án khớp thực tế ngay từ đầu, hạn chế phát sinh sửa đổi giữa chừng khi thi công.
+
 ## Chi phí xây nhà tại Tây Ninh 2026
 
 | Hạng mục | Đơn giá 2026 (Tây Ninh) |
@@ -44,12 +50,6 @@ Nhân công tại Tây Ninh mềm hơn khu vực giáp TP.HCM, và nền đất 
 ## Giấy phép xây dựng tại Tây Ninh
 
 Giấy phép do **UBND thành phố/thị xã hoặc UBND huyện** cấp cho nhà ở riêng lẻ, tuân thủ quy hoạch địa phương. Khu vực Trảng Bàng, Gò Dầu giáp TP.HCM và Long An đô thị hoá nhanh nên cần đối chiếu quy hoạch phân khu.
-
-## Vì sao nên có kiến trúc sư khu vực đồng hành
-
-Với nhà vườn đất rộng và khí hậu nắng, kiến trúc sư giúp bố cục công năng hợp lý, chống nóng và tận dụng cảnh quan sân vườn — tạo khác biệt lớn về tiện nghi.
-
-App Làm Nhà là **mạng lưới kiến trúc sư được thẩm định theo khu vực** — KTS đồng hành cùng bạn **xuyên suốt, từ bản vẽ đến giám sát công trình** và luôn **đứng về phía chủ nhà**. Khi thi công, KTS phối hợp và **giám sát chất lượng thay bạn** cùng đội thợ/nhà thầu tại địa phương, thay vì giao khoán rồi thôi. Bạn làm việc trực tiếp, minh bạch từng bước — **không qua trung gian mua bán**.
 
 ## Câu hỏi thường gặp
 

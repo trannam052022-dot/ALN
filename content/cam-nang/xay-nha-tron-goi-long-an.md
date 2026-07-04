@@ -25,6 +25,12 @@ keywords:
 
 Long An giáp ranh TP.HCM ở phía Tây Nam, hạ tầng kết nối tốt nên nhu cầu xây nhà ở và nhà xưởng, nhà cho thuê tăng nhanh. Đặc thù nền đất là điều cần lưu ý nhất khi tính chi phí.
 
+## Vì sao nên có kiến trúc sư khu vực đồng hành
+
+Kiến trúc sư gần công trình sẽ khảo sát nền đất, chọn giải pháp móng và cao độ chống ngập phù hợp, nắm quy hoạch từng huyện.
+
+Đây cũng là lý do kiến trúc sư trong mạng lưới ALN tại Long An không dùng chung một bản vẽ mẫu cho mọi công trình: am hiểu nền đất, khí hậu và quy định cấp phép tại địa phương giúp phương án khớp thực tế ngay từ đầu, hạn chế phát sinh sửa đổi giữa chừng khi thi công.
+
 ## Chi phí xây nhà tại Long An 2026
 
 | Hạng mục | Đơn giá 2026 (Long An) |
@@ -46,12 +52,6 @@ Với nền đất phèn/yếu, **ép cọc và xử lý nền** là hạng mụ
 ## Giấy phép xây dựng tại Long An
 
 Giấy phép do **UBND thành phố Tân An hoặc UBND huyện/thị xã** cấp cho nhà ở riêng lẻ, tuân thủ quy hoạch. Khu vực giáp TP.HCM (Đức Hòa, Bến Lức) cần đối chiếu quy hoạch phân khu vì đang phát triển nhanh.
-
-## Vì sao nên có kiến trúc sư khu vực đồng hành
-
-Kiến trúc sư gần công trình sẽ khảo sát nền đất, chọn giải pháp móng và cao độ chống ngập phù hợp, nắm quy hoạch từng huyện.
-
-App Làm Nhà là **mạng lưới kiến trúc sư được thẩm định theo khu vực** — KTS đồng hành cùng bạn **xuyên suốt, từ bản vẽ đến giám sát công trình** và luôn **đứng về phía chủ nhà**. Khi thi công, KTS phối hợp và **giám sát chất lượng thay bạn** cùng đội thợ/nhà thầu tại địa phương, thay vì giao khoán rồi thôi. Bạn làm việc trực tiếp, minh bạch từng bước — **không qua trung gian mua bán**.
 
 ## Câu hỏi thường gặp
 

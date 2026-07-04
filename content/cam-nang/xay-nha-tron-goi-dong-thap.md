@@ -25,6 +25,12 @@ keywords:
 
 Đồng Tháp có địa hình thấp, một phần thuộc vùng Đồng Tháp Mười ngập lũ theo mùa nước nổi. Cao độ nền và giải pháp móng là hai yếu tố quyết định khi xây nhà tại đây.
 
+## Vì sao nên có kiến trúc sư khu vực đồng hành
+
+Kiến trúc sư địa phương hiểu quy luật nước nổi sẽ tính đúng cao độ nền, giải pháp móng và bố cục nhà an toàn mùa lũ — điều rất khó tự áng chừng.
+
+Đây cũng là lý do kiến trúc sư trong mạng lưới ALN tại Đồng Tháp không dùng chung một bản vẽ mẫu cho mọi công trình: am hiểu nền đất, khí hậu và quy định cấp phép tại địa phương giúp phương án khớp thực tế ngay từ đầu, hạn chế phát sinh sửa đổi giữa chừng khi thi công.
+
 ## Chi phí xây nhà tại Đồng Tháp 2026
 
 | Hạng mục | Đơn giá 2026 (Đồng Tháp) |
@@ -44,12 +50,6 @@ Chi phí **tôn nền chống lũ** và **ép cọc** là hai khoản dễ bị 
 ## Giấy phép xây dựng tại Đồng Tháp
 
 Giấy phép do **UBND thành phố Cao Lãnh, Sa Đéc, Hồng Ngự hoặc UBND huyện** cấp cho nhà ở riêng lẻ, tuân thủ quy hoạch và cao độ nền khu vực ngập lũ.
-
-## Vì sao nên có kiến trúc sư khu vực đồng hành
-
-Kiến trúc sư địa phương hiểu quy luật nước nổi sẽ tính đúng cao độ nền, giải pháp móng và bố cục nhà an toàn mùa lũ — điều rất khó tự áng chừng.
-
-App Làm Nhà là **mạng lưới kiến trúc sư được thẩm định theo khu vực** — KTS đồng hành cùng bạn **xuyên suốt, từ bản vẽ đến giám sát công trình** và luôn **đứng về phía chủ nhà**. Khi thi công, KTS phối hợp và **giám sát chất lượng thay bạn** cùng đội thợ/nhà thầu tại địa phương, thay vì giao khoán rồi thôi. Bạn làm việc trực tiếp, minh bạch từng bước — **không qua trung gian mua bán**.
 
 ## Câu hỏi thường gặp
 

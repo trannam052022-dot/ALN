@@ -25,6 +25,12 @@ keywords:
 
 Cà Mau ở cực Nam, địa hình thấp, sông rạch dày và nền đất rất yếu. Đây là một trong những nơi khó về nền móng nhất cả nước, nên không thể xây theo kinh nghiệm áng chừng.
 
+## Vì sao nên có kiến trúc sư khu vực đồng hành
+
+Với nền yếu và sụt lún đặc thù, kiến trúc sư địa phương sẽ chỉ định loại cọc, chiều sâu và giải pháp chống ăn mòn phù hợp — yếu tố sống còn để nhà không lún nghiêng.
+
+Đây cũng là lý do kiến trúc sư trong mạng lưới ALN tại Cà Mau không dùng chung một bản vẽ mẫu cho mọi công trình: am hiểu nền đất, khí hậu và quy định cấp phép tại địa phương giúp phương án khớp thực tế ngay từ đầu, hạn chế phát sinh sửa đổi giữa chừng khi thi công.
+
 ## Chi phí xây nhà tại Cà Mau 2026
 
 | Hạng mục | Đơn giá 2026 (Cà Mau) |
@@ -44,12 +50,6 @@ Phần móng ở Cà Mau thường tốn hơn trung bình do phải **ép cọc 
 ## Giấy phép xây dựng tại Cà Mau
 
 Giấy phép do **UBND thành phố Cà Mau hoặc UBND huyện** cấp cho nhà ở riêng lẻ, tuân thủ quy hoạch và hành lang sông rạch. Vùng ven biển, ven rừng ngập mặn có ràng buộc riêng.
-
-## Vì sao nên có kiến trúc sư khu vực đồng hành
-
-Với nền yếu và sụt lún đặc thù, kiến trúc sư địa phương sẽ chỉ định loại cọc, chiều sâu và giải pháp chống ăn mòn phù hợp — yếu tố sống còn để nhà không lún nghiêng.
-
-App Làm Nhà là **mạng lưới kiến trúc sư được thẩm định theo khu vực** — KTS đồng hành cùng bạn **xuyên suốt, từ bản vẽ đến giám sát công trình** và luôn **đứng về phía chủ nhà**. Khi thi công, KTS phối hợp và **giám sát chất lượng thay bạn** cùng đội thợ/nhà thầu tại địa phương, thay vì giao khoán rồi thôi. Bạn làm việc trực tiếp, minh bạch từng bước — **không qua trung gian mua bán**.
 
 ## Câu hỏi thường gặp
 

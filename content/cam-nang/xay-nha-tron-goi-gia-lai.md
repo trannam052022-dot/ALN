@@ -25,6 +25,12 @@ keywords:
 
 Gia Lai nằm trên cao nguyên Pleiku, khí hậu mát mẻ, đất đỏ bazan đặc trưng. Địa hình đồi lượn sóng là điểm cần lưu ý khi chọn giải pháp nền.
 
+## Vì sao nên có kiến trúc sư khu vực đồng hành
+
+Với địa hình đồi dốc, kiến trúc sư giúp bố cục nhà bám địa hình, xử lý san nền và thoát nước — tận dụng tầm nhìn cao nguyên mà vẫn an toàn, chống thấm.
+
+Đây cũng là lý do kiến trúc sư trong mạng lưới ALN tại Gia Lai không dùng chung một bản vẽ mẫu cho mọi công trình: am hiểu nền đất, khí hậu và quy định cấp phép tại địa phương giúp phương án khớp thực tế ngay từ đầu, hạn chế phát sinh sửa đổi giữa chừng khi thi công.
+
 ## Chi phí xây nhà tại Gia Lai 2026
 
 | Hạng mục | Đơn giá 2026 (Gia Lai) |
@@ -44,12 +50,6 @@ Nền bazan cứng giúp móng nhẹ; chi phí phát sinh chủ yếu ở **san 
 ## Giấy phép xây dựng tại Gia Lai
 
 Giấy phép do **UBND thành phố Pleiku, thị xã An Khê/Ayun Pa hoặc UBND huyện** cấp cho nhà ở riêng lẻ, tuân thủ quy hoạch địa phương.
-
-## Vì sao nên có kiến trúc sư khu vực đồng hành
-
-Với địa hình đồi dốc, kiến trúc sư giúp bố cục nhà bám địa hình, xử lý san nền và thoát nước — tận dụng tầm nhìn cao nguyên mà vẫn an toàn, chống thấm.
-
-App Làm Nhà là **mạng lưới kiến trúc sư được thẩm định theo khu vực** — KTS đồng hành cùng bạn **xuyên suốt, từ bản vẽ đến giám sát công trình** và luôn **đứng về phía chủ nhà**. Khi thi công, KTS phối hợp và **giám sát chất lượng thay bạn** cùng đội thợ/nhà thầu tại địa phương, thay vì giao khoán rồi thôi. Bạn làm việc trực tiếp, minh bạch từng bước — **không qua trung gian mua bán**.
 
 ## Câu hỏi thường gặp
 

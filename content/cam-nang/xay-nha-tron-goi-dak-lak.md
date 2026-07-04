@@ -25,6 +25,12 @@ keywords:
 
 Đắk Lắk là trung tâm Tây Nguyên với đất đỏ bazan màu mỡ và khí hậu cao nguyên dễ chịu. Điều kiện nền đất ở đây thuận lợi hơn nhiều so với vùng đồng bằng ngập nước.
 
+## Vì sao nên có kiến trúc sư khu vực đồng hành
+
+Với đất rộng và khí hậu cao nguyên, kiến trúc sư giúp bố cục nhà vườn hợp lý, tận dụng cảnh quan, đón nắng gió và xử lý độ dốc nếu có.
+
+Đây cũng là lý do kiến trúc sư trong mạng lưới ALN tại Đắk Lắk không dùng chung một bản vẽ mẫu cho mọi công trình: am hiểu nền đất, khí hậu và quy định cấp phép tại địa phương giúp phương án khớp thực tế ngay từ đầu, hạn chế phát sinh sửa đổi giữa chừng khi thi công.
+
 ## Chi phí xây nhà tại Đắk Lắk 2026
 
 | Hạng mục | Đơn giá 2026 (Đắk Lắk) |
@@ -44,12 +50,6 @@ Nền bazan cứng giúp phần móng thường nhẹ nhàng (móng đơn/móng 
 ## Giấy phép xây dựng tại Đắk Lắk
 
 Giấy phép do **UBND thành phố Buôn Ma Thuột, thị xã Buôn Hồ hoặc UBND huyện** cấp cho nhà ở riêng lẻ. Với đất nông nghiệp/rẫy, cần kiểm tra mục đích sử dụng đất trước khi xây.
-
-## Vì sao nên có kiến trúc sư khu vực đồng hành
-
-Với đất rộng và khí hậu cao nguyên, kiến trúc sư giúp bố cục nhà vườn hợp lý, tận dụng cảnh quan, đón nắng gió và xử lý độ dốc nếu có.
-
-App Làm Nhà là **mạng lưới kiến trúc sư được thẩm định theo khu vực** — KTS đồng hành cùng bạn **xuyên suốt, từ bản vẽ đến giám sát công trình** và luôn **đứng về phía chủ nhà**. Khi thi công, KTS phối hợp và **giám sát chất lượng thay bạn** cùng đội thợ/nhà thầu tại địa phương, thay vì giao khoán rồi thôi. Bạn làm việc trực tiếp, minh bạch từng bước — **không qua trung gian mua bán**.
 
 ## Câu hỏi thường gặp
 

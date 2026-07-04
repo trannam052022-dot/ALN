@@ -25,6 +25,12 @@ keywords:
 
 An Giang đặc biệt ở chỗ vừa có vùng đầu nguồn ngập lũ, vừa có vùng đồi núi Bảy Núi đất cao. Cách xây nhà vì thế khác nhau rõ giữa các khu vực trong tỉnh.
 
+## Vì sao nên có kiến trúc sư khu vực đồng hành
+
+Với địa hình đa dạng (ngập lũ và đồi núi), kiến trúc sư địa phương sẽ chọn đúng giải pháp cao độ, móng và thoát nước cho từng khu — tránh áp một kiểu chung gây sai.
+
+Đây cũng là lý do kiến trúc sư trong mạng lưới ALN tại An Giang không dùng chung một bản vẽ mẫu cho mọi công trình: am hiểu nền đất, khí hậu và quy định cấp phép tại địa phương giúp phương án khớp thực tế ngay từ đầu, hạn chế phát sinh sửa đổi giữa chừng khi thi công.
+
 ## Chi phí xây nhà tại An Giang 2026
 
 | Hạng mục | Đơn giá 2026 (An Giang) |
@@ -44,12 +50,6 @@ Vùng đồng bằng cần cộng chi phí **tôn nền chống lũ và ép cọ
 ## Giấy phép xây dựng tại An Giang
 
 Giấy phép do **UBND thành phố Long Xuyên, Châu Đốc, thị xã Tân Châu hoặc UBND huyện** cấp cho nhà ở riêng lẻ, tuân thủ quy hoạch và cao độ nền ở khu vực ngập lũ.
-
-## Vì sao nên có kiến trúc sư khu vực đồng hành
-
-Với địa hình đa dạng (ngập lũ và đồi núi), kiến trúc sư địa phương sẽ chọn đúng giải pháp cao độ, móng và thoát nước cho từng khu — tránh áp một kiểu chung gây sai.
-
-App Làm Nhà là **mạng lưới kiến trúc sư được thẩm định theo khu vực** — KTS đồng hành cùng bạn **xuyên suốt, từ bản vẽ đến giám sát công trình** và luôn **đứng về phía chủ nhà**. Khi thi công, KTS phối hợp và **giám sát chất lượng thay bạn** cùng đội thợ/nhà thầu tại địa phương, thay vì giao khoán rồi thôi. Bạn làm việc trực tiếp, minh bạch từng bước — **không qua trung gian mua bán**.
 
 ## Câu hỏi thường gặp
 

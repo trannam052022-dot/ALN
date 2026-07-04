@@ -25,6 +25,12 @@ keywords:
 
 Bình Dương là một trong những thị trường xây dựng nhà ở sôi động nhất phía Nam nhờ dân cư và chuyên gia khu công nghiệp đổ về. Chi phí và thủ tục ở đây có vài khác biệt đáng chú ý so với TP.HCM.
 
+## Vì sao nên có kiến trúc sư khu vực đồng hành
+
+Một **kiến trúc sư ở Đông Nam Bộ, gần công trình** sẽ khảo sát hiện trạng, nắm quy định cấp phép từng địa phương và xử lý nhanh khi cần điều chỉnh.
+
+Đây cũng là lý do kiến trúc sư trong mạng lưới ALN tại Bình Dương không dùng chung một bản vẽ mẫu cho mọi công trình: am hiểu nền đất, khí hậu và quy định cấp phép tại địa phương giúp phương án khớp thực tế ngay từ đầu, hạn chế phát sinh sửa đổi giữa chừng khi thi công.
+
 ## Chi phí xây nhà tại Bình Dương 2026
 
 | Hạng mục | Đơn giá 2026 (Bình Dương) |
@@ -44,12 +50,6 @@ So với TP.HCM, giá tại Bình Dương thường **mềm hơn một chút** d
 ## Giấy phép xây dựng tại Bình Dương
 
 Giấy phép do **UBND thành phố/thị xã** (Thủ Dầu Một, Thuận An, Dĩ An…) cấp cho nhà ở riêng lẻ, tuân thủ quy hoạch phân khu và mật độ xây dựng. Hồ sơ xin phép cần bản vẽ có chữ ký người có chứng chỉ hành nghề.
-
-## Vì sao nên có kiến trúc sư khu vực đồng hành
-
-Một **kiến trúc sư ở Đông Nam Bộ, gần công trình** sẽ khảo sát hiện trạng, nắm quy định cấp phép từng địa phương và xử lý nhanh khi cần điều chỉnh.
-
-App Làm Nhà là **mạng lưới kiến trúc sư được thẩm định theo khu vực** — KTS đồng hành cùng bạn **xuyên suốt, từ bản vẽ đến giám sát công trình** và luôn **đứng về phía chủ nhà**. Khi thi công, KTS phối hợp và **giám sát chất lượng thay bạn** cùng đội thợ/nhà thầu tại địa phương, thay vì giao khoán rồi thôi. Bạn làm việc trực tiếp, minh bạch từng bước — **không qua trung gian mua bán**.
 
 ## Câu hỏi thường gặp
 

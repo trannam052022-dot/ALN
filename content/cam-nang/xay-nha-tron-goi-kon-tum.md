@@ -25,6 +25,12 @@ keywords:
 
 Kon Tum ở cực Bắc Tây Nguyên, địa hình nhiều đồi núi và thung lũng, khí hậu mát. Xử lý địa hình dốc và thoát nước là yếu tố then chốt khi xây nhà.
 
+## Vì sao nên có kiến trúc sư khu vực đồng hành
+
+Với địa hình dốc, kiến trúc sư giúp bố cục nhà bám sườn đồi, tính tường chắn và thoát nước — vừa an toàn, vừa tận dụng tầm nhìn.
+
+Đây cũng là lý do kiến trúc sư trong mạng lưới ALN tại Kon Tum không dùng chung một bản vẽ mẫu cho mọi công trình: am hiểu nền đất, khí hậu và quy định cấp phép tại địa phương giúp phương án khớp thực tế ngay từ đầu, hạn chế phát sinh sửa đổi giữa chừng khi thi công.
+
 ## Chi phí xây nhà tại Kon Tum 2026
 
 | Hạng mục | Đơn giá 2026 (Kon Tum) |
@@ -44,12 +50,6 @@ Nền đất phần lớn tốt nên móng nhẹ; chi phí phát sinh chủ yế
 ## Giấy phép xây dựng tại Kon Tum
 
 Giấy phép do **UBND thành phố Kon Tum hoặc UBND huyện** cấp cho nhà ở riêng lẻ, tuân thủ quy hoạch. Đất đồi/nông nghiệp cần kiểm tra mục đích sử dụng đất trước khi xây.
-
-## Vì sao nên có kiến trúc sư khu vực đồng hành
-
-Với địa hình dốc, kiến trúc sư giúp bố cục nhà bám sườn đồi, tính tường chắn và thoát nước — vừa an toàn, vừa tận dụng tầm nhìn.
-
-App Làm Nhà là **mạng lưới kiến trúc sư được thẩm định theo khu vực** — KTS đồng hành cùng bạn **xuyên suốt, từ bản vẽ đến giám sát công trình** và luôn **đứng về phía chủ nhà**. Khi thi công, KTS phối hợp và **giám sát chất lượng thay bạn** cùng đội thợ/nhà thầu tại địa phương, thay vì giao khoán rồi thôi. Bạn làm việc trực tiếp, minh bạch từng bước — **không qua trung gian mua bán**.
 
 ## Câu hỏi thường gặp
 

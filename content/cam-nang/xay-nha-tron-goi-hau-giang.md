@@ -25,6 +25,12 @@ keywords:
 
 Hậu Giang là tỉnh nông nghiệp trung tâm miền Tây, hệ thống kênh rạch dày. Nền đất phèn và mực nước cao là điểm cần lưu ý nhất khi xây nhà.
 
+## Vì sao nên có kiến trúc sư khu vực đồng hành
+
+Kiến trúc sư miền Tây hiểu nền phèn sẽ chỉ định loại bê tông móng, giải pháp cọc và chống thấm phù hợp — tránh móng bị ăn mòn về sau.
+
+Đây cũng là lý do kiến trúc sư trong mạng lưới ALN tại Hậu Giang không dùng chung một bản vẽ mẫu cho mọi công trình: am hiểu nền đất, khí hậu và quy định cấp phép tại địa phương giúp phương án khớp thực tế ngay từ đầu, hạn chế phát sinh sửa đổi giữa chừng khi thi công.
+
 ## Chi phí xây nhà tại Hậu Giang 2026
 
 | Hạng mục | Đơn giá 2026 (Hậu Giang) |
@@ -44,12 +50,6 @@ Nhân công mềm giúp mặt bằng giá dễ chịu; phần móng nền phèn 
 ## Giấy phép xây dựng tại Hậu Giang
 
 Giấy phép do **UBND thành phố Vị Thanh, Ngã Bảy hoặc UBND huyện** cấp cho nhà ở riêng lẻ, tuân thủ quy hoạch và hành lang bảo vệ kênh rạch.
-
-## Vì sao nên có kiến trúc sư khu vực đồng hành
-
-Kiến trúc sư miền Tây hiểu nền phèn sẽ chỉ định loại bê tông móng, giải pháp cọc và chống thấm phù hợp — tránh móng bị ăn mòn về sau.
-
-App Làm Nhà là **mạng lưới kiến trúc sư được thẩm định theo khu vực** — KTS đồng hành cùng bạn **xuyên suốt, từ bản vẽ đến giám sát công trình** và luôn **đứng về phía chủ nhà**. Khi thi công, KTS phối hợp và **giám sát chất lượng thay bạn** cùng đội thợ/nhà thầu tại địa phương, thay vì giao khoán rồi thôi. Bạn làm việc trực tiếp, minh bạch từng bước — **không qua trung gian mua bán**.
 
 ## Câu hỏi thường gặp
 

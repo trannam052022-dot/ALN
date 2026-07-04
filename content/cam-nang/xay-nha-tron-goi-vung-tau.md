@@ -25,6 +25,12 @@ keywords:
 
 Vũng Tàu vừa là nơi an cư, vừa là thị trường nhà nghỉ dưỡng ven biển sôi động. Xây nhà ở đây có một yếu tố sống còn mà nơi khác ít gặp: **khí hậu biển ăn mòn công trình**.
 
+## Vì sao nên có kiến trúc sư khu vực đồng hành
+
+Kiến trúc sư hiểu điều kiện biển sẽ chỉ định đúng vật liệu chống ăn mòn, giải pháp móng trên nền cát và thiết kế đón gió biển hợp lý.
+
+Đây cũng là lý do kiến trúc sư trong mạng lưới ALN tại Vũng Tàu không dùng chung một bản vẽ mẫu cho mọi công trình: am hiểu nền đất, khí hậu và quy định cấp phép tại địa phương giúp phương án khớp thực tế ngay từ đầu, hạn chế phát sinh sửa đổi giữa chừng khi thi công.
+
 ## Chi phí xây nhà tại Vũng Tàu 2026
 
 | Hạng mục | Đơn giá 2026 (Vũng Tàu) |
@@ -49,12 +55,6 @@ Bỏ qua các yếu tố này, nhà ven biển có thể xuống cấp chỉ sau
 ## Giấy phép xây dựng tại Bà Rịa - Vũng Tàu
 
 Giấy phép do **UBND thành phố Vũng Tàu/Bà Rịa hoặc UBND huyện** cấp, tuân thủ quy hoạch — đặc biệt khu ven biển thường có ràng buộc về chiều cao, khoảng lùi và cảnh quan. Nhà nghỉ dưỡng cho thuê cần xem kỹ mục đích sử dụng đất.
-
-## Vì sao nên có kiến trúc sư khu vực đồng hành
-
-Kiến trúc sư hiểu điều kiện biển sẽ chỉ định đúng vật liệu chống ăn mòn, giải pháp móng trên nền cát và thiết kế đón gió biển hợp lý.
-
-App Làm Nhà là **mạng lưới kiến trúc sư được thẩm định theo khu vực** — KTS đồng hành cùng bạn **xuyên suốt, từ bản vẽ đến giám sát công trình** và luôn **đứng về phía chủ nhà**. Khi thi công, KTS phối hợp và **giám sát chất lượng thay bạn** cùng đội thợ/nhà thầu tại địa phương, thay vì giao khoán rồi thôi. Bạn làm việc trực tiếp, minh bạch từng bước — **không qua trung gian mua bán**.
 
 ## Câu hỏi thường gặp
 
