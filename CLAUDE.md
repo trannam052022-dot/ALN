@@ -168,7 +168,7 @@ body { font-size: 1rem; /* kế thừa từ html */ }
 - `projects/{pid}` update: founder hoặc `uid in memberUids` → CN/KTS/DN trong project đều update được (dùng khi advance stage).
 - `designerApplications/{uid}`: giống pattern ktsApplications — designer tự ghi, founder duyệt.
 - `designProjects/{pid}`: founder create, `designer.uid`/`cn.uid`/`dn.uid`/`memberUids` read, `memberUids` update.
-- **App Check bypass còn tồn tại**: founder UID cứng được mock `role:founder` mà không đọc Firestore → cần điều tra và bỏ bypass sau.
+- **App Check**: đã chạy từ 02/07/2026. Bypass founder cứng ở đăng nhập thường (login.html chỗ A) đã gỡ 04/07/2026 → founder đọc role thật từ `users/{uid}`. Còn hardcode UID founder ở `doFounderLogin` (login.html) và `isFounder()` trong `firestore.rules` — có mật khẩu bảo vệ, dọn sau nếu cần quản lý founder bằng dữ liệu.
 
 ## Các nút GHI đã được nối (Firestore/Storage)
 
@@ -200,19 +200,26 @@ Claude PHẢI HỎI trước khi:
 - Xoá dữ liệu Firestore
 - Thay đổi cấu trúc `firebase.json` / `firestore.indexes.json`
 
-## CÒN LẠI (thứ tự ưu tiên)
+## CÒN LẠI (cập nhật 04/07/2026)
 
-### P1 — Quan trọng, làm ngay
-1. **UI Founder tạo dự án mới** — `founder_panel.html` cần tab/modal "Tạo dự án": chọn CN (dropdown `users` where `role=cn`), chọn KTS, chọn DN (optional), nhập tên dự án + tổng phí + escrow → `setDoc('projects/{newId}', {..., memberUids:[cn,kts,dn], stage:'C1', progress:{C1:0,C2:0,C3:0,C4:0}})`. ID dự án tự sinh `ALN-` + 4 chữ số ngẫu nhiên.
-2. **Thông báo cho CN khi founder duyệt account** — khi `founderApprovePending(uid, 'cn')` chạy, gọi Cloud Function hoặc ghi doc vào `notifications/{uid}` để CN biết mình đã được kích hoạt.
+### ✅ Đã xong (từng nằm trong danh sách này)
+- **UI Founder tạo dự án mới** — có modal "Tạo dự án" + `createProject` trong `founder_panel.html`.
+- **Thông báo CN khi được duyệt** — cơ chế in-app: `founderApprovePending` đặt `approvedNotified:false`; các dashboard (client_CN/DN, kts, designer) phát hiện `approvedNotified===false` lúc đăng nhập/đang online rồi báo + set `true`.
+- **App Check** — enforcement đã chạy từ 02/07/2026 (site key đúng, 5 chữ A).
+- **Node 22** — `functions/package.json` đã `"node":"22"`.
+- **Đăng ký CN công khai** — `register.html` hoạt động (CN active ngay, KTS/DN chờ duyệt).
+- **HTTPS applamnha.vn** — cert đã cấp, site chạy HTTPS.
+- **Gỡ bypass founder cứng ở đăng nhập thường** — `login.html` (chỗ A) đã bỏ profile founder "chế"; founder đọc role thật từ `users/{uid}`.
 
-### P2 — Kỹ thuật
-3. **App Check** — điều tra tại sao `getDoc(users/founderUID)` trả `exists:false`. Nếu App Check chặn, tắt enforcement trên Firebase Console rồi bỏ bypass cứng.
-4. Nâng `functions/package.json` Node lên 22 (Node 20 deprecated 30/04/2026, decommission 30/10/2026).
+### P2 — Kỹ thuật (tùy chọn dọn dẹp)
+1. **Hardcode founder còn 2 chỗ** (không gấp — có mật khẩu bảo vệ): cổng founder riêng `doFounderLogin` (login.html) + `isFounder()` trong `firestore.rules` đều kiểm UID cứng `h4kEg…`. Chỉ đụng khi muốn quản lý founder bằng dữ liệu thay vì hardcode → sửa `firestore.rules` phải HỎI trước.
 
 ### P3 — Tương lai
-5. Escrow/payment khi founder confirm chuyển tiền sau khi stage advance.
-6. `register.html` đăng ký công khai CN (dùng ngay), KTS/DN chờ duyệt.
+2. **Escrow/payment** khi founder confirm chuyển tiền sau khi stage advance (C1→C4).
+
+### Ngoài code (chờ bên ngoài / user làm)
+- **FB Graph API** đăng bài tự động lên Fanpage — chờ Facebook duyệt App Review.
+- **Zalo OA / mã số thuế** — đang hoãn.
 
 ## Lệnh Git thường dùng
 
