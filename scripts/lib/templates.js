@@ -7,6 +7,7 @@ var CATEGORIES = {
   'phap-ly-giay-phep': 'Pháp lý & Giấy phép',
   'kinh-nghiem-lam-nha': 'Kinh nghiệm làm nhà',
   'chon-kien-truc-su': 'Chọn Kiến trúc sư',
+  'khu-vuc': 'Xây nhà theo khu vực',
 };
 
 function categoryLabel(slug) {
