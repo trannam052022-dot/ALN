@@ -46,6 +46,10 @@ input::placeholder{color:var(--muted)}
 .view{display:none;min-height:100vh;position:relative;z-index:1}
 .view.active{display:flex}
 
+/* ── Badge khu vực (từ chấm vùng ở home.html) ── */
+.vung-badge{display:flex;align-items:center;gap:8px;font-family:var(--syne);font-size:12px;font-weight:700;color:var(--gold2);background:rgba(201,168,76,.09);border:1px solid rgba(201,168,76,.28);border-radius:10px;padding:10px 14px;margin-bottom:16px}
+.vung-badge i{font-size:16px;color:var(--gold)}
+
 /* ══ REGISTER / LOGIN VIEWS ══ */
 #viewAuth{align-items:center;justify-content:center;padding:24px 18px}
 .auth-wrap{width:100%;max-width:400px}
@@ -302,6 +306,10 @@ input::placeholder{color:var(--muted)}
         <div class="card-title">Giữ chỗ ngay</div>
         <div class="card-sub">Điền 2 ô, xong trong 30 giây</div>
 
+        <div class="vung-badge" id="vungBadge" style="display:none">
+          <i class="ph-duotone ph-map-pin"></i><span id="vungBadgeText"></span>
+        </div>
+
         <!-- Chọn phòng -->
         <div class="room-tabs" id="roomTabs">
           <div class="rtab on" data-room="architect" onclick="pickRoom('architect',this)">
@@ -472,6 +480,22 @@ function pickRoom(r,el){
   var s=document.querySelector('.card-sub');   if(s) s.textContent=c.sub;
   var b=document.getElementById('regBtn');     if(b) b.innerHTML='<i class="ph-duotone ph-bookmark-simple"></i> '+c.btn;
 }
+
+/* Khu vực từ URL ?vung=mien-bac (đồng bộ với các chấm vùng ở home.html) */
+var VUNG_VI={'mien-bac':'Miền Bắc','mien-trung':'Miền Trung','mien-nam':'Miền Nam','mien-tay':'Miền Tây','tay-nguyen':'Tây Nguyên'};
+window.SELECTED_VUNG='';
+window.SELECTED_VUNG_VI='';
+(function(){
+  var v=new URLSearchParams(location.search).get('vung');
+  if(!v||!VUNG_VI[v]) return;
+  window.SELECTED_VUNG=v;
+  window.SELECTED_VUNG_VI=VUNG_VI[v];
+  var badge=document.getElementById('vungBadge');
+  if(badge){
+    document.getElementById('vungBadgeText').textContent='Khu vực của bạn: '+VUNG_VI[v];
+    badge.style.display='flex';
+  }
+})();
 function showLogin(){document.getElementById('panelRegister').style.display='none';document.getElementById('panelLogin').style.display='';}
 function showRegister(){document.getElementById('panelLogin').style.display='none';document.getElementById('panelRegister').style.display='';}
 function showView(v){
@@ -605,6 +629,8 @@ window.doRegister=async function(){
   if(!name){showToast('Vui lòng nhập họ tên',true);return;}
   if(!validPhone(phone)){showToast('SĐT chưa đúng (10 số, bắt đầu bằng 0)',true);return;}
   const isCn = selectedRoom==='cn';
+  const region   = window.SELECTED_VUNG || '';
+  const regionVi = window.SELECTED_VUNG_VI || '';
   btn.disabled=true;
   btn.innerHTML='<i class="ph-duotone ph-spinner ph-spin"></i> '+(isCn?'Đang tạo tài khoản…':'Đang giữ chỗ…');
   const email=phone+'@aln.vn';
@@ -620,11 +646,12 @@ window.doRegister=async function(){
       /* ── Chủ nhà: tạo account active, vào thẳng client_CN ── */
       const uref=doc(db,'users',uid);
       const usnap=await getDoc(uref);
-      if(!usnap.exists()) await setDoc(uref,{name,phone,role:'cn',status:'active',createdAt:serverTimestamp()});
+      if(!usnap.exists()) await setDoc(uref,{name,phone,role:'cn',region,regionVi,status:'active',createdAt:serverTimestamp()});
+      else if(region) await setDoc(uref,{region,regionVi},{merge:true});
       /* Ghi reservations để Founder thấy trong Phòng chờ */
       const rref=doc(db,'reservations',uid);
       const rsnap=await getDoc(rref);
-      if(!rsnap.exists()) await setDoc(rref,{uid,name,phone,role:'cn',status:'active',profileSubmitted:true,reservedAt:serverTimestamp()});
+      if(!rsnap.exists()) await setDoc(rref,{uid,name,phone,role:'cn',region,regionVi,status:'active',profileSubmitted:true,reservedAt:serverTimestamp()});
       showToast('Tạo tài khoản thành công ✓ Đang vào...');
       setTimeout(function(){ location.href='../client_CN.html'; },1000);
     } else {
@@ -632,12 +659,13 @@ window.doRegister=async function(){
       const deadline=Date.now()+RESERVE_DAYS*864e5;
       const uref=doc(db,'users',uid);
       const usnap=await getDoc(uref);
-      if(!usnap.exists()) await setDoc(uref,{name,phone,role:selectedRoom,status:'reserved',profileSubmitted:false,createdAt:serverTimestamp()});
+      if(!usnap.exists()) await setDoc(uref,{name,phone,role:selectedRoom,region,regionVi,status:'reserved',profileSubmitted:false,createdAt:serverTimestamp()});
+      else if(region) await setDoc(uref,{region,regionVi},{merge:true});
       const rref=doc(db,'reservations',uid);
       const rsnap=await getDoc(rref);
       if(!rsnap.exists()){
-        await setDoc(rref,{uid,name,phone,role:selectedRoom,status:'reserved',profileSubmitted:false,reminderCount:0,reservedAt:serverTimestamp(),deadlineMs:deadline});
-        CURRENT={uid,name,phone,role:selectedRoom,status:'reserved',profileSubmitted:false,deadlineMs:deadline};
+        await setDoc(rref,{uid,name,phone,role:selectedRoom,region,regionVi,status:'reserved',profileSubmitted:false,reminderCount:0,reservedAt:serverTimestamp(),deadlineMs:deadline});
+        CURRENT={uid,name,phone,role:selectedRoom,region,regionVi,status:'reserved',profileSubmitted:false,deadlineMs:deadline};
       } else {
         CURRENT={...rsnap.data(),uid};
       }
