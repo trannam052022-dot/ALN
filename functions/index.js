@@ -16,12 +16,13 @@ const BASE_URL    = "https://trannam052022-dot.github.io/ALN/";
 const APP_URL     = BASE_URL + "founder_panel.html";
 
 const PAGE_BY_ROLE = {
-  founder:   "founder_panel.html",
-  kts:       "kts_dashboard.html",
-  designer:  "designer_dashboard.html",
-  dn:        "client_DN.html",
-  cn:        "client_CN.html",
-  community: "aln_community.html",
+  founder:     "founder_panel.html",
+  kts:         "kts_dashboard.html",
+  designer:    "designer_dashboard.html",
+  dn:          "client_DN.html",
+  cn:          "client_CN.html",
+  community:   "aln_community.html",
+  reservation: "aln-giu-cho/phong-cho.html",
 };
 
 /* Gửi push đến tất cả FCM tokens của một uid cụ thể */
@@ -1766,6 +1767,149 @@ exports.dailyDigest = functions
       );
     } catch (e) {
       console.error("[dailyDigest] Lỗi:", e);
+    }
+    return null;
+  });
+
+/* ── ① Vòng đời "Giữ chỗ" — nhắc hạn & tự hết hạn (09:00 giờ VN mỗi ngày) ──
+   Duyệt reservations còn 'reserved' & chưa nộp hồ sơ:
+   - Còn ≤48h tới deadline → đẩy nhắc (tối đa 3 lần, cách nhau ≥20h).
+   - Quá deadlineMs → status:'expired' + báo người dùng + gom báo Founder.
+   Field đã có sẵn (deadlineMs, reminderCount) từ luồng giữ chỗ — chỉ thiếu bộ hẹn giờ. */
+exports.reservationLifecycle = functions
+  .region("asia-southeast1")
+  .pubsub.schedule("0 9 * * *")
+  .timeZone("Asia/Ho_Chi_Minh")
+  .onRun(async () => {
+    const now = Date.now();
+    const ROLE_VI = { architect: "KTS", designer: "Designer", business: "Doanh nghiệp" };
+    let expired = 0, reminded = 0;
+    try {
+      const snap = await db.collection("reservations").where("status", "==", "reserved").get();
+      for (const docSnap of snap.docs) {
+        const r = docSnap.data();
+        if (r.profileSubmitted === true) continue;
+        const deadline = typeof r.deadlineMs === "number" ? r.deadlineMs : 0;
+        if (!deadline) continue;
+        const roleVi = ROLE_VI[r.role] || "hồ sơ";
+
+        // Quá hạn → hết hiệu lực
+        if (now >= deadline) {
+          await docSnap.ref.update({
+            status: "expired",
+            expiredAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+          expired++;
+          await notifyUser(
+            r.uid,
+            "Giữ chỗ đã hết hạn",
+            `Chỗ ${roleVi} của bạn đã quá 3 ngày mà chưa nộp hồ sơ. Giữ chỗ lại bất cứ lúc nào để tiếp tục.`,
+            { type: "RESERVATION_EXPIRED" },
+            "reservation"
+          );
+          continue;
+        }
+
+        // Gần hạn ≤48h → nhắc (cách nhau ≥20h, tối đa 3 lần)
+        const hoursLeft = (deadline - now) / 3600000;
+        const lastMs = r.lastRemindedAt && r.lastRemindedAt.toMillis ? r.lastRemindedAt.toMillis() : 0;
+        const count = typeof r.reminderCount === "number" ? r.reminderCount : 0;
+        if (hoursLeft <= 48 && count < 3 && (now - lastMs) >= 20 * 3600000) {
+          const hLeft = Math.max(1, Math.round(hoursLeft));
+          await notifyUser(
+            r.uid,
+            "⏳ Sắp hết hạn giữ chỗ",
+            `Còn ~${hLeft} giờ để nộp hồ sơ ${roleVi} vào phòng chờ ALN.`,
+            { type: "RESERVATION_REMINDER" },
+            "reservation"
+          );
+          await docSnap.ref.update({
+            reminderCount: count + 1,
+            lastRemindedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+          reminded++;
+        }
+      }
+
+      if (expired > 0) {
+        await notifyFounder(
+          "⌛ Giữ chỗ hết hạn",
+          `${expired} lượt giữ chỗ vừa quá hạn 3 ngày (chưa nộp hồ sơ). Có thể gọi lại để mời tiếp.`,
+          { type: "RESERVATION_EXPIRED_DIGEST", count: String(expired) }
+        );
+      }
+      console.log(`[reservationLifecycle] expired=${expired} reminded=${reminded}`);
+    } catch (e) {
+      console.error("[reservationLifecycle] Lỗi:", e);
+    }
+    return null;
+  });
+
+/* ── ② Cảnh báo dự án "đứng bánh" (SLA) — 09:10 giờ VN mỗi ngày ──
+   Dự án chưa hoàn tất (stage != C4) mà updatedAt không nhúc nhích quá
+   SLA_STALL_DAYS ngày → cờ sla_warn + nhắc KTS/Designer phụ trách + gom báo Founder.
+   Chỉ báo lại mỗi ≥3 ngày để không spam; tự gỡ cờ khi dự án chạy lại. */
+const SLA_STALL_DAYS = 5;
+
+async function _scanStalledProjects(coll, ownerField, ownerRole) {
+  const now = Date.now();
+  const stallMs = SLA_STALL_DAYS * 86400000;
+  const snap = await db.collection(coll).get();
+  const stalled = [];
+  for (const d of snap.docs) {
+    const p = d.data();
+    const stage = p.stage || "";
+    const fresh = () => { if (p.sla_warn === true) return d.ref.update({ sla_warn: false }); };
+
+    if (stage === "C4" || p.completed === true) { await fresh(); continue; }
+    const updMs = p.updatedAt && p.updatedAt.toMillis ? p.updatedAt.toMillis() : 0;
+    if (!updMs || (now - updMs) < stallMs) { await fresh(); continue; }
+
+    // đã cảnh báo trong 3 ngày gần đây thì bỏ qua (tránh spam)
+    const warnMs = p.slaWarnAt && p.slaWarnAt.toMillis ? p.slaWarnAt.toMillis() : 0;
+    if (warnMs && (now - warnMs) < 3 * 86400000) continue;
+
+    const days = Math.round((now - updMs) / 86400000);
+    await d.ref.update({
+      sla_warn: true,
+      slaWarnAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    const ownerUid = p[ownerField] && p[ownerField].uid;
+    if (ownerUid) {
+      await notifyUser(
+        ownerUid,
+        "⏱ Dự án cần bước tiếp theo",
+        `"${p.name || d.id}" đứng ở chặng ${stage} đã ${days} ngày. Kiểm tra & xử lý bước tiếp theo giúp khách nhé.`,
+        { type: "PROJECT_STALLED", pid: d.id, coll },
+        ownerRole
+      );
+    }
+    stalled.push(`${p.name || d.id} (${stage}, ${days}n)`);
+  }
+  return stalled;
+}
+
+exports.projectSlaNudge = functions
+  .region("asia-southeast1")
+  .pubsub.schedule("10 9 * * *")
+  .timeZone("Asia/Ho_Chi_Minh")
+  .onRun(async () => {
+    try {
+      const [a, b] = await Promise.all([
+        _scanStalledProjects("projects", "kts", "kts"),
+        _scanStalledProjects("designProjects", "designer", "designer"),
+      ]);
+      const all = a.concat(b);
+      if (all.length) {
+        await notifyFounder(
+          "🐢 Dự án đứng bánh",
+          `${all.length} dự án chưa nhúc nhích >${SLA_STALL_DAYS} ngày: ${all.slice(0, 5).join(" · ")}${all.length > 5 ? " …" : ""}`,
+          { type: "PROJECT_STALLED_DIGEST", count: String(all.length) }
+        );
+      }
+      console.log(`[projectSlaNudge] stalled=${all.length}`);
+    } catch (e) {
+      console.error("[projectSlaNudge] Lỗi:", e);
     }
     return null;
   });
