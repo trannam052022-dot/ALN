@@ -138,6 +138,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://applamnha.vn/cam-nang/xay-nha-tron-goi-dak-lak/</loc>
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://applamnha.vn/cam-nang/xay-nha-tron-goi-dak-nong/</loc>
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://applamnha.vn/cam-nang/xay-nha-tron-goi-dong-nai/</loc>
     <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
@@ -150,6 +162,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://applamnha.vn/cam-nang/xay-nha-tron-goi-gia-lai/</loc>
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://applamnha.vn/cam-nang/xay-nha-tron-goi-hau-giang/</loc>
     <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
@@ -157,6 +175,18 @@
   </url>
   <url>
     <loc>https://applamnha.vn/cam-nang/xay-nha-tron-goi-kien-giang/</loc>
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://applamnha.vn/cam-nang/xay-nha-tron-goi-kon-tum/</loc>
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://applamnha.vn/cam-nang/xay-nha-tron-goi-lam-dong/</loc>
     <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
