@@ -63,6 +63,18 @@ Repo GitHub public — file `.md` của bài hẹn ngày vẫn đọc được q
 
 → Không có việc chờ — tính năng hẹn ngày đăng + tự gỡ bài đã hoàn thiện đầy đủ cả 2 chiều (xuất bản & thu hồi). Founder nhớ bật "Read and write permissions" cho Actions (mục trên) để workflow hoạt động.
 
+### Nâng cấp action version (2026-07-04)
+
+`publish-cam-nang.yml`: `actions/checkout@v4→v7`, `actions/setup-node@v4→v6`, `node-version` build đổi `'20'→'22'` — sửa cảnh báo GitHub Actions Node.js 20 runtime lỗi thời (Node 20 hết hỗ trợ 30/04/2026). Đã xác nhận bằng cách chạy thật workflow qua GitHub API (`workflow_dispatch`) — job xanh, check-run không còn annotation cảnh báo.
+
+### Đợt 2 — 5 bài Pháp lý & Giấy phép, hẹn ngày đăng rải 05–21/07 (2026-07-04)
+
+Nhận 5 bài `.md` + 5 ảnh từ Founder (qua đính kèm chat, không phải đặt vào thư mục gốc máy Founder — 2 môi trường tách biệt). Founder đã tự điền sẵn `publishDate` đúng trong frontmatter (không cần tôi sửa): `ban-ve-xin-phep-xay-dung-gom-gi` (05/07), `xay-nha-khong-xin-phep-bi-phat` (10/07), `ho-so-thiet-ke-du-dieu-kien-phap-ly` (14/07), `thu-tuc-hoan-cong-nha-o` (17/07), `chu-ky-kien-truc-su-co-gia-tri-gi` (21/07). Ảnh khớp 100% với trường `image:`, không phải sửa gì. Nội dung có link chéo nội bộ giữa các bài Đợt 1 + Đợt 2 (giúp đạt yêu cầu "internal link ≥ 2 bài khác" ở nhiều bài hơn).
+
+Build lại và xác nhận: cả 5 bài đều **chưa hiện** ngày 04/07 (log liệt kê đủ "chưa tới ngày đăng"), không sinh file HTML, không vào sitemap/danh mục/trang chủ — `grep` xác nhận rỗng ở cả 3 nơi. Cron `publish-cam-nang.yml` (6h sáng giờ VN) sẽ tự đăng từng bài đúng ngày `publishDate` mà không cần thao tác gì thêm.
+
+**Lưu ý:** trong lúc làm, một phiên khác đã push thêm khu vực nội dung mới "Xây nhà theo khu vực" (24 tỉnh/thành, category `khu-vuc` mới trong `templates.js`) + tái cấu trúc vài file gốc vào `_archive/`. Đã merge sạch, không xung đột — build lại xác nhận cả 24 bài khu vực + 5 bài Đợt 1 vẫn đúng (29 bài xuất bản), 5 bài Đợt 2 vẫn đúng trạng thái ẩn.
+
 ---
 
 ## Pass 1 — Khảo sát codebase + xác nhận kiến trúc (2026-07-03)
