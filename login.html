@@ -570,20 +570,12 @@ async function doLogin(){
     ]);
     const email = fb.usernameToEmail(user);
     const cred  = await fb.signInWithEmailAndPassword(fb.auth, email, pw);
-    const FOUNDER_UID = 'h4kEguPEyMcwJwl89stc0Q6j2si2';
     await cred.user.getIdToken(true);
     let snap = null;
     for (let i = 0; i < 3; i++) {
       snap = await fb.getDoc(fb.doc(fb.db, 'users', cred.user.uid));
       if (snap.exists()) break;
       await new Promise(r => setTimeout(r, 800));
-    }
-    if (cred.user.uid === FOUNDER_UID && (!snap || !snap.exists())) {
-      console.warn('[ALN Login] Founder document miss — dùng profile cứng');
-      snap = {
-        exists: () => true,
-        data: () => ({ role:'founder', name:'KTS. Trần Đại Long', username:'founder.tranlong', email:'tranlongkts.vn@gmail.com' })
-      };
     }
     if(!snap.exists()){
       await fb.signOut(fb.auth);
