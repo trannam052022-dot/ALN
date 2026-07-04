@@ -4615,9 +4615,10 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, storage, storageRef, uploadBytes, getDownloadURL, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, query, where, orderBy, limit, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
+import { app, auth, db, storage, storageRef, uploadBytes, getDownloadURL, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, query, where, orderBy, limit, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "founder";
+window.app = app; // để các hàm ở script thường (saveAddModal…) gọi getFunctions(app,…) được
 
 /* ── KHUNG GIÁ: lưu thẳng lên Firestore ── */
 window.pricingSaveToFirestore = async function(data) {
