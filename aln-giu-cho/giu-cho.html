@@ -77,6 +77,8 @@ input::placeholder{color:var(--muted)}
 .success h2{font-family:var(--serif);font-size:28px;font-weight:600;margin-bottom:8px}
 .success p{font-size:12px;color:var(--text2);line-height:1.7;max-width:300px;margin:0 auto 18px}
 .tag-room{display:inline-block;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--gold2);background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.28);border-radius:8px;padding:8px 18px;margin-bottom:18px}
+.vung-badge{display:flex;align-items:center;gap:8px;font-family:var(--syne);font-size:12px;font-weight:700;color:var(--gold2);background:rgba(201,168,76,.09);border:1px solid rgba(201,168,76,.28);border-radius:10px;padding:10px 14px;margin-bottom:16px}
+.vung-badge i{font-size:16px;color:var(--gold)}
 .install-box{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.22);border-radius:11px;padding:15px;margin:18px 0;text-align:left}
 .install-box .ib-head{display:flex;align-items:center;gap:8px;font-family:var(--syne);font-size:12px;font-weight:700;color:var(--gold2);margin-bottom:6px}
 .install-box p{font-size:11px;color:var(--text2);margin:0;text-align:left;line-height:1.55}
@@ -97,6 +99,9 @@ input::placeholder{color:var(--muted)}
 
   <!-- FORM GIỮ CHỖ -->
   <div class="card" id="formCard">
+    <div class="vung-badge" id="vungBadge" style="display:none">
+      <i class="ph-duotone ph-map-pin"></i><span id="vungBadgeText"></span>
+    </div>
     <div class="field">
       <label>Họ và tên <span class="req">✦</span></label>
       <input type="text" id="f_name" placeholder="VD: Trần Đại Long" autocomplete="name">
@@ -172,6 +177,23 @@ document.querySelectorAll('#roomGrid .room').forEach(function(r){
   match.closest('.room').classList.add('on');
 })();
 
+/* ---------- khu vực từ URL ?vung=mien-bac ---------- */
+var VUNG_VI = {
+  'mien-bac':'Miền Bắc', 'mien-trung':'Miền Trung', 'mien-nam':'Miền Nam',
+  'mien-tay':'Miền Tây', 'tay-nguyen':'Tây Nguyên'
+};
+window.SELECTED_VUNG = '';       // slug, VD 'mien-bac'
+window.SELECTED_VUNG_VI = '';    // nhãn hiển thị, VD 'Miền Bắc'
+(function(){
+  var v = new URLSearchParams(location.search).get('vung');
+  if(!v || !VUNG_VI[v]) return;
+  window.SELECTED_VUNG = v;
+  window.SELECTED_VUNG_VI = VUNG_VI[v];
+  var badge = document.getElementById('vungBadge');
+  document.getElementById('vungBadgeText').textContent = 'Khu vực của bạn: ' + VUNG_VI[v];
+  badge.style.display = 'flex';
+})();
+
 /* ---------- toast ---------- */
 var _tt=null;
 function showToast(msg,err){var el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(err?' err':'');clearTimeout(_tt);_tt=setTimeout(function(){el.className='toast'},3200);}
@@ -219,6 +241,8 @@ window.reserve = async function(){
   if(!validPhone(phone)){ showToast('Số điện thoại chưa đúng (10 số, bắt đầu bằng 0)', true); return; }
   if(!roomEl){ showToast('Vui lòng chọn phòng làm việc', true); return; }
   const role = roomEl.value;
+  const region   = window.SELECTED_VUNG || '';
+  const regionVi = window.SELECTED_VUNG_VI || '';
 
   btn.disabled=true; btn.innerHTML='<i class="ph-duotone ph-spinner ph-spin"></i> Đang giữ chỗ…';
   const email = phone + '@aln.vn';
@@ -242,19 +266,21 @@ window.reserve = async function(){
     const uref = doc(db,'users',uid);
     const usnap = await getDoc(uref);
     if(!usnap.exists()){
-      await setDoc(uref,{ name, phone, role, status:'reserved', profileSubmitted:false, createdAt:serverTimestamp() });
+      await setDoc(uref,{ name, phone, role, region, regionVi, status:'reserved', profileSubmitted:false, createdAt:serverTimestamp() });
+    } else if(region){
+      await setDoc(uref,{ region, regionVi }, {merge:true});
     }
 
     const rref = doc(db,'reservations',uid);
     const rsnap = await getDoc(rref);
     if(!rsnap.exists()){
       await setDoc(rref,{
-        uid, name, phone, role,
+        uid, name, phone, role, region, regionVi,
         status:'reserved', profileSubmitted:false, reminderCount:0,
         reservedAt: serverTimestamp(), deadlineMs: deadline
       });
     } else if(!rsnap.data().profileSubmitted){
-      await setDoc(rref,{ ...rsnap.data(), name, phone, role }, {merge:true});
+      await setDoc(rref,{ ...rsnap.data(), name, phone, role, region, regionVi }, {merge:true});
     }
 
     document.getElementById('formCard').style.display='none';
