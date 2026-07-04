@@ -13,6 +13,12 @@
 //
 // Founder KHÔNG cần chạy lệnh này — Claude Code chạy mỗi khi thêm bài mới
 // rồi commit thẳng HTML sinh ra (xem CHANGES.md Pass 1, mục "Kiến trúc build").
+//
+// Hẹn ngày đăng: thêm "publishDate: YYYY-MM-DD" vào frontmatter bài viết.
+// Bài chưa tới ngày (theo giờ VN) sẽ KHÔNG được build ra (không tồn tại URL,
+// không vào sitemap/danh mục/trang chủ) cho tới khi script chạy lại đúng/qua
+// ngày đó — xem .github/workflows/publish-cam-nang.yml (cron tự chạy 6h sáng
+// mỗi ngày). Không có "publishDate" = xuất bản ngay như trước giờ.
 
 var fs = require('fs');
 var path = require('path');
@@ -47,6 +53,14 @@ var STATIC_PUBLIC_PAGES = [
   { url: '/privacy.html', priority: '0.3', changefreq: 'yearly' },
 ];
 
+// "Hôm nay" theo giờ Việt Nam (UTC+7) — KHÔNG phụ thuộc múi giờ máy chạy script
+// (quan trọng vì GitHub Actions runner chạy giờ UTC). Dịch epoch hiện tại +7h
+// rồi lấy ngày theo UTC là ra đúng ngày lịch ở VN, không cần thư viện ngoài.
+function todayVN() {
+  var vn = new Date(Date.now() + 7 * 60 * 60 * 1000);
+  return vn.toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
 function readArticles() {
   var files = fs.readdirSync(CONTENT_DIR).filter(function (f) { return f.endsWith('.md'); });
   var articles = files.map(function (file) {
@@ -66,13 +80,28 @@ function readArticles() {
     data.sourceFile = file;
     return data;
   });
+
+  // Hẹn ngày đăng: frontmatter "publishDate: YYYY-MM-DD" (tuỳ chọn). Không có
+  // → xuất bản ngay (tương thích ngược, không cần sửa bài cũ). Có nhưng còn ở
+  // tương lai → ẩn hoàn toàn (KHÔNG sinh file HTML, KHÔNG vào sitemap/danh mục/
+  // khối trang chủ) cho tới đúng ngày. So sánh chuỗi "YYYY-MM-DD" là đủ, không
+  // cần parse Date.
+  var today = todayVN();
+  var upcoming = articles.filter(function (a) { return a.publishDate && a.publishDate > today; });
+  if (upcoming.length) {
+    console.log('Bài chưa tới ngày đăng (' + upcoming.length + '): ' + upcoming.map(function (a) {
+      return a.slug + ' (publishDate: ' + a.publishDate + ')';
+    }).join(', '));
+  }
+  var published = articles.filter(function (a) { return !a.publishDate || a.publishDate <= today; });
+
   // Bài mới nhất trước — sort theo "updated" (fallback "date"), dạng YYYY-MM-DD nên so sánh chuỗi là đủ.
-  articles.sort(function (a, b) {
+  published.sort(function (a, b) {
     var da = a.updated || a.date || '';
     var db = b.updated || b.date || '';
     return db.localeCompare(da);
   });
-  return articles;
+  return published;
 }
 
 function writeFileIfChanged(filePath, content) {

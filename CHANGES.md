@@ -13,6 +13,56 @@ Việc thủ công còn lại của Founder (mục 9 brief gốc): đăng ký Go
 
 ---
 
+## Pass 6 — Hẹn ngày đăng bài (2026-07-04)
+
+**Trạng thái:** Xong, đã push `main`. Không đụng `firestore.rules`/`storage.rules`.
+
+### Đã khảo sát trước khi code (Founder duyệt hướng)
+
+Ràng buộc nền tảng: site tĩnh không có server-side runtime, nên "tự hiện đúng ngày" **bắt buộc** phải có 1 tiến trình build+push lại đúng lúc (không có cách nào né được, kể cả đổi sang Jekyll). So sánh 2 hướng:
+1. **GitHub Actions cron** tự build+push mỗi ngày — tự động thật sự.
+2. Chỉ lọc theo ngày trong build script, chạy thủ công — không đảm bảo "tới ngày mới hiện" vì phụ thuộc có người nhớ chạy lại.
+
+→ Chọn hướng 1, dùng chung bộ lọc ngày của hướng 2 làm nền. Founder xác nhận đồng ý cho workflow tự `push` thẳng `main`.
+
+### Thiết kế
+
+- **`publishDate: YYYY-MM-DD`** — trường mới, tuỳ chọn, trong frontmatter bài viết. Không có = xuất bản ngay (tương thích ngược, 5 bài Đợt 1 không cần sửa gì).
+- Lọc tại **một điểm duy nhất** — `readArticles()` trong `scripts/build-cam-nang.js`: bài có `publishDate` > hôm nay (giờ VN) bị loại khỏi danh sách trả về, trước khi tới bất kỳ bước sinh trang/sitemap/khối trang chủ nào — nên tất cả nơi khác (bài viết, danh mục, `home.html`, `sitemap.xml`) tự động đồng bộ, không phải sửa thêm chỗ nào khác.
+- Bài chưa tới ngày: **không sinh file HTML** (không phải sinh ra rồi gắn `noindex`) — URL thật sự chưa tồn tại (404) cho tới đúng ngày, an toàn hơn là dựa vào thẻ meta.
+- `todayVN()`: tính "hôm nay" bằng epoch UTC hiện tại +7 giờ rồi lấy ngày — không phụ thuộc múi giờ máy chạy (quan trọng vì GitHub Actions runner chạy giờ UTC).
+- Bộ lọc dùng `publishDate ≤ hôm nay` (không phải `==`) → **tự chữa lành**: nếu 1 lần chạy cron lỗi, lần chạy thành công kế tiếp tự động đăng bù bài bị trễ, không cần can thiệp tay.
+- Log ra danh sách bài đang chờ ngày mỗi lần build (`Bài chưa tới ngày đăng (N): slug (publishDate: ...)`), tiện kiểm tra khi chạy tay.
+
+### `.github/workflows/publish-cam-nang.yml` (mới)
+
+- `cron: '0 23 * * *'` = 6:00 sáng giờ VN mỗi ngày — né khung giờ GitHub Actions đông tải nhất (quanh 00:00 UTC), bài lên trước giờ hành chính.
+- `workflow_dispatch` — cho phép chạy tay để kiểm tra bất kỳ lúc nào.
+- Chạy `node scripts/build-cam-nang.js`, nếu `git diff` có thay đổi → commit + push thẳng `main`; không có gì thay đổi → không commit (im lặng, không tạo commit rác).
+- **Cần Founder kiểm tra 1 lần:** Settings → Actions → General → "Workflow permissions" phải để **"Read and write permissions"** thì bước push mới chạy được (nếu đang để "Read only" sẽ fail ở bước push — dễ nhận ra qua email lỗi GitHub gửi tự động).
+- Phát hiện lỗi: dựa vào email tự động của GitHub khi scheduled workflow fail (mặc định, không cần cấu hình thêm) + cơ chế tự chữa lành ở trên — không dựng thêm hệ thống giám sát riêng vì không cần thiết ở quy mô site này.
+
+### Rủi ro đã lưu ý (không giải quyết bằng kỹ thuật)
+
+Repo GitHub public — file `.md` của bài hẹn ngày vẫn đọc được qua lịch sử commit công khai trước ngày "chính thức" lên trang, dù trang web không lộ. Founder đã chấp nhận rủi ro này; khuyến nghị: chỉ thêm file `.md` sát ngày đăng (trước 1-2 ngày) thay vì thêm trước hàng tuần, để thu hẹp cửa sổ rủi ro.
+
+### Đã kiểm tra
+
+- Tạo bài test với `publishDate` tương lai (2099-01-01) → xác nhận: không sinh file HTML, không xuất hiện trong `sitemap.xml`/trang danh mục/khối trang chủ, có log cảnh báo đúng.
+- Đổi `publishDate` về quá khứ (2020-01-01), build lại → bài xuất hiện đầy đủ ở mọi nơi.
+- Xoá bài test, build lại 2 lần → về đúng trạng thái 5 bài ban đầu, idempotent (lần 2 không đổi gì).
+- 5 bài Đợt 1 hiện tại không có `publishDate` → không bị ảnh hưởng, vẫn xuất bản như cũ (đã xác nhận qua diff rỗng).
+
+### Việc còn thiếu (không chặn, ghi nhận để biết)
+
+- Chưa có cơ chế "gỡ bài" tự động: nếu sau này đổi `publishDate` của 1 bài đang live sang tương lai (để ẩn lại), file HTML cũ đã sinh ra trước đó sẽ không tự bị xoá (script chỉ ghi thêm/ghi đè, không xoá file). Ngoài phạm vi yêu cầu hiện tại (chỉ cần hẹn ngày *tới*, chưa cần "gỡ bài"), nêu ra để Founder biết nếu sau này cần.
+
+### Việc tiếp theo
+
+→ Không có việc chờ — tính năng đã sẵn sàng dùng, chỉ cần thêm `publishDate` khi muốn hẹn ngày cho bài mới. Founder nhớ bật "Read and write permissions" cho Actions (mục trên) để workflow hoạt động.
+
+---
+
 ## Pass 1 — Khảo sát codebase + xác nhận kiến trúc (2026-07-03)
 
 **Trạng thái:** Báo cáo, chưa code.

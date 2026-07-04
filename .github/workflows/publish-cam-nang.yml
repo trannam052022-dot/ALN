@@ -1,0 +1,43 @@
+name: ALN Cẩm nang — Tự động đăng bài hẹn ngày
+
+# Chạy mỗi ngày 6:00 sáng giờ Việt Nam (UTC+7 = UTC 23:00 hôm trước).
+# Build script tự lọc bài theo "publishDate" trong frontmatter — bài nào đã
+# tới ngày (giờ VN) sẽ được sinh ra + commit. Bộ lọc dùng "<= hôm nay" nên nếu
+# 1 lần chạy bị lỗi, lần chạy thành công kế tiếp tự đăng bù bài bị trễ — không
+# cần can thiệp tay.
+on:
+  schedule:
+    - cron: '0 23 * * *'
+  workflow_dispatch: # Cho phép chạy tay bất kỳ lúc nào để kiểm tra
+
+concurrency:
+  group: publish-cam-nang
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build Cẩm nang (lọc bài theo publishDate)
+        run: node scripts/build-cam-nang.js
+
+      - name: Commit + push nếu có bài tới ngày đăng hôm nay
+        run: |
+          git config user.name "ALN Cam Nang Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Không có bài nào tới ngày đăng hôm nay — không commit."
+          else
+            git commit -m "Tự động đăng bài Cẩm nang đến ngày hẹn"
+            git push
+          fi
