@@ -304,7 +304,9 @@ function sleep(ms) {
 // đăng FB (chống trùng qua .fb-posted.json). Bài chưa tới ngày không nằm
 // trong "articles" nên tự nhiên chỉ được xét đúng lúc "vừa xuất bản".
 async function postDueArticlesToFacebook(articles) {
-  var secret = process.env.CAM_NANG_FB_SECRET;
+  // trim() phòng trường hợp GitHub Actions secret bị dính khoảng trắng/xuống
+  // dòng thừa lúc copy-paste — phải khớp trim() ở phía Cloud Function.
+  var secret = (process.env.CAM_NANG_FB_SECRET || '').trim();
   var state = loadFbPostedState();
   var candidates = articles.filter(function (a) {
     return a.facebook === true && !state[a.slug];
@@ -315,6 +317,7 @@ async function postDueArticlesToFacebook(articles) {
     console.error('::error::Có ' + candidates.length + ' bài Cẩm nang cần đăng Facebook nhưng thiếu env CAM_NANG_FB_SECRET — bỏ qua bước đăng FB (web vẫn xuất bản bình thường). Xem CHANGES.md để tạo secret.');
     return { attempted: 0, failed: candidates.length };
   }
+  console.log('Đang gọi postCamNangToFacebook cho ' + candidates.length + ' bài — secret.length=' + secret.length + ' (chẩn đoán, không phải giá trị thật).');
 
   var failed = 0;
   for (var i = 0; i < candidates.length; i++) {

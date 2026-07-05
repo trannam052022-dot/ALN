@@ -508,12 +508,22 @@ exports.postCamNangToFacebook = onRequest(
     }
     // Header đến ở dạng base64 (xem scripts/build-cam-nang.js) vì secret gốc
     // có thể chứa ký tự ngoài ASCII — HTTP header không cho phép giá trị đó
-    // trực tiếp. Decode lại rồi mới so khớp với secret gốc.
+    // trực tiếp. Decode lại rồi mới so khớp với secret gốc. trim() cả 2 phía
+    // để chịu được khoảng trắng/xuống dòng thừa lúc copy-paste secret vào
+    // GitHub Actions / Firebase Secret Manager (2 nơi nhập khác cơ chế nhau).
     let receivedSecret = "";
     try {
-      receivedSecret = Buffer.from(req.get("x-cam-nang-secret") || "", "base64").toString("utf8");
+      receivedSecret = Buffer.from(req.get("x-cam-nang-secret") || "", "base64").toString("utf8").trim();
     } catch (e) { receivedSecret = ""; }
-    if (receivedSecret !== CAM_NANG_FB_SECRET.value()) {
+    const configuredSecret = (CAM_NANG_FB_SECRET.value() || "").trim();
+    // Log ĐỘ DÀI thôi, không log giá trị — dùng để chẩn đoán lệch secret /
+    // deploy cũ mà không lộ nội dung secret ra Cloud Functions log.
+    console.log(
+      "[postCamNangToFacebook] build=2026-07-05-b64fix secret check — received.length=" +
+      receivedSecret.length + ", configured.length=" + configuredSecret.length +
+      ", match=" + (receivedSecret === configuredSecret)
+    );
+    if (!configuredSecret || receivedSecret !== configuredSecret) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }

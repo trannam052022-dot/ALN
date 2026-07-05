@@ -150,6 +150,21 @@ Founder test thật (`workflow_dispatch`, bài `xay-nha-khong-xin-phep-bi-phat`,
 
 **Cần làm tiếp:** deploy lại function để nhận code mới — `firebase deploy --only functions:postCamNangToFacebook --project aln-platform` — rồi chạy tay `workflow_dispatch` 1 lần nữa để xác nhận đăng FB thành công cho bài test.
 
+### Fix 2 — vẫn "Unauthorized" sau khi deploy lại (2026-07-05)
+
+Founder xác nhận đã set secret giống hệt ở cả GitHub Actions + Firebase và deploy lại, nhưng chạy `workflow_dispatch` vẫn báo `Đăng Facebook thất bại ... : Unauthorized`.
+
+**Khảo sát tận gốc (không giả định secret lệch):** lấy log job thật qua GitHub API — 2 lần chạy gần nhất (run `28732136223`, `28732318220`) đều chạy trên đúng commit `19f2d62` (bản đã encode base64 header). Xác nhận `scripts/build-cam-nang.js` phía gửi **chắc chắn** đã base64-encode secret trước khi đặt vào header (đọc lại đúng code tại commit đó). Đối chiếu `functions/index.js` cùng commit cũng **có** decode base64 trước khi so khớp — 2 phía trong repo khớp nhau về cơ chế encode/decode, tên header (`x-cam-nang-secret`) và tên biến đọc secret (`process.env.CAM_NANG_FB_SECRET` phía script, `CAM_NANG_FB_SECRET.value()` phía function) đều đúng.
+
+Vì code trong repo đã tự khớp nhau (verify bằng test cục bộ: encode base64 → decode lại → ra đúng chuỗi gốc), lỗi 401 vẫn xảy ra nhiều khả năng nhất do: **function đang chạy trên Cloud Functions là bản deploy TRƯỚC commit `19f2d62`** (deploy từ máy Founder lúc local chưa `git pull` commit fix mới nhất) — bản cũ so sánh secret dạng thô, trong khi client giờ luôn gửi base64 → không bao giờ khớp. Khả năng thứ 2 (thấp hơn nhưng không loại trừ): khoảng trắng/xuống dòng thừa lệch giữa 2 nơi nhập secret (GitHub Actions textarea giữ nguyên như dán vào, Firebase CLI prompt có thể xử lý khác).
+
+**Đã sửa (cả 2 khả năng, không cần đổi secret):**
+- `trim()` cả 2 phía trước khi so sánh (`build-cam-nang.js` khi đọc `process.env.CAM_NANG_FB_SECRET`, `functions/index.js` khi decode header và khi đọc `CAM_NANG_FB_SECRET.value()`) — hết rủi ro khoảng trắng thừa.
+- Thêm log chẩn đoán AN TOÀN (chỉ độ dài, không log giá trị) ở cả 2 phía: script log `secret.length` trước khi gọi; function log `received.length`, `configured.length`, `match` mỗi lần được gọi — lần chạy tới sẽ thấy ngay trong Cloud Functions log (`firebase functions:log` hoặc Console) độ dài 2 bên có khớp không, xác định dứt điểm còn lệch ở đâu nếu vẫn lỗi.
+- Thêm mốc `build=2026-07-05-b64fix` vào log function — nếu log KHÔNG hiện dòng này nghĩa là function vẫn đang chạy bản cũ (xác nhận trực tiếp nghi vấn deploy cũ thay vì đoán).
+
+**Cần làm tiếp:** `git pull origin main` để lấy đúng code mới nhất trước khi `firebase deploy --only functions:postCamNangToFacebook --project aln-platform`, rồi chạy tay `workflow_dispatch` 1 lần nữa. Nếu vẫn lỗi, xem `firebase functions:log --only postCamNangToFacebook` để đọc dòng log độ dài secret ở trên — 2 độ dài lệch nhau nghĩa là secret 2 nơi thực sự khác nhau (cần đặt lại), bằng nhau mà vẫn `match=false` thì báo lại để khảo sát tiếp.
+
 ---
 
 ## Pass 1 — Khảo sát codebase + xác nhận kiến trúc (2026-07-03)
