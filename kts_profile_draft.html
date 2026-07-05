@@ -22,9 +22,9 @@
   --sans: 'DM Sans', sans-serif; --serif: 'Cormorant Garamond', serif;
   --syne: 'Syne', sans-serif; --mono: 'JetBrains Mono', monospace;
 }
-html { font-size: 13px; }
-@media (min-width: 1440px) { html { font-size: 14px; } }
-@media (min-width: 1920px) { html { font-size: 16px; } }
+html { font-size: 16px; }
+@media (min-width: 1440px) { html { font-size: 18px; } }
+@media (min-width: 1920px) { html { font-size: 20px; } }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--sans); background: var(--cream); color: var(--text); line-height: 1.6; font-size: 1rem; }
 .draft-ribbon {
@@ -292,8 +292,8 @@ window.inviteKts = async function(){
   try {
     const res = await callInvite({ ktsUid: KTS_UID, threadId: null });
     showToast(res.data.existing
-      ? 'Bạn đã có lời mời đang mở với KTS này — trao đổi tiếp qua kênh chat sàn ALN'
-      : '🤝 Đã gửi lời mời tư vấn! KTS sẽ nhận thông báo và trao đổi với bạn qua kênh chat sàn ALN');
+      ? 'Dạ, anh/chị đã có lời mời đang mở với KTS này — trao đổi tiếp qua kênh chat sàn ALN'
+      : '🤝 Đã gửi lời mời tư vấn! KTS sẽ nhận thông báo và trao đổi với anh/chị qua kênh chat sàn ALN');
   } catch(e){
     showToast('Lỗi: ' + ((e && e.message) || 'không gửi được lời mời'));
   } finally { btn.disabled = false; }

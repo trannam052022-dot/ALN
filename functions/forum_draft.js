@@ -386,7 +386,7 @@ exports.forumPostDraft = onCall({ region: REGION }, async (request) => {
   if (!CATEGORIES.includes(category)) throw new HttpsError("invalid-argument", "Chuyên mục không hợp lệ");
   const p2 = await getP2Enabled();
   if (!canPostCategory(profile.role, category, p2)) {
-    throw new HttpsError("permission-denied", "Vai trò của bạn không đăng được vào chuyên mục này");
+    throw new HttpsError("permission-denied", "Dạ, vai trò của anh/chị không đăng được vào chuyên mục này");
   }
   if (!text && media.length === 0) throw new HttpsError("invalid-argument", "Nhập nội dung hoặc chọn ảnh");
 
@@ -548,9 +548,9 @@ exports.forumCommentDraft = onCall({ region: REGION }, async (request) => {
   if (profile.role === "founder" || profile.role === "kts") {
     // KTS/Founder bình luận mọi chuyên mục
   } else if ((profile.role === "cn" || profile.role === "dn") && p2) {
-    if (post.authorUid !== uid) throw new HttpsError("permission-denied", "Bạn chỉ bình luận được trong thread của mình");
+    if (post.authorUid !== uid) throw new HttpsError("permission-denied", "Dạ, anh/chị chỉ bình luận được trong thread của mình");
   } else {
-    throw new HttpsError("permission-denied", "Vai trò của bạn chưa bình luận được trong diễn đàn");
+    throw new HttpsError("permission-denied", "Dạ, vai trò của anh/chị chưa bình luận được trong diễn đàn");
   }
 
   /* Bộ lọc chống lách sàn */
@@ -609,13 +609,13 @@ exports.forumCommentDraft = onCall({ region: REGION }, async (request) => {
     if (post.authorUid && !notified.has(post.authorUid)) {
       notified.add(post.authorUid);
       await fdNotifyBatched(post.authorUid, postId,
-        "💬 " + (profile.name || "Ai đó") + " bình luận bài của bạn", preview,
+        "💬 " + (profile.name || "Ai đó") + " bình luận bài của anh/chị", preview,
         { type: "FORUM_COMMENT", postId });
     }
     if (rootAuthorUid && !notified.has(rootAuthorUid)) {
       notified.add(rootAuthorUid);
       await fdNotifyBatched(rootAuthorUid, postId,
-        "↩️ " + (profile.name || "Ai đó") + " trả lời bình luận của bạn", preview,
+        "↩️ " + (profile.name || "Ai đó") + " trả lời bình luận của anh/chị", preview,
         { type: "FORUM_REPLY", postId });
     }
   } else {
@@ -716,7 +716,7 @@ exports.forumBestAnswerDraft = onCall({ region: REGION }, async (request) => {
   if (info.authorRole === "kts") {
     await addRep(info.authorUid, "bestAnswer", 1, COL.posts + "/" + postId + "/comments/" + commentId);
   }
-  await fdNotify(info.authorUid, "🏆 Câu trả lời của bạn được chọn Best Answer",
+  await fdNotify(info.authorUid, "🏆 Câu trả lời của anh/chị được chọn Best Answer",
     "Chủ thớt đã đánh dấu câu trả lời hay nhất — +5 điểm uy tín",
     { type: "FORUM_BEST_ANSWER", postId, commentId });
 
@@ -804,8 +804,8 @@ exports.forumInviteDraft = onCall({ region: REGION }, async (request) => {
     updatedAt: ts(),
   });
 
-  await fdNotify(ktsUid, "🤝 Bạn được mời tư vấn dự án",
-    `${profile.name || "Khách"} vừa mời bạn tư vấn qua diễn đàn — mở kênh chat sàn để trao đổi`,
+  await fdNotify(ktsUid, "🤝 Anh/chị được mời tư vấn dự án",
+    `${profile.name || "Khách"} vừa mời anh/chị tư vấn qua diễn đàn — mở kênh chat sàn để trao đổi`,
     { type: "FORUM_INVITE", inviteId: invRef.id });
   await fdNotify(FOUNDER_UID, "📈 Invite mới trong phễu diễn đàn",
     `${profile.name || uid} mời ${ktsProfile.name || ktsUid}`,
@@ -877,7 +877,7 @@ exports.forumAdminDraft = onCall({ region: REGION }, async (request) => {
         if (cSnap.data().status === "pending") {
           await cRef.update({ status: "visible" });
           await postRef.update({ commentCount: inc(1), updatedAt: ts() });
-          await fdNotify(cSnap.data().authorUid, "✅ Bình luận của bạn đã được duyệt", "Bình luận đã hiển thị trên diễn đàn", { type: "FORUM_APPROVED", postId: d.postId });
+          await fdNotify(cSnap.data().authorUid, "✅ Bình luận của anh/chị đã được duyệt", "Bình luận đã hiển thị trên diễn đàn", { type: "FORUM_APPROVED", postId: d.postId });
         }
         await fdb.collection(COL.modQueue).doc(String(d.postId) + "__" + String(d.commentId)).delete();
       } else {
@@ -885,7 +885,7 @@ exports.forumAdminDraft = onCall({ region: REGION }, async (request) => {
         if (!pSnap.exists) throw new HttpsError("not-found", "Bài viết không tồn tại");
         if (pSnap.data().status === "pending") {
           await postRef.update({ status: "visible", updatedAt: ts() });
-          await fdNotify(pSnap.data().authorUid, "✅ Bài của bạn đã được duyệt", "Bài đã hiển thị trên diễn đàn", { type: "FORUM_APPROVED", postId: d.postId });
+          await fdNotify(pSnap.data().authorUid, "✅ Bài của anh/chị đã được duyệt", "Bài đã hiển thị trên diễn đàn", { type: "FORUM_APPROVED", postId: d.postId });
         }
         await fdb.collection(COL.modQueue).doc(String(d.postId)).delete();
       }
@@ -966,7 +966,7 @@ exports.forumAdminDraft = onCall({ region: REGION }, async (request) => {
       await postRef.update({ firstAnswerRewarded: true });
       await addRep(cSnap.data().authorUid, "firstAnswer", 1, COL.posts + "/" + d.postId + "/comments/" + d.commentId);
       await fdNotify(cSnap.data().authorUid, "⭐ Câu trả lời đầu tiên đạt chất lượng",
-        "Founder xác nhận — bạn nhận thêm điểm uy tín x2", { type: "FORUM_FIRST_ANSWER", postId: d.postId });
+        "Founder xác nhận — anh/chị nhận thêm điểm uy tín x2", { type: "FORUM_FIRST_ANSWER", postId: d.postId });
       return { ok: true };
     }
 

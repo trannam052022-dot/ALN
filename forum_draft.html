@@ -37,9 +37,9 @@
   --syne:  'Syne', sans-serif;
   --mono:  'JetBrains Mono', monospace;
 }
-html { font-size: 13px; }
-@media (min-width: 1440px) { html { font-size: 14px; } }
-@media (min-width: 1920px) { html { font-size: 16px; } }
+html { font-size: 16px; }
+@media (min-width: 1440px) { html { font-size: 18px; } }
+@media (min-width: 1920px) { html { font-size: 20px; } }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--sans); background: var(--cream); color: var(--text); line-height: 1.6; font-size: 1rem; }
 
@@ -692,8 +692,8 @@ function bootForRole(){
     $('btnPost').style.display = 'none';
     renderGate('ph-users-three', 'Diễn đàn đang mở nội bộ KTS',
       USER.role === 'cn' || USER.role === 'dn'
-        ? 'Chuyên mục Tư vấn Dự án dành cho Chủ nhà / Doanh nghiệp sẽ sớm ra mắt. Khi đó bạn có thể đăng nhu cầu và mời KTS tư vấn ngay trên diễn đàn.'
-        : 'Vai trò của bạn chưa có quyền truy cập diễn đàn trong giai đoạn này.');
+        ? 'Chuyên mục Tư vấn Dự án dành cho Chủ nhà / Doanh nghiệp sẽ sớm ra mắt. Khi đó anh/chị có thể đăng nhu cầu và mời KTS tư vấn ngay trên diễn đàn.'
+        : 'Dạ, vai trò của anh/chị chưa có quyền truy cập diễn đàn trong giai đoạn này.');
     if(postsUnsub){ postsUnsub(); postsUnsub = null; }
     return;
   }
@@ -803,7 +803,7 @@ function rankBadge(rank){
 function suggestedKtsHtml(p){
   if(catOf(p) !== 'tu_van_du_an' || !Array.isArray(p.suggestedKts) || !p.suggestedKts.length) return '';
   const canInvite = (USER.role === 'cn' || USER.role === 'dn' || USER.role === 'founder');
-  return '<div class="sug-box"><div class="sug-title"><i class="ph-duotone ph-sparkle"></i> KTS phù hợp cho dự án của bạn</div>'
+  return '<div class="sug-box"><div class="sug-title"><i class="ph-duotone ph-sparkle"></i> KTS phù hợp cho dự án của anh/chị</div>'
     + '<div class="sug-list">' + p.suggestedKts.map(k =>
         '<div class="sug-item">'
         + '<a href="kts_profile_draft.html?uid='+escH(k.uid)+'" class="sug-name">'+escH(k.name||'KTS ALN')+'</a>'
@@ -875,7 +875,7 @@ window.toggleP2 = async function(){
 /* ════ ĐĂNG BÀI ════ */
 window.openPostModal = function(){
   const cats = postableCats();
-  if(!cats.length){ showToast('Vai trò của bạn chưa đăng bài được'); return; }
+  if(!cats.length){ showToast('Dạ, vai trò của anh/chị chưa đăng bài được'); return; }
   selectedCat = cats[0];
   $('catSelect').innerHTML = cats.map(c =>
     '<div class="cat-opt'+(c===selectedCat?' sel':'')+'" onclick="pickCat(\''+c+'\')" id="catOpt-'+c+'">'
@@ -962,7 +962,7 @@ window.submitPost = async function(){
     const res = await callPost({ category: selectedCat, text, media, brief });
     closePostModal();
     showToast(res.data.status === 'pending'
-      ? 'Đã gửi — bài của bạn chờ Founder duyệt (3 đóng góp đầu tiên)'
+      ? 'Dạ, đã gửi — bài của anh/chị chờ Founder duyệt (3 đóng góp đầu tiên)'
       : 'Đã đăng bài!');
   } catch(e){
     showToast('⛔ ' + fnErr(e));
@@ -1099,7 +1099,7 @@ function renderComment(p, c, isReply){
 function renderComposer(p){
   if(!canCommentHere(p)){
     if((USER.role === 'cn' || USER.role === 'dn') && P2_ON){
-      return '<div style="font-size:var(--text-2xs);color:var(--muted);margin-top:10px">Bạn chỉ bình luận được trong thread do mình tạo (chuyên mục Tư vấn Dự án).</div>';
+      return '<div style="font-size:var(--text-2xs);color:var(--muted);margin-top:10px">Dạ, anh/chị chỉ bình luận được trong thread do mình tạo (chuyên mục Tư vấn Dự án).</div>';
     }
     return '';
   }
@@ -1186,7 +1186,7 @@ window.aiDraft = async function(pid){
     el.value = r.data.draft || prev;
     autoGrowCm(); el.scrollTop = 0; el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     showAiGate();
-    showToast('AI mới soạn NHÁP — đọc kỹ & chỉnh cho đúng ý bạn trước khi gửi');
+    showToast('AI mới soạn NHÁP — đọc kỹ & chỉnh cho đúng ý anh/chị trước khi gửi');
   } catch(e){ el.value = prev; showToast('Lỗi AI: ' + fnErr(e)); }
   finally { el.disabled = false; if(btn){ btn.disabled = false; btn.classList.remove('loading'); } el.focus();
     const w = $('cmFilterWarn'); if(w){ const v = filterViolation(el.value); w.style.display = v ? 'block' : 'none'; if(v) w.textContent = '⚠ Nội dung chứa ' + VIOLATION_LABEL[v] + ' — sẽ bị chặn. ' + BLOCK_MSG; }
@@ -1266,7 +1266,7 @@ window.inviteKts = async function(ktsUid, threadId){
   try {
     const res = await callInvite({ ktsUid, threadId });
     showToast(res.data.existing
-      ? 'Bạn đã có lời mời đang mở với KTS này — mở kênh chat sàn để trao đổi tiếp'
+      ? 'Dạ, anh/chị đã có lời mời đang mở với KTS này — mở kênh chat sàn để trao đổi tiếp'
       : '🤝 Đã gửi lời mời tư vấn! KTS sẽ nhận thông báo — trao đổi tiếp qua kênh chat sàn ALN');
   } catch(e){ showToast('Lỗi: '+fnErr(e)); }
 };
