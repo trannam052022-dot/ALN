@@ -187,6 +187,15 @@ select.btn { appearance: auto; }
       <button class="btn primary" onclick="runSeedHoiKts()" id="btnSeedHoiKts"><i class="ph-duotone ph-chats-teardrop"></i>Nạp 20 câu Hỏi KTS</button>
     </div>
     <div class="tool-card">
+      <h3>🕒 RẢI BÀI THEO NGÀY (drip — diễn đàn trông như đang sống)</h3>
+      <p>Trạng thái: <span class="p2-state" id="dripState">—</span>. Khi BẬT: mỗi ngày hệ thống tự đăng 2–4 câu hỏi mới từ kho vào giờ ngẫu nhiên (8h–20h) và trổ dần các câu trả lời của nhiều KTS sau vài giờ đến vài ngày — mỗi câu hỏi từ ít đến nhiều bình luận, tự nhiên như thật. Bước 1: nạp kho. Bước 2: bật drip. Nút test đăng ngay 1 câu để xem thử.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" onclick="runSeedQueue()" id="btnSeedQueue"><i class="ph-duotone ph-stack"></i>Nạp kho drip</button>
+        <button class="btn primary" onclick="toggleDrip()" id="btnDrip"><i class="ph-duotone ph-play-circle"></i>Bật / Tắt drip</button>
+        <button class="btn" onclick="dripNow()" id="btnDripNow"><i class="ph-duotone ph-lightning"></i>Đăng ngay 1 câu (test)</button>
+      </div>
+    </div>
+    <div class="tool-card">
       <h3>📄 Tài liệu bàn giao</h3>
       <p>Checklist nghiệm thu P1.1→P2.6, trả lời 7 câu khảo sát, bản nháp rules và danh sách chuyển đổi nháp → thật nằm trong file <b>BAN_GIAO_DIEN_DAN.md</b> ở repo.</p>
     </div>
@@ -219,6 +228,7 @@ function timeAgo(ts){
 }
 
 let P2_ON = false;
+let DRIP_ON = false;
 
 window.showPanel = function(id, btn){
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -246,6 +256,9 @@ function boot(){
     P2_ON = s.exists() && !!s.data().FORUM_P2_ENABLED;
     $('p2State').textContent = P2_ON ? 'BẬT (CN/DN vào được)' : 'TẮT (nội bộ KTS)';
     $('p2State').style.color = P2_ON ? 'var(--green)' : 'var(--red)';
+    DRIP_ON = s.exists() && !!s.data().FORUM_HOIKTS_DRIP_ENABLED;
+    const ds = $('dripState');
+    if(ds){ ds.textContent = DRIP_ON ? 'ĐANG RẢI (tự đăng theo ngày)' : 'TẮT'; ds.style.color = DRIP_ON ? 'var(--green)' : 'var(--red)'; }
   }, () => {});
 
   /* BÁO CÁO */
@@ -464,6 +477,32 @@ window.runSeedHoiKts = async function(){
     showToast('💬 Đã nạp '+(res.data.hoiKtsPosts||0)+' câu Hỏi KTS + thể lệ ghim. Bật P2 để CN/DN xem.');
   } catch(e){ showToast('Lỗi seed: '+(e.message||e)); }
   finally { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-chats-teardrop"></i>Nạp 20 câu Hỏi KTS'; }
+};
+window.runSeedQueue = async function(){
+  const btn = $('btnSeedQueue'); btn.disabled = true;
+  btn.innerHTML = '<i class="ph-duotone ph-spinner-gap"></i>Đang nạp...';
+  try {
+    const res = await callAdmin({ action: 'seedHoiKtsQueue' });
+    showToast('📦 Kho drip: +'+(res.data.queued||0)+' câu vào hàng chờ (bỏ qua '+(res.data.skipped||0)+' câu đã đăng).');
+  } catch(e){ showToast('Lỗi: '+(e.message||e)); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-stack"></i>Nạp kho drip'; }
+};
+window.toggleDrip = async function(){
+  const btn = $('btnDrip'); btn.disabled = true;
+  try {
+    await callAdmin({ action: 'toggleDrip', enabled: !DRIP_ON });
+    showToast(!DRIP_ON ? '🕒 Đã BẬT rải bài — mỗi ngày tự đăng 2–4 câu.' : 'Đã TẮT rải bài.');
+  } catch(e){ showToast('Lỗi: '+(e.message||e)); }
+  finally { btn.disabled = false; }
+};
+window.dripNow = async function(){
+  const btn = $('btnDripNow'); btn.disabled = true;
+  btn.innerHTML = '<i class="ph-duotone ph-spinner-gap"></i>Đang đăng...';
+  try {
+    const res = await callAdmin({ action: 'dripNow' });
+    showToast('⚡ Đã đăng '+(res.data.publishedNow||0)+' câu mới + '+(res.data.dueAnswers||0)+' câu trả lời tới hạn. Mở diễn đàn xem thử!');
+  } catch(e){ showToast('Lỗi: '+(e.message||e)); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-lightning"></i>Đăng ngay 1 câu (test)'; }
 };
 </script>
 </body>

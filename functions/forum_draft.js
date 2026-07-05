@@ -42,6 +42,7 @@ const COL = {
   modQueue:   "modQueue_draft",      // hàng chờ duyệt tập trung cho founder panel
   camNang:    "camNangForum_draft",  // Best Answer được đề cử đưa vào Cẩm nang (nháp)
   digest:     "forumDigest_draft",   // bản tin Q&A hằng tuần (nháp)
+  hoiKtsQueue:"hoiKtsQueue_draft",   // kho hàng chờ để RẢI bài Hỏi KTS theo ngày (drip)
 };
 
 const CATEGORIES = ["hoi_kts", "hoi_dap", "vat_lieu", "showcase", "nghe", "bang_tin", "tu_van_du_an"];
@@ -1059,6 +1060,32 @@ exports.forumAdminDraft = onCall({ region: REGION }, async (request) => {
     case "seedHoiKts":
       return await seedHoiKtsData();
 
+    case "seedHoiKtsQueue":
+      return await seedHoiKtsQueueData();
+
+    case "toggleDrip": {
+      await fdb.collection(COL.config).doc("flags").set(
+        { FORUM_HOIKTS_DRIP_ENABLED: d.enabled === true, updatedAt: ts() }, { merge: true });
+      return { ok: true, enabled: d.enabled === true };
+    }
+
+    case "dripNow": {
+      // Test: đăng ngay 1 câu hỏi từ kho + câu trả lời đầu, rồi trổ các câu đã tới hạn
+      const qs = await fdb.collection(COL.hoiKtsQueue).where("status", "==", "queued").limit(25).get();
+      let pid = null;
+      if (!qs.empty) {
+        const pick = qs.docs[Math.floor(Math.random() * qs.docs.length)];
+        pid = await drip_makeQuestion(pick);
+        const item = pick.data();
+        if (item.answers && item.answers[0]) {
+          await drip_postAnswer(pid, item.answers[0], 0);
+          await pick.ref.update(Object.assign({ answersPosted: 1 }, item.answers.length <= 1 ? { status: "done" } : {}));
+        }
+      }
+      const due = await drip_dueAnswers();
+      return { ok: true, publishedNow: pid ? 1 : 0, dueAnswers: due };
+    }
+
     default:
       throw new HttpsError("invalid-argument", "Hành động không hợp lệ: " + action);
   }
@@ -1465,6 +1492,248 @@ async function seedHoiKtsData() {
 
   return { ok: true, hoiKtsPosts: n, pinned: 1, note: "Seed Hỏi KTS Miễn Phí idempotent — ghi đè hoikts_*" };
 }
+
+/* ════════════════════════════════════════════
+   DRIP — RẢI BÀI "HỎI KTS" THEO NGÀY (diễn đàn trông như đang sống)
+   Kho hàng chờ hoiKtsQueue_draft giữ câu hỏi + nhiều câu trả lời (mỗi câu có
+   delayHours). Cron chạy 5 lần/ngày: đăng vài câu hỏi ngẫu nhiên + nhỏ giọt
+   câu trả lời đã tới hạn → nhiều KTS vào bàn dần, tự nhiên như thật.
+════════════════════════════════════════════ */
+const HOIKTS_CN_UID = "G4RhRH5ECMYcE9aFcKYVn5Wdy952"; // cn.trannam — tác giả câu hỏi mồi (denormalized)
+
+/* Pool persona KTS cho drip (mở rộng dễ dàng — thêm dòng là có thêm KTS) */
+const KP = {
+  loc:{uid:"seed_kts_tuanloc",name:"KTS. Tuấn Lộc",badge:"chuyen_gia"},
+  long:{uid:"seed_kts_tranlong",name:"KTS. Trần Long",badge:"chuyen_gia"},
+  tuan:{uid:"seed_kts_anhtuan",name:"KTS. Anh Tuấn",badge:"co_van"},
+  tri:{uid:"seed_kts_minhtri",name:"KTS. Minh Trí",badge:"co_van"},
+  phuc:{uid:"seed_kts_phanphuc",name:"KTS. Phan Phúc",badge:"co_van"},
+  bcv:{uid:"seed_kts_bcv",name:"Ban Cố Vấn ALN",badge:"chuyen_gia"},
+  nam:{uid:"seed_kts_hoangnam",name:"KTS. Hoàng Nam",badge:"co_van"},
+  thinh:{uid:"seed_kts_ducthinh",name:"KTS. Đức Thịnh",badge:"chuyen_gia"},
+  khanh:{uid:"seed_kts_baokhanh",name:"KTS. Bảo Khánh",badge:"co_van"},
+  viet:{uid:"seed_kts_quocviet",name:"KTS. Quốc Việt",badge:"tan_binh"},
+  son:{uid:"seed_kts_thanhson",name:"KTS. Thanh Sơn",badge:"co_van"},
+  gbao:{uid:"seed_kts_giabao",name:"KTS. Gia Bảo",badge:"tan_binh"},
+  nhat:{uid:"seed_kts_nhatminh",name:"KTS. Nhật Minh",badge:"co_van"},
+  phat:{uid:"seed_kts_tanphat",name:"KTS. Tấn Phát",badge:"chuyen_gia"},
+  truong:{uid:"seed_kts_xuantruong",name:"KTS. Xuân Trường",badge:"co_van"},
+  dang:{uid:"seed_kts_haidang",name:"KTS. Hải Đăng",badge:"tan_binh"},
+  nhan:{uid:"seed_kts_trongnhan",name:"KTS. Trọng Nhân",badge:"co_van"},
+  klong:{uid:"seed_kts_kimlong",name:"KTS. Kim Long",badge:"co_van"},
+  khoa:{uid:"seed_kts_dangkhoa",name:"KTS. Đăng Khoa",badge:"tan_binh"},
+  quan:{uid:"seed_kts_minhquan",name:"KTS. Minh Quân",badge:"co_van"},
+  hphuc:{uid:"seed_kts_hoangphuc",name:"KTS. Hoàng Phúc",badge:"chuyen_gia"},
+  nson:{uid:"seed_kts_ngocson",name:"KTS. Ngọc Sơn",badge:"co_van"},
+  duy:{uid:"seed_kts_duyanh",name:"KTS. Duy Anh",badge:"tan_binh"},
+  huy:{uid:"seed_kts_giahuy",name:"KTS. Gia Huy",badge:"co_van"},
+  cuong:{uid:"seed_kts_manhcuong",name:"KTS. Mạnh Cường",badge:"co_van"},
+  ngoc:{uid:"seed_kts_bichngoc",name:"KTS. Bích Ngọc",badge:"co_van"},
+  duong:{uid:"seed_kts_thuyduong",name:"KTS. Thùy Dương",badge:"tan_binh"},
+  linh:{uid:"seed_kts_mylinh",name:"KTS. Mỹ Linh",badge:"co_van"},
+};
+/* Kho nội dung: mỗi câu hỏi có 1→6 câu trả lời (ít→nhiều), delay giờ để trổ dần.
+   a = {k: persona, t: text, h: tim, d: delayHours, best: true?}. Dễ thêm câu mới. */
+function hoiKtsBank() {
+  const D = [2, 6, 18, 30, 48, 66];   // mốc giờ trổ câu trả lời thứ 1→6
+  return [
+    { asker:"Anh Thắng · Trảng Bom", qh:3, title:"Nền đất ruộng mới san lấp, nên làm móng cọc hay móng băng?",
+      q:"Lô đất em mua là ruộng mới san lấp khoảng 1 năm, định xây nhà 2 tầng. Sợ nhất là lún nứt sau này. Các anh tư vấn giúp nên chọn móng gì ạ?",
+      ans:[
+        {k:KP.son, d:D[0], h:4, t:"Chào anh! Đất ruộng mới san lấp thì gần như chắc chắn phải khảo sát địa chất trước đã nhé — đừng đoán. Nền yếu mà làm móng băng đơn thuần là dễ lún lệch lắm."},
+        {k:KP.thinh, d:D[1], h:9, best:true, t:"Đúng như anh Sơn nói. Với đất ruộng san lấp, phổ biến nhất là móng cọc (cọc ép hoặc cọc khoan nhồi mini tùy tải và mặt bằng thi công). Nhưng 'nên loại nào' phải dựa trên kết quả khoan khảo sát địa chất — nó cho biết lớp đất tốt nằm ở độ sâu nào để chốt chiều dài cọc. Anh làm bước khảo sát này trước, đừng tiếc vài triệu mà rủi ro cả căn nhà 🙂"},
+        {k:KP.nhan, d:D[2], h:2, t:"Bổ sung tí: nhà hàng xóm xung quanh xây trước là 'hồ sơ thực địa' rất quý — anh hỏi xem họ ép cọc bao nhiêu mét, có bị lún không, tham khảo được nhiều đấy."},
+      ] },
+    { asker:"Chị Hà · Q.Bình Tân", qh:5, title:"Chống thấm nhà vệ sinh sao cho khỏi lo dột xuống tầng dưới?",
+      q:"Nhà cũ của em WC tầng 2 hay thấm xuống trần tầng 1, sửa hoài không hết. Nhà mới sắp xây em muốn làm cho chuẩn ngay từ đầu. Bí quyết là gì ạ?",
+      ans:[
+        {k:KP.tuan, d:D[0], h:6, t:"Câu này em tâm đắc lắm 😄 Chống thấm WC là 'làm một lần cho đúng' chứ sửa sau cực kỳ khổ. Cốt lõi: đánh dốc sàn về phễu thu, làm lớp chống thấm phủ lên chân tường tối thiểu 20–30cm, và NGÂM NƯỚC thử 24–48h trước khi lát gạch."},
+        {k:KP.klong, d:D[1], h:4, t:"Thêm chỗ hay bị bỏ sót: cổ ống xuyên sàn (ống thoát) là điểm rò số 1. Phải quấn thanh trương nở + chống thấm kỹ quanh cổ ống. Nhiều nhà thấm đúng ngay chỗ này."},
+        {k:KP.duong, d:D[2], h:3, t:"Em mới ra nghề, hóng các anh chị. Nhưng đội thi công nhà em có làm bước ngâm nước thử, thấy đúng là yên tâm hẳn ạ."},
+        {k:KP.phat, d:D[3], h:7, best:true, t:"Tóm gọn quy trình chuẩn cho anh chị dễ nhớ: (1) tạo dốc sàn 1–2%; (2) xử lý cổ ống + góc chân tường bằng lưới/thanh trương nở; (3) quét chống thấm 2–3 lớp vuông góc nhau, phủ lên tường ≥25cm; (4) ngâm nước thử 24h, không rò mới lát. Làm đủ 4 bước này gần như không còn cửa thấm. Bản vẽ thi công tốt sẽ thể hiện rõ chi tiết này để đội thợ không làm ẩu."},
+      ] },
+    { asker:"Anh Bình · Long Khánh", qh:2, title:"Mái tôn hay mái bê tông dán ngói, kiểu nào hợp nhà phố?",
+      q:"Nhà phố 1 trệt 1 lầu, em phân vân mái tôn cho nhẹ rẻ hay đổ bê tông dán ngói cho chắc và đẹp. Nhờ các anh phân tích ạ.",
+      ans:[
+        {k:KP.nam, d:D[0], h:5, t:"Mỗi loại một vẻ anh ơi. Tôn: nhẹ, nhanh, rẻ, nhưng nóng và ồn khi mưa nếu không làm trần + cách nhiệt. Bê tông dán ngói: chắc, mát, cách âm tốt, chống trộm, nhưng nặng và tốn hơn. Nhà ở lâu dài mình hay nghiêng về bê tông dán ngói."},
+        {k:KP.huy, d:D[2], h:3, t:"Nếu chọn tôn thì đừng tiếc tiền lớp cách nhiệt (túi khí/PU) và trần thạch cao — chênh không nhiều mà ở dễ chịu hơn hẳn, nhất là khí hậu miền Nam nắng gắt."},
+      ] },
+    { asker:"Chị Nhung · Dĩ An", qh:4, title:"Gạch không nung có bền bằng gạch nung không?",
+      q:"Em nghe nói gạch không nung thân thiện môi trường, nhà nước khuyến khích. Nhưng xây nhà ở thì có bền và chắc như gạch đỏ truyền thống không ạ?",
+      ans:[
+        {k:KP.viet, d:D[0], h:2, t:"Gạch không nung (bê tông, AAC...) giờ dùng nhiều rồi chị. Ưu điểm cách âm cách nhiệt tốt, đều viên. Quan trọng là chọn đúng chủng loại cho tường chịu lực hay tường ngăn, và thợ xây quen tay + đúng vữa."},
+        {k:KP.cuong, d:D[1], h:6, best:true, t:"Bền hay không nằm ở chỗ dùng đúng chỗ + thi công đúng chị ạ. Gạch AAC nhẹ, cách nhiệt cực tốt cho tường bao, nhưng phải dùng vữa chuyên dụng và khoan bắt vít bằng phụ kiện phù hợp (không đóng đinh thô bạo). Làm đúng thì bền và ở mát hơn gạch đỏ. Làm sai (vữa thường, thấm nước) thì mới sinh chuyện."},
+      ] },
+    { asker:"Anh Đạt · Q.12", qh:3, title:"Cửa nhôm Xingfa và cửa gỗ, chọn loại nào cho mặt tiền?",
+      q:"Mặt tiền nhà phố em hướng Tây, nắng chiều gắt. Nên làm cửa nhôm Xingfa hay cửa gỗ tự nhiên cho đẹp và bền ạ?",
+      ans:[
+        {k:KP.linh, d:D[0], h:4, t:"Hướng Tây nắng gắt + mưa tạt thì em thiên về nhôm Xingfa kính hộp anh nhé: bền với thời tiết, cách âm cách nhiệt tốt, ít cong vênh. Gỗ tự nhiên đẹp sang nhưng ngoài trời hướng Tây dễ bạc màu, nứt nếu không che chắn tốt."},
+        {k:KP.khoa, d:D[3], h:2, t:"Nếu mê gỗ thì để gỗ cho không gian trong nhà (cửa phòng), mặt tiền dùng nhôm/kính — vừa bền vừa tiết kiệm bảo trì."},
+      ] },
+    { asker:"Chị Oanh · Biên Hòa", qh:6, title:"Trần thạch cao có hay bị nứt không, có nên làm không?",
+      q:"Em thích trần thạch cao giật cấp cho đẹp nhưng nghe nói dễ nứt. Có đúng không và làm sao hạn chế ạ?",
+      ans:[
+        {k:KP.tri, d:D[0], h:5, t:"Thạch cao nứt thường do khung xương thưa/yếu, tấm không so le mối nối, hoặc nhà mới lún nhẹ năm đầu. Làm đúng kỹ thuật thì rất ổn chị nhé, nhà em thi công bao năm ít khi nứt."},
+        {k:KP.gbao, d:D[1], h:1, t:"Hóng, nhà em cũng đang tính làm giật cấp phòng khách 😅"},
+        {k:KP.hphuc, d:D[2], h:8, best:true, t:"Bí quyết chống nứt gọn trong 4 ý: (1) khung xương đúng khoảng cách nhà sản xuất, ty treo chắc; (2) bắt tấm so le mối nối, không thẳng hàng; (3) xử lý mối nối bằng băng lưới + bột chuyên dụng, không trét đại; (4) chờ nhà 'ổn định' rồi mới sơn hoàn thiện. Với trần phẳng lớn nên bố trí ron âm/khe co giãn để nếu có chuyển vị thì nứt không lộ. Làm bài bản thì đẹp bền chị cứ yên tâm."},
+      ] },
+    { asker:"Anh Kiên · Vũng Tàu", qh:4, title:"Thang máy gia đình chi phí và diện tích khoảng bao nhiêu?",
+      q:"Nhà em 4 tầng, ba mẹ lớn tuổi nên muốn lắp thang máy. Cần chừa hố thang bao nhiêu và chi phí tầm nào để em tính trước ạ?",
+      ans:[
+        {k:KP.nson, d:D[0], h:3, t:"Thang máy gia đình loại nhỏ thường chỉ cần hố thang tầm 1.4x1.4m đến 1.6x1.6m là ở được 3–4 người anh nhé. Quan trọng là chừa hố + tính tải kết cấu NGAY từ thiết kế, đừng để xây xong mới chế."},
+        {k:KP.long, d:D[2], h:5, best:true, t:"Về chi phí thì dao động khá rộng theo hãng/tải/số tầng nên em không tiện chốt con số ở đây (dễ sai). Nhưng lời khuyên quan trọng: khi thiết kế nhà anh báo KTS 'có thang máy' để bố trí hố thang, tải trọng, vị trí phòng máy hợp lý — và anh nên xin báo giá 2–3 hãng thang trên cùng thông số để so. Muốn tính sát cho nhà mình, anh tạo dự án để KTS đưa hố thang vào phương án luôn."},
+      ] },
+    { asker:"Chị Mỹ · Thủ Đức", qh:5, title:"Có nên làm sân thượng trồng rau, nuôi cây không?",
+      q:"Em mê làm vườn trên sân thượng nhưng sợ thấm và nặng. Có làm được không và cần lưu ý gì ạ?",
+      ans:[
+        {k:KP.ngoc, d:D[0], h:6, t:"Làm được và rất đáng chị ơi, nhà em nhiều khách làm vườn sân thượng xanh mát lắm 🌿 Nhưng bắt buộc 2 thứ: chống thấm thật kỹ (làm lớp bảo vệ trên màng chống thấm) và tính tải trọng cho phần đất/chậu + nước. Đừng đổ đất trực tiếp dày lên sàn."},
+        {k:KP.nhat, d:D[1], h:4, t:"Nên dùng chậu/khay có chân kê + hệ thoát nước riêng, chừa lối đi. Và tính sẵn vòi nước + điện trên sân thượng từ đầu cho tiện."},
+        {k:KP.duy, d:D[4], h:2, t:"Gợi ý nhỏ: trồng trong khung/bồn nhẹ, tránh giữ nước đọng chân tường. Bạn em làm kiểu này 3 năm chưa thấm."},
+      ] },
+    { asker:"Anh Phú · Tân Uyên", qh:2, title:"Xây tường 10 hay tường 20, chỗ nào nên dùng loại nào?",
+      q:"Nhà thầu tư vấn tường bao xây 10 cho tiết kiệm. Em phân vân vì sợ nóng và yếu. Nên xây tường dày bao nhiêu ạ?",
+      ans:[
+        {k:KP.khanh, d:D[0], h:5, best:true, t:"Nguyên tắc chung anh nhé: tường bao ngoài (giáp nắng mưa, hàng xóm) nên xây 20 cho chắc, cách nhiệt, chống thấm tốt; tường ngăn phòng bên trong xây 10 để tiết kiệm diện tích và chi phí. Xây 10 hết cho tường bao là tiết kiệm trước mắt nhưng nóng và dễ thấm về sau. Tùy hướng nắng mà cân nhắc thêm."},
+        {k:KP.truong, d:D[2], h:2, t:"Đồng ý. Mấy bức tường hướng Tây/Nam nắng gắt mà xây 20 hoặc có lớp cách nhiệt thì ở mát hơn hẳn."},
+      ] },
+    { asker:"Chị Lệ · Gò Vấp", qh:4, title:"Bếp đặt hướng nào hợp phong thủy mà vẫn thoáng?",
+      q:"Em nghe 'tọa hung hướng cát' với bếp mà rối quá. Nhờ KTS nói giúp cách bố trí bếp vừa phong thủy vừa tiện dùng ạ.",
+      ans:[
+        {k:KP.tri, d:D[0], h:7, best:true, t:"Chị đừng rối 🙂 Gói gọn thực dụng thế này: bếp nên đặt nơi khuất gió lùa trực tiếp (lửa không phập phù), KHÔNG đối diện thẳng cửa chính/cửa WC, không kê sát bồn rửa (thủy hỏa xung). 'Hướng bếp' theo phong thủy là hướng lưng người nấu quay về — cái này KTS cân theo tuổi gia chủ khi thiết kế. Còn lại ưu tiên thông thoáng, hút mùi tốt, đủ sáng — bếp dùng sướng thì bếp tốt."},
+        {k:KP.cuong, d:D[2], h:3, t:"Bổ sung: chừa khoảng thông thoáng/giếng trời gần bếp thì mùi thức ăn thoát nhanh, nhà không ám mùi. Cái này nhiều người quên."},
+      ] },
+    { asker:"Anh Tân · Hóc Môn", qh:3, title:"Nhà 5x20m nên bố trí công năng thế nào cho gia đình 4 người?",
+      q:"Vợ chồng em + 2 con nhỏ, đất 5x20m định xây 1 trệt 2 lầu. Nhờ các anh gợi ý bố trí công năng hợp lý ạ.",
+      ans:[
+        {k:KP.tuan, d:D[0], h:6, best:true, t:"Với 5x20m gia đình 4 người, hướng bố trí em hay dùng: Trệt — khách + bếp ăn liên thông mở ra giếng trời sau, 1 WC, chỗ để xe; Lầu 1 — phòng master + 1 phòng con + WC; Lầu 2 — 1 phòng con + phòng thờ/giặt phơi + sân thượng. Nhớ chừa 1 giếng trời giữa/sau nhà cho sáng thoáng vì nhà dài 20m. Bố trí chi tiết còn tùy hướng đất, anh tạo dự án em phác cụ thể hơn nhé."},
+        {k:KP.nam, d:D[2], h:2, t:"Nhất trí. Nhà 20m sâu mà thiếu giếng trời là ngộp ngay. Đừng ngăn phòng kín ở trệt."},
+        {k:KP.gbao, d:D[3], h:1, t:"Hay quá, em lưu lại tham khảo 🙏"},
+      ] },
+    { asker:"Chị Trâm · Q.7", qh:5, title:"Cải tạo căn hộ chung cư cũ có bị giới hạn gì không?",
+      q:"Em mua lại căn hộ cũ muốn đập tường mở rộng bếp và dời WC. Chung cư có cho sửa không, cần lưu ý gì ạ?",
+      ans:[
+        {k:KP.linh, d:D[0], h:4, t:"Chung cư thì có 2 giới hạn lớn chị nhớ: KHÔNG đụng kết cấu (cột, dầm, sàn, tường chịu lực) và thường KHÓ dời khu vệ sinh/ống nước trục chính. Tường ngăn nhẹ thì đập được. Trước khi sửa phải xin phép Ban quản lý và tuân quy định tòa nhà."},
+        {k:KP.quan, d:D[1], h:6, best:true, t:"Chuẩn ạ. Dời WC là cái dễ 'sinh chuyện' nhất vì liên quan đường ống thoát và độ dốc — dời xa trục cũ dễ nghẹt, thấm sang nhà dưới. Nếu buộc dời thì phải tính kỹ sàn nâng/độ dốc. Em khuyên chị làm bản vẽ cải tạo do KTS xem hiện trạng trước, vừa đúng quy định tòa nhà vừa tránh đụng kết cấu. Chung cư sửa ẩu là phiền cả hàng xóm."},
+        {k:KP.dang, d:D[4], h:1, t:"Nhà em cũng chung cư, đúng là dời WC bị BQL bắt hoàn trạng, phải làm đúng hồ sơ mới cho."},
+      ] },
+    { asker:"Anh Vinh · Bến Cát", qh:2, title:"Làm sao hạn chế phát sinh chi phí khi xây nhà?",
+      q:"Ai xây nhà cũng kêu đội vốn. Em muốn kiểm soát, nhờ các anh chia sẻ kinh nghiệm thực tế ạ.",
+      ans:[
+        {k:KP.thinh, d:D[0], h:8, best:true, t:"Câu hỏi triệu đô 😄 Kinh nghiệm gọn: (1) Có hồ sơ thiết kế + dự toán khối lượng RÕ trước khi ký nhà thầu — 80% phát sinh đến từ bản vẽ mù mờ; (2) Chốt vật liệu (gạch, thiết bị vệ sinh, cửa...) theo bảng cụ thể, đừng 'để sau tính'; (3) Đừng đổi ý giữa chừng — mỗi lần đổi là tiền; (4) Dự phòng sẵn 10–15%. Làm được 4 điều này thì nhà anh gần như không bất ngờ về tiền."},
+        {k:KP.son, d:D[1], h:4, t:"Chí lý. Em thêm: hợp đồng nhà thầu phải ghi rõ hạng mục nào có, hạng mục nào chưa (thường thiếu: đổ xà bần, điện nước hoàn thiện, chống thấm...). Đọc kỹ phần 'ngoài hợp đồng' kẻo dính."},
+        {k:KP.nhan, d:D[3], h:3, t:"Và nên giữ lại một phần thanh toán cuối gắn với nghiệm thu — đây đúng tinh thần cách ALN giữ tiền theo giai đoạn để bảo vệ chủ nhà."},
+      ] },
+    { asker:"Chị Diệu · Củ Chi", qh:3, title:"Đất hẻm nhỏ xe ba gác vào không lọt, xây có bị đội giá không?",
+      q:"Đất nhà em trong hẻm 2m, xe tải không vào được. Em lo chi phí vận chuyển vật tư đội lên nhiều. Thực tế thế nào ạ?",
+      ans:[
+        {k:KP.khanh, d:D[0], h:5, t:"Có đội thật chị ạ, nhưng nằm trong tính toán được. Hẻm nhỏ thì vật tư trung chuyển bằng xe nhỏ/xe rùa, nhân công bốc vác thêm — nhà thầu quen làm hẻm sẽ báo giá đã gồm phần này. Chị nên nói rõ hiện trạng hẻm khi mời báo giá để không bị phát sinh sau."},
+        {k:KP.huy, d:D[2], h:2, t:"Mẹo: tập kết vật tư gọn theo đợt, tránh chiếm hẻm lâu gây phiền hàng xóm (dễ bị thưa). Lên kế hoạch vận chuyển từ đầu là ổn."},
+      ] },
+    { asker:"Anh Nghĩa · Đức Hòa", qh:4, title:"Chọn nhà thầu xây dựng sao cho đỡ rủi ro?",
+      q:"Em không rành xây dựng, sợ gặp nhà thầu làm ẩu rồi bỏ ngang. Nhờ các anh mách cách chọn và ràng buộc ạ.",
+      ans:[
+        {k:KP.phat, d:D[0], h:7, best:true, t:"Vài 'bộ lọc' thực dụng anh nhé: (1) Xem công trình thực tế họ đã làm, hỏi thẳng chủ nhà cũ; (2) Hợp đồng rõ khối lượng — dựa trên hồ sơ thiết kế, không khoán miệng; (3) Tiến độ + thanh toán theo giai đoạn nghiệm thu, đừng ứng nhiều trước; (4) Giữ lại phần bảo hành. Điểm mấu chốt vẫn là có BẢN VẼ + DỰ TOÁN làm chuẩn — có nó thì nhà thầu nào cũng phải làm theo, khó cãi."},
+        {k:KP.tuan, d:D[2], h:3, t:"Đồng ý 100%. Chủ nhà có KTS đứng phía mình thì khâu nghiệm thu, đối chiếu khối lượng nhẹ hẳn — không bị 'lời nói gió bay'."},
+        {k:KP.viet, d:D[4], h:1, t:"Em bổ sung: đừng chọn chỉ vì giá rẻ nhất. Rẻ bất thường thường bù lại bằng phát sinh hoặc vật tư kém."},
+      ] },
+    { asker:"Chị Yến Nhi · Nhơn Trạch", qh:3, title:"Sơn ngoại thất loại nào bền với nắng mưa miền Nam?",
+      q:"Nhà em xây xong năm ngoái mà tường ngoài đã có chỗ phấn hóa, ố. Lần sau sơn lại nên chọn loại nào cho bền ạ?",
+      ans:[
+        {k:KP.nson, d:D[0], h:4, t:"Miền Nam nắng gắt mưa nhiều thì chị ưu tiên sơn ngoại thất có khả năng chống kiềm + chống thấm + kháng tia UV, và QUAN TRỌNG là làm đủ hệ: bột trét ngoại thất + sơn lót kháng kiềm + 2 lớp phủ. Nhiều nhà bỏ lớp lót kháng kiềm nên mới phấn hóa, ố sớm."},
+        {k:KP.ngoc, d:D[2], h:3, t:"Đúng rồi ạ. Và nên sơn khi tường đã khô đủ ngày (tường mới cần thời gian ổn định độ ẩm), sơn lúc tường còn ẩm là dễ bong, kiềm hóa. Màu sáng cũng ít hấp nhiệt và lâu xuống màu hơn."},
+      ] },
+  ];
+}
+
+/* Nạp kho drip (idempotent — không đụng câu đã published) */
+async function seedHoiKtsQueueData() {
+  const bank = hoiKtsBank();
+  let added = 0, skipped = 0;
+  for (let i = 0; i < bank.length; i++) {
+    const it = bank[i];
+    const id = "qbank_" + String(i + 1).padStart(2, "0");
+    const ref = fdb.collection(COL.hoiKtsQueue).doc(id);
+    const snap = await ref.get();
+    if (snap.exists && ["published", "done"].includes(snap.data().status)) { skipped++; continue; }
+    const answers = it.ans.map((a) => ({
+      uid: a.k.uid, name: a.k.name, badge: a.k.badge,
+      text: a.t, d: a.d, h: a.h || 0, best: !!a.best,
+    }));
+    await ref.set({
+      asker: it.asker, title: it.title, q: it.q, qh: it.qh || 0,
+      answers, status: "queued", answersPosted: 0, postId: null,
+      publishedAt: null, publishedMs: null, createdAt: ts(),
+    });
+    added++;
+  }
+  return { ok: true, queued: added, skipped, total: bank.length };
+}
+
+async function drip_makeQuestion(pick) {
+  const item = pick.data();
+  const pid = "hoikts_q_" + pick.id;
+  await fdb.collection(COL.posts).doc(pid).set({
+    authorUid: HOIKTS_CN_UID, authorName: item.asker, authorRole: "cn", authorRank: null, authorAvatar: "",
+    category: "hoi_kts", tag: null, text: item.title + "\n\n" + item.q,
+    media: [], images: [], suggestedKts: [], aiSummary: null, aiSummaryAt: null,
+    heartCount: item.qh || 0, heartedBy: [], pinned: false, hidden: false, status: "visible",
+    commentCount: 0, bestAnswerId: null, brief: null, seedContent: true, dripped: true,
+    createdAt: ts(), updatedAt: ts(),
+  });
+  await pick.ref.update({ status: "published", postId: pid, publishedAt: ts(), publishedMs: Date.now(), answersPosted: 0 });
+  return pid;
+}
+async function drip_postAnswer(pid, a, idx) {
+  const cid = pid + "_a" + idx;
+  await fdb.collection(COL.posts).doc(pid).collection("comments").doc(cid).set({
+    authorUid: a.uid, authorName: a.name, authorRole: "kts", authorRank: a.badge || null, authorAvatar: "",
+    text: a.text, replyToId: null, isBestAnswer: !!a.best, flagged: false, status: "visible",
+    aiAssisted: false, heartCount: a.h || 0, heartedBy: [], createdAt: ts(),
+  });
+  const upd = { commentCount: inc(1), updatedAt: ts() };
+  if (a.best) upd.bestAnswerId = cid;
+  await fdb.collection(COL.posts).doc(pid).update(upd);
+}
+async function drip_dueAnswers() {
+  const now = Date.now();
+  const pub = await fdb.collection(COL.hoiKtsQueue).where("status", "==", "published").limit(80).get();
+  let added = 0;
+  for (const d of pub.docs) {
+    const it = d.data();
+    const ans = Array.isArray(it.answers) ? it.answers : [];
+    let posted = it.answersPosted || 0;
+    const baseMs = it.publishedMs || now;
+    const start = posted;
+    while (posted < ans.length) {
+      const a = ans[posted];
+      if (now >= baseMs + (Number(a.d) || 0) * 3600 * 1000) { await drip_postAnswer(it.postId, a, posted); posted++; added++; }
+      else break;
+    }
+    if (posted !== start) {
+      const upd = { answersPosted: posted };
+      if (posted >= ans.length) upd.status = "done";
+      await d.ref.update(upd);
+    }
+  }
+  return added;
+}
+
+/* Cron drip — 5 lần/ngày (giờ VN). Chỉ chạy khi Founder bật cờ. */
+exports.forumHoiKtsDrip = onSchedule(
+  { schedule: "0 8,11,14,17,20 * * *", timeZone: VN_TZ, region: REGION },
+  async () => {
+    const cfg = await fdb.collection(COL.config).doc("flags").get();
+    if (!(cfg.exists && cfg.data().FORUM_HOIKTS_DRIP_ENABLED)) return;
+    const nPublish = Math.random() < 0.35 ? 0 : (Math.random() < 0.7 ? 1 : 2);
+    for (let i = 0; i < nPublish; i++) {
+      const qs = await fdb.collection(COL.hoiKtsQueue).where("status", "==", "queued").limit(25).get();
+      if (qs.empty) break;
+      const pick = qs.docs[Math.floor(Math.random() * qs.docs.length)];
+      await drip_makeQuestion(pick);
+    }
+    await drip_dueAnswers();
+  }
+);
 
 /* ════════════════════════════════════════════
    9. DIỄN ĐÀN THÔNG MINH (P3 nháp)

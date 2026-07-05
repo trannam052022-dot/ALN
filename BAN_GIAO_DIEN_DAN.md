@@ -310,3 +310,9 @@ Nguyên tắc xuyên suốt: **hấp dẫn nhưng thông tin chính xác** — A
 - Admin action `seedHoiKts` (nút "Nạp 20 câu Hỏi KTS" trong Tools): 20 câu hỏi chủ nhà giả lập + trả lời mẫu của 6 persona KTS (Tuấn Lộc/Trần Long/Anh Tuấn/Minh Trí/Phan Phúc/Ban Cố Vấn) kèm huy hiệu Cố vấn/Chuyên gia, rải ngày 14 ngày, vài Best Answer + tim; 1 bài Thể lệ ghim đầu chuyên mục. Idempotent (ghi đè `hoikts_*`).
 - Nút "Chọn KTS này làm dự án" hoạt động cả trong hoi_kts. Persona seed dùng uid `seed_*` (không có users doc) → forumChooseKtsDraft nới cho bản nháp (fallback tên, cờ `seedKts:true`, không FCM). Khi nghiệm thu: chỉ cho chọn KTS thật đã xác minh.
 - Nội dung 20 câu lấy từ FORUM_NOIDUNG_20CAU_THELE_UX.md; đơn giá thiết kế niêm yết (nhà phố/nội thất 120k, biệt thự 160k, nội thất biệt thự 180k đ/m²) xuất hiện trong lời KTS đúng như tài liệu.
+
+## 11. RẢI BÀI THEO NGÀY (drip — diễn đàn trông như đang sống)
+- **Kho hàng chờ** `hoiKtsQueue_draft`: câu hỏi + nhiều câu trả lời (mỗi câu có `delayHours`), trạng thái queued → published → done. Nội dung khởi tạo: 16 câu, mỗi câu 2–6 câu trả lời của nhiều KTS (pool ~28 persona, giọng đời), best-answer/đang-chờ phân bố tự nhiên. Dễ mở rộng: thêm phần tử vào `hoiKtsBank()`.
+- **Cron `forumHoiKtsDrip`** chạy 8h·11h·14h·17h·20h (giờ VN), CHỈ khi cờ `FORUM_HOIKTS_DRIP_ENABLED` bật: mỗi lần đăng 0–2 câu hỏi ngẫu nhiên (đăng với thời gian hiện tại, không backdate) + trổ các câu trả lời đã tới hạn theo `delayHours` → mỗi câu hỏi từ ít đến nhiều bình luận, nhiều KTS vào bàn dần.
+- **Điều khiển (Tools trang quản trị):** "Nạp kho drip" (`seedHoiKtsQueue`), "Bật/Tắt drip" (`toggleDrip`), "Đăng ngay 1 câu (test)" (`dripNow`). Mặc định drip TẮT tới khi Founder bật.
+- Nhịp: ~2–4 câu hỏi/ngày → kho 16 câu chạy ~1 tuần; nạp thêm nội dung để kéo dài. Chi phí cron không đáng kể. Tất cả trên bản nháp.
