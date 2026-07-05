@@ -384,6 +384,18 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 .sim-item { padding:7px 9px; border-radius:6px; background:var(--white); border:1px solid var(--border); font-size:var(--text-xs); color:var(--text2); cursor:pointer; margin-bottom:5px; transition:border-color .15s; }
 .sim-item:hover { border-color:var(--blue); }
 .sim-best { display:inline-flex; align-items:center; gap:3px; font-size:var(--text-2xs); font-weight:700; color:var(--green); margin-right:6px; }
+
+/* Chọn KTS làm dự án */
+.sug-sub { font-weight:500; color:var(--sub); text-transform:none; letter-spacing:0; }
+.cm-act.choose { color:#1a1400; background:linear-gradient(135deg,var(--gold2),var(--gold)); border:none; font-weight:700; box-shadow:0 2px 8px rgba(152,105,10,.22); }
+.chosen-banner { display:flex; align-items:center; gap:7px; margin:12px 0; padding:11px 14px; border-radius:var(--r-sm); background:rgba(21,128,61,.08); border:1px solid rgba(21,128,61,.3); color:#14532d; font-size:var(--text-sm); font-weight:600; }
+.chosen-banner i { color:var(--green); font-size:1.2em; }
+.choose-kts { font-size:var(--text-sm); color:var(--text); line-height:1.6; margin-bottom:10px; }
+.choose-brief { margin-bottom:10px; }
+.choose-assure { padding:11px 13px; border-radius:var(--r-sm); background:var(--gold-bg); border:1px solid rgba(152,105,10,.28); font-size:var(--text-sm); color:var(--text); line-height:1.55; }
+.choose-assure i { color:var(--gold); }
+.choose-fee { margin-top:7px; font-size:var(--text-xs); color:var(--text2); font-style:italic; }
+.choose-note { margin-top:10px; font-size:var(--text-xs); color:var(--sub); line-height:1.5; }
 </style>
 </head>
 <body>
@@ -519,6 +531,28 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
   </div>
 </div>
 
+<div class="modal-overlay" id="chooseModal" onclick="if(event.target===this)closeChoose()">
+  <div class="modal-box" style="width:460px">
+    <div class="modal-head">
+      <div class="modal-title">Chọn KTS làm dự án</div>
+      <button class="modal-close" onclick="closeChoose()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="choose-kts" id="chooseKtsName"></div>
+      <div class="choose-brief" id="chooseBrief"></div>
+      <div class="choose-assure">
+        <div><i class="ph-duotone ph-shield-check"></i> Thanh toán an toàn qua 4 giai đoạn C1→C4 — tiền giữ tại ALN đến khi anh/chị nghiệm thu từng bước.</div>
+        <div class="choose-fee" id="chooseFee"></div>
+      </div>
+      <div class="choose-note">Sau khi xác nhận, KTS sẽ nhận thông báo và trao đổi tiếp qua kênh chat sàn ALN. Câu trả lời trên diễn đàn là tư vấn sơ bộ; hồ sơ thiết kế chính thức do KTS có chứng chỉ hành nghề ký.</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeChoose()">Hủy</button>
+      <button class="btn-submit" id="chooseConfirmBtn" onclick="confirmChoose()"><i class="ph-duotone ph-handshake"></i> Xác nhận chọn KTS</button>
+    </div>
+  </div>
+</div>
+
 <div class="lightbox" id="lightbox" onclick="this.classList.remove('open')"><img id="lightboxImg" src="" alt=""></div>
 <div id="toast"></div>
 
@@ -543,6 +577,7 @@ const callSimilar   = httpsCallable(fns, 'forumSimilarDraft');
 const callAiDraft   = httpsCallable(fns, 'forumAiDraftAnswer');
 const callSummarize = httpsCallable(fns, 'forumSummarizeDraft');
 const callToCamNang = httpsCallable(fns, 'forumToCamNangDraft');
+const callChooseKts = httpsCallable(fns, 'forumChooseKtsDraft');
 
 /* ════ CẤU HÌNH CHUYÊN MỤC (đồng bộ với forum_draft.js) ════ */
 const CATS = {
@@ -790,26 +825,30 @@ function authorNameHtml(p){
   }
   return escH(p.authorName);
 }
-/* Hạng uy tín KTS (server tính) — tín hiệu tin cậy */
+/* 3 CẤP BẬC KTS (server tính từ điểm uy tín) — bậc cao được ưu tiên nhận dự án */
 const RANK_META = {
-  vip:       ['VIP',        '#7a5408', 'rgba(184,134,11,.16)'],
-  pro:       ['PRO',        '#98690a', 'rgba(152,105,10,.10)'],
-  tieuchuan: ['Tiêu chuẩn', '#0e7490', 'rgba(14,116,144,.10)'],
+  chuyen_gia: ['Chuyên gia ALN', '#98690a', 'rgba(152,105,10,.12)', '⭐ '],
+  co_van:     ['Cố vấn',         '#0f2c52', 'rgba(15,44,82,.10)',  ''],
+  tan_binh:   ['Tân binh',       '#5b6b7f', 'rgba(91,107,127,.08)', ''],
 };
 function rankBadge(rank){
   const m = RANK_META[rank]; if(!m) return '';
-  return '<span class="rank-badge" style="color:'+m[1]+';background:'+m[2]+';border:1px solid '+m[1]+'44">★ '+m[0]+'</span>';
+  const pri = (rank === 'chuyen_gia' || rank === 'co_van') ? ' title="Huy hiệu cao — được ưu tiên nhận dự án"' : '';
+  return '<span class="rank-badge"'+pri+' style="color:'+m[1]+';background:'+m[2]+';border:1px solid '+m[1]+'44">'+m[3]+m[0]+'</span>';
 }
 /* Phễu chốt: KTS gợi ý cho thread Tư vấn Dự án (server điền p.suggestedKts) */
 function suggestedKtsHtml(p){
   if(catOf(p) !== 'tu_van_du_an' || !Array.isArray(p.suggestedKts) || !p.suggestedKts.length) return '';
-  const canInvite = (USER.role === 'cn' || USER.role === 'dn' || USER.role === 'founder');
-  return '<div class="sug-box"><div class="sug-title"><i class="ph-duotone ph-sparkle"></i> KTS phù hợp cho dự án của bạn</div>'
+  if(p.chosenKts) return '';   // đã chọn KTS làm dự án thì thôi
+  const canChoose = (USER.role === 'cn' || USER.role === 'dn' || USER.role === 'founder');
+  return '<div class="sug-box"><div class="sug-title"><i class="ph-duotone ph-sparkle"></i> KTS phù hợp cho dự án của bạn <span class="sug-sub">(huy hiệu cao được ưu tiên)</span></div>'
     + '<div class="sug-list">' + p.suggestedKts.map(k =>
         '<div class="sug-item">'
         + '<a href="kts_profile_draft.html?uid='+escH(k.uid)+'" class="sug-name">'+escH(k.name||'KTS ALN')+'</a>'
         + rankBadge(k.rank)
-        + ((canInvite && k.uid !== USER.uid) ? '<button class="sug-invite" onclick="inviteKts(\''+escH(k.uid)+'\',\''+p.id+'\')"><i class="ph-duotone ph-handshake"></i> Mời</button>' : '')
+        + ((canChoose && k.uid !== USER.uid)
+            ? '<button class="sug-invite" onclick="openChoose(\''+escH(k.uid)+'\',\''+escH(k.name||'KTS')+'\')"><i class="ph-duotone ph-handshake"></i> Chọn làm dự án</button>'
+            : '')
         + '</div>').join('')
     + '</div></div>';
 }
@@ -1023,6 +1062,7 @@ function renderThread(){
     + (p.text ? '<div class="tc-text">'+escH(p.text)+'</div>' : '')
     + briefHtml(p)
     + mediaHtml(p, true)
+    + (p.chosenKts ? '<div class="chosen-banner"><i class="ph-duotone ph-check-circle"></i> Chủ đầu tư đã chọn <b>'+escH(p.chosenKts.name)+'</b>'+rankBadge(p.chosenKts.rank)+' làm KTS dự án — đang trao đổi qua kênh chat sàn ALN</div>' : '')
     + suggestedKtsHtml(p)
     + '<div class="tc-foot" style="border-top:none;padding-top:0">'
       + '<button class="tc-stat'+(hearted?' hearted':'')+'" onclick="heartPost(\''+p.id+'\')">'+(hearted?'❤️':'🤍')+' '+(p.heartCount||0)+'</button>'
@@ -1087,7 +1127,8 @@ function renderComment(p, c, isReply){
         + '<button class="cm-act'+(hearted?' hearted':'')+'" onclick="heartComment(\''+p.id+'\',\''+c.id+'\')">'+(hearted?'❤️':'🤍')+' '+(c.heartCount||0)+'</button>'
         + (canCommentHere(p) ? '<button class="cm-act" onclick="startReply(\''+(c.replyToId||c.id)+'\',\''+escH(c.authorName)+'\')">↩ Trả lời</button>' : '')
         + (canMarkBest ? '<button class="cm-act" onclick="markBest(\''+p.id+'\',\''+c.id+'\')" style="color:#3a7a3e">✔ Best Answer</button>' : '')
-        + (canInvite ? '<button class="cm-act invite" onclick="inviteKts(\''+escH(c.authorUid)+'\',\''+p.id+'\')"><i class="ph-duotone ph-handshake"></i> Mời KTS tư vấn</button>' : '')
+        + (canInvite ? '<button class="cm-act invite" onclick="inviteKts(\''+escH(c.authorUid)+'\',\''+p.id+'\')"><i class="ph-duotone ph-chats-circle"></i> Mời tư vấn</button>' : '')
+        + ((canInvite && !p.chosenKts) ? '<button class="cm-act choose" onclick="openChoose(\''+escH(c.authorUid)+'\',\''+escH(c.authorName||'KTS')+'\')"><i class="ph-duotone ph-handshake"></i> Chọn KTS này làm dự án</button>' : '')
         + (USER.role==='founder' && isTuVan && c.authorRole==='kts' && !p.firstAnswerRewarded
             ? '<button class="cm-act" onclick="rewardFirst(\''+p.id+'\',\''+c.id+'\')" style="color:var(--gold)">⭐ Thưởng trả lời đầu ×2</button>' : '')
         + '<button class="cm-act" onclick="openReport(\'comment\',\''+p.id+'\',\''+c.id+'\')">⚑</button>'
@@ -1192,6 +1233,28 @@ window.aiDraft = async function(pid){
   finally { el.disabled = false; if(btn){ btn.disabled = false; btn.classList.remove('loading'); } el.focus();
     const w = $('cmFilterWarn'); if(w){ const v = filterViolation(el.value); w.style.display = v ? 'block' : 'none'; if(v) w.textContent = '⚠ Nội dung chứa ' + VIOLATION_LABEL[v] + ' — sẽ bị chặn. ' + BLOCK_MSG; }
   }
+};
+/* Chủ đầu tư CHỌN KTS làm dự án — mở modal xác nhận */
+let chooseTarget = null;
+window.openChoose = function(ktsUid, ktsName){
+  const p = ALL_POSTS.find(x => x.id === openThreadId);
+  if(!p) return;
+  chooseTarget = { ktsUid: ktsUid, ktsName: ktsName };
+  $('chooseKtsName').innerHTML = 'Bạn sẽ chọn <b>'+escH(ktsName||'KTS')+'</b> thực hiện dự án này (thông tin lấy sẵn từ câu hỏi — không phải nhập lại).';
+  $('chooseBrief').innerHTML = p.brief ? briefHtml(p) : '';
+  $('chooseFee').textContent = 'Phí thiết kế theo bảng niêm yết công khai của ALN — minh bạch trước khi vào hợp đồng.';
+  $('chooseModal').classList.add('open');
+};
+window.closeChoose = function(){ $('chooseModal').classList.remove('open'); chooseTarget = null; };
+window.confirmChoose = async function(){
+  if(!chooseTarget) return;
+  const btn = $('chooseConfirmBtn'); btn.disabled = true;
+  try {
+    await callChooseKts({ threadId: openThreadId, ktsUid: chooseTarget.ktsUid });
+    closeChoose();
+    showToast('🎯 Đã chọn KTS làm dự án! KTS sẽ nhận thông báo — trao đổi tiếp & vào Quy trình 4 bước (C1→C4) qua kênh chat sàn ALN.');
+  } catch(e){ showToast('Lỗi: ' + fnErr(e)); }
+  finally { btn.disabled = false; }
 };
 /* Founder: đề cử Best Answer vào Cẩm nang (nội dung đã kiểm chứng) */
 window.toCamNang = async function(pid){

@@ -290,3 +290,17 @@ Nguyên tắc xuyên suốt: **hấp dẫn nhưng thông tin chính xác** — A
 
 ### Danh sách hàm mới (đều `*Draft`, tự export qua `Object.assign` trong index.js)
 `forumSimilarDraft`, `forumAiDraftAnswer`, `forumSummarizeDraft`, `forumToCamNangDraft`, `forumUnansweredNudgeDraft` (cron), `forumWeeklyDigestDraft` (cron). Collection mới: `camNangForum_draft`, `forumDigest_draft`.
+
+## 9. Bổ sung theo yêu cầu Founder (05/07/2026)
+
+### 9.1 Nút "Chọn KTS này làm dự án" (chủ đầu tư)
+- Callable `forumChooseKtsDraft({ threadId, ktsUid })` — CN/DN (khi P2) hoặc Founder.
+- Nút GOLD "Chọn KTS này làm dự án" hiện dưới mỗi câu trả lời của KTS trong thread Tư vấn + trong khối "KTS phù hợp". Bấm → modal xác nhận (tóm tắt brief lấy sẵn từ câu hỏi + cam kết escrow C1→C4 + phí niêm yết + disclaimer) → xác nhận.
+- Ghi `invites_draft` với `intent: "project"` (mạnh hơn "mời tư vấn"), copy `brief` sang để nghiệm thu tạo dự án không phải nhập lại; gắn `chosenKts` lên thread + báo KTS/Founder. Thread đã chọn → hiện banner "Đã chọn KTS X làm dự án", ẩn các nút chọn.
+- **BẢN NHÁP CHƯA tạo dự án thật** (`projects/`). Khi nghiệm thu: nối vào `createProjectFromThread`/`createProjectForDN` (schema escrow C1–C4) để chuyển `intent:project` invite → dự án thật.
+
+### 9.2 3 cấp bậc KTS + ưu tiên nhận dự án
+- Huy hiệu 3 bậc (đồng bộ tinh thần spec): **Tân binh** (xám) → **Cố vấn** (navy #0f2c52, ≥20 điểm) → **Chuyên gia ALN** (gold ⭐, ≥60 điểm). Điểm từ Best Answer +5 / tim +1 / ghim Showcase +3 / trả lời đầu tu_van +5.
+- Huy hiệu hiện cạnh tên KTS ở card/thread/bình luận + gợi ý KTS. Bậc cao được **ưu tiên** trong danh sách "KTS phù hợp" (sắp theo bậc) + tooltip "được ưu tiên nhận dự án".
+- Trang hồ sơ KTS hiện bậc + **thanh gợi ý tiến độ** ("còn X điểm để lên Cố vấn / Chuyên gia") tạo động lực.
+- Seed KTS mẫu để ở bậc Chuyên gia ALN (65 điểm) để demo bậc cao nhất.

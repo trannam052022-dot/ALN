@@ -281,17 +281,24 @@ function scoreLead(brief) {
   return { score: s, tier };
 }
 
-/* ── Hạng KTS suy từ điểm uy tín (đồng bộ nhãn với kts_profile_draft) ── */
+/* ── 3 CẤP BẬC KTS (huy hiệu) suy từ điểm uy tín — bậc cao được ưu tiên nhận dự án ──
+   Điểm: Best Answer +5, được tim +1, Showcase ghim +3, trả lời đầu tu_van x2(+5). */
 const RANK_TIERS = [
-  { key: "vip",       label: "VIP",       min: 40 },
-  { key: "pro",       label: "PRO",       min: 20 },
-  { key: "tieuchuan", label: "Tiêu chuẩn", min: 8 },
-  { key: "coban",     label: "Cơ bản",    min: 0 },
+  { key: "chuyen_gia", label: "Chuyên gia ALN", min: 60 },
+  { key: "co_van",     label: "Cố vấn",         min: 20 },
+  { key: "tan_binh",   label: "Tân binh",       min: 0 },
 ];
 function rankFromPoints(points) {
   const p = Number(points) || 0;
   for (const t of RANK_TIERS) if (p >= t.min) return t.key;
-  return "coban";
+  return "tan_binh";
+}
+/* Mốc điểm để lên bậc kế (phục vụ thanh tiến độ tạo động lực) */
+function nextRankInfo(points) {
+  const p = Number(points) || 0;
+  if (p >= 60) return null;                       // đã cao nhất
+  if (p >= 20) return { next: "chuyen_gia", nextLabel: "Chuyên gia ALN", need: 60 - p, at: 60 };
+  return { next: "co_van", nextLabel: "Cố vấn", need: 20 - p, at: 20 };
 }
 async function getRepPoints(uid) {
   try {
@@ -319,7 +326,7 @@ function vnKeywordTokens(text) {
 }
 
 /* ── Gợi ý KTS đang hoạt động tích cực trong diễn đàn (denormalized từ bài đăng) ── */
-const RANK_ORDER = { vip: 3, pro: 2, tieuchuan: 1, coban: 0 };
+const RANK_ORDER = { chuyen_gia: 2, co_van: 1, tan_binh: 0 };
 async function suggestKtsFromForum(excludeUid, limitN) {
   try {
     const snap = await fdb.collection(COL.posts)
@@ -815,6 +822,69 @@ exports.forumInviteDraft = onCall({ region: REGION }, async (request) => {
 });
 
 /* ════════════════════════════════════════════
+   6b. CHỌN KTS LÀM DỰ ÁN — forumChooseKtsDraft (điểm chốt mạnh của phễu)
+   Chủ đầu tư chọn 1 KTS để thực hiện dự án → ghi ý định 'project' vào invites_draft
+   + gắn chosenKts lên thread + báo KTS/Founder.
+   BẢN NHÁP: CHƯA tạo dự án thật (projects/) — khi nghiệm thu sẽ nối vào
+   createProjectFromThread/createProjectForDN để copy brief sang escrow C1–C4.
+════════════════════════════════════════════ */
+exports.forumChooseKtsDraft = onCall({ region: REGION }, async (request) => {
+  const { uid, profile } = await requireAuth(request);
+  const d = request.data || {};
+  const ktsUid = String(d.ktsUid || "");
+  const threadId = String(d.threadId || "");
+  if (!ktsUid || !threadId) throw new HttpsError("invalid-argument", "Thiếu KTS hoặc thread");
+
+  const p2 = await getP2Enabled();
+  if (!(profile.role === "founder" || ((profile.role === "cn" || profile.role === "dn") && p2))) {
+    throw new HttpsError("permission-denied", "Chỉ Chủ đầu tư (CN/DN, khi P2 mở) chọn được KTS làm dự án");
+  }
+
+  const postRef = fdb.collection(COL.posts).doc(threadId);
+  const postSnap = await postRef.get();
+  if (!postSnap.exists) throw new HttpsError("not-found", "Thread không tồn tại");
+  const post = postSnap.data();
+  if (post.category !== "tu_van_du_an") throw new HttpsError("failed-precondition", "Chỉ chọn KTS trong thread Tư vấn Dự án");
+  if (post.chosenKtsUid) throw new HttpsError("failed-precondition", "Thread đã chọn KTS làm dự án rồi");
+
+  const ktsProfile = await getProfile(ktsUid);
+  if (!ktsProfile || ktsProfile.role !== "kts") throw new HttpsError("not-found", "Không tìm thấy KTS");
+  const badge = await safeRank(ktsUid, "kts");
+
+  const invRef = await fdb.collection(COL.invites).add({
+    cnUid: uid,
+    cnName: profile.name || "",
+    cnRole: profile.role,
+    ktsUid,
+    ktsName: ktsProfile.name || "",
+    ktsBadge: badge,
+    threadId,
+    intent: "project",             // 'project' = chọn làm dự án (mạnh hơn 'tuvan')
+    brief: post.brief || null,     // copy brief để nghiệm thu tạo dự án không phải nhập lại
+    status: "new",                 // new → quoted → contracted → won/lost
+    createdAt: ts(),
+    updatedAt: ts(),
+  });
+
+  await postRef.update({
+    chosenKtsUid: ktsUid,
+    chosenKts: { uid: ktsUid, name: ktsProfile.name || "", rank: badge },
+    chosenInviteId: invRef.id,
+    chosenAt: ts(),
+    updatedAt: ts(),
+  });
+
+  await fdNotify(ktsUid, "⭐ Bạn được CHỌN làm KTS dự án!",
+    `${profile.name || "Chủ đầu tư"} đã chọn bạn thực hiện dự án — mở kênh chat sàn để xác nhận & vào Quy trình 4 bước`,
+    { type: "FORUM_CHOOSE_KTS", inviteId: invRef.id, postId: threadId });
+  await fdNotify(FOUNDER_UID, "🎯 Chủ đầu tư CHỌN KTS làm dự án",
+    `${profile.name || uid} chọn ${ktsProfile.name || ktsUid} (thread ${threadId})`,
+    { type: "FORUM_CHOOSE_KTS_ADMIN", inviteId: invRef.id, postId: threadId });
+
+  return { ok: true, inviteId: invRef.id };
+});
+
+/* ════════════════════════════════════════════
    7. XÓA (mềm) — forumDeleteDraft (tác giả hoặc Founder)
 ════════════════════════════════════════════ */
 exports.forumDeleteDraft = onCall({ region: REGION }, async (request) => {
@@ -1000,7 +1070,7 @@ async function seedDraftData() {
     status: "visible", commentCount: 0, bestAnswerId: null, brief: null, tag: null,
     authorAvatar: "", authorRank: null, suggestedKts: [], aiSummary: null, aiSummaryAt: null,
   };
-  const ktsAuthor = { authorUid: KTS_UID, authorName: KTS_NAME, authorRole: "kts", authorRank: "pro" };
+  const ktsAuthor = { authorUid: KTS_UID, authorName: KTS_NAME, authorRole: "kts", authorRank: "chuyen_gia" };
   const cnAuthor = { authorUid: CN_UID, authorName: CN_NAME, authorRole: "cn" };
   const founderAuthor = { authorUid: FOUNDER_UID, authorName: FOUNDER_NAME, authorRole: "founder" };
 
@@ -1023,7 +1093,7 @@ async function seedDraftData() {
     heartCount: 0, heartedBy: [], createdAt: T(48),
   });
   batch1.set(posts.doc("draft_p01").collection("comments").doc("draft_c02"), {
-    authorUid: KTS_UID, authorName: KTS_NAME, authorRole: "kts", authorRank: "pro", authorAvatar: "",
+    authorUid: KTS_UID, authorName: KTS_NAME, authorRole: "kts", authorRank: "chuyen_gia", authorAvatar: "",
     text: "Nhà ở riêng lẻ ≤7 tầng và <5.000m² sàn thì thuộc diện thẩm duyệt đơn giản. Với 5 tầng + tum, bậc chịu lửa tối thiểu bậc III; thang bộ hở trong nhà được chấp nhận nếu có lối lên mái + thang V3 ngoài ban công từ tầng 3. Mặt tiền 4m vẫn bố trí được, quan trọng là chiều rộng vế thang ≥0,9m.",
     replyToId: null, isBestAnswer: true, flagged: false, status: "visible",
     heartCount: 3, heartedBy: [FOUNDER_UID, CN_UID, DN_UID], createdAt: T(46),
@@ -1122,12 +1192,12 @@ async function seedDraftData() {
       budget: "1-2ty", timeline: "3-6thang", hasLand: true, consentNd13: true,
     },
     leadId: "draft_lead01",
-    suggestedKts: [{ uid: KTS_UID, name: KTS_NAME, rank: "pro" }],
+    suggestedKts: [{ uid: KTS_UID, name: KTS_NAME, rank: "chuyen_gia" }],
     commentCount: 2, createdAt: T(10), updatedAt: T(6),
     firstAnswerRewarded: true,
   }));
   batch1.set(posts.doc("draft_p09").collection("comments").doc("draft_c07"), {
-    authorUid: KTS_UID, authorName: KTS_NAME, authorRole: "kts", authorRank: "pro", authorAvatar: "",
+    authorUid: KTS_UID, authorName: KTS_NAME, authorRole: "kts", authorRank: "chuyen_gia", authorAvatar: "",
     text: "Với 6x20m và nhu cầu 2 thế hệ, anh gợi ý phòng ông bà đặt tầng trệt phía sau (gần WC chung, tránh leo thang), khối bếp + ăn thông sân sau lấy gió. Tầng 2 là 2 phòng ngủ + sinh hoạt chung, tầng 3 phòng thờ + sân phơi. Chừa sân trước 4m là đậu được ô tô 7 chỗ.",
     replyToId: null, isBestAnswer: true, flagged: false, status: "visible",
     heartCount: 2, heartedBy: [CN_UID, FOUNDER_UID], createdAt: T(9),
@@ -1211,10 +1281,10 @@ async function seedDraftData() {
     createdAt: T(4),
   });
 
-  /* Điểm uy tín KTS mẫu: BestAnswer(p01) 5 + BestAnswer(p09) 5 + FirstAnswer(p09) 5 + Pin(p05) 3 + 5 tim comment = 23 */
+  /* Điểm uy tín KTS mẫu (đủ ≥60 → huy hiệu Chuyên gia ALN để demo bậc cao nhất) */
   batch2.set(fdb.collection(COL.reputation).doc(KTS_UID), {
-    points: 23,
-    counts: { bestAnswer: 2, heart: 5, pin: 1, firstAnswer: 1 },
+    points: 65,
+    counts: { bestAnswer: 6, heart: 22, pin: 2, firstAnswer: 1 },
     projectsDone: 3,
     region: "TP.HCM & Đông Nam Bộ",
     updatedAt: ts(),

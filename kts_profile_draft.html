@@ -72,7 +72,8 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
   padding: 3px 11px; border-radius: 99px; border: 1px solid;
 }
 .rank-coban    { color:var(--sub); border-color:var(--border2); background:var(--cream2); }
-.rank-tieuchuan{ color:#0e7490; border-color:rgba(14,116,144,.4); background:rgba(14,116,144,.07); }
+.rank-tieuchuan{ color:#0f2c52; border-color:rgba(15,44,82,.4); background:rgba(15,44,82,.07); }
+.pf-rank-hint { display:inline-block; margin-left:10px; font-size:var(--text-xs); color:var(--sub); font-style:italic; }
 .rank-pro      { color:var(--gold); border-color:rgba(152,105,10,.45); background:rgba(152,105,10,.08); }
 .rank-vip      { color:#7a5408; border-color:rgba(152,105,10,.6); background:rgba(184,134,11,.16); }
 .pf-region { font-size: var(--text-sm); color: var(--sub); margin-top: 7px; display: flex; align-items: center; gap: 5px; }
@@ -196,11 +197,17 @@ function timeAgo(ts){
 }
 
 /* Hạng KTS theo điểm uy tín (ngưỡng BẢN NHÁP — chốt lại khi nghiệm thu) */
+/* 3 cấp bậc KTS (đồng bộ với server) — bậc cao được ưu tiên nhận dự án */
 function rankOf(points){
-  if(points >= 80) return { label:'VIP',        cls:'rank-vip' };
-  if(points >= 30) return { label:'PRO',        cls:'rank-pro' };
-  if(points >= 10) return { label:'TIÊU CHUẨN', cls:'rank-tieuchuan' };
-  return { label:'CƠ BẢN', cls:'rank-coban' };
+  if(points >= 60) return { label:'⭐ CHUYÊN GIA ALN', cls:'rank-vip' };
+  if(points >= 20) return { label:'CỐ VẤN',           cls:'rank-tieuchuan' };
+  return { label:'TÂN BINH', cls:'rank-coban' };
+}
+/* Còn bao nhiêu điểm để lên bậc kế — tạo động lực */
+function nextRankHint(points){
+  if(points >= 60) return 'Bậc cao nhất — được ưu tiên nhận dự án';
+  if(points >= 20) return 'Còn ' + (60 - points) + ' điểm để lên Chuyên gia ALN';
+  return 'Còn ' + (20 - points) + ' điểm để lên Cố vấn';
 }
 
 const KTS_UID = new URLSearchParams(location.search).get('uid') || '';
@@ -242,7 +249,8 @@ onAuthStateChanged(auth, async user => {
     $('stProjects').textContent = rep.projectsDone || 0;
     $('stBest').textContent = counts.bestAnswer || 0;
     const rank = rankOf(points);
-    $('pfRank').innerHTML = '<span class="pf-rank '+rank.cls+'"><i class="ph-duotone ph-medal"></i>'+rank.label+'</span>';
+    $('pfRank').innerHTML = '<span class="pf-rank '+rank.cls+'"><i class="ph-duotone ph-medal"></i>'+rank.label+'</span>'
+      + '<span class="pf-rank-hint">' + nextRankHint(points) + '</span>';
     if(rep.region){
       $('pfRegion').style.display = 'flex';
       $('pfRegion').querySelector('span').textContent = rep.region;
