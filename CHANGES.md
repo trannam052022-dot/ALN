@@ -87,6 +87,61 @@ Viết 1 script một lần (`reorder-differentiator.js`, không thêm vào buil
 
 ---
 
+## Pass 7 — Tự động đăng Facebook khi Cẩm nang xuất bản (2026-07-05)
+
+**Trạng thái:** Code xong, đã push `main`. **CHỜ Founder tạo secret `CAM_NANG_FB_SECRET`** (hướng dẫn cuối mục này) trước khi tính năng chạy thật — chưa tạo thì bước đăng FB tự bỏ qua an toàn (web vẫn xuất bản bình thường), không lỗi vỡ workflow.
+
+Chưa bật `facebook: true` cho bài nào — Pass này chỉ dựng cơ chế, Founder tự gắn nhãn từng bài sau.
+
+### Đã khảo sát trước khi code (Founder duyệt hướng)
+
+- `postToFacebook` (functions/index.js) là `onCall`, bắt buộc `request.auth.uid === FOUNDER_UID` → Founder đăng tay từ `founder_panel.html`. GitHub Actions (nơi chạy `build-cam-nang.js`) không có phiên đăng nhập Founder nên **không gọi thẳng được** hàm này, và cũng không nên sửa hàm này (sẽ phá bất biến "chỉ Founder đăng tay" đang ghi rõ trong comment của nó).
+- → Chọn dựng **Cloud Function mới `postCamNangToFacebook`** (`onRequest`, không phải `onCall`), xác thực bằng secret riêng `CAM_NANG_FB_SECRET` (khác `FB_PAGE_TOKEN`) qua header `x-cam-nang-secret` — không đụng gì tới `postToFacebook`/luồng đăng tay hiện có.
+
+### Thiết kế
+
+- **Frontmatter mới: `facebook: true`** — tuỳ chọn, mặc định an toàn (không có hoặc `false` = chỉ lên web, không đăng FB).
+- **`functions/index.js`** — hàm mới `postCamNangToFacebook`:
+  - Method phải là `POST`, header `x-cam-nang-secret` phải khớp secret `CAM_NANG_FB_SECRET` (401 nếu sai/thiếu).
+  - Nhận `{ title, description, url, imageUrl, slug }`, ghép caption `title\n\ndescription\n\nXem chi tiết: {url}`.
+  - Có `imageUrl` https hợp lệ → đăng `/photos`; không có → đăng `/feed` (tái dùng đúng logic Graph API của `postToFacebook`, viết riêng bản copy nhỏ — không import chéo để 2 hàm độc lập, dễ audit).
+  - Lỗi Graph API hoặc lỗi mạng → `console.error` (thấy trong Cloud Functions log) + gọi `notifyFounder()` có sẵn (push trong app, giống các cron khác) rồi trả lỗi HTTP cho phía gọi — **không throw ra ngoài không rõ ràng**.
+- **`scripts/build-cam-nang.js`**:
+  - `postDueArticlesToFacebook(articles)` chạy **SAU CÙNG**, sau khi toàn bộ bước build web (bài viết/danh mục/sitemap/robots/home) đã xong — lỗi ở bước FB không bao giờ chặn phần web.
+  - Bài đủ điều kiện gọi FB = `facebook === true` **và** đã nằm trong `articles` (tức đã qua bộ lọc `publishDate` — chỉ bài thật sự đang xuất bản hôm nay mới được xét) **và** slug chưa có trong `content/cam-nang/.fb-posted.json`.
+  - Đăng xong (thành công) → ghi `{slug: {postedAt, fbPostId}}` vào `.fb-posted.json`, file này **commit cùng lúc** với HTML sinh ra (đã nằm trong `git add -A` sẵn có của workflow) → chống đăng trùng vĩnh viễn kể cả chạy lại workflow nhiều lần/`workflow_dispatch` tay.
+  - Đăng lỗi → **không** ghi vào file trạng thái (để lộ rõ là chưa đăng được), log `::error::` (annotation hiện đỏ trong tab Actions) + không throw (bài khác vẫn tiếp tục đăng).
+  - Nhiều bài cùng ngày → nghỉ 2 giây giữa mỗi lần đăng để tránh Facebook coi là spam.
+  - Thiếu env `CAM_NANG_FB_SECRET` (chưa tạo secret) mà có bài cần đăng → log `::error::` cảnh báo rõ, bỏ qua toàn bộ bước FB, **không** ảnh hưởng web.
+- **`.github/workflows/publish-cam-nang.yml`**:
+  - Bước build nhận thêm `env: CAM_NANG_FB_SECRET: ${{ secrets.CAM_NANG_FB_SECRET }}`.
+  - Thêm bước cuối `if: always() && steps.build.outputs.fb_failures != '0'` → `exit 1` nếu có bài đăng FB lỗi. Bước này chạy **SAU** bước commit+push nên không ảnh hưởng việc web đã lên — chỉ làm cả run hiện đỏ trong tab Actions (+ email GitHub tự gửi nếu Founder có bật thông báo Actions failure, giống cơ chế đã dùng ở Pass 6) như một lớp báo lỗi thứ 2 ngoài push trong app.
+
+### Việc Founder cần tự làm trước khi dùng thật (Claude KHÔNG tự nhập giá trị secret)
+
+Tạo **1 chuỗi bí mật ngẫu nhiên** (ví dụ chạy `openssl rand -hex 32` trên máy, hoặc dùng trình sinh mật khẩu bất kỳ ≥ 32 ký tự) rồi khai báo **giống hệt giá trị đó** ở cả 2 nơi:
+
+**A. GitHub Actions (để workflow gọi được Cloud Function):**
+1. Vào repo `https://github.com/trannam052022-dot/ALN` → **Settings** → **Secrets and variables** → **Actions**.
+2. Bấm **New repository secret**.
+3. Name: `CAM_NANG_FB_SECRET` — Value: dán chuỗi bí mật đã tạo ở trên.
+4. Bấm **Add secret**.
+
+**B. Firebase Secret Manager (để Cloud Function đọc được giá trị này khi chạy):**
+1. Cài `firebase-tools` nếu máy chưa có, đăng nhập đúng project: `firebase login` rồi `firebase use aln-platform`.
+2. Chạy: `firebase functions:secrets:set CAM_NANG_FB_SECRET` — khi được hỏi, dán **đúng chuỗi giống hệt** bước A.
+3. Deploy lại function để nó nạp secret mới: `firebase deploy --only functions:postCamNangToFacebook --project aln-platform`.
+
+**Lưu ý:** 2 giá trị ở mục A và B **phải giống hệt nhau** (đây là "mật khẩu dùng chung" giữa GitHub Actions và Cloud Function, không phải 2 secret độc lập). Nếu sau này cần đổi, phải đổi cả 2 nơi cùng lúc.
+
+Sau khi hoàn tất A + B, tính năng sẵn sàng — chỉ cần gắn `facebook: true` vào frontmatter bài nào muốn tự đăng FB khi tới `publishDate`.
+
+### Chưa kiểm tra được (cần Founder tạo secret xong mới test end-to-end)
+
+Đã kiểm tra `node --check` cho cả `functions/index.js` và `scripts/build-cam-nang.js` (không lỗi cú pháp). Chưa gọi thật Graph API / Cloud Function (cần secret + deploy thật) — khi Founder tạo xong secret, nên bật thử `facebook: true` cho 1 bài test (`publishDate` quá khứ gần) rồi chạy tay `workflow_dispatch` để xác nhận đăng lên Fanpage đúng caption/ảnh/link trước khi dùng cho bài thật.
+
+---
+
 ## Pass 1 — Khảo sát codebase + xác nhận kiến trúc (2026-07-03)
 
 **Trạng thái:** Báo cáo, chưa code.

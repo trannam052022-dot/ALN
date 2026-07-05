@@ -19,6 +19,15 @@
 // không vào sitemap/danh mục/trang chủ) cho tới khi script chạy lại đúng/qua
 // ngày đó — xem .github/workflows/publish-cam-nang.yml (cron tự chạy 6h sáng
 // mỗi ngày). Không có "publishDate" = xuất bản ngay như trước giờ.
+//
+// Đăng Facebook tự động: thêm "facebook: true" vào frontmatter để khi bài
+// tới publishDate và lên web, hệ thống TỰ ĐỘNG đăng luôn lên Fanpage "App Làm
+// Nhà" (không cần duyệt lại — nội dung Cẩm nang đã duyệt lúc soạn). Không có
+// trường này hoặc "facebook: false" = mặc định an toàn, chỉ lên web, không
+// đăng FB. Chống đăng trùng bằng content/cam-nang/.fb-posted.json (mỗi slug
+// chỉ đăng đúng 1 lần — xem postDueArticlesToFacebook bên dưới). Cần thiết
+// lập secret CAM_NANG_FB_SECRET (GitHub Actions + Firebase) trước khi dùng —
+// xem CHANGES.md.
 
 var fs = require('fs');
 var path = require('path');
@@ -31,6 +40,14 @@ var ROOT = path.join(__dirname, '..');
 var CONTENT_DIR = path.join(ROOT, 'content', 'cam-nang');
 var OUT_DIR = path.join(ROOT, 'cam-nang');
 var SITE_BASE = 'https://applamnha.vn';
+
+// ── Tự đăng Facebook khi bài Cẩm nang có "facebook: true" vừa xuất bản ──
+// Endpoint Cloud Function postCamNangToFacebook (functions/index.js), xác thực
+// bằng secret CAM_NANG_FB_SECRET (khác Firebase Auth vì chạy từ GitHub Actions).
+// Có thể override URL qua env CAM_NANG_FB_POST_URL nếu cần (vd. test cục bộ).
+var FB_POST_URL = process.env.CAM_NANG_FB_POST_URL ||
+  'https://asia-southeast1-aln-platform.cloudfunctions.net/postCamNangToFacebook';
+var FB_POSTED_STATE_FILE = path.join(CONTENT_DIR, '.fb-posted.json');
 
 // ── Danh sách trang public tĩnh ngoài Cẩm nang — liệt kê thủ công (KHÔNG
 // quét toàn bộ *.html) vì repo có nhiều trang nội bộ/admin cần đăng nhập
@@ -226,7 +243,93 @@ function buildHomeSection(articles) {
   return writeFileIfChanged(homePath, newHtml);
 }
 
-function main() {
+function loadFbPostedState() {
+  if (!fs.existsSync(FB_POSTED_STATE_FILE)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(FB_POSTED_STATE_FILE, 'utf8'));
+  } catch (e) {
+    console.error('::error::Không đọc được ' + FB_POSTED_STATE_FILE + ' (' + e.message + ') — coi như chưa có bài nào đăng.');
+    return {};
+  }
+}
+
+function saveFbPostedState(state) {
+  var content = JSON.stringify(state, null, 2) + '\n';
+  writeFileIfChanged(FB_POSTED_STATE_FILE, content);
+}
+
+// Gọi Cloud Function postCamNangToFacebook cho 1 bài. Trả về { ok, error }
+// — KHÔNG BAO GIỜ throw, để một bài đăng FB lỗi không chặn các bài khác/web.
+function postArticleToFacebook(article, secret) {
+  var url = SITE_BASE + '/cam-nang/' + article.slug + '/?utm_source=facebook&utm_medium=social';
+  var imageUrl = article.image
+    ? (/^https?:\/\//.test(article.image) ? article.image : SITE_BASE + article.image)
+    : undefined;
+
+  return fetch(FB_POST_URL, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-cam-nang-secret': secret },
+    body: JSON.stringify({
+      title: article.title,
+      description: article.description || article.summary || '',
+      url: url,
+      imageUrl: imageUrl,
+      slug: article.slug,
+    }),
+  }).then(function (resp) {
+    return resp.json().then(function (data) {
+      if (!resp.ok || data.error) {
+        return { ok: false, error: (data && data.error) || ('HTTP ' + resp.status) };
+      }
+      return { ok: true, postId: data.postId || '' };
+    });
+  }).catch(function (e) {
+    return { ok: false, error: e.message || String(e) };
+  });
+}
+
+function sleep(ms) {
+  return new Promise(function (resolve) { setTimeout(resolve, ms); });
+}
+
+// Bài đủ điều kiện: facebook:true trong frontmatter + đã ở trong danh sách
+// xuất bản hôm nay (đã qua bộ lọc publishDate ở readArticles) + CHƯA từng
+// đăng FB (chống trùng qua .fb-posted.json). Bài chưa tới ngày không nằm
+// trong "articles" nên tự nhiên chỉ được xét đúng lúc "vừa xuất bản".
+async function postDueArticlesToFacebook(articles) {
+  var secret = process.env.CAM_NANG_FB_SECRET;
+  var state = loadFbPostedState();
+  var candidates = articles.filter(function (a) {
+    return a.facebook === true && !state[a.slug];
+  });
+
+  if (!candidates.length) return { attempted: 0, failed: 0 };
+  if (!secret) {
+    console.error('::error::Có ' + candidates.length + ' bài Cẩm nang cần đăng Facebook nhưng thiếu env CAM_NANG_FB_SECRET — bỏ qua bước đăng FB (web vẫn xuất bản bình thường). Xem CHANGES.md để tạo secret.');
+    return { attempted: 0, failed: candidates.length };
+  }
+
+  var failed = 0;
+  for (var i = 0; i < candidates.length; i++) {
+    var article = candidates[i];
+    var result = await postArticleToFacebook(article, secret);
+    if (result.ok) {
+      state[article.slug] = { postedAt: new Date().toISOString(), fbPostId: result.postId || '' };
+      console.log('Đã đăng Facebook: ' + article.slug + (result.postId ? ' (post ' + result.postId + ')' : ''));
+    } else {
+      failed++;
+      var errText = typeof result.error === 'string' ? result.error : (result.error && result.error.message) || JSON.stringify(result.error);
+      console.error('::error::Đăng Facebook thất bại cho bài "' + article.slug + '": ' + errText);
+    }
+    // Nghỉ giữa các lần đăng để tránh bị Facebook coi là spam khi nhiều bài cùng ngày.
+    if (i < candidates.length - 1) await sleep(2000);
+  }
+
+  saveFbPostedState(state);
+  return { attempted: candidates.length, failed: failed };
+}
+
+async function main() {
   var articles = readArticles();
   var removedCount = cleanupOrphanedArticles(articles);
   var articlesChanged = buildArticles(articles);
@@ -242,6 +345,19 @@ function main() {
   console.log('  home.html (khối 3 bài mới nhất) đổi: ' + (homeChanged ? 'có' : 'không'));
   console.log('  sitemap.xml đổi: ' + (sitemapChanged ? 'có' : 'không'));
   console.log('  robots.txt đổi: ' + (robotsChanged ? 'có' : 'không'));
+
+  // Đăng Facebook chạy SAU CÙNG, sau khi web đã build xong — lỗi ở bước này
+  // (token hết hạn, mạng lỗi...) không được phép chặn/ảnh hưởng phần web ở trên.
+  var fbResult = await postDueArticlesToFacebook(articles);
+  console.log('  Bài đăng Facebook: ' + fbResult.attempted + ' (lỗi: ' + fbResult.failed + ')');
+  // Báo cho step sau của workflow biết có lỗi FB để hiện đỏ tab Actions —
+  // KHÔNG exit(1) ở đây vì bước commit+push web phải chạy sau bước này trước đã.
+  if (process.env.GITHUB_OUTPUT) {
+    fs.appendFileSync(process.env.GITHUB_OUTPUT, 'fb_failures=' + fbResult.failed + '\n');
+  }
 }
 
-main();
+main().catch(function (e) {
+  console.error(e);
+  process.exitCode = 1;
+});

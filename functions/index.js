@@ -1,5 +1,5 @@
 const functions = require("firebase-functions");
-const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 const { v1: firestoreV1 } = require("@google-cloud/firestore");
@@ -7,6 +7,10 @@ const { v1: firestoreV1 } = require("@google-cloud/firestore");
 const ANTHROPIC_KEY = defineSecret("ANTHROPIC_API_KEY");
 const FB_PAGE_TOKEN = defineSecret("FB_PAGE_TOKEN");
 const FB_PAGE_ID = "1244358728751633"; // Trang "App Làm Nhà"
+// Secret riêng cho GitHub Actions gọi postCamNangToFacebook — KHÁC FB_PAGE_TOKEN.
+// Không dùng Firebase Auth vì workflow build-cam-nang chạy ngoài phiên đăng nhập
+// Founder. Xem hướng dẫn tạo secret này ở CHANGES.md.
+const CAM_NANG_FB_SECRET = defineSecret("CAM_NANG_FB_SECRET");
 
 admin.initializeApp();
 
@@ -483,6 +487,70 @@ exports.postToFacebook = onCall(
       if (e instanceof HttpsError) throw e;
       console.error("[postToFacebook]", e);
       throw new HttpsError("internal", e.message || "Lỗi đăng bài");
+    }
+  }
+);
+
+/* ── Đăng bài Cẩm nang lên Facebook TỰ ĐỘNG khi build-cam-nang.js (GitHub
+   Actions) xuất bản một bài có "facebook: true" trong frontmatter. Khác với
+   postToFacebook (đòi Founder đăng nhập, bấm tay), hàm này được gọi từ workflow
+   nên xác thực bằng CAM_NANG_FB_SECRET (header x-cam-nang-secret) thay vì
+   Firebase Auth. Nội dung Cẩm nang đã duyệt lúc soạn nên không cần duyệt lại.
+   Lỗi KHÔNG được để im lặng: log rõ + báo Founder qua push, nhưng không throw
+   ra ngoài để tránh ảnh hưởng gì tới phía gọi (script vẫn phải cho web publish
+   tiếp tục dù bước này lỗi). */
+exports.postCamNangToFacebook = onRequest(
+  { region: "asia-southeast1", secrets: [FB_PAGE_TOKEN, CAM_NANG_FB_SECRET] },
+  async (req, res) => {
+    if (req.method !== "POST") {
+      res.status(405).json({ error: "Method not allowed" });
+      return;
+    }
+    if (req.get("x-cam-nang-secret") !== CAM_NANG_FB_SECRET.value()) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+    const { title, description, url, imageUrl, slug } = req.body || {};
+    if (!title || !url || typeof title !== "string" || typeof url !== "string") {
+      res.status(400).json({ error: "Thiếu title/url" });
+      return;
+    }
+    const message = [title.trim(), (description || "").trim(), "Xem chi tiết: " + url.trim()]
+      .filter(Boolean)
+      .join("\n\n");
+    const hasImg = typeof imageUrl === "string" && /^https:\/\//.test(imageUrl.trim());
+    const token = FB_PAGE_TOKEN.value();
+    try {
+      const endpoint = hasImg ? "photos" : "feed";
+      const payload = hasImg
+        ? { url: imageUrl.trim(), caption: message, access_token: token }
+        : { message: message, access_token: token };
+      const resp = await fetch(`https://graph.facebook.com/v21.0/${FB_PAGE_ID}/${endpoint}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await resp.json();
+      if (!resp.ok || data.error) {
+        const errMsg = (data.error && data.error.message) || ("HTTP " + resp.status);
+        console.error("[postCamNangToFacebook] FB error:", slug, JSON.stringify(data.error || data));
+        await notifyFounder(
+          "⚠️ Đăng Cẩm nang lên Facebook thất bại",
+          `Bài "${title}" (${slug || "?"}) không đăng được lên Fanpage: ${errMsg}`,
+          { type: "CAM_NANG_FB_POST_FAILED", slug: slug || "" }
+        );
+        res.status(502).json({ error: "Facebook từ chối: " + errMsg });
+        return;
+      }
+      res.status(200).json({ ok: true, postId: data.id || "" });
+    } catch (e) {
+      console.error("[postCamNangToFacebook]", slug, e);
+      await notifyFounder(
+        "⚠️ Đăng Cẩm nang lên Facebook thất bại",
+        `Bài "${title}" (${slug || "?"}) lỗi khi đăng lên Fanpage: ${e.message || e}`,
+        { type: "CAM_NANG_FB_POST_FAILED", slug: slug || "" }
+      );
+      res.status(500).json({ error: e.message || "Lỗi đăng bài" });
     }
   }
 );

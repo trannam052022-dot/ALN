@@ -28,6 +28,9 @@ jobs:
           node-version: '22'
 
       - name: Build Cẩm nang (lọc bài theo publishDate)
+        id: build
+        env:
+          CAM_NANG_FB_SECRET: ${{ secrets.CAM_NANG_FB_SECRET }}
         run: node scripts/build-cam-nang.js
 
       - name: Commit + push nếu có bài tới ngày đăng hôm nay
@@ -41,3 +44,12 @@ jobs:
             git commit -m "Tự động đăng bài Cẩm nang đến ngày hẹn"
             git push
           fi
+
+      # Web đã publish xong ở bước trên dù bước dưới đây có fail — bước này chỉ
+      # làm tab Actions hiện đỏ + (nếu bật email thông báo Actions) email Founder
+      # khi có bài đăng Facebook thất bại, để không "im lặng" bỏ qua lỗi FB.
+      - name: Báo lỗi nếu có bài đăng Facebook thất bại
+        if: always() && steps.build.outputs.fb_failures != '' && steps.build.outputs.fb_failures != '0'
+        run: |
+          echo "::error::${{ steps.build.outputs.fb_failures }} bài Cẩm nang đăng Facebook thất bại hôm nay — xem log bước 'Build Cẩm nang' ở trên. Founder cũng đã nhận thông báo push trong app."
+          exit 1
