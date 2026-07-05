@@ -48,15 +48,37 @@ const BLOCK_MSG = "Trao đổi dự án thực hiện qua kênh chat sàn ALN đ
 /* ── BỘ LỌC CHỐNG LÁCH SÀN (bản server — bản client chỉ để UX) ── */
 const ALLOWED_HOSTS = ["applamnha.vn", "trannam052022-dot.github.io"];
 
+/* Bỏ dấu tiếng Việt để bắt chữ số viết bằng chữ, không phân biệt hoa/thường */
+function vnNormNoMark(s) {
+  return String(s || "").toLowerCase()
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/đ/g, "d"); // đ → d
+}
+/* Đổi chữ số tiếng Việt → chữ số Ả Rập để bắt SĐT dạng "0909 tám hai chín sáu 90".
+   Chỉ map 0–9 (ít false-positive: phải có chuỗi số dài liên tiếp mới khớp SĐT). */
+const VN_NUM_WORDS = {
+  khong: "0", mot: "1", hai: "2", ba: "3", bon: "4", tu: "4",
+  nam: "5", lam: "5", sau: "6", bay: "7", tam: "8", chin: "9",
+};
+function vnDigitize(text) {
+  return vnNormNoMark(text).replace(
+    /\b(khong|mot|hai|ba|bon|tu|nam|lam|sau|bay|tam|chin)\b/g,
+    (m) => VN_NUM_WORDS[m]
+  );
+}
+
 function forumFilterViolation(text) {
   if (!text) return null;
   const t = String(text);
 
-  // 1. Email
-  if (/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(t)) return "email";
+  // 1. Email (kể cả né bằng " a còng "/" at "/"(a)" thay @ và " chấm " thay .)
+  const deAt = t
+    .replace(/\s*(\(|\[)?\s*(a còng|a cong|a móc|a moc|at)\s*(\)|\])?\s*/gi, "@")
+    .replace(/\s+(chấm|cham|dot)\s+/gi, ".");
+  if (/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(deAt)) return "email";
 
   // 2. Từ khóa kênh ngoài
-  if (/(zalo|viber|telegram|whatsapp|s[đd]t\b|số\s*[đd]t|số\s*điện\s*thoại|gmail|hotmail|yahoo|facebook\.com|fb\.com|messenger|instagram|tiktok)/i.test(t)) {
+  if (/(zalo|viber|telegram|tele\b|whatsapp|wechat|s[đd]t\b|số\s*[đd]t|số\s*điện\s*thoại|gmail|hotmail|yahoo|facebook\.com|fb\.com|messenger|instagram|tiktok)/i.test(t)) {
     return "keyword";
   }
 
@@ -78,6 +100,9 @@ function forumFilterViolation(text) {
   // 4. SĐT Việt Nam — chuẩn hóa bỏ khoảng trắng/chấm/gạch/ngoặc rồi dò
   const norm = t.replace(/[\s.\-_() ]/g, "");
   if (/(?:\+?84|0)\d{9,10}(?!\d)/.test(norm)) return "phone";
+  // (b) chữ số viết bằng chữ xen kẽ số: "0909 tám hai chín sáu 90"
+  const spelled = vnDigitize(t).replace(/[\s.\-_() ]/g, "");
+  if (/(?:\+?84|0)\d{9,10}(?!\d)/.test(spelled)) return "phone";
 
   return null;
 }

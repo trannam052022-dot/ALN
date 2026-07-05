@@ -508,11 +508,15 @@ const BLOCK_MSG = 'Trao đổi dự án thực hiện qua kênh chat sàn ALN đ
 
 /* ════ BỘ LỌC CHỐNG LÁCH SÀN — bản client (UX); server là chốt chặn thật ════ */
 const ALLOWED_HOSTS = ['applamnha.vn', 'trannam052022-dot.github.io'];
+const VN_NUM_WORDS = { khong:'0', mot:'1', hai:'2', ba:'3', bon:'4', tu:'4', nam:'5', lam:'5', sau:'6', bay:'7', tam:'8', chin:'9' };
+function vnNormNoMark(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d'); }
+function vnDigitize(text){ return vnNormNoMark(text).replace(/\b(khong|mot|hai|ba|bon|tu|nam|lam|sau|bay|tam|chin)\b/g, m => VN_NUM_WORDS[m]); }
 function filterViolation(text) {
   if (!text) return null;
   const t = String(text);
-  if (/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(t)) return 'email';
-  if (/(zalo|viber|telegram|whatsapp|s[đd]t\b|số\s*[đd]t|số\s*điện\s*thoại|gmail|hotmail|yahoo|facebook\.com|fb\.com|messenger|instagram|tiktok)/i.test(t)) return 'keyword';
+  const deAt = t.replace(/\s*(\(|\[)?\s*(a còng|a cong|a móc|a moc|at)\s*(\)|\])?\s*/gi, '@').replace(/\s+(chấm|cham|dot)\s+/gi, '.');
+  if (/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(deAt)) return 'email';
+  if (/(zalo|viber|telegram|tele\b|whatsapp|wechat|s[đd]t\b|số\s*[đd]t|số\s*điện\s*thoại|gmail|hotmail|yahoo|facebook\.com|fb\.com|messenger|instagram|tiktok)/i.test(t)) return 'keyword';
   const linkRe = /(https?:\/\/|www\.)[^\s<>"']+/gi; let m;
   while ((m = linkRe.exec(t))) {
     let url = m[0]; if (!/^https?:/i.test(url)) url = 'http://' + url;
@@ -521,8 +525,9 @@ function filterViolation(text) {
       if (!ALLOWED_HOSTS.some(h => host === h || host.endsWith('.' + h))) return 'link';
     } catch (e) { return 'link'; }
   }
-  const norm = t.replace(/[\s.\-_() ]/g, '');
-  if (/(?:\+?84|0)\d{9,10}(?!\d)/.test(norm)) return 'phone';
+  const PHONE_RE = /(?:\+?84|0)\d{9,10}(?!\d)/;
+  if (PHONE_RE.test(t.replace(/[\s.\-_() ]/g, ''))) return 'phone';
+  if (PHONE_RE.test(vnDigitize(t).replace(/[\s.\-_() ]/g, ''))) return 'phone';
   return null;
 }
 const VIOLATION_LABEL = { phone:'số điện thoại', keyword:'từ khóa kênh liên lạc ngoài', link:'link ngoài', email:'địa chỉ email' };

@@ -146,7 +146,14 @@ So sánh 3 phương án:
 | Trigger onCreate xóa bài vi phạm | Client giữ nguyên ghi thẳng | Bài vi phạm TỒN TẠI vài giây trên feed realtime (mọi người kịp thấy SĐT) → vô nghĩa với mục tiêu chống lách; xóa sau còn gây giật UI |
 | Regex trong rules | Không cần function | Rules chỉ có `matches()` cơ bản, không normalize được "0 9 0 9. 8 2-9 6 9 6", không ghi log được, giới hạn độ phức tạp biểu thức → lách dễ |
 
-Bộ lọc chặn: SĐT VN (normalize bỏ khoảng trắng/chấm/gạch/ngoặc rồi dò `(+84|0)\d{9,10}`), từ khóa (zalo/viber/telegram/whatsapp/sđt/sdt/số điện thoại/gmail/hotmail/yahoo/facebook.com/fb.com/messenger/instagram/tiktok), email regex, link ngoài không thuộc applamnha.vn / trannam052022-dot.github.io. Bản client chỉ để UX cảnh báo sớm — chốt chặn thật là server.
+Bộ lọc chặn: SĐT VN (normalize bỏ khoảng trắng/chấm/gạch/ngoặc rồi dò `(+84|0)\d{9,10}`), từ khóa (zalo/viber/telegram/tele/whatsapp/wechat/sđt/sdt/số điện thoại/gmail/hotmail/yahoo/facebook.com/fb.com/messenger/instagram/tiktok), email regex, link ngoài không thuộc applamnha.vn / trannam052022-dot.github.io. Bản client chỉ để UX cảnh báo sớm — chốt chặn thật là server.
+
+**Nâng cấp chống né bằng chữ (05/07/2026):** thêm 2 lớp bắt kiểu ngụy trang:
+- **SĐT viết bằng chữ số tiếng Việt xen kẽ** — vd `0909 TÁM HAI CHÍN SÁU 90` hoặc viết đủ chữ `không chín không chín tám hai...`: hàm `vnDigitize()` bỏ dấu + đổi không/một/hai/ba/bốn/tư/năm/lăm/sáu/bảy/tám/chín → chữ số rồi mới dò regex SĐT. Chỉ map 0–9 nên không chặn nhầm văn xuôi ("Ba mẹ tôi muốn xây năm sau, sáu phòng ngủ" → sạch — đã test).
+- **Email né bằng chữ** — "a còng"/"at"/"(a)" thay `@`, "chấm"/"dot" thay `.` → chuẩn hóa lại trước khi dò.
+- Đã kiểm 15/15 case (10 phải-chặn + 5 không-được-chặn) + test trực tiếp trên function đã deploy: chuỗi ví dụ bị chặn với `reason: phone`.
+
+**CÒN LẠI — né bằng ẢNH chứa số/chữ (dán hình có SĐT):** bộ lọc text KHÔNG bắt được. Cần OCR ảnh — có chi phí (Cloud Vision ~$1.5/1000 ảnh sau 1000 free/tháng, hoặc Tesseract.js chạy trong function: miễn phí nhưng nặng cold-start). Đây là quyết định chi phí → CHỜ Founder chọn (xem cuối tài liệu / tin nhắn bàn giao). Trước mắt: nút Báo cáo + founder xem ảnh trong thread là lớp chặn thủ công.
 
 ### #3 — CN không bao giờ đọc được hoi_dap/vat_lieu/nghe kể cả gọi API thẳng
 
