@@ -534,6 +534,7 @@ exports.forumCommentDraft = onCall({ region: REGION }, async (request) => {
   const postId = String(d.postId || "");
   const text = String(d.text || "").trim();
   let replyToId = d.replyToId ? String(d.replyToId) : null;
+  const aiAssisted = d.aiAssisted === true;   // KTS có dùng trợ lý AI soạn nháp (đã tự xác nhận đọc)
 
   if (!postId || !text) throw new HttpsError("invalid-argument", "Thiếu nội dung");
   const postRef = fdb.collection(COL.posts).doc(postId);
@@ -587,6 +588,7 @@ exports.forumCommentDraft = onCall({ region: REGION }, async (request) => {
     authorAvatar: profile.avatarUrl || "",
     text,
     replyToId: replyToId || null,
+    aiAssisted,
     isBestAnswer: false,
     flagged: false,
     status: pending ? "pending" : "visible",
@@ -1300,13 +1302,15 @@ exports.forumAiDraftAnswer = onCall({ region: REGION, secrets: [ANTHROPIC_KEY] }
   }
 
   const system =
-    "Bạn là trợ lý soạn NHÁP câu trả lời cho kiến trúc sư Việt Nam trên diễn đàn nội bộ ALN. " +
-    "Bám ĐÚNG điều người dùng đang hỏi trong ngữ cảnh luồng (đọc kỹ bình luận mới nhất / câu đang được trả lời) — KHÔNG trả lời lạc sang câu hỏi cũ đã xong. " +
-    "Trả lời NGẮN GỌN, đúng chuyên môn xây dựng/kiến trúc VN. Khi phù hợp thì nhắc TCVN/QCVN liên quan — " +
-    "CHỈ ghi mã số nếu chắc chắn, TUYỆT ĐỐI không bịa số hiệu tiêu chuẩn. Chỗ nào không chắc ghi rõ 'cần kiểm chứng'. " +
-    "QUAN TRỌNG — nếu người hỏi về DỰ TOÁN / báo giá / chi phí cụ thể: chỉ nêu KHUNG tham khảo chung (các đầu mục cấu thành chi phí, khoảng suất đầu tư nếu chắc chắn) và HƯỚNG họ chốt dự toán chi tiết qua Quy trình 4 bước trên sàn ALN (nút 'Mời KTS tư vấn' → kênh chat sàn) để được bảo vệ — TUYỆT ĐỐI không báo giá chi tiết/đàm phán tiền công khai trên diễn đàn. " +
+    "Bạn viết giúp một KIẾN TRÚC SƯ Việt Nam bản nháp trả lời trên diễn đàn, để chính KTS đó đọc lại rồi gửi. " +
+    "Viết như KTS đang NHẮN TIN trò chuyện tự nhiên với đồng nghiệp/khách: giọng thân thiện, xưng 'mình', gọn gàng, đi thẳng vào ý — như người thật nói, KHÔNG phải văn bản hành chính. " +
+    "TUYỆT ĐỐI KHÔNG dùng ký hiệu markdown: không dùng **, ##, ###, gạch ngang bảng, hay tiêu đề in đậm. Viết văn xuôi tự nhiên; nếu cần liệt kê thì tối đa vài gạch đầu dòng bằng dấu '-' ngắn gọn, đừng lạm dụng. " +
+    "Độ dài vừa phải (khoảng 4–8 câu), không dàn trải. " +
+    "Bám ĐÚNG điều đang được hỏi trong ngữ cảnh luồng (đọc kỹ bình luận mới nhất / câu đang được trả lời) — KHÔNG trả lời lạc sang câu hỏi cũ đã xong. " +
+    "Đúng chuyên môn xây dựng/kiến trúc VN. Khi thật sự liên quan mới nhắc TCVN/QCVN, CHỈ ghi mã số nếu chắc chắn, TUYỆT ĐỐI không bịa số hiệu; chỗ nào không chắc thì nói tự nhiên kiểu 'cái này bạn kiểm tra lại theo...'. " +
+    "Nếu người ta hỏi về DỰ TOÁN / báo giá / chi phí: nói chuyện tự nhiên về vài đầu mục chính rồi rủ họ trao đổi chi tiết qua nút 'Mời KTS tư vấn' / kênh chat trên sàn ALN cho chuẩn và được bảo vệ — KHÔNG báo giá chi tiết hay mặc cả tiền công khai trên diễn đàn. " +
     "Không ghi số điện thoại, email, link ngoài, zalo. " +
-    "Kết thúc đúng 1 dòng: '⚠️ Bản nháp AI — KTS kiểm chứng trước khi gửi.'";
+    "KHÔNG tự thêm dòng cảnh báo/disclaimer nào ở cuối — hệ thống tự lo phần đó.";
   const draft = await callClaude(ANTHROPIC_KEY.value(), "claude-sonnet-4-6", system, userMsg, 700);
   return { draft };
 });
@@ -1330,8 +1334,8 @@ exports.forumSummarizeDraft = onCall({ region: REGION, secrets: [ANTHROPIC_KEY] 
     convo += "- " + (x.authorName || "") + (x.isBestAnswer ? " (Best Answer)" : "") + ": " + (x.text || "") + "\n";
   });
   const system =
-    "Tóm tắt luồng thảo luận diễn đàn kiến trúc/xây dựng thành TL;DR tiếng Việt: 2-4 gạch đầu dòng ngắn, " +
-    "nêu vấn đề + kết luận/đáp án chính. CHỈ tóm tắt nội dung đã có, KHÔNG thêm thông tin mới. Không ghi SĐT/email/link.";
+    "Tóm tắt luồng thảo luận diễn đàn kiến trúc/xây dựng thành TL;DR tiếng Việt: 2-4 gạch đầu dòng ngắn (mỗi dòng bắt đầu bằng '- '), " +
+    "nêu vấn đề + kết luận/đáp án chính. TUYỆT ĐỐI KHÔNG dùng ký hiệu markdown (**, ##, bảng). CHỈ tóm tắt nội dung đã có, KHÔNG thêm thông tin mới. Không ghi SĐT/email/link.";
   const summary = await callClaude(ANTHROPIC_KEY.value(), "claude-haiku-4-5-20251001", system, convo, 400);
   await postRef.update({ aiSummary: summary, aiSummaryAt: ts() });
   return { summary, cached: false };

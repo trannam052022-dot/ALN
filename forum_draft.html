@@ -369,6 +369,13 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 .ai-draft-btn { display:inline-flex; align-items:center; gap:6px; margin:8px 0 6px; padding:6px 14px; border-radius:99px; cursor:pointer; font-family:var(--syne); font-size:var(--text-2xs); font-weight:700; letter-spacing:.03em; color:var(--gold); background:var(--gold-bg); border:1px dashed rgba(152,105,10,.5); transition:background .2s; }
 .ai-draft-btn:hover { background:rgba(152,105,10,.14); }
 .ai-draft-btn.loading { opacity:.6; cursor:wait; }
+.cm-send:disabled { opacity:.4; cursor:not-allowed; }
+
+/* Cổng bắt buộc đọc & xác nhận bản nháp AI */
+.ai-gate { margin-top:8px; padding:9px 12px; border-radius:var(--r-sm); background:rgba(180,83,9,.07); border:1px solid rgba(180,83,9,.3); }
+.ai-gate-label { display:flex; align-items:flex-start; gap:8px; font-size:var(--text-xs); font-weight:600; color:var(--amber); cursor:pointer; line-height:1.45; }
+.ai-gate-label input[type=checkbox] { margin-top:2px; width:15px; height:15px; accent-color:var(--amber); cursor:pointer; flex-shrink:0; }
+.ai-gate-label input:disabled { cursor:wait; }
 
 /* Câu hỏi tương tự */
 .similar-box { margin-top:10px; padding:10px 12px; border-radius:var(--r-sm); background:rgba(29,78,216,.05); border:1px solid rgba(29,78,216,.22); }
@@ -983,6 +990,7 @@ window.closeThread = function(){
   $('threadModal').classList.remove('open');
   if(commentsUnsub){ commentsUnsub(); commentsUnsub = null; }
   threadComments = []; replyTo = null;
+  if(typeof resetAiGate === 'function') resetAiGate();
 };
 
 function canCommentHere(p){
@@ -1102,7 +1110,11 @@ function renderComposer(p){
     + (showAi ? '<button class="ai-draft-btn" id="aiDraftBtn" onclick="aiDraft(\''+p.id+'\')"><i class="ph-duotone ph-sparkle"></i> AI soạn nháp trả lời</button>' : '')
     + '<div class="cm-composer">'
       + '<textarea class="cm-input" id="cmInput" placeholder="Viết bình luận... (không SĐT / Zalo / link ngoài)" oninput="liveCmFilter()"></textarea>'
-      + '<button class="cm-send" onclick="submitComment(\''+p.id+'\')"><i class="ph-duotone ph-paper-plane-tilt"></i></button>'
+      + '<button class="cm-send" id="cmSendBtn" onclick="submitComment(\''+p.id+'\')"><i class="ph-duotone ph-paper-plane-tilt"></i></button>'
+    + '</div>'
+    + '<div class="ai-gate" id="aiGate" style="display:none">'
+      + '<label class="ai-gate-label"><input type="checkbox" id="aiConfirm" onchange="onAiConfirm()" disabled>'
+      + '<span id="aiGateText"></span></label>'
     + '</div>'
     + '<div class="filter-warn" id="cmFilterWarn" style="margin-top:6px"></div>';
 }
@@ -1116,6 +1128,7 @@ window.liveCmFilter = function(){
   const el = $('cmInput'), warn = $('cmFilterWarn');
   if(!el || !warn) return;
   autoGrowCm();
+  if(cmAiDrafted && el.value.trim() === '') resetAiGate();   // xóa trắng thì bỏ cổng
   const v = filterViolation(el.value);
   if(v){ warn.style.display = 'block'; warn.textContent = '⚠ Nội dung chứa ' + VIOLATION_LABEL[v] + ' — sẽ bị chặn. ' + BLOCK_MSG; }
   else warn.style.display = 'none';
@@ -1133,7 +1146,36 @@ window.summarizeThread = async function(pid){
       + escH(r.data.summary || '').replace(/\n/g, '<br>');
   } catch(e){ box.style.display='none'; showToast('Lỗi tóm tắt: ' + fnErr(e)); }
 };
-/* KTS: AI soạn NHÁP trả lời — điền vào ô, KTS kiểm chứng rồi mới gửi */
+/* Cổng bắt buộc ĐỌC & XÁC NHẬN trước khi gửi bản nháp AI (chống bấm gửi vô tội vạ) */
+let cmAiDrafted = false;
+let _aiCd = null;
+function showAiGate(){
+  cmAiDrafted = true;
+  const gate = $('aiGate'), cb = $('aiConfirm'), txt = $('aiGateText'), send = $('cmSendBtn');
+  if(!gate || !cb || !txt) return;
+  gate.style.display = 'block';
+  if(send) send.disabled = true;
+  cb.checked = false; cb.disabled = true;
+  let s = 6;   // buộc đọc ít nhất 6 giây trước khi được tick
+  txt.textContent = 'Hãy đọc lại nội dung AI đã soạn… (' + s + 's)';
+  clearInterval(_aiCd);
+  _aiCd = setInterval(() => {
+    s--;
+    if(s <= 0){ clearInterval(_aiCd); cb.disabled = false; txt.textContent = 'Tôi đã đọc kỹ, kiểm chứng & chịu trách nhiệm về nội dung này'; }
+    else txt.textContent = 'Hãy đọc lại nội dung AI đã soạn… (' + s + 's)';
+  }, 1000);
+}
+window.onAiConfirm = function(){
+  const send = $('cmSendBtn'), cb = $('aiConfirm');
+  if(send && cb) send.disabled = !cb.checked;
+};
+function resetAiGate(){
+  cmAiDrafted = false; clearInterval(_aiCd);
+  const gate = $('aiGate'), send = $('cmSendBtn');
+  if(gate) gate.style.display = 'none';
+  if(send) send.disabled = false;
+}
+/* KTS: AI soạn NHÁP trả lời — điền vào ô; buộc đọc & xác nhận rồi mới gửi được */
 window.aiDraft = async function(pid){
   const el = $('cmInput'); if(!el) return;
   const btn = $('aiDraftBtn'); const prev = el.value;
@@ -1142,10 +1184,13 @@ window.aiDraft = async function(pid){
   try {
     const r = await callAiDraft({ postId: pid, replyToId: replyTo ? replyTo.id : null });
     el.value = r.data.draft || prev;
-    showToast('AI đã soạn nháp — hãy KIỂM CHỨNG & chỉnh trước khi gửi');
     autoGrowCm(); el.scrollTop = 0; el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    showAiGate();
+    showToast('AI mới soạn NHÁP — đọc kỹ & chỉnh cho đúng ý bạn trước khi gửi');
   } catch(e){ el.value = prev; showToast('Lỗi AI: ' + fnErr(e)); }
-  finally { el.disabled = false; if(btn){ btn.disabled = false; btn.classList.remove('loading'); } el.focus(); liveCmFilter(); }
+  finally { el.disabled = false; if(btn){ btn.disabled = false; btn.classList.remove('loading'); } el.focus();
+    const w = $('cmFilterWarn'); if(w){ const v = filterViolation(el.value); w.style.display = v ? 'block' : 'none'; if(v) w.textContent = '⚠ Nội dung chứa ' + VIOLATION_LABEL[v] + ' — sẽ bị chặn. ' + BLOCK_MSG; }
+  }
 };
 /* Founder: đề cử Best Answer vào Cẩm nang (nội dung đã kiểm chứng) */
 window.toCamNang = async function(pid){
@@ -1189,12 +1234,17 @@ window.submitComment = async function(pid){
   const el = $('cmInput');
   const text = (el && el.value || '').trim();
   if(!text){ showToast('Nhập nội dung bình luận'); return; }
+  /* Bản nháp AI: bắt buộc đã tick xác nhận đọc & kiểm chứng */
+  if(cmAiDrafted){
+    const cb = $('aiConfirm');
+    if(!cb || !cb.checked){ showToast('✋ Hãy đọc lại bản nháp AI và tick xác nhận đã kiểm chứng trước khi gửi'); return; }
+  }
   const v = filterViolation(text);
   if(v){ showToast('⛔ ' + BLOCK_MSG); liveCmFilter(); return; }
   el.disabled = true;
   try {
-    const res = await callComment({ postId: pid, text, replyToId: replyTo ? replyTo.id : null });
-    el.value = ''; cancelReply();
+    const res = await callComment({ postId: pid, text, replyToId: replyTo ? replyTo.id : null, aiAssisted: cmAiDrafted });
+    el.value = ''; resetAiGate(); cancelReply();
     if(res.data.status === 'pending') showToast('Đã gửi — bình luận chờ Founder duyệt (3 đóng góp đầu)');
   } catch(e){
     showToast('⛔ ' + fnErr(e));
