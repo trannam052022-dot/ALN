@@ -4,9 +4,10 @@ slug: xay-nha-khong-xin-phep-bi-phat
 category: phap-ly-giay-phep
 description: "Xây nhà không phép hoặc sai phép bị xử lý thế nào? Các mức xử phạt, nguy cơ buộc tháo dỡ và cách tránh rủi ro khi xây nhà."
 image: /images/cam-nang/xay-nha-khong-phep.jpg
-date: 2026-07-10
-updated: 2026-07-10
-publishDate: 2026-07-10
+date: 2026-07-05
+updated: 2026-07-05
+publishDate: 2026-07-05
+facebook: true
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
   - xây nhà không xin phép bị phạt
