@@ -1140,7 +1140,7 @@ window.aiDraft = async function(pid){
   if(btn){ btn.disabled = true; btn.classList.add('loading'); }
   el.value = 'AI đang soạn nháp…'; el.disabled = true;
   try {
-    const r = await callAiDraft({ postId: pid });
+    const r = await callAiDraft({ postId: pid, replyToId: replyTo ? replyTo.id : null });
     el.value = r.data.draft || prev;
     showToast('AI đã soạn nháp — hãy KIỂM CHỨNG & chỉnh trước khi gửi');
     autoGrowCm(); el.scrollTop = 0; el.scrollIntoView({ block: 'center', behavior: 'smooth' });

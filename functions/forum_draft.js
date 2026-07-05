@@ -1271,17 +1271,43 @@ exports.forumAiDraftAnswer = onCall({ region: REGION, secrets: [ANTHROPIC_KEY] }
   if (profile.role !== "kts" && profile.role !== "founder")
     throw new HttpsError("permission-denied", "Chỉ KTS/Founder dùng trợ lý soạn nháp");
   const postId = String((request.data || {}).postId || "");
-  const snap = await fdb.collection(COL.posts).doc(postId).get();
+  const replyToId = (request.data || {}).replyToId ? String((request.data).replyToId) : null;
+  const postRef = fdb.collection(COL.posts).doc(postId);
+  const snap = await postRef.get();
   if (!snap.exists) throw new HttpsError("not-found", "Bài không tồn tại");
   const p = snap.data();
+
+  /* Đọc luồng bình luận để AI bám ĐÚNG ngữ cảnh (nhất là câu đang được trả lời) */
+  const cs = await postRef.collection("comments").orderBy("createdAt", "asc").limit(30).get();
+  let convo = "";
+  let replyingTo = null;
+  cs.forEach((c) => {
+    const x = c.data();
+    if (x.status !== "visible") return;
+    convo += "- " + (x.authorName || "") + " (" + (x.authorRole || "") + ")"
+      + (x.isBestAnswer ? " [Best Answer]" : "") + ": " + (x.text || "") + "\n";
+    if (replyToId && c.id === replyToId) replyingTo = x;
+  });
+
+  let userMsg = "BÀI GỐC (" + (p.authorRole || "") + "):\n" + (p.text || "") + "\n";
+  if (convo) userMsg += "\nCÁC BÌNH LUẬN ĐÃ CÓ:\n" + convo;
+  if (replyingTo) {
+    userMsg += "\n>>> KTS ĐANG TRẢ LỜI TRỰC TIẾP bình luận này của "
+      + (replyingTo.authorName || "") + ":\n\"" + (replyingTo.text || "") + "\"\n"
+      + "Hãy soạn nháp trả lời ĐÚNG điều họ vừa hỏi ở bình luận này (không lặp lại câu hỏi gốc nếu đã được trả lời).";
+  } else {
+    userMsg += "\nHãy soạn nháp trả lời cho nội dung MỚI NHẤT đang cần chuyên gia (nếu câu hỏi gốc đã có Best Answer thì trả lời phần đang thảo luận tiếp).";
+  }
+
   const system =
     "Bạn là trợ lý soạn NHÁP câu trả lời cho kiến trúc sư Việt Nam trên diễn đàn nội bộ ALN. " +
+    "Bám ĐÚNG điều người dùng đang hỏi trong ngữ cảnh luồng (đọc kỹ bình luận mới nhất / câu đang được trả lời) — KHÔNG trả lời lạc sang câu hỏi cũ đã xong. " +
     "Trả lời NGẮN GỌN, đúng chuyên môn xây dựng/kiến trúc VN. Khi phù hợp thì nhắc TCVN/QCVN liên quan — " +
-    "CHỈ ghi mã số nếu chắc chắn, TUYỆT ĐỐI không bịa số hiệu tiêu chuẩn. Chỗ nào không chắc phải ghi rõ 'cần kiểm chứng'. " +
+    "CHỈ ghi mã số nếu chắc chắn, TUYỆT ĐỐI không bịa số hiệu tiêu chuẩn. Chỗ nào không chắc ghi rõ 'cần kiểm chứng'. " +
+    "QUAN TRỌNG — nếu người hỏi về DỰ TOÁN / báo giá / chi phí cụ thể: chỉ nêu KHUNG tham khảo chung (các đầu mục cấu thành chi phí, khoảng suất đầu tư nếu chắc chắn) và HƯỚNG họ chốt dự toán chi tiết qua Quy trình 4 bước trên sàn ALN (nút 'Mời KTS tư vấn' → kênh chat sàn) để được bảo vệ — TUYỆT ĐỐI không báo giá chi tiết/đàm phán tiền công khai trên diễn đàn. " +
     "Không ghi số điện thoại, email, link ngoài, zalo. " +
     "Kết thúc đúng 1 dòng: '⚠️ Bản nháp AI — KTS kiểm chứng trước khi gửi.'";
-  const draft = await callClaude(ANTHROPIC_KEY.value(), "claude-sonnet-4-6", system,
-    "Câu hỏi trên diễn đàn:\n\n" + (p.text || ""), 700);
+  const draft = await callClaude(ANTHROPIC_KEY.value(), "claude-sonnet-4-6", system, userMsg, 700);
   return { draft };
 });
 
