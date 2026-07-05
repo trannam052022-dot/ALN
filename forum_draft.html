@@ -25,7 +25,7 @@
   --gold-bg: rgba(152,105,10,.09);
   --gold-glow: rgba(152,105,10,.16);
   --heart:   #e0524f;
-  --violet:  #7c3aed;
+  --amber:   #b45309;
   --green:   #15803d;
   --blue:    #1d4ed8;
   --r: 14px; --r-sm: 8px;
@@ -96,13 +96,13 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 .p2-switch {
   display: none; align-items: center; gap: 7px;
   padding: 4px 10px; border-radius: 99px;
-  border: 1px dashed rgba(124,58,237,.45); background: rgba(124,58,237,.06);
-  font-size: var(--text-2xs); font-weight: 700; color: var(--violet); font-family: var(--mono);
+  border: 1px dashed rgba(180,83,9,.45); background: rgba(180,83,9,.06);
+  font-size: var(--text-2xs); font-weight: 700; color: var(--amber); font-family: var(--mono);
   cursor: pointer; user-select: none;
 }
 .p2-dot { width: 26px; height: 14px; border-radius: 99px; background: var(--border2); position: relative; transition: background .2s; }
 .p2-dot::after { content:''; position:absolute; top:2px; left:2px; width:10px; height:10px; border-radius:50%; background:#fff; transition: left .2s; }
-.p2-switch.on .p2-dot { background: var(--violet); }
+.p2-switch.on .p2-dot { background: var(--amber); }
 .p2-switch.on .p2-dot::after { left: 14px; }
 
 /* ── HERO ── */
@@ -131,10 +131,10 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 /* ── DISCLAIMER TƯ VẤN ── */
 .tuvan-disclaimer {
   display: none; max-width: 760px; margin: 16px auto 0; padding: 11px 16px;
-  border: 1px solid rgba(124,58,237,.3); background: rgba(124,58,237,.05);
+  border: 1px solid rgba(180,83,9,.3); background: rgba(180,83,9,.05);
   border-radius: var(--r-sm); font-size: var(--text-xs); color: var(--text2); line-height: 1.6;
 }
-.tuvan-disclaimer b { color: var(--violet); }
+.tuvan-disclaimer b { color: var(--amber); }
 
 /* ── FEED ── */
 .feed-wrap { max-width: 760px; margin: 0 auto; padding: 18px 16px 70px; }
@@ -196,10 +196,10 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 .brief-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 7px;
   margin-top: 10px; padding: 11px 12px; border-radius: var(--r-sm);
-  background: rgba(124,58,237,.05); border: 1px solid rgba(124,58,237,.22);
+  background: rgba(180,83,9,.05); border: 1px solid rgba(180,83,9,.22);
 }
 .brief-item { font-size: var(--text-xs); color: var(--text2); }
-.brief-item b { display: block; font-size: var(--text-2xs); color: var(--violet); font-family: var(--mono); letter-spacing: .06em; font-weight: 700; }
+.brief-item b { display: block; font-size: var(--text-2xs); color: var(--amber); font-family: var(--mono); letter-spacing: .06em; font-weight: 700; }
 
 /* ── EMPTY / LOADING / GATE ── */
 .empty-state { text-align: center; padding: 70px 20px; color: var(--muted); }
@@ -281,9 +281,9 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
 
 /* Mini-brief form */
-.brief-form { display: none; flex-direction: column; gap: 11px; padding: 13px 14px; border-radius: var(--r-sm); background: rgba(124,58,237,.04); border: 1px solid rgba(124,58,237,.22); }
+.brief-form { display: none; flex-direction: column; gap: 11px; padding: 13px 14px; border-radius: var(--r-sm); background: rgba(180,83,9,.04); border: 1px solid rgba(180,83,9,.22); }
 .bf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.bf-field label { display: block; font-size: var(--text-2xs); font-weight: 700; color: var(--violet); font-family: var(--mono); letter-spacing: .06em; margin-bottom: 4px; }
+.bf-field label { display: block; font-size: var(--text-2xs); font-weight: 700; color: var(--amber); font-family: var(--mono); letter-spacing: .06em; margin-bottom: 4px; }
 .bf-field select, .bf-field input[type=text], .bf-field input[type=number] {
   width: 100%; padding: 8px 10px; border-radius: 7px; border: 1px solid var(--border);
   background: var(--white); font-family: var(--sans); font-size: var(--text-xs); color: var(--text); outline: none;
@@ -319,7 +319,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 }
 .cm-input:focus { border-color: var(--gold); }
 .cm-send { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--text); color: #fff; cursor: pointer; font-size: 14px; flex-shrink: 0; }
-.reply-tag { display: none; align-items: center; gap: 6px; font-size: var(--text-2xs); color: var(--violet); font-weight: 700; margin-top: 8px; }
+.reply-tag { display: none; align-items: center; gap: 6px; font-size: var(--text-2xs); color: var(--amber); font-weight: 700; margin-top: 8px; }
 .reply-tag button { background:none; border:none; color: var(--sub); cursor:pointer; font-size: var(--text-2xs); }
 
 /* ── REPORT MODAL ── */
@@ -508,7 +508,7 @@ const CATS = {
   showcase:     { label: 'Showcase',          icon: 'ph-image-square', color: '#b8860b' },
   nghe:         { label: 'Nghề & Chứng chỉ', icon: 'ph-certificate',  color: '#0e7490' },
   bang_tin:     { label: 'Bảng tin ALN',      icon: 'ph-megaphone',    color: '#dc2626' },
-  tu_van_du_an: { label: 'Tư vấn Dự án',     icon: 'ph-house-line',   color: '#7c3aed' },
+  tu_van_du_an: { label: 'Tư vấn Dự án',     icon: 'ph-house-line',   color: '#b45309' },
 };
 const OPEN_CATEGORIES = ['tu_van_du_an', 'showcase', 'bang_tin'];
 const KTS_POST_CATEGORIES = ['hoi_dap', 'vat_lieu', 'showcase', 'nghe'];
