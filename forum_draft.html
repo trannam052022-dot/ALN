@@ -37,9 +37,10 @@
   --syne:  'Syne', sans-serif;
   --mono:  'JetBrains Mono', monospace;
 }
-html { font-size: 13px; }
-@media (min-width: 1440px) { html { font-size: 14px; } }
-@media (min-width: 1920px) { html { font-size: 16px; } }
+/* Nền cỡ chữ 16px cho MỌI kích thước → không co lại khi thu nhỏ màn hình; chỉ nhỉnh nhẹ trên màn hình lớn */
+html { font-size: 16px; }
+@media (min-width: 1600px) { html { font-size: 17px; } }
+@media (min-width: 1920px) { html { font-size: 18px; } }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--sans); background: var(--cream); color: var(--text); line-height: 1.6; font-size: 1rem; }
 
