@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Hồ sơ KTS — Diễn đàn ALN (BẢN NHÁP)</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/>
+<link rel="stylesheet" href="aln-tokens.css">
+<style>
+:root {
+  --cream: #f8f6f2; --cream2: #f2ede6; --white: #fff;
+  --border: #e8e2d8; --border2: #d8d0c4;
+  --text: #2a2520; --text2: #5a5048; --sub: #8a8078; --muted: #b8b0a4;
+  --gold: #c9a84c; --arch: #8a6b4a; --violet: #7c3aed;
+  --r: 14px; --r-sm: 8px;
+  --sh: 0 2px 12px rgba(60,40,20,.07), 0 1px 3px rgba(60,40,20,.05);
+  --sans: 'DM Sans', sans-serif; --serif: 'Cormorant Garamond', serif;
+  --syne: 'Syne', sans-serif; --mono: 'JetBrains Mono', monospace;
+}
+html { font-size: 13px; }
+@media (min-width: 1440px) { html { font-size: 14px; } }
+@media (min-width: 1920px) { html { font-size: 16px; } }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--cream); color: var(--text); line-height: 1.6; font-size: 1rem; }
+.draft-ribbon {
+  background: repeating-linear-gradient(45deg,#b0413e,#b0413e 14px,#963835 14px,#963835 28px);
+  color:#fff; text-align:center; font-size: var(--text-xs); font-weight:700;
+  letter-spacing:.12em; padding: 4px 10px; font-family: var(--mono);
+}
+.topbar {
+  position: sticky; top: 0; z-index: 80;
+  background: rgba(248,246,242,.94); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px; padding: 0 20px; height: 52px;
+}
+.tb-logo-box {
+  width: 30px; height: 30px; border-radius: 7px;
+  background: rgba(201,168,76,.1); border: 1.5px solid rgba(201,168,76,.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--text-xs); font-weight: 800; color: var(--gold); font-family: var(--syne);
+}
+.tb-page { font-family: var(--serif); font-size: var(--text-md); color: var(--text2); font-style: italic; }
+.tb-link {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 5px;
+  font-size: var(--text-xs); color: var(--sub); text-decoration: none;
+  padding: 5px 12px; border-radius: 99px; border: 1px solid var(--border); background: var(--white);
+}
+.wrap { max-width: 860px; margin: 0 auto; padding: 24px 16px 70px; }
+
+/* HEADER CARD */
+.profile-card {
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--r);
+  box-shadow: var(--sh); padding: 26px; display: flex; gap: 22px; align-items: center; flex-wrap: wrap;
+}
+.pf-avatar {
+  width: 92px; height: 92px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+  background: var(--cream2); border: 2px solid rgba(201,168,76,.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--text-2xl); font-weight: 700; color: var(--sub); font-family: var(--serif);
+}
+.pf-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.pf-info { flex: 1; min-width: 220px; }
+.pf-name { font-family: var(--serif); font-size: var(--text-2xl); font-weight: 400; line-height: 1.2; }
+.pf-rank {
+  display: inline-flex; align-items: center; gap: 5px; margin-top: 6px;
+  font-size: var(--text-2xs); font-weight: 800; letter-spacing: .1em; font-family: var(--mono);
+  padding: 3px 11px; border-radius: 99px; border: 1px solid;
+}
+.rank-coban    { color:#8a8078; border-color:#d8d0c4; background:#f2ede6; }
+.rank-tieuchuan{ color:#2b7a8f; border-color:rgba(43,122,143,.4); background:rgba(43,122,143,.07); }
+.rank-pro      { color:#8a6b4a; border-color:rgba(138,107,74,.45); background:rgba(138,107,74,.08); }
+.rank-vip      { color:#a8862f; border-color:rgba(201,168,76,.55); background:rgba(201,168,76,.12); }
+.pf-region { font-size: var(--text-sm); color: var(--sub); margin-top: 7px; display: flex; align-items: center; gap: 5px; }
+.pf-note { font-size: var(--text-2xs); color: var(--muted); margin-top: 9px; line-height: 1.55; }
+.btn-invite {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 26px; border-radius: 99px; border: none; cursor: pointer;
+  background: linear-gradient(135deg, var(--violet), #5b21b6); color: #fff;
+  font-size: var(--text-sm); font-weight: 700; font-family: var(--sans);
+  box-shadow: 0 6px 20px rgba(124,58,237,.3); transition: transform .15s;
+}
+.btn-invite:hover { transform: translateY(-1px); }
+.btn-invite:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+/* STATS */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 14px; }
+.stat-card {
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--r-sm);
+  box-shadow: var(--sh); padding: 14px 16px; text-align: center;
+}
+.stat-num { font-family: var(--syne); font-size: var(--text-xl); font-weight: 800; color: var(--arch); }
+.stat-label { font-size: var(--text-2xs); color: var(--sub); font-family: var(--mono); letter-spacing: .08em; font-weight: 700; margin-top: 2px; }
+.rep-detail { font-size: var(--text-2xs); color: var(--muted); text-align: center; margin-top: 8px; font-family: var(--mono); }
+
+/* SHOWCASE */
+.sec-title { font-family: var(--serif); font-size: var(--text-lg); margin: 26px 0 12px; display: flex; align-items: center; gap: 8px; }
+.sc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.sc-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: var(--sh); }
+.sc-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+.sc-body { padding: 11px 13px; }
+.sc-text { font-size: var(--text-xs); color: var(--text2); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.sc-meta { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: var(--text-2xs); color: var(--muted); font-family: var(--mono); }
+.empty-state { text-align: center; padding: 46px 20px; color: var(--muted); font-size: var(--text-sm); }
+.privacy-note {
+  margin-top: 26px; padding: 12px 16px; border-radius: var(--r-sm);
+  background: rgba(124,58,237,.05); border: 1px solid rgba(124,58,237,.25);
+  font-size: var(--text-2xs); color: var(--text2); line-height: 1.65;
+}
+.privacy-note b { color: var(--violet); }
+#toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(90px);
+  background: var(--text); color: #fff; padding: 10px 22px; border-radius: 99px;
+  font-size: var(--text-sm); font-weight: 600; z-index: 500; transition: transform .3s;
+  max-width: 90vw; text-align: center;
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+#authVeil { position: fixed; inset: 0; z-index: 1000; background: var(--cream); display: flex; align-items: center; justify-content: center; }
+.veil-spin { width: 34px; height: 34px; border: 3px solid var(--border2); border-top-color: var(--arch); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div id="authVeil"><div><div class="veil-spin"></div><div style="font-family:var(--serif);font-style:italic;color:var(--sub);text-align:center">Đang tải hồ sơ...</div></div></div>
+
+<div class="draft-ribbon">BẢN NHÁP — TRANG HỒ SƠ CÔNG KHAI KTS (DỮ LIỆU _DRAFT)</div>
+
+<nav class="topbar">
+  <div class="tb-logo-box">ALN</div>
+  <div class="tb-page">Hồ sơ Kiến trúc sư</div>
+  <a class="tb-link" href="forum_draft.html"><i class="ph-duotone ph-arrow-left"></i>Diễn đàn</a>
+</nav>
+
+<div class="wrap">
+  <div class="profile-card" id="profileCard">
+    <div class="pf-avatar" id="pfAvatar">?</div>
+    <div class="pf-info">
+      <div class="pf-name" id="pfName">—</div>
+      <div id="pfRank"></div>
+      <div class="pf-region" id="pfRegion" style="display:none"><i class="ph-duotone ph-map-pin"></i><span></span></div>
+      <div class="pf-note">Kiến trúc sư đối tác trên sàn ALN — mọi liên hệ và giao dịch thực hiện qua nút "Mời KTS tư vấn" để được bảo vệ bởi Quy trình 4 bước.</div>
+    </div>
+    <button class="btn-invite" id="btnInvite" onclick="inviteKts()" style="display:none">
+      <i class="ph-duotone ph-handshake"></i>Mời KTS tư vấn
+    </button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="stPoints">0</div><div class="stat-label">ĐIỂM UY TÍN</div></div>
+    <div class="stat-card"><div class="stat-num" id="stProjects">0</div><div class="stat-label">DỰ ÁN QUA SÀN</div></div>
+    <div class="stat-card"><div class="stat-num" id="stBest">0</div><div class="stat-label">BEST ANSWER</div></div>
+    <div class="stat-card"><div class="stat-num" id="stShowcase">0</div><div class="stat-label">BÀI SHOWCASE</div></div>
+  </div>
+  <div class="rep-detail" id="repDetail"></div>
+
+  <div class="sec-title"><i class="ph-duotone ph-image-square" style="color:var(--gold)"></i>Showcase công trình</div>
+  <div class="sc-grid" id="scGrid"></div>
+  <div class="empty-state" id="scEmpty" style="display:none">Chưa có bài showcase nào trên diễn đàn.</div>
+
+  <div class="privacy-note">
+    <b>ⓘ Bảo vệ hai chiều:</b> Trang hồ sơ không hiển thị số điện thoại, email, Zalo hay liên kết ngoài của KTS.
+    Mọi cuộc trao đổi dự án bắt đầu bằng nút "Mời KTS tư vấn" và diễn ra trên kênh chat sàn ALN —
+    đây là điều kiện để giao dịch được bảo vệ bởi Quy trình 4 bước và Quỹ bảo đảm.
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import {
+  app, auth, db, onAuthStateChanged,
+  doc, getDoc, getDocs, collection, query, where
+} from './firebase-config.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+
+const fns = getFunctions(app, 'asia-southeast1');
+const callInvite = httpsCallable(fns, 'forumInviteDraft');
+
+const $ = id => document.getElementById(id);
+function escH(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+let toastTimer = null;
+function showToast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3600); }
+function timeAgo(ts){
+  if(!ts) return '';
+  const ms = ts.seconds ? ts.seconds*1000 : Date.now();
+  const d = Math.floor((Date.now()-ms)/86400000);
+  if(d < 1) return 'hôm nay';
+  if(d < 30) return d + ' ngày trước';
+  return new Date(ms).toLocaleDateString('vi-VN');
+}
+
+/* Hạng KTS theo điểm uy tín (ngưỡng BẢN NHÁP — chốt lại khi nghiệm thu) */
+function rankOf(points){
+  if(points >= 80) return { label:'VIP',        cls:'rank-vip' };
+  if(points >= 30) return { label:'PRO',        cls:'rank-pro' };
+  if(points >= 10) return { label:'TIÊU CHUẨN', cls:'rank-tieuchuan' };
+  return { label:'CƠ BẢN', cls:'rank-coban' };
+}
+
+const KTS_UID = new URLSearchParams(location.search).get('uid') || '';
+let ME = null;
+
+onAuthStateChanged(auth, async user => {
+  if(!user){ location.replace('login.html'); return; }
+  if(!KTS_UID){ $('authVeil').remove(); $('pfName').textContent = 'Thiếu tham số uid'; return; }
+
+  let meSnap = await getDoc(doc(db, 'users', user.uid));
+  ME = meSnap.exists() ? Object.assign({ uid: user.uid }, meSnap.data())
+     : (user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2' ? { uid: user.uid, role: 'founder', name: 'KTS. Trần Đại Long' } : null);
+  if(!ME){ location.replace('login.html'); return; }
+
+  /* Hồ sơ KTS — CHỈ lấy tên + avatar, TUYỆT ĐỐI không hiển thị liên hệ */
+  const ktsSnap = await getDoc(doc(db, 'users', KTS_UID));
+  if(!ktsSnap.exists() || ktsSnap.data().role !== 'kts'){
+    $('authVeil').remove();
+    $('pfName').textContent = 'Không tìm thấy KTS';
+    return;
+  }
+  const kts = ktsSnap.data();
+  $('pfName').textContent = kts.name || 'Kiến trúc sư ALN';
+  $('pfAvatar').innerHTML = kts.avatarUrl
+    ? '<img src="'+escH(kts.avatarUrl)+'">' : escH((kts.name||'K')[0].toUpperCase());
+
+  /* Nút mời — hiện với CN/DN/founder, không hiện với chính KTS */
+  if((ME.role === 'cn' || ME.role === 'dn' || ME.role === 'founder') && ME.uid !== KTS_UID){
+    $('btnInvite').style.display = 'inline-flex';
+  }
+
+  /* Điểm uy tín + thống kê (ktsReputation_draft — chỉ server ghi được) */
+  try {
+    const repSnap = await getDoc(doc(db, 'ktsReputation_draft', KTS_UID));
+    const rep = repSnap.exists() ? repSnap.data() : {};
+    const points = rep.points || 0;
+    const counts = rep.counts || {};
+    $('stPoints').textContent = points;
+    $('stProjects').textContent = rep.projectsDone || 0;
+    $('stBest').textContent = counts.bestAnswer || 0;
+    const rank = rankOf(points);
+    $('pfRank').innerHTML = '<span class="pf-rank '+rank.cls+'"><i class="ph-duotone ph-medal"></i>'+rank.label+'</span>';
+    if(rep.region){
+      $('pfRegion').style.display = 'flex';
+      $('pfRegion').querySelector('span').textContent = rep.region;
+    }
+    $('repDetail').textContent = 'Best Answer +5 × ' + (counts.bestAnswer||0)
+      + ' · Tim bình luận +1 × ' + (counts.heart||0)
+      + ' · Ghim Showcase +3 × ' + (counts.pin||0)
+      + ' · Trả lời đầu chất lượng +5 × ' + (counts.firstAnswer||0);
+  } catch(e){ console.warn('[profile rep]', e.message); }
+
+  /* Showcase từ diễn đàn nháp — equality filters, không cần composite index */
+  try {
+    const q = query(collection(db, 'alnPosts_draft'),
+      where('authorUid', '==', KTS_UID), where('category', '==', 'showcase'));
+    const snap = await getDocs(q);
+    const posts = [];
+    snap.forEach(d => posts.push(Object.assign({ id: d.id }, d.data())));
+    const visible = posts
+      .filter(p => p.status === 'visible' && !p.hidden)
+      .sort((a, b) => ((b.createdAt&&b.createdAt.seconds)||0) - ((a.createdAt&&a.createdAt.seconds)||0));
+    $('stShowcase').textContent = visible.length;
+    if(!visible.length){ $('scEmpty').style.display = 'block'; }
+    else {
+      $('scGrid').innerHTML = visible.map(p => {
+        const img = (p.images && p.images[0]) || '';
+        return '<div class="sc-card">'
+          + (img ? '<img src="'+escH(img)+'" loading="lazy">' : '')
+          + '<div class="sc-body">'
+            + '<div class="sc-text">'+escH(p.text||'')+'</div>'
+            + '<div class="sc-meta"><span>❤ '+(p.heartCount||0)+'</span><span>💬 '+(p.commentCount||0)+'</span><span>'+timeAgo(p.createdAt)+'</span>'
+            + (p.pinned ? '<span style="color:var(--gold)">📌 GHIM</span>' : '') + '</div>'
+          + '</div></div>';
+      }).join('');
+    }
+  } catch(e){
+    console.warn('[profile showcase]', e.message);
+    $('scEmpty').style.display = 'block';
+    $('scEmpty').textContent = 'Chưa xem được showcase (' + e.code + ')';
+  }
+
+  $('authVeil').remove();
+});
+
+window.inviteKts = async function(){
+  const btn = $('btnInvite');
+  btn.disabled = true;
+  try {
+    const res = await callInvite({ ktsUid: KTS_UID, threadId: null });
+    showToast(res.data.existing
+      ? 'Bạn đã có lời mời đang mở với KTS này — trao đổi tiếp qua kênh chat sàn ALN'
+      : '🤝 Đã gửi lời mời tư vấn! KTS sẽ nhận thông báo và trao đổi với bạn qua kênh chat sàn ALN');
+  } catch(e){
+    showToast('Lỗi: ' + ((e && e.message) || 'không gửi được lời mời'));
+  } finally { btn.disabled = false; }
+};
+</script>
+</body>
+</html>

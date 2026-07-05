@@ -247,5 +247,95 @@ service cloud.firestore {
         allow write: if false;
       }
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DRAFT — DIỄN ĐÀN ALN (sẽ gỡ khi nghiệm thu)
+       Chỉ THÊM block mới cho các collection hậu tố _draft.
+       Mọi GHI đi qua Cloud Functions (Admin SDK, bỏ qua rules)
+       → client chỉ ĐỌC; write: false toàn bộ.
+       (notifBuffer_draft không có block → mặc định deny, đúng ý.)
+    ═══════════════════════════════════════════════════════════════ */
+
+    function fdProfile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    function fdKtsActive() {
+      return signedIn() && fdProfile().role == 'kts' &&
+        fdProfile().get('status', 'active') == 'active';
+    }
+    function fdCnDnActive() {
+      return signedIn() && fdProfile().role in ['cn', 'dn'] &&
+        fdProfile().get('status', 'active') == 'active';
+    }
+    function fdP2On() {
+      return get(/databases/$(database)/documents/forumConfig_draft/flags)
+        .data.FORUM_P2_ENABLED == true;
+    }
+    // Chuyên mục CN/DN được đọc — hoi_dap/vat_lieu/nghe KTS-only VĨNH VIỄN
+    function fdOpenCategory(cat) {
+      return cat in ['tu_van_du_an', 'showcase', 'bang_tin'];
+    }
+
+    match /alnPosts_draft/{postId} {
+      // CN/DN: chỉ đọc được doc thuộc chuyên mục mở VÀ khi cờ P2 bật —
+      // query bắt buộc kèm where('category','in',[...]) mới qua được list.
+      allow read: if isFounder() || fdKtsActive() ||
+        (fdCnDnActive() && fdP2On() && fdOpenCategory(resource.data.category));
+      allow write: if false;
+
+      match /comments/{commentId} {
+        allow read: if isFounder() || fdKtsActive() ||
+          (fdCnDnActive() && fdP2On() && fdOpenCategory(
+            get(/databases/$(database)/documents/alnPosts_draft/$(postId)).data.category));
+        allow write: if false;
+      }
+    }
+
+    match /forumConfig_draft/{docId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /reports_draft/{id} {
+      allow read: if isFounder();
+      allow write: if false;
+    }
+
+    match /modLogs_draft/{id} {
+      allow read: if isFounder();
+      allow write: if false;
+    }
+
+    match /modQueue_draft/{id} {
+      allow read: if isFounder();
+      allow write: if false;
+    }
+
+    match /invites_draft/{id} {
+      allow read: if isFounder() || (signedIn() && (
+        resource.data.cnUid == request.auth.uid ||
+        resource.data.ktsUid == request.auth.uid));
+      allow write: if false;
+    }
+
+    match /leads_draft/{id} {
+      allow read: if isFounder();
+      allow write: if false;
+    }
+
+    match /ktsReputation_draft/{uid} {
+      allow read: if signedIn();
+      allow write: if false;
+      match /events/{eventId} {
+        allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
+        allow write: if false;
+      }
+    }
+
+    match /forumUserState_draft/{uid} {
+      allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow write: if false;
+    }
+    /* ═══ HẾT BLOCK DRAFT DIỄN ĐÀN ═══ */
   }
 }

@@ -1981,3 +1981,7 @@ exports.projectSlaNudge = functions
     }
     return null;
   });
+
+/* ── DIỄN ĐÀN ALN (BẢN NHÁP) — các callable *Draft, chỉ ghi collection _draft.
+      Xem functions/forum_draft.js. Gỡ/đổi khi nghiệm thu diễn đàn. ── */
+Object.assign(exports, require("./forum_draft"));

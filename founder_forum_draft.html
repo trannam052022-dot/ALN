@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Quản trị Diễn đàn — BẢN NHÁP</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/>
+<link rel="stylesheet" href="aln-tokens.css">
+<style>
+:root {
+  --bg: #080c14; --bg2: #0c1220; --card: #101828; --card2: #141d30;
+  --line: #1d2a44; --line2: #27375a;
+  --dim: #8090ae; --sub: #9aaac4; --text2: #bcc8dc; --text1: #dce6f4;
+  --gold: #c9a84c; --green: #4ade80; --red: #f87171; --blue: #60a5fa;
+  --violet: #a78bfa; --amber: #fbbf24;
+  --r: 12px; --r-sm: 8px;
+  --sans: 'DM Sans', sans-serif; --serif: 'Cormorant Garamond', serif;
+  --syne: 'Syne', sans-serif; --mono: 'JetBrains Mono', monospace;
+}
+html { font-size: 13px; }
+@media (min-width: 1440px) { html { font-size: 14px; } }
+@media (min-width: 1920px) { html { font-size: 16px; } }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text1); line-height: 1.6; font-size: 1rem; }
+.draft-ribbon {
+  background: repeating-linear-gradient(45deg,#7a2e2c,#7a2e2c 14px,#5f2422 14px,#5f2422 28px);
+  color:#ffd9d7; text-align:center; font-size: var(--text-xs); font-weight:700;
+  letter-spacing:.12em; padding: 4px 10px; font-family: var(--mono);
+}
+.topbar {
+  position: sticky; top: 0; z-index: 80;
+  background: rgba(8,12,20,.92); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; gap: 12px; padding: 0 20px; height: 52px;
+}
+.tb-logo-box {
+  width: 30px; height: 30px; border-radius: 7px;
+  background: rgba(201,168,76,.08); border: 1.5px solid rgba(201,168,76,.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--text-xs); font-weight: 800; color: var(--gold); font-family: var(--syne);
+}
+.tb-page { font-family: var(--serif); font-size: var(--text-md); color: var(--sub); font-style: italic; }
+.tb-link {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 5px;
+  font-size: var(--text-xs); color: var(--sub); text-decoration: none;
+  padding: 5px 12px; border-radius: 99px; border: 1px solid var(--line2); background: var(--card);
+}
+.tb-link:hover { color: var(--text1); }
+.wrap { max-width: 1020px; margin: 0 auto; padding: 20px 16px 70px; }
+
+/* KPI */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+.kpi {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 13px 15px;
+}
+.kpi-num { font-family: var(--syne); font-size: var(--text-xl); font-weight: 800; }
+.kpi-label { font-size: var(--text-2xs); color: var(--dim); font-family: var(--mono); letter-spacing: .09em; font-weight: 700; }
+
+/* NAV TABS */
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.tab {
+  padding: 6px 15px; border-radius: 99px; font-size: var(--text-xs); font-weight: 700;
+  border: 1px solid var(--line2); background: var(--card); color: var(--sub);
+  cursor: pointer; font-family: var(--sans); display: inline-flex; align-items: center; gap: 6px;
+}
+.tab.active { background: var(--gold); border-color: var(--gold); color: #14100a; }
+.tab .cnt { font-family: var(--mono); font-size: var(--text-2xs); background: rgba(255,255,255,.12); padding: 0 6px; border-radius: 99px; }
+.tab.active .cnt { background: rgba(0,0,0,.18); }
+
+/* PANELS */
+.panel { display: none; }
+.panel.active { display: block; }
+.item {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 13px 16px; margin-bottom: 10px;
+}
+.item-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+.item-title { font-size: var(--text-sm); font-weight: 700; color: var(--text1); }
+.item-time { font-size: var(--text-2xs); color: var(--dim); font-family: var(--mono); margin-left: auto; }
+.item-snippet {
+  font-size: var(--text-xs); color: var(--text2); line-height: 1.6;
+  background: var(--bg2); border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 8px 11px; margin: 7px 0; white-space: pre-wrap; word-break: break-word;
+}
+.item-actions { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 8px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: var(--text-2xs); font-weight: 700; font-family: var(--mono); letter-spacing: .05em;
+  padding: 2px 9px; border-radius: 99px; border: 1px solid;
+}
+.chip-red    { color: var(--red);    border-color: rgba(248,113,113,.4); background: rgba(248,113,113,.08); }
+.chip-green  { color: var(--green);  border-color: rgba(74,222,128,.4);  background: rgba(74,222,128,.08); }
+.chip-blue   { color: var(--blue);   border-color: rgba(96,165,250,.4);  background: rgba(96,165,250,.08); }
+.chip-gold   { color: var(--gold);   border-color: rgba(201,168,76,.4);  background: rgba(201,168,76,.08); }
+.chip-violet { color: var(--violet); border-color: rgba(167,139,250,.4); background: rgba(167,139,250,.08); }
+.chip-dim    { color: var(--dim);    border-color: var(--line2);         background: var(--bg2); }
+.btn {
+  padding: 6px 14px; border-radius: 99px; font-size: var(--text-xs); font-weight: 700;
+  border: 1px solid var(--line2); background: var(--card2); color: var(--text2);
+  cursor: pointer; font-family: var(--sans); display: inline-flex; align-items: center; gap: 5px;
+}
+.btn:hover { border-color: var(--gold); color: var(--gold); }
+.btn.danger:hover { border-color: var(--red); color: var(--red); }
+.btn.primary { background: var(--gold); border-color: var(--gold); color: #14100a; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+select.btn { appearance: auto; }
+.empty { text-align: center; color: var(--dim); font-size: var(--text-sm); padding: 40px 0; }
+
+/* FUNNEL */
+.funnel { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px; }
+.fstage { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 10px 6px; text-align: center; }
+.fstage b { display: block; font-family: var(--syne); font-size: var(--text-lg); }
+.fstage span { font-size: var(--text-2xs); color: var(--dim); font-family: var(--mono); letter-spacing: .06em; }
+@media (max-width: 640px) { .funnel { grid-template-columns: repeat(2, 1fr); } }
+
+/* TOOLS */
+.tool-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; margin-bottom: 12px; }
+.tool-card h3 { font-family: var(--serif); font-weight: 400; font-size: var(--text-lg); margin-bottom: 6px; }
+.tool-card p { font-size: var(--text-xs); color: var(--sub); line-height: 1.65; margin-bottom: 12px; }
+.p2-state { font-family: var(--mono); font-weight: 800; }
+
+#toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(90px);
+  background: var(--gold); color: #14100a; padding: 10px 22px; border-radius: 99px;
+  font-size: var(--text-sm); font-weight: 700; z-index: 500; transition: transform .3s;
+  max-width: 90vw; text-align: center;
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+#authVeil { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: flex; align-items: center; justify-content: center; }
+.veil-spin { width: 34px; height: 34px; border: 3px solid var(--line2); border-top-color: var(--gold); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div id="authVeil"><div><div class="veil-spin"></div><div style="font-family:var(--serif);font-style:italic;color:var(--sub);text-align:center">Đang xác thực Founder...</div></div></div>
+
+<div class="draft-ribbon">BẢN NHÁP — QUẢN TRỊ DIỄN ĐÀN (CHƯA NHÚNG VÀO FOUNDER PANEL THẬT)</div>
+
+<nav class="topbar">
+  <div class="tb-logo-box">ALN</div>
+  <div class="tb-page">Quản trị Diễn đàn</div>
+  <a class="tb-link" href="forum_draft.html"><i class="ph-duotone ph-chats-circle"></i>Mở diễn đàn nháp</a>
+</nav>
+
+<div class="wrap">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-num" style="color:var(--red)" id="kReports">0</div><div class="kpi-label">BÁO CÁO CHỜ XỬ LÝ</div></div>
+    <div class="kpi"><div class="kpi-num" style="color:var(--amber)" id="kQueue">0</div><div class="kpi-label">BÀI/BL CHỜ DUYỆT</div></div>
+    <div class="kpi"><div class="kpi-num" style="color:var(--violet)" id="kInvites">0</div><div class="kpi-label">INVITE TRONG PHỄU</div></div>
+    <div class="kpi"><div class="kpi-num" style="color:var(--blue)" id="kLeads">0</div><div class="kpi-label">LEAD TỪ DIỄN ĐÀN</div></div>
+    <div class="kpi"><div class="kpi-num" style="color:var(--green)" id="kBlocked">0</div><div class="kpi-label">LƯỢT CHẶN LÁCH SÀN</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-panel="pReports" onclick="showPanel('pReports',this)"><i class="ph-duotone ph-flag"></i>Báo cáo <span class="cnt" id="cReports">0</span></button>
+    <button class="tab" data-panel="pQueue" onclick="showPanel('pQueue',this)"><i class="ph-duotone ph-clock-countdown"></i>Chờ duyệt <span class="cnt" id="cQueue">0</span></button>
+    <button class="tab" data-panel="pInvites" onclick="showPanel('pInvites',this)"><i class="ph-duotone ph-handshake"></i>Phễu Invite <span class="cnt" id="cInvites">0</span></button>
+    <button class="tab" data-panel="pLeads" onclick="showPanel('pLeads',this)"><i class="ph-duotone ph-fire"></i>Leads <span class="cnt" id="cLeads">0</span></button>
+    <button class="tab" data-panel="pModLogs" onclick="showPanel('pModLogs',this)"><i class="ph-duotone ph-shield-slash"></i>Chặn lách sàn <span class="cnt" id="cModLogs">0</span></button>
+    <button class="tab" data-panel="pTools" onclick="showPanel('pTools',this)"><i class="ph-duotone ph-wrench"></i>Công cụ</button>
+  </div>
+
+  <div class="panel active" id="pReports"><div class="empty">Đang tải...</div></div>
+  <div class="panel" id="pQueue"><div class="empty">Đang tải...</div></div>
+  <div class="panel" id="pInvites"></div>
+  <div class="panel" id="pLeads"><div class="empty">Đang tải...</div></div>
+  <div class="panel" id="pModLogs"><div class="empty">Đang tải...</div></div>
+
+  <div class="panel" id="pTools">
+    <div class="tool-card">
+      <h3>⚑ Giai đoạn P2 — mở diễn đàn cho CN/DN</h3>
+      <p>Đang: <span class="p2-state" id="p2State">—</span>. Khi BẬT: CN/DN (active) xem được Tư vấn Dự án + Showcase + Bảng tin, đăng được mini-brief, mời KTS tư vấn. Chuyên mục Hỏi đáp / Vật liệu / Nghề vẫn KTS-only vĩnh viễn. Điều kiện khuyến nghị: ≥10 KTS active trực trả lời.</p>
+      <button class="btn primary" onclick="toggleP2()" id="btnP2">Bật / Tắt P2</button>
+    </div>
+    <div class="tool-card">
+      <h3>🌱 Nạp dữ liệu mẫu (seed)</h3>
+      <p>Tạo ~11 bài đủ chuyên mục, bình luận lồng, 1 Best Answer, 1 thread Tư vấn Dự án kèm lead + invite mẫu, 1 bài chờ duyệt, 1 báo cáo, 1 log chặn lách sàn, điểm uy tín KTS mẫu. Chạy lại an toàn (ghi đè đúng các doc draft_*).</p>
+      <button class="btn primary" onclick="runSeed()" id="btnSeed"><i class="ph-duotone ph-plant"></i>Nạp dữ liệu mẫu</button>
+    </div>
+    <div class="tool-card">
+      <h3>📄 Tài liệu bàn giao</h3>
+      <p>Checklist nghiệm thu P1.1→P2.6, trả lời 7 câu khảo sát, bản nháp rules và danh sách chuyển đổi nháp → thật nằm trong file <b>BAN_GIAO_DIEN_DAN.md</b> ở repo.</p>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import {
+  app, auth, db, onAuthStateChanged,
+  doc, getDoc, collection, query, orderBy, onSnapshot
+} from './firebase-config.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+
+const fns = getFunctions(app, 'asia-southeast1');
+const callAdmin = httpsCallable(fns, 'forumAdminDraft');
+
+const $ = id => document.getElementById(id);
+function escH(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+let toastTimer = null;
+function showToast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3600); }
+function timeAgo(ts){
+  if(!ts) return '';
+  const ms = ts.seconds ? ts.seconds*1000 : Date.now();
+  const diff = Math.floor((Date.now()-ms)/1000);
+  if(diff < 3600) return Math.max(1, Math.floor(diff/60))+' phút trước';
+  if(diff < 86400) return Math.floor(diff/3600)+' giờ trước';
+  return new Date(ms).toLocaleDateString('vi-VN');
+}
+
+let P2_ON = false;
+
+window.showPanel = function(id, btn){
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  $(id).classList.add('active');
+  btn.classList.add('active');
+};
+
+onAuthStateChanged(auth, async user => {
+  if(!user){ location.replace('login.html'); return; }
+  const snap = await getDoc(doc(db, 'users', user.uid));
+  const role = snap.exists() ? snap.data().role
+    : (user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2' ? 'founder' : '');
+  if(role !== 'founder'){
+    document.body.innerHTML = '<div style="text-align:center;padding:80px;color:#8090ae;font-family:DM Sans">Trang này chỉ dành cho Founder.</div>';
+    return;
+  }
+  $('authVeil').remove();
+  boot();
+});
+
+function boot(){
+  /* Cờ P2 */
+  onSnapshot(doc(db, 'forumConfig_draft', 'flags'), s => {
+    P2_ON = s.exists() && !!s.data().FORUM_P2_ENABLED;
+    $('p2State').textContent = P2_ON ? 'BẬT (CN/DN vào được)' : 'TẮT (nội bộ KTS)';
+    $('p2State').style.color = P2_ON ? 'var(--green)' : 'var(--red)';
+  }, () => {});
+
+  /* BÁO CÁO */
+  onSnapshot(query(collection(db, 'reports_draft'), orderBy('createdAt', 'desc')), s => {
+    const items = []; s.forEach(d => items.push(Object.assign({ id: d.id }, d.data())));
+    const news = items.filter(i => i.status === 'new');
+    $('kReports').textContent = news.length;
+    $('cReports').textContent = news.length;
+    renderReports(items);
+  }, err => { $('pReports').innerHTML = '<div class="empty">Lỗi tải: '+escH(err.code)+'</div>'; });
+
+  /* HÀNG CHỜ DUYỆT */
+  onSnapshot(query(collection(db, 'modQueue_draft'), orderBy('createdAt', 'desc')), s => {
+    const items = []; s.forEach(d => items.push(Object.assign({ id: d.id }, d.data())));
+    $('kQueue').textContent = items.length;
+    $('cQueue').textContent = items.length;
+    renderQueue(items);
+  }, err => { $('pQueue').innerHTML = '<div class="empty">Lỗi tải: '+escH(err.code)+'</div>'; });
+
+  /* INVITES */
+  onSnapshot(query(collection(db, 'invites_draft'), orderBy('createdAt', 'desc')), s => {
+    const items = []; s.forEach(d => items.push(Object.assign({ id: d.id }, d.data())));
+    $('kInvites').textContent = items.length;
+    $('cInvites').textContent = items.length;
+    renderInvites(items);
+  }, err => { $('pInvites').innerHTML = '<div class="empty">Lỗi tải: '+escH(err.code)+'</div>'; });
+
+  /* LEADS */
+  onSnapshot(query(collection(db, 'leads_draft'), orderBy('createdAt', 'desc')), s => {
+    const items = []; s.forEach(d => items.push(Object.assign({ id: d.id }, d.data())));
+    $('kLeads').textContent = items.length;
+    $('cLeads').textContent = items.length;
+    renderLeads(items);
+  }, err => { $('pLeads').innerHTML = '<div class="empty">Lỗi tải: '+escH(err.code)+'</div>'; });
+
+  /* MOD LOGS */
+  onSnapshot(query(collection(db, 'modLogs_draft'), orderBy('createdAt', 'desc')), s => {
+    const items = []; s.forEach(d => items.push(Object.assign({ id: d.id }, d.data())));
+    $('kBlocked').textContent = items.length;
+    $('cModLogs').textContent = items.length;
+    renderModLogs(items);
+  }, err => { $('pModLogs').innerHTML = '<div class="empty">Lỗi tải: '+escH(err.code)+'</div>'; });
+}
+
+/* ── RENDER: BÁO CÁO ── */
+const REASON_LABEL = { lach_san:'Lách sàn', spam:'Spam', xau:'Nội dung xấu', khac:'Khác' };
+function renderReports(items){
+  if(!items.length){ $('pReports').innerHTML = '<div class="empty">Chưa có báo cáo nào.</div>'; return; }
+  $('pReports').innerHTML = items.map(r => {
+    const isNew = r.status === 'new';
+    return '<div class="item">'
+      + '<div class="item-head">'
+        + '<span class="chip '+(isNew?'chip-red':'chip-dim')+'">'+(isNew?'MỚI':'ĐÃ XỬ LÝ'+(r.resolution?' · '+escH(r.resolution):''))+'</span>'
+        + '<span class="chip chip-gold">'+escH(REASON_LABEL[r.reason]||r.reason)+'</span>'
+        + '<span class="item-title">'+escH(r.targetType === 'comment' ? 'Bình luận' : 'Bài viết')+' của '+escH(r.targetAuthorName||'?')+'</span>'
+        + '<span class="item-time">'+timeAgo(r.createdAt)+'</span>'
+      + '</div>'
+      + '<div style="font-size:var(--text-2xs);color:var(--dim)">Người báo cáo: '+escH(r.reporterName||r.reporterUid)+(r.note?' — “'+escH(r.note)+'”':'')+'</div>'
+      + '<div class="item-snippet">'+escH(r.targetSnippet||'(không có nội dung text)')+'</div>'
+      + (isNew ? '<div class="item-actions">'
+          + '<button class="btn danger" onclick="removeReported(\''+r.id+'\',\''+escH(r.postId)+'\',\''+escH(r.commentId||'')+'\')"><i class="ph-duotone ph-trash"></i>Gỡ nội dung</button>'
+          + '<button class="btn" onclick="resolveReport(\''+r.id+'\',\'ignored\')"><i class="ph-duotone ph-check"></i>Bỏ qua</button>'
+        + '</div>' : '')
+    + '</div>';
+  }).join('');
+}
+window.removeReported = async function(reportId, postId, commentId){
+  if(!confirm('Gỡ nội dung bị báo cáo?')) return;
+  try {
+    await callAdmin({ action: 'remove', postId, commentId: commentId || null });
+    await callAdmin({ action: 'resolveReport', reportId, resolution: 'removed' });
+    showToast('Đã gỡ nội dung + đóng báo cáo');
+  } catch(e){ showToast('Lỗi: '+(e.message||e)); }
+};
+window.resolveReport = async function(reportId, resolution){
+  try {
+    await callAdmin({ action: 'resolveReport', reportId, resolution });
+    showToast('Đã đóng báo cáo');
+  } catch(e){ showToast('Lỗi: '+(e.message||e)); }
+};
+
+/* ── RENDER: CHỜ DUYỆT ── */
+function renderQueue(items){
+  if(!items.length){ $('pQueue').innerHTML = '<div class="empty">Không có bài / bình luận nào chờ duyệt.</div>'; return; }
+  $('pQueue').innerHTML = items.map(q => '<div class="item">'
+    + '<div class="item-head">'
+      + '<span class="chip chip-blue">'+(q.kind === 'comment' ? 'BÌNH LUẬN' : 'BÀI VIẾT')+'</span>'
+      + (q.category ? '<span class="chip chip-violet">'+escH(q.category)+'</span>' : '')
+      + '<span class="item-title">'+escH(q.authorName||'?')+' ('+escH(q.authorRole||'')+')</span>'
+      + '<span class="item-time">'+timeAgo(q.createdAt)+'</span>'
+    + '</div>'
+    + '<div class="item-snippet">'+escH(q.snippet||'')+'</div>'
+    + '<div class="item-actions">'
+      + '<button class="btn primary" onclick="approveItem(\''+escH(q.postId)+'\',\''+escH(q.commentId||'')+'\')"><i class="ph-duotone ph-check-circle"></i>Duyệt</button>'
+      + '<button class="btn danger" onclick="rejectItem(\''+escH(q.postId)+'\',\''+escH(q.commentId||'')+'\')"><i class="ph-duotone ph-x-circle"></i>Từ chối</button>'
+      + '<a class="btn" href="forum_draft.html" target="_blank"><i class="ph-duotone ph-eye"></i>Mở diễn đàn</a>'
+    + '</div>'
+  + '</div>').join('');
+}
+window.approveItem = async function(postId, commentId){
+  try { await callAdmin({ action: 'approve', postId, commentId: commentId || null }); showToast('Đã duyệt'); }
+  catch(e){ showToast('Lỗi: '+(e.message||e)); }
+};
+window.rejectItem = async function(postId, commentId){
+  if(!confirm('Từ chối và gỡ nội dung này?')) return;
+  try { await callAdmin({ action: 'remove', postId, commentId: commentId || null }); showToast('Đã từ chối'); }
+  catch(e){ showToast('Lỗi: '+(e.message||e)); }
+};
+
+/* ── RENDER: INVITES (PHỄU) ── */
+const INV_STAGES = ['new', 'quoted', 'contracted', 'won', 'lost'];
+const INV_LABEL = { new:'MỚI', quoted:'ĐÃ BÁO GIÁ', contracted:'ĐÃ KÝ HĐ', won:'THẮNG', lost:'THUA' };
+const INV_COLOR = { new:'chip-blue', quoted:'chip-gold', contracted:'chip-violet', won:'chip-green', lost:'chip-dim' };
+function renderInvites(items){
+  const counts = {};
+  INV_STAGES.forEach(s => counts[s] = items.filter(i => i.status === s).length);
+  let html = '<div class="funnel">' + INV_STAGES.map(s =>
+    '<div class="fstage"><b>'+counts[s]+'</b><span>'+INV_LABEL[s]+'</span></div>').join('') + '</div>';
+  if(!items.length){
+    html += '<div class="empty">Chưa có invite nào. KPI chính: số invite chuyển thành thanh toán Bước 1.</div>';
+  } else {
+    html += items.map(i => '<div class="item">'
+      + '<div class="item-head">'
+        + '<span class="chip '+(INV_COLOR[i.status]||'chip-dim')+'">'+escH(INV_LABEL[i.status]||i.status)+'</span>'
+        + '<span class="item-title">'+escH(i.cnName||i.cnUid)+' → KTS '+escH(i.ktsName||i.ktsUid)+'</span>'
+        + '<span class="item-time">'+timeAgo(i.createdAt)+'</span>'
+      + '</div>'
+      + '<div style="font-size:var(--text-2xs);color:var(--dim)">'+(i.threadId?'Từ thread: '+escH(i.threadId):'Từ trang hồ sơ KTS')+'</div>'
+      + '<div class="item-actions">Chuyển trạng thái: '
+        + INV_STAGES.filter(s => s !== i.status).map(s =>
+            '<button class="btn" onclick="setInvite(\''+i.id+'\',\''+s+'\')">'+INV_LABEL[s]+'</button>').join('')
+      + '</div>'
+    + '</div>').join('');
+  }
+  $('pInvites').innerHTML = html;
+}
+window.setInvite = async function(inviteId, status){
+  try { await callAdmin({ action: 'setInviteStatus', inviteId, status }); showToast('Đã chuyển: '+(INV_LABEL[status]||status)); }
+  catch(e){ showToast('Lỗi: '+(e.message||e)); }
+};
+
+/* ── RENDER: LEADS ── */
+const TIER_CHIP = { nong:'chip-red', am:'chip-gold', nguoi:'chip-blue' };
+function renderLeads(items){
+  if(!items.length){ $('pLeads').innerHTML = '<div class="empty">Chưa có lead nào từ diễn đàn (thread Tư vấn Dự án sẽ tự sinh lead vào đây).</div>'; return; }
+  $('pLeads').innerHTML = items.map(l => '<div class="item">'
+    + '<div class="item-head">'
+      + '<span class="chip '+(TIER_CHIP[l.tier]||'chip-dim')+'">'+escH((l.tier||'?').toUpperCase())+' · '+(l.score||0)+' điểm</span>'
+      + '<span class="item-title">'+escH(l.name||'?')+'</span>'
+      + '<span class="chip chip-dim">'+escH(l.source||'')+'</span>'
+      + '<span class="item-time">'+timeAgo(l.createdAt)+'</span>'
+    + '</div>'
+    + '<div style="font-size:var(--text-xs);color:var(--text2)">'
+      + escH(l.projectType||'')+' · '+escH(l.area||'?')+'m² · '+escH(l.budget||'')+' · '+escH(l.timeline||'')
+      + ' · '+(l.hasLand?'đã có đất':'chưa có đất')+' · '+escH(l.region||'')
+    + '</div>'
+    + '<div style="font-size:var(--text-2xs);color:var(--dim)">SĐT (kín, chỉ Founder thấy): '+escH(l.phone||'(chưa có trong hồ sơ user)')+(l.threadId?' — thread '+escH(l.threadId):'')+'</div>'
+  + '</div>').join('');
+}
+
+/* ── RENDER: MOD LOGS ── */
+const VLABEL = { phone:'SĐT', keyword:'Từ khóa kênh ngoài', link:'Link ngoài', email:'Email' };
+function renderModLogs(items){
+  if(!items.length){ $('pModLogs').innerHTML = '<div class="empty">Chưa có lượt chặn nào — cộng đồng đang sạch.</div>'; return; }
+  /* Đếm theo người để soi ai cố tình lách nhiều lần */
+  const byUser = {};
+  items.forEach(m => { byUser[m.uid] = byUser[m.uid] || { name: m.name || m.uid, n: 0 }; byUser[m.uid].n++; });
+  const repeat = Object.values(byUser).filter(u => u.n >= 3);
+  let html = '';
+  if(repeat.length){
+    html += '<div class="item" style="border-color:rgba(248,113,113,.5)"><div class="item-head"><span class="chip chip-red">⚠ CỐ TÌNH LÁCH ≥3 LẦN</span></div>'
+      + '<div style="font-size:var(--text-xs);color:var(--text2)">' + repeat.map(u => escH(u.name)+' ('+u.n+' lần)').join(' · ') + '</div>'
+      + '<div style="font-size:var(--text-2xs);color:var(--dim);margin-top:4px">Khung xử lý: Cảnh báo → Khóa 90 ngày → Khóa vĩnh viễn. Nhận tiền ngoài ALN = khóa ngay + thu hồi Quỹ bảo đảm.</div></div>';
+  }
+  html += items.map(m => '<div class="item">'
+    + '<div class="item-head">'
+      + '<span class="chip chip-red">'+escH(VLABEL[m.reason]||m.reason)+'</span>'
+      + '<span class="chip chip-dim">'+(m.kind === 'comment' ? 'BÌNH LUẬN' : 'BÀI VIẾT')+'</span>'
+      + '<span class="item-title">'+escH(m.name||m.uid)+' ('+escH(m.role||'')+')</span>'
+      + '<span class="item-time">'+timeAgo(m.createdAt)+'</span>'
+    + '</div>'
+    + '<div class="item-snippet">'+escH(m.snippet||'')+'</div>'
+  + '</div>').join('');
+  $('pModLogs').innerHTML = html;
+}
+
+/* ── TOOLS ── */
+window.toggleP2 = async function(){
+  const btn = $('btnP2'); btn.disabled = true;
+  try {
+    await callAdmin({ action: 'toggleP2', enabled: !P2_ON });
+    showToast(!P2_ON ? 'Đã BẬT P2' : 'Đã TẮT P2');
+  } catch(e){ showToast('Lỗi: '+(e.message||e)); }
+  finally { btn.disabled = false; }
+};
+window.runSeed = async function(){
+  const btn = $('btnSeed'); btn.disabled = true;
+  btn.innerHTML = '<i class="ph-duotone ph-spinner-gap"></i>Đang nạp...';
+  try {
+    const res = await callAdmin({ action: 'seed' });
+    showToast('🌱 Đã nạp dữ liệu mẫu: '+(res.data.posts||0)+' bài + comment + lead + invite + báo cáo');
+  } catch(e){ showToast('Lỗi seed: '+(e.message||e)); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-plant"></i>Nạp dữ liệu mẫu'; }
+};
+</script>
+</body>
+</html>
