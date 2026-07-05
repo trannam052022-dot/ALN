@@ -313,9 +313,9 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 .cm-disclaimer { font-size: var(--text-2xs); color: var(--muted); font-style: italic; margin-top: 5px; border-top: 1px dashed var(--border); padding-top: 4px; line-height: 1.5; }
 .cm-composer { display: flex; gap: 8px; align-items: flex-end; margin-top: 6px; }
 .cm-input {
-  flex: 1; min-height: 40px; max-height: 130px; resize: vertical;
-  border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px;
-  font-size: var(--text-xs); font-family: var(--sans); background: var(--cream); outline: none; line-height: 1.55; color: var(--text);
+  flex: 1; min-height: 44px; max-height: 55vh; resize: vertical; overflow-y: auto;
+  border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+  font-size: var(--text-sm); font-family: var(--sans); background: var(--cream); outline: none; line-height: 1.6; color: var(--text);
 }
 .cm-input:focus { border-color: var(--gold); }
 .cm-send { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--text); color: #fff; cursor: pointer; font-size: 14px; flex-shrink: 0; }
@@ -1106,9 +1106,16 @@ function renderComposer(p){
     + '</div>'
     + '<div class="filter-warn" id="cmFilterWarn" style="margin-top:6px"></div>';
 }
+/* Ô trả lời tự giãn theo nội dung (giãn hết ý AI, tối đa 55% màn hình rồi cuộn) */
+function autoGrowCm(){
+  const el = $('cmInput'); if(!el) return;
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight + 2, Math.round(window.innerHeight * 0.55)) + 'px';
+}
 window.liveCmFilter = function(){
   const el = $('cmInput'), warn = $('cmFilterWarn');
   if(!el || !warn) return;
+  autoGrowCm();
   const v = filterViolation(el.value);
   if(v){ warn.style.display = 'block'; warn.textContent = '⚠ Nội dung chứa ' + VIOLATION_LABEL[v] + ' — sẽ bị chặn. ' + BLOCK_MSG; }
   else warn.style.display = 'none';
@@ -1136,6 +1143,7 @@ window.aiDraft = async function(pid){
     const r = await callAiDraft({ postId: pid });
     el.value = r.data.draft || prev;
     showToast('AI đã soạn nháp — hãy KIỂM CHỨNG & chỉnh trước khi gửi');
+    autoGrowCm(); el.scrollTop = 0; el.scrollIntoView({ block: 'center', behavior: 'smooth' });
   } catch(e){ el.value = prev; showToast('Lỗi AI: ' + fnErr(e)); }
   finally { el.disabled = false; if(btn){ btn.disabled = false; btn.classList.remove('loading'); } el.focus(); liveCmFilter(); }
 };
