@@ -163,6 +163,20 @@ Vì code trong repo đã tự khớp nhau (verify bằng test cục bộ: encode
 - Thêm log chẩn đoán AN TOÀN (chỉ độ dài, không log giá trị) ở cả 2 phía: script log `secret.length` trước khi gọi; function log `received.length`, `configured.length`, `match` mỗi lần được gọi — lần chạy tới sẽ thấy ngay trong Cloud Functions log (`firebase functions:log` hoặc Console) độ dài 2 bên có khớp không, xác định dứt điểm còn lệch ở đâu nếu vẫn lỗi.
 - Thêm mốc `build=2026-07-05-b64fix` vào log function — nếu log KHÔNG hiện dòng này nghĩa là function vẫn đang chạy bản cũ (xác nhận trực tiếp nghi vấn deploy cũ thay vì đoán).
 
+### Fix 3 — secret đã khớp (qua bước Unauthorized), giờ lỗi FB_PAGE_TOKEN (2026-07-05)
+
+Sau khi deploy lại, `CAM_NANG_FB_SECRET` đã khớp (không còn 401) — request đã tới được bước gọi Graph API, nhưng Facebook trả về: `Mã thông báo truy cập OAuth không hợp lệ - Không thể phân tích mã thông báo truy cập`.
+
+**Khảo sát:** đối chiếu từng dòng `postToFacebook` (đăng tay, đang chạy được) với `postCamNangToFacebook` (đăng tự động, đang lỗi) — cách đọc token (`const token = FB_PAGE_TOKEN.value();`), cách đặt vào payload (`access_token: token` trong JSON body, không phải header nên không dính lỗi ByteString như CAM_NANG_FB_SECRET trước đó), `FB_PAGE_ID`, endpoint, Graph API version — **giống hệt nhau 100%** giữa 2 hàm. Vậy đây không phải lỗi code/encoding ở phía chúng ta.
+
+Khác biệt duy nhất còn lại: Firebase Secret Manager **pin secret theo version tại thời điểm deploy** của từng function. `postToFacebook` không deploy lại gần đây → vẫn dùng version `FB_PAGE_TOKEN` cũ (đang hợp lệ). `postCamNangToFacebook` mới deploy lần đầu cho tính năng này → lấy version "latest" của `FB_PAGE_TOKEN` tại thời điểm đó — nếu version latest từng bị ghi đè bằng giá trị sai (ví dụ thao tác nhầm secret trong lúc set `CAM_NANG_FB_SECRET`) thì đúng triệu chứng: hàm cũ (pin bản cũ) vẫn chạy, hàm mới (lấy bản mới) nhận token hỏng. Không có quyền xem Secret Manager console/version history từ đây nên không tự kết luận chắc chắn được — cần Founder kiểm tra tiếp bằng log.
+
+**Đã thêm (không sửa token, không đổi code logic gọi Facebook):** log AN TOÀN chỉ độ dài `FB_PAGE_TOKEN` (không log giá trị) ở **cả 2 hàm** `postToFacebook` và `postCamNangToFacebook` — bấm đăng tay 1 lần + để tự động chạy 1 lần, so 2 dòng log độ dài trong `firebase functions:log`:
+- Độ dài khác nhau → xác nhận đúng nghi vấn lệch version, cần vào Google Cloud Console → Secret Manager → `FB_PAGE_TOKEN` → xem lịch sử version, xác định version nào đúng (thường là version cũ hơn mà `postToFacebook` đang dùng), sau đó **thêm 1 version mới bằng đúng giá trị token hợp lệ đó**, rồi `firebase deploy --only functions:postToFacebook,functions:postCamNangToFacebook` để cả 2 hàm cùng pin lại version đúng mới nhất.
+- Độ dài giống nhau → không phải lỗi version, cần xem tiếp `error.code`/`error.type` đầy đủ đã log trong `[postCamNangToFacebook] FB error: ...` (đã có sẵn, không đổi) để tra theo mã lỗi Facebook cụ thể (ví dụ token hết hạn thật, hoặc Page token bị Facebook thu hồi do App Review).
+
+**Cần làm tiếp:** deploy lại (`firebase deploy --only functions:postToFacebook,functions:postCamNangToFacebook --project aln-platform`), bấm đăng tay 1 bài nháp bất kỳ (để có log `postToFacebook`) + chạy `workflow_dispatch` (để có log `postCamNangToFacebook`), rồi xem `firebase functions:log` so 2 độ dài.
+
 **Cần làm tiếp:** `git pull origin main` để lấy đúng code mới nhất trước khi `firebase deploy --only functions:postCamNangToFacebook --project aln-platform`, rồi chạy tay `workflow_dispatch` 1 lần nữa. Nếu vẫn lỗi, xem `firebase functions:log --only postCamNangToFacebook` để đọc dòng log độ dài secret ở trên — 2 độ dài lệch nhau nghĩa là secret 2 nơi thực sự khác nhau (cần đặt lại), bằng nhau mà vẫn `match=false` thì báo lại để khảo sát tiếp.
 
 ---

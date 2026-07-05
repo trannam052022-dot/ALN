@@ -457,6 +457,9 @@ exports.postToFacebook = onCall(
     }
     const hasImg = imageUrl && typeof imageUrl === "string" && /^https:\/\//.test(imageUrl.trim());
     const token = FB_PAGE_TOKEN.value();
+    // Log AN TOÀN (chỉ độ dài, không log giá trị) — đối chiếu với log cùng
+    // dạng ở postCamNangToFacebook khi cần so token 2 hàm có khớp không.
+    console.log("[postToFacebook] FB_PAGE_TOKEN.length=" + (token ? token.length : 0));
     try {
       // Có ảnh → đăng lên /photos (caption = nội dung); không ảnh → /feed
       const endpoint = hasImg ? "photos" : "feed";
@@ -537,6 +540,11 @@ exports.postCamNangToFacebook = onRequest(
       .join("\n\n");
     const hasImg = typeof imageUrl === "string" && /^https:\/\//.test(imageUrl.trim());
     const token = FB_PAGE_TOKEN.value();
+    // Log AN TOÀN (chỉ độ dài, không log giá trị) — so với log cùng dạng ở
+    // postToFacebook (đăng tay, đang chạy được) để biết 2 hàm có đang dùng
+    // đúng CÙNG version FB_PAGE_TOKEN hay không (Secret Manager pin theo
+    // version tại thời điểm deploy — hàm deploy sau có thể lấy version khác).
+    console.log("[postCamNangToFacebook] FB_PAGE_TOKEN.length=" + (token ? token.length : 0) + ", slug=" + (slug || "?"));
     try {
       const endpoint = hasImg ? "photos" : "feed";
       const payload = hasImg
