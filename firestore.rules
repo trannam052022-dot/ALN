@@ -249,11 +249,13 @@ service cloud.firestore {
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       DRAFT — DIỄN ĐÀN ALN (sẽ gỡ khi nghiệm thu)
-       Chỉ THÊM block mới cho các collection hậu tố _draft.
-       Mọi GHI đi qua Cloud Functions (Admin SDK, bỏ qua rules)
-       → client chỉ ĐỌC; write: false toàn bộ.
-       (notifBuffer_draft không có block → mặc định deny, đúng ý.)
+       DIỄN ĐÀN ALN (forum.html / kts_profile.html / founder_forum.html)
+       Collection riêng (forumPosts...) — KHÔNG dùng chung với alnPosts
+       của aln_community.html (Nhịp sống, tính năng khác).
+       Mọi GHI đi qua Cloud Functions (functions/forum.js, Admin SDK,
+       bỏ qua rules) → client chỉ ĐỌC; write: false toàn bộ.
+       (notifBuffer/camNangForum/forumDigest/hoiKtsQueue không có block
+       → mặc định deny, chỉ Cloud Function admin SDK đọc/ghi, đúng ý.)
     ═══════════════════════════════════════════════════════════════ */
 
     function fdProfile() {
@@ -268,7 +270,7 @@ service cloud.firestore {
         fdProfile().get('status', 'active') == 'active';
     }
     function fdP2On() {
-      return get(/databases/$(database)/documents/forumConfig_draft/flags)
+      return get(/databases/$(database)/documents/forumConfig/flags)
         .data.FORUM_P2_ENABLED == true;
     }
     // Chuyên mục CN/DN được đọc — hoi_dap/vat_lieu/nghe KTS-only VĨNH VIỄN
@@ -276,7 +278,7 @@ service cloud.firestore {
       return cat in ['tu_van_du_an', 'showcase', 'bang_tin'];
     }
 
-    match /alnPosts_draft/{postId} {
+    match /forumPosts/{postId} {
       // CN/DN: chỉ đọc được doc thuộc chuyên mục mở VÀ khi cờ P2 bật —
       // query bắt buộc kèm where('category','in',[...]) mới qua được list.
       allow read: if isFounder() || fdKtsActive() ||
@@ -286,44 +288,44 @@ service cloud.firestore {
       match /comments/{commentId} {
         allow read: if isFounder() || fdKtsActive() ||
           (fdCnDnActive() && fdP2On() && fdOpenCategory(
-            get(/databases/$(database)/documents/alnPosts_draft/$(postId)).data.category));
+            get(/databases/$(database)/documents/forumPosts/$(postId)).data.category));
         allow write: if false;
       }
     }
 
-    match /forumConfig_draft/{docId} {
+    match /forumConfig/{docId} {
       allow read: if signedIn();
       allow write: if false;
     }
 
-    match /reports_draft/{id} {
+    match /reports/{id} {
       allow read: if isFounder();
       allow write: if false;
     }
 
-    match /modLogs_draft/{id} {
+    match /modLogs/{id} {
       allow read: if isFounder();
       allow write: if false;
     }
 
-    match /modQueue_draft/{id} {
+    match /modQueue/{id} {
       allow read: if isFounder();
       allow write: if false;
     }
 
-    match /invites_draft/{id} {
+    match /invites/{id} {
       allow read: if isFounder() || (signedIn() && (
         resource.data.cnUid == request.auth.uid ||
         resource.data.ktsUid == request.auth.uid));
       allow write: if false;
     }
 
-    match /leads_draft/{id} {
+    match /leads/{id} {
       allow read: if isFounder();
       allow write: if false;
     }
 
-    match /ktsReputation_draft/{uid} {
+    match /ktsReputation/{uid} {
       allow read: if signedIn();
       allow write: if false;
       match /events/{eventId} {
@@ -332,10 +334,10 @@ service cloud.firestore {
       }
     }
 
-    match /forumUserState_draft/{uid} {
+    match /forumUserState/{uid} {
       allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
       allow write: if false;
     }
-    /* ═══ HẾT BLOCK DRAFT DIỄN ĐÀN ═══ */
+    /* ═══ HẾT BLOCK DIỄN ĐÀN ═══ */
   }
 }

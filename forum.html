@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex,nofollow">
-<title>Diễn đàn ALN — BẢN NHÁP</title>
+<title>Diễn đàn ALN</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/>
 <link rel="stylesheet" href="aln-tokens.css">
@@ -43,13 +42,6 @@ html { font-size: 16px; }
 @media (min-width: 1920px) { html { font-size: 18px; } }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--sans); background: var(--cream); color: var(--text); line-height: 1.6; font-size: 1rem; }
-
-/* ── DRAFT RIBBON ── */
-.draft-ribbon {
-  background: repeating-linear-gradient(45deg,#b0413e,#b0413e 14px,#963835 14px,#963835 28px);
-  color:#fff; text-align:center; font-size: var(--text-xs); font-weight:700;
-  letter-spacing:.12em; padding: 4px 10px; font-family: var(--mono);
-}
 
 /* ── TOPBAR ── */
 .topbar {
@@ -402,8 +394,6 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 
 <div id="authVeil"><div><div class="veil-spin"></div><div class="veil-text">Đang xác thực...</div></div></div>
 
-<div class="draft-ribbon">BẢN NHÁP DIỄN ĐÀN — DỮ LIỆU _DRAFT, KHÔNG ẢNH HƯỞNG HỆ THỐNG THẬT</div>
-
 <nav class="topbar">
   <div class="tb-logo-box">ALN</div>
   <div class="tb-page">Diễn đàn ALN</div>
@@ -411,7 +401,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
     <div class="p2-switch" id="p2Switch" onclick="toggleP2()" title="Chỉ Founder thấy — bật/tắt Giai đoạn P2 (mở cho CN/DN)">
       P2 CN/DN <span class="p2-dot"></span><span id="p2Label">TẮT</span>
     </div>
-    <a class="tb-link" id="lnkAdmin" href="founder_forum_draft.html" style="display:none"><i class="ph-duotone ph-shield-star"></i>Quản trị</a>
+    <a class="tb-link" id="lnkAdmin" href="founder_forum.html" style="display:none"><i class="ph-duotone ph-shield-star"></i>Quản trị</a>
     <div class="tb-user" id="tbUser" style="display:none">
       <div class="tb-avatar" id="tbAvatar"></div><span id="tbName"></span>
     </div>
@@ -565,21 +555,21 @@ import {
 import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
 
 const fns = getFunctions(app, 'asia-southeast1');
-const callPost    = httpsCallable(fns, 'forumPostDraft');
-const callComment = httpsCallable(fns, 'forumCommentDraft');
-const callHeart   = httpsCallable(fns, 'forumHeartDraft');
-const callBest    = httpsCallable(fns, 'forumBestAnswerDraft');
-const callReport  = httpsCallable(fns, 'forumReportDraft');
-const callInvite  = httpsCallable(fns, 'forumInviteDraft');
-const callDelete  = httpsCallable(fns, 'forumDeleteDraft');
-const callAdmin   = httpsCallable(fns, 'forumAdminDraft');
-const callSimilar   = httpsCallable(fns, 'forumSimilarDraft');
+const callPost    = httpsCallable(fns, 'forumPost');
+const callComment = httpsCallable(fns, 'forumComment');
+const callHeart   = httpsCallable(fns, 'forumHeart');
+const callBest    = httpsCallable(fns, 'forumBestAnswer');
+const callReport  = httpsCallable(fns, 'forumReport');
+const callInvite  = httpsCallable(fns, 'forumInvite');
+const callDelete  = httpsCallable(fns, 'forumDelete');
+const callAdmin   = httpsCallable(fns, 'forumAdmin');
+const callSimilar   = httpsCallable(fns, 'forumSimilar');
 const callAiDraft   = httpsCallable(fns, 'forumAiDraftAnswer');
-const callSummarize = httpsCallable(fns, 'forumSummarizeDraft');
-const callToCamNang = httpsCallable(fns, 'forumToCamNangDraft');
-const callChooseKts = httpsCallable(fns, 'forumChooseKtsDraft');
+const callSummarize = httpsCallable(fns, 'forumSummarize');
+const callToCamNang = httpsCallable(fns, 'forumToCamNang');
+const callChooseKts = httpsCallable(fns, 'forumChooseKts');
 
-/* ════ CẤU HÌNH CHUYÊN MỤC (đồng bộ với forum_draft.js) ════ */
+/* ════ CẤU HÌNH CHUYÊN MỤC (đồng bộ với forum.js) ════ */
 const CATS = {
   hoi_kts:      { label: 'Hỏi KTS Miễn Phí', icon: 'ph-hand-heart',  color: '#0f2c52' },
   hoi_dap:      { label: 'Hỏi đáp kỹ thuật', icon: 'ph-chats-circle', color: '#1d4ed8' },
@@ -709,7 +699,7 @@ onAuthStateChanged(auth, async user => {
   }
 
   /* Cờ P2 realtime → dựng lại giao diện khi founder gạt công tắc */
-  onSnapshot(doc(db, 'forumConfig_draft', 'flags'), s => {
+  onSnapshot(doc(db, 'forumConfig', 'flags'), s => {
     P2_ON = s.exists() && !!s.data().FORUM_P2_ENABLED;
     updateP2Switch();
     bootForRole();
@@ -766,10 +756,10 @@ function subscribePosts(){
   if(postsUnsub) postsUnsub();
   let q;
   if(USER.role === 'founder' || USER.role === 'kts'){
-    q = query(collection(db, 'alnPosts_draft'), orderBy('createdAt', 'desc'));
+    q = query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc'));
   } else {
     /* CN/DN: bắt buộc lọc category để qua rules; sort client-side (tránh cần composite index) */
-    q = query(collection(db, 'alnPosts_draft'), where('category', 'in', OPEN_CATEGORIES));
+    q = query(collection(db, 'forumPosts'), where('category', 'in', OPEN_CATEGORIES));
   }
   postsUnsub = onSnapshot(q, snap => {
     const posts = [];
@@ -822,7 +812,7 @@ function catChip(p){
 }
 function authorNameHtml(p){
   if(p.authorRole === 'kts'){
-    return '<a href="kts_profile_draft.html?uid='+escH(p.authorUid)+'" onclick="event.stopPropagation()">'+escH(p.authorName)+'</a>';
+    return '<a href="kts_profile.html?uid='+escH(p.authorUid)+'" onclick="event.stopPropagation()">'+escH(p.authorName)+'</a>';
   }
   return escH(p.authorName);
 }
@@ -845,7 +835,7 @@ function suggestedKtsHtml(p){
   return '<div class="sug-box"><div class="sug-title"><i class="ph-duotone ph-sparkle"></i> KTS phù hợp cho dự án của bạn <span class="sug-sub">(huy hiệu cao được ưu tiên)</span></div>'
     + '<div class="sug-list">' + p.suggestedKts.map(k =>
         '<div class="sug-item">'
-        + '<a href="kts_profile_draft.html?uid='+escH(k.uid)+'" class="sug-name">'+escH(k.name||'KTS ALN')+'</a>'
+        + '<a href="kts_profile.html?uid='+escH(k.uid)+'" class="sug-name">'+escH(k.name||'KTS ALN')+'</a>'
         + rankBadge(k.rank)
         + ((canChoose && k.uid !== USER.uid)
             ? '<button class="sug-invite" onclick="openChoose(\''+escH(k.uid)+'\',\''+escH(k.name||'KTS')+'\')"><i class="ph-duotone ph-handshake"></i> Chọn làm dự án</button>'
@@ -1019,7 +1009,7 @@ window.openThread = function(pid){
   $('threadModal').classList.add('open');
   renderThread();
   if(commentsUnsub) commentsUnsub();
-  const cq = query(collection(db, 'alnPosts_draft', pid, 'comments'), orderBy('createdAt', 'asc'));
+  const cq = query(collection(db, 'forumPosts', pid, 'comments'), orderBy('createdAt', 'asc'));
   commentsUnsub = onSnapshot(cq, snap => {
     threadComments = [];
     snap.forEach(d => threadComments.push(Object.assign({ id: d.id }, d.data())));
@@ -1111,7 +1101,7 @@ function renderComment(p, c, isReply){
   const canChoose = (isTuVan || catOf(p) === 'hoi_kts') && c.authorRole === 'kts'
     && buyerRole && c.authorUid !== USER.uid && !p.chosenKts;
   const nameHtml = c.authorRole === 'kts'
-    ? '<a href="kts_profile_draft.html?uid='+escH(c.authorUid)+'">'+escH(c.authorName)+'</a>'
+    ? '<a href="kts_profile.html?uid='+escH(c.authorUid)+'">'+escH(c.authorName)+'</a>'
     : escH(c.authorName);
 
   return '<div class="cm-item'+(isReply?' reply':'')+'">'

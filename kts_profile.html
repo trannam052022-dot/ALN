@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex,nofollow">
-<title>Hồ sơ KTS — Diễn đàn ALN (BẢN NHÁP)</title>
+<title>Hồ sơ KTS — Diễn đàn ALN</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/>
 <link rel="stylesheet" href="aln-tokens.css">
@@ -27,11 +26,6 @@ html { font-size: 13px; }
 @media (min-width: 1920px) { html { font-size: 16px; } }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--sans); background: var(--cream); color: var(--text); line-height: 1.6; font-size: 1rem; }
-.draft-ribbon {
-  background: repeating-linear-gradient(45deg,#b0413e,#b0413e 14px,#963835 14px,#963835 28px);
-  color:#fff; text-align:center; font-size: var(--text-xs); font-weight:700;
-  letter-spacing:.12em; padding: 4px 10px; font-family: var(--mono);
-}
 .topbar {
   position: sticky; top: 0; z-index: 80;
   background: rgba(248,246,242,.94); backdrop-filter: blur(20px);
@@ -130,12 +124,10 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 
 <div id="authVeil"><div><div class="veil-spin"></div><div style="font-family:var(--serif);font-style:italic;color:var(--sub);text-align:center">Đang tải hồ sơ...</div></div></div>
 
-<div class="draft-ribbon">BẢN NHÁP — TRANG HỒ SƠ CÔNG KHAI KTS (DỮ LIỆU _DRAFT)</div>
-
 <nav class="topbar">
   <div class="tb-logo-box">ALN</div>
   <div class="tb-page">Hồ sơ Kiến trúc sư</div>
-  <a class="tb-link" href="forum_draft.html"><i class="ph-duotone ph-arrow-left"></i>Diễn đàn</a>
+  <a class="tb-link" href="forum.html"><i class="ph-duotone ph-arrow-left"></i>Diễn đàn</a>
 </nav>
 
 <div class="wrap">
@@ -181,7 +173,7 @@ import {
 import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
 
 const fns = getFunctions(app, 'asia-southeast1');
-const callInvite = httpsCallable(fns, 'forumInviteDraft');
+const callInvite = httpsCallable(fns, 'forumInvite');
 
 const $ = id => document.getElementById(id);
 function escH(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -196,7 +188,6 @@ function timeAgo(ts){
   return new Date(ms).toLocaleDateString('vi-VN');
 }
 
-/* Hạng KTS theo điểm uy tín (ngưỡng BẢN NHÁP — chốt lại khi nghiệm thu) */
 /* 3 cấp bậc KTS (đồng bộ với server) — bậc cao được ưu tiên nhận dự án */
 function rankOf(points){
   if(points >= 60) return { label:'⭐ CHUYÊN GIA ALN', cls:'rank-vip' };
@@ -239,9 +230,9 @@ onAuthStateChanged(auth, async user => {
     $('btnInvite').style.display = 'inline-flex';
   }
 
-  /* Điểm uy tín + thống kê (ktsReputation_draft — chỉ server ghi được) */
+  /* Điểm uy tín + thống kê (ktsReputation — chỉ server ghi được) */
   try {
-    const repSnap = await getDoc(doc(db, 'ktsReputation_draft', KTS_UID));
+    const repSnap = await getDoc(doc(db, 'ktsReputation', KTS_UID));
     const rep = repSnap.exists() ? repSnap.data() : {};
     const points = rep.points || 0;
     const counts = rep.counts || {};
@@ -263,7 +254,7 @@ onAuthStateChanged(auth, async user => {
 
   /* Showcase từ diễn đàn nháp — equality filters, không cần composite index */
   try {
-    const q = query(collection(db, 'alnPosts_draft'),
+    const q = query(collection(db, 'forumPosts'),
       where('authorUid', '==', KTS_UID), where('category', '==', 'showcase'));
     const snap = await getDocs(q);
     const posts = [];
