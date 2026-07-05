@@ -1,13 +1,14 @@
 /* ════════════════════════════════════════════════════════════════
-   DIỄN ĐÀN ALN — BẢN NHÁP (forum_draft)
+   DIỄN ĐÀN ALN (forum)
    ────────────────────────────────────────────────────────────────
    TOÀN BỘ ghi dữ liệu diễn đàn đi qua các callable trong file này
    (Admin SDK) → client KHÔNG ghi trực tiếp → bộ lọc chống lách sàn,
    phân quyền, moderation, điểm uy tín đều được cưỡng chế server-side.
 
-   Mọi collection đều mang hậu tố _draft — KHÔNG đụng dữ liệu thật.
-   Chỉ ĐỌC (không ghi) 2 collection thật: users/ (hồ sơ, role) và
-   fcmTokens/ (gửi push). Khi nghiệm thu: đổi hằng số COL bên dưới.
+   Collection riêng cho diễn đàn (posts: forumPosts) — KHÔNG dùng
+   chung với alnPosts của aln_community.html (Nhịp sống, tính năng
+   khác). Chỉ ĐỌC (không ghi) 2 collection thật: users/ (hồ sơ, role)
+   và fcmTokens/ (gửi push).
 ════════════════════════════════════════════════════════════════ */
 
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
@@ -26,23 +27,40 @@ const Timestamp = admin.firestore.Timestamp;
 const REGION = "asia-southeast1";
 const FOUNDER_UID = "h4kEguPEyMcwJwl89stc0Q6j2si2";
 const BASE_URL = "https://trannam052022-dot.github.io/ALN/";
-const FORUM_URL = BASE_URL + "forum_draft.html";
+const FORUM_URL = BASE_URL + "forum.html";
 
-/* Tên collection — đổi 1 chỗ này khi chuyển nháp → thật */
+/* Tên collection production của diễn đàn */
 const COL = {
-  posts:      "alnPosts_draft",
-  reports:    "reports_draft",
-  modLogs:    "modLogs_draft",
-  invites:    "invites_draft",
-  leads:      "leads_draft",
-  config:     "forumConfig_draft",
-  reputation: "ktsReputation_draft",
-  userState:  "forumUserState_draft",
-  notifBuf:   "notifBuffer_draft",
-  modQueue:   "modQueue_draft",      // hàng chờ duyệt tập trung cho founder panel
-  camNang:    "camNangForum_draft",  // Best Answer được đề cử đưa vào Cẩm nang (nháp)
-  digest:     "forumDigest_draft",   // bản tin Q&A hằng tuần (nháp)
-  hoiKtsQueue:"hoiKtsQueue_draft",   // kho hàng chờ để RẢI bài Hỏi KTS theo ngày (drip)
+  posts:      "forumPosts",
+  reports:    "reports",
+  modLogs:    "modLogs",
+  invites:    "invites",
+  leads:      "leads",
+  config:     "forumConfig",
+  reputation: "ktsReputation",
+  userState:  "forumUserState",
+  notifBuf:   "notifBuffer",
+  modQueue:   "modQueue",      // hàng chờ duyệt tập trung cho founder panel
+  camNang:    "camNangForum",  // Best Answer được đề cử đưa vào Cẩm nang
+  digest:     "forumDigest",   // bản tin Q&A hằng tuần
+  hoiKtsQueue:"hoiKtsQueue",   // kho hàng chờ để RẢI bài Hỏi KTS theo ngày (drip)
+};
+
+/* Tên collection _draft cũ — CHỈ dùng cho action "migrateFromDraft" (chạy 1 lần khi nghiệm thu).
+   notifBuffer_draft không migrate: chỉ là debounce tạm thời, mang state cũ sang không có ích. */
+const LEGACY_DRAFT_COL = {
+  posts:       "alnPosts_draft",
+  reports:     "reports_draft",
+  modLogs:     "modLogs_draft",
+  invites:     "invites_draft",
+  leads:       "leads_draft",
+  config:      "forumConfig_draft",
+  reputation:  "ktsReputation_draft",
+  userState:   "forumUserState_draft",
+  modQueue:    "modQueue_draft",
+  camNang:     "camNangForum_draft",
+  digest:      "forumDigest_draft",
+  hoiKtsQueue: "hoiKtsQueue_draft",
 };
 
 const CATEGORIES = ["hoi_kts", "hoi_dap", "vat_lieu", "showcase", "nghe", "bang_tin", "tu_van_du_an"];
@@ -186,14 +204,14 @@ function canPostCategory(role, cat, p2) {
   return false;
 }
 
-/* Gửi push đến mọi FCM token của một uid — CHỈ ĐỌC fcmTokens, không dọn token hỏng (bản nháp) */
+/* Gửi push đến mọi FCM token của một uid — dọn token hỏng sau khi gửi (giống notifyUser trong index.js) */
 async function fdNotify(uid, title, body, extraData) {
   try {
     const snap = await fdb.collection("fcmTokens").where("uid", "==", uid).get();
     if (snap.empty) return;
     const tokens = snap.docs.map((d) => d.data().token).filter((t) => typeof t === "string" && t.length > 0);
     if (!tokens.length) return;
-    await admin.messaging().sendEachForMulticast({
+    const result = await admin.messaging().sendEachForMulticast({
       tokens,
       notification: { title, body },
       webpush: {
@@ -202,8 +220,18 @@ async function fdNotify(uid, title, body, extraData) {
       },
       data: Object.assign({ click_action: FORUM_URL }, extraData || {}),
     });
+    const batch = fdb.batch();
+    result.responses.forEach((r, i) => {
+      if (!r.success && r.error &&
+          (r.error.code === "messaging/invalid-registration-token" ||
+           r.error.code === "messaging/registration-token-not-registered")) {
+        const stale = tokens[i];
+        snap.docs.forEach((d) => { if (d.data().token === stale) batch.delete(d.ref); });
+      }
+    });
+    await batch.commit();
   } catch (e) {
-    console.error("[forum_draft notify]", e);
+    console.error("[forum notify]", e);
   }
 }
 
@@ -381,9 +409,9 @@ async function requireAuth(request) {
 }
 
 /* ════════════════════════════════════════════
-   1. ĐĂNG BÀI — forumPostDraft
+   1. ĐĂNG BÀI — forumPost
 ════════════════════════════════════════════ */
-exports.forumPostDraft = onCall({ region: REGION }, async (request) => {
+exports.forumPost = onCall({ region: REGION }, async (request) => {
   const { uid, profile } = await requireAuth(request);
   const d = request.data || {};
   const category = String(d.category || "");
@@ -534,9 +562,9 @@ exports.forumPostDraft = onCall({ region: REGION }, async (request) => {
 });
 
 /* ════════════════════════════════════════════
-   2. BÌNH LUẬN — forumCommentDraft
+   2. BÌNH LUẬN — forumComment
 ════════════════════════════════════════════ */
-exports.forumCommentDraft = onCall({ region: REGION }, async (request) => {
+exports.forumComment = onCall({ region: REGION }, async (request) => {
   const { uid, profile } = await requireAuth(request);
   const d = request.data || {};
   const postId = String(d.postId || "");
@@ -641,9 +669,9 @@ exports.forumCommentDraft = onCall({ region: REGION }, async (request) => {
 });
 
 /* ════════════════════════════════════════════
-   3. THẢ TIM — forumHeartDraft (bài hoặc bình luận)
+   3. THẢ TIM — forumHeart (bài hoặc bình luận)
 ════════════════════════════════════════════ */
-exports.forumHeartDraft = onCall({ region: REGION }, async (request) => {
+exports.forumHeart = onCall({ region: REGION }, async (request) => {
   const { uid } = await requireAuth(request);
   const d = request.data || {};
   const postId = String(d.postId || "");
@@ -675,9 +703,9 @@ exports.forumHeartDraft = onCall({ region: REGION }, async (request) => {
 });
 
 /* ════════════════════════════════════════════
-   4. BEST ANSWER — forumBestAnswerDraft
+   4. BEST ANSWER — forumBestAnswer
 ════════════════════════════════════════════ */
-exports.forumBestAnswerDraft = onCall({ region: REGION }, async (request) => {
+exports.forumBestAnswer = onCall({ region: REGION }, async (request) => {
   const { uid, profile } = await requireAuth(request);
   const d = request.data || {};
   const postId = String(d.postId || "");
@@ -732,9 +760,9 @@ exports.forumBestAnswerDraft = onCall({ region: REGION }, async (request) => {
 });
 
 /* ════════════════════════════════════════════
-   5. BÁO CÁO VI PHẠM — forumReportDraft
+   5. BÁO CÁO VI PHẠM — forumReport
 ════════════════════════════════════════════ */
-exports.forumReportDraft = onCall({ region: REGION }, async (request) => {
+exports.forumReport = onCall({ region: REGION }, async (request) => {
   const { uid, profile } = await requireAuth(request);
   const d = request.data || {};
   const targetType = d.targetType === "comment" ? "comment" : "post";
@@ -777,9 +805,9 @@ exports.forumReportDraft = onCall({ region: REGION }, async (request) => {
 });
 
 /* ════════════════════════════════════════════
-   6. MỜI KTS TƯ VẤN — forumInviteDraft (điểm chốt phễu)
+   6. MỜI KTS TƯ VẤN — forumInvite (điểm chốt phễu)
 ════════════════════════════════════════════ */
-exports.forumInviteDraft = onCall({ region: REGION }, async (request) => {
+exports.forumInvite = onCall({ region: REGION }, async (request) => {
   const { uid, profile } = await requireAuth(request);
   const d = request.data || {};
   const ktsUid = String(d.ktsUid || "");
@@ -823,13 +851,13 @@ exports.forumInviteDraft = onCall({ region: REGION }, async (request) => {
 });
 
 /* ════════════════════════════════════════════
-   6b. CHỌN KTS LÀM DỰ ÁN — forumChooseKtsDraft (điểm chốt mạnh của phễu)
-   Chủ đầu tư chọn 1 KTS để thực hiện dự án → ghi ý định 'project' vào invites_draft
+   6b. CHỌN KTS LÀM DỰ ÁN — forumChooseKts (điểm chốt mạnh của phễu)
+   Chủ đầu tư chọn 1 KTS để thực hiện dự án → ghi ý định 'project' vào invites
    + gắn chosenKts lên thread + báo KTS/Founder.
-   BẢN NHÁP: CHƯA tạo dự án thật (projects/) — khi nghiệm thu sẽ nối vào
+   TODO (P3): CHƯA tạo dự án thật (projects/) — cần nối vào
    createProjectFromThread/createProjectForDN để copy brief sang escrow C1–C4.
 ════════════════════════════════════════════ */
-exports.forumChooseKtsDraft = onCall({ region: REGION }, async (request) => {
+exports.forumChooseKts = onCall({ region: REGION }, async (request) => {
   const { uid, profile } = await requireAuth(request);
   const d = request.data || {};
   const ktsUid = String(d.ktsUid || "");
@@ -855,8 +883,8 @@ exports.forumChooseKtsDraft = onCall({ region: REGION }, async (request) => {
     ktsName = ktsProfile.name || "";
     badge = await safeRank(ktsUid, "kts");
   } else {
-    // BẢN NHÁP: KTS persona mồi (uid seed_*) không có trong users/ — dùng tên denormalized.
-    // Khi nghiệm thu: chỉ cho chọn KTS thật đã xác minh chứng chỉ.
+    // KTS persona mồi (uid seed_*) không có trong users/ — dùng tên denormalized.
+    // TODO (P3): khi có đủ KTS thật, chỉ cho chọn KTS đã xác minh chứng chỉ.
     seedKts = true;
     ktsName = ktsNameHint || "KTS ALN";
     badge = null;
@@ -899,9 +927,9 @@ exports.forumChooseKtsDraft = onCall({ region: REGION }, async (request) => {
 });
 
 /* ════════════════════════════════════════════
-   7. XÓA (mềm) — forumDeleteDraft (tác giả hoặc Founder)
+   7. XÓA (mềm) — forumDelete (tác giả hoặc Founder)
 ════════════════════════════════════════════ */
-exports.forumDeleteDraft = onCall({ region: REGION }, async (request) => {
+exports.forumDelete = onCall({ region: REGION }, async (request) => {
   const { uid, profile } = await requireAuth(request);
   const d = request.data || {};
   const postId = String(d.postId || "");
@@ -929,9 +957,9 @@ exports.forumDeleteDraft = onCall({ region: REGION }, async (request) => {
 });
 
 /* ════════════════════════════════════════════
-   8. QUẢN TRỊ FOUNDER — forumAdminDraft (gồm seed)
+   8. QUẢN TRỊ FOUNDER — forumAdmin (gồm seed)
 ════════════════════════════════════════════ */
-exports.forumAdminDraft = onCall({ region: REGION }, async (request) => {
+exports.forumAdmin = onCall({ region: REGION }, async (request) => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Chưa đăng nhập");
   const uid = request.auth.uid;
   const profile = await getProfile(uid);
@@ -1054,8 +1082,11 @@ exports.forumAdminDraft = onCall({ region: REGION }, async (request) => {
       return { ok: true };
     }
 
+    case "migrateFromDraft":
+      return await migrateFromDraft();
+
     case "seed":
-      return await seedDraftData();
+      return await seedForumData();
 
     case "seedHoiKts":
       return await seedHoiKtsData();
@@ -1092,9 +1123,65 @@ exports.forumAdminDraft = onCall({ region: REGION }, async (request) => {
 });
 
 /* ════════════════════════════════════════════
+   MIGRATE _draft → PRODUCTION — chạy 1 LẦN khi nghiệm thu (Tools → "Chuyển dữ liệu từ bản nháp").
+   Idempotent (set theo đúng id cũ) — chạy lại an toàn, không nhân đôi.
+   KHÔNG tự xoá collection _draft cũ — Founder tự dọn trên Firestore Console sau khi đối soát.
+════════════════════════════════════════════ */
+async function migrateFromDraft() {
+  async function copyPlain(oldName, newName) {
+    const snap = await fdb.collection(oldName).get();
+    let batch = fdb.batch(), n = 0;
+    const commits = [];
+    snap.forEach((doc) => {
+      batch.set(fdb.collection(newName).doc(doc.id), doc.data(), { merge: true });
+      if (++n === 400) { commits.push(batch.commit()); batch = fdb.batch(); n = 0; }
+    });
+    if (n) commits.push(batch.commit());
+    await Promise.all(commits);
+    return snap.size;
+  }
+
+  async function copyWithSubcollection(oldName, newName, subName) {
+    const snap = await fdb.collection(oldName).get();
+    let subs = 0;
+    for (const doc of snap.docs) {
+      await fdb.collection(newName).doc(doc.id).set(doc.data(), { merge: true });
+      const subSnap = await fdb.collection(oldName).doc(doc.id).collection(subName).get();
+      for (const s of subSnap.docs) {
+        await fdb.collection(newName).doc(doc.id).collection(subName).doc(s.id).set(s.data(), { merge: true });
+        subs++;
+      }
+    }
+    return { docs: snap.size, subs };
+  }
+
+  const posts = await copyWithSubcollection(LEGACY_DRAFT_COL.posts, COL.posts, "comments");
+  const reputation = await copyWithSubcollection(LEGACY_DRAFT_COL.reputation, COL.reputation, "events");
+
+  const counts = {
+    posts: posts.docs,
+    comments: posts.subs,
+    reputation: reputation.docs,
+    reputationEvents: reputation.subs,
+    reports: await copyPlain(LEGACY_DRAFT_COL.reports, COL.reports),
+    modLogs: await copyPlain(LEGACY_DRAFT_COL.modLogs, COL.modLogs),
+    invites: await copyPlain(LEGACY_DRAFT_COL.invites, COL.invites),
+    leads: await copyPlain(LEGACY_DRAFT_COL.leads, COL.leads),
+    config: await copyPlain(LEGACY_DRAFT_COL.config, COL.config),
+    userState: await copyPlain(LEGACY_DRAFT_COL.userState, COL.userState),
+    modQueue: await copyPlain(LEGACY_DRAFT_COL.modQueue, COL.modQueue),
+    camNang: await copyPlain(LEGACY_DRAFT_COL.camNang, COL.camNang),
+    digest: await copyPlain(LEGACY_DRAFT_COL.digest, COL.digest),
+    hoiKtsQueue: await copyPlain(LEGACY_DRAFT_COL.hoiKtsQueue, COL.hoiKtsQueue),
+  };
+
+  return { ok: true, migrated: counts, note: "Idempotent — chạy lại an toàn. KHÔNG tự xoá collection _draft cũ." };
+}
+
+/* ════════════════════════════════════════════
    SEED DỮ LIỆU MẪU — idempotent (set theo id cố định)
 ════════════════════════════════════════════ */
-async function seedDraftData() {
+async function seedForumData() {
   const KTS_UID = "kw5TgVDggIfboEqERS1cAphn3263";   // kts.tranlong
   const CN_UID = "G4RhRH5ECMYcE9aFcKYVn5Wdy952";    // cn.trannam
   const DN_UID = "aTyHR3oQw6P87xpA9p8hTr2NbGA2";    // dn.tkhouse
@@ -1495,7 +1582,7 @@ async function seedHoiKtsData() {
 
 /* ════════════════════════════════════════════
    DRIP — RẢI BÀI "HỎI KTS" THEO NGÀY (diễn đàn trông như đang sống)
-   Kho hàng chờ hoiKtsQueue_draft giữ câu hỏi + nhiều câu trả lời (mỗi câu có
+   Kho hàng chờ hoiKtsQueue giữ câu hỏi + nhiều câu trả lời (mỗi câu có
    delayHours). Cron chạy 5 lần/ngày: đăng vài câu hỏi ngẫu nhiên + nhỏ giọt
    câu trả lời đã tới hạn → nhiều KTS vào bàn dần, tự nhiên như thật.
 ════════════════════════════════════════════ */
@@ -1742,7 +1829,7 @@ exports.forumHoiKtsDrip = onSchedule(
 ════════════════════════════════════════════ */
 
 /* 9.1 — Chống trùng: tìm câu hỏi tương tự đã có (ưu tiên bài có Best Answer) */
-exports.forumSimilarDraft = onCall({ region: REGION }, async (request) => {
+exports.forumSimilar = onCall({ region: REGION }, async (request) => {
   const { profile } = await requireAuth(request);
   const d = request.data || {};
   const tokens = vnKeywordTokens(String(d.text || ""));
@@ -1816,7 +1903,7 @@ exports.forumAiDraftAnswer = onCall({ region: REGION, secrets: [ANTHROPIC_KEY] }
 });
 
 /* 9.3 — Tóm tắt AI (TL;DR) thread dài, CACHE để tiết kiệm chi phí */
-exports.forumSummarizeDraft = onCall({ region: REGION, secrets: [ANTHROPIC_KEY] }, async (request) => {
+exports.forumSummarize = onCall({ region: REGION, secrets: [ANTHROPIC_KEY] }, async (request) => {
   await requireAuth(request);
   const postId = String((request.data || {}).postId || "");
   const postRef = fdb.collection(COL.posts).doc(postId);
@@ -1842,7 +1929,7 @@ exports.forumSummarizeDraft = onCall({ region: REGION, secrets: [ANTHROPIC_KEY] 
 });
 
 /* 9.4 — Đề cử Best Answer vào Cẩm nang (Founder; chỉ nội dung đã kiểm chứng) */
-exports.forumToCamNangDraft = onCall({ region: REGION }, async (request) => {
+exports.forumToCamNang = onCall({ region: REGION }, async (request) => {
   const { profile } = await requireAuth(request);
   if (profile.role !== "founder") throw new HttpsError("permission-denied", "Chỉ Founder đề cử Cẩm nang");
   const postId = String((request.data || {}).postId || "");
@@ -1864,7 +1951,7 @@ exports.forumToCamNangDraft = onCall({ region: REGION }, async (request) => {
 });
 
 /* 9.5 — SLA: câu hỏi KTS quá 2 ngày chưa ai trả lời → nhắc top KTS + báo Founder */
-exports.forumUnansweredNudgeDraft = onSchedule(
+exports.forumUnansweredNudge = onSchedule(
   { schedule: "20 9 * * *", timeZone: VN_TZ, region: REGION },
   async () => {
     const KTS_CATS = ["hoi_dap", "vat_lieu", "nghe", "showcase"];
@@ -1890,7 +1977,7 @@ exports.forumUnansweredNudgeDraft = onSchedule(
 );
 
 /* 9.6 — Bản tin Q&A hằng tuần (Thứ 2 07:30) cho toàn mạng KTS */
-exports.forumWeeklyDigestDraft = onSchedule(
+exports.forumWeeklyDigest = onSchedule(
   { schedule: "30 7 * * 1", timeZone: VN_TZ, region: REGION },
   async () => {
     const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;

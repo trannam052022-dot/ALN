@@ -1,6 +1,22 @@
-# BÀN GIAO — DIỄN ĐÀN ALN (P1 + P2, BẢN NHÁP)
+# BÀN GIAO — DIỄN ĐÀN ALN (P1 + P2)
 
-> Ngày bàn giao: 05/07/2026. Toàn bộ diễn đàn xây trên **bản nháp cách ly**: trang `*_draft.html`, collection `*_draft`, Cloud Functions `*Draft`. **Không đụng** aln_community.html, alnPosts, users, leads thật.
+> Ngày bàn giao bản nháp: 05/07/2026. Ngày nghiệm thu → hệ thống thật: 05/07/2026.
+
+## 0. ĐÃ NGHIỆM THU (05/07/2026) — trạng thái hiện tại
+
+Diễn đàn đã chuyển từ bản nháp cách ly sang production. Thay đổi so với kế hoạch mục 6 bên dưới:
+
+- **Trang thật:** `forum.html` (diễn đàn), `kts_profile.html` (hồ sơ công khai KTS), `founder_forum.html` (quản trị, link từ `founder_panel.html` → nhóm Vận hành → "Quản trị Diễn đàn"). Đã bỏ ribbon "BẢN NHÁP" + `noindex`.
+- **Functions:** `functions/forum.js` (đổi tên từ `forum_draft.js`), 14 callable bỏ hậu tố `Draft` (`forumPost`, `forumComment`, `forumHeart`, `forumBestAnswer`, `forumReport`, `forumInvite`, `forumChooseKts`, `forumDelete`, `forumAdmin`, `forumSimilar`, `forumSummarize`, `forumToCamNang`, `forumUnansweredNudge`, `forumWeeklyDigest`). Riêng `forumAiDraftAnswer` **giữ nguyên tên** — "Draft" ở đây nghĩa là "bản nháp câu trả lời của AI" (thuật ngữ nghiệp vụ), không phải hậu tố môi trường nháp.
+- **⚠️ Lệch kế hoạch quan trọng — tên collection bài viết:** kế hoạch gốc (mục 6.1, mục 3-#1) định đổi `alnPosts_draft` → `alnPosts`. KHÔNG làm vậy được vì `alnPosts` **đã là collection thật đang chạy** của `aln_community.html` + `profile.html` (tính năng "Nhịp sống ALN" — feed đơn giản, ghi thẳng client, khác hoàn toàn diễn đàn này). Đổi tên trùng sẽ trộn lẫn 2 schema và có thể vỡ dữ liệu. → Đã dùng tên riêng **`forumPosts`** cho diễn đàn. Các collection còn lại đổi theo đúng kế hoạch: `reports`, `modLogs`, `modQueue`, `invites`, `leads`, `forumConfig`, `ktsReputation` (+`events`), `forumUserState`. Không migrate `notifBuffer_draft` (chỉ là debounce tạm, không cần mang state cũ sang).
+- **Migration dữ liệu:** không dùng script Node độc lập ở mục 5 (cần service account, không chạy được từ môi trường này). Thay bằng action callable `forumAdmin({action:'migrateFromDraft'})` — nút "Chuyển dữ liệu từ bản nháp" trong `founder_forum.html` → tab Công cụ. Copy toàn bộ post+comments, report, modLog, invite, lead, reputation+events, userState, modQueue, camNangForum, forumDigest, hoiKtsQueue từ `*_draft` sang collection thật. Idempotent, KHÔNG tự xoá `_draft` cũ. **Founder cần tự bấm nút này 1 lần sau khi deploy functions.**
+- **Rules:** `firestore.rules` đã thay hẳn block `_draft` bằng block production (collection thật, cùng cấu trúc quyền, `forumPosts` thay vì `alnPosts`). File đã sửa trong repo — **CHƯA deploy**, cần chạy `firebase deploy --only firestore:rules` sau khi review.
+- **Điều hướng:** đã gắn link "Diễn đàn" vào `home.html` (nav công khai), `kts_dashboard.html` / `client_CN.html` / `client_DN.html` (sidebar, cạnh "Nhịp sống ALN"), và `founder_panel.html` (nhóm Vận hành). Không gắn cho `designer_dashboard.html` vì diễn đàn hiện chưa hỗ trợ role `designer` (chỉ founder/kts/cn/dn).
+- **Việc CHƯA làm** (giữ nguyên là TODO, xem mục 6 gốc bên dưới để biết chi tiết): migration `tag → category` cho `alnPosts` thật của aln_community.html (không áp dụng — hai collection khác nhau nên rủi ro #6 gốc không còn liên quan); storage.rules siết `community/`; composite index `category+createdAt` (chỉ cần khi đông); tạo dự án thật từ `forumChooseKts` (vẫn chỉ ghi `invites`, chưa nối `projects/`).
+
+## 1. (Kế hoạch bản nháp gốc — giữ để tham khảo lịch sử)
+
+> Toàn bộ diễn đàn xây trên **bản nháp cách ly**: trang `*_draft.html`, collection `*_draft`, Cloud Functions `*Draft`. **Không đụng** aln_community.html, alnPosts, users, leads thật.
 
 ## 1. Đường dẫn trang nháp
 
