@@ -266,9 +266,16 @@ function postArticleToFacebook(article, secret) {
     ? (/^https?:\/\//.test(article.image) ? article.image : SITE_BASE + article.image)
     : undefined;
 
+  // Header HTTP chỉ chấp nhận ByteString (Latin-1, 0-255) — nếu secret có ký tự
+  // tiếng Việt/Unicode (Founder tự chọn, không bắt buộc chỉ dùng hex/ASCII) thì
+  // gán thẳng vào header sẽ crash "Cannot convert argument to a ByteString".
+  // Encode base64 (luôn thuần ASCII) trước khi đặt vào header; phía Cloud
+  // Function decode lại rồi mới so khớp — xem functions/index.js.
+  var secretHeader = Buffer.from(secret, 'utf8').toString('base64');
+
   return fetch(FB_POST_URL, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-cam-nang-secret': secret },
+    headers: { 'content-type': 'application/json', 'x-cam-nang-secret': secretHeader },
     body: JSON.stringify({
       title: article.title,
       description: article.description || article.summary || '',

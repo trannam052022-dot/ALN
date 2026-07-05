@@ -506,7 +506,14 @@ exports.postCamNangToFacebook = onRequest(
       res.status(405).json({ error: "Method not allowed" });
       return;
     }
-    if (req.get("x-cam-nang-secret") !== CAM_NANG_FB_SECRET.value()) {
+    // Header đến ở dạng base64 (xem scripts/build-cam-nang.js) vì secret gốc
+    // có thể chứa ký tự ngoài ASCII — HTTP header không cho phép giá trị đó
+    // trực tiếp. Decode lại rồi mới so khớp với secret gốc.
+    let receivedSecret = "";
+    try {
+      receivedSecret = Buffer.from(req.get("x-cam-nang-secret") || "", "base64").toString("utf8");
+    } catch (e) { receivedSecret = ""; }
+    if (receivedSecret !== CAM_NANG_FB_SECRET.value()) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }

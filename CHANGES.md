@@ -140,6 +140,16 @@ Sau khi hoàn tất A + B, tính năng sẵn sàng — chỉ cần gắn `facebo
 
 Đã kiểm tra `node --check` cho cả `functions/index.js` và `scripts/build-cam-nang.js` (không lỗi cú pháp). Chưa gọi thật Graph API / Cloud Function (cần secret + deploy thật) — khi Founder tạo xong secret, nên bật thử `facebook: true` cho 1 bài test (`publishDate` quá khứ gần) rồi chạy tay `workflow_dispatch` để xác nhận đăng lên Fanpage đúng caption/ảnh/link trước khi dùng cho bài thật.
 
+### Fix — lỗi ByteString khi secret có ký tự tiếng Việt (2026-07-05)
+
+Founder test thật (`workflow_dispatch`, bài `xay-nha-khong-xin-phep-bi-phat`, `publishDate`/`facebook: true` gắn tạm) → job fail: `Cannot convert argument to a ByteString because the character at index 7 has a value of 7895 which is greater than 255` (lấy log qua GitHub API, job `28731854149`).
+
+**Nguyên nhân:** `postArticleToFacebook` (`scripts/build-cam-nang.js`) gán thẳng giá trị `CAM_NANG_FB_SECRET` vào header `x-cam-nang-secret`. Header HTTP chỉ chấp nhận ByteString (Latin-1, 0-255) — secret Founder tự đặt có ký tự tiếng Việt (mã 7895 = `ợ`) nên `fetch` (undici, Node 22) throw ngay khi dựng header, trước khi kịp gọi mạng. Xác nhận bằng cách tái hiện lỗi y hệt cục bộ với 1 chuỗi có `ợ` ở vị trí 7 truyền vào header `fetch`. Nội dung JSON body (title/description tiếng Việt) không liên quan — body không bị giới hạn ByteString như header, không phải nguyên nhân.
+
+**Sửa:** encode secret bằng base64 (thuần ASCII) trước khi đặt vào header ở `build-cam-nang.js`; `postCamNangToFacebook` (`functions/index.js`) decode lại base64 rồi mới so khớp với secret gốc. Nhờ vậy secret giữ nguyên giá trị Founder đã đặt (**không cần đổi secret**) mà vẫn không bao giờ crash header dù chứa ký tự gì. Đã kiểm tra: tái hiện lỗi cũ với secret có `ợ` → xác nhận throw; áp dụng fix → header ra chuỗi base64 thuần ASCII, round-trip decode đúng lại secret gốc; build lại `build-cam-nang.js` không regression (bài test vẫn đang chờ đăng vì `.fb-posted.json` chưa từng ghi nhận thành công, sẽ tự đăng lại đúng ở lần chạy kế tiếp sau khi deploy).
+
+**Cần làm tiếp:** deploy lại function để nhận code mới — `firebase deploy --only functions:postCamNangToFacebook --project aln-platform` — rồi chạy tay `workflow_dispatch` 1 lần nữa để xác nhận đăng FB thành công cho bài test.
+
 ---
 
 ## Pass 1 — Khảo sát codebase + xác nhận kiến trúc (2026-07-03)
