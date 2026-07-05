@@ -408,12 +408,18 @@ function renderModLogs(items){
   /* Đếm theo người để soi ai cố tình lách nhiều lần */
   const byUser = {};
   items.forEach(m => { byUser[m.uid] = byUser[m.uid] || { name: m.name || m.uid, n: 0 }; byUser[m.uid].n++; });
-  const repeat = Object.values(byUser).filter(u => u.n >= 3);
+  const repeat = Object.values(byUser).filter(u => u.n >= 3)
+    .map(u => { u.stage = u.n >= 5 ? 'Đề nghị khóa vĩnh viễn' : 'Đề nghị khóa 90 ngày'; return u; })
+    .sort((a,b) => b.n - a.n);
   let html = '';
   if(repeat.length){
-    html += '<div class="item" style="border-color:rgba(248,113,113,.5)"><div class="item-head"><span class="chip chip-red">⚠ CỐ TÌNH LÁCH ≥3 LẦN</span></div>'
-      + '<div style="font-size:var(--text-xs);color:var(--text2)">' + repeat.map(u => escH(u.name)+' ('+u.n+' lần)').join(' · ') + '</div>'
-      + '<div style="font-size:var(--text-2xs);color:var(--dim);margin-top:4px">Khung xử lý: Cảnh báo → Khóa 90 ngày → Khóa vĩnh viễn. Nhận tiền ngoài ALN = khóa ngay + thu hồi Quỹ bảo đảm.</div></div>';
+    html += '<div class="item" style="border-color:rgba(248,113,113,.5)"><div class="item-head"><span class="chip chip-red">⚠ TÁI PHẠM LÁCH SÀN — TỰ LEO THANG</span></div>'
+      + '<div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">'
+      + repeat.map(u => '<div style="display:flex;align-items:center;gap:8px;font-size:var(--text-xs);color:var(--text2)">'
+          + '<span class="chip '+(u.n>=5?'chip-red':'chip-gold')+'">'+escH(u.stage)+'</span>'
+          + '<b>'+escH(u.name)+'</b><span style="color:var(--dim)">'+u.n+' lần</span></div>').join('')
+      + '</div>'
+      + '<div style="font-size:var(--text-2xs);color:var(--dim);margin-top:7px">Khung xử lý: Cảnh báo (1–2) → Khóa 90 ngày (3–4) → Khóa vĩnh viễn (≥5). Nhận tiền ngoài ALN = khóa ngay + thu hồi Quỹ bảo đảm. <i>(Bản nháp chỉ đề xuất — Founder quyết định khóa thật.)</i></div></div>';
   }
   html += items.map(m => '<div class="item">'
     + '<div class="item-head">'

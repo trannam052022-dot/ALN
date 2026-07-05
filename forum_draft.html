@@ -346,6 +346,36 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
   .bf-row { grid-template-columns: 1fr; }
   .cm-item.reply { margin-left: 20px; }
 }
+
+/* ── DIỄN ĐÀN THÔNG MINH ── */
+.rank-badge { display:inline-flex; align-items:center; gap:3px; font-size:var(--text-2xs); font-weight:700; padding:1px 7px; border-radius:99px; font-family:var(--syne); letter-spacing:.03em; margin-left:3px; vertical-align:middle; }
+
+/* KTS gợi ý (phễu chốt) */
+.sug-box { margin:12px 0; padding:13px 14px; border-radius:var(--r-sm); background:var(--gold-bg); border:1px solid rgba(152,105,10,.28); }
+.sug-title { font-size:var(--text-2xs); font-weight:700; color:var(--gold); font-family:var(--mono); letter-spacing:.06em; text-transform:uppercase; margin-bottom:9px; display:flex; align-items:center; gap:6px; }
+.sug-list { display:flex; flex-direction:column; gap:8px; }
+.sug-item { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:var(--r-sm); background:var(--white); border:1px solid var(--border); }
+.sug-name { font-size:var(--text-sm); font-weight:600; color:var(--text); }
+.sug-name:hover { color:var(--gold); }
+.sug-invite { margin-left:auto; display:inline-flex; align-items:center; gap:5px; padding:5px 14px; border-radius:99px; border:none; cursor:pointer; font-family:var(--syne); font-size:var(--text-2xs); font-weight:700; letter-spacing:.03em; color:#1a1400; background:linear-gradient(135deg,var(--gold2),var(--gold)); box-shadow:0 3px 10px rgba(152,105,10,.22); transition:transform .25s var(--ease); }
+.sug-invite:hover { transform:translateY(-1px); }
+
+/* Tóm tắt AI */
+.ai-summary { margin:10px 0; padding:12px 14px; border-radius:var(--r-sm); background:var(--cream2); border:1px solid var(--border); font-size:var(--text-sm); color:var(--text2); line-height:1.65; }
+.ai-tag { font-size:var(--text-2xs); font-weight:700; color:var(--gold); font-family:var(--mono); letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px; display:flex; align-items:center; gap:5px; }
+.ai-tag .ph-circle-notch { animation:spin .8s linear infinite; }
+
+/* Nút AI soạn nháp (KTS) */
+.ai-draft-btn { display:inline-flex; align-items:center; gap:6px; margin:8px 0 6px; padding:6px 14px; border-radius:99px; cursor:pointer; font-family:var(--syne); font-size:var(--text-2xs); font-weight:700; letter-spacing:.03em; color:var(--gold); background:var(--gold-bg); border:1px dashed rgba(152,105,10,.5); transition:background .2s; }
+.ai-draft-btn:hover { background:rgba(152,105,10,.14); }
+.ai-draft-btn.loading { opacity:.6; cursor:wait; }
+
+/* Câu hỏi tương tự */
+.similar-box { margin-top:10px; padding:10px 12px; border-radius:var(--r-sm); background:rgba(29,78,216,.05); border:1px solid rgba(29,78,216,.22); }
+.sim-title { font-size:var(--text-2xs); font-weight:700; color:var(--blue); font-family:var(--mono); letter-spacing:.05em; margin-bottom:7px; display:flex; align-items:center; gap:5px; }
+.sim-item { padding:7px 9px; border-radius:6px; background:var(--white); border:1px solid var(--border); font-size:var(--text-xs); color:var(--text2); cursor:pointer; margin-bottom:5px; transition:border-color .15s; }
+.sim-item:hover { border-color:var(--blue); }
+.sim-best { display:inline-flex; align-items:center; gap:3px; font-size:var(--text-2xs); font-weight:700; color:var(--green); margin-right:6px; }
 </style>
 </head>
 <body>
@@ -434,6 +464,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
         <div class="f-label">NỘI DUNG</div>
         <textarea class="post-textarea" id="postText" placeholder="Chia sẻ câu hỏi, kinh nghiệm, hoặc mô tả nhu cầu..." oninput="livePostFilter()"></textarea>
         <div class="filter-warn" id="postFilterWarn" style="margin-top:8px"></div>
+        <div class="similar-box" id="similarBox" style="display:none"></div>
       </div>
       <div>
         <div class="f-label">HÌNH ẢNH / CLIP (tối đa 4)</div>
@@ -500,6 +531,10 @@ const callReport  = httpsCallable(fns, 'forumReportDraft');
 const callInvite  = httpsCallable(fns, 'forumInviteDraft');
 const callDelete  = httpsCallable(fns, 'forumDeleteDraft');
 const callAdmin   = httpsCallable(fns, 'forumAdminDraft');
+const callSimilar   = httpsCallable(fns, 'forumSimilarDraft');
+const callAiDraft   = httpsCallable(fns, 'forumAiDraftAnswer');
+const callSummarize = httpsCallable(fns, 'forumSummarizeDraft');
+const callToCamNang = httpsCallable(fns, 'forumToCamNangDraft');
 
 /* ════ CẤU HÌNH CHUYÊN MỤC (đồng bộ với forum_draft.js) ════ */
 const CATS = {
@@ -747,6 +782,29 @@ function authorNameHtml(p){
   }
   return escH(p.authorName);
 }
+/* Hạng uy tín KTS (server tính) — tín hiệu tin cậy */
+const RANK_META = {
+  vip:       ['VIP',        '#7a5408', 'rgba(184,134,11,.16)'],
+  pro:       ['PRO',        '#98690a', 'rgba(152,105,10,.10)'],
+  tieuchuan: ['Tiêu chuẩn', '#0e7490', 'rgba(14,116,144,.10)'],
+};
+function rankBadge(rank){
+  const m = RANK_META[rank]; if(!m) return '';
+  return '<span class="rank-badge" style="color:'+m[1]+';background:'+m[2]+';border:1px solid '+m[1]+'44">★ '+m[0]+'</span>';
+}
+/* Phễu chốt: KTS gợi ý cho thread Tư vấn Dự án (server điền p.suggestedKts) */
+function suggestedKtsHtml(p){
+  if(catOf(p) !== 'tu_van_du_an' || !Array.isArray(p.suggestedKts) || !p.suggestedKts.length) return '';
+  const canInvite = (USER.role === 'cn' || USER.role === 'dn' || USER.role === 'founder');
+  return '<div class="sug-box"><div class="sug-title"><i class="ph-duotone ph-sparkle"></i> KTS phù hợp cho dự án của bạn</div>'
+    + '<div class="sug-list">' + p.suggestedKts.map(k =>
+        '<div class="sug-item">'
+        + '<a href="kts_profile_draft.html?uid='+escH(k.uid)+'" class="sug-name">'+escH(k.name||'KTS ALN')+'</a>'
+        + rankBadge(k.rank)
+        + ((canInvite && k.uid !== USER.uid) ? '<button class="sug-invite" onclick="inviteKts(\''+escH(k.uid)+'\',\''+p.id+'\')"><i class="ph-duotone ph-handshake"></i> Mời</button>' : '')
+        + '</div>').join('')
+    + '</div></div>';
+}
 function mediaHtml(p, inThread){
   const media = p.media || [];
   if(!media.length) return '';
@@ -779,7 +837,7 @@ function renderCard(p){
     + '<div class="tc-top">'
       + '<div class="tc-avatar">'+av+'</div>'
       + '<div style="flex:1;min-width:0">'
-        + '<div class="tc-name">'+authorNameHtml(p)+roleBadge(p.authorRole)+'</div>'
+        + '<div class="tc-name">'+authorNameHtml(p)+roleBadge(p.authorRole)+rankBadge(p.authorRank)+'</div>'
         + '<div class="tc-time">'+timeAgo(p.createdAt)+'</div>'
       + '</div>'
       + (p.status==='pending' ? '<span class="badge-pending">CHỜ DUYỆT</span>' : '')
@@ -831,6 +889,7 @@ function syncBriefForm(){
 window.closePostModal = function(){
   $('postModal').classList.remove('open');
   $('postText').value = ''; $('postFilterWarn').style.display = 'none';
+  const sb = $('similarBox'); if(sb){ sb.style.display = 'none'; sb.innerHTML = ''; }
   selectedFiles = []; renderImgPreview();
   $('bfConsent').checked = false;
 };
@@ -841,6 +900,7 @@ window.livePostFilter = function(){
     warn.style.display = 'block';
     warn.textContent = '⚠ Nội dung chứa ' + VIOLATION_LABEL[v] + ' — sẽ bị chặn. ' + BLOCK_MSG;
   } else warn.style.display = 'none';
+  if(typeof checkSimilar === 'function') checkSimilar();
 };
 window.handleImgSelect = function(input){
   const files = Array.from(input.files || []).slice(0, 4 - selectedFiles.length);
@@ -944,7 +1004,7 @@ function renderThread(){
     + '<div class="tc-top">'
       + '<div class="tc-avatar">'+av+'</div>'
       + '<div style="flex:1;min-width:0">'
-        + '<div class="tc-name">'+authorNameHtml(p)+roleBadge(p.authorRole)+'</div>'
+        + '<div class="tc-name">'+authorNameHtml(p)+roleBadge(p.authorRole)+rankBadge(p.authorRank)+'</div>'
         + '<div class="tc-time">'+timeAgo(p.createdAt)+'</div>'
       + '</div>'
       + (p.status==='pending' ? '<span class="badge-pending">CHỜ DUYỆT</span>' : '')
@@ -954,11 +1014,17 @@ function renderThread(){
     + (p.text ? '<div class="tc-text">'+escH(p.text)+'</div>' : '')
     + briefHtml(p)
     + mediaHtml(p, true)
+    + suggestedKtsHtml(p)
     + '<div class="tc-foot" style="border-top:none;padding-top:0">'
       + '<button class="tc-stat'+(hearted?' hearted':'')+'" onclick="heartPost(\''+p.id+'\')">'+(hearted?'❤️':'🤍')+' '+(p.heartCount||0)+'</button>'
       + '<button class="tc-stat" onclick="openReport(\'post\',\''+p.id+'\')"><i class="ph-duotone ph-flag"></i> Báo cáo</button>'
+      + ((p.commentCount||0) >= 2 ? '<button class="tc-stat" onclick="summarizeThread(\''+p.id+'\')"><i class="ph-duotone ph-list-bullets"></i> Tóm tắt AI</button>' : '')
       + ((mine || USER.role==='founder') ? '<button class="tc-stat" onclick="delPost(\''+p.id+'\')"><i class="ph-duotone ph-trash"></i> Xóa</button>' : '')
       + (USER.role==='founder' ? '<button class="tc-stat" onclick="pinPost(\''+p.id+'\')"><i class="ph-duotone ph-push-pin"></i> '+(p.pinned?'Bỏ ghim':'Ghim')+'</button>' : '')
+      + (USER.role==='founder' && p.bestAnswerId ? '<button class="tc-stat" onclick="toCamNang(\''+p.id+'\')" style="color:var(--gold)"><i class="ph-duotone ph-book-bookmark"></i> '+(p.camNangId?'Đã vào Cẩm nang':'Đưa vào Cẩm nang')+'</button>' : '')
+    + '</div>'
+    + '<div id="aiSummaryBox" class="ai-summary" style="display:'+(p.aiSummary?'block':'none')+'">'
+      + (p.aiSummary ? '<div class="ai-tag"><i class="ph-duotone ph-sparkle"></i> Tóm tắt AI</div>'+escH(p.aiSummary).replace(/\n/g,'<br>') : '')
     + '</div>'
     + '<div style="border-top:1px solid var(--border);padding-top:12px">'
       + '<div class="f-label">'+(p.commentCount||0)+' BÌNH LUẬN</div>'
@@ -973,8 +1039,12 @@ function renderComments(p){
   const visible = threadComments.filter(c =>
     c.status === 'visible' || (c.status === 'pending' && (c.authorUid === USER.uid || USER.role === 'founder')));
   const roots = visible.filter(c => !c.replyToId);
-  /* Best Answer lên đầu */
-  roots.sort((a, b) => (b.isBestAnswer?1:0) - (a.isBestAnswer?1:0));
+  /* Xếp hạng thông minh: Best Answer → nhiều tim → cũ trước */
+  const cms = t => (t && t.seconds) || 0;
+  roots.sort((a, b) =>
+    ((b.isBestAnswer?1:0) - (a.isBestAnswer?1:0))
+    || ((b.heartCount||0) - (a.heartCount||0))
+    || (cms(a.createdAt) - cms(b.createdAt)));
   if(!visible.length) return '<div style="font-size:var(--text-xs);color:var(--muted);padding:8px 0">Chưa có bình luận nào.</div>';
   return roots.map(c => renderComment(p, c, false)
     + visible.filter(r => r.replyToId === c.id).map(r => renderComment(p, r, true)).join('')
@@ -997,7 +1067,7 @@ function renderComment(p, c, isReply){
     + '<div class="cm-avatar">'+av+'</div>'
     + '<div class="cm-bubble'+(c.isBestAnswer?' best':'')+'">'
       + '<div class="cm-head">'
-        + '<span class="cm-name">'+nameHtml+'</span>'+roleBadge(c.authorRole)
+        + '<span class="cm-name">'+nameHtml+'</span>'+roleBadge(c.authorRole)+rankBadge(c.authorRank)
         + (c.isBestAnswer ? '<span class="badge-ba"><i class="ph-duotone ph-seal-check"></i>Best Answer</span>' : '')
         + (c.status==='pending' ? '<span class="badge-pending">CHỜ DUYỆT</span>' : '')
         + '<span class="cm-time">'+timeAgo(c.createdAt)+'</span>'
@@ -1025,9 +1095,11 @@ function renderComposer(p){
     }
     return '';
   }
+  const showAi = (USER.role === 'kts' || USER.role === 'founder');
   return '<div class="reply-tag" id="replyTag" style="display:'+(replyTo?'flex':'none')+'">'
       + (replyTo ? '↩ Đang trả lời <b>'+escH(replyTo.name)+'</b>' : '')
       + '<button onclick="cancelReply()">✕ hủy</button></div>'
+    + (showAi ? '<button class="ai-draft-btn" id="aiDraftBtn" onclick="aiDraft(\''+p.id+'\')"><i class="ph-duotone ph-sparkle"></i> AI soạn nháp trả lời</button>' : '')
     + '<div class="cm-composer">'
       + '<textarea class="cm-input" id="cmInput" placeholder="Viết bình luận... (không SĐT / Zalo / link ngoài)" oninput="liveCmFilter()"></textarea>'
       + '<button class="cm-send" onclick="submitComment(\''+p.id+'\')"><i class="ph-duotone ph-paper-plane-tilt"></i></button>'
@@ -1040,6 +1112,57 @@ window.liveCmFilter = function(){
   const v = filterViolation(el.value);
   if(v){ warn.style.display = 'block'; warn.textContent = '⚠ Nội dung chứa ' + VIOLATION_LABEL[v] + ' — sẽ bị chặn. ' + BLOCK_MSG; }
   else warn.style.display = 'none';
+};
+
+/* ════ DIỄN ĐÀN THÔNG MINH (client) ════ */
+/* Tóm tắt AI thread dài (server cache để tiết kiệm) */
+window.summarizeThread = async function(pid){
+  const box = $('aiSummaryBox'); if(!box) return;
+  box.style.display = 'block';
+  box.innerHTML = '<div class="ai-tag"><i class="ph-duotone ph-circle-notch"></i> Đang tóm tắt…</div>';
+  try {
+    const r = await callSummarize({ postId: pid });
+    box.innerHTML = '<div class="ai-tag"><i class="ph-duotone ph-sparkle"></i> Tóm tắt AI</div>'
+      + escH(r.data.summary || '').replace(/\n/g, '<br>');
+  } catch(e){ box.style.display='none'; showToast('Lỗi tóm tắt: ' + fnErr(e)); }
+};
+/* KTS: AI soạn NHÁP trả lời — điền vào ô, KTS kiểm chứng rồi mới gửi */
+window.aiDraft = async function(pid){
+  const el = $('cmInput'); if(!el) return;
+  const btn = $('aiDraftBtn'); const prev = el.value;
+  if(btn){ btn.disabled = true; btn.classList.add('loading'); }
+  el.value = 'AI đang soạn nháp…'; el.disabled = true;
+  try {
+    const r = await callAiDraft({ postId: pid });
+    el.value = r.data.draft || prev;
+    showToast('AI đã soạn nháp — hãy KIỂM CHỨNG & chỉnh trước khi gửi');
+  } catch(e){ el.value = prev; showToast('Lỗi AI: ' + fnErr(e)); }
+  finally { el.disabled = false; if(btn){ btn.disabled = false; btn.classList.remove('loading'); } el.focus(); liveCmFilter(); }
+};
+/* Founder: đề cử Best Answer vào Cẩm nang (nội dung đã kiểm chứng) */
+window.toCamNang = async function(pid){
+  try { await callToCamNang({ postId: pid }); showToast('✅ Đã đưa Best Answer vào Cẩm nang (nháp)'); }
+  catch(e){ showToast('Lỗi: ' + fnErr(e)); }
+};
+/* Chống trùng: tìm câu hỏi tương tự khi soạn bài (debounce) */
+let _simTimer = null;
+window.checkSimilar = function(){
+  clearTimeout(_simTimer);
+  _simTimer = setTimeout(async () => {
+    const box = $('similarBox'); if(!box) return;
+    const text = ($('postText').value || '').trim();
+    if(text.length < 12){ box.style.display = 'none'; box.innerHTML = ''; return; }
+    try {
+      const r = await callSimilar({ text });
+      const items = (r.data && r.data.items) || [];
+      if(!items.length){ box.style.display = 'none'; box.innerHTML = ''; return; }
+      box.style.display = 'block';
+      box.innerHTML = '<div class="sim-title"><i class="ph-duotone ph-magnifying-glass"></i> Câu hỏi tương tự đã có — bấm để xem trước khi đăng</div>'
+        + items.map(i => '<div class="sim-item" onclick="closePostModal();openThread(\''+i.id+'\')">'
+            + (i.hasBest ? '<span class="sim-best"><i class="ph-duotone ph-seal-check"></i> Đã có Best Answer</span>' : '')
+            + escH(i.title) + '…</div>').join('');
+    } catch(e){ /* im lặng — không cản người dùng đăng */ }
+  }, 650);
 };
 window.startReply = function(cid, name){
   replyTo = { id: cid, name };

@@ -254,3 +254,39 @@ Chỉ thực hiện SAU khi Founder trả lời: **"duyệt cập nhật diễn 
 - [x] Push các file nháp lên `main` (không trang thật nào tham chiếu tới chúng)
 
 *(Nếu mục nào chưa tick — xem ghi chú cuối cùng trong tin nhắn bàn giao của Claude.)*
+
+## 8. DIỄN ĐÀN THÔNG MINH (P3 — bổ sung 05/07/2026)
+
+Nguyên tắc xuyên suốt: **hấp dẫn nhưng thông tin chính xác** — AI chỉ tạo *nháp/tóm tắt*, người thật (KTS) xác nhận; chỉ Best Answer (đã kiểm chứng) mới được đề cao / đưa Cẩm nang.
+
+### A. Phễu chốt tự động (KPI ra tiền)
+- **Gợi ý KTS** cho thread Tư vấn Dự án: `forumPostDraft` điền `suggestedKts` (top KTS hoạt động tích cực, denormalized từ bài đăng) + FCM báo các KTS đó. UI: khối "KTS phù hợp" có nút **Mời** → tạo invite như cũ.
+- **Xếp hạng câu trả lời**: Best Answer → nhiều tim → cũ trước (thay vì chỉ theo thời gian).
+- **Hạng uy tín KTS** (`authorRank`: Tiêu chuẩn/PRO/VIP) suy từ điểm uy tín, hiện badge cạnh tên ở card/thread/comment → tín hiệu tin cậy.
+
+### B. Kho tri thức + AI
+- **Chống trùng**: soạn bài → `forumSimilarDraft` hiện câu hỏi tương tự đã có (ưu tiên bài có Best Answer) để bấm xem trước.
+- **AI soạn nháp trả lời** (KTS/founder): `forumAiDraftAnswer` (Claude Sonnet) — trích TCVN/QCVN khi phù hợp, KHÔNG bịa số hiệu, luôn kèm dòng "⚠️ Bản nháp AI — KTS kiểm chứng trước khi gửi". KHÔNG tự đăng; điền vào ô để KTS sửa.
+- **Tóm tắt AI (TL;DR)** thread dài: `forumSummarizeDraft` (Claude Haiku), **CACHE** trong bài (`aiSummary`) để không gọi lại tốn phí.
+
+### C. Kiểm duyệt thông minh
+- **Leo thang 3 bước tự động** theo `blockCount` trong `forumUserState_draft`: Cảnh báo (1–2) → Đề nghị khóa 90 ngày (3–4) → Đề nghị khóa vĩnh viễn (≥5); báo Founder ở mốc 3 & 5. Bản nháp CHỈ đề xuất — Founder quyết định khóa thật. Trang quản trị hiện rõ bậc xử lý theo từng người.
+- **Tiền/hậu kiểm theo độ tin cậy**: người hay bị chặn (≥2 lần) bị đưa lại diện tiền kiểm.
+
+### D. Nuôi nội dung & SLA
+- **Đưa Best Answer vào Cẩm nang**: Founder xem thread có Best Answer → nút "Đưa vào Cẩm nang" (`forumToCamNangDraft` → `camNangForum_draft`). Chỉ nội dung đã kiểm chứng.
+- **SLA cron** `forumUnansweredNudgeDraft` (09:20 hằng ngày): câu hỏi KTS quá 2 ngày chưa ai trả lời → nhắc top KTS + báo Founder.
+- **Bản tin tuần** `forumWeeklyDigestDraft` (Thứ 2 07:30): tổng hợp Q&A nổi bật (tim + comment + Best Answer) → `forumDigest_draft` + báo Founder.
+
+### Đã kiểm chứng (trên function đã deploy)
+- forumSimilarDraft ✅ (3 kết quả), forumSummarizeDraft ✅ (TL;DR trích QCVN 06:2022, có cache), forumAiDraftAnswer ✅ (nháp trích tiêu chuẩn + disclaimer), forumToCamNangDraft ✅.
+- Seed đã bổ sung `authorRank`/`suggestedKts` → mở trang nháp thấy ngay badge PRO + khối KTS gợi ý.
+
+### ⚠️ Chi phí (báo trước)
+- **AI (Claude)** chỉ chạy KHI người dùng bấm nút (soạn nháp / tóm tắt) — không tự chạy nền. TL;DR có cache. Dùng secret `ANTHROPIC_API_KEY` sẵn có; tính phí theo token Anthropic.
+- **2 cron mới** (SLA + bản tin tuần) chạy 1 lần/ngày & 1 lần/tuần — chi phí không đáng kể.
+- **Gợi ý KTS**: chỉ đọc Firestore (rẻ), chạy khi đăng thread Tư vấn.
+- Không đổi `firestore.rules` (functions ghi qua Admin SDK; client không đọc collection mới).
+
+### Danh sách hàm mới (đều `*Draft`, tự export qua `Object.assign` trong index.js)
+`forumSimilarDraft`, `forumAiDraftAnswer`, `forumSummarizeDraft`, `forumToCamNangDraft`, `forumUnansweredNudgeDraft` (cron), `forumWeeklyDigestDraft` (cron). Collection mới: `camNangForum_draft`, `forumDigest_draft`.

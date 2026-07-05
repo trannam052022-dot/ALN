@@ -11,7 +11,12 @@
 ════════════════════════════════════════════════════════════════ */
 
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
+
+const ANTHROPIC_KEY = defineSecret("ANTHROPIC_API_KEY");
+const VN_TZ = "Asia/Ho_Chi_Minh";
 
 if (!admin.apps.length) admin.initializeApp();
 const fdb = admin.firestore();
@@ -35,6 +40,8 @@ const COL = {
   userState:  "forumUserState_draft",
   notifBuf:   "notifBuffer_draft",
   modQueue:   "modQueue_draft",      // hàng chờ duyệt tập trung cho founder panel
+  camNang:    "camNangForum_draft",  // Best Answer được đề cử đưa vào Cẩm nang (nháp)
+  digest:     "forumDigest_draft",   // bản tin Q&A hằng tuần (nháp)
 };
 
 const CATEGORIES = ["hoi_dap", "vat_lieu", "showcase", "nghe", "bang_tin", "tu_van_du_an"];
@@ -232,16 +239,35 @@ async function addRep(uid, type, sign, refPath) {
   await ref.collection("events").add({ type, delta: pts, refPath: refPath || null, createdAt: ts() });
 }
 
+/* Chính sách 3 bước: Cảnh báo (1-2) → Đề nghị khóa 90 ngày (3-4) → Đề nghị khóa vĩnh viễn (≥5).
+   Bản nháp CHỈ ghi cờ đề nghị + báo Founder — KHÔNG tự khóa tài khoản thật. */
+function modStageFromCount(n) {
+  if (n >= 5) return { stage: "suggest_permanent", label: "Đề nghị khóa vĩnh viễn" };
+  if (n >= 3) return { stage: "suggest_lock90",   label: "Đề nghị khóa 90 ngày" };
+  return { stage: "warned", label: "Cảnh báo" };
+}
 async function logBlocked(uid, profile, kind, reason, text) {
   await fdb.collection(COL.modLogs).add({
     uid,
     name: (profile && profile.name) || "",
     role: (profile && profile.role) || "",
     kind,                              // 'post' | 'comment'
-    reason,                            // 'phone' | 'keyword' | 'link' | 'email'
+    reason,                            // 'phone' | 'keyword' | 'link' | 'email' | 'image:*'
     snippet: String(text || "").slice(0, 200),
     createdAt: ts(),
   });
+  // Đếm dồn số lần lách sàn + tính bậc xử lý
+  const stRef = fdb.collection(COL.userState).doc(uid);
+  await stRef.set({ blockCount: inc(1), lastBlockAt: ts() }, { merge: true });
+  const stSnap = await stRef.get();
+  const n = (stSnap.exists && stSnap.data().blockCount) || 1;
+  const { stage, label } = modStageFromCount(n);
+  await stRef.set({ modStage: stage }, { merge: true });
+  if (n === 3 || n === 5) {
+    await fdNotify(FOUNDER_UID, "⚠️ Tái phạm lách sàn (" + n + " lần)",
+      `${(profile && profile.name) || uid} — ${label}. Vào quản trị diễn đàn để xử lý.`,
+      { type: "FORUM_REPEAT_OFFENDER", uid });
+  }
 }
 
 /* Chấm điểm lead theo MARKETING.md */
@@ -253,6 +279,88 @@ function scoreLead(brief) {
   if (brief.projectType === "xay_moi") s += 2; else s += 1;
   const tier = s >= 7 ? "nong" : s >= 4 ? "am" : "nguoi";
   return { score: s, tier };
+}
+
+/* ── Hạng KTS suy từ điểm uy tín (đồng bộ nhãn với kts_profile_draft) ── */
+const RANK_TIERS = [
+  { key: "vip",       label: "VIP",       min: 40 },
+  { key: "pro",       label: "PRO",       min: 20 },
+  { key: "tieuchuan", label: "Tiêu chuẩn", min: 8 },
+  { key: "coban",     label: "Cơ bản",    min: 0 },
+];
+function rankFromPoints(points) {
+  const p = Number(points) || 0;
+  for (const t of RANK_TIERS) if (p >= t.min) return t.key;
+  return "coban";
+}
+async function getRepPoints(uid) {
+  try {
+    const s = await fdb.collection(COL.reputation).doc(uid).get();
+    return s.exists ? (Number(s.data().points) || 0) : 0;
+  } catch (e) { return 0; }
+}
+/* Hạng chỉ áp cho KTS; CN/DN/founder → null */
+async function safeRank(uid, role) {
+  if (role !== "kts") return null;
+  return rankFromPoints(await getRepPoints(uid));
+}
+
+/* ── Tách từ khóa tiếng Việt (bỏ dấu, bỏ stopword, ≥3 ký tự) để dò câu hỏi tương tự ── */
+const VN_STOP = new Set(("cua co la va cho khong nhu the nao nay do gi khi thi mot cac nhung duoc" +
+  " minh ban toi anh chi em nha xay dung thiet ke can hoi xin moi voi tren duoi ra vao lam sao bao nhieu").split(/\s+/));
+function vnKeywordTokens(text) {
+  const norm = vnNormNoMark(text).replace(/[^a-z0-9\s]/g, " ");
+  const out = [];
+  for (const w of norm.split(/\s+/)) {
+    if (w.length >= 3 && !VN_STOP.has(w) && !out.includes(w)) out.push(w);
+    if (out.length >= 24) break;
+  }
+  return out;
+}
+
+/* ── Gợi ý KTS đang hoạt động tích cực trong diễn đàn (denormalized từ bài đăng) ── */
+const RANK_ORDER = { vip: 3, pro: 2, tieuchuan: 1, coban: 0 };
+async function suggestKtsFromForum(excludeUid, limitN) {
+  try {
+    const snap = await fdb.collection(COL.posts)
+      .where("authorRole", "==", "kts")
+      .orderBy("createdAt", "desc").limit(80).get();
+    const byUid = new Map();
+    snap.forEach((doc) => {
+      const p = doc.data();
+      if (!p.authorUid || p.authorUid === excludeUid) return;
+      const cur = byUid.get(p.authorUid) || {
+        uid: p.authorUid, name: p.authorName || "KTS ALN",
+        rank: p.authorRank || "coban", posts: 0,
+      };
+      cur.posts += 1;
+      if ((RANK_ORDER[p.authorRank] || 0) > (RANK_ORDER[cur.rank] || 0)) cur.rank = p.authorRank;
+      byUid.set(p.authorUid, cur);
+    });
+    return Array.from(byUid.values())
+      .sort((a, b) => (RANK_ORDER[b.rank] - RANK_ORDER[a.rank]) || (b.posts - a.posts))
+      .slice(0, limitN || 3);
+  } catch (e) {
+    console.warn("[forum] suggestKts fail:", e.message);
+    return [];
+  }
+}
+
+/* ── Gọi Claude (Anthropic Messages API) — dùng chung cho nháp trả lời & tóm tắt ── */
+async function callClaude(apiKey, model, system, userText, maxTokens) {
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+    body: JSON.stringify({
+      model,
+      max_tokens: maxTokens || 700,
+      system,
+      messages: [{ role: "user", content: userText }],
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new HttpsError("internal", "AI lỗi: " + (data.error && data.error.message || res.status));
+  return (data.content && data.content[0] && data.content[0].text || "").trim();
 }
 
 async function requireAuth(request) {
@@ -323,24 +431,32 @@ exports.forumPostDraft = onCall({ region: REGION }, async (request) => {
     };
   }
 
-  /* Tiền kiểm 3 đóng góp đầu (trừ founder) — từ thứ 4 đăng thẳng */
+  /* Tiền kiểm: 3 đóng góp đầu HOẶC người hay bị chặn lách sàn (≥2 lần) → chờ duyệt.
+     Người sạch, đã qua 3 bài → đăng thẳng (hậu kiểm). */
   let pending = false;
   if (profile.role !== "founder") {
     const stSnap = await fdb.collection(COL.userState).doc(uid).get();
-    const contrib = stSnap.exists ? stSnap.data().contribCount || 0 : 0;
-    pending = contrib < NEW_ACCOUNT_FREE_AFTER;
+    const st = stSnap.exists ? stSnap.data() : {};
+    const contrib = st.contribCount || 0;
+    const blocks = st.blockCount || 0;
+    pending = contrib < NEW_ACCOUNT_FREE_AFTER || blocks >= 2;
   }
+
+  const authorRank = await safeRank(uid, profile.role);   // hạng KTS (trust signal)
 
   const post = {
     authorUid: uid,
     authorName: profile.name || "",
     authorRole: profile.role,
+    authorRank,
     authorAvatar: profile.avatarUrl || "",
     category,
     tag,
     text,
     media,
     images: media.filter((m) => m && m.type === "image").map((m) => m.url),
+    suggestedKts: [],                 // điền sau khi tạo (thread Tư vấn Dự án)
+    aiSummary: null, aiSummaryAt: null,
     heartCount: 0,
     heartedBy: [],
     pinned: false,
@@ -380,6 +496,19 @@ exports.forumPostDraft = onCall({ region: REGION }, async (request) => {
     await fdNotify(FOUNDER_UID, "🔥 Lead mới từ diễn đàn (" + tier + ")",
       `${profile.name || "Khách"} — ${brief.projectType}, ${brief.area}m², ${brief.region}`,
       { type: "FORUM_LEAD", postId: postRef.id });
+
+    /* Phễu chốt: gợi ý 3 KTS hoạt động tích cực + báo cho họ có lead phù hợp */
+    if (!pending) {
+      const kts = await suggestKtsFromForum(uid, 3);
+      if (kts.length) {
+        await postRef.update({ suggestedKts: kts });
+        for (const k of kts) {
+          await fdNotify(k.uid, "🤝 Có khách cần tư vấn dự án",
+            `${brief.projectType} · ${brief.area}m² · ${brief.region} — mở diễn đàn để nhận lời mời`,
+            { type: "FORUM_SUGGESTED", postId: postRef.id });
+        }
+      }
+    }
   }
 
   if (pending) {
@@ -440,18 +569,21 @@ exports.forumCommentDraft = onCall({ region: REGION }, async (request) => {
     rootAuthorUid = parent.authorUid;
   }
 
-  /* Tiền kiểm 3 đóng góp đầu */
+  /* Tiền kiểm: 3 đóng góp đầu HOẶC hay bị chặn lách sàn (≥2) */
   let pending = false;
   if (profile.role !== "founder") {
     const stSnap = await fdb.collection(COL.userState).doc(uid).get();
-    const contrib = stSnap.exists ? stSnap.data().contribCount || 0 : 0;
-    pending = contrib < NEW_ACCOUNT_FREE_AFTER;
+    const st = stSnap.exists ? stSnap.data() : {};
+    pending = (st.contribCount || 0) < NEW_ACCOUNT_FREE_AFTER || (st.blockCount || 0) >= 2;
   }
+
+  const authorRank = await safeRank(uid, profile.role);
 
   const comment = {
     authorUid: uid,
     authorName: profile.name || "",
     authorRole: profile.role,
+    authorRank,
     authorAvatar: profile.avatarUrl || "",
     text,
     replyToId: replyToId || null,
@@ -864,9 +996,9 @@ async function seedDraftData() {
   const base = {
     heartCount: 0, heartedBy: [], pinned: false, hidden: false,
     status: "visible", commentCount: 0, bestAnswerId: null, brief: null, tag: null,
-    authorAvatar: "",
+    authorAvatar: "", authorRank: null, suggestedKts: [], aiSummary: null, aiSummaryAt: null,
   };
-  const ktsAuthor = { authorUid: KTS_UID, authorName: KTS_NAME, authorRole: "kts" };
+  const ktsAuthor = { authorUid: KTS_UID, authorName: KTS_NAME, authorRole: "kts", authorRank: "pro" };
   const cnAuthor = { authorUid: CN_UID, authorName: CN_NAME, authorRole: "cn" };
   const founderAuthor = { authorUid: FOUNDER_UID, authorName: FOUNDER_NAME, authorRole: "founder" };
 
@@ -889,7 +1021,7 @@ async function seedDraftData() {
     heartCount: 0, heartedBy: [], createdAt: T(48),
   });
   batch1.set(posts.doc("draft_p01").collection("comments").doc("draft_c02"), {
-    authorUid: KTS_UID, authorName: KTS_NAME, authorRole: "kts", authorAvatar: "",
+    authorUid: KTS_UID, authorName: KTS_NAME, authorRole: "kts", authorRank: "pro", authorAvatar: "",
     text: "Nhà ở riêng lẻ ≤7 tầng và <5.000m² sàn thì thuộc diện thẩm duyệt đơn giản. Với 5 tầng + tum, bậc chịu lửa tối thiểu bậc III; thang bộ hở trong nhà được chấp nhận nếu có lối lên mái + thang V3 ngoài ban công từ tầng 3. Mặt tiền 4m vẫn bố trí được, quan trọng là chiều rộng vế thang ≥0,9m.",
     replyToId: null, isBestAnswer: true, flagged: false, status: "visible",
     heartCount: 3, heartedBy: [FOUNDER_UID, CN_UID, DN_UID], createdAt: T(46),
@@ -988,11 +1120,12 @@ async function seedDraftData() {
       budget: "1-2ty", timeline: "3-6thang", hasLand: true, consentNd13: true,
     },
     leadId: "draft_lead01",
+    suggestedKts: [{ uid: KTS_UID, name: KTS_NAME, rank: "pro" }],
     commentCount: 2, createdAt: T(10), updatedAt: T(6),
     firstAnswerRewarded: true,
   }));
   batch1.set(posts.doc("draft_p09").collection("comments").doc("draft_c07"), {
-    authorUid: KTS_UID, authorName: KTS_NAME, authorRole: "kts", authorAvatar: "",
+    authorUid: KTS_UID, authorName: KTS_NAME, authorRole: "kts", authorRank: "pro", authorAvatar: "",
     text: "Với 6x20m và nhu cầu 2 thế hệ, anh gợi ý phòng ông bà đặt tầng trệt phía sau (gần WC chung, tránh leo thang), khối bếp + ăn thông sân sau lấy gió. Tầng 2 là 2 phòng ngủ + sinh hoạt chung, tầng 3 phòng thờ + sân phơi. Chừa sân trước 4m là đậu được ô tô 7 chỗ.",
     replyToId: null, isBestAnswer: true, flagged: false, status: "visible",
     heartCount: 2, heartedBy: [CN_UID, FOUNDER_UID], createdAt: T(9),
@@ -1099,3 +1232,156 @@ async function seedDraftData() {
 
   return { ok: true, posts: 11, note: "Seed idempotent — chạy lại sẽ ghi đè đúng các doc draft_*" };
 }
+
+/* ════════════════════════════════════════════
+   9. DIỄN ĐÀN THÔNG MINH (P3 nháp)
+   Nguyên tắc: AI chỉ tạo NHÁP/tóm tắt — người thật xác nhận;
+   chỉ Best Answer (đã kiểm chứng) mới được đề cao / đưa Cẩm nang.
+════════════════════════════════════════════ */
+
+/* 9.1 — Chống trùng: tìm câu hỏi tương tự đã có (ưu tiên bài có Best Answer) */
+exports.forumSimilarDraft = onCall({ region: REGION }, async (request) => {
+  const { profile } = await requireAuth(request);
+  const d = request.data || {};
+  const tokens = vnKeywordTokens(String(d.text || ""));
+  if (tokens.length < 2) return { items: [] };
+  const p2 = await getP2Enabled();
+  const cats = viewableCategories(profile.role, p2);
+  if (!cats.length) return { items: [] };
+  const snap = await fdb.collection(COL.posts).orderBy("createdAt", "desc").limit(120).get();
+  const scored = [];
+  snap.forEach((doc) => {
+    const p = doc.data();
+    if (p.status !== "visible" || !cats.includes(p.category)) return;
+    const hay = vnNormNoMark(p.text || "");
+    let overlap = 0;
+    for (const t of tokens) if (hay.includes(t)) overlap++;
+    if (overlap >= 2) scored.push({
+      id: doc.id, overlap, hasBest: !!p.bestAnswerId,
+      title: (p.text || "").slice(0, 90), category: p.category, commentCount: p.commentCount || 0,
+    });
+  });
+  scored.sort((a, b) => (b.hasBest - a.hasBest) || (b.overlap - a.overlap) || (b.commentCount - a.commentCount));
+  return { items: scored.slice(0, 3) };
+});
+
+/* 9.2 — Trợ lý AI soạn NHÁP câu trả lời cho KTS (KTS tự kiểm chứng & gửi) */
+exports.forumAiDraftAnswer = onCall({ region: REGION, secrets: [ANTHROPIC_KEY] }, async (request) => {
+  const { profile } = await requireAuth(request);
+  if (profile.role !== "kts" && profile.role !== "founder")
+    throw new HttpsError("permission-denied", "Chỉ KTS/Founder dùng trợ lý soạn nháp");
+  const postId = String((request.data || {}).postId || "");
+  const snap = await fdb.collection(COL.posts).doc(postId).get();
+  if (!snap.exists) throw new HttpsError("not-found", "Bài không tồn tại");
+  const p = snap.data();
+  const system =
+    "Bạn là trợ lý soạn NHÁP câu trả lời cho kiến trúc sư Việt Nam trên diễn đàn nội bộ ALN. " +
+    "Trả lời NGẮN GỌN, đúng chuyên môn xây dựng/kiến trúc VN. Khi phù hợp thì nhắc TCVN/QCVN liên quan — " +
+    "CHỈ ghi mã số nếu chắc chắn, TUYỆT ĐỐI không bịa số hiệu tiêu chuẩn. Chỗ nào không chắc phải ghi rõ 'cần kiểm chứng'. " +
+    "Không ghi số điện thoại, email, link ngoài, zalo. " +
+    "Kết thúc đúng 1 dòng: '⚠️ Bản nháp AI — KTS kiểm chứng trước khi gửi.'";
+  const draft = await callClaude(ANTHROPIC_KEY.value(), "claude-sonnet-4-6", system,
+    "Câu hỏi trên diễn đàn:\n\n" + (p.text || ""), 700);
+  return { draft };
+});
+
+/* 9.3 — Tóm tắt AI (TL;DR) thread dài, CACHE để tiết kiệm chi phí */
+exports.forumSummarizeDraft = onCall({ region: REGION, secrets: [ANTHROPIC_KEY] }, async (request) => {
+  await requireAuth(request);
+  const postId = String((request.data || {}).postId || "");
+  const postRef = fdb.collection(COL.posts).doc(postId);
+  const snap = await postRef.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Bài không tồn tại");
+  const p = snap.data();
+  const sMs = p.aiSummaryAt && p.aiSummaryAt.toMillis ? p.aiSummaryAt.toMillis() : 0;
+  const uMs = p.updatedAt && p.updatedAt.toMillis ? p.updatedAt.toMillis() : 0;
+  if (p.aiSummary && sMs >= uMs) return { summary: p.aiSummary, cached: true };
+  const cs = await postRef.collection("comments").orderBy("createdAt", "asc").limit(24).get();
+  let convo = "CÂU HỎI:\n" + (p.text || "") + "\n\nCÁC TRẢ LỜI:\n";
+  cs.forEach((c) => {
+    const x = c.data();
+    if (x.status !== "visible") return;
+    convo += "- " + (x.authorName || "") + (x.isBestAnswer ? " (Best Answer)" : "") + ": " + (x.text || "") + "\n";
+  });
+  const system =
+    "Tóm tắt luồng thảo luận diễn đàn kiến trúc/xây dựng thành TL;DR tiếng Việt: 2-4 gạch đầu dòng ngắn, " +
+    "nêu vấn đề + kết luận/đáp án chính. CHỈ tóm tắt nội dung đã có, KHÔNG thêm thông tin mới. Không ghi SĐT/email/link.";
+  const summary = await callClaude(ANTHROPIC_KEY.value(), "claude-haiku-4-5-20251001", system, convo, 400);
+  await postRef.update({ aiSummary: summary, aiSummaryAt: ts() });
+  return { summary, cached: false };
+});
+
+/* 9.4 — Đề cử Best Answer vào Cẩm nang (Founder; chỉ nội dung đã kiểm chứng) */
+exports.forumToCamNangDraft = onCall({ region: REGION }, async (request) => {
+  const { profile } = await requireAuth(request);
+  if (profile.role !== "founder") throw new HttpsError("permission-denied", "Chỉ Founder đề cử Cẩm nang");
+  const postId = String((request.data || {}).postId || "");
+  const postRef = fdb.collection(COL.posts).doc(postId);
+  const snap = await postRef.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Bài không tồn tại");
+  const p = snap.data();
+  if (!p.bestAnswerId) throw new HttpsError("failed-precondition", "Chưa có Best Answer — chỉ đề cử nội dung đã kiểm chứng");
+  const baSnap = await postRef.collection("comments").doc(p.bestAnswerId).get();
+  const ba = baSnap.exists ? baSnap.data() : null;
+  const ref = await fdb.collection(COL.camNang).add({
+    sourcePostId: postId, category: p.category,
+    question: p.text || "", answer: (ba && ba.text) || "",
+    answerBy: (ba && ba.authorName) || "", answerByUid: (ba && ba.authorUid) || "",
+    status: "draft", createdAt: ts(),
+  });
+  await postRef.update({ camNangId: ref.id });
+  return { ok: true, id: ref.id };
+});
+
+/* 9.5 — SLA: câu hỏi KTS quá 2 ngày chưa ai trả lời → nhắc top KTS + báo Founder */
+exports.forumUnansweredNudgeDraft = onSchedule(
+  { schedule: "20 9 * * *", timeZone: VN_TZ, region: REGION },
+  async () => {
+    const KTS_CATS = ["hoi_dap", "vat_lieu", "nghe", "showcase"];
+    const cutoff = Date.now() - 2 * 24 * 60 * 60 * 1000;
+    const snap = await fdb.collection(COL.posts).orderBy("createdAt", "desc").limit(150).get();
+    const stale = [];
+    snap.forEach((d) => {
+      const p = d.data();
+      const ms = p.createdAt && p.createdAt.toMillis ? p.createdAt.toMillis() : Date.now();
+      if (p.status === "visible" && KTS_CATS.includes(p.category) && (p.commentCount || 0) === 0 && ms < cutoff) {
+        stale.push({ id: d.id, text: p.text || "" });
+      }
+    });
+    if (!stale.length) return;
+    const kts = await suggestKtsFromForum(null, 5);
+    for (const k of kts) {
+      await fdNotify(k.uid, "❓ " + stale.length + " câu hỏi chưa ai trả lời",
+        "Có câu hỏi kỹ thuật đang chờ chuyên gia — vào diễn đàn giúp đồng nghiệp nhé.", { type: "FORUM_SLA" });
+    }
+    await fdNotify(FOUNDER_UID, "❓ " + stale.length + " câu hỏi quá 2 ngày chưa trả lời",
+      stale.slice(0, 3).map((s) => "• " + s.text.slice(0, 40)).join("\n"), { type: "FORUM_SLA_DIGEST" });
+  }
+);
+
+/* 9.6 — Bản tin Q&A hằng tuần (Thứ 2 07:30) cho toàn mạng KTS */
+exports.forumWeeklyDigestDraft = onSchedule(
+  { schedule: "30 7 * * 1", timeZone: VN_TZ, region: REGION },
+  async () => {
+    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const snap = await fdb.collection(COL.posts).orderBy("createdAt", "desc").limit(150).get();
+    const items = [];
+    snap.forEach((d) => {
+      const p = d.data();
+      const ms = p.createdAt && p.createdAt.toMillis ? p.createdAt.toMillis() : 0;
+      if (p.status === "visible" && ms >= weekAgo) {
+        items.push({
+          id: d.id, text: (p.text || "").slice(0, 80), category: p.category,
+          score: (p.heartCount || 0) * 2 + (p.commentCount || 0) + (p.bestAnswerId ? 3 : 0),
+        });
+      }
+    });
+    items.sort((a, b) => b.score - a.score);
+    const top = items.slice(0, 5);
+    const ref = await fdb.collection(COL.digest).add({ count: items.length, top, createdAt: ts() });
+    if (top.length) {
+      await fdNotify(FOUNDER_UID, "📰 Bản tin diễn đàn tuần (" + items.length + " bài)",
+        top.map((t) => "• " + t.text).join("\n"), { type: "FORUM_WEEKLY", digestId: ref.id });
+    }
+  }
+);
