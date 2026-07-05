@@ -67,6 +67,40 @@ function vnDigitize(text) {
   );
 }
 
+/* ── OCR ẢNH (Cloud Vision) — bắt SĐT/kênh ngoài dán bằng hình ── */
+let _visionClient = null;
+function visionClient() {
+  if (!_visionClient) {
+    const vision = require("@google-cloud/vision");
+    _visionClient = new vision.ImageAnnotatorClient();
+  }
+  return _visionClient;
+}
+/* Đổi Firebase download URL → gs:// để service account đọc trực tiếp (không phụ thuộc token) */
+function gsFromDownloadUrl(url) {
+  const m = /\/v0\/b\/([^/]+)\/o\/([^?]+)/.exec(String(url || ""));
+  if (!m) return null;
+  return "gs://" + m[1] + "/" + decodeURIComponent(m[2]);
+}
+/* OCR từng ảnh, chạy lại bộ lọc text trên chữ đọc được. Trả 'phone'/'email'/... nếu vi phạm.
+   Vision lỗi → KHÔNG chặn (tránh chặn oan vì hạ tầng), chỉ log; nút Báo cáo là lớp chặn dự phòng. */
+async function ocrMediaViolation(media) {
+  const imgs = (Array.isArray(media) ? media : [])
+    .filter((m) => m && m.type === "image" && m.url).slice(0, 4);
+  for (const m of imgs) {
+    try {
+      const uri = gsFromDownloadUrl(m.url) || m.url;
+      const [res] = await visionClient().textDetection(uri);
+      const txt = (res.fullTextAnnotation && res.fullTextAnnotation.text) || "";
+      const v = txt ? forumFilterViolation(txt) : null;
+      if (v) return v;
+    } catch (e) {
+      console.warn("[forum] OCR fail:", (e && e.message) || e);
+    }
+  }
+  return null;
+}
+
 function forumFilterViolation(text) {
   if (!text) return null;
   const t = String(text);
@@ -253,6 +287,12 @@ exports.forumPostDraft = onCall({ region: REGION }, async (request) => {
   if (violation) {
     await logBlocked(uid, profile, "post", violation, text);
     throw new HttpsError("failed-precondition", BLOCK_MSG, { reason: violation });
+  }
+  /* OCR ảnh: bắt SĐT/kênh ngoài dán bằng hình (Cloud Vision) */
+  const imgViolation = await ocrMediaViolation(media);
+  if (imgViolation) {
+    await logBlocked(uid, profile, "post", "image:" + imgViolation, "(ảnh chứa " + imgViolation + ")");
+    throw new HttpsError("failed-precondition", BLOCK_MSG, { reason: imgViolation, via: "image" });
   }
 
   /* Mini-brief bắt buộc với Tư vấn Dự án (CN/DN) */

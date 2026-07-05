@@ -153,7 +153,13 @@ Bộ lọc chặn: SĐT VN (normalize bỏ khoảng trắng/chấm/gạch/ngoặ
 - **Email né bằng chữ** — "a còng"/"at"/"(a)" thay `@`, "chấm"/"dot" thay `.` → chuẩn hóa lại trước khi dò.
 - Đã kiểm 15/15 case (10 phải-chặn + 5 không-được-chặn) + test trực tiếp trên function đã deploy: chuỗi ví dụ bị chặn với `reason: phone`.
 
-**CÒN LẠI — né bằng ẢNH chứa số/chữ (dán hình có SĐT):** bộ lọc text KHÔNG bắt được. Cần OCR ảnh — có chi phí (Cloud Vision ~$1.5/1000 ảnh sau 1000 free/tháng, hoặc Tesseract.js chạy trong function: miễn phí nhưng nặng cold-start). Đây là quyết định chi phí → CHỜ Founder chọn (xem cuối tài liệu / tin nhắn bàn giao). Trước mắt: nút Báo cáo + founder xem ảnh trong thread là lớp chặn thủ công.
+**Né bằng ẢNH chứa số/chữ (dán hình có SĐT) — ĐÃ CHẶN bằng OCR Cloud Vision (05/07/2026):**
+- `forumPostDraft` sau khi lọc text sẽ OCR mọi ảnh đính kèm (`ocrMediaViolation`): đọc chữ trong ảnh bằng Google Cloud Vision `textDetection`, rồi chạy lại đúng bộ lọc text ở trên. Ảnh chứa SĐT/zalo/email/link ngoài → CHẶN đăng, ghi `modLogs_draft` với reason `image:phone` (hoặc image:keyword…).
+- Chuyển Firebase download URL → `gs://` để service account đọc trực tiếp; tối đa 4 ảnh/bài.
+- Vision lỗi hạ tầng → KHÔNG chặn oan (chỉ log warning); nút Báo cáo + Founder duyệt là lớp dự phòng.
+- **Chi phí:** 1000 ảnh đầu/tháng miễn phí, sau đó ~$1.5/1000 ảnh. Chỉ chạy khi bài CÓ ảnh (bài chỉ-chữ không tốn). Đã bật API `vision.googleapis.com` cho project.
+- **Đã test thật trên function đã deploy:** ảnh "0909 829 696" → chặn `reason: phone, via: image`; ảnh "Lien he Zalo…" → chặn `keyword`; ảnh sạch "Biệt thự 3 tầng…" → đăng bình thường (không chặn nhầm).
+- Bình luận chỉ có chữ (không đính ảnh) nên không cần OCR.
 
 ### #3 — CN không bao giờ đọc được hoi_dap/vat_lieu/nghe kể cả gọi API thẳng
 
