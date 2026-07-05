@@ -304,3 +304,9 @@ Nguyên tắc xuyên suốt: **hấp dẫn nhưng thông tin chính xác** — A
 - Huy hiệu hiện cạnh tên KTS ở card/thread/bình luận + gợi ý KTS. Bậc cao được **ưu tiên** trong danh sách "KTS phù hợp" (sắp theo bậc) + tooltip "được ưu tiên nhận dự án".
 - Trang hồ sơ KTS hiện bậc + **thanh gợi ý tiến độ** ("còn X điểm để lên Cố vấn / Chuyên gia") tạo động lực.
 - Seed KTS mẫu để ở bậc Chuyên gia ALN (65 điểm) để demo bậc cao nhất.
+
+## 10. Chuyên mục "Hỏi KTS Miễn Phí" + 20 câu mồi (05/07/2026)
+- Thêm chuyên mục `hoi_kts` (mở cho CN/DN khi P2, KTS/Founder trả lời) — mặt public "Hỏi KTS Miễn Phí".
+- Admin action `seedHoiKts` (nút "Nạp 20 câu Hỏi KTS" trong Tools): 20 câu hỏi chủ nhà giả lập + trả lời mẫu của 6 persona KTS (Tuấn Lộc/Trần Long/Anh Tuấn/Minh Trí/Phan Phúc/Ban Cố Vấn) kèm huy hiệu Cố vấn/Chuyên gia, rải ngày 14 ngày, vài Best Answer + tim; 1 bài Thể lệ ghim đầu chuyên mục. Idempotent (ghi đè `hoikts_*`).
+- Nút "Chọn KTS này làm dự án" hoạt động cả trong hoi_kts. Persona seed dùng uid `seed_*` (không có users doc) → forumChooseKtsDraft nới cho bản nháp (fallback tên, cờ `seedKts:true`, không FCM). Khi nghiệm thu: chỉ cho chọn KTS thật đã xác minh.
+- Nội dung 20 câu lấy từ FORUM_NOIDUNG_20CAU_THELE_UX.md; đơn giá thiết kế niêm yết (nhà phố/nội thất 120k, biệt thự 160k, nội thất biệt thự 180k đ/m²) xuất hiện trong lời KTS đúng như tài liệu.

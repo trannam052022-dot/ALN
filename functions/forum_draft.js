@@ -44,9 +44,9 @@ const COL = {
   digest:     "forumDigest_draft",   // bản tin Q&A hằng tuần (nháp)
 };
 
-const CATEGORIES = ["hoi_dap", "vat_lieu", "showcase", "nghe", "bang_tin", "tu_van_du_an"];
-const KTS_POST_CATEGORIES = ["hoi_dap", "vat_lieu", "showcase", "nghe"];
-const OPEN_CATEGORIES = ["tu_van_du_an", "showcase", "bang_tin"]; // CN/DN xem được (P2)
+const CATEGORIES = ["hoi_kts", "hoi_dap", "vat_lieu", "showcase", "nghe", "bang_tin", "tu_van_du_an"];
+const KTS_POST_CATEGORIES = ["hoi_kts", "hoi_dap", "vat_lieu", "showcase", "nghe"];
+const OPEN_CATEGORIES = ["hoi_kts", "tu_van_du_an", "showcase", "bang_tin"]; // CN/DN xem được (P2)
 const NEW_ACCOUNT_FREE_AFTER = 3;      // từ đóng góp thứ 4 đăng thẳng (hậu kiểm)
 const NOTIF_BATCH_WINDOW_MS = 10 * 60 * 1000; // gộp thông báo 10 phút
 
@@ -181,7 +181,7 @@ function viewableCategories(role, p2) {
 function canPostCategory(role, cat, p2) {
   if (role === "founder") return true;
   if (role === "kts") return KTS_POST_CATEGORIES.includes(cat);
-  if ((role === "cn" || role === "dn") && p2) return cat === "tu_van_du_an";
+  if ((role === "cn" || role === "dn") && p2) return cat === "tu_van_du_an" || cat === "hoi_kts";
   return false;
 }
 
@@ -833,6 +833,7 @@ exports.forumChooseKtsDraft = onCall({ region: REGION }, async (request) => {
   const d = request.data || {};
   const ktsUid = String(d.ktsUid || "");
   const threadId = String(d.threadId || "");
+  const ktsNameHint = String(d.ktsName || "").slice(0, 80);
   if (!ktsUid || !threadId) throw new HttpsError("invalid-argument", "Thiếu KTS hoặc thread");
 
   const p2 = await getP2Enabled();
@@ -844,20 +845,30 @@ exports.forumChooseKtsDraft = onCall({ region: REGION }, async (request) => {
   const postSnap = await postRef.get();
   if (!postSnap.exists) throw new HttpsError("not-found", "Thread không tồn tại");
   const post = postSnap.data();
-  if (post.category !== "tu_van_du_an") throw new HttpsError("failed-precondition", "Chỉ chọn KTS trong thread Tư vấn Dự án");
+  if (!["tu_van_du_an", "hoi_kts"].includes(post.category)) throw new HttpsError("failed-precondition", "Chỉ chọn KTS trong thread Tư vấn / Hỏi KTS");
   if (post.chosenKtsUid) throw new HttpsError("failed-precondition", "Thread đã chọn KTS làm dự án rồi");
 
   const ktsProfile = await getProfile(ktsUid);
-  if (!ktsProfile || ktsProfile.role !== "kts") throw new HttpsError("not-found", "Không tìm thấy KTS");
-  const badge = await safeRank(ktsUid, "kts");
+  let ktsName, badge, seedKts = false;
+  if (ktsProfile && ktsProfile.role === "kts") {
+    ktsName = ktsProfile.name || "";
+    badge = await safeRank(ktsUid, "kts");
+  } else {
+    // BẢN NHÁP: KTS persona mồi (uid seed_*) không có trong users/ — dùng tên denormalized.
+    // Khi nghiệm thu: chỉ cho chọn KTS thật đã xác minh chứng chỉ.
+    seedKts = true;
+    ktsName = ktsNameHint || "KTS ALN";
+    badge = null;
+  }
 
   const invRef = await fdb.collection(COL.invites).add({
     cnUid: uid,
     cnName: profile.name || "",
     cnRole: profile.role,
     ktsUid,
-    ktsName: ktsProfile.name || "",
+    ktsName,
     ktsBadge: badge,
+    seedKts,
     threadId,
     intent: "project",             // 'project' = chọn làm dự án (mạnh hơn 'tuvan')
     brief: post.brief || null,     // copy brief để nghiệm thu tạo dự án không phải nhập lại
@@ -868,17 +879,19 @@ exports.forumChooseKtsDraft = onCall({ region: REGION }, async (request) => {
 
   await postRef.update({
     chosenKtsUid: ktsUid,
-    chosenKts: { uid: ktsUid, name: ktsProfile.name || "", rank: badge },
+    chosenKts: { uid: ktsUid, name: ktsName, rank: badge },
     chosenInviteId: invRef.id,
     chosenAt: ts(),
     updatedAt: ts(),
   });
 
-  await fdNotify(ktsUid, "⭐ Bạn được CHỌN làm KTS dự án!",
-    `${profile.name || "Chủ đầu tư"} đã chọn bạn thực hiện dự án — mở kênh chat sàn để xác nhận & vào Quy trình 4 bước`,
-    { type: "FORUM_CHOOSE_KTS", inviteId: invRef.id, postId: threadId });
+  if (!seedKts) {
+    await fdNotify(ktsUid, "⭐ Bạn được CHỌN làm KTS dự án!",
+      `${profile.name || "Chủ đầu tư"} đã chọn bạn thực hiện dự án — mở kênh chat sàn để xác nhận & vào Quy trình 4 bước`,
+      { type: "FORUM_CHOOSE_KTS", inviteId: invRef.id, postId: threadId });
+  }
   await fdNotify(FOUNDER_UID, "🎯 Chủ đầu tư CHỌN KTS làm dự án",
-    `${profile.name || uid} chọn ${ktsProfile.name || ktsUid} (thread ${threadId})`,
+    `${profile.name || uid} chọn ${ktsName} (thread ${threadId})`,
     { type: "FORUM_CHOOSE_KTS_ADMIN", inviteId: invRef.id, postId: threadId });
 
   return { ok: true, inviteId: invRef.id };
@@ -1042,6 +1055,9 @@ exports.forumAdminDraft = onCall({ region: REGION }, async (request) => {
 
     case "seed":
       return await seedDraftData();
+
+    case "seedHoiKts":
+      return await seedHoiKtsData();
 
     default:
       throw new HttpsError("invalid-argument", "Hành động không hợp lệ: " + action);
@@ -1303,6 +1319,151 @@ async function seedDraftData() {
   }
 
   return { ok: true, posts: 11, note: "Seed idempotent — chạy lại sẽ ghi đè đúng các doc draft_*" };
+}
+
+/* Seed chuyên mục "Hỏi KTS Miễn Phí" — 20 câu hỏi mồi + trả lời mẫu (persona KTS).
+   Câu hỏi đứng tên chủ nhà giả lập; trả lời đứng tên KTS phân công. Rải ngày 14 ngày. */
+async function seedHoiKtsData() {
+  const P = {
+    bcv:   { uid: "seed_kts_bcv",      name: "Ban Cố Vấn ALN", badge: "chuyen_gia" },
+    loc:   { uid: "seed_kts_tuanloc",  name: "KTS. Tuấn Lộc",  badge: "chuyen_gia" },
+    long:  { uid: "seed_kts_tranlong", name: "KTS. Trần Long", badge: "chuyen_gia" },
+    tuan:  { uid: "seed_kts_anhtuan",  name: "KTS. Anh Tuấn",  badge: "co_van" },
+    tri:   { uid: "seed_kts_minhtri",  name: "KTS. Minh Trí",  badge: "co_van" },
+    phuc:  { uid: "seed_kts_phanphuc", name: "KTS. Phan Phúc", badge: "co_van" },
+  };
+  const now = Date.now();
+  const T = (h) => Timestamp.fromMillis(now - h * 3600 * 1000);
+
+  const QA = [
+    { asker: "Anh Hùng · Biên Hòa", by: P.loc, best: true, hearts: 7, h: 320,
+      title: "Xây nhà phố 4x18m, 3 tầng ở Đồng Nai hết khoảng bao nhiêu tiền?",
+      q: "Em có lô đất 4x18m ở Biên Hòa, định xây 3 tầng để ở, chưa biết nên chuẩn bị ngân sách bao nhiêu. Nhờ các anh KTS tư vấn giúp.",
+      a: "Chào anh. Với lô 4x18m xây 3 tầng, nếu xây hết đất thì tổng diện tích sàn khoảng 200–216m². Chi phí xây thô + hoàn thiện cơ bản hiện dao động 5,5–7 triệu/m² tùy vật liệu và nhà thầu, tức phần xây dựng rơi vào khoảng 1,2–1,5 tỷ. Anh nên dự phòng thêm 10–15% cho phát sinh.\n\nRiêng phần thiết kế, nhiều chủ nhà hay bỏ qua nhưng đây là khoản rẻ nhất mà tiết kiệm nhiều nhất: một bộ hồ sơ đầy đủ (kiến trúc, kết cấu, điện nước) giúp anh khóa được khối lượng với nhà thầu, tránh phát sinh mơ hồ.\n\nCon số trên là ước tính chung. Nếu anh cho biết thêm nhu cầu (mấy phòng ngủ, có thang máy không, phong cách mong muốn), tôi tư vấn sát hơn. Khi cần bóc tách chi tiết cho đúng lô đất, anh có thể tạo dự án trên ALN để KTS làm việc trực tiếp." },
+    { asker: "Anh Dũng · Long Thành", by: P.loc, best: false, hearts: 5, h: 300,
+      title: "Nên xây nhà trọn gói hay tách riêng thiết kế và thi công?",
+      q: "Nhà thầu gần nhà báo em giá trọn gói 'miễn phí thiết kế'. Vậy có nên thuê KTS riêng nữa không, hay để nhà thầu lo hết cho tiện?",
+      a: "Câu hỏi này gần như chủ nhà nào cũng gặp. 'Miễn phí thiết kế' nghe hấp dẫn, nhưng bản chất: không có gì miễn phí — chi phí thiết kế đã nằm trong giá thi công, và quan trọng hơn, bản vẽ khi đó phục vụ lợi ích của nhà thầu trước tiên. Bản vẽ sơ sài đồng nghĩa khối lượng mơ hồ, phát sinh sẽ xuất hiện ở giai đoạn anh chị khó dừng lại.\n\nThuê KTS độc lập nghĩa là có một người đứng về phía chủ nhà: hồ sơ chi tiết để so sánh báo giá nhiều nhà thầu, có căn cứ nghiệm thu, có người giám sát quyền tác giả.\n\nKinh nghiệm của tôi: với nhà từ 1,5 tỷ trở lên, tách riêng thiết kế luôn có lợi. Với nhà nhỏ ngân sách rất sát, trọn gói có thể chấp nhận nhưng nên yêu cầu xem đủ hồ sơ kết cấu và điện nước trước khi ký." },
+    { asker: "Chị Lan · Vũng Tàu", by: P.loc, best: false, hearts: 4, h: 280,
+      title: "Đơn giá thiết kế 120.000đ/m² tính trên diện tích nào?",
+      q: "Em thấy trên ALN ghi thiết kế nhà phố 120.000đ/m². Vậy m² này tính theo đất hay theo sàn? Nhà em đất 5x20m nhưng chỉ xây 2 tầng.",
+      a: "Chào chị. Đơn giá thiết kế tính trên tổng diện tích sàn xây dựng, không phải diện tích đất. Ví dụ đất 5x20m (100m²), xây 2 tầng, mỗi tầng xây khoảng 80m² (chừa sân) thì tổng sàn 160m² — phí thiết kế khoảng 160 × 120.000đ = 19,2 triệu cho trọn bộ hồ sơ nhà phố.\n\nBộ hồ sơ gồm: phương án kiến trúc (mặt bằng, mặt đứng, mặt cắt, 3D), hồ sơ kết cấu, hồ sơ điện–nước, và dự toán khối lượng. Hồ sơ do KTS có chứng chỉ hành nghề ký theo quy định.\n\nSo với tổng giá trị căn nhà cỡ 1,3–1,5 tỷ thì phí thiết kế chiếm hơn 1% — nhưng là 1% quyết định 99% còn lại đi đúng hướng hay không. Chị tạo dự án để nhận báo phí chính xác theo số tầng và diện tích thực tế." },
+    { asker: "Anh Phát · Bà Rịa", by: P.loc, best: false, hearts: 6, h: 250,
+      title: "Có 900 triệu, nên xây 2 tầng hoàn thiện hay 3 tầng để thô dần?",
+      q: "Vợ chồng em có 900 triệu, đất 4x16m ở Bà Rịa. Phân vân xây 2 tầng làm luôn nội thất, hay xây 3 tầng rồi hoàn thiện từ từ?",
+      a: "Đây là bài toán rất thực tế. Quan điểm của tôi: ưu tiên phương án 2 tầng hoàn thiện gọn, trừ khi gia đình chắc chắn cần thêm phòng trong 2–3 năm tới.\n\nLý do: nhà xây thô để đó xuống cấp nhanh (thấm, nứt), ở trong nhà dở dang ảnh hưởng sinh hoạt kéo dài, và 'hoàn thiện từ từ' thường đội lên 20–30% so với làm một lần do thi công lắt nhắt. 900 triệu cho 4x16m xây 2 tầng (~128m² sàn) là vừa vặn làm tử tế.\n\nPhương án trung gian đáng cân nhắc: thiết kế ngay cho 3 tầng (móng, cột, chờ thép, chờ ống kỹ thuật) nhưng chỉ xây 2 tầng. Sau này lên tầng không phải đập phá — đó là giá trị của việc có KTS tham gia từ sớm." },
+    { asker: "Chị Mai · TP.HCM", by: P.bcv, best: true, hearts: 9, h: 230,
+      title: "Tiền thiết kế trả cho KTS qua ALN như thế nào, có an toàn không?",
+      q: "Em chưa từng thuê KTS online bao giờ. Lỡ chuyển tiền xong KTS làm không đúng ý hoặc bỏ ngang thì sao?",
+      a: "Chào anh/chị, lo lắng này rất chính đáng và đây chính là lý do ALN tồn tại. Trên ALN, anh/chị không chuyển tiền trực tiếp cho KTS. Tiền được giữ an toàn tại nền tảng và giải ngân theo 4 giai đoạn C1→C4, mỗi giai đoạn gắn với một sản phẩm cụ thể nghiệm thu được:\n\n- C1 — Phương án sơ bộ: mặt bằng công năng, duyệt mới đi tiếp.\n- C2 — Hồ sơ kiến trúc: mặt đứng, mặt cắt, phối cảnh 3D.\n- C3 — Hồ sơ kỹ thuật: kết cấu, điện–nước.\n- C4 — Bàn giao trọn bộ + dự toán.\n\nỞ mỗi bước, anh/chị xem sản phẩm trước, hài lòng thì xác nhận, tiền giai đoạn đó mới chuyển cho KTS. Có tranh chấp, ALN phân xử dựa trên hồ sơ lưu trên hệ thống — vì vậy nên trao đổi trong workspace dự án, không qua kênh riêng. Toàn bộ KTS đều được xác minh chứng chỉ hành nghề." },
+    { asker: "Chị Hoa · Vũng Tàu", by: P.long, best: true, hearts: 8, h: 210,
+      title: "Xây nhà ở riêng lẻ có bắt buộc phải có bản vẽ do KTS ký không?",
+      q: "Nhà em cấp 4 lên 2 tầng ở TP. Vũng Tàu. Nghe nói giờ xin phép xây dựng phải có bản vẽ của người có chứng chỉ, đúng không ạ?",
+      a: "Chào chị. Đúng vậy. Theo Nghị định 15/2021/NĐ-CP về quản lý dự án đầu tư xây dựng, hồ sơ thiết kế trong hồ sơ xin phép phải do tổ chức/cá nhân đủ điều kiện năng lực thực hiện — với nhà ở riêng lẻ, người chủ trì thiết kế phải có chứng chỉ hành nghề phù hợp và ký, đóng dấu.\n\nTrường hợp cải tạo nâng tầng còn cần lưu ý: phải khảo sát, đánh giá kết cấu móng hiện trạng có chịu được tầng mới không — phần này cần kỹ sư kết cấu xác nhận, liên quan trực tiếp an toàn.\n\nNhiều chủ nhà mua 'bản vẽ xin phép' trôi nổi ký khống — rủi ro là hồ sơ bị trả, hoặc xây sai bản vẽ được duyệt dẫn đến khó hoàn công. Trên ALN, mọi hồ sơ đều do KTS đứng tên chịu trách nhiệm theo quy định." },
+    { asker: "Anh Nam · Biên Hòa", by: P.long, best: false, hearts: 5, h: 195,
+      title: "Bản vẽ xin phép xây dựng và bản vẽ thi công khác nhau thế nào?",
+      q: "Em tưởng có 1 bộ bản vẽ dùng chung, nhưng nhà thầu nói bản vẽ xin phép không thi công được. Vậy em phải làm mấy bộ hồ sơ?",
+      a: "Câu hỏi rất hay, đây là điểm nhiều chủ nhà nhầm lẫn. Hai bộ hồ sơ khác nhau về mục đích và độ chi tiết:\n\nBản vẽ xin phép là hồ sơ pháp lý nộp cơ quan cấp phép: thể hiện quy mô, mật độ, chiều cao, khoảng lùi... đủ để xét duyệt có phù hợp quy hoạch không. Nó không đủ chi tiết để thợ làm theo.\n\nHồ sơ thi công mới là 'kim chỉ nam' ngoài công trường: chi tiết kết cấu từng cấu kiện, bố trí thép, sơ đồ điện–nước, chi tiết cầu thang, chống thấm... Thiếu bộ này, thợ làm theo kinh nghiệm và mọi tranh cãi đều từ đó.\n\nLưu ý: hai bộ phải thống nhất với nhau. Xây khác bản vẽ được duyệt là rủi ro khi hoàn công. Tốt nhất cùng một KTS làm cả hai." },
+    { asker: "Anh Tài · Long Điền", by: P.long, best: false, hearts: 6, h: 175,
+      title: "Xây nhà trên đất chưa lên thổ cư có xin phép được không?",
+      q: "Đất em ở Long Điền là đất trồng cây lâu năm, có được xây nhà tạm hay nhà cấp 4 không? Có cách nào hợp thức không ạ?",
+      a: "Chào anh. Tôi trả lời thẳng để anh tránh rủi ro: đất nông nghiệp (kể cả đất trồng cây lâu năm) không được phép xây nhà ở, kể cả nhà tạm hay cấp 4. Xây trên đất chưa chuyển mục đích là vi phạm, có thể bị buộc tháo dỡ và xử phạt.\n\nHướng đi đúng: làm thủ tục chuyển mục đích sử dụng đất sang đất ở tại Phòng TN&MT/bộ phận một cửa. Điều kiện tiên quyết là khu đất nằm trong quy hoạch cho phép đất ở — anh tra cứu quy hoạch hoặc hỏi UBND xã trước khi nộp. Chi phí chính là tiền sử dụng đất theo bảng giá địa phương.\n\nSau khi lên thổ cư và có giấy phép, lúc đó mới bàn chuyện thiết kế. KTS có thể tư vấn trước quy mô xây phù hợp quy hoạch để anh quyết diện tích chuyển mục đích tối ưu." },
+    { asker: "Chị Yến · Q.9", by: P.long, best: false, hearts: 4, h: 160,
+      title: "Hoàn công là gì, không hoàn công có sao không?",
+      q: "Nhà em xây xong 2 năm rồi nhưng chưa làm hoàn công vì nghe nói thủ tục rắc rối. Để vậy luôn có sao không các anh?",
+      a: "Chào chị. Hoàn công là thủ tục ghi nhận căn nhà vào sổ. Chưa hoàn công thì trên giấy tờ tài sản của chị chỉ có... miếng đất trống. Hệ quả: khó thế chấp vay ngân hàng đúng giá trị, mua bán chuyển nhượng bị vướng, tranh chấp thì căn nhà không được ghi nhận đầy đủ.\n\nHồ sơ hoàn công gồm: giấy phép xây dựng, bản vẽ được duyệt, bản vẽ hiện trạng hoàn công. Mấu chốt: nhà xây phải khớp với giấy phép. Nếu xây lệch (thêm tầng, lố diện tích), phải xử lý phần sai phạm trước.\n\nLời khuyên: làm sớm, để lâu quy định thay đổi càng phức tạp. Nếu nhà xây đúng phép, thủ tục không đáng ngại như lời đồn." },
+    { asker: "Anh Sơn · Gia Lai", by: P.bcv, best: false, hearts: 7, h: 145,
+      title: "Quy trình làm việc với KTS trên ALN diễn ra như thế nào?",
+      q: "Em ở tỉnh xa, không tiện gặp mặt. Làm việc với KTS online từ A đến Z có ổn không, quy trình cụ thể ra sao?",
+      a: "Chào anh. Hoàn toàn ổn — phần lớn dự án trên ALN diễn ra online toàn bộ:\n\n1. Tạo dự án & brief: anh mô tả nhu cầu (trợ lý MyMy hỏi từng câu đơn giản, anh chỉ việc trả lời).\n2. Ghép KTS phù hợp theo loại công trình và khu vực.\n3. C1 – Phương án sơ bộ: KTS gửi mặt bằng công năng, trao đổi ngay trong workspace, lưu lịch sử.\n4. C2 – Kiến trúc: mặt đứng, phối cảnh 3D — anh 'nhìn thấy' ngôi nhà trước khi xây.\n5. C3 – Kỹ thuật: kết cấu, điện nước.\n6. C4 – Bàn giao trọn bộ hồ sơ + dự toán.\n\nTiền từng giai đoạn chỉ chuyển sau khi anh nghiệm thu. Việc khảo sát thực địa, KTS hướng dẫn anh chụp ảnh/quay video theo checklist, hoặc điều phối đo đạc tại địa phương." },
+    { asker: "Chị Trang · Bình Dương", by: P.bcv, best: true, hearts: 8, h: 130,
+      title: "Một bộ hồ sơ thiết kế đầy đủ gồm những gì?",
+      q: "Lần đầu thuê thiết kế, em sợ nhận về vài tấm 3D đẹp mà thiếu bản vẽ kỹ thuật. Bộ hồ sơ chuẩn phải có những gì ạ?",
+      a: "Câu hỏi rất đúng trọng tâm — 3D đẹp chỉ là phần nổi. Một bộ hồ sơ nhà ở đầy đủ gồm 4 phần:\n\nKiến trúc: mặt bằng các tầng, mặt đứng, mặt cắt, mặt bằng mái, phối cảnh 3D.\nKết cấu: mặt bằng móng, chi tiết móng–cột–dầm–sàn, bố trí thép, thang.\nĐiện–nước (M&E): sơ đồ cấp điện, chiếu sáng, ổ cắm, cấp thoát nước, vị trí thiết bị vệ sinh.\nDự toán: bảng khối lượng chính để làm việc với nhà thầu.\n\nTrên ALN, danh mục này được chuẩn hóa thành checklist nghiệm thu từng giai đoạn C1–C4 — anh chị không cần tự nhớ, hệ thống hiển thị rõ giai đoạn nào cần bản vẽ nào. Mọi bản vẽ đều có chữ ký KTS chủ trì có chứng chỉ." },
+    { asker: "Anh Khoa · Đồng Nai", by: P.bcv, best: false, hearts: 5, h: 115,
+      title: "KTS làm không đúng ý, sửa bao nhiêu lần là hợp lý?",
+      q: "Bạn em thuê thiết kế bên ngoài, sửa tới lần 3 thì KTS đòi thêm tiền, cãi nhau um sùm. Trên ALN chuyện sửa bản vẽ quy định thế nào?",
+      a: "Tranh chấp 'sửa bao nhiêu lần' hầu như luôn từ việc hai bên không thống nhất trước phạm vi. ALN xử lý bằng cấu trúc giai đoạn:\n\nMỗi giai đoạn (C1–C4), chủ nhà có số vòng chỉnh sửa hợp lý ghi rõ trong thỏa thuận — thường 2–3 vòng ở bước phương án (C1). Nguyên tắc: chốt xong giai đoạn nào, khóa giai đoạn đó. Đã duyệt mặt bằng ở C1 thì sang C2 không quay lại đổi toàn bộ công năng — thay đổi lớn là phát sinh có tính phí, minh bạch trước khi làm.\n\nCách này công bằng cả hai phía. Mọi yêu cầu chỉnh sửa trao đổi trong workspace có lưu vết, khi bất đồng ALN có căn cứ phân xử. Mẹo: trả lời kỹ brief ban đầu, số vòng sửa càng ít." },
+    { asker: "Anh Bình · Thủ Đức", by: P.tuan, best: false, hearts: 6, h: 100,
+      title: "Nên chuẩn bị gì trước khi làm việc với KTS để đỡ mất thời gian?",
+      q: "Tuần sau em bắt đầu làm thiết kế nhà 5x18m. Em nên chuẩn bị sẵn những gì để buổi trao đổi đầu tiên hiệu quả?",
+      a: "Chào anh. Chuẩn bị tốt 5 thứ này, buổi đầu sẽ hiệu quả gấp đôi:\n\n1. Giấy tờ đất + số liệu thực tế: sổ đỏ, ảnh hiện trạng, hướng đất, đường trước nhà rộng bao nhiêu, cống thoát nước phía nào.\n2. Danh sách thành viên & thói quen sống: mấy người, độ tuổi, ai hay nấu nướng, có ông bà ở cùng không, ô tô hay xe máy.\n3. Ngân sách thật: con số anh sẵn sàng chi, đừng nói thấp để 'phòng thủ' — thiết kế theo ngân sách sai thì phương án sai.\n4. Ảnh những ngôi nhà anh thích (5–10 ảnh): KTS đọc gu của anh nhanh hơn ngàn lời.\n5. Thứ anh KHÔNG thích: ít ai chuẩn bị nhưng cực kỳ giá trị.\n\nTrên ALN, trợ lý MyMy sẽ hỏi anh đúng những mục này khi tạo dự án." },
+    { asker: "Anh Long · Q.8", by: P.tuan, best: true, hearts: 9, h: 85,
+      title: "Nhà phố 4m ngang làm sao cho sáng và thoáng, không bị ống hộp tối?",
+      q: "Nhà em 4x20m, hai bên đều bị nhà hàng xóm che kín. Sợ nhất xây xong nhà tối om phải bật đèn cả ngày. Có cách nào khắc phục không ạ?",
+      a: "Đây là bài toán kinh điển của nhà phố Việt Nam, và tin vui là hoàn toàn giải được. Ba nguyên tắc tôi luôn áp dụng với nhà ống dài:\n\nGiếng trời đặt đúng chỗ: với nhà 20m sâu, tối thiểu 1 giếng trời giữa nhà (thường ở khu cầu thang) + 1 khoảng thông thoáng cuối nhà. Giếng trời giữa nhà là 'lá phổi' — vừa lấy sáng vừa tạo đối lưu hút gió.\n\nCầu thang đổi vai trò: thay vì khối đặc chắn sáng, cầu thang nên kết hợp giếng trời, bậc hở hoặc lan can thoáng để ánh sáng xuyên xuống trệt.\n\nHạn chế ngăn phòng kín ở trệt: khu khách–bếp nên liên thông, phân chia bằng chênh cốt sàn hoặc đảo bếp thay vì tường.\n\nLưu ý: giếng trời phải tính chống hắt mưa và nắng gắt hướng Tây ngay từ thiết kế. Anh tạo dự án kèm ảnh hiện trạng để tôi xem hướng đất cụ thể." },
+    { asker: "Chị Ngọc · Biên Hòa", by: P.tuan, best: false, hearts: 5, h: 70,
+      title: "Có nên làm tầng lửng không? Khi nào nên, khi nào không?",
+      q: "Nhà em 4x15m định xây 1 trệt 1 lầu, đang phân vân thêm lửng để làm phòng làm việc. Lửng có làm nhà thấp và bí không?",
+      a: "Tầng lửng là con dao hai lưỡi — dùng đúng thì lời cả không gian lẫn chi phí, dùng sai thì được cái lửng, hỏng cái trệt.\n\nNên làm lửng khi: khu vực bị giới hạn chiều cao/số tầng mà cần thêm diện tích; trệt kinh doanh cần trần cao thoáng phía trước; hoặc cần không gian 'nửa riêng tư' như phòng làm việc, phòng thờ.\n\nKhông nên khi: nhà đã đủ tầng cho nhu cầu — lửng lúc đó chỉ làm trệt thấp đi. Nguyên tắc kỹ thuật: dưới lửng nên còn thông thủy ~2,4–2,6m và bản thân lửng ~2,2m trở lên; tổng chiều cao trệt khi đó ~4,5–5m. Lửng chỉ nên chiếm ~2/3 chiều sâu, phần còn lại thông tầng.\n\nNhà chị 4x15m làm phòng làm việc thì lửng hợp lý, miễn xử lý đúng chiều cao — còn tùy quy định chiều cao khu vực, KTS sẽ kiểm khi có thông tin lô đất." },
+    { asker: "Anh Tuấn · Vũng Tàu", by: P.tri, best: false, hearts: 7, h: 55,
+      title: "Hướng nhà xấu với tuổi gia chủ, có bắt buộc phải đổi đất không?",
+      q: "Em tuổi Đinh Mão, mua trúng lô đất hướng Tây Bắc, thầy nói hướng này xung với tuổi. Chẳng lẽ bán đất mua lô khác? Có cách hóa giải bằng thiết kế không?",
+      a: "Chào anh. Câu trả lời của giới nghề: không cần đổi đất — phong thủy hiện đại xử lý bằng thiết kế.\n\nNguyên tắc 'nhất vị, nhị hướng': vị trí, thế đất tốt quan trọng hơn hướng cửa. Với hướng chưa hợp tuổi, KTS có nhiều công cụ: xoay hướng cửa chính lệch góc so với hướng đất, bố trí bếp và bàn thờ theo cung tốt của gia chủ (đây mới là hai yếu tố quan trọng nhất), dùng tiền sảnh/lam che tạo 'hướng khí' riêng cho lối vào.\n\nHướng Tây Bắc về khí hậu thực ra không tệ — nắng chiều xử lý bằng lam chắn, cây xanh, ban công sâu, đồng thời làm mặt tiền đẹp hơn.\n\nQuan điểm của tôi: phong thủy tốt nhất là nhà thông thoáng, đủ sáng, công năng thuận tiện. Anh giữ lô đất, khi thiết kế đưa ngày sinh gia chủ vào brief, KTS cân đối cả phong thủy lẫn công năng." },
+    { asker: "Chị Hương · Bà Rịa", by: P.tri, best: true, hearts: 8, h: 40,
+      title: "Biệt thự vườn 200m² nên bố trí mấy phòng ngủ, có nên làm hồ bơi?",
+      q: "Nhà em có đất vườn 500m² ở Bà Rịa, định xây biệt thự 1 trệt 1 lầu khoảng 200m² sàn cho gia đình 5 người + ông bà hay ghé. Bố trí sao cho hợp lý, và hồ bơi có đáng đầu tư không?",
+      a: "Chào chị. Đất 500m² xây 200m² sàn là tỷ lệ rất đẹp — nhà có vườn bao quanh đúng nghĩa. Cấu trúc tôi thường tư vấn:\n\nTrệt (~120m²): khách–bếp–ăn liên thông mở ra vườn, 1 phòng ngủ ông bà (bắt buộc ở trệt, gần WC, tránh cầu thang), WC chung, kho + giặt.\nLầu (~80m²): phòng master + 2 phòng con, sân phơi/ban công. Tổng 4 phòng ngủ là chuẩn.\n\nVề hồ bơi: cân nhắc kỹ. Chi phí xây chỉ là phần đầu — vận hành (lọc, hóa chất, điện, vệ sinh) tốn vài triệu mỗi tháng và cần người chăm. Nhà dùng cuối tuần dễ thành 'ao cảnh' tốn kém. Phương án thay thế: hồ cảnh nhỏ + sân vườn đẹp, hoặc chừa sẵn vị trí và hạ tầng chờ.\n\nChị tạo dự án kèm sơ đồ khu đất, tôi phác thảo phân khu cụ thể hơn." },
+    { asker: "Anh Vũ · Q.Tân Bình", by: P.tri, best: false, hearts: 6, h: 28,
+      title: "Phòng thờ nên đặt ở đâu trong nhà phố 3 tầng?",
+      q: "Nhà em 3 tầng, ba mẹ muốn phòng thờ trang nghiêm nhưng em thấy để tầng thượng thì ông bà lớn tuổi leo cực. Đặt ở đâu là hợp lý nhất ạ?",
+      a: "Câu hỏi chạm đúng mâu thuẫn giữa quan niệm truyền thống và thực tế sử dụng. Truyền thống chuộng đặt phòng thờ ở tầng cao nhất. Nhưng người lớn tuổi thắp nhang mỗi ngày mà leo 3 tầng là bất tiện, chưa kể an toàn.\n\nBa phương án theo thứ tự tôi hay tư vấn:\n1. Tầng thượng kèm không gian nghỉ: nếu nhà có/dự trù thang máy thì đây vẫn đẹp nhất.\n2. Tầng lửng hoặc tầng 2, không gian riêng: thỏa hiệp tốt. Lưu ý tránh bàn thờ dựa tường WC hoặc nằm dưới WC tầng trên.\n3. Góc thờ trang trọng tại trệt (nhà ít tầng hoặc ông bà yếu): dùng vách ngăn ước lệ tạo tôn nghiêm.\n\nChốt: đặt ở đâu mà người thờ cúng chính dùng được hằng ngày thoải mái — đó là vị trí đúng. KTS xử lý phần trang nghiêm bằng thiết kế." },
+    { asker: "Chị Diễm · Q.2", by: P.phuc, best: false, hearts: 5, h: 16,
+      title: "Thiết kế nội thất 120.000đ/m² gồm những gì, khác gì bản 3D của xưởng?",
+      q: "Xưởng nội thất báo em 'thiết kế 3D miễn phí khi đặt đóng đồ'. Vậy thuê thiết kế nội thất riêng 120.000đ/m² trên ALN có gì khác biệt?",
+      a: "Chào chị. Khác biệt giống hệt chuyện 'nhà thầu miễn phí thiết kế' bên xây dựng: bản 3D của xưởng là công cụ bán đồ của xưởng đó — họ vẽ những gì họ đóng được, vật liệu họ có sẵn, chi phí vẽ đã nằm trong giá đồ.\n\nBộ hồ sơ nội thất độc lập trên ALN gồm: mặt bằng bố trí nội thất từng phòng, phối cảnh 3D các không gian chính, hồ sơ kỹ thuật chi tiết từng món đồ (kích thước, vật liệu, cấu tạo), chi tiết ốp trần–tường–sàn, sơ đồ điện nội thất (công tắc, đèn, ổ cắm theo vị trí đồ đạc), và bảng khối lượng.\n\nGiá trị lớn nhất: với hồ sơ này, chị mang đi báo giá 3–4 xưởng trên cùng một chuẩn — xưởng cạnh tranh giá cho chị, thay vì bị khóa vào một xưởng. Khoản chênh lệch khi so giá thường lớn hơn nhiều lần phí thiết kế." },
+    { asker: "Anh Hải · Dĩ An", by: P.phuc, best: true, hearts: 7, h: 6,
+      title: "Làm nội thất song song lúc xây hay xây xong mới tính?",
+      q: "Nhà em đang đổ móng. Vợ em nói xây xong rồi từ từ tính nội thất, nhưng em sợ lúc đó lại đập sửa. Kinh nghiệm các anh thế nào ạ?",
+      a: "Anh lo đúng rồi đấy. Câu trả lời của người làm nghề: thiết kế nội thất nên chốt trước khi xây xong phần thô — lý tưởng là ngay bây giờ, khi nhà anh mới đổ móng.\n\nLý do nằm ở những thứ 'chôn trong tường': vị trí ổ cắm, công tắc, đèn phải theo vị trí giường–tủ–sofa; máy lạnh cần chờ ống đồng và thoát nước; tivi treo tường cần chờ điện âm; bếp cần đúng vị trí cấp thoát nước và hút mùi; trần thạch cao giật cấp phải biết trước sơ đồ đèn. Xây xong mới thiết kế nội thất gần như chắc chắn phải đục tường đi lại điện nước.\n\nQuy trình chuẩn: chốt phương án nội thất ở mức bố trí + sơ đồ kỹ thuật NGAY trong lúc xây thô, còn chi tiết vật liệu, màu sắc thì thong thả sau. Nhà anh đang đổ móng là thời điểm vàng." },
+  ];
+
+  const CN_UID = "G4RhRH5ECMYcE9aFcKYVn5Wdy952"; // dùng uid CN thật làm tác giả câu hỏi mồi (denormalized)
+  const posts = fdb.collection(COL.posts);
+  let batch = fdb.batch();
+  let ops = 0;
+  const flush = async () => { if (ops) { await batch.commit(); batch = fdb.batch(); ops = 0; } };
+
+  // Bài ghim: Thể lệ chuyên mục (đứng tên Ban Cố Vấn ALN)
+  batch.set(posts.doc("hoikts_rules"), {
+    authorUid: P.bcv.uid, authorName: P.bcv.name, authorRole: "founder", authorRank: null, authorAvatar: "",
+    category: "hoi_kts", tag: null,
+    text: "THỂ LỆ CHUYÊN MỤC HỎI KTS MIỄN PHÍ\n\nĐây là nơi chủ nhà đặt câu hỏi về xây nhà, thiết kế, pháp lý xây dựng — và nhận câu trả lời từ KTS thật, có chứng chỉ hành nghề, hoàn toàn miễn phí.\n\nDành cho chủ nhà:\n- Cung cấp đủ thông tin (loại công trình, kích thước đất, số tầng, khoảng ngân sách, khu vực) để được tư vấn sát.\n- KHÔNG đăng số điện thoại, email, Zalo trong bài — hệ thống tự ẩn, bảo vệ anh chị khỏi môi giới mạo danh.\n- Tư vấn trên diễn đàn là sơ bộ, định hướng. Phương án cụ thể cần thực hiện qua dự án chính thức, nơi KTS ký tên chịu trách nhiệm.\n- Thấy câu trả lời hữu ích? Bấm tim — đó là lời cảm ơn thiết thực nhất.\n\nDành cho KTS:\n- Chỉ tài khoản KTS đã xác minh chứng chỉ mới được trả lời.\n- Trả lời với tinh thần tư vấn thật, đặt lợi ích chủ nhà lên trước. Hệ thống huy hiệu (Tân binh → Cố vấn → Chuyên gia ALN) ghi nhận điều đó.\n- KHÔNG chèo kéo trao đổi ngoài nền tảng, KHÔNG báo giá chi tiết trong phần trả lời (có thể nhắc đơn giá niêm yết công khai).\n\nKhi sẵn sàng đi xa hơn phần hỏi đáp: bấm \"Chọn KTS này làm dự án\" dưới câu trả lời của KTS anh chị tin tưởng — thông tin từ câu hỏi được chuyển sẵn sang dự án, thanh toán an toàn qua 4 giai đoạn có nghiệm thu.",
+    media: [], images: [], suggestedKts: [], aiSummary: null, aiSummaryAt: null,
+    heartCount: 12, heartedBy: [], pinned: true, hidden: false, status: "visible",
+    commentCount: 0, bestAnswerId: null, brief: null, seedContent: true,
+    createdAt: T(336), updatedAt: T(336),
+  });
+  ops++;
+
+  let n = 0;
+  for (let i = 0; i < QA.length; i++) {
+    const it = QA[i];
+    const pid = "hoikts_p" + String(i + 1).padStart(2, "0");
+    const cid = pid + "_a";
+    batch.set(posts.doc(pid), {
+      authorUid: CN_UID, authorName: it.asker, authorRole: "cn", authorRank: null, authorAvatar: "",
+      category: "hoi_kts", tag: null,
+      text: it.title + "\n\n" + it.q,
+      media: [], images: [], suggestedKts: [], aiSummary: null, aiSummaryAt: null,
+      heartCount: Math.max(0, it.hearts - 3), heartedBy: [],
+      pinned: false, hidden: false, status: "visible",
+      commentCount: 1, bestAnswerId: it.best ? cid : null, brief: null, seedContent: true,
+      createdAt: T(it.h), updatedAt: T(it.h - 1),
+    });
+    ops++;
+    batch.set(posts.doc(pid).collection("comments").doc(cid), {
+      authorUid: it.by.uid, authorName: it.by.name, authorRole: "kts", authorRank: it.by.badge, authorAvatar: "",
+      text: it.a, replyToId: null, isBestAnswer: !!it.best, flagged: false, status: "visible",
+      aiAssisted: false, heartCount: it.hearts, heartedBy: [], createdAt: T(it.h - 2),
+    });
+    ops++;
+    n++;
+    if (ops >= 400) await flush();
+  }
+  await flush();
+
+  return { ok: true, hoiKtsPosts: n, pinned: 1, note: "Seed Hỏi KTS Miễn Phí idempotent — ghi đè hoikts_*" };
 }
 
 /* ════════════════════════════════════════════

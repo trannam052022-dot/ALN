@@ -182,6 +182,11 @@ select.btn { appearance: auto; }
       <button class="btn primary" onclick="runSeed()" id="btnSeed"><i class="ph-duotone ph-plant"></i>Nạp dữ liệu mẫu</button>
     </div>
     <div class="tool-card">
+      <h3>💬 Nạp "Hỏi KTS Miễn Phí" (20 câu mồi)</h3>
+      <p>Tạo 20 câu hỏi chủ nhà + trả lời mẫu của KTS (persona Tuấn Lộc / Trần Long / Anh Tuấn / Minh Trí / Phan Phúc / Ban Cố Vấn) + 1 bài thể lệ ghim — để diễn đàn trông như đang hoạt động. Bật P2 để CN/DN xem được. Chạy lại an toàn (ghi đè hoikts_*).</p>
+      <button class="btn primary" onclick="runSeedHoiKts()" id="btnSeedHoiKts"><i class="ph-duotone ph-chats-teardrop"></i>Nạp 20 câu Hỏi KTS</button>
+    </div>
+    <div class="tool-card">
       <h3>📄 Tài liệu bàn giao</h3>
       <p>Checklist nghiệm thu P1.1→P2.6, trả lời 7 câu khảo sát, bản nháp rules và danh sách chuyển đổi nháp → thật nằm trong file <b>BAN_GIAO_DIEN_DAN.md</b> ở repo.</p>
     </div>
@@ -450,6 +455,15 @@ window.runSeed = async function(){
     showToast('🌱 Đã nạp dữ liệu mẫu: '+(res.data.posts||0)+' bài + comment + lead + invite + báo cáo');
   } catch(e){ showToast('Lỗi seed: '+(e.message||e)); }
   finally { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-plant"></i>Nạp dữ liệu mẫu'; }
+};
+window.runSeedHoiKts = async function(){
+  const btn = $('btnSeedHoiKts'); btn.disabled = true;
+  btn.innerHTML = '<i class="ph-duotone ph-spinner-gap"></i>Đang nạp...';
+  try {
+    const res = await callAdmin({ action: 'seedHoiKts' });
+    showToast('💬 Đã nạp '+(res.data.hoiKtsPosts||0)+' câu Hỏi KTS + thể lệ ghim. Bật P2 để CN/DN xem.');
+  } catch(e){ showToast('Lỗi seed: '+(e.message||e)); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-chats-teardrop"></i>Nạp 20 câu Hỏi KTS'; }
 };
 </script>
 </body>

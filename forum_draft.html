@@ -581,6 +581,7 @@ const callChooseKts = httpsCallable(fns, 'forumChooseKtsDraft');
 
 /* ════ CẤU HÌNH CHUYÊN MỤC (đồng bộ với forum_draft.js) ════ */
 const CATS = {
+  hoi_kts:      { label: 'Hỏi KTS Miễn Phí', icon: 'ph-hand-heart',  color: '#0f2c52' },
   hoi_dap:      { label: 'Hỏi đáp kỹ thuật', icon: 'ph-chats-circle', color: '#1d4ed8' },
   vat_lieu:     { label: 'Vật liệu & Giá',   icon: 'ph-package',      color: '#15803d' },
   showcase:     { label: 'Showcase',          icon: 'ph-image-square', color: '#b8860b' },
@@ -588,8 +589,8 @@ const CATS = {
   bang_tin:     { label: 'Bảng tin ALN',      icon: 'ph-megaphone',    color: '#dc2626' },
   tu_van_du_an: { label: 'Tư vấn Dự án',     icon: 'ph-house-line',   color: '#b45309' },
 };
-const OPEN_CATEGORIES = ['tu_van_du_an', 'showcase', 'bang_tin'];
-const KTS_POST_CATEGORIES = ['hoi_dap', 'vat_lieu', 'showcase', 'nghe'];
+const OPEN_CATEGORIES = ['hoi_kts', 'tu_van_du_an', 'showcase', 'bang_tin'];
+const KTS_POST_CATEGORIES = ['hoi_kts', 'hoi_dap', 'vat_lieu', 'showcase', 'nghe'];
 const ROLE_LABEL = { kts:'KTS', designer:'Designer', founder:'Founder ALN', cn:'Chủ nhà', dn:'Doanh nghiệp' };
 const BACK_BY_ROLE = { kts:'kts_dashboard.html', designer:'designer_dashboard.html', founder:'founder_panel.html', dn:'client_DN.html', cn:'client_CN.html' };
 const DISCLAIMER = 'Nội dung tư vấn trên diễn đàn là ý kiến tham khảo của cá nhân KTS, không phải hồ sơ thiết kế có chữ ký chủ trì theo NĐ 175/2024 và không thay thế hợp đồng dịch vụ. Mọi giao dịch qua sàn ALN mới được bảo vệ bởi Quy trình 4 bước.';
@@ -672,7 +673,7 @@ function postableCats(){
   if(!USER) return [];
   if(USER.role === 'founder') return Object.keys(CATS);
   if(USER.role === 'kts') return KTS_POST_CATEGORIES;
-  if((USER.role === 'cn' || USER.role === 'dn') && P2_ON) return ['tu_van_du_an'];
+  if((USER.role === 'cn' || USER.role === 'dn') && P2_ON) return ['hoi_kts', 'tu_van_du_an'];
   return [];
 }
 
@@ -1105,9 +1106,10 @@ function renderComment(p, c, isReply){
   const av = c.authorAvatar ? '<img src="'+escH(c.authorAvatar)+'">' : escH((c.authorName||'?')[0].toUpperCase());
   const isTuVan = catOf(p) === 'tu_van_du_an';
   const canMarkBest = !isReply && (p.authorUid === USER.uid || USER.role === 'founder') && !c.isBestAnswer && c.authorUid !== USER.uid;
-  const canInvite = isTuVan && c.authorRole === 'kts'
-    && (USER.role === 'cn' || USER.role === 'dn' || USER.role === 'founder')
-    && c.authorUid !== USER.uid;
+  const buyerRole = (USER.role === 'cn' || USER.role === 'dn' || USER.role === 'founder');
+  const canInvite = isTuVan && c.authorRole === 'kts' && buyerRole && c.authorUid !== USER.uid;
+  const canChoose = (isTuVan || catOf(p) === 'hoi_kts') && c.authorRole === 'kts'
+    && buyerRole && c.authorUid !== USER.uid && !p.chosenKts;
   const nameHtml = c.authorRole === 'kts'
     ? '<a href="kts_profile_draft.html?uid='+escH(c.authorUid)+'">'+escH(c.authorName)+'</a>'
     : escH(c.authorName);
@@ -1128,7 +1130,7 @@ function renderComment(p, c, isReply){
         + (canCommentHere(p) ? '<button class="cm-act" onclick="startReply(\''+(c.replyToId||c.id)+'\',\''+escH(c.authorName)+'\')">↩ Trả lời</button>' : '')
         + (canMarkBest ? '<button class="cm-act" onclick="markBest(\''+p.id+'\',\''+c.id+'\')" style="color:#3a7a3e">✔ Best Answer</button>' : '')
         + (canInvite ? '<button class="cm-act invite" onclick="inviteKts(\''+escH(c.authorUid)+'\',\''+p.id+'\')"><i class="ph-duotone ph-chats-circle"></i> Mời tư vấn</button>' : '')
-        + ((canInvite && !p.chosenKts) ? '<button class="cm-act choose" onclick="openChoose(\''+escH(c.authorUid)+'\',\''+escH(c.authorName||'KTS')+'\')"><i class="ph-duotone ph-handshake"></i> Chọn KTS này làm dự án</button>' : '')
+        + (canChoose ? '<button class="cm-act choose" onclick="openChoose(\''+escH(c.authorUid)+'\',\''+escH(c.authorName||'KTS')+'\')"><i class="ph-duotone ph-handshake"></i> Chọn KTS này làm dự án</button>' : '')
         + (USER.role==='founder' && isTuVan && c.authorRole==='kts' && !p.firstAnswerRewarded
             ? '<button class="cm-act" onclick="rewardFirst(\''+p.id+'\',\''+c.id+'\')" style="color:var(--gold)">⭐ Thưởng trả lời đầu ×2</button>' : '')
         + '<button class="cm-act" onclick="openReport(\'comment\',\''+p.id+'\',\''+c.id+'\')">⚑</button>'
@@ -1250,7 +1252,7 @@ window.confirmChoose = async function(){
   if(!chooseTarget) return;
   const btn = $('chooseConfirmBtn'); btn.disabled = true;
   try {
-    await callChooseKts({ threadId: openThreadId, ktsUid: chooseTarget.ktsUid });
+    await callChooseKts({ threadId: openThreadId, ktsUid: chooseTarget.ktsUid, ktsName: chooseTarget.ktsName });
     closeChoose();
     showToast('🎯 Đã chọn KTS làm dự án! KTS sẽ nhận thông báo — trao đổi tiếp & vào Quy trình 4 bước (C1→C4) qua kênh chat sàn ALN.');
   } catch(e){ showToast('Lỗi: ' + fnErr(e)); }
