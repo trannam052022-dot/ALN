@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Diễn đàn ALN</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/>
 <link rel="stylesheet" href="aln-tokens.css">
 <style>
@@ -335,6 +335,39 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 .veil-spin { width: 34px; height: 34px; border: 3px solid var(--border2); border-top-color: var(--gold); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .veil-text { font-family: var(--serif); font-size: var(--text-md); color: var(--sub); font-style: italic; text-align: center; }
+
+/* ── PASS 4: khách vãng lai ── */
+/* Tab chuyên mục KTS-only bị khóa với khách */
+.ftab.locked { opacity:.72; cursor:pointer; }
+.ftab.locked .lock-i { color:var(--gold); margin-right:2px; }
+.ftab.locked:hover { opacity:1; border-color:var(--gold); }
+/* Link đăng nhập/đăng ký trên thanh top cho khách */
+.tb-guest { display:inline-flex; align-items:center; gap:8px; }
+.tb-guest .g-login { font-family:var(--sans); font-size:var(--text-xs); font-weight:600; color:var(--text2); cursor:pointer; text-decoration:none; }
+.tb-guest .g-login:hover { color:var(--gold); }
+.tb-guest .g-reg { font-family:var(--syne); font-size:var(--text-xs); font-weight:700; letter-spacing:.02em; padding:6px 15px; border-radius:99px; color:#1a1400; background:linear-gradient(135deg,var(--gold2),var(--gold)); text-decoration:none; box-shadow:0 3px 10px rgba(152,105,10,.22); }
+/* CTA đăng nhập trong ô bình luận (khách) */
+.guest-cta { margin-top:12px; padding:14px 16px; border-radius:var(--r-sm); background:var(--gold-bg); border:1px dashed rgba(152,105,10,.4); text-align:center; }
+.guest-cta p { font-size:var(--text-sm); color:var(--text2); margin-bottom:10px; }
+.guest-cta button { font-family:var(--syne); font-size:var(--text-xs); font-weight:700; padding:8px 20px; border-radius:99px; border:none; cursor:pointer; color:#1a1400; background:linear-gradient(135deg,var(--gold2),var(--gold)); box-shadow:0 3px 10px rgba(152,105,10,.22); }
+/* Huy hiệu vai trò cạnh tên (đã đăng nhập) */
+#tbRole { font-family:var(--syne); font-size:var(--text-2xs); font-weight:700; letter-spacing:.02em; padding:1px 8px; border-radius:99px; margin-left:2px; }
+
+/* ── Modal đăng nhập/đăng ký (brand công khai: navy + gold, Be Vietnam Pro) ── */
+#loginModal { position:fixed; inset:0; z-index:1200; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(6,18,36,.68); backdrop-filter:blur(3px); font-family:'Be Vietnam Pro', sans-serif; }
+#loginModal.open { display:flex; }
+.lm-box { width:100%; max-width:420px; background:#0f2c52; border:1px solid rgba(212,160,23,.35); border-radius:18px; padding:30px 28px 26px; box-shadow:0 24px 70px rgba(4,12,26,.6); text-align:center; position:relative; }
+.lm-close { position:absolute; top:14px; right:16px; background:none; border:none; color:#8fa6c4; font-size:22px; line-height:1; cursor:pointer; }
+.lm-close:hover { color:#fff; }
+.lm-logo { width:52px; height:52px; margin:0 auto 14px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-family:'Be Vietnam Pro',sans-serif; font-weight:700; font-size:20px; letter-spacing:.04em; color:#0f2c52; background:linear-gradient(135deg,#e2c06a,#d4a017); }
+.lm-title { font-size:20px; font-weight:700; color:#fff; margin-bottom:8px; line-height:1.3; }
+.lm-sub { font-size:14px; color:#b9c9de; line-height:1.6; margin-bottom:22px; }
+.lm-btn-primary { display:block; width:100%; padding:13px; border-radius:11px; border:none; cursor:pointer; font-family:'Be Vietnam Pro',sans-serif; font-weight:700; font-size:15px; color:#0f2c52; background:linear-gradient(135deg,#e2c06a,#d4a017); box-shadow:0 6px 18px rgba(212,160,23,.3); margin-bottom:11px; text-decoration:none; }
+.lm-btn-primary:hover { filter:brightness(1.05); }
+.lm-btn-ghost { display:block; width:100%; padding:12px; border-radius:11px; cursor:pointer; font-family:'Be Vietnam Pro',sans-serif; font-weight:600; font-size:14px; color:#d4a017; background:transparent; border:1px solid rgba(212,160,23,.5); text-decoration:none; }
+.lm-btn-ghost:hover { background:rgba(212,160,23,.1); }
+.lm-note { margin-top:16px; font-size:12px; color:#7f96b4; line-height:1.5; }
+
 @media (max-width: 620px) {
   .bf-row { grid-template-columns: 1fr; }
   .cm-item.reply { margin-left: 20px; }
@@ -403,7 +436,11 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
     </div>
     <a class="tb-link" id="lnkAdmin" href="founder_forum.html" style="display:none"><i class="ph-duotone ph-shield-star"></i>Quản trị</a>
     <div class="tb-user" id="tbUser" style="display:none">
-      <div class="tb-avatar" id="tbAvatar"></div><span id="tbName"></span>
+      <div class="tb-avatar" id="tbAvatar"></div><span id="tbName"></span><span id="tbRole" style="display:none"></span>
+    </div>
+    <div class="tb-guest" id="tbGuest" style="display:none">
+      <a class="g-login" onclick="requireLogin()">Đăng nhập</a>
+      <a class="g-reg" href="register.html">Đăng ký miễn phí</a>
     </div>
     <a class="tb-link" id="tbBack" href="#"><i class="ph-duotone ph-arrow-left"></i>Dashboard</a>
     <button class="btn-post" id="btnPost" style="display:none" onclick="openPostModal()">
@@ -429,6 +466,19 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 <div class="feed-wrap">
   <div id="feedList">
     <div class="empty-state"><i class="ph-duotone ph-spinner-gap"></i><p>Đang tải diễn đàn...</p></div>
+  </div>
+</div>
+
+<!-- ══ MODAL ĐĂNG NHẬP (khách vãng lai) ══ -->
+<div id="loginModal" onclick="if(event.target===this)closeLoginModal()">
+  <div class="lm-box">
+    <button class="lm-close" onclick="closeLoginModal()">✕</button>
+    <div class="lm-logo">ALN</div>
+    <div class="lm-title" id="lmTitle">Đăng nhập hoặc tạo tài khoản miễn phí để đặt câu hỏi cho KTS</div>
+    <div class="lm-sub">Miễn phí — hỏi trực tiếp Kiến trúc sư đã xác minh, xem giá vật liệu, theo dõi công trình thực tế.</div>
+    <a class="lm-btn-primary" id="lmRegBtn" href="register.html">Đăng ký miễn phí</a>
+    <a class="lm-btn-ghost" id="lmLoginBtn" href="login.html">Tôi đã có tài khoản — Đăng nhập</a>
+    <div class="lm-note">Bạn vẫn đọc được các chủ đề công khai mà không cần đăng nhập.</div>
   </div>
 </div>
 
@@ -651,16 +701,23 @@ function fnErr(e){
   return msg.replace(/^(functions\/|Firebase: )/i, '');
 }
 
+/* Khách vãng lai (chưa đăng nhập) — dùng USER sentinel role 'guest' */
+function isGuest(){ return !USER || USER.role === 'guest'; }
+/* 4 chuyên mục categoryVisibility=='public' — khớp CATEGORY_VISIBILITY ở functions/forum.js */
+const PUBLIC_CATEGORIES = ['hoi_kts', 'tu_van_du_an', 'showcase', 'bang_tin'];
+/* 3 chuyên mục KTS-only vĩnh viễn — khách thấy tên nhưng khóa nội dung */
+const GUEST_LOCKED_CATEGORIES = ['hoi_dap', 'vat_lieu', 'nghe'];
+
 /* Chuyên mục user hiện tại XEM được */
 function viewableCats(){
-  if(!USER) return [];
+  if(isGuest()) return PUBLIC_CATEGORIES;
   if(USER.role === 'founder' || USER.role === 'kts') return Object.keys(CATS);
   if((USER.role === 'cn' || USER.role === 'dn') && P2_ON) return OPEN_CATEGORIES;
   return [];
 }
 /* Chuyên mục user hiện tại ĐĂNG được */
 function postableCats(){
-  if(!USER) return [];
+  if(isGuest()) return [];
   if(USER.role === 'founder') return Object.keys(CATS);
   if(USER.role === 'kts') return KTS_POST_CATEGORIES;
   if((USER.role === 'cn' || USER.role === 'dn') && P2_ON) return ['hoi_kts', 'tu_van_du_an'];
@@ -669,7 +726,7 @@ function postableCats(){
 
 /* ════ AUTH + BOOT ════ */
 onAuthStateChanged(auth, async user => {
-  if(!user){ location.replace('login.html'); return; }
+  if(!user){ bootGuest(); return; }
   let snap = await getDoc(doc(db, 'users', user.uid));
   let profile;
   if(!snap.exists() && user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2'){
@@ -682,8 +739,11 @@ onAuthStateChanged(auth, async user => {
 
   USER = { uid: user.uid, role: profile.role, name: profile.name || '', avatar: profile.avatarUrl || '' };
   $('tbUser').style.display = 'flex';
+  $('tbGuest').style.display = 'none';
   $('tbName').textContent = USER.name;
   $('tbAvatar').innerHTML = USER.avatar ? '<img src="'+escH(USER.avatar)+'">' : escH((USER.name||'?')[0].toUpperCase());
+  setTbRole(USER.role);
+  $('tbBack').style.display = 'inline-flex';
   $('tbBack').href = BACK_BY_ROLE[USER.role] || 'login.html';
   $('authVeil').remove();
 
@@ -705,6 +765,57 @@ onAuthStateChanged(auth, async user => {
     bootForRole();
   }, () => { P2_ON = false; updateP2Switch(); bootForRole(); });
 });
+
+/* Khách vãng lai: KHÔNG nghe forumConfig/flags (rules chặn → sẽ lỗi), P2 coi như tắt */
+function bootGuest(){
+  USER = { uid: null, role: 'guest', name: '', avatar: '', guest: true };
+  P2_ON = false;
+  $('tbUser').style.display = 'none';
+  $('tbGuest').style.display = 'inline-flex';
+  $('tbBack').style.display = 'none';   // khách chưa có dashboard để quay lại
+  const av = $('authVeil'); if(av) av.remove();
+  bootForRole();
+  $('btnPost').style.display = 'inline-flex';   // vẫn hiện (bấm → modal đăng nhập)
+}
+
+/* Huy hiệu vai trò cạnh tên (đã đăng nhập) */
+function setTbRole(role){
+  const el = $('tbRole'); if(!el) return;
+  const isKts = role === 'kts';
+  el.textContent = isKts ? '✓ KTS đã xác minh' : (ROLE_LABEL[role] || role);
+  el.style.color = isKts ? 'var(--gold)' : 'var(--sub)';
+  el.style.background = isKts ? 'var(--gold-bg)' : 'var(--cream2)';
+  el.style.border = '1px solid ' + (isKts ? 'rgba(152,105,10,.35)' : 'var(--border)');
+  el.style.display = 'inline-flex';
+}
+
+/* Modal đăng nhập cho khách — lưu thread + vị trí để quay lại sau khi đăng nhập */
+window.requireLogin = function(){
+  try {
+    sessionStorage.setItem('forumReturn', JSON.stringify({
+      thread: openThreadId || null, scroll: window.scrollY || 0, t: Date.now()
+    }));
+  } catch(e){}
+  $('loginModal').classList.add('open');
+};
+window.closeLoginModal = function(){ $('loginModal').classList.remove('open'); };
+
+/* Mở lại thread từ ?thread=ID hoặc từ sessionStorage sau khi đăng nhập (≤30 phút) */
+let _deepLinkDone = false;
+function maybeOpenDeepLink(){
+  if(_deepLinkDone) return;
+  _deepLinkDone = true;
+  let tid = null;
+  try { tid = new URL(location.href).searchParams.get('thread'); } catch(e){}
+  if(!tid){
+    try {
+      const r = JSON.parse(sessionStorage.getItem('forumReturn') || 'null');
+      if(r && r.thread && (Date.now() - (r.t || 0) < 30*60000)) tid = r.thread;
+    } catch(e){}
+  }
+  try { sessionStorage.removeItem('forumReturn'); } catch(e){}
+  if(tid) openThread(tid);
+}
 
 function updateP2Switch(){
   const sw = $('p2Switch');
@@ -728,6 +839,7 @@ function bootForRole(){
   $('btnPost').style.display = postableCats().length ? 'inline-flex' : 'none';
   renderTabs();
   subscribePosts();
+  maybeOpenDeepLink();
 }
 
 function renderGate(icon, title, msg){
@@ -744,6 +856,14 @@ function renderTabs(){
     html += '<button class="ftab'+(FILTER===c?' active':'')+'" onclick="setFilter(\''+c+'\')">'
       + '<i class="ph-duotone '+m.icon+'"></i>' + escH(m.label) + '</button>';
   });
+  /* Khách: hiện tên 3 chuyên mục KTS-only kèm ổ khóa — bấm ra modal đăng nhập */
+  if(isGuest()){
+    GUEST_LOCKED_CATEGORIES.forEach(c => {
+      const m = CATS[c];
+      html += '<button class="ftab locked" onclick="requireLogin()" title="Chỉ KTS đã xác minh — đăng nhập để xem">'
+        + '<i class="ph-duotone ph-lock-simple lock-i"></i>' + escH(m.label) + '</button>';
+    });
+  }
   $('catTabs').innerHTML = html;
   $('tuvanDisclaimer').style.display = FILTER === 'tu_van_du_an' ? 'block' : 'none';
 }
@@ -755,7 +875,14 @@ window.setFilter = function(f){
 function subscribePosts(){
   if(postsUnsub) postsUnsub();
   let q;
-  if(USER.role === 'founder' || USER.role === 'kts'){
+  if(isGuest()){
+    /* Khách: chỉ đọc bài public+visible+không ẩn (khớp rules); nhiều == + sort client-side
+       → Firestore dùng single-field index (zigzag), KHÔNG cần composite index mới */
+    q = query(collection(db, 'forumPosts'),
+      where('categoryVisibility', '==', 'public'),
+      where('status', '==', 'visible'),
+      where('hidden', '==', false));
+  } else if(USER.role === 'founder' || USER.role === 'kts'){
     q = query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc'));
   } else {
     /* CN/DN: bắt buộc lọc category để qua rules; sort client-side (tránh cần composite index) */
@@ -905,6 +1032,7 @@ window.toggleP2 = async function(){
 
 /* ════ ĐĂNG BÀI ════ */
 window.openPostModal = function(){
+  if(isGuest()){ requireLogin(); return; }
   const cats = postableCats();
   if(!cats.length){ showToast('Vai trò của bạn chưa đăng bài được'); return; }
   selectedCat = cats[0];
@@ -1009,10 +1137,18 @@ window.openThread = function(pid){
   $('threadModal').classList.add('open');
   renderThread();
   if(commentsUnsub) commentsUnsub();
-  const cq = query(collection(db, 'forumPosts', pid, 'comments'), orderBy('createdAt', 'asc'));
+  /* Khách: chỉ đọc comment public+visible (khớp rules), sort client-side; đăng nhập: như cũ */
+  const cq = isGuest()
+    ? query(collection(db, 'forumPosts', pid, 'comments'),
+        where('categoryVisibility', '==', 'public'), where('status', '==', 'visible'))
+    : query(collection(db, 'forumPosts', pid, 'comments'), orderBy('createdAt', 'asc'));
   commentsUnsub = onSnapshot(cq, snap => {
     threadComments = [];
     snap.forEach(d => threadComments.push(Object.assign({ id: d.id }, d.data())));
+    if(isGuest()){
+      const cms = t => (t && t.seconds) || 0;
+      threadComments.sort((a, b) => cms(a.createdAt) - cms(b.createdAt));
+    }
     renderThread();
   }, err => console.warn('[forum comments]', err.message));
 };
@@ -1131,6 +1267,10 @@ function renderComment(p, c, isReply){
 }
 
 function renderComposer(p){
+  if(isGuest()){
+    return '<div class="guest-cta"><p>Đăng nhập hoặc tạo tài khoản miễn phí để đặt câu hỏi cho KTS.</p>'
+      + '<button onclick="requireLogin()"><i class="ph-duotone ph-chat-circle-dots"></i> Đăng nhập để bình luận</button></div>';
+  }
   if(!canCommentHere(p)){
     if((USER.role === 'cn' || USER.role === 'dn') && P2_ON){
       return '<div style="font-size:var(--text-2xs);color:var(--muted);margin-top:10px">Bạn chỉ bình luận được trong thread do mình tạo (chuyên mục Tư vấn Dự án).</div>';
@@ -1171,6 +1311,7 @@ window.liveCmFilter = function(){
 /* ════ DIỄN ĐÀN THÔNG MINH (client) ════ */
 /* Tóm tắt AI thread dài (server cache để tiết kiệm) */
 window.summarizeThread = async function(pid){
+  if(isGuest()){ requireLogin(); return; }
   const box = $('aiSummaryBox'); if(!box) return;
   box.style.display = 'block';
   box.innerHTML = '<div class="ai-tag"><i class="ph-duotone ph-circle-notch"></i> Đang tóm tắt…</div>';
@@ -1309,9 +1450,11 @@ window.submitComment = async function(pid){
 
 /* ════ ACTIONS ════ */
 window.heartPost = async function(pid){
+  if(isGuest()){ requireLogin(); return; }
   try { await callHeart({ postId: pid }); } catch(e){ showToast('Lỗi: '+fnErr(e)); }
 };
 window.heartComment = async function(pid, cid){
+  if(isGuest()){ requireLogin(); return; }
   try { await callHeart({ postId: pid, commentId: cid }); } catch(e){ showToast('Lỗi: '+fnErr(e)); }
 };
 window.markBest = async function(pid, cid){
@@ -1353,6 +1496,7 @@ const RP_OPTIONS = [
   { key:'khac',     label:'Lý do khác' },
 ];
 window.openReport = function(targetType, postId, commentId){
+  if(isGuest()){ requireLogin(); return; }
   reportTarget = { targetType, postId, commentId: commentId || null };
   reportReason = 'lach_san';
   $('rpReasons').innerHTML = RP_OPTIONS.map(o =>
