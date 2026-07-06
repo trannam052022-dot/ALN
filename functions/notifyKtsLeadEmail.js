@@ -94,7 +94,7 @@ exports.notifyKtsLeadEmail = onDocumentCreated(
 
     const regionN = norm(lead.region);
     const targets = ktsSnap.docs.map((d) => d.data()).filter((k) => {
-      if (!k.email) return false;
+      if (!k.email || /@aln\.vn$/i.test(k.email)) return false;   // bỏ email ảo (KTS chưa có email thật)
       const provs = Array.isArray(k.serviceProvinces) && k.serviceProvinces.length
         ? k.serviceProvinces
         : (k.homeProvince ? [k.homeProvince] : []);

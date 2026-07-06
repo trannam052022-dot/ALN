@@ -2058,3 +2058,6 @@ exports.projectSlaNudge = functions
 
 /* ── DIỄN ĐÀN ALN — callable + cron, xem functions/forum.js ── */
 Object.assign(exports, require("./forum"));
+
+/* ── Email báo lead khu vực cho KTS (opt-in nhanLeadEmail), xem functions/notifyKtsLeadEmail.js ── */
+exports.notifyKtsLeadEmail = require("./notifyKtsLeadEmail").notifyKtsLeadEmail;

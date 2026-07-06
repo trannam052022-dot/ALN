@@ -902,6 +902,7 @@ window._doSubmit = async function() {
       province: provHome,
       homeProvince: provHome,
       serviceProvinces: provWork.length ? provWork : [provHome],
+      nhanLeadEmail: true,   // nhận email báo dự án mới trong khu vực (tắt được ở hồ sơ KTS)
       status: 'pending', plan: 'free', credits: {}, createdAt: serverTimestamp()
     });
     await setDoc(doc(db, 'ktsApplications', uid), {
