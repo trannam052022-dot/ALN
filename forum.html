@@ -17,6 +17,10 @@
 <meta name="twitter:title" content="Diễn đàn ALN — Hỏi Kiến trúc sư miễn phí">
 <meta name="twitter:description" content="Hỏi đáp trực tiếp với KTS đã xác minh, xem giá vật liệu & công trình thực tế.">
 <meta name="twitter:image" content="https://applamnha.vn/assets/demo/aln-demo-biet-thu-vuon.jpg">
+<!-- JSON-LD structured data (baseline; JS cập nhật động theo thread đang mở) -->
+<script type="application/ld+json" id="forumJsonLd">
+{"@context":"https://schema.org","@type":"WebPage","name":"Diễn đàn ALN — Hỏi Kiến trúc sư miễn phí","url":"https://applamnha.vn/forum.html","description":"Hỏi đáp trực tiếp với Kiến trúc sư đã xác minh, xem giá vật liệu, showcase công trình thực tế. Đọc công khai, miễn phí.","inLanguage":"vi","publisher":{"@type":"Organization","name":"ALN — App Làm Nhà","url":"https://applamnha.vn"}}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/>
 <link rel="stylesheet" href="aln-tokens.css">
@@ -1181,7 +1185,9 @@ window.closeThread = function(){
    Host tĩnh không SSR nên FB/Zalo (không chạy JS) chỉ thấy thẻ mặc định; nhưng link
    ?thread=ID chia sẻ được (tự mở lại thread) và Google (chạy JS) index được từng thread. */
 const _DEFAULT_TITLE = document.title;
+const _BASELINE_JSONLD = ((document.getElementById('forumJsonLd') || {}).textContent) || '';
 function _setMeta(sel, val){ const el = document.querySelector(sel); if(el) el.setAttribute('content', val); }
+function _setJsonLd(obj){ const el = document.getElementById('forumJsonLd'); if(el) el.textContent = JSON.stringify(obj); }
 function updateThreadMeta(pid){
   const p = ALL_POSTS.find(x => x.id === pid);
   const url = 'https://applamnha.vn/forum.html?thread=' + encodeURIComponent(pid);
@@ -1201,6 +1207,19 @@ function updateThreadMeta(pid){
   _setMeta('meta[name="twitter:title"]', title);
   _setMeta('meta[name="twitter:description"]', desc);
   _setMeta('meta[name="twitter:image"]', img);
+  // JSON-LD DiscussionForumPosting cho thread (rich result Google) — khớp bài thật ALN
+  const ld = {
+    '@context': 'https://schema.org', '@type': 'DiscussionForumPosting',
+    headline: title, articleBody: raw.slice(0, 500), url: url, inLanguage: 'vi',
+    author: { '@type': 'Person', name: p.authorName || 'Thành viên ALN' },
+    interactionStatistic: [
+      { '@type': 'InteractionCounter', interactionType: 'https://schema.org/CommentAction', userInteractionCount: p.commentCount || 0 },
+      { '@type': 'InteractionCounter', interactionType: 'https://schema.org/LikeAction', userInteractionCount: p.heartCount || 0 },
+    ],
+  };
+  if (p.createdAt && p.createdAt.seconds) ld.datePublished = new Date(p.createdAt.seconds * 1000).toISOString();
+  if (p.media && p.media[0] && p.media[0].type !== 'video' && p.media[0].url) ld.image = p.media[0].url;
+  _setJsonLd(ld);
 }
 function resetForumMeta(){
   document.title = _DEFAULT_TITLE;
@@ -1209,6 +1228,7 @@ function resetForumMeta(){
   _setMeta('meta[property="og:description"]', 'Hỏi đáp trực tiếp với KTS đã xác minh, xem giá vật liệu & công trình thực tế. Đọc công khai, miễn phí.');
   _setMeta('meta[property="og:url"]', 'https://applamnha.vn/forum.html');
   _setMeta('meta[property="og:image"]', 'https://applamnha.vn/assets/demo/aln-demo-biet-thu-vuon.jpg');
+  const el = document.getElementById('forumJsonLd'); if(el && _BASELINE_JSONLD) el.textContent = _BASELINE_JSONLD;
 }
 
 function canCommentHere(p){
