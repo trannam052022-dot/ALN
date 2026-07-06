@@ -622,8 +622,11 @@ async function exportImg(fmt, btn) {
     }
     const canvas = await html2canvas(board, {
       scale: 3,
-      allowTaint: true,
-      useCORS: false,
+      // useCORS + allowTaint:false → tải ảnh remote (logo) kèm CORS nên canvas KHÔNG
+      // bị nhiễm; nếu host ảnh thiếu CORS thì html2canvas bỏ qua ảnh đó chứ không làm
+      // hỏng cả canvas (trước đây allowTaint:true khiến toBlob/toDataURL thất bại).
+      allowTaint: false,
+      useCORS: true,
       backgroundColor: '#080C14',
       logging: false,
       imageTimeout: 0,
@@ -800,7 +803,9 @@ onAuthStateChanged(auth, async u => {
       if (c.logoUrl) {
         ['logo-side-img','logo-ft-img'].forEach(function(id) {
           const img = document.getElementById(id);
-          if (img) { img.src = c.logoUrl; img.style.display = 'block'; }
+          // crossOrigin trước khi gán src → ảnh remote tải kèm CORS, không nhiễm canvas
+          // lúc html2canvas export. Phải đặt TRƯỚC src để không dính bản cache non-CORS.
+          if (img) { img.crossOrigin = 'anonymous'; img.src = c.logoUrl; img.style.display = 'block'; }
         });
         const txt = document.getElementById('logo-side-txt');
         if (txt) txt.style.display = 'none';
@@ -834,7 +839,7 @@ window.submitBoardPA = async function(btn) {
 
   try {
     const canvas = await html2canvas(board, {
-      scale: 3, allowTaint: true, useCORS: false,
+      scale: 3, allowTaint: false, useCORS: true,
       backgroundColor: '#080C14', logging: false, imageTimeout: 0
     });
     status.textContent = 'Đang upload lên hệ thống...';
