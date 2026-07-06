@@ -1,4 +1,16 @@
 User-agent: *
 Allow: /
 
+# Trang nội bộ / cần đăng nhập — không index (khu KTS/DN/Founder, công cụ)
+Disallow: /founder_panel.html
+Disallow: /founder_forum.html
+Disallow: /kts_dashboard.html
+Disallow: /designer_dashboard.html
+Disallow: /ks_dashboard.html
+Disallow: /client_CN.html
+Disallow: /client_DN.html
+Disallow: /board-editor.html
+Disallow: /seed.html
+Disallow: /ALN_MatranKy_KhungBV.html
+
 Sitemap: https://applamnha.vn/sitemap.xml

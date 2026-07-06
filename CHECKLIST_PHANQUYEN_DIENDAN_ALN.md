@@ -230,7 +230,16 @@ pending/rejected ghi stages → DENY, KTS active → PASS.
 
 ---
 
-## PASS 5 — SEO & chia sẻ (chỉ có ý nghĩa khi đã mở public)
+## PASS 5 — SEO & chia sẻ ✅ MỨC A XONG (06/07/2026 — chờ merge)
+
+> Host tĩnh GitHub Pages → KHÔNG SSR. Đã làm **Mức A**: `robots.txt` chặn trang nội bộ +
+> cho crawl forum; `sitemap.xml` thêm `forum.html`; `forum.html` có OG/meta mặc định + JS
+> cập nhật `<title>`/OG động + `history.replaceState(?thread=ID)` khi mở thread (link chia sẻ
+> được, Google render JS index được từng thread).
+> ⚠️ Mức B (phiên sau): thẻ FB/Zalo per-thread thật (cần prerender bot); sitemap per-thread
+> (build đọc Firestore); submit Google Search Console (user tự làm).
+
+### (đề gốc — tham khảo)
 
 - [ ] Mỗi thread có URL riêng dạng `/dien-dan/{category-slug}/{thread-slug}-{id}`.
 - [ ] Server-side render hoặc pre-render meta tags cho thread public:
