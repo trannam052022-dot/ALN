@@ -1275,7 +1275,16 @@ async function seedForumData() {
 
   const now = Date.now();
   const T = (hoursAgo) => Timestamp.fromMillis(now - hoursAgo * 3600 * 1000);
-  const img = (seed) => ({ url: "https://picsum.photos/seed/" + seed + "/900/640", type: "image" });
+  // Ảnh demo ALN thật (đã deploy) — đẹp & liên quan chủ đề, thay ảnh ngẫu nhiên picsum.
+  const IMGMAP = {
+    alnvl1:  "aln-demo-office-tower.jpg",       // vật liệu/giá — bối cảnh công trình
+    alnsc1:  "aln-demo-villa-tancodien.jpg",    // showcase biệt thự Tân Cổ Điển
+    alnsc2:  "aln-demo-biet-thu-vuon.jpg",      // showcase biệt thự vườn
+    alnsc3:  "aln-demo-biet-thu-vuon.jpg",      // showcase nhà phố/giếng trời
+    alnold1: "aln-demo-office-tower.jpg",       // công trình mái dốc
+  };
+  const imgUrl = (seed) => "https://applamnha.vn/assets/demo/" + (IMGMAP[seed] || "aln-demo-biet-thu-vuon.jpg");
+  const img = (seed) => ({ url: imgUrl(seed), type: "image" });
 
   const base = {
     heartCount: 0, heartedBy: [], pinned: false, hidden: false,
@@ -1334,7 +1343,7 @@ async function seedForumData() {
   batch1.set(posts.doc("draft_p03"), Object.assign({}, base, ktsAuthor, {
     category: "vat_lieu",
     text: "Cập nhật giá gạch không nung khu vực Bình Dương tháng 7/2026: gạch block 390x190x190 dao động 12.5k–13.8k/viên tại bãi, tăng nhẹ ~4% so với quý trước. Anh em khu vực khác cập nhật giúp để có mặt bằng chung.",
-    media: [img("alnvl1")], images: ["https://picsum.photos/seed/alnvl1/900/640"],
+    media: [img("alnvl1")], images: [imgUrl("alnvl1")],
     heartCount: 1, heartedBy: [FOUNDER_UID],
     commentCount: 1, createdAt: T(26), updatedAt: T(24),
   }));
@@ -1357,7 +1366,7 @@ async function seedForumData() {
     category: "showcase",
     text: "Biệt thự vườn Tân Cổ Điển tại Thủ Đức vừa hoàn thiện phần thô — nhịp cột đôi sảnh chính và vòm cong tầng 2 là hai chi tiết mất nhiều công nhất. Cảm ơn đội thi công đã theo sát bản vẽ từng cm.",
     media: [img("alnsc1"), img("alnsc2")],
-    images: ["https://picsum.photos/seed/alnsc1/900/640", "https://picsum.photos/seed/alnsc2/900/640"],
+    images: [imgUrl("alnsc1"), imgUrl("alnsc2")],
     pinned: true, pinRewarded: true,
     heartCount: 4, heartedBy: [FOUNDER_UID, CN_UID, DN_UID, "seed_x"],
     commentCount: 0, createdAt: T(70), updatedAt: T(70),
@@ -1365,7 +1374,7 @@ async function seedForumData() {
   batch1.set(posts.doc("draft_p06"), Object.assign({}, base, ktsAuthor, {
     category: "showcase",
     text: "Góc cầu thang giếng trời nhà phố 4x16m — ánh sáng tự nhiên đủ cho cả 3 tầng giữa, không cần đèn ban ngày. Giải pháp lam gỗ chắn nắng hướng Tây hoạt động tốt hơn kỳ vọng.",
-    media: [img("alnsc3")], images: ["https://picsum.photos/seed/alnsc3/900/640"],
+    media: [img("alnsc3")], images: [imgUrl("alnsc3")],
     heartCount: 2, heartedBy: [FOUNDER_UID, CN_UID],
     commentCount: 0, createdAt: T(18), updatedAt: T(18),
   }));
@@ -1427,7 +1436,7 @@ async function seedForumData() {
   const p10 = Object.assign({}, base, ktsAuthor, {
     tag: "arch",
     text: "(Bài dạng CŨ — chỉ có tag, chưa có category — để kiểm tra migration hiển thị như Showcase) Hoàng hôn trên công trình mái dốc hôm nay.",
-    media: [img("alnold1")], images: ["https://picsum.photos/seed/alnold1/900/640"],
+    media: [img("alnold1")], images: [imgUrl("alnold1")],
     heartCount: 1, heartedBy: [FOUNDER_UID],
     commentCount: 0, createdAt: T(200), updatedAt: T(200),
   });
