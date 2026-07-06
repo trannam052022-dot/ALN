@@ -139,25 +139,49 @@
 
 ---
 
-## PASS 3 — Chuẩn hóa role trong `users/{uid}` & Xác minh KTS
+## PASS 3 — Chuẩn hóa role trong `users/{uid}` & Xác minh KTS ✅ XONG (06/07/2026) — CHỜ DEPLOY
 
 > Toàn hệ thống ALN dùng `users/{uid}.role` — KHÔNG chuyển sang custom claims.
 
-- [ ] Rà soát và chuẩn hóa giá trị `role` trong `users`: đúng tập
-      `'cn' | 'kts' | 'dn' | 'founder'` — không có giá trị lạ/viết hoa lệch.
-- [ ] Kiểm tra luồng gán role:
-  - [ ] CN đăng ký → `role: 'cn'` (mặc định)
-  - [ ] KTS được duyệt chứng chỉ (thao tác từ Founder Admin, qua Cloud Function
-        dùng Admin SDK) → cập nhật `role: 'kts'`
-  - [ ] DN được duyệt → `role: 'dn'`
-- [ ] Rules cho collection `users`: user thường KHÔNG được tự sửa trường `role`
-      của chính mình (chặn leo thang đặc quyền) — chỉ Admin SDK cập nhật được.
-      Đây là điều kiện tiên quyết để PASS 2 an toàn.
-- [ ] Trong Founder Admin: nút duyệt/gỡ xác minh KTS, ghi log ai duyệt, lúc nào.
-- [ ] Role đổi có hiệu lực ngay ở lần đọc rules kế tiếp (vì rules `get()` trực tiếp
-      từ users doc) — không cần refresh token.
+- [x] **Kéo lên làm TRƯỚC PASS 2** (theo chỉ đạo TRANNAM, vì rules PASS 2 tin tưởng
+      `users/{uid}.role`): `firestore.rules` — user thường KHÔNG tự sửa được `role`
+      của chính mình nữa (`request.resource.data.role == resource.data.role` bắt buộc
+      trừ khi `isFounder()`). Đã phát hiện đây là lỗ hổng CÓ THẬT (rules cũ cho phép
+      tự sửa mọi field kể cả role) — xem thêm phần "PHÁT HIỆN THÊM" dưới đây.
+- [x] Rà soát + chuẩn hóa giá trị `role`: thêm callable `founderNormalizeUsers`
+      (`functions/index.js`) — tự sửa role bị lệch hoa/thường hoặc thừa khoảng trắng
+      (vd `"KTS "` → `"kts"`) nếu sau chuẩn hoá khớp tập hợp lệ `cn|kts|dn|designer|ks|founder`;
+      role hoàn toàn lạ (không đoán được) → CHỈ liệt kê cho Founder tự xem, không tự sửa.
+      Nút "Chuẩn hoá dữ liệu users" trong `founder_forum.html` → Tools.
+- [x] Kiểm tra luồng gán role — **đã đúng từ trước, không cần sửa**: CN đăng ký
+      (`register.html`) → `role:'cn'` ngay; KTS/DN/Designer/KS nộp đơn → `role` đã đúng
+      từ lúc nộp (`kts-apply.html`... ghi `role:'kts'` ngay), chỉ `status:'pending'→'active'`
+      khi Founder duyệt (`founderApprovePending`, không đổi `role`) — khớp tinh thần
+      checklist dù cơ chế khác chữ (không phải "duyệt xong mới gán role qua Cloud Function").
+- [x] **MONETIZATION_KTS.md — chừa trường `plan:'free'`, `credits:{}`:** thêm vào cả
+      5 luồng tạo user (`register.html`, `kts-apply.html`, `dn-studio.html`,
+      `designer-apply.html`, `ks-apply.html`, `createUserByFounder`) cho user MỚI, và
+      `founderNormalizeUsers` backfill cho user CŨ (chỉ set nếu field chưa tồn tại,
+      không ghi đè). Đúng yêu cầu: chỉ chừa trường, không có logic/UI/rules gì thêm.
+- [~] **CHƯA làm:** "ghi log ai duyệt KTS, lúc nào" — `founderApprovePending` hiện không
+      ghi log riêng. Không nằm trong 3 việc TRANNAM chỉ đạo lần này (chuẩn hoá role +
+      chặn tự sửa role + chừa plan/credits) nên để lại, làm sau nếu cần.
+- [x] Role đổi hiệu lực ngay lần đọc rules kế tiếp — đúng, vì rules `get()` trực tiếp
+      từ `users` doc (không dùng custom claims), không cần refresh token.
 
-**Commit:** `feat(auth): chuẩn hóa role trong users doc + chặn tự sửa role`
+### ⚠️ PHÁT HIỆN THÊM (ngoài phạm vi 3 việc được giao — CẦN TRANNAM QUYẾT ĐỊNH)
+
+Đường ghi **`create`** của `users/{uid}` hiện chỉ kiểm `request.auth.uid == uid`,
+KHÔNG kiểm giá trị `role` gửi lên: `allow create: if signedIn() && request.auth.uid == uid;`.
+Về lý thuyết, ai đó bỏ qua giao diện đăng ký (gọi thẳng Firestore SDK) có thể tự tạo
+doc `users/{uid_của_mình}` với `role:'founder'` hoặc `role:'kts', status:'active'` ngay
+từ đầu — không qua được `isFounder()` (hardcoded UID) nên KHÔNG chiếm được quyền Founder
+thật, nhưng CÓ THỂ tự phong `kts`/`dn` active-ngay, bỏ qua bước Founder duyệt. Phạm vi
+sửa rộng hơn (5 trang đăng ký: `register.html`, `kts-apply.html`, `dn-studio.html`,
+`designer-apply.html`, `ks-apply.html`) nên CHƯA tự sửa trong phiên này — chờ TRANNAM
+quyết định có muốn siết luôn không.
+
+**Commit:** `07f1506` (chặn tự sửa role) + `<sẽ điền>` (chuẩn hoá role + plan/credits)
 
 ---
 

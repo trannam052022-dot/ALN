@@ -902,7 +902,7 @@ window._doSubmit = async function() {
       province: provHome,
       homeProvince: provHome,
       serviceProvinces: provWork.length ? provWork : [provHome],
-      status: 'pending', createdAt: serverTimestamp()
+      status: 'pending', plan: 'free', credits: {}, createdAt: serverTimestamp()
     });
     await setDoc(doc(db, 'ktsApplications', uid), {
       uid: uid, name: name, phone: phone, email: email || '',

@@ -443,6 +443,7 @@ async function doRegister(){
       role:      activeRole,
       email:     email,
       status:    activeRole === 'cn' ? 'active' : 'pending',
+      plan: 'free', credits: {},
       createdAt: fb.serverTimestamp(),
     });
 

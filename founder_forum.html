@@ -175,6 +175,11 @@ select.btn { appearance: auto; }
       <button class="btn primary" onclick="runBackfillVisibility()" id="btnBackfillVis"><i class="ph-duotone ph-globe"></i>Cập nhật categoryVisibility</button>
     </div>
     <div class="tool-card">
+      <h3>👤 Chuẩn hoá dữ liệu users (role/plan/credits)</h3>
+      <p>Rà soát toàn bộ <code>users/{uid}</code>: sửa role viết hoa/thừa khoảng trắng lệch chuẩn (không tự sửa role không nhận diện được — chỉ liệt kê cho Founder tự xem), chừa field <code>plan:'free'</code> / <code>credits:{}</code> cho tài khoản chưa có (chuẩn bị cho gói tiện ích KTS sau này — chưa có logic gì). Không phải riêng diễn đàn, dùng chung nút này cho tiện. Idempotent.</p>
+      <button class="btn primary" onclick="runNormalizeUsers()" id="btnNormUsers"><i class="ph-duotone ph-users-three"></i>Chuẩn hoá dữ liệu users</button>
+    </div>
+    <div class="tool-card">
       <h3>⚑ Giai đoạn P2 — mở diễn đàn cho CN/DN</h3>
       <p>Đang: <span class="p2-state" id="p2State">—</span>. Khi BẬT: CN/DN (active) xem được Tư vấn Dự án + Showcase + Bảng tin, đăng được mini-brief, mời KTS tư vấn. Chuyên mục Hỏi đáp / Vật liệu / Nghề vẫn KTS-only vĩnh viễn. Điều kiện khuyến nghị: ≥10 KTS active trực trả lời.</p>
       <button class="btn primary" onclick="toggleP2()" id="btnP2">Bật / Tắt P2</button>
@@ -216,6 +221,7 @@ import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/
 
 const fns = getFunctions(app, 'asia-southeast1');
 const callAdmin = httpsCallable(fns, 'forumAdmin');
+const callNormalizeUsers = httpsCallable(fns, 'founderNormalizeUsers');
 
 const $ = id => document.getElementById(id);
 function escH(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -488,6 +494,18 @@ window.runBackfillVisibility = async function(){
     showToast('🌐 Đã cập nhật: '+(d.updatedPosts||0)+'/'+(d.totalPosts||0)+' bài, '+(d.updatedComments||0)+' bình luận');
   } catch(e){ showToast('Lỗi: '+(e.message||e)); }
   finally { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-globe"></i>Cập nhật categoryVisibility'; }
+};
+window.runNormalizeUsers = async function(){
+  const btn = $('btnNormUsers'); btn.disabled = true;
+  btn.innerHTML = '<i class="ph-duotone ph-spinner-gap"></i>Đang chuẩn hoá...';
+  try {
+    const res = await callNormalizeUsers();
+    const d = res.data || {};
+    const anomalies = (d.anomalousRoles || []).length;
+    showToast('👤 '+d.totalUsers+' users — sửa role: '+d.fixedRoleCasing+', thêm plan: '+d.addedPlan+', thêm credits: '+d.addedCredits+(anomalies ? ', ⚠️ '+anomalies+' role lạ (xem console)' : ''));
+    if (anomalies) console.warn('[normalizeUsers] role lạ cần Founder tự xem:', d.anomalousRoles);
+  } catch(e){ showToast('Lỗi: '+(e.message||e)); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-users-three"></i>Chuẩn hoá dữ liệu users'; }
 };
 window.runSeed = async function(){
   const btn = $('btnSeed'); btn.disabled = true;

@@ -1764,6 +1764,7 @@ exports.createUserByFounder = onCall(
       await db.doc('users/' + userRecord.uid).set({
         username, name, role, email, phone: phone || '',
         status: 'active',
+        plan: 'free', credits: {},   // MONETIZATION_KTS.md — chỉ chừa trường, chưa có logic
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
         createdBy: 'founder'
       });
@@ -1772,6 +1773,48 @@ exports.createUserByFounder = onCall(
       if (e.code === 'auth/email-already-exists') throw new HttpsError("already-exists", "Username đã tồn tại");
       throw new HttpsError("internal", e.message);
     }
+  }
+);
+
+/* ── CHECKLIST_PHANQUYEN_DIENDAN_ALN.md PASS 3 — chuẩn hoá role trong users/{uid} +
+   chừa 2 trường plan/credits (MONETIZATION_KTS.md, chỉ chừa trường, chưa có logic).
+   Idempotent, chạy lại vô hại. Role không rõ (không nằm trong tập hợp lệ, kể cả sau
+   khi trim+lowercase) KHÔNG tự sửa — chỉ liệt kê để Founder tự xem xét bằng tay,
+   tránh đoán sai làm mất/nâng nhầm quyền của ai đó. */
+exports.founderNormalizeUsers = onCall(
+  { region: "asia-southeast1" },
+  async (request) => {
+    if (!request.auth) throw new HttpsError("unauthenticated", "Chưa đăng nhập");
+    const FOUNDER_UIDS = ['h4kEguPEyMcwJwl89stc0Q6j2si2'];
+    if (!FOUNDER_UIDS.includes(request.auth.uid)) throw new HttpsError("permission-denied", "Chỉ Founder");
+
+    const VALID_ROLES = ['cn', 'kts', 'dn', 'designer', 'ks', 'founder'];
+    const snap = await db.collection('users').get();
+    let fixedRoleCasing = 0, addedPlan = 0, addedCredits = 0;
+    const anomalousRoles = [];
+
+    for (const doc of snap.docs) {
+      const u = doc.data();
+      const update = {};
+
+      const rawRole = typeof u.role === 'string' ? u.role : '';
+      const normalizedRole = rawRole.trim().toLowerCase();
+      if (VALID_ROLES.includes(normalizedRole)) {
+        if (u.role !== normalizedRole) { update.role = normalizedRole; fixedRoleCasing++; }
+      } else {
+        anomalousRoles.push({ uid: doc.id, role: u.role === undefined ? null : u.role });
+      }
+
+      if (u.plan === undefined) { update.plan = 'free'; addedPlan++; }
+      if (u.credits === undefined) { update.credits = {}; addedCredits++; }
+
+      if (Object.keys(update).length) await doc.ref.update(update);
+    }
+
+    return {
+      ok: true, totalUsers: snap.size, fixedRoleCasing, addedPlan, addedCredits,
+      anomalousRoles, note: "anomalousRoles cần Founder tự xem xét — không tự sửa.",
+    };
   }
 );
 
