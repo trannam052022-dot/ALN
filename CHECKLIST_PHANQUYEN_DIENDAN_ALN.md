@@ -200,9 +200,16 @@ pending/rejected ghi stages → DENY, KTS active → PASS.
 
 ---
 
-## PASS 4 — Frontend: luồng khách vãng lai
+## PASS 4 — Frontend: luồng khách vãng lai ✅ XONG (06/07/2026 — chờ merge + test production)
 
-- [ ] Gỡ chặn đăng nhập ở trang danh sách + trang đọc thread của chuyên mục public.
+> Chỉ sửa `forum.html` (không đụng rules/index/backend/login.html). Dùng **USER sentinel**
+> `{uid:null, role:'guest'}` để hầu hết code render tự an toàn; thêm nhánh guest ở điểm then
+> chốt + guard handler ghi → modal đăng nhập. Query khách nhiều `==` + sort client-side →
+> KHÔNG cần composite index mới. ⚠️ LỆCH nhẹ: khu KTS-only bấm vào ra modal đăng nhập chung
+> thay vì nút "Trở thành KTS" (luồng đăng ký KTS thuộc PASS 7 chưa làm); "quay lại đúng thread"
+> chỉ tự động khi user trở lại forum.html trong 30' vì không đụng login.html theo chỉ đạo.
+
+- [x] Gỡ chặn đăng nhập ở trang danh sách + trang đọc thread của chuyên mục public.
 - [ ] Hiển thị chuyên mục `kts` và `dn` theo quy tắc:
   - [ ] **Khách vãng lai (chưa đăng nhập):** chuyên mục KTS HIỆN TÊN nhưng KHÓA nội dung,
         kèm dòng "Khu vực dành riêng cho KTS đã xác minh chứng chỉ hành nghề" + nút
