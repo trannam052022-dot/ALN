@@ -151,6 +151,24 @@ async function main() {
     await assertFails(cn.collection("forumPosts").doc("post_public").update({ text: "hack" }));
   });
 
+  console.log("\nusers — chặn tự sửa role (PASS 3, kéo lên trước khi deploy PASS 2)\n");
+
+  await check("CN tự sửa role của chính mình thành 'kts' → DENY (chặn leo thang đặc quyền)", async () => {
+    await assertFails(cn.collection("users").doc("cn1").update({ role: "kts" }));
+  });
+
+  await check("CN tự sửa role của chính mình thành 'founder' → DENY", async () => {
+    await assertFails(cn.collection("users").doc("cn1").update({ role: "founder" }));
+  });
+
+  await check("CN tự sửa field khác (name) của chính mình, không đụng role → PASS", async () => {
+    await assertSucceeds(cn.collection("users").doc("cn1").update({ name: "Tên mới" }));
+  });
+
+  await check("Founder sửa role của người khác (duyệt KTS) → PASS", async () => {
+    await assertSucceeds(founder.collection("users").doc("cn1").update({ role: "kts" }));
+  });
+
   console.log("\ncomments — đọc / ghi\n");
 
   await check("Khách vãng lai đọc comment dưới bài public → PASS", async () => {

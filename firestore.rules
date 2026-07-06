@@ -33,7 +33,12 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if signedIn();
       allow create: if signedIn() && request.auth.uid == uid;
-      allow update: if isFounder() || request.auth.uid == uid;
+      // PASS 3 (CHECKLIST_PHANQUYEN_DIENDAN_ALN.md) kéo lên trước: user thường KHÔNG
+      // được tự sửa role của chính mình (chặn leo thang đặc quyền) — chỉ Founder mới
+      // đổi được role người khác. Bắt buộc vì rules diễn đàn (PASS 2) + Cloud Functions
+      // đều tin tưởng users/{uid}.role để quyết định quyền.
+      allow update: if isFounder() ||
+        (request.auth.uid == uid && request.resource.data.role == resource.data.role);
       allow delete: if isFounder();
     }
 
