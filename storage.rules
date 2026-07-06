@@ -29,7 +29,9 @@ service firebase.storage {
     // (đường dẫn không gắn uid người đăng nên không siết theo chủ sở hữu được;
     // client hiện không tự xoá ảnh Storage nên siết update/delete không phá tính năng nào)
     match /community/{allPaths=**} {
-      allow read:   if request.auth != null;
+      // PASS 6: đọc CÔNG KHAI để khách vãng lai xem được ảnh bài forum public.
+      // An toàn: URL Storage có token khó đoán + chỉ xuất hiện trong bài mà user được đọc.
+      allow read:   if true;
       allow create: if request.auth != null;
       allow update, delete: if request.auth != null && request.auth.uid == 'h4kEguPEyMcwJwl89stc0Q6j2si2';
     }
