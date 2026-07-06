@@ -1181,23 +1181,27 @@ exports.forumAdmin = onCall({ region: REGION }, async (request) => {
 ════════════════════════════════════════════ */
 async function backfillCategoryVisibility() {
   const snap = await fdb.collection(COL.posts).get();
-  let posts = 0, comments = 0;
+  let posts = 0, comments = 0, fixedHidden = 0, fixedStatus = 0;
   for (const doc of snap.docs) {
     const p = doc.data();
     const vis = categoryVisibilityOf(p.category);
-    if (p.categoryVisibility !== vis) {
-      await doc.ref.update({ categoryVisibility: vis });
-      posts++;
-    }
+    const upd = {};
+    if (p.categoryVisibility !== vis) { upd.categoryVisibility = vis; posts++; }
+    // Bài cũ (seed/migrate) thiếu hidden/status → khách + CN/DN không đọc được vì rules
+    // đòi hidden==false && status=='visible'. Set mặc định an toàn: bài cũ vốn đang hiển thị.
+    if (p.hidden === undefined) { upd.hidden = false; fixedHidden++; }
+    if (p.status === undefined) { upd.status = "visible"; fixedStatus++; }
+    if (Object.keys(upd).length) await doc.ref.update(upd);
     const cSnap = await doc.ref.collection("comments").get();
     for (const c of cSnap.docs) {
-      if (c.data().categoryVisibility !== vis) {
-        await c.ref.update({ categoryVisibility: vis });
-        comments++;
-      }
+      const cd = c.data();
+      const cupd = {};
+      if (cd.categoryVisibility !== vis) { cupd.categoryVisibility = vis; comments++; }
+      if (cd.status === undefined) { cupd.status = "visible"; }
+      if (Object.keys(cupd).length) await c.ref.update(cupd);
     }
   }
-  return { ok: true, totalPosts: snap.size, updatedPosts: posts, updatedComments: comments };
+  return { ok: true, totalPosts: snap.size, updatedPosts: posts, updatedComments: comments, fixedHidden, fixedStatus };
 }
 
 /* ════════════════════════════════════════════
