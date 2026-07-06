@@ -597,7 +597,7 @@ window._doSubmit = async function() {
 
     await setDoc(doc(db, 'users', uid), {
       username: uname, name: company, role: 'dn',
-      email: email || (uname + '@aln.vn'), status: 'pending', createdAt: serverTimestamp()
+      email: email || (uname + '@aln.vn'), status: 'pending', plan: 'free', credits: {}, createdAt: serverTimestamp()
     });
     await setDoc(doc(db, 'dnApplications', uid), {
       uid: uid,

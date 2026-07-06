@@ -36,6 +36,18 @@ async function seed() {
     await db.collection("users").doc("kts1").set({ role: "kts", status: "active", name: "KTS Test" });
     await db.collection("users").doc("dn1").set({ role: "dn", status: "active", name: "DN Test" });
     await db.collection("users").doc("h4kEguPEyMcwJwl89stc0Q6j2si2").set({ role: "founder", status: "active", name: "Founder Test" });
+    // KTS mới đăng ký, chờ Founder duyệt — role đúng nhưng status 'pending'
+    await db.collection("users").doc("ktsPending").set({ role: "kts", status: "pending", name: "KTS Chờ" });
+    // KTS đã bị Founder từ chối — role vẫn 'kts' nhưng status 'rejected'
+    await db.collection("users").doc("ktsRejected").set({ role: "kts", status: "rejected", name: "KTS Từ chối" });
+
+    // Dự án + stage để test quyền GHI của isKts (ghi stages = quyền KTS)
+    await db.collection("projects").doc("proj1").set({
+      cn: { uid: "cn1" }, kts: { uid: "kts1" }, dn: { uid: "dn1" },
+      memberUids: ["cn1", "kts1", "dn1"], stage: "C1",
+    });
+    await db.collection("projects").doc("proj1").collection("stages").doc("C2")
+      .set({ note: "seed" });
 
     await db.collection("forumConfig").doc("flags").set({ FORUM_P2_ENABLED: true });
 
@@ -85,6 +97,9 @@ async function main() {
   const kts = testEnv.authenticatedContext("kts1").firestore();
   const dn = testEnv.authenticatedContext("dn1").firestore();
   const founder = testEnv.authenticatedContext("h4kEguPEyMcwJwl89stc0Q6j2si2").firestore();
+  const ktsPending = testEnv.authenticatedContext("ktsPending").firestore();
+  const ktsRejected = testEnv.authenticatedContext("ktsRejected").firestore();
+  const newbie = testEnv.authenticatedContext("newbie").firestore();
 
   console.log("\nforumPosts — đọc\n");
 
@@ -149,6 +164,67 @@ async function main() {
 
   await check("Sửa bài của người khác qua client → DENY (chỉ Cloud Function được sửa)", async () => {
     await assertFails(cn.collection("forumPosts").doc("post_public").update({ text: "hack" }));
+  });
+
+  console.log("\nusers — chặn tự sửa role (PASS 3, kéo lên trước khi deploy PASS 2)\n");
+
+  await check("CN tự sửa role của chính mình thành 'kts' → DENY (chặn leo thang đặc quyền)", async () => {
+    await assertFails(cn.collection("users").doc("cn1").update({ role: "kts" }));
+  });
+
+  await check("CN tự sửa role của chính mình thành 'founder' → DENY", async () => {
+    await assertFails(cn.collection("users").doc("cn1").update({ role: "founder" }));
+  });
+
+  await check("CN tự sửa field khác (name) của chính mình, không đụng role → PASS", async () => {
+    await assertSucceeds(cn.collection("users").doc("cn1").update({ name: "Tên mới" }));
+  });
+
+  await check("Founder sửa role của người khác (duyệt KTS) → PASS", async () => {
+    await assertSucceeds(founder.collection("users").doc("cn1").update({ role: "kts" }));
+  });
+
+  console.log("\nusers — chặn tự phong role đặc quyền lúc TẠO + tự kích active (PASS 3+)\n");
+
+  await check("Người mới tự tạo doc role:'cn' status:'active' → PASS (CN active ngay)", async () => {
+    await assertSucceeds(newbie.collection("users").doc("newbie").set({ role: "cn", status: "active", name: "Newbie" }));
+  });
+
+  await check("Người mới tự tạo doc role:'kts' status:'pending' → PASS (đúng luồng đăng ký KTS)", async () => {
+    await assertSucceeds(testEnv.authenticatedContext("applyKts").firestore()
+      .collection("users").doc("applyKts").set({ role: "kts", status: "pending", name: "Apply KTS" }));
+  });
+
+  await check("Người mới tự tạo doc role:'kts' status:'active' → DENY (tự kích active)", async () => {
+    await assertFails(testEnv.authenticatedContext("hackKts").firestore()
+      .collection("users").doc("hackKts").set({ role: "kts", status: "active", name: "Hack" }));
+  });
+
+  await check("Người mới tự tạo doc role:'founder' → DENY (tự phong founder)", async () => {
+    await assertFails(testEnv.authenticatedContext("hackFdr").firestore()
+      .collection("users").doc("hackFdr").set({ role: "founder", status: "active", name: "Hack" }));
+  });
+
+  await check("CN tự kích status của mình 'active'→giữ nguyên (sửa name) → PASS", async () => {
+    await assertSucceeds(cn.collection("users").doc("cn1").update({ name: "CN đổi tên" }));
+  });
+
+  await check("KTS pending tự sửa status của mình thành 'active' → DENY (tự kích active)", async () => {
+    await assertFails(ktsPending.collection("users").doc("ktsPending").update({ status: "active" }));
+  });
+
+  console.log("\nisKts/isDesigner — quyền GHI stages phải kèm status=='active'\n");
+
+  await check("KTS active ghi stages dự án → PASS", async () => {
+    await assertSucceeds(kts.collection("projects").doc("proj1").collection("stages").doc("C2").set({ note: "kts active" }));
+  });
+
+  await check("KTS pending ghi stages dự án → DENY (chưa được Founder duyệt)", async () => {
+    await assertFails(ktsPending.collection("projects").doc("proj1").collection("stages").doc("C2").set({ note: "pending" }));
+  });
+
+  await check("KTS bị từ chối ghi stages dự án → DENY (status 'rejected')", async () => {
+    await assertFails(ktsRejected.collection("projects").doc("proj1").collection("stages").doc("C2").set({ note: "rejected" }));
   });
 
   console.log("\ncomments — đọc / ghi\n");
