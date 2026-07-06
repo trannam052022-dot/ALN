@@ -1041,6 +1041,35 @@ exports.forumAdmin = onCall({ region: REGION }, async (request) => {
       return { ok: true };
     }
 
+    /* P3 — Founder tạo dự án thật (projects/) từ invite intent:'project' của forumChooseKts.
+       Project được tạo client-side ở founder_panel.html (modal "Tạo dự án", Founder tự
+       nhập phí/escrow) — hàm này chỉ gắn projectId lên invite + báo KTS/CN, vì client
+       không ghi thẳng được collection invites (rules write:false). */
+    case "linkProjectToInvite": {
+      const invId = String(d.inviteId || "");
+      const projectId = String(d.projectId || "");
+      if (!invId || !projectId) throw new HttpsError("invalid-argument", "Thiếu inviteId hoặc projectId");
+      const invRef = fdb.collection(COL.invites).doc(invId);
+      const invSnap = await invRef.get();
+      if (!invSnap.exists) throw new HttpsError("not-found", "Invite không tồn tại");
+      const inv = invSnap.data();
+      await invRef.update({ status: "contracted", projectId, contractedAt: ts(), updatedAt: ts() });
+      if (inv.threadId) {
+        await fdb.collection(COL.posts).doc(inv.threadId).update({ chosenProjectId: projectId }).catch(() => {});
+      }
+      if (inv.ktsUid) {
+        await fdNotify(inv.ktsUid, "🏗️ Dự án đã được tạo!",
+          `Founder đã tạo dự án ${projectId} từ lời mời của ${inv.cnName || "khách"} — vào Dự án để bắt đầu`,
+          { type: "FORUM_PROJECT_CREATED", inviteId: invId, projectId });
+      }
+      if (inv.cnUid) {
+        await fdNotify(inv.cnUid, "🏗️ Dự án của bạn đã được tạo!",
+          `Dự án ${projectId} với ${inv.ktsName || "KTS"} đã sẵn sàng — vào trang của bạn để theo dõi`,
+          { type: "FORUM_PROJECT_CREATED", inviteId: invId, projectId });
+      }
+      return { ok: true };
+    }
+
     case "togglePin": {
       if (!postRef) throw new HttpsError("invalid-argument", "Thiếu postId");
       const pSnap = await postRef.get();

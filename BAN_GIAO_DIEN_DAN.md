@@ -23,7 +23,11 @@ Diễn đàn đã chuyển từ bản nháp cách ly sang production. Thay đổ
 - [ ] **Composite index** `forumPosts: category ASC + createdAt DESC` — CHỈ cần khi diễn đàn đông (CN/DN dùng P2, nhiều bài). Đụng `firestore.indexes.json` nên PHẢI hỏi trước khi làm.
 
 ### Việc lớn hơn, làm khi có thời gian (P3, chưa có deadline)
-- [ ] **Nối `forumChooseKts` → tạo dự án thật.** Hiện nút "Chọn KTS này làm dự án" trong thread Tư vấn chỉ ghi `invites` (`intent: 'project'`, đã copy sẵn `brief`), CHƯA tự tạo doc trong `projects/`. Cần nối vào `createProjectFromThread`/`createProjectForDN` (xem `functions/index.js`) để đồng bộ escrow C1–C4. Việc này ảnh hưởng luồng dự án thật nên làm cẩn thận, tách riêng 1 phiên.
+- [x] **Nối `forumChooseKts` → tạo dự án thật** (05/07/2026). KHÔNG tự động tạo project (Founder vẫn phải tự nhập phí/escrow — đúng quy trình cũ), mà nối vào modal "Tạo dự án" có sẵn của `founder_panel.html`:
+  - `founder_forum.html` → tab Phễu Invite: invite có `intent:'project'` chưa gắn `projectId` → hiện nút **"Tạo dự án từ đây"** → mở `founder_panel.html?createProjectFromInvite=<id>` (tab mới).
+  - `founder_panel.html`: đọc query param lúc load, tự mở modal "Tạo dự án mới" + điền sẵn CN/KTS/địa chỉ (từ `invite.brief.region`) — Founder chỉ cần nhập tên công trình + phí + escrow rồi bấm Tạo.
+  - Sau khi tạo xong, gọi callable mới `forumAdmin({action:'linkProjectToInvite', inviteId, projectId})` (client không ghi thẳng `invites` được vì rules `write:false`) → gắn `projectId` lên invite (`status:'contracted'`) + gắn `chosenProjectId` lên thread + báo KTS/CN qua FCM.
+  - **Cần deploy lại functions** (`firebase deploy --only functions`) để có action `linkProjectToInvite` trước khi dùng được nút này.
 - [ ] **Bật công tắc P2** (mở diễn đàn cho CN/DN) khi thấy đủ KTS active trả lời (khuyến nghị gốc ≥10 KTS) — hiện đang TẮT, chỉ founder/kts thấy toàn bộ diễn đàn.
 - [ ] Diễn đàn chưa hỗ trợ role `designer` (không có category riêng, không có nav link) — cân nhắc thêm nếu muốn Designer NT cũng tham gia.
 

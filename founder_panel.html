@@ -3958,6 +3958,18 @@ async function saveCreateProj(){
       } catch(e) { console.warn('[match link]', e); }
     }
 
+    // Sau khi tạo project thành công — link invite diễn đàn (forumChooseKts) nếu có.
+    // invites collection write:false trong rules nên phải qua Cloud Function.
+    if (window._pendingInviteId) {
+      try {
+        var fnsMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
+        var fns2 = fnsMod.getFunctions(app, 'asia-southeast1');
+        var linkFn = fnsMod.httpsCallable(fns2, 'forumAdmin');
+        await linkFn({ action: 'linkProjectToInvite', inviteId: window._pendingInviteId, projectId: pid });
+        window._pendingInviteId = null;
+      } catch(e) { console.warn('[invite link]', e); }
+    }
+
     closeCreateProj();
     if(typeof showToast === 'function') showToast('✅ Đã tạo dự án ' + pid, 'ok');
     else alert('✅ Đã tạo dự án ' + pid);
@@ -5576,6 +5588,33 @@ onAuthStateChanged(auth, async (user) => {
     try { _startFounderDesignListen(); } catch(e){ console.error('[Founder design listen]', e); }
     try { _startFeeConfigListen(); } catch(e){ console.error('[Founder fee config listen]', e); }
     try { _startPendingListen(); } catch(e){ console.error('[Founder pending]', e); }
+
+    // ── Đến từ founder_forum.html "Tạo dự án từ đây" (invite intent:project) ──
+    try {
+      const inviteId = new URLSearchParams(location.search).get('createProjectFromInvite');
+      if (inviteId) {
+        const invSnap = await getDoc(doc(db, 'invites', inviteId));
+        if (invSnap.exists()) {
+          const inv = invSnap.data();
+          if (inv.projectId) {
+            alert('Invite này đã có dự án: ' + inv.projectId);
+          } else if (typeof window.openCreateProj === 'function') {
+            window.openCreateProj();
+            setTimeout(() => {
+              const cnSel = document.getElementById('cp_cn');
+              if (cnSel) { cnSel.value = inv.cnUid || ''; cnSel.dispatchEvent(new Event('change')); }
+              const ktsSel = document.getElementById('cp_kts');
+              if (ktsSel) { ktsSel.value = inv.ktsUid || ''; ktsSel.dispatchEvent(new Event('change')); }
+              const addrEl = document.getElementById('cp_addr');
+              if (addrEl && inv.brief && inv.brief.region) addrEl.value = inv.brief.region;
+              window._pendingInviteId = inviteId;
+            }, 500);
+          }
+        } else {
+          alert('Không tìm thấy invite này.');
+        }
+      }
+    } catch(e){ console.error('[createProjectFromInvite]', e); }
 
     // ── WEB PUSH (FCM): đăng ký token tự động khi đã có quyền thông báo ──
     window.__ALN_UID = user.uid;

@@ -385,6 +385,11 @@ function renderInvites(items){
         + '<span class="item-time">'+timeAgo(i.createdAt)+'</span>'
       + '</div>'
       + '<div style="font-size:var(--text-2xs);color:var(--dim)">'+(i.threadId?'Từ thread: '+escH(i.threadId):'Từ trang hồ sơ KTS')+'</div>'
+      + (i.intent === 'project' ? (
+          i.projectId
+            ? '<div style="font-size:var(--text-2xs);color:var(--green);margin-top:4px"><i class="ph-duotone ph-check-circle"></i> Đã tạo dự án: '+escH(i.projectId)+'</div>'
+            : '<div style="margin-top:6px"><a class="btn primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px" target="_blank" href="founder_panel.html?createProjectFromInvite='+encodeURIComponent(i.id)+'"><i class="ph-duotone ph-folder-plus"></i>Tạo dự án từ đây</a></div>'
+        ) : '')
       + '<div class="item-actions">Chuyển trạng thái: '
         + INV_STAGES.filter(s => s !== i.status).map(s =>
             '<button class="btn" onclick="setInvite(\''+i.id+'\',\''+s+'\')">'+INV_LABEL[s]+'</button>').join('')
