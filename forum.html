@@ -875,18 +875,18 @@ window.setFilter = function(f){
 function subscribePosts(){
   if(postsUnsub) postsUnsub();
   let q;
-  if(isGuest()){
-    /* Khách: chỉ đọc bài public+visible+không ẩn (khớp rules); nhiều == + sort client-side
-       → Firestore dùng single-field index (zigzag), KHÔNG cần composite index mới */
+  if(USER.role === 'founder' || USER.role === 'kts'){
+    q = query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc'));
+  } else {
+    /* Khách + CN + DN: chỉ đọc bài public+visible+không ẩn — khớp CHÍNH XÁC rules
+       (fdPublicVisiblePost) nên KHÔNG bao giờ permission-denied. Query cũ của CN/DN
+       (where category in OPEN_CATEGORIES) lấy cả bài hoi_kts đang chờ duyệt/ẩn mà CN/DN
+       không có quyền đọc → cả query fail. Nhiều == + sort client-side → không cần index mới.
+       (CN/DN sẽ thấy bài chờ duyệt của chính mình sau khi được Founder duyệt.) */
     q = query(collection(db, 'forumPosts'),
       where('categoryVisibility', '==', 'public'),
       where('status', '==', 'visible'),
       where('hidden', '==', false));
-  } else if(USER.role === 'founder' || USER.role === 'kts'){
-    q = query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc'));
-  } else {
-    /* CN/DN: bắt buộc lọc category để qua rules; sort client-side (tránh cần composite index) */
-    q = query(collection(db, 'forumPosts'), where('category', 'in', OPEN_CATEGORIES));
   }
   postsUnsub = onSnapshot(q, snap => {
     const posts = [];
@@ -1137,15 +1137,17 @@ window.openThread = function(pid){
   $('threadModal').classList.add('open');
   renderThread();
   if(commentsUnsub) commentsUnsub();
-  /* Khách: chỉ đọc comment public+visible (khớp rules), sort client-side; đăng nhập: như cũ */
-  const cq = isGuest()
-    ? query(collection(db, 'forumPosts', pid, 'comments'),
-        where('categoryVisibility', '==', 'public'), where('status', '==', 'visible'))
-    : query(collection(db, 'forumPosts', pid, 'comments'), orderBy('createdAt', 'asc'));
+  /* Founder/KTS: đọc mọi comment (orderBy). Khách + CN + DN: chỉ comment public+visible
+     (khớp rules — tránh permission-denied khi thread có comment chờ duyệt/ẩn), sort client-side */
+  const fullReader = (USER.role === 'founder' || USER.role === 'kts');
+  const cq = fullReader
+    ? query(collection(db, 'forumPosts', pid, 'comments'), orderBy('createdAt', 'asc'))
+    : query(collection(db, 'forumPosts', pid, 'comments'),
+        where('categoryVisibility', '==', 'public'), where('status', '==', 'visible'));
   commentsUnsub = onSnapshot(cq, snap => {
     threadComments = [];
     snap.forEach(d => threadComments.push(Object.assign({ id: d.id }, d.data())));
-    if(isGuest()){
+    if(!fullReader){
       const cms = t => (t && t.seconds) || 0;
       threadComments.sort((a, b) => cms(a.createdAt) - cms(b.createdAt));
     }
