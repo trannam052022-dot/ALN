@@ -256,6 +256,11 @@ service cloud.firestore {
        bỏ qua rules) → client chỉ ĐỌC; write: false toàn bộ.
        (notifBuffer/camNangForum/forumDigest/hoiKtsQueue không có block
        → mặc định deny, chỉ Cloud Function admin SDK đọc/ghi, đúng ý.)
+
+       CHECKLIST_PHANQUYEN_DIENDAN_ALN.md PASS 2 — đọc CÔNG KHAI (kể cả
+       chưa đăng nhập) cho bài/bình luận categoryVisibility=='public' và
+       đang hiển thị. Nhánh public KHÔNG gọi get() nào (rẻ, || short-
+       circuit) — get() chỉ chạy cho khu kts/dn như cũ.
     ═══════════════════════════════════════════════════════════════ */
 
     function fdProfile() {
@@ -277,16 +282,21 @@ service cloud.firestore {
     function fdOpenCategory(cat) {
       return cat in ['tu_van_du_an', 'showcase', 'bang_tin'];
     }
+    // Bài public đang hiển thị — đọc được kể cả không đăng nhập
+    function fdPublicVisiblePost(d) {
+      return d.categoryVisibility == 'public' && d.status == 'visible' && d.hidden == false;
+    }
 
     match /forumPosts/{postId} {
       // CN/DN: chỉ đọc được doc thuộc chuyên mục mở VÀ khi cờ P2 bật —
       // query bắt buộc kèm where('category','in',[...]) mới qua được list.
-      allow read: if isFounder() || fdKtsActive() ||
+      allow read: if fdPublicVisiblePost(resource.data) || isFounder() || fdKtsActive() ||
         (fdCnDnActive() && fdP2On() && fdOpenCategory(resource.data.category));
       allow write: if false;
 
       match /comments/{commentId} {
-        allow read: if isFounder() || fdKtsActive() ||
+        allow read: if (resource.data.categoryVisibility == 'public' && resource.data.status == 'visible')
+          || isFounder() || fdKtsActive() ||
           (fdCnDnActive() && fdP2On() && fdOpenCategory(
             get(/databases/$(database)/documents/forumPosts/$(postId)).data.category));
         allow write: if false;

@@ -15,6 +15,14 @@ Diễn đàn đã chuyển từ bản nháp cách ly sang production. Thay đổ
 - **storage.rules `community/`:** ✅ Đã siết — `create` vẫn mở cho mọi user đăng nhập, `update/delete` chỉ Founder (PR #8, đã deploy). Không đụng gì tới `alnPosts` hay Firestore, chỉ Storage.
 - **Deploy đã chạy xong (05/07/2026):** `firebase deploy --only functions` (16 hàm forum, đủ tên mới) → bấm nút "Chuyển dữ liệu từ bản nháp" (34 chủ đề đã migrate) → `firebase deploy --only firestore:rules` → `firebase deploy --only storage`. **Diễn đàn đang chạy thật, không còn phụ thuộc `_draft`.**
 
+## 0.2 PHÂN QUYỀN CÔNG KHAI (06/07/2026) — xem file riêng
+
+TRANNAM đưa thêm đề bài mới: mở diễn đàn đọc công khai (không cần đăng nhập) cho khách
+vãng lai, chỉ khu KTS mới cần đúng vai. Chi tiết + tiến độ nằm ở
+**`CHECKLIST_PHANQUYEN_DIENDAN_ALN.md`** (PASS 1-6) và **`CHECKLIST_KTS_ONBOARDING_2NAC.md`**
+(đăng ký KTS 2 nấc, làm sau khi xong 6 PASS kia). Đang ở PASS 2/6, đọc file đó để biết
+chính xác đã xong tới đâu — không lặp lại chi tiết ở đây.
+
 ## 0.1 VIỆC CÒN LẠI (đọc mục này đầu phiên sau)
 
 ### Ưu tiên thấp / không gấp
