@@ -491,7 +491,7 @@ window.runBackfillVisibility = async function(){
   try {
     const res = await callAdmin({ action: 'backfillCategoryVisibility' });
     const d = res.data || {};
-    showToast('🌐 Đã cập nhật: '+(d.updatedPosts||0)+'/'+(d.totalPosts||0)+' bài, '+(d.updatedComments||0)+' bình luận');
+    showToast('🌐 Đã cập nhật: '+(d.updatedPosts||0)+'/'+(d.totalPosts||0)+' bài, '+(d.updatedComments||0)+' bình luận — vá hidden: '+(d.fixedHidden||0)+', status: '+(d.fixedStatus||0));
   } catch(e){ showToast('Lỗi: '+(e.message||e)); }
   finally { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-globe"></i>Cập nhật categoryVisibility'; }
 };
