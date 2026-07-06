@@ -169,19 +169,34 @@
 - [x] Role đổi hiệu lực ngay lần đọc rules kế tiếp — đúng, vì rules `get()` trực tiếp
       từ `users` doc (không dùng custom claims), không cần refresh token.
 
-### ⚠️ PHÁT HIỆN THÊM (ngoài phạm vi 3 việc được giao — CẦN TRANNAM QUYẾT ĐỊNH)
+### ✅ PHÁT HIỆN THÊM — ĐÃ VÁ (TRANNAM duyệt 06/07/2026: "vá cả 3 điểm")
 
-Đường ghi **`create`** của `users/{uid}` hiện chỉ kiểm `request.auth.uid == uid`,
-KHÔNG kiểm giá trị `role` gửi lên: `allow create: if signedIn() && request.auth.uid == uid;`.
-Về lý thuyết, ai đó bỏ qua giao diện đăng ký (gọi thẳng Firestore SDK) có thể tự tạo
-doc `users/{uid_của_mình}` với `role:'founder'` hoặc `role:'kts', status:'active'` ngay
-từ đầu — không qua được `isFounder()` (hardcoded UID) nên KHÔNG chiếm được quyền Founder
-thật, nhưng CÓ THỂ tự phong `kts`/`dn` active-ngay, bỏ qua bước Founder duyệt. Phạm vi
-sửa rộng hơn (5 trang đăng ký: `register.html`, `kts-apply.html`, `dn-studio.html`,
-`designer-apply.html`, `ks-apply.html`) nên CHƯA tự sửa trong phiên này — chờ TRANNAM
-quyết định có muốn siết luôn không.
+Đường ghi **`create`** của `users/{uid}` trước đây chỉ kiểm `request.auth.uid == uid`,
+KHÔNG kiểm giá trị `role`: ai bỏ qua giao diện đăng ký (gọi thẳng Firestore SDK) có thể
+tự tạo doc `users/{uid_mình}` với `role:'kts', status:'active'` → `isKts()` (chỉ kiểm
+`role=='kts'`, không kiểm status, và `allow write` stages KHÔNG có member check) sẽ cấp
+quyền ghi stages của **mọi dự án**. Lỗ hổng leo thang đặc quyền thật; bản vá `role`-update
+(07f1506) KHÔNG chặn được đường `create`.
 
-**Commit:** `07f1506` (chặn tự sửa role) + `<sẽ điền>` (chuẩn hoá role + plan/credits)
+Đã vá **3 điểm khớp nhau** (`firestore.rules`):
+1. **create** — `role` phải thuộc `['cn','kts','dn','designer','ks']` (chặn `'founder'`);
+   `status` buộc `'pending'` cho mọi role trừ `'cn'` (active ngay). Founder tạo tự do.
+2. **update** — pin thêm `status` (ngoài `role`): user thường không tự kích `active`.
+3. **isKts()/isDesigner()** — thêm `&& status == 'active'`: KTS `pending`/`rejected`
+   không có quyền dù `role=='kts'`.
+
+Kèm 10 ca unit test mới (`test/firestore-rules/forum-rules.test.js`): create tự phong
+founder/tự-active → DENY, đăng ký KTS pending → PASS, tự kích status → DENY, KTS
+pending/rejected ghi stages → DENY, KTS active → PASS.
+
+> ⚠️ **THỨ TỰ DEPLOY BẮT BUỘC** (vì rules mới cần mọi `users/{uid}` có field `status`):
+> `functions` → bấm **"Cập nhật categoryVisibility"** → bấm **"Chuẩn hoá dữ liệu users"**
+> (nút này giờ còn backfill `status:'active'` cho 4 tài khoản seed thật vốn thiếu field
+> `status`) → xác nhận xong MỚI `firestore:rules`. Deploy rules trước khi normalize sẽ
+> khoá nhầm các tài khoản cũ thiếu `status`.
+
+**Commit:** `07f1506` (chặn tự sửa role) + `<PASS 3>` (chuẩn hoá role + plan/credits)
++ `<sẽ điền>` (vá create-role + isKts status-gate + backfill status)
 
 ---
 

@@ -1780,7 +1780,11 @@ exports.createUserByFounder = onCall(
    chừa 2 trường plan/credits (MONETIZATION_KTS.md, chỉ chừa trường, chưa có logic).
    Idempotent, chạy lại vô hại. Role không rõ (không nằm trong tập hợp lệ, kể cả sau
    khi trim+lowercase) KHÔNG tự sửa — chỉ liệt kê để Founder tự xem xét bằng tay,
-   tránh đoán sai làm mất/nâng nhầm quyền của ai đó. */
+   tránh đoán sai làm mất/nâng nhầm quyền của ai đó.
+   BẮT BUỘC chạy TRƯỚC khi deploy firestore.rules bản siết create/update+isKts: backfill
+   status:'active' cho doc CŨ thiếu field status (4 tài khoản seed thật + dữ liệu trước
+   luồng đăng ký) — nếu không, rules mới (isKts cần status=='active', update pin status)
+   sẽ khoá nhầm các tài khoản đó. Doc tạo qua *-apply.html luôn có status nên không đụng. */
 exports.founderNormalizeUsers = onCall(
   { region: "asia-southeast1" },
   async (request) => {
@@ -1790,7 +1794,7 @@ exports.founderNormalizeUsers = onCall(
 
     const VALID_ROLES = ['cn', 'kts', 'dn', 'designer', 'ks', 'founder'];
     const snap = await db.collection('users').get();
-    let fixedRoleCasing = 0, addedPlan = 0, addedCredits = 0;
+    let fixedRoleCasing = 0, addedPlan = 0, addedCredits = 0, addedStatus = 0;
     const anomalousRoles = [];
 
     for (const doc of snap.docs) {
@@ -1807,12 +1811,14 @@ exports.founderNormalizeUsers = onCall(
 
       if (u.plan === undefined) { update.plan = 'free'; addedPlan++; }
       if (u.credits === undefined) { update.credits = {}; addedCredits++; }
+      // Doc cũ thiếu status = tài khoản đã provision trước luồng đăng ký → coi là active.
+      if (u.status === undefined) { update.status = 'active'; addedStatus++; }
 
       if (Object.keys(update).length) await doc.ref.update(update);
     }
 
     return {
-      ok: true, totalUsers: snap.size, fixedRoleCasing, addedPlan, addedCredits,
+      ok: true, totalUsers: snap.size, fixedRoleCasing, addedPlan, addedCredits, addedStatus,
       anomalousRoles, note: "anomalousRoles cần Founder tự xem xét — không tự sửa.",
     };
   }

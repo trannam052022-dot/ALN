@@ -7,13 +7,19 @@ service cloud.firestore {
         request.auth.uid == 'h4kEguPEyMcwJwl89stc0Q6j2si2';
     }
     function signedIn() { return request.auth != null; }
+    // isKts/isDesigner cấp quyền GHI lên stages của MỌI dự án (không member check) →
+    // bắt buộc kèm status=='active': chỉ KTS/Designer đã được Founder DUYỆT mới có quyền.
+    // KTS 'pending' (mới đăng ký) hoặc 'rejected' (bị từ chối) KHÔNG có quyền dù role=='kts'.
+    // get() cùng path được rules cache trong 1 request → không tốn thêm lượt đọc.
     function isKts() {
       return request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'kts';
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'kts' &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'active';
     }
     function isDesigner() {
       return request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'designer';
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'designer' &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'active';
     }
     function isMemberOfProject(pid) {
       let p = get(/databases/$(database)/documents/projects/$(pid)).data;
@@ -32,13 +38,25 @@ service cloud.firestore {
 
     match /users/{uid} {
       allow read: if signedIn();
-      allow create: if signedIn() && request.auth.uid == uid;
-      // PASS 3 (CHECKLIST_PHANQUYEN_DIENDAN_ALN.md) kéo lên trước: user thường KHÔNG
-      // được tự sửa role của chính mình (chặn leo thang đặc quyền) — chỉ Founder mới
-      // đổi được role người khác. Bắt buộc vì rules diễn đàn (PASS 2) + Cloud Functions
-      // đều tin tưởng users/{uid}.role để quyết định quyền.
-      allow update: if isFounder() ||
-        (request.auth.uid == uid && request.resource.data.role == resource.data.role);
+      // create: user tự tạo doc của mình KHÔNG được tự phong role đặc quyền. role phải
+      // thuộc tập hợp lệ (chặn 'founder'); và status buộc 'pending' cho mọi role trừ 'cn'
+      // (CN active ngay) → kẻ tự tạo role:'kts' vẫn kẹt 'pending', isKts() không cấp quyền
+      // cho tới khi Founder duyệt. Founder (seed.html / admin) tạo tự do.
+      allow create: if isFounder() || (
+        signedIn() && request.auth.uid == uid &&
+        request.resource.data.role in ['cn','kts','dn','designer','ks'] &&
+        (request.resource.data.role == 'cn'
+          ? request.resource.data.status == 'active'
+          : request.resource.data.status == 'pending')
+      );
+      // update: user thường KHÔNG được tự sửa role LẪN status của chính mình (chặn leo
+      // thang đặc quyền + tự kích active) — chỉ Founder đổi được. Bắt buộc vì rules diễn
+      // đàn (PASS 2), isKts/isDesigner và Cloud Functions đều tin users/{uid}.role+status.
+      allow update: if isFounder() || (
+        request.auth.uid == uid &&
+        request.resource.data.role == resource.data.role &&
+        request.resource.data.status == resource.data.status
+      );
       allow delete: if isFounder();
     }
 

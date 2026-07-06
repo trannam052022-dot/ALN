@@ -502,7 +502,7 @@ window.runNormalizeUsers = async function(){
     const res = await callNormalizeUsers();
     const d = res.data || {};
     const anomalies = (d.anomalousRoles || []).length;
-    showToast('👤 '+d.totalUsers+' users — sửa role: '+d.fixedRoleCasing+', thêm plan: '+d.addedPlan+', thêm credits: '+d.addedCredits+(anomalies ? ', ⚠️ '+anomalies+' role lạ (xem console)' : ''));
+    showToast('👤 '+d.totalUsers+' users — sửa role: '+d.fixedRoleCasing+', thêm status: '+(d.addedStatus||0)+', thêm plan: '+d.addedPlan+', thêm credits: '+d.addedCredits+(anomalies ? ', ⚠️ '+anomalies+' role lạ (xem console)' : ''));
     if (anomalies) console.warn('[normalizeUsers] role lạ cần Founder tự xem:', d.anomalousRoles);
   } catch(e){ showToast('Lỗi: '+(e.message||e)); }
   finally { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-users-three"></i>Chuẩn hoá dữ liệu users'; }
