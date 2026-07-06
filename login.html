@@ -547,6 +547,18 @@ function showError(msg){
 }
 
 const FILE_BY_ROLE = { kts:'kts_dashboard.html', dn:'client_DN.html', cn:'client_CN.html', designer:'designer_dashboard.html', founder:'founder_panel.html', ks:'ks_dashboard.html' };
+/* Nếu người dùng bấm đăng nhập TỪ diễn đàn (forum.html lưu sessionStorage.forumReturn),
+   sau khi login xong đưa họ QUAY LẠI forum (đúng thread) thay vì dashboard mặc định. */
+function alnReturnDest(){
+  try {
+    var r = JSON.parse(sessionStorage.getItem('forumReturn') || 'null');
+    if (r && (Date.now() - (r.t || 0) < 30 * 60000)) {
+      sessionStorage.removeItem('forumReturn');
+      return 'forum.html' + (r.thread ? '?thread=' + encodeURIComponent(r.thread) : '');
+    }
+  } catch(e){}
+  return null;
+}
 
 function resetLoginBtn(){
   const btn = document.getElementById('btnLogin');
@@ -611,7 +623,7 @@ async function doLogin(){
     document.getElementById('redirectSub').textContent = 'Đang vào trang ' + m.title + '...';
     overlay.style.display = 'flex';
     setTimeout(function(){
-      var dest = FILE_BY_ROLE[redirectRole] + '?u=' + encodeURIComponent(username) + '&r=' + redirectRole;
+      var dest = alnReturnDest() || (FILE_BY_ROLE[redirectRole] + '?u=' + encodeURIComponent(username) + '&r=' + redirectRole);
       window.location.replace(dest);
     }, 800);
   } catch(err) {
@@ -685,7 +697,7 @@ async function doFounderLogin(){
     document.getElementById('redirectMsg').textContent = 'Xin chào, KTS. Trần Đại Long';
     document.getElementById('redirectSub').textContent = 'Đang vào Cổng Quản trị Sáng lập...';
     overlay.style.display = 'flex';
-    setTimeout(function(){ window.location.replace('founder_panel.html?u=' + encodeURIComponent(user) + '&r=founder'); }, 900);
+    setTimeout(function(){ window.location.replace(alnReturnDest() || ('founder_panel.html?u=' + encodeURIComponent(user) + '&r=founder')); }, 900);
   } catch(err){
     var code = (err && err.code) || '';
     if(code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found'){
