@@ -1294,12 +1294,15 @@ async function seedForumData() {
   const ktsAuthor = { authorUid: KTS_UID, authorName: KTS_NAME, authorRole: "kts", authorRank: "chuyen_gia" };
   const cnAuthor = { authorUid: CN_UID, authorName: CN_NAME, authorRole: "cn" };
   const founderAuthor = { authorUid: FOUNDER_UID, authorName: FOUNDER_NAME, authorRole: "founder" };
+  // Bài seed BẮT BUỘC có categoryVisibility (khớp category) — nếu không, query khách/CN
+  // (lọc categoryVisibility=='public') sẽ loại sạch bài seed → Showcase/Tư vấn hiện rỗng.
+  const P = (a, f) => Object.assign({}, base, a, f, { categoryVisibility: categoryVisibilityOf(f.category) });
 
   const posts = fdb.collection(COL.posts);
   const batch1 = fdb.batch();
 
   /* P1 — Hỏi đáp kỹ thuật (có Best Answer) */
-  batch1.set(posts.doc("draft_p01"), Object.assign({}, base, ktsAuthor, {
+  batch1.set(posts.doc("draft_p01"), P(ktsAuthor, {
     category: "hoi_dap",
     text: "Nhà phố 5 tầng + tum, diện tích sàn 400m² — bậc chịu lửa yêu cầu theo QCVN 06:2022 là bao nhiêu? Có bắt buộc thang thoát hiểm riêng không khi mặt tiền chỉ 4m? Anh em nào vừa làm hồ sơ PCCC loại này chia sẻ giúp.",
     media: [], images: [],
@@ -1326,7 +1329,7 @@ async function seedForumData() {
     heartCount: 1, heartedBy: [KTS_UID], createdAt: T(44),
   });
 
-  batch1.set(posts.doc("draft_p02"), Object.assign({}, base, ktsAuthor, {
+  batch1.set(posts.doc("draft_p02"), P(ktsAuthor, {
     category: "hoi_dap",
     text: "Đơn giá phần thô 4,5tr/m² hiện nay thường đã gồm ép cọc chưa, hay tách riêng? Khách hỏi mà mỗi nhà thầu báo một kiểu, muốn nghe mặt bằng chung anh em đang áp.",
     media: [], images: [],
@@ -1340,7 +1343,7 @@ async function seedForumData() {
   });
 
   /* P1 — Vật liệu & Giá */
-  batch1.set(posts.doc("draft_p03"), Object.assign({}, base, ktsAuthor, {
+  batch1.set(posts.doc("draft_p03"), P(ktsAuthor, {
     category: "vat_lieu",
     text: "Cập nhật giá gạch không nung khu vực Bình Dương tháng 7/2026: gạch block 390x190x190 dao động 12.5k–13.8k/viên tại bãi, tăng nhẹ ~4% so với quý trước. Anh em khu vực khác cập nhật giúp để có mặt bằng chung.",
     media: [img("alnvl1")], images: [imgUrl("alnvl1")],
@@ -1354,7 +1357,7 @@ async function seedForumData() {
     heartCount: 0, heartedBy: [], createdAt: T(24),
   });
 
-  batch1.set(posts.doc("draft_p04"), Object.assign({}, base, ktsAuthor, {
+  batch1.set(posts.doc("draft_p04"), P(ktsAuthor, {
     category: "vat_lieu",
     text: "So sánh nhanh 3 dòng sơn ngoại thất phổ thông sau 2 năm thi công thực tế: độ phai màu hướng Tây khác biệt rõ. Kết luận cá nhân: khu vực nắng gắt nên tư vấn khách lên dòng cao cấp hơn 1 bậc, chênh chi phí ~8% nhưng tuổi thọ màng sơn gần gấp rưỡi.",
     media: [], images: [],
@@ -1362,7 +1365,7 @@ async function seedForumData() {
   }));
 
   /* P1 — Showcase (1 bài được ghim) */
-  batch1.set(posts.doc("draft_p05"), Object.assign({}, base, ktsAuthor, {
+  batch1.set(posts.doc("draft_p05"), P(ktsAuthor, {
     category: "showcase",
     text: "Biệt thự vườn Tân Cổ Điển tại Thủ Đức vừa hoàn thiện phần thô — nhịp cột đôi sảnh chính và vòm cong tầng 2 là hai chi tiết mất nhiều công nhất. Cảm ơn đội thi công đã theo sát bản vẽ từng cm.",
     media: [img("alnsc1"), img("alnsc2")],
@@ -1371,7 +1374,7 @@ async function seedForumData() {
     heartCount: 4, heartedBy: [FOUNDER_UID, CN_UID, DN_UID, "seed_x"],
     commentCount: 0, createdAt: T(70), updatedAt: T(70),
   }));
-  batch1.set(posts.doc("draft_p06"), Object.assign({}, base, ktsAuthor, {
+  batch1.set(posts.doc("draft_p06"), P(ktsAuthor, {
     category: "showcase",
     text: "Góc cầu thang giếng trời nhà phố 4x16m — ánh sáng tự nhiên đủ cho cả 3 tầng giữa, không cần đèn ban ngày. Giải pháp lam gỗ chắn nắng hướng Tây hoạt động tốt hơn kỳ vọng.",
     media: [img("alnsc3")], images: [imgUrl("alnsc3")],
@@ -1380,7 +1383,7 @@ async function seedForumData() {
   }));
 
   /* P1 — Nghề & Chứng chỉ */
-  batch1.set(posts.doc("draft_p07"), Object.assign({}, base, ktsAuthor, {
+  batch1.set(posts.doc("draft_p07"), P(ktsAuthor, {
     category: "nghe",
     text: "Lộ trình thi CCHN kiến trúc hạng II năm nay có thay đổi: sát hạch trực tuyến trước, phỏng vấn sau. Anh em chuẩn bị hồ sơ năng lực nhớ kèm xác nhận tham gia tối thiểu 2 công trình đã nghiệm thu.",
     media: [], images: [],
@@ -1394,7 +1397,7 @@ async function seedForumData() {
   });
 
   /* P1 — Bảng tin ALN (chỉ Founder đăng) */
-  batch1.set(posts.doc("draft_p08"), Object.assign({}, base, founderAuthor, {
+  batch1.set(posts.doc("draft_p08"), P(founderAuthor, {
     category: "bang_tin",
     text: "📌 DIỄN ĐÀN ALN phiên bản mới: bình luận theo luồng, Best Answer, chuyên mục riêng cho KTS. Quy tắc duy nhất — mọi trao đổi dự án thực hiện qua kênh chat sàn ALN để được bảo vệ bởi Quy trình 4 bước. Nhận tiền ngoài sàn = khóa tài khoản vĩnh viễn + thu hồi Quỹ bảo đảm.",
     media: [], images: [],
@@ -1404,7 +1407,7 @@ async function seedForumData() {
   }));
 
   /* P2 — Thread Tư vấn Dự án (CN đăng, KTS trả lời, có invite + lead) */
-  batch1.set(posts.doc("draft_p09"), Object.assign({}, base, cnAuthor, {
+  batch1.set(posts.doc("draft_p09"), P(cnAuthor, {
     category: "tu_van_du_an",
     text: "Gia đình em có lô đất 6x20m ở TP. Thủ Đức, muốn xây nhà 3 tầng cho 2 thế hệ ở chung (ông bà + vợ chồng con nhỏ). Ưu tiên thông thoáng, có sân trước để xe. Nhờ các anh KTS tư vấn hướng bố trí công năng ạ.",
     media: [], images: [],
@@ -1433,7 +1436,7 @@ async function seedForumData() {
   batch1.update(posts.doc("draft_p09"), { bestAnswerId: "draft_c07" });
 
   /* Bài CŨ không có category — hiển thị như showcase (demo migration) */
-  const p10 = Object.assign({}, base, ktsAuthor, {
+  const p10 = P(ktsAuthor, {
     tag: "arch",
     text: "(Bài dạng CŨ — chỉ có tag, chưa có category — để kiểm tra migration hiển thị như Showcase) Hoàng hôn trên công trình mái dốc hôm nay.",
     media: [img("alnold1")], images: [imgUrl("alnold1")],
@@ -1443,7 +1446,7 @@ async function seedForumData() {
   batch1.set(posts.doc("draft_p10"), p10);
 
   /* Bài CHỜ DUYỆT — demo hàng chờ moderation */
-  batch1.set(posts.doc("draft_p11"), Object.assign({}, base, ktsAuthor, {
+  batch1.set(posts.doc("draft_p11"), P(ktsAuthor, {
     category: "hoi_dap",
     text: "(Demo bài chờ duyệt của tài khoản mới) Xin kinh nghiệm chống thấm sân thượng lát gạch — nên màng khò hay gốc xi măng 2 thành phần?",
     media: [], images: [],
