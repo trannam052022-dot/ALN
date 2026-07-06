@@ -3,7 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diễn đàn ALN</title>
+<title>Diễn đàn ALN — Hỏi Kiến trúc sư miễn phí, vật liệu & công trình thực tế</title>
+<meta name="description" content="Diễn đàn ALN: hỏi đáp trực tiếp với Kiến trúc sư đã xác minh, xem giá vật liệu, showcase công trình thực tế. Đọc công khai, miễn phí.">
+<link rel="canonical" href="https://applamnha.vn/forum.html">
+<!-- Open Graph / social (PASS 5 — mặc định; JS cập nhật động khi mở thread) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ALN — App Làm Nhà">
+<meta property="og:url" content="https://applamnha.vn/forum.html">
+<meta property="og:title" content="Diễn đàn ALN — Hỏi Kiến trúc sư miễn phí">
+<meta property="og:description" content="Hỏi đáp trực tiếp với KTS đã xác minh, xem giá vật liệu & công trình thực tế. Đọc công khai, miễn phí.">
+<meta property="og:image" content="https://applamnha.vn/assets/demo/aln-demo-biet-thu-vuon.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Diễn đàn ALN — Hỏi Kiến trúc sư miễn phí">
+<meta name="twitter:description" content="Hỏi đáp trực tiếp với KTS đã xác minh, xem giá vật liệu & công trình thực tế.">
+<meta name="twitter:image" content="https://applamnha.vn/assets/demo/aln-demo-biet-thu-vuon.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/>
 <link rel="stylesheet" href="aln-tokens.css">
@@ -1136,6 +1149,7 @@ window.openThread = function(pid){
   replyTo = null;
   $('threadModal').classList.add('open');
   renderThread();
+  updateThreadMeta(pid);   // PASS 5: title/OG/URL theo thread để chia sẻ & SEO
   if(commentsUnsub) commentsUnsub();
   /* Founder/KTS: đọc mọi comment (orderBy). Khách + CN + DN: chỉ comment public+visible
      (khớp rules — tránh permission-denied khi thread có comment chờ duyệt/ẩn), sort client-side */
@@ -1160,7 +1174,42 @@ window.closeThread = function(){
   if(commentsUnsub){ commentsUnsub(); commentsUnsub = null; }
   threadComments = []; replyTo = null;
   if(typeof resetAiGate === 'function') resetAiGate();
+  resetForumMeta();   // PASS 5: trả title/OG/URL về mặc định diễn đàn
 };
+
+/* PASS 5 — SEO/chia sẻ: cập nhật <title>, OG, và URL (?thread=ID) theo thread đang mở.
+   Host tĩnh không SSR nên FB/Zalo (không chạy JS) chỉ thấy thẻ mặc định; nhưng link
+   ?thread=ID chia sẻ được (tự mở lại thread) và Google (chạy JS) index được từng thread. */
+const _DEFAULT_TITLE = document.title;
+function _setMeta(sel, val){ const el = document.querySelector(sel); if(el) el.setAttribute('content', val); }
+function updateThreadMeta(pid){
+  const p = ALL_POSTS.find(x => x.id === pid);
+  const url = 'https://applamnha.vn/forum.html?thread=' + encodeURIComponent(pid);
+  try { history.replaceState({ thread: pid }, '', 'forum.html?thread=' + encodeURIComponent(pid)); } catch(e){}
+  if(!p) return;
+  const raw = (p.text || '').replace(/\s+/g, ' ').trim();
+  const title = (raw.slice(0, 70) || 'Chủ đề') + (raw.length > 70 ? '…' : '');
+  const cat = (CATS[catOf(p)] || {}).label || 'Diễn đàn';
+  document.title = title + ' — ' + cat + ' | Diễn đàn ALN';
+  const desc = raw.slice(0, 155) || 'Trao đổi trên Diễn đàn ALN.';
+  const img = (p.media && p.media[0] && p.media[0].type !== 'video' && p.media[0].url)
+    || 'https://applamnha.vn/assets/demo/aln-demo-biet-thu-vuon.jpg';
+  _setMeta('meta[property="og:title"]', title);
+  _setMeta('meta[property="og:description"]', desc);
+  _setMeta('meta[property="og:url"]', url);
+  _setMeta('meta[property="og:image"]', img);
+  _setMeta('meta[name="twitter:title"]', title);
+  _setMeta('meta[name="twitter:description"]', desc);
+  _setMeta('meta[name="twitter:image"]', img);
+}
+function resetForumMeta(){
+  document.title = _DEFAULT_TITLE;
+  try { history.replaceState({}, '', 'forum.html'); } catch(e){}
+  _setMeta('meta[property="og:title"]', 'Diễn đàn ALN — Hỏi Kiến trúc sư miễn phí');
+  _setMeta('meta[property="og:description"]', 'Hỏi đáp trực tiếp với KTS đã xác minh, xem giá vật liệu & công trình thực tế. Đọc công khai, miễn phí.');
+  _setMeta('meta[property="og:url"]', 'https://applamnha.vn/forum.html');
+  _setMeta('meta[property="og:image"]', 'https://applamnha.vn/assets/demo/aln-demo-biet-thu-vuon.jpg');
+}
 
 function canCommentHere(p){
   if(!USER) return false;
