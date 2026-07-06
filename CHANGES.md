@@ -4,6 +4,21 @@
 
 ---
 
+## Diễn đàn ALN — Phân quyền công khai (06/07/2026)
+
+> Chi tiết đầy đủ: `CHECKLIST_PHANQUYEN_DIENDAN_ALN.md`. Tổng hợp 6 PASS:
+
+- **PASS 1** — Denormalize `categoryVisibility` (public/kts) vào `forumPosts`/`comments`.
+- **PASS 2** — Rules: đọc công khai theo `categoryVisibility`, mọi ghi qua Cloud Functions (client DENY). Unit test emulator.
+- **PASS 3** — Chuẩn hoá `role` + vá lỗ hổng tự phong role (create/update/isKts theo `status`).
+- **PASS 4** — Khách vãng lai đọc forum công khai (USER sentinel guest), 3 khu KTS-only khóa, modal đăng nhập navy/gold, badge "KTS đã xác minh".
+- **PASS 5** — SEO mức A: robots.txt chặn trang nội bộ, sitemap thêm forum, OG/meta động + `?thread=ID`.
+- **PASS 6** — Nghiệm thu: soát rò rỉ (payload public không PII ✅), `storage.rules` `community/` mở đọc công khai (khách xem ảnh bài public), test 5 vai.
+
+**Fix phát sinh:** query khách+CN+DN khớp rules (hết permission-denied); backfill `hidden`/`status` bài cũ; Board PA tainted-canvas CORS.
+
+---
+
 ## ĐÃ DEPLOY (2026-07-04)
 
 Founder duyệt lần cuối → merge nhánh `claude/cam-nang-aln-pass-1-kyj5ik` vào `main` (commit `c58e6ec`), push lên GitHub. Không có xung đột (main chỉ đổi các trang app nội bộ không liên quan — `client_CN/DN`, `designer_dashboard`, `founder_panel`, `kts_dashboard`, `functions/index.js`). Đã build lại + kiểm tra idempotent trên `main` trước khi push. GitHub Pages tự build lại theo cấu hình hiện tại (~1-2 phút).

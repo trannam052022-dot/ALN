@@ -253,7 +253,15 @@ pending/rejected ghi stages → DENY, KTS active → PASS.
 
 ---
 
-## PASS 6 — Kiểm thử tổng & nghiệm thu
+## PASS 6 — Kiểm thử tổng & nghiệm thu ⏳ CODE-LEVEL XONG — chờ test 5 vai (06/07/2026)
+
+> **Code-level đã làm:**
+> - [x] Soát rò rỉ: `forumPosts`/`comments` payload public chỉ có authorName/role/rank/text/
+>   media/brief(quận-tỉnh) — KHÔNG email/phone. `phone` chỉ ở collection `leads` (Founder-only).
+> - [x] `storage.rules` `community/` → `allow read: if true` (khách xem ảnh bài public). Chờ deploy `firebase deploy --only storage`.
+> - [x] `CHANGES.md` tổng hợp 6 PASS.
+> **Còn lại (user tự chạy):** test thủ công 5 vai desktop+mobile theo ma trận (khách/CN/KTS/DN/Founder).
+
 
 - [ ] Test thủ công 5 vai (ẩn danh / CN / KTS / DN / Founder) trên cả desktop + mobile.
 - [ ] Xác nhận không rò rỉ dữ liệu: mở DevTools → Network, đọc payload các document public,
