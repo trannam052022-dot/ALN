@@ -66,6 +66,23 @@ const LEGACY_DRAFT_COL = {
 const CATEGORIES = ["hoi_kts", "hoi_dap", "vat_lieu", "showcase", "nghe", "bang_tin", "tu_van_du_an"];
 const KTS_POST_CATEGORIES = ["hoi_kts", "hoi_dap", "vat_lieu", "showcase", "nghe"];
 const OPEN_CATEGORIES = ["hoi_kts", "tu_van_du_an", "showcase", "bang_tin"]; // CN/DN xem được (P2)
+
+/* CHECKLIST_PHANQUYEN_DIENDAN_ALN.md PASS 1 — quyền ĐỌC theo category, denormalize
+   vào field categoryVisibility của mỗi forumPosts để rules không phải get() chéo.
+   hoi_dap/vat_lieu/nghe giữ nguyên KTS-only như đang chạy (không nằm trong
+   OPEN_CATEGORIES); các category còn lại mặc định 'public' theo đúng chỉ định
+   trong checklist. Chưa có category nào dành riêng cho DN trong hệ thống hiện tại. */
+const CATEGORY_VISIBILITY = {
+  hoi_kts:       "public",
+  hoi_dap:       "kts",
+  vat_lieu:      "kts",
+  showcase:      "public",
+  nghe:          "kts",
+  bang_tin:      "public",
+  tu_van_du_an:  "public",
+};
+function categoryVisibilityOf(cat) { return CATEGORY_VISIBILITY[cat] || "kts"; }
+
 const NEW_ACCOUNT_FREE_AFTER = 3;      // từ đóng góp thứ 4 đăng thẳng (hậu kiểm)
 const NOTIF_BATCH_WINDOW_MS = 10 * 60 * 1000; // gộp thông báo 10 phút
 
@@ -487,6 +504,7 @@ exports.forumPost = onCall({ region: REGION }, async (request) => {
     authorRank,
     authorAvatar: profile.avatarUrl || "",
     category,
+    categoryVisibility: categoryVisibilityOf(category),
     tag,
     text,
     media,
@@ -622,6 +640,7 @@ exports.forumComment = onCall({ region: REGION }, async (request) => {
     authorRole: profile.role,
     authorRank,
     authorAvatar: profile.avatarUrl || "",
+    categoryVisibility: post.categoryVisibility || categoryVisibilityOf(post.category),
     text,
     replyToId: replyToId || null,
     aiAssisted,
@@ -1114,6 +1133,9 @@ exports.forumAdmin = onCall({ region: REGION }, async (request) => {
     case "migrateFromDraft":
       return await migrateFromDraft();
 
+    case "backfillCategoryVisibility":
+      return await backfillCategoryVisibility();
+
     case "seed":
       return await seedForumData();
 
@@ -1150,6 +1172,33 @@ exports.forumAdmin = onCall({ region: REGION }, async (request) => {
       throw new HttpsError("invalid-argument", "Hành động không hợp lệ: " + action);
   }
 });
+
+/* ════════════════════════════════════════════
+   CHECKLIST_PHANQUYEN_DIENDAN_ALN.md PASS 1 — backfill categoryVisibility cho bài
+   + bình luận đã tồn tại trước khi có field này (kể cả bài cũ chỉ có tag, không có
+   category — mặc định 'kts' cho an toàn, không lộ ra công khai). Idempotent, chạy
+   lại vô hại (luôn tính lại đúng theo category hiện tại của từng bài).
+════════════════════════════════════════════ */
+async function backfillCategoryVisibility() {
+  const snap = await fdb.collection(COL.posts).get();
+  let posts = 0, comments = 0;
+  for (const doc of snap.docs) {
+    const p = doc.data();
+    const vis = categoryVisibilityOf(p.category);
+    if (p.categoryVisibility !== vis) {
+      await doc.ref.update({ categoryVisibility: vis });
+      posts++;
+    }
+    const cSnap = await doc.ref.collection("comments").get();
+    for (const c of cSnap.docs) {
+      if (c.data().categoryVisibility !== vis) {
+        await c.ref.update({ categoryVisibility: vis });
+        comments++;
+      }
+    }
+  }
+  return { ok: true, totalPosts: snap.size, updatedPosts: posts, updatedComments: comments };
+}
 
 /* ════════════════════════════════════════════
    MIGRATE _draft → PRODUCTION — chạy 1 LẦN khi nghiệm thu (Tools → "Chuyển dữ liệu từ bản nháp").
@@ -1790,7 +1839,7 @@ async function drip_makeQuestion(pick) {
   const pid = "hoikts_q_" + pick.id;
   await fdb.collection(COL.posts).doc(pid).set({
     authorUid: HOIKTS_CN_UID, authorName: item.asker, authorRole: "cn", authorRank: null, authorAvatar: "",
-    category: "hoi_kts", tag: null, text: item.title + "\n\n" + item.q,
+    category: "hoi_kts", categoryVisibility: categoryVisibilityOf("hoi_kts"), tag: null, text: item.title + "\n\n" + item.q,
     media: [], images: [], suggestedKts: [], aiSummary: null, aiSummaryAt: null,
     heartCount: item.qh || 0, heartedBy: [], pinned: false, hidden: false, status: "visible",
     commentCount: 0, bestAnswerId: null, brief: null, seedContent: true, dripped: true,
@@ -1803,6 +1852,7 @@ async function drip_postAnswer(pid, a, idx) {
   const cid = pid + "_a" + idx;
   await fdb.collection(COL.posts).doc(pid).collection("comments").doc(cid).set({
     authorUid: a.uid, authorName: a.name, authorRole: "kts", authorRank: a.badge || null, authorAvatar: "",
+    categoryVisibility: categoryVisibilityOf("hoi_kts"),
     text: a.text, replyToId: null, isBestAnswer: !!a.best, flagged: false, status: "visible",
     aiAssisted: false, heartCount: a.h || 0, heartedBy: [], createdAt: ts(),
   });
