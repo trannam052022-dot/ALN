@@ -1510,6 +1510,11 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
             <div><div style="font-size:12px;font-weight:500;color:var(--text)">Đánh giá từ Chủ nhà</div><div style="font-size:11px;color:var(--muted)">Khi có review mới</div></div>
             <label style="position:relative;display:inline-block;width:38px;height:22px;cursor:pointer"><input type="checkbox" style="opacity:0;width:0;height:0"><span style="position:absolute;inset:0;background:var(--border2);border-radius:99px;transition:.2s"><span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.2s"></span></span></label>
           </div>
+          <style>.lead-sw{position:relative;display:inline-block;width:38px;height:22px;cursor:pointer}.lead-sw input{opacity:0;width:0;height:0}.lead-sw .track{position:absolute;inset:0;background:var(--border2);border-radius:99px;transition:.2s}.lead-sw .knob{position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.2s}.lead-sw input:checked+.track{background:var(--green)}.lead-sw input:checked+.track .knob{transform:translateX(16px)}</style>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><div style="font-size:12px;font-weight:500;color:var(--text)">Email dự án mới</div><div style="font-size:11px;color:var(--muted)">Nhận email khi có chủ nhà cần tư vấn trong khu vực bạn</div></div>
+            <label class="lead-sw"><input type="checkbox" id="tgLeadEmail" onchange="toggleLeadEmail(this)"><span class="track"><span class="knob"></span></span></label>
+          </div>
         </div>
       </div>
       <div class="card" style="padding:20px">
@@ -3249,6 +3254,16 @@ function _getInitials() {
 }
 
 // Lưu hồ sơ
+/* Bật/tắt nhận email dự án mới (lead khu vực) — lưu users/{uid}.nhanLeadEmail */
+window.toggleLeadEmail = async function toggleLeadEmail(el) {
+  const uid = window.__ALN_UID;
+  if (!uid) { el.checked = !el.checked; showToast('Chưa đăng nhập','t-red'); return; }
+  try {
+    await setDoc(doc(db,'users',uid), { nhanLeadEmail: el.checked }, {merge:true});
+    showToast(el.checked ? '✅ Đã BẬT email dự án mới' : 'Đã TẮT email dự án mới', 't-green');
+  } catch(e) { el.checked = !el.checked; showToast('Lỗi lưu: '+(e.message||e),'t-red'); }
+};
+
 window.saveProfile = async function saveProfile() {
   const uid = window.__ALN_UID;
   if (!uid) { showToast('Chưa đăng nhập','t-red'); return; }
@@ -3542,6 +3557,9 @@ onAuthStateChanged(auth, async (user) => {
     // Điền username vào Cài đặt
     const suEl = document.getElementById('settingUsername');
     if (suEl && profile.username) suEl.textContent = profile.username;
+    // Toggle "Email dự án mới": chỉ BẬT khi đã opt-in thật (=== true) — KTS cũ chưa có field → hiện TẮT
+    const tgLE = document.getElementById('tgLeadEmail');
+    if (tgLE) tgLE.checked = profile.nhanLeadEmail === true;
 
     // Hồ sơ KTS đầu sidebar: tên + avatar theo tài khoản đăng nhập
     try {
