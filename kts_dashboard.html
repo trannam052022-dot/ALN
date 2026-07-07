@@ -716,7 +716,93 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     </div>
   </header>
 
-  <div class="content">
+  <div class="content" style="position: relative">
+
+<style id="officeMastheadKtsStyle">
+.office-masthead-kts{
+  --om-bg:#0e1424; --om-panel:#131d33; --om-line:rgba(212,168,64,.4); --om-line2:rgba(224,182,84,.2); --om-gold:#e0b654;
+  --om-cream:#f0ead6; --om-sub:#9aa8bd; --om-online:#3dd68c;
+  background:var(--om-bg); border:3px solid var(--om-gold); border-radius:16px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
+  padding:36px 38px 26px; position:relative; margin-bottom:28px;
+}
+.omk-grid-overlay{
+  position:absolute; inset:0; pointer-events:none; opacity:.12;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(184,134,11,.5) 0px, rgba(184,134,11,.5) 1px, transparent 1px, transparent 32px),
+    repeating-linear-gradient(90deg, rgba(184,134,11,.5) 0px, rgba(184,134,11,.5) 1px, transparent 1px, transparent 32px);
+}
+.omk-frame{position:relative}
+.omk-frame-corner{display:none}
+.omk-frame-corner.tl{top:-14px;left:-14px;border-top:1px solid;border-left:1px solid}
+.omk-frame-corner.tr{top:-14px;right:-14px;border-top:1px solid;border-right:1px solid}
+.omk-frame-corner.bl{bottom:-14px;left:-14px;border-bottom:1px solid;border-left:1px solid}
+.omk-frame-corner.br{bottom:-14px;right:-14px;border-bottom:1px solid;border-right:1px solid}
+.omk-titleblock{position:relative;padding:2px 4px}
+.omk-eyebrow{font-family:var(--syne);font-size:13px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--om-gold);margin-bottom:10px}
+.omk-title{font-family:var(--serif);font-style:italic;font-weight:600;font-size:38px;color:var(--om-cream);letter-spacing:.01em;line-height:1.18}
+.omk-title-rule{width:46px;height:1px;background:var(--om-gold);opacity:.55;margin:11px 0 13px}
+.omk-meta-row{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;color:var(--om-sub);flex-wrap:wrap;margin-bottom:12px;letter-spacing:.02em}
+.omk-meta-sep{width:1px;height:11px;background:var(--om-line2);opacity:.9}
+.omk-meta-item{color:var(--om-sub)}
+.om-status{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--om-gold);background:rgba(255,255,255,.025);border:1px solid rgba(198,154,52,.22);padding:6px 14px;border-radius:99px;letter-spacing:.02em}
+.om-status-dot{width:6px;height:6px;border-radius:50%;background:var(--om-online);box-shadow:0 0 7px var(--om-online);animation:omkBlink 2.2s infinite;flex-shrink:0}
+.om-status.closed .om-status-dot{background:#8a6d3a;box-shadow:none;animation:none}
+@keyframes omkBlink{0%,100%{opacity:1}50%{opacity:.35}}
+.om-staff-row{position:relative;display:flex;align-items:center;gap:0;flex-wrap:wrap;margin-top:22px;padding-top:16px;border-top:1px solid var(--om-line2)}
+.om-staff{display:flex;align-items:center;gap:9px;padding:0 18px}
+.om-staff:first-child{padding-left:0}
+.om-staff+.om-staff{border-left:1px solid var(--om-line2)}
+.om-staff-av{position:relative;width:29px;height:29px;border-radius:50%;background:var(--om-bg);border:1px solid rgba(240,234,214,.22);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:11px;font-weight:600;color:var(--om-cream);flex-shrink:0}
+.om-dot-on{position:absolute;bottom:-1px;right:-1px;width:7px;height:7px;border-radius:50%;background:var(--om-online);border:1.5px solid var(--om-bg)}
+.om-staff-name{font-size:11px;font-weight:600;color:var(--om-cream);letter-spacing:.01em}
+.om-staff-role{font-size:9px;color:var(--om-sub);letter-spacing:.03em;margin-top:1px}
+.om-rooms{position:relative;display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.om-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:2px;border:1px solid rgba(198,154,52,.18);background:transparent;color:var(--om-sub);font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.om-chip i{color:var(--om-gold);opacity:.75}
+.om-chip:hover{border-color:var(--om-gold);color:var(--om-cream)}
+.om-chip.active{border-color:var(--om-gold);color:var(--om-gold);background:rgba(198,154,52,.07)}
+.om-activity{position:relative;margin-top:16px;display:flex;flex-direction:column;gap:6px;min-height:0}
+.om-activity-item{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--om-sub);letter-spacing:.01em}
+.om-activity-item b{color:var(--om-cream);font-weight:600}
+.om-activity-dot{width:3px;height:3px;border-radius:50%;background:var(--om-gold);flex-shrink:0}
+.om-activity-empty{font-size:11px;color:var(--om-sub);opacity:.55;font-style:italic;font-family:var(--serif)}
+.om-footer{position:relative;margin-top:16px;padding-top:14px;border-top:1px solid var(--om-line2);font-size:10px;color:var(--om-sub);display:flex;align-items:center;gap:7px;letter-spacing:.02em}
+.om-footer i{color:var(--om-gold)}
+@media(max-width:700px){
+  .omk-title{font-size:26px}
+  .office-masthead-kts{padding:24px 20px 16px}
+  .om-staff{padding:0 14px}
+}
+@media(min-width:769px){
+  .topbar{display:none}
+  .content{padding-top:22px}
+}
+</style>
+
+<div class="office-masthead-kts" id="officeMastheadKts" style="width: 100%; max-width: 1114px; min-height: 294px">
+  <div class="omk-frame">
+    <div class="omk-frame-corner tl"></div>
+    <div class="omk-frame-corner tr"></div>
+    <div class="omk-frame-corner bl"></div>
+    <div class="omk-frame-corner br"></div>
+    <div class="omk-titleblock">
+      <div class="omk-eyebrow">Mạng lưới Kiến trúc sư toàn quốc</div>
+      <div class="omk-title">Văn phòng KTS</div>
+      <div class="omk-title-rule"></div>
+      <div class="om-status" id="omkStatusWrap"><span class="om-status-dot"></span><span id="omkStatusText">Đang mở cửa · Giờ 8:00–18:00</span></div>
+    </div>
+  </div>
+
+  <div class="om-rooms" id="omkRooms">
+    <button class="om-chip active" data-room="desk" onclick="omkGoRoom('desk')"><i class="ph-duotone ph-note-pencil"></i>Bàn làm việc</button>
+    <button class="om-chip" data-room="meeting" onclick="omkGoRoom('meeting')"><i class="ph-duotone ph-users-three"></i>Phòng họp</button>
+    <button class="om-chip" data-room="archive" onclick="omkGoRoom('archive')"><i class="ph-duotone ph-archive"></i>Kho hồ sơ</button>
+    <button class="om-chip" data-room="progress" onclick="omkGoRoom('progress')"><i class="ph-duotone ph-chart-line-up"></i>Bảng tiến độ</button>
+  </div>
+
+  <div class="om-activity" id="omkActivity"></div>
+</div>
 
     <!-- GREETING -->
     <div style="margin-bottom:22px">
@@ -768,7 +854,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     ══════════════════════════════════ -->
     <div class="dash-2col">
     <div><!-- LEFT: SLA -->
-    <div class="sec-label no-line sla-section" style="justify-content:space-between">
+    <div class="sec-label no-line sla-section" id="ktsAnchorDesk" style="justify-content:space-between">
       <span>Nhiệm vụ ưu tiên</span>
       <span style="font-size:10px;font-weight:600;color:var(--amber);background:var(--amber-bg);border:1px solid rgba(152,105,10,.2);padding:2px 9px;border-radius:99px;letter-spacing:0;text-transform:none">1 đang chờ</span>
     </div>
@@ -1158,7 +1244,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <!-- ══════════════════════════════════
          MODULE 2c — BẢNG REVIEW DỰ ÁN
     ══════════════════════════════════ -->
-    <div class="sec-label review-section"><i class="ph-duotone ph-clipboard-text" style="font-size:13px"></i> Bảng Review & Tài liệu dự án</div>
+    <div class="sec-label review-section" id="ktsAnchorArchive"><i class="ph-duotone ph-clipboard-text" style="font-size:13px"></i> Bảng Review & Tài liệu dự án</div>
     <div class="card">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
         <div>
@@ -1275,7 +1361,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
 
     <!-- ═══ DỰ ÁN CỦA TÔI ═══ -->
-    <div class="sec-label myproj-section"><i class="ph-duotone ph-briefcase" style="font-size:13px"></i> Dự án của tôi</div>
+    <div class="sec-label myproj-section" id="ktsAnchorProgress"><i class="ph-duotone ph-briefcase" style="font-size:13px"></i> Dự án của tôi</div>
     <div id="myProjList">
       <div style="color:var(--muted);font-size:13px;text-align:center;padding:24px">Đang tải...</div>
     </div>
@@ -2722,7 +2808,7 @@ function alnNotify(title, body){
     var first = document.querySelector('.sec-label.wallet-section');
     if(!first) return;
     var cont = first.parentElement;
-    var SKIP = /modal|toast|popup|fab|veil|overlay|aln|chat/i;
+    var SKIP = /modal|toast|popup|fab|veil|overlay|aln|chat|masthead/i;
     var MARK = [['wallet-section','wallet'],['proposal-section','proposal'],['review-section','review'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip'],['myproj-section','myproj'],['myprofile-section','myprofile'],['reputation-section','reputation'],['ktscreator-section','ktscreator'],['settings-section','settings'],['library-section','library']];
     var groups = { dashboard: [] };
     var cur = 'dashboard';
@@ -4679,6 +4765,69 @@ window.hkLeave = function(){
   document.getElementById('hkFrame').src = 'about:blank';
   document.getElementById('hkModal').style.display = 'none';
 };
+</script>
+
+<script>
+(function(){
+  function $(id){return document.getElementById(id);}
+  function initials(name){
+    var nm=(name||'').replace(/^KTS\.\s*/,'').trim();
+    var pts=nm.split(' ').filter(Boolean);
+    if(!pts.length) return 'KT';
+    return (pts[0][0]+(pts.length>1?pts[pts.length-1][0]:'')).toUpperCase();
+  }
+  function updateOfficeStatus(){
+    var h=new Date().getHours();
+    var open = h>=8 && h<18;
+    var wrap=$('omkStatusWrap'); var txt=$('omkStatusText');
+    if(wrap){ wrap.classList.toggle('closed', !open); }
+    if(txt){ txt.textContent = open ? 'Đang mở cửa · Giờ 8:00–18:00' : 'Văn phòng đã đóng cửa · để lại lời nhắn'; }
+    return open;
+  }
+  function renderOmkActivity(){
+    var el=$('omkActivity'); if(!el) return;
+    var src = (typeof _KTS_NOTIFS !== 'undefined') ? _KTS_NOTIFS : [];
+    var list = src.slice(0,3);
+    if(!list.length){ el.innerHTML=''; return; }
+    el.innerHTML = list.map(function(n){
+      return '<div class="om-activity-item"><span class="om-activity-dot"></span>'+n.body+'</div>';
+    }).join('');
+  }
+  function updateMasthead(){
+    updateOfficeStatus();
+    renderOmkActivity();
+  }
+  window.omkGoRoom=function(room){
+    document.querySelectorAll('#omkRooms .om-chip').forEach(function(c){c.classList.toggle('active', c.getAttribute('data-room')===room);});
+    if(room==='meeting'){ if(typeof openChatModal==='function') openChatModal(); return; }
+    var tabMap={desk:'dashboard', archive:'review', progress:'myproj'};
+    if(typeof window.ktsShowTab==='function'){
+      var navEl = document.querySelector('.sidebar .nav-item[data-tab="'+tabMap[room]+'"]');
+      window.ktsShowTab(tabMap[room], navEl);
+    }
+    setTimeout(function(){
+      var idMap={desk:'ktsAnchorDesk', archive:'ktsAnchorArchive', progress:'ktsAnchorProgress'};
+      var el=document.getElementById(idMap[room]);
+      if(el){ var y = el.getBoundingClientRect().top + window.scrollY - 70; window.scrollTo({top:Math.max(y,0), behavior:'smooth'}); }
+    },80);
+  };
+  function wireHooks(){
+    if(typeof window._addNotif==='function' && !window._addNotif.__omWrapped){
+      var origAN=window._addNotif;
+      window._addNotif=function(){ var r=origAN.apply(this,arguments); renderOmkActivity(); return r; };
+      window._addNotif.__omWrapped=true;
+    }
+  }
+  updateOfficeStatus();
+  var tries=0;
+  var poll=setInterval(function(){
+    wireHooks();
+    updateMasthead();
+    tries++;
+    if(tries>60) clearInterval(poll);
+  },500);
+  setInterval(updateOfficeStatus, 60000);
+})();
 </script>
 </body>
 </html>
