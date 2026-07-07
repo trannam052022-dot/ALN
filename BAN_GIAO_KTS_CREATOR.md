@@ -34,35 +34,43 @@ Chi tiết thay đổi:
 
 ---
 
-## ⚠️ DỪNG THEO ĐIỀU KIỆN #5 — HẠNG MỤC D (DIỄN ĐÀN) CHƯA LÀM
+## ✅ CẬP NHẬT 07/07/2026 — HẠNG MỤC D ĐÃ LÀM (sau khi xác minh lại PASS 1-6 đã merge)
 
-`TONG_HOP_PHUONG_AN_KTS_CREATOR.md` viết Hạng mục D dựa trên giả định diễn đàn còn ở
-`forum_draft.html` + collection `*_draft` (đúng tình trạng hồi 05/07/2026). **Thực tế hiện
-tại đã khác, có mâu thuẫn thật với đề bài:**
+Ban đầu tôi DỪNG Hạng mục D vì tưởng `CHECKLIST_PHANQUYEN_DIENDAN_ALN.md` (PASS 1-6) còn
+đang chạy dở trên `forum.html` — kiểm tra lại git log kỹ hơn thì PASS 1-6 **đã merge xong**
+vào `main` từ trước (file `.md` chỉ ghi chú lỗi thời "chờ merge"). Vì vậy đã tiến hành D trên
+nền `forum.html`/`functions/forum.js` thật, phạm vi đã thu hẹp cho khớp hệ thống hiện có:
 
-1. Diễn đàn đã **lên production** từ 05–06/07/2026: trang thật là `forum.html`
-   (không phải `forum_draft.html`), collection thật `forumPosts`/`comments`/`ktsReputation`/...
-   (xem `BAN_GIAO_DIEN_DAN.md` mục 0). Không còn "`forum_draft.html`" để build thêm lên đó.
-2. **D1 (đọc công khai)** và một phần **D2 (anti-bypass)**/**D3 (badge)** đang được làm bởi
-   một luồng công việc RIÊNG, đang chạy dở: `CHECKLIST_PHANQUYEN_DIENDAN_ALN.md` — PASS 1-3
-   đã xong (chờ deploy), PASS 4 (khách vãng lai đọc công khai forum.html) đã code xong chờ
-   merge/test, PASS 5-6 cũng đã code-level xong. Badge 3 bậc (Tân binh/Cố vấn/Chuyên gia ALN)
-   **đã có sẵn** trong hệ thống thật (không phải "KTS Sáng lập" nhưng cùng vị trí hiển thị).
-3. Sửa `forum.html` / `functions/forum.js` ngay bây giờ để thêm D1-D4 sẽ **đụng trực tiếp**
-   vào file đang được một luồng khác chỉnh sửa dở dang → rủi ro xung đột/ghi đè cao.
+- **D1 (đọc công khai)** — coi như đã xong từ PASS 1-6, không làm lại.
+- **D2 (mở rộng anti-bypass)** — `functions/forum.js`: thêm cụm từ khoá **"liên hệ riêng"**
+  (bắt cả không dấu) vào bộ lọc `forumFilterViolation`; thêm danh sách `SHORTENER_HOSTS`
+  (bit.ly, tinyurl.com, cutt.ly, t.co, is.gd...) → link rút gọn bị chặn với lý do riêng
+  `link_rut_gon` (trước đây rơi chung vào `"link"`) để mod log rõ ràng hơn. Đã mirror y hệt
+  sang bộ lọc client-side trong `forum.html` (chỉ UX cảnh báo sớm, chốt chặn vẫn ở server).
+  Đã viết 8 test case xác nhận không phá hành vi cũ (link/từ khoá/SĐT đã chặn từ trước vẫn
+  chặn đúng, link applamnha.vn vẫn qua được).
+  ⚠️ **Cần Founder tự chạy `firebase deploy --only functions` để có hiệu lực** — code mới
+  merge vào `main` chỉ cập nhật frontend GitHub Pages ngay, KHÔNG tự động deploy Cloud
+  Functions.
+  *Phạm vi đã thu hẹp so với đề bài gốc:* không build tính năng "nhúng clip vào bài diễn đàn"
+  (không tồn tại trong `forum.html` hiện tại, sẽ là một tính năng lớn riêng — nếu Founder
+  muốn KTS chia sẻ clip TikTok/FB ngay trong bài đăng diễn đàn, cần thêm một quyết định
+  kiến trúc riêng vì link TikTok/Facebook hiện đang bị bộ lọc chặn như "kênh ngoài").
+- **D3 (badge "KTS Sáng lập")** — `forum.html`: đọc `kts_profiles_draft` (collection có sẵn
+  từ Hạng mục A, `allow read: if true`) 1 lần khi tải trang, hiện badge cạnh tên KTS có
+  `badgeFounder:true` trên mọi bài đăng + bình luận (thread lẫn feed). Không cần sửa
+  `functions/forum.js` hay rules — thuần đọc client-side, có hiệu lực ngay khi trang build
+  lại qua GitHub Pages, không cần deploy Functions/Rules.
+- **D4 (leaderboard điểm uy tín)** — Widget mới trên `forum.html` (dưới banner disclaimer,
+  trên feed), đọc top 10 từ `ktsReputation` (collection thật, `orderBy('points','desc')`,
+  không cần index mới vì chỉ 1 field orderBy). **Chỉ hiện với user đã đăng nhập** (khách
+  vãng lai không thấy — vì rules `ktsReputation` yêu cầu `signedIn()`, đổi rules này cần
+  hỏi Founder trước nên tôi không đổi). Bỏ chữ "tháng" so với đề bài gốc — hiện xếp hạng theo
+  **tổng điểm luỹ kế** (đơn giản, không cần hạ tầng tính điểm-theo-tháng); nếu Founder muốn
+  đúng "theo tháng", cần thêm tổng hợp từ subcollection `events` (việc lớn hơn, để sau).
 
-**Theo ĐIỀU KIỆN DỪNG CỨNG #5 của đề bài, tôi DỪNG toàn bộ Hạng mục D, chưa code gì, chờ
-Founder quyết định một trong các hướng sau:**
-
-- **(a)** Gộp yêu cầu D vào `CHECKLIST_PHANQUYEN_DIENDAN_ALN.md` làm tiếp theo (PASS 4 đã
-  gần đúng D1; D3 "KTS Sáng lập" có thể thêm như 1 field boolean bên cạnh badge 3 bậc có sẵn;
-  D4 leaderboard + D2 mở rộng anti-bypass cho clip embed làm sau khi PASS 1-6 nghiệm thu xong).
-- **(b)** Làm D trên một bản sao cách ly hoàn toàn mới (vd `forum_kts_creator_draft.html`
-  + collection riêng) — tốn công trùng lặp, không tái dùng được badge/reputation/anti-bypass
-  đã có, không khuyến nghị.
-- **(c)** Founder tự chốt phạm vi khác cho D.
-
-Khi có quyết định, quay lại làm tiếp Hạng mục D theo đúng hướng được chọn.
+**Việc Founder cần làm để D2 có hiệu lực đầy đủ:** `firebase deploy --only functions`. D3/D4
+đã chạy được ngay khi GitHub Pages build lại (không phụ thuộc deploy Functions/Rules).
 
 ---
 

@@ -438,6 +438,17 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 .choose-assure i { color:var(--gold); }
 .choose-fee { margin-top:7px; font-size:var(--text-xs); color:var(--text2); font-style:italic; }
 .choose-note { margin-top:10px; font-size:var(--text-xs); color:var(--sub); line-height:1.5; }
+
+/* Bảng xếp hạng điểm uy tín (Hạng mục D4 — KTS Creator ALN) */
+.lb-widget { max-width:720px; margin:0 auto 14px; padding:14px 16px; border-radius:var(--r); background:var(--white); border:1px solid var(--border); box-shadow:var(--sh); }
+.lb-title { font-size:var(--text-xs); font-weight:700; color:var(--gold); font-family:var(--mono); letter-spacing:.06em; text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.lb-list { display:flex; flex-direction:column; gap:6px; }
+.lb-row { display:flex; align-items:center; gap:10px; padding:6px 8px; border-radius:8px; }
+.lb-row:nth-child(-n+3) { background:var(--gold-bg); }
+.lb-rank-num { width:20px; text-align:center; font-family:var(--syne); font-weight:800; color:var(--sub); font-size:var(--text-sm); flex-shrink:0; }
+.lb-row:nth-child(-n+3) .lb-rank-num { color:var(--gold); }
+.lb-name { flex:1; font-size:var(--text-sm); font-weight:600; color:var(--text); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.lb-points { font-family:var(--mono); font-size:var(--text-xs); font-weight:700; color:var(--gold); flex-shrink:0; }
 </style>
 </head>
 <body>
@@ -478,6 +489,11 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 
 <div class="tuvan-disclaimer" id="tuvanDisclaimer">
   <b>ⓘ Lưu ý pháp lý:</b> Nội dung tư vấn trên diễn đàn là ý kiến tham khảo của cá nhân KTS, không phải hồ sơ thiết kế có chữ ký chủ trì theo NĐ 175/2024 và không thay thế hợp đồng dịch vụ. Mọi giao dịch qua sàn ALN mới được bảo vệ bởi Quy trình 4 bước.
+</div>
+
+<div class="lb-widget" id="lbWidget" style="display:none">
+  <div class="lb-title"><i class="ph-duotone ph-trophy"></i>Bảng xếp hạng điểm uy tín</div>
+  <div class="lb-list" id="lbList"></div>
 </div>
 
 <div class="feed-wrap">
@@ -616,7 +632,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 <script type="module">
 import {
   app, auth, db, onAuthStateChanged,
-  doc, getDoc, collection, query, where, orderBy, onSnapshot,
+  doc, getDoc, getDocs, collection, query, where, orderBy, limit, onSnapshot,
   storage, storageRef, uploadBytes, getDownloadURL
 } from './firebase-config.js';
 import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
@@ -655,6 +671,7 @@ const BLOCK_MSG = 'Trao đổi dự án thực hiện qua kênh chat sàn ALN đ
 
 /* ════ BỘ LỌC CHỐNG LÁCH SÀN — bản client (UX); server là chốt chặn thật ════ */
 const ALLOWED_HOSTS = ['applamnha.vn', 'trannam052022-dot.github.io'];
+const SHORTENER_HOSTS = ['bit.ly','tinyurl.com','cutt.ly','is.gd','t.co','rebrand.ly','tiny.cc','shorte.st','s.id','ouo.io','soo.gd','zii.im','adf.ly','lnkd.in','bit.do'];
 const VN_NUM_WORDS = { khong:'0', mot:'1', hai:'2', ba:'3', bon:'4', tu:'4', nam:'5', lam:'5', sau:'6', bay:'7', tam:'8', chin:'9' };
 function vnNormNoMark(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d'); }
 function vnDigitize(text){ return vnNormNoMark(text).replace(/\b(khong|mot|hai|ba|bon|tu|nam|lam|sau|bay|tam|chin)\b/g, m => VN_NUM_WORDS[m]); }
@@ -664,11 +681,13 @@ function filterViolation(text) {
   const deAt = t.replace(/\s*(\(|\[)?\s*(a còng|a cong|a móc|a moc|at)\s*(\)|\])?\s*/gi, '@').replace(/\s+(chấm|cham|dot)\s+/gi, '.');
   if (/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(deAt)) return 'email';
   if (/(zalo|viber|telegram|tele\b|whatsapp|wechat|s[đd]t\b|số\s*[đd]t|số\s*điện\s*thoại|gmail|hotmail|yahoo|facebook\.com|fb\.com|messenger|instagram|tiktok)/i.test(t)) return 'keyword';
+  if (/lien\s*he\s*rieng/i.test(vnNormNoMark(t))) return 'keyword';
   const linkRe = /(https?:\/\/|www\.)[^\s<>"']+/gi; let m;
   while ((m = linkRe.exec(t))) {
     let url = m[0]; if (!/^https?:/i.test(url)) url = 'http://' + url;
     try {
       const host = new URL(url).hostname.toLowerCase();
+      if (SHORTENER_HOSTS.some(h => host === h || host.endsWith('.' + h))) return 'link_rut_gon';
       if (!ALLOWED_HOSTS.some(h => host === h || host.endsWith('.' + h))) return 'link';
     } catch (e) { return 'link'; }
   }
@@ -677,7 +696,7 @@ function filterViolation(text) {
   if (PHONE_RE.test(vnDigitize(t).replace(/[\s.\-_() ]/g, ''))) return 'phone';
   return null;
 }
-const VIOLATION_LABEL = { phone:'số điện thoại', keyword:'từ khóa kênh liên lạc ngoài', link:'link ngoài', email:'địa chỉ email' };
+const VIOLATION_LABEL = { phone:'số điện thoại', keyword:'từ khóa kênh liên lạc ngoài', link:'link ngoài', link_rut_gon:'link rút gọn', email:'địa chỉ email' };
 
 /* ════ STATE ════ */
 let USER = null;            // {uid, role, name, avatar}
@@ -694,6 +713,7 @@ let reportTarget = null;     // {targetType, postId, commentId}
 let reportReason = 'lach_san';
 let postsUnsub = null;
 let toastTimer = null;
+let KTSC_FOUNDER_UIDS = new Set(); // uid các KTS có badge "Sáng lập" (kts_profiles_draft) — Hạng mục D3
 
 /* ════ HELPERS ════ */
 const $ = id => document.getElementById(id);
@@ -857,6 +877,26 @@ function bootForRole(){
   renderTabs();
   subscribePosts();
   maybeOpenDeepLink();
+  loadLeaderboard();
+}
+
+/* Bảng xếp hạng điểm uy tín top 10 (Hạng mục D4) — chỉ user đã đăng nhập xem được,
+   vì rules ktsReputation yêu cầu signedIn(); khách vãng lai không thấy widget này. */
+async function loadLeaderboard(){
+  try {
+    const snap = await getDocs(query(collection(db, 'ktsReputation'), orderBy('points', 'desc'), limit(10)));
+    const rows = [];
+    snap.forEach(d => rows.push({ uid: d.id, points: d.data().points || 0 }));
+    if(!rows.length) return;
+    const names = await Promise.all(rows.map(r => getDoc(doc(db, 'users', r.uid))));
+    names.forEach((s, i) => { rows[i].name = (s.exists() && s.data().name) || 'KTS ALN'; });
+    $('lbList').innerHTML = rows.map((r, i) =>
+      '<div class="lb-row"><span class="lb-rank-num">'+(i+1)+'</span>'
+      + '<span class="lb-name">'+escH(r.name)+'</span>'
+      + '<span class="lb-points">'+r.points+'đ</span></div>'
+    ).join('');
+    $('lbWidget').style.display = 'block';
+  } catch(e){ console.warn('[forum] leaderboard', e.message); }
 }
 
 function renderGate(icon, title, msg){
@@ -971,6 +1011,24 @@ function rankBadge(rank){
   const pri = (rank === 'chuyen_gia' || rank === 'co_van') ? ' title="Huy hiệu cao — được ưu tiên nhận dự án"' : '';
   return '<span class="rank-badge"'+pri+' style="color:'+m[1]+';background:'+m[2]+';border:1px solid '+m[1]+'44">'+m[3]+m[0]+'</span>';
 }
+/* Huy hiệu "KTS Sáng lập" (chương trình KTS Creator ALN — Hạng mục D3, kts_profiles_draft.badgeFounder) */
+function founderBadge(uid){
+  if(!uid || !KTSC_FOUNDER_UIDS.has(uid)) return '';
+  return '<span class="rank-badge" title="Thuộc thế hệ KTS Sáng lập đầu tiên của ALN" style="color:#98690a;background:rgba(152,105,10,.12);border:1px solid #98690a44"><i class="ph-duotone ph-medal"></i> KTS Sáng lập</span>';
+}
+/* Nạp 1 lần danh sách KTS có huy hiệu Sáng lập (đọc công khai, không cần đăng nhập) rồi
+   render lại feed/thread đang mở để hiện huy hiệu — không chặn luồng auth/posts chính. */
+async function loadFounderBadges(){
+  try {
+    const snap = await getDocs(query(collection(db, 'kts_profiles_draft'), where('badgeFounder', '==', true)));
+    const uids = new Set();
+    snap.forEach(d => uids.add(d.id));
+    KTSC_FOUNDER_UIDS = uids;
+    if(ALL_POSTS.length) renderFeed();
+    if(openThreadId) renderThread();
+  } catch(e){ console.warn('[forum] founder badges', e.message); }
+}
+loadFounderBadges();
 /* Phễu chốt: KTS gợi ý cho thread Tư vấn Dự án (server điền p.suggestedKts) */
 function suggestedKtsHtml(p){
   if(catOf(p) !== 'tu_van_du_an' || !Array.isArray(p.suggestedKts) || !p.suggestedKts.length) return '';
@@ -1019,7 +1077,7 @@ function renderCard(p){
     + '<div class="tc-top">'
       + '<div class="tc-avatar">'+av+'</div>'
       + '<div style="flex:1;min-width:0">'
-        + '<div class="tc-name">'+authorNameHtml(p)+roleBadge(p.authorRole)+rankBadge(p.authorRank)+'</div>'
+        + '<div class="tc-name">'+authorNameHtml(p)+roleBadge(p.authorRole)+rankBadge(p.authorRank)+founderBadge(p.authorUid)+'</div>'
         + '<div class="tc-time">'+timeAgo(p.createdAt)+'</div>'
       + '</div>'
       + (p.status==='pending' ? '<span class="badge-pending">CHỜ DUYỆT</span>' : '')
@@ -1250,7 +1308,7 @@ function renderThread(){
     + '<div class="tc-top">'
       + '<div class="tc-avatar">'+av+'</div>'
       + '<div style="flex:1;min-width:0">'
-        + '<div class="tc-name">'+authorNameHtml(p)+roleBadge(p.authorRole)+rankBadge(p.authorRank)+'</div>'
+        + '<div class="tc-name">'+authorNameHtml(p)+roleBadge(p.authorRole)+rankBadge(p.authorRank)+founderBadge(p.authorUid)+'</div>'
         + '<div class="tc-time">'+timeAgo(p.createdAt)+'</div>'
       + '</div>'
       + (p.status==='pending' ? '<span class="badge-pending">CHỜ DUYỆT</span>' : '')
@@ -1315,7 +1373,7 @@ function renderComment(p, c, isReply){
     + '<div class="cm-avatar">'+av+'</div>'
     + '<div class="cm-bubble'+(c.isBestAnswer?' best':'')+'">'
       + '<div class="cm-head">'
-        + '<span class="cm-name">'+nameHtml+'</span>'+roleBadge(c.authorRole)+rankBadge(c.authorRank)
+        + '<span class="cm-name">'+nameHtml+'</span>'+roleBadge(c.authorRole)+rankBadge(c.authorRank)+founderBadge(c.authorUid)
         + (c.isBestAnswer ? '<span class="badge-ba"><i class="ph-duotone ph-seal-check"></i>Best Answer</span>' : '')
         + (c.status==='pending' ? '<span class="badge-pending">CHỜ DUYỆT</span>' : '')
         + '<span class="cm-time">'+timeAgo(c.createdAt)+'</span>'

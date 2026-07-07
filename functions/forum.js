@@ -90,6 +90,12 @@ const BLOCK_MSG = "Trao đổi dự án thực hiện qua kênh chat sàn ALN đ
 
 /* ── BỘ LỌC CHỐNG LÁCH SÀN (bản server — bản client chỉ để UX) ── */
 const ALLOWED_HOSTS = ["applamnha.vn", "trannam052022-dot.github.io"];
+// Link rút gọn — chặn riêng (lý do rõ trong modLogs) thay vì rơi vào nhánh "link" chung,
+// vì đây là chiêu lách sàn phổ biến (che giấu đích đến thật) — Hạng mục D2 KTS Creator.
+const SHORTENER_HOSTS = [
+  "bit.ly", "tinyurl.com", "cutt.ly", "is.gd", "t.co", "rebrand.ly",
+  "tiny.cc", "shorte.st", "s.id", "ouo.io", "soo.gd", "zii.im", "adf.ly", "lnkd.in", "bit.do",
+];
 
 /* Bỏ dấu tiếng Việt để bắt chữ số viết bằng chữ, không phân biệt hoa/thường */
 function vnNormNoMark(s) {
@@ -158,6 +164,8 @@ function forumFilterViolation(text) {
   if (/(zalo|viber|telegram|tele\b|whatsapp|wechat|s[đd]t\b|số\s*[đd]t|số\s*điện\s*thoại|gmail|hotmail|yahoo|facebook\.com|fb\.com|messenger|instagram|tiktok)/i.test(t)) {
     return "keyword";
   }
+  // 2b. "Liên hệ riêng" (kể cả gõ không dấu) — chặn không phân biệt hoa/thường/dấu
+  if (/lien\s*he\s*rieng/i.test(vnNormNoMark(t))) return "keyword";
 
   // 3. Link ngoài (http/https/www không thuộc domain ALN)
   const linkRe = /(https?:\/\/|www\.)[^\s<>"']+/gi;
@@ -167,6 +175,8 @@ function forumFilterViolation(text) {
     if (!/^https?:/i.test(url)) url = "http://" + url;
     try {
       const host = new URL(url).hostname.toLowerCase();
+      const isShortener = SHORTENER_HOSTS.some((h) => host === h || host.endsWith("." + h));
+      if (isShortener) return "link_rut_gon";
       const ok = ALLOWED_HOSTS.some((h) => host === h || host.endsWith("." + h));
       if (!ok) return "link";
     } catch (e) {
