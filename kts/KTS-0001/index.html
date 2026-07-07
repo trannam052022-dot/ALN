@@ -192,7 +192,7 @@ function render(){
       + '</div>'
     + '</div>'
     + '<div class="cta-row">'
-      + '<button class="btn btn-gold" onclick="openLeadModal()"><i class="ph-duotone ph-hand-heart"></i>Bắt đầu Bước 1</button>'
+      + '<button class="btn btn-gold" onclick="openLeadModal()"><i class="ph-duotone ph-users-three"></i>Vào xem cộng đồng ALN</button>'
       + '<a class="btn btn-outline" href="'+ZALO_OA_URL+'" target="_blank" rel="noopener"><i class="ph-duotone ph-chat-circle-dots"></i>Nhắn Zalo OA ALN</a>'
     + '</div>'
     + '<div class="trust-note"><b>ⓘ</b> Mọi trao đổi &amp; giao dịch dự án diễn ra qua kênh chính thức App Làm Nhà,'
@@ -201,48 +201,42 @@ function render(){
 
 window.openLeadModal = function(){
   $('modalBody').innerHTML =
-    '<h3>Bắt đầu Bước 1</h3>'
-    + '<p class="sub">Để lại thông tin, đội ngũ App Làm Nhà sẽ liên hệ trong 24h để bắt đầu tư vấn cùng '
-      + escH((KTS_PROFILE && KTS_PROFILE.name) || 'KTS') + '.</p>'
-    + '<div class="field"><label>HỌ VÀ TÊN</label><input type="text" id="ldName" placeholder="Nguyễn Văn A"></div>'
-    + '<div class="field"><label>SỐ ĐIỆN THOẠI</label><input type="tel" id="ldPhone" placeholder="09xxxxxxxx"></div>'
-    + '<label class="chk-row"><input type="checkbox" id="ldConsent">Tôi đồng ý để App Làm Nhà liên hệ tư vấn theo Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân.</label>'
-    + '<button class="btn btn-gold" style="width:100%" id="ldSubmit" onclick="submitLead()">Gửi thông tin</button>'
+    '<h3>Vào xem cộng đồng ALN</h3>'
+    + '<p class="sub">Để lại số điện thoại để vào xem diễn đàn — hỏi đáp trực tiếp với Kiến trúc sư, xem công trình &amp; giá vật liệu thực tế. Khi cần tư vấn riêng, bạn đăng ký sau.</p>'
+    + '<div class="field"><label>SỐ ĐIỆN THOẠI</label><input type="tel" id="ldPhone" placeholder="09xxxxxxxx" onkeydown="if(event.key===\'Enter\')submitLead()"></div>'
+    + '<button class="btn btn-gold" style="width:100%" id="ldSubmit" onclick="submitLead()"><i class="ph-duotone ph-arrow-right"></i>Vào xem cộng đồng</button>'
+    + '<p style="font-size:var(--text-2xs);color:var(--muted);margin-top:12px;line-height:1.6;text-align:center">Bằng việc tiếp tục, bạn đồng ý để App Làm Nhà liên hệ tư vấn theo Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân.</p>'
     + '<div class="modal-err" id="ldErr"></div>';
   $('modalVeil').classList.add('show');
+  setTimeout(function(){ var el = $('ldPhone'); if(el) el.focus(); }, 50);
 };
 window.closeModal = function(){ $('modalVeil').classList.remove('show'); };
 
 window.submitLead = async function(){
-  const name = $('ldName').value.trim();
-  const phone = $('ldPhone').value.trim();
-  const consent = $('ldConsent').checked;
+  const phoneRaw = $('ldPhone').value.trim();
+  const phone = phoneRaw.replace(/[\s.\-()]/g, '');
   const err = $('ldErr');
   err.style.display = 'none';
-  if(name.length < 2){ err.textContent = 'Vui lòng nhập họ tên.'; err.style.display='block'; return; }
-  if(phone.length < 8){ err.textContent = 'Vui lòng nhập số điện thoại hợp lệ.'; err.style.display='block'; return; }
-  if(!consent){ err.textContent = 'Vui lòng đồng ý điều khoản để tiếp tục.'; err.style.display='block'; return; }
+  if(!/^0\d{8,10}$/.test(phone)){ err.textContent = 'Vui lòng nhập số điện thoại hợp lệ (VD: 0909xxxxxx).'; err.style.display='block'; return; }
   const btn = $('ldSubmit');
-  btn.disabled = true; btn.textContent = 'Đang gửi...';
+  btn.disabled = true; btn.innerHTML = 'Đang mở diễn đàn...';
   try {
     if(!authReady){ await new Promise(r => setTimeout(r, 500)); }
     await addDoc(collection(db, 'leads_draft'), {
-      name, phone,
+      name: '', phone,
       utm_source: UTM_SOURCE,
       kts_ref: KTS_CODE,
       clip_ref: CLIP_REF || null,
+      source_page: 'kts_landing',
       status: 'moi',
       createdAt: serverTimestamp()
     });
-    $('modalBody').innerHTML =
-      '<div class="modal-success"><i class="ph-duotone ph-check-circle"></i>'
-      + '<h3 style="margin-top:12px">Đã ghi nhận!</h3>'
-      + '<p class="sub">Cảm ơn bạn — đội ngũ App Làm Nhà sẽ liên hệ trong 24h.</p></div>';
-    setTimeout(closeModal, 2600);
+    // Xem vòng ngoài: dẫn khách vào diễn đàn công khai
+    location.href = '../../forum.html';
   } catch(e){
     console.error(e);
-    btn.disabled = false; btn.textContent = 'Gửi thông tin';
-    err.textContent = 'Lỗi gửi: ' + (e.message || e.code); err.style.display = 'block';
+    btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-arrow-right"></i>Vào xem cộng đồng';
+    err.textContent = 'Lỗi: ' + (e.message || e.code); err.style.display = 'block';
   }
 };
 
