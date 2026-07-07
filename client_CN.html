@@ -52,9 +52,10 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .sidebar-cn::-webkit-scrollbar-thumb{background:rgba(212,160,23,.3);border-radius:99px}
 .main-cn{margin-left:240px;flex:1;min-width:0;overflow-x:hidden}
 /* Sidebar brand */
-.dn-sidebar-brand{padding:16px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(212,160,23,.06) 0%,transparent 100%)}
-.dn-logo-mark{width:30px;height:30px;border-radius:var(--r-sm);border:1px solid rgba(212,160,23,.4);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);background:rgba(212,160,23,.08)}
-.dn-logo-text{font-family:var(--syne);font-weight:800;font-size:13px;letter-spacing:.04em;color:var(--text)}
+.dn-sidebar-brand{padding:20px 18px 16px;border-bottom:1px solid var(--border);margin-top:20px}
+.dn-sidebar-brand-top{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.dn-sidebar-brand-name{font-family:var(--serif);font-style:italic;font-weight:700;font-size:19px;color:var(--text);margin-top:4px;letter-spacing:-.01em}
+.dn-sidebar-brand-name::after{content:"";display:block;width:26px;height:2px;background:var(--gold);margin-top:9px;border-radius:2px}
 /* Sidebar profile card */
 .dn-sidebar-profile{padding:14px 16px 12px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(152,105,10,.04) 0%,transparent 100%)}
 .dn-profile-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#98690a,#b8860b);color:#fff;font-family:var(--syne);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px rgba(152,105,10,.28);border:2px solid rgba(152,105,10,.3)}
@@ -652,8 +653,8 @@ button,.btn,a[role="button"]{transition:transform .25s var(--ease),box-shadow .2
   <nav class="sidebar-cn" id="sidebarCN">
     <!-- Brand header -->
     <div class="dn-sidebar-brand">
-      <div class="dn-logo-mark"><i class="ph-duotone ph-buildings"></i></div>
-      <div class="dn-logo-text">ALN <span style="color:var(--gold)">Corp.</span></div>
+      <div class="dn-sidebar-brand-top">Không gian Chủ nhà</div>
+      <div class="dn-sidebar-brand-name">ALN Workspace</div>
     </div>
 
     <!-- Company profile card -->
@@ -701,23 +702,22 @@ button,.btn,a[role="button"]{transition:transform .25s var(--ease),box-shadow .2
   <div class="main-cn">
     <style id="officeMastheadStyle">
 .office-masthead{
-  --om-bg:#0e1424; --om-panel:#131d33; --om-line:rgba(184,134,11,.32); --om-line2:rgba(198,154,52,.16); --om-gold:#c69a34;
+  --om-bg:#0e1424; --om-panel:#131d33; --om-line:rgba(212,168,64,.4); --om-line2:rgba(224,182,84,.2); --om-gold:#e0b654;
   --om-cream:#f0ead6; --om-sub:#9aa8bd; --om-online:#3dd68c;
-  background:var(--om-bg); border-bottom:1px solid var(--om-line);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.045), inset 0 -1px 0 rgba(198,154,52,.08);
-  padding:26px 28px 18px; position:relative;
+  background:var(--om-bg); border:3px solid var(--om-gold); border-radius:16px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
+  padding:32px 34px 22px; margin:20px 24px 0; position:relative;
 }
-.om-top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.om-top-row{display:flex;justify-content:space-between;align-items:stretch;gap:24px;flex-wrap:wrap}
 .om-sign{flex:1;min-width:220px}
-.om-sign-eyebrow{font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:var(--om-gold);opacity:.9;margin-bottom:8px}
-.om-sign-title{font-family:var(--serif);font-style:italic;font-weight:600;font-size:28px;color:var(--om-cream);letter-spacing:.01em;line-height:1.18}
+.om-sign-eyebrow{font-family:var(--syne);font-size:13px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--om-gold);margin-bottom:10px}
+.om-sign-title{font-family:var(--serif);font-style:italic;font-weight:600;font-size:32px;color:var(--om-cream);letter-spacing:.01em;line-height:1.18}
 .om-sign-rule{width:46px;height:1px;background:var(--om-gold);opacity:.55;margin:10px 0 12px}
-.om-status{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--om-sub);background:rgba(255,255,255,.025);border:1px solid rgba(198,154,52,.22);padding:6px 14px;border-radius:99px;letter-spacing:.02em}
+.om-status{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--om-gold);background:rgba(255,255,255,.025);border:1px solid rgba(198,154,52,.22);padding:6px 14px;border-radius:99px;letter-spacing:.02em}
 .om-status-dot{width:6px;height:6px;border-radius:50%;background:var(--om-online);box-shadow:0 0 7px var(--om-online);animation:omBlink 2.2s infinite;flex-shrink:0}
 .om-status.closed .om-status-dot{background:#8a6d3a;box-shadow:none;animation:none}
 @keyframes omBlink{0%,100%{opacity:1}50%{opacity:.35}}
-.om-kts-card{display:flex;align-items:center;gap:14px;background:var(--om-panel);border:1px solid var(--om-line);border-radius:2px;padding:14px 20px;flex-shrink:0;position:relative;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
-.om-kts-card::before{content:'';position:absolute;top:6px;left:6px;right:6px;bottom:6px;border:1px solid var(--om-line2);pointer-events:none}
+.om-kts-card{display:flex;align-items:center;gap:14px;background:var(--om-panel);border:2px solid var(--om-gold);border-radius:12px;padding:14px 20px;flex-shrink:0;position:relative;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
 .om-kts-av{width:48px;height:48px;border-radius:50%;background:var(--om-bg);border:1px solid var(--om-gold);outline:1px solid rgba(198,154,52,.25);outline-offset:2px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-weight:600;font-size:17px;color:var(--om-gold);flex-shrink:0}
 .om-kts-divider{width:1px;align-self:stretch;background:var(--om-line2);flex-shrink:0}
 .om-kts-info{min-width:0}
@@ -729,14 +729,6 @@ button,.btn,a[role="button"]{transition:transform .25s var(--ease),box-shadow .2
 .om-knock-btn:hover{background:transparent;color:var(--om-gold);box-shadow:none}
 .om-knock-btn.closed{background:transparent;color:var(--om-gold);box-shadow:none}
 .om-knock-btn.closed:hover{background:var(--om-gold);color:#171008}
-.om-staff-row{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--om-line2)}
-.om-staff{display:flex;align-items:center;gap:9px;padding:0 18px}
-.om-staff:first-child{padding-left:0}
-.om-staff+.om-staff{border-left:1px solid var(--om-line2)}
-.om-staff-av{position:relative;width:29px;height:29px;border-radius:50%;background:var(--om-bg);border:1px solid rgba(240,234,214,.22);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:11px;font-weight:600;color:var(--om-cream);flex-shrink:0}
-.om-dot-on{position:absolute;bottom:-1px;right:-1px;width:7px;height:7px;border-radius:50%;background:var(--om-online);border:1.5px solid var(--om-bg)}
-.om-staff-name{font-size:11px;font-weight:600;color:var(--om-cream);letter-spacing:.01em}
-.om-staff-role{font-size:9px;color:var(--om-sub);letter-spacing:.03em;margin-top:1px}
 .om-rooms{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
 .om-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:2px;border:1px solid rgba(198,154,52,.18);background:transparent;color:var(--om-sub);font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s}
 .om-chip i{color:var(--om-gold);opacity:.75}
@@ -747,14 +739,13 @@ button,.btn,a[role="button"]{transition:transform .25s var(--ease),box-shadow .2
 .om-activity-item b{color:var(--om-cream);font-weight:600}
 .om-activity-dot{width:3px;height:3px;border-radius:50%;background:var(--om-gold);flex-shrink:0}
 .om-activity-empty{font-size:11px;color:var(--om-sub);opacity:.55;font-style:italic;font-family:var(--serif)}
-.om-footer{margin-top:16px;padding-top:14px;border-top:1px solid var(--om-line2);font-size:10px;color:var(--om-sub);display:flex;align-items:center;gap:7px;letter-spacing:.02em}
-.om-footer i{color:var(--om-gold)}
 @media(max-width:700px){
   .om-top-row{flex-direction:column}
   .om-kts-card{width:100%}
   .om-sign-title{font-size:22px}
-  .om-staff-row{gap:0}
-  .om-staff{padding:0 14px}
+}
+@media(min-width:769px){
+  .topbar{display:none}
 }
 </style>
 
@@ -779,8 +770,6 @@ button,.btn,a[role="button"]{transition:transform .25s var(--ease),box-shadow .2
       </button>
     </div>
   </div>
-
-  <div class="om-staff-row" id="omStaffRow"></div>
 
   <div class="om-rooms" id="omRooms">
     <button class="om-chip active" data-room="desk" onclick="omGoRoom('desk')"><i class="ph-duotone ph-note-pencil"></i>Bàn làm việc</button>
@@ -4100,23 +4089,12 @@ window.hkLeave = function(){
     updateOfficeStatus();
     var p=(window.PROJECTS_CLIENT||[]).find(function(x){return x.id===window.activeProj;});
     var ktsName=(p&&p.kts)||'KTS. Trần Long';
-    var cnName=(typeof CN_USER!=='undefined' && CN_USER.name && CN_USER.name!=='App Làm Nhà Corp.') ? CN_USER.name : 'Mỹ Thanh';
     var nEl=$('omKtsName'); if(nEl) nEl.textContent=ktsName;
     var aEl=$('omKtsAv');
     var avatarUrl = (p && p.ktsUid && window._cnUserCache && window._cnUserCache[p.ktsUid] && window._cnUserCache[p.ktsUid].avatarURL) || null;
     if(aEl){
       if(avatarUrl){ aEl.innerHTML='<img src="'+avatarUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">'; }
       else { aEl.textContent=initials(ktsName); }
-    }
-    var sr=$('omStaffRow');
-    if(sr){
-      sr.innerHTML=[
-        {n:ktsName, r:'KTS phụ trách'},
-        {n:cnName, r:'Chủ nhà'},
-        {n:'Thư ký ALN', r:'Hỗ trợ vận hành'}
-      ].map(function(s){
-        return '<div class="om-staff"><div class="om-staff-av">'+initials(s.n)+'<span class="om-dot-on"></span></div><div><div class="om-staff-name">'+s.n+'</div><div class="om-staff-role">'+s.r+'</div></div></div>';
-      }).join('');
     }
     renderOmActivity();
   }
