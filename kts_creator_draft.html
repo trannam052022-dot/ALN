@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>[BẢN NHÁP] KTS Creator ALN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="aln-tokens.css">
+<style>
+:root{
+  --bg:#080c14; --bg2:#0e1422; --bg3:#141b2e;
+  --card:rgba(14,20,34,.88); --border:rgba(255,255,255,.07); --border-g:rgba(201,168,76,.18);
+  --muted:rgba(228,212,176,.38); --text:#f0e6cc; --text2:rgba(240,230,204,.62);
+  --gold:#C9A84C; --gold2:#e8d07a; --gold-bg:rgba(201,168,76,.08);
+  --green:#3dd68c; --red:#f06060; --amber:#f0b429;
+  --r:14px; --mono:'JetBrains Mono',monospace; --sans:'DM Sans',sans-serif;
+  --serif:'Cormorant Garamond',serif; --syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:1rem;line-height:1.6}
+a{color:var(--gold)}
+.draft-ribbon{position:sticky;top:0;z-index:200;background:linear-gradient(90deg,#7a1f1f,#a83232);color:#fff;text-align:center;padding:6px 12px;font-family:var(--mono);font-size:var(--text-2xs);letter-spacing:.08em;font-weight:700}
+.page{max-width:760px;margin:0 auto;padding:24px 18px 90px}
+h1{font-family:var(--serif);font-weight:400;font-size:var(--text-2xl);margin-bottom:4px}
+.sub-h{font-size:var(--text-xs);color:var(--muted);margin-bottom:24px}
+
+.card{background:var(--card);border:1px solid var(--border-g);border-radius:var(--r);padding:20px;margin-bottom:20px}
+.card h2{font-family:var(--syne);font-size:var(--text-md);font-weight:700;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+.code-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.code-box{font-family:var(--mono);background:var(--gold-bg);border:1px solid var(--border-g);border-radius:8px;padding:8px 14px;font-size:var(--text-md);font-weight:700;color:var(--gold)}
+.link-box{flex:1;min-width:220px;font-family:var(--mono);font-size:var(--text-2xs);color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;word-break:break-all}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:99px;border:none;cursor:pointer;font-family:var(--syne);font-weight:700;font-size:var(--text-xs)}
+.btn-gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a1400}
+.btn-outline{background:transparent;border:1px solid var(--border-g);color:var(--text)}
+.btn-sm{padding:6px 12px;font-size:var(--text-2xs)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:var(--text-2xs);color:var(--muted);margin-bottom:6px;font-family:var(--mono);letter-spacing:.05em}
+.field input,.field select,.field textarea{width:100%;padding:10px 13px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:var(--text-sm);font-family:var(--sans)}
+.field textarea{resize:vertical;min-height:60px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold)}
+
+.url-row{display:flex;gap:8px;margin-bottom:8px}
+.url-row input{flex:1}
+.url-row button{flex-shrink:0}
+
+.chk-row{display:flex;gap:8px;align-items:flex-start;margin:14px 0;font-size:var(--text-xs);color:var(--text2);line-height:1.6}
+.chk-row input{margin-top:3px}
+
+.kit-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
+.kit-item:last-child{border-bottom:none}
+.kit-name{font-size:var(--text-sm);font-weight:600}
+.kit-desc{font-size:var(--text-2xs);color:var(--muted);margin-top:2px}
+
+.clip-item{border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+.clip-title{font-weight:600;font-size:var(--text-sm)}
+.clip-meta{font-size:var(--text-2xs);color:var(--muted);margin-top:4px;font-family:var(--mono)}
+.status-pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:var(--text-2xs);font-weight:700;font-family:var(--mono)}
+.st-cho_duyet{background:rgba(240,180,41,.12);color:var(--amber)}
+.st-dat_chuan{background:rgba(61,214,140,.12);color:var(--green)}
+.st-tu_choi{background:rgba(240,96,96,.12);color:var(--red)}
+.reject-reason{margin-top:8px;font-size:var(--text-2xs);color:var(--red)}
+
+.err-msg{color:var(--red);font-size:var(--text-2xs);margin-top:8px;display:none}
+.ok-msg{color:var(--green);font-size:var(--text-2xs);margin-top:8px;display:none}
+#authVeil{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.veil-spin{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="draft-ribbon">⚠ BẢN NHÁP — kts_creator_draft.html · chỉ dùng nội bộ pilot · chờ Founder duyệt</div>
+<div id="authVeil"><div><div class="veil-spin"></div><div style="font-family:var(--serif);font-style:italic;color:var(--muted);text-align:center">Đang tải...</div></div></div>
+
+<div class="page" id="pageBody" style="display:none">
+  <h1>KTS Creator ALN</h1>
+  <div class="sub-h">Nhiều cửa vào, một cửa giao dịch — link định danh, form nộp clip &amp; kho kit của bạn.</div>
+
+  <div class="card">
+    <h2><i class="ph-duotone ph-identification-badge"></i>Link định danh của bạn</h2>
+    <div class="code-row">
+      <div class="code-box" id="myCode">—</div>
+      <div class="link-box" id="myLink">—</div>
+      <button class="btn btn-outline btn-sm" onclick="copyLink()"><i class="ph-duotone ph-copy"></i>Copy</button>
+    </div>
+    <div class="ok-msg" id="copyOk">Đã copy link!</div>
+    <div style="margin-top:12px;font-size:var(--text-2xs);color:var(--muted);line-height:1.7">
+      Dùng ĐÚNG link này (kèm watermark) trên MỌI bản đăng — TikTok/Facebook/YouTube/ALN.
+      Muốn gắn cho một clip cụ thể: thêm <code>&amp;clip=&lt;tên-clip-của-bạn&gt;</code> vào cuối link.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><i class="ph-duotone ph-video-camera"></i>Nộp clip đạt chuẩn</h2>
+    <div class="field">
+      <label>TIÊU ĐỀ CLIP</label>
+      <input type="text" id="clipTitle" placeholder="VD: Ý tưởng 2D biệt thự phố — 60s">
+    </div>
+    <div class="field">
+      <label>FORMAT</label>
+      <select id="clipFormat">
+        <option value="1">1 — Ý tưởng 2D (60s)</option>
+        <option value="2">2 — Timelapse 3D</option>
+        <option value="3">3 — Bóc hồ sơ thi công (6 hạng mục)</option>
+        <option value="4">4 — Nhận tiền đúng hạn (social proof)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>URL CÁC BẢN ĐĂNG (tối thiểu 1, tối đa 10 — MỌI bản đều phải có watermark + link định danh)</label>
+      <div id="urlList"></div>
+      <button class="btn btn-outline btn-sm" onclick="addUrlRow()"><i class="ph-duotone ph-plus"></i>Thêm URL</button>
+    </div>
+    <label class="chk-row">
+      <input type="checkbox" id="clipCommit">
+      Tôi cam kết: MỌI bản đăng ở trên đều có watermark + link định danh, KHÔNG gắn SĐT/Zalo cá nhân ở
+      bất kỳ bản nào. Nếu vi phạm, cả clip không tính điểm và bị xử lý theo thang: Cảnh báo → Khóa 90 ngày → Khóa vĩnh viễn.
+    </label>
+    <button class="btn btn-gold" id="submitClipBtn" onclick="submitClip()"><i class="ph-duotone ph-paper-plane-tilt"></i>Nộp duyệt</button>
+    <div class="err-msg" id="clipErr"></div>
+    <div class="ok-msg" id="clipOk">Đã nộp! Chờ Founder duyệt trong tab "Clip của tôi" bên dưới.</div>
+  </div>
+
+  <div class="card">
+    <h2><i class="ph-duotone ph-list-checks"></i>Clip của tôi</h2>
+    <div id="clipList"><div style="color:var(--muted);font-size:var(--text-xs)">Đang tải...</div></div>
+  </div>
+
+  <div class="card">
+    <h2><i class="ph-duotone ph-download-simple"></i>Kho kit</h2>
+    <div class="kit-item">
+      <div><div class="kit-name">Logo / watermark (tạm)</div><div class="kit-desc">Dùng tạm logo app — đội Marketing sẽ cung cấp file watermark chính thức sau pilot.</div></div>
+      <a class="btn btn-outline btn-sm" href="icon-512.png" download><i class="ph-duotone ph-download-simple"></i>Tải</a>
+    </div>
+    <div class="kit-item" id="kit-1"><div><div class="kit-name">Kịch bản #1 — Ý tưởng 2D (60s)</div><div class="kit-desc">Mở bài — vấn đề của chủ nhà → giải pháp 2D → CTA</div></div><button class="btn btn-outline btn-sm" onclick="downloadScript(1)"><i class="ph-duotone ph-download-simple"></i>Tải .txt</button></div>
+    <div class="kit-item" id="kit-2"><div><div class="kit-name">Kịch bản #2 — Timelapse 3D</div><div class="kit-desc">Dựng nhanh phối cảnh 3D theo timelapse, nhạc nền, CTA cuối clip</div></div><button class="btn btn-outline btn-sm" onclick="downloadScript(2)"><i class="ph-duotone ph-download-simple"></i>Tải .txt</button></div>
+    <div class="kit-item" id="kit-3"><div><div class="kit-name">Kịch bản #3 — Bóc hồ sơ thi công (6 hạng mục)</div><div class="kit-desc">Giải thích minh bạch 6 hạng mục hồ sơ thi công cho chủ nhà</div></div><button class="btn btn-outline btn-sm" onclick="downloadScript(3)"><i class="ph-duotone ph-download-simple"></i>Tải .txt</button></div>
+    <div class="kit-item" id="kit-4"><div><div class="kit-name">Kịch bản #4 — Nhận tiền đúng hạn</div><div class="kit-desc">Social proof: KTS chia sẻ trải nghiệm nhận tiền đúng hạn qua Quỹ bảo đảm</div></div><button class="btn btn-outline btn-sm" onclick="downloadScript(4)"><i class="ph-duotone ph-download-simple"></i>Tải .txt</button></div>
+  </div>
+</div>
+
+<script type="module">
+import {
+  app, auth, db, onAuthStateChanged,
+  doc, getDoc, setDoc, collection, addDoc, getDocs, query, where, serverTimestamp
+} from './firebase-config.js';
+
+const $ = id => document.getElementById(id);
+function escH(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+const LANDING_BASE = location.origin + location.pathname.replace(/kts_creator_draft\.html$/, 'kts_landing_draft.html');
+
+let ME = null;       // { uid, role, name, ... } từ users/{uid}
+let MY_PROFILE = null; // kts_profiles_draft/{uid}
+
+const FORMAT_LABEL = {
+  '1': 'Ý tưởng 2D (60s)', '2': 'Timelapse 3D',
+  '3': 'Bóc hồ sơ thi công (6 hạng mục)', '4': 'Nhận tiền đúng hạn'
+};
+const STATUS_LABEL = { cho_duyet: 'Chờ duyệt', dat_chuan: 'Đạt chuẩn', tu_choi: 'Từ chối' };
+
+const SCRIPTS = {
+  1: `KỊCH BẢN #1 — Ý TƯỞNG 2D (60 GIÂY)\n\n0-8s: Hook — nêu đúng nỗi lo của chủ nhà (VD: "Đất 5x18m làm sao vừa đủ 3 phòng ngủ mà vẫn thoáng?").\n8-40s: Trình bày phương án 2D — mặt bằng, ý tưởng công năng, điểm nhấn thiết kế. Giọng nói tự nhiên, không đọc thuộc lòng.\n40-55s: Vì sao phương án này hợp lý (ánh sáng, phong thủy cơ bản, chi phí).\n55-60s: CTA — "Muốn có phương án như vậy cho nhà bạn? Bắt đầu Bước 1 qua link ở bio/mô tả."\n\nLƯU Ý: gắn watermark + link định danh trên MỌI bản đăng, KHÔNG đọc/hiện SĐT-Zalo cá nhân.`,
+  2: `KỊCH BẢN #2 — TIMELAPSE 3D\n\n0-5s: Hook hình ảnh — phối cảnh 3D xuất hiện nhanh, bắt mắt.\n5-45s: Timelapse quá trình dựng 3D (tăng tốc), nhạc nền phù hợp, có thể voice-over ngắn giải thích ý tưởng.\n45-60s: Kết quả cuối + CTA "Xem đủ phương án — Bắt đầu Bước 1 qua link ở bio/mô tả."\n\nLƯU Ý: gắn watermark + link định danh trên MỌI bản đăng, KHÔNG hiện SĐT-Zalo cá nhân.`,
+  3: `KỊCH BẢN #3 — BÓC HỒ SƠ THI CÔNG (6 HẠNG MỤC)\n\nGiới thiệu ngắn 6 hạng mục hồ sơ thi công (kết cấu, điện, nước, hoàn thiện...) theo đúng quy trình ALN.\nMục tiêu: cho chủ nhà thấy sự minh bạch, không "đi đêm", đúng tinh thần chống thầu ăn chênh.\nCTA cuối: "Xem hồ sơ minh bạch từng hạng mục — Bắt đầu Bước 1 qua link ở bio/mô tả."\n\nLƯU Ý: KHÔNG hiện thông tin định danh công trình/khách hàng chưa đồng ý, KHÔNG SĐT-Zalo cá nhân.`,
+  4: `KỊCH BẢN #4 — NHẬN TIỀN ĐÚNG HẠN (SOCIAL PROOF)\n\nKTS chia sẻ trải nghiệm thật: nhận tiền đúng hạn qua từng chặng nhờ Quỹ bảo đảm 4 bước của ALN.\nNhấn mạnh: không cần đòi nợ, không rủi ro bùng tiền, quy trình minh bạch.\nCTA: "Muốn được bảo vệ như vậy? Bắt đầu Bước 1 qua link ở bio/mô tả."\n\nLƯU Ý: KHÔNG tiết lộ số tiền cụ thể của khách hàng chưa đồng ý, KHÔNG SĐT-Zalo cá nhân.`
+};
+window.downloadScript = function(n){
+  const blob = new Blob([SCRIPTS[n]], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'kich-ban-kts-creator-' + n + '.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+
+window.addUrlRow = function(){
+  const list = $('urlList');
+  if(list.children.length >= 10) return;
+  const row = document.createElement('div');
+  row.className = 'url-row';
+  row.innerHTML = '<input type="text" placeholder="https://... (TikTok/Facebook/YouTube/ALN)">'
+    + '<button class="btn btn-outline btn-sm" onclick="this.parentElement.remove()"><i class="ph-duotone ph-x"></i></button>';
+  list.appendChild(row);
+};
+
+window.copyLink = function(){
+  navigator.clipboard.writeText($('myLink').textContent).then(()=>{
+    const ok = $('copyOk'); ok.style.display = 'block';
+    setTimeout(()=> ok.style.display = 'none', 2000);
+  });
+};
+
+function genKtsCode(existingCodes){
+  let max = 0;
+  existingCodes.forEach(c => {
+    const m = /^KTS-(\d{4,})$/.exec(c || '');
+    if(m) max = Math.max(max, parseInt(m[1], 10));
+  });
+  return 'KTS-' + String(max + 1).padStart(4, '0');
+}
+
+async function ensureMyProfile(){
+  const ref = doc(db, 'kts_profiles_draft', ME.uid);
+  const snap = await getDoc(ref);
+  if(snap.exists()){ MY_PROFILE = Object.assign({ uid: ME.uid }, snap.data()); return; }
+  // Tự cấp mã KTS-XXXX lần đầu ghé trang (pilot — Founder có thể chỉnh lại trong founder_kts_creator_draft.html)
+  const allSnap = await getDocs(collection(db, 'kts_profiles_draft'));
+  const codes = []; allSnap.forEach(d => codes.push(d.data().ktsCode));
+  const code = genKtsCode(codes);
+  const profile = {
+    ktsCode: code, name: ME.name || 'Kiến trúc sư ALN',
+    avatarUrl: ME.avatarUrl || '', portfolioSummary: '',
+    badgeFounder: false, active: true,
+    createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+  };
+  await setDoc(ref, profile);
+  MY_PROFILE = Object.assign({ uid: ME.uid }, profile);
+}
+
+function renderCode(){
+  $('myCode').textContent = MY_PROFILE.ktsCode;
+  $('myLink').textContent = LANDING_BASE + '?code=' + MY_PROFILE.ktsCode;
+}
+
+window.submitClip = async function(){
+  const err = $('clipErr'), ok = $('clipOk');
+  err.style.display = 'none'; ok.style.display = 'none';
+  const title = $('clipTitle').value.trim();
+  const format = $('clipFormat').value;
+  const urls = Array.from($('urlList').querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
+  const commit = $('clipCommit').checked;
+  if(title.length < 3){ err.textContent = 'Vui lòng nhập tiêu đề clip.'; err.style.display = 'block'; return; }
+  if(urls.length < 1){ err.textContent = 'Cần ít nhất 1 URL bản đăng.'; err.style.display = 'block'; return; }
+  if(urls.length > 10){ err.textContent = 'Tối đa 10 URL.'; err.style.display = 'block'; return; }
+  if(!commit){ err.textContent = 'Vui lòng xác nhận cam kết trước khi nộp.'; err.style.display = 'block'; return; }
+  const btn = $('submitClipBtn');
+  btn.disabled = true;
+  try {
+    await addDoc(collection(db, 'clips_draft'), {
+      ktsUid: ME.uid, ktsCode: MY_PROFILE.ktsCode, ktsName: MY_PROFILE.name,
+      title, format, urls, commitNoContact: true,
+      status: 'cho_duyet', createdAt: serverTimestamp()
+    });
+    ok.style.display = 'block';
+    $('clipTitle').value = ''; $('urlList').innerHTML = ''; addUrlRow();
+    $('clipCommit').checked = false;
+    loadMyClips();
+  } catch(e){
+    err.textContent = 'Lỗi nộp clip: ' + (e.message || e.code); err.style.display = 'block';
+  } finally { btn.disabled = false; }
+};
+
+async function loadMyClips(){
+  const box = $('clipList');
+  try {
+    const q = query(collection(db, 'clips_draft'), where('ktsUid', '==', ME.uid));
+    const snap = await getDocs(q);
+    const items = [];
+    snap.forEach(d => items.push(Object.assign({ id: d.id }, d.data())));
+    items.sort((a,b) => ((b.createdAt&&b.createdAt.seconds)||0) - ((a.createdAt&&a.createdAt.seconds)||0));
+    if(!items.length){ box.innerHTML = '<div style="color:var(--muted);font-size:var(--text-xs)">Chưa có clip nào.</div>'; return; }
+    box.innerHTML = items.map(c => (
+      '<div class="clip-item">'
+      + '<div class="clip-title">' + escH(c.title) + '</div>'
+      + '<div class="clip-meta">Format ' + escH(c.format) + ' — ' + escH(FORMAT_LABEL[c.format]||'') + ' · '
+        + '<span class="status-pill st-' + c.status + '">' + (STATUS_LABEL[c.status]||c.status) + '</span> · '
+        + (c.urls||[]).length + ' URL</div>'
+      + (c.status === 'tu_choi' && c.rejectReason ? '<div class="reject-reason">Lý do từ chối: ' + escH(c.rejectReason) + '</div>' : '')
+      + '</div>'
+    )).join('');
+  } catch(e){
+    box.innerHTML = '<div style="color:var(--red);font-size:var(--text-xs)">Lỗi tải clip (' + escH(e.code||e.message) + ')</div>';
+  }
+}
+
+onAuthStateChanged(auth, async user => {
+  if(!user){ location.replace('login.html'); return; }
+  const snap = await getDoc(doc(db, 'users', user.uid));
+  ME = snap.exists() ? Object.assign({ uid: user.uid }, snap.data())
+     : (user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2' ? { uid: user.uid, role: 'founder', name: 'KTS. Trần Đại Long' } : null);
+  if(!ME || (ME.role !== 'kts' && ME.role !== 'founder')){
+    document.body.innerHTML = '<div style="padding:60px 20px;text-align:center;color:var(--muted);font-family:sans-serif">Trang này chỉ dành cho Kiến trúc sư.</div>';
+    return;
+  }
+  try {
+    await ensureMyProfile();
+    renderCode();
+    addUrlRow();
+    await loadMyClips();
+    $('authVeil').remove();
+    $('pageBody').style.display = 'block';
+  } catch(e){
+    console.error(e);
+    document.body.innerHTML = '<div style="padding:60px 20px;text-align:center;color:var(--red);font-family:sans-serif">Lỗi tải trang: ' + escH(e.message||e.code) + '</div>';
+  }
+});
+</script>
+</body>
+</html>

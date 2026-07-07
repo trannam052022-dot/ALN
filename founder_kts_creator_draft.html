@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>[BẢN NHÁP] Founder — KTS Creator ALN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="aln-tokens.css">
+<style>
+:root{
+  --bg:#080c14; --bg2:#0e1422; --bg3:#141b2e;
+  --card:rgba(14,20,34,.88); --border:rgba(255,255,255,.07); --border-g:rgba(201,168,76,.18);
+  --muted:rgba(228,212,176,.38); --text:#f0e6cc; --text2:rgba(240,230,204,.62);
+  --gold:#C9A84C; --gold2:#e8d07a; --gold-bg:rgba(201,168,76,.08);
+  --green:#3dd68c; --red:#f06060; --amber:#f0b429;
+  --r:14px; --mono:'JetBrains Mono',monospace; --sans:'DM Sans',sans-serif;
+  --serif:'Cormorant Garamond',serif; --syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:1rem;line-height:1.6}
+.draft-ribbon{position:sticky;top:0;z-index:200;background:linear-gradient(90deg,#7a1f1f,#a83232);color:#fff;text-align:center;padding:6px 12px;font-family:var(--mono);font-size:var(--text-2xs);letter-spacing:.08em;font-weight:700}
+.page{max-width:1080px;margin:0 auto;padding:24px 18px 90px}
+h1{font-family:var(--serif);font-weight:400;font-size:var(--text-2xl);margin-bottom:4px}
+.sub-h{font-size:var(--text-xs);color:var(--muted);margin-bottom:20px}
+
+.tabs{display:flex;gap:6px;margin-bottom:20px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tab-btn{background:none;border:none;color:var(--text2);padding:10px 16px;font-family:var(--syne);font-weight:700;font-size:var(--text-xs);cursor:pointer;border-bottom:2px solid transparent}
+.tab-btn.active{color:var(--gold);border-color:var(--gold)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.card{background:var(--card);border:1px solid var(--border-g);border-radius:var(--r);padding:20px;margin-bottom:18px}
+.card h2{font-family:var(--syne);font-size:var(--text-md);font-weight:700;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+.field{margin-bottom:12px}
+.field label{display:block;font-size:var(--text-2xs);color:var(--muted);margin-bottom:5px;font-family:var(--mono)}
+.field input,.field select{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:var(--text-sm)}
+.form-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.form-row .field{flex:1;min-width:160px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:99px;border:none;cursor:pointer;font-family:var(--syne);font-weight:700;font-size:var(--text-xs)}
+.btn-gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a1400}
+.btn-outline{background:transparent;border:1px solid var(--border-g);color:var(--text)}
+.btn-red{background:rgba(240,96,96,.15);color:var(--red);border:1px solid rgba(240,96,96,.35)}
+.btn-sm{padding:6px 12px;font-size:var(--text-2xs)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+table{width:100%;border-collapse:collapse;font-size:var(--text-xs)}
+th{text-align:left;color:var(--muted);font-family:var(--mono);font-size:var(--text-2xs);letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--border)}
+td{padding:8px 10px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:var(--text-2xs);font-weight:700;font-family:var(--mono)}
+.pill-gold{background:var(--gold-bg);color:var(--gold)}
+.pill-green{background:rgba(61,214,140,.12);color:var(--green)}
+.pill-red{background:rgba(240,96,96,.12);color:var(--red)}
+.pill-amber{background:rgba(240,180,41,.12);color:var(--amber)}
+
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.stat-num{font-family:var(--syne);font-size:var(--text-xl);font-weight:800;color:var(--gold)}
+.stat-label{font-size:var(--text-2xs);color:var(--muted);font-family:var(--mono);margin-top:2px}
+
+.clip-review{border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px}
+.clip-review-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.clip-review-title{font-weight:700;font-size:var(--text-sm)}
+.clip-review-meta{font-size:var(--text-2xs);color:var(--muted);font-family:var(--mono);margin-top:2px}
+.url-list{margin:10px 0;font-size:var(--text-2xs)}
+.url-list a{display:block;color:var(--gold);word-break:break-all;margin-bottom:3px}
+.checklist{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin:12px 0;padding:12px;background:var(--bg3);border-radius:8px}
+.checklist label{display:flex;align-items:center;gap:8px;font-size:var(--text-xs)}
+.review-actions{display:flex;gap:8px;margin-top:10px}
+.empty{color:var(--muted);font-size:var(--text-xs);padding:20px 0;text-align:center}
+#authVeil{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.veil-spin{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+select.filter{width:auto;display:inline-block}
+</style>
+</head>
+<body>
+
+<div class="draft-ribbon">⚠ BẢN NHÁP — founder_kts_creator_draft.html · chỉ Founder · chờ duyệt trước khi tích hợp founder_panel.html</div>
+<div id="authVeil"><div><div class="veil-spin"></div><div style="font-family:var(--serif);font-style:italic;color:var(--muted);text-align:center">Đang tải...</div></div></div>
+
+<div class="page" id="pageBody" style="display:none">
+  <h1>KTS Creator ALN — Quản trị</h1>
+  <div class="sub-h">Lead theo mã KTS · Hồ sơ KTS Creator · Duyệt clip đạt chuẩn (pilot — duyệt tay).</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="leads" onclick="switchTab('leads')">Lead</button>
+    <button class="tab-btn" data-tab="clips" onclick="switchTab('clips')">Duyệt Clip</button>
+    <button class="tab-btn" data-tab="profiles" onclick="switchTab('profiles')">Hồ sơ KTS Creator</button>
+  </div>
+
+  <!-- TAB: LEADS -->
+  <div class="tab-panel active" id="tab-leads">
+    <div class="card">
+      <h2><i class="ph-duotone ph-funnel"></i>Bộ lọc</h2>
+      <div class="form-row">
+        <div class="field"><label>MÃ KTS</label><select class="filter" id="fltKts" onchange="renderLeads()"><option value="">Tất cả</option></select></div>
+        <div class="field"><label>NỀN TẢNG (utm_source)</label><select class="filter" id="fltUtm" onchange="renderLeads()"><option value="">Tất cả</option><option value="tiktok">TikTok</option><option value="facebook">Facebook</option><option value="youtube">YouTube</option><option value="forum">Diễn đàn</option><option value="khac">Khác</option></select></div>
+        <div class="field"><label>TỪ NGÀY</label><input type="date" id="fltFrom" onchange="renderLeads()"></div>
+        <div class="field"><label>ĐẾN NGÀY</label><input type="date" id="fltTo" onchange="renderLeads()"></div>
+      </div>
+    </div>
+    <div class="stat-row" id="leadStats"></div>
+    <div class="card">
+      <h2><i class="ph-duotone ph-users-three"></i>Danh sách lead</h2>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Ngày</th><th>Tên</th><th>SĐT</th><th>Mã KTS</th><th>Nền tảng</th><th>Clip</th><th>Trạng thái</th></tr></thead>
+          <tbody id="leadsBody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="leadsEmpty" style="display:none">Chưa có lead nào khớp bộ lọc.</div>
+    </div>
+  </div>
+
+  <!-- TAB: CLIPS -->
+  <div class="tab-panel" id="tab-clips">
+    <div class="card">
+      <h2><i class="ph-duotone ph-clipboard-text"></i>Chờ duyệt</h2>
+      <div id="clipsPending"></div>
+      <div class="empty" id="clipsPendingEmpty" style="display:none">Không có clip nào chờ duyệt.</div>
+    </div>
+    <div class="card">
+      <h2><i class="ph-duotone ph-archive"></i>Đã xử lý</h2>
+      <div id="clipsDone"></div>
+      <div class="empty" id="clipsDoneEmpty" style="display:none">Chưa có clip nào được xử lý.</div>
+    </div>
+  </div>
+
+  <!-- TAB: PROFILES -->
+  <div class="tab-panel" id="tab-profiles">
+    <div class="card">
+      <h2><i class="ph-duotone ph-user-plus"></i>Thêm hồ sơ KTS Creator</h2>
+      <div class="form-row">
+        <div class="field"><label>USERNAME KTS (VD: kts.tranlong)</label><input type="text" id="addUsername"></div>
+        <div class="field"><label>TÓM TẮT PORTFOLIO</label><input type="text" id="addSummary" placeholder="VD: 5 năm kinh nghiệm biệt thự, nhà phố..."></div>
+        <div class="field" style="flex:0 0 auto"><label>&nbsp;</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:var(--text-xs);white-space:nowrap"><input type="checkbox" id="addBadge">KTS Sáng lập</label>
+        </div>
+        <button class="btn btn-gold" id="addBtn" onclick="addProfile()">Thêm</button>
+      </div>
+      <div class="err-msg" id="addErr" style="color:var(--red);font-size:var(--text-2xs);display:none;margin-top:6px"></div>
+    </div>
+    <div class="card">
+      <h2><i class="ph-duotone ph-identification-badge"></i>Danh sách hồ sơ</h2>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Mã KTS</th><th>Tên</th><th>Sáng lập</th><th>Trạng thái</th><th>Link</th><th></th></tr></thead>
+          <tbody id="profilesBody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="profilesEmpty" style="display:none">Chưa có hồ sơ KTS Creator nào.</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import {
+  app, auth, db, onAuthStateChanged,
+  doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, query, where, serverTimestamp
+} from './firebase-config.js';
+
+const $ = id => document.getElementById(id);
+function escH(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+const LANDING_BASE = location.origin + location.pathname.replace(/founder_kts_creator_draft\.html$/, 'kts_landing_draft.html');
+
+let LEADS = [], PROFILES = [], CLIPS = [];
+const FORMAT_LABEL = { '1':'Ý tưởng 2D', '2':'Timelapse 3D', '3':'Bóc hồ sơ thi công', '4':'Nhận tiền đúng hạn' };
+const STATUS_LABEL = { moi:'Mới', da_lien_he:'Đã liên hệ', khong_phan_hoi:'Không phản hồi', chuyen_doi:'Chuyển đổi' };
+
+window.switchTab = function(name){
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
+};
+
+/* ── LEADS ── */
+async function loadLeads(){
+  const snap = await getDocs(collection(db, 'leads_draft'));
+  LEADS = [];
+  snap.forEach(d => LEADS.push(Object.assign({ id: d.id }, d.data())));
+  LEADS.sort((a,b) => ((b.createdAt&&b.createdAt.seconds)||0) - ((a.createdAt&&a.createdAt.seconds)||0));
+  renderLeads();
+}
+window.renderLeads = function(){
+  const kts = $('fltKts').value, utm = $('fltUtm').value;
+  const from = $('fltFrom').value ? new Date($('fltFrom').value).getTime() : null;
+  const to = $('fltTo').value ? new Date($('fltTo').value).getTime() + 86400000 : null;
+  const filtered = LEADS.filter(l => {
+    if(kts && l.kts_ref !== kts) return false;
+    if(utm && l.utm_source !== utm) return false;
+    const ms = (l.createdAt && l.createdAt.seconds) ? l.createdAt.seconds*1000 : 0;
+    if(from && ms < from) return false;
+    if(to && ms > to) return false;
+    return true;
+  });
+  $('leadsEmpty').style.display = filtered.length ? 'none' : 'block';
+  $('leadsBody').innerHTML = filtered.map(l => {
+    const d = (l.createdAt && l.createdAt.seconds) ? new Date(l.createdAt.seconds*1000).toLocaleString('vi-VN') : '—';
+    return '<tr><td>'+d+'</td><td>'+escH(l.name)+'</td><td>'+escH(l.phone)+'</td>'
+      + '<td>'+escH(l.kts_ref)+'</td><td>'+escH(l.utm_source)+'</td><td>'+escH(l.clip_ref||'—')+'</td>'
+      + '<td><select onchange="updateLeadStatus(\''+l.id+'\',this.value)">'
+        + Object.keys(STATUS_LABEL).map(s => '<option value="'+s+'"'+(l.status===s?' selected':'')+'>'+STATUS_LABEL[s]+'</option>').join('')
+      + '</select></td></tr>';
+  }).join('');
+
+  // B2 — đếm hiệu quả theo KTS (KHÔNG tự cộng điểm — chỉ hiển thị cho Founder trả điểm minh bạch)
+  const byKts = {};
+  filtered.forEach(l => { byKts[l.kts_ref] = (byKts[l.kts_ref]||0) + 1; });
+  const rows = Object.keys(byKts).sort((a,b) => byKts[b]-byKts[a]);
+  $('leadStats').innerHTML =
+    '<div class="stat-card"><div class="stat-num">'+filtered.length+'</div><div class="stat-label">TỔNG LEAD (lọc)</div></div>'
+    + rows.slice(0,5).map(k => '<div class="stat-card"><div class="stat-num">'+byKts[k]+'</div><div class="stat-label">'+escH(k)+'</div></div>').join('');
+};
+window.updateLeadStatus = async function(id, status){
+  try {
+    await updateDoc(doc(db, 'leads_draft', id), { status, updatedAt: serverTimestamp() });
+    const it = LEADS.find(x => x.id === id); if(it) it.status = status;
+  } catch(e){ alert('Lỗi cập nhật: ' + (e.message||e.code)); }
+};
+
+/* ── PROFILES ── */
+function genKtsCode(existingCodes){
+  let max = 0;
+  existingCodes.forEach(c => { const m = /^KTS-(\d{4,})$/.exec(c||''); if(m) max = Math.max(max, parseInt(m[1],10)); });
+  return 'KTS-' + String(max + 1).padStart(4, '0');
+}
+async function loadProfiles(){
+  const snap = await getDocs(collection(db, 'kts_profiles_draft'));
+  PROFILES = [];
+  snap.forEach(d => PROFILES.push(Object.assign({ uid: d.id }, d.data())));
+  PROFILES.sort((a,b) => (a.ktsCode||'').localeCompare(b.ktsCode||''));
+  renderProfiles();
+  const fk = $('fltKts');
+  fk.innerHTML = '<option value="">Tất cả</option>' + PROFILES.map(p => '<option value="'+escH(p.ktsCode)+'">'+escH(p.ktsCode)+' — '+escH(p.name)+'</option>').join('');
+}
+function renderProfiles(){
+  $('profilesEmpty').style.display = PROFILES.length ? 'none' : 'block';
+  $('profilesBody').innerHTML = PROFILES.map(p => (
+    '<tr><td>'+escH(p.ktsCode)+'</td><td>'+escH(p.name)+'</td>'
+    + '<td>'+(p.badgeFounder ? '<span class="pill pill-gold">Sáng lập</span>' : '—')+'</td>'
+    + '<td>'+(p.active===false ? '<span class="pill pill-red">Tạm ngưng</span>' : '<span class="pill pill-green">Hoạt động</span>')+'</td>'
+    + '<td style="font-family:var(--mono);font-size:var(--text-2xs)">'+escH(LANDING_BASE+'?code='+p.ktsCode)+'</td>'
+    + '<td><button class="btn btn-outline btn-sm" onclick="toggleActive(\''+p.uid+'\')">'+(p.active===false?'Bật lại':'Tạm ngưng')+'</button></td></tr>'
+  )).join('');
+}
+window.toggleActive = async function(uid){
+  const p = PROFILES.find(x => x.uid === uid); if(!p) return;
+  const next = !(p.active === false ? false : true);
+  try {
+    await updateDoc(doc(db, 'kts_profiles_draft', uid), { active: !next ? true : false, updatedAt: serverTimestamp() });
+    p.active = !next ? true : false;
+    renderProfiles();
+  } catch(e){ alert('Lỗi: ' + (e.message||e.code)); }
+};
+window.addProfile = async function(){
+  const err = $('addErr'); err.style.display = 'none';
+  const username = $('addUsername').value.trim().toLowerCase();
+  const summary = $('addSummary').value.trim();
+  const badge = $('addBadge').checked;
+  if(!username){ err.textContent = 'Vui lòng nhập username KTS.'; err.style.display = 'block'; return; }
+  const btn = $('addBtn'); btn.disabled = true;
+  try {
+    const q = query(collection(db, 'users'), where('username', '==', username));
+    const snap = await getDocs(q);
+    if(snap.empty){ err.textContent = 'Không tìm thấy user với username này.'; err.style.display = 'block'; return; }
+    const uDoc = snap.docs[0];
+    const u = uDoc.data();
+    if(u.role !== 'kts'){ err.textContent = 'User này không phải role kts.'; err.style.display = 'block'; return; }
+    const existing = await getDoc(doc(db, 'kts_profiles_draft', uDoc.id));
+    if(existing.exists()){ err.textContent = 'KTS này đã có hồ sơ Creator (mã ' + existing.data().ktsCode + ').'; err.style.display = 'block'; return; }
+    const code = genKtsCode(PROFILES.map(p => p.ktsCode));
+    await setDoc(doc(db, 'kts_profiles_draft', uDoc.id), {
+      ktsCode: code, name: u.name || username, avatarUrl: u.avatarUrl || '',
+      portfolioSummary: summary, badgeFounder: badge, active: true,
+      createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+    });
+    $('addUsername').value = ''; $('addSummary').value = ''; $('addBadge').checked = false;
+    await loadProfiles();
+  } catch(e){
+    err.textContent = 'Lỗi: ' + (e.message||e.code); err.style.display = 'block';
+  } finally { btn.disabled = false; }
+};
+
+/* ── CLIPS ── */
+async function loadClips(){
+  const snap = await getDocs(collection(db, 'clips_draft'));
+  CLIPS = [];
+  snap.forEach(d => CLIPS.push(Object.assign({ id: d.id }, d.data())));
+  CLIPS.sort((a,b) => ((b.createdAt&&b.createdAt.seconds)||0) - ((a.createdAt&&a.createdAt.seconds)||0));
+  renderClips();
+}
+function checklistHtml(id){
+  const items = [
+    ['watermark','Watermark ✓'], ['linkDinhDanh','Link định danh ✓'],
+    ['khongSdtZalo','Không SĐT/Zalo ✓'], ['khongLoKh','Không lộ thông tin KH chưa đồng ý ✓'],
+    ['dungFormat','Đúng format ✓']
+  ];
+  return '<div class="checklist">' + items.map(([k,label]) =>
+    '<label><input type="checkbox" data-clip="'+id+'" data-key="'+k+'">'+label+'</label>'
+  ).join('') + '</div>';
+}
+function renderClips(){
+  const pending = CLIPS.filter(c => c.status === 'cho_duyet');
+  const done = CLIPS.filter(c => c.status !== 'cho_duyet');
+  $('clipsPendingEmpty').style.display = pending.length ? 'none' : 'block';
+  $('clipsDoneEmpty').style.display = done.length ? 'none' : 'block';
+
+  $('clipsPending').innerHTML = pending.map(c => (
+    '<div class="clip-review">'
+    + '<div class="clip-review-head"><div><div class="clip-review-title">'+escH(c.title)+'</div>'
+      + '<div class="clip-review-meta">'+escH(c.ktsName)+' ('+escH(c.ktsCode)+') · Format '+escH(c.format)+' — '+escH(FORMAT_LABEL[c.format]||'')+'</div></div>'
+      + '<span class="pill pill-amber">Chờ duyệt</span></div>'
+    + '<div class="url-list">'+(c.urls||[]).map(u => '<a href="'+escH(u)+'" target="_blank" rel="noopener">'+escH(u)+'</a>').join('')+'</div>'
+    + checklistHtml(c.id)
+    + '<div class="review-actions">'
+      + '<button class="btn btn-gold btn-sm" onclick="reviewClip(\''+c.id+'\',\'dat_chuan\')"><i class="ph-duotone ph-check"></i>Đạt chuẩn</button>'
+      + '<button class="btn btn-red btn-sm" onclick="reviewClip(\''+c.id+'\',\'tu_choi\')"><i class="ph-duotone ph-x"></i>Từ chối</button>'
+    + '</div></div>'
+  )).join('');
+
+  $('clipsDone').innerHTML = done.map(c => (
+    '<div class="clip-review">'
+    + '<div class="clip-review-head"><div><div class="clip-review-title">'+escH(c.title)+'</div>'
+      + '<div class="clip-review-meta">'+escH(c.ktsName)+' ('+escH(c.ktsCode)+') · Format '+escH(c.format)+'</div></div>'
+      + (c.status==='dat_chuan' ? '<span class="pill pill-green">Đạt chuẩn</span>' : '<span class="pill pill-red">Từ chối</span>')+'</div>'
+    + (c.status==='tu_choi' && c.rejectReason ? '<div style="font-size:var(--text-2xs);color:var(--red)">Lý do: '+escH(c.rejectReason)+'</div>' : '')
+    + '</div>'
+  )).join('');
+}
+window.reviewClip = async function(id, status){
+  const boxes = document.querySelectorAll('input[data-clip="'+id+'"]');
+  const checklist = {};
+  boxes.forEach(b => checklist[b.dataset.key] = b.checked);
+  if(status === 'dat_chuan'){
+    const allChecked = Object.values(checklist).length === 5 && Object.values(checklist).every(Boolean);
+    if(!allChecked){ alert('Cần tick đủ 5 mục checklist trước khi duyệt Đạt chuẩn.'); return; }
+  }
+  let rejectReason = '';
+  if(status === 'tu_choi'){
+    rejectReason = prompt('Lý do từ chối:') || '';
+    if(!rejectReason){ return; }
+  }
+  try {
+    await updateDoc(doc(db, 'clips_draft', id), {
+      status, checklist, rejectReason: rejectReason || null,
+      reviewedAt: serverTimestamp(), reviewedBy: auth.currentUser.uid
+    });
+    await loadClips();
+  } catch(e){ alert('Lỗi duyệt clip: ' + (e.message||e.code)); }
+};
+
+onAuthStateChanged(auth, async user => {
+  if(!user){ location.replace('login.html'); return; }
+  const snap = await getDoc(doc(db, 'users', user.uid));
+  const isFounder = user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2' || (snap.exists() && snap.data().role === 'founder');
+  if(!isFounder){
+    document.body.innerHTML = '<div style="padding:60px 20px;text-align:center;color:var(--muted)">Trang chỉ dành cho Founder.</div>';
+    return;
+  }
+  try {
+    await loadProfiles();
+    await loadLeads();
+    await loadClips();
+    $('authVeil').remove();
+    $('pageBody').style.display = 'block';
+  } catch(e){
+    console.error(e);
+    document.body.innerHTML = '<div style="padding:60px 20px;text-align:center;color:var(--red)">Lỗi tải trang: ' + escH(e.message||e.code) + '</div>';
+  }
+});
+</script>
+</body>
+</html>

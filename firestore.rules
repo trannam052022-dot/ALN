@@ -372,5 +372,42 @@ service cloud.firestore {
       allow write: if false;
     }
     /* ═══ HẾT BLOCK DIỄN ĐÀN ═══ */
+
+    /* ═══════════════════════════════════════════════════════════════
+       KTS CREATOR ALN — BẢN NHÁP (chưa nghiệm thu). Trang:
+       kts_landing_draft.html / kts_creator_draft.html / founder_kts_creator_draft.html.
+       Collection hậu tố _draft riêng, KHÔNG đụng alnPosts/forumPosts/leads/invites.
+       Xem TONG_HOP_PHUONG_AN_KTS_CREATOR.md + BAN_GIAO_KTS_CREATOR.md.
+       ═══════════════════════════════════════════════════════════════ */
+
+    // Hồ sơ KTS Creator (mã KTS-XXXX, badge, tóm tắt portfolio) — đọc công khai cho
+    // landing (KHÔNG bao giờ chứa SĐT/Zalo cá nhân). Chính chủ KTS active hoặc Founder ghi.
+    match /kts_profiles_draft/{uid} {
+      allow read: if true;
+      allow create, update: if isFounder() || (signedIn() && request.auth.uid == uid && isKts());
+      allow delete: if isFounder();
+    }
+
+    // Lead từ landing định danh KTS — khách (kể cả ẩn danh, qua signInAnonymously)
+    // tạo được, không đọc lại (bảo mật) — giống hệt pattern landingLeads hiện có.
+    match /leads_draft/{id} {
+      allow create: if signedIn() && request.app != null
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0 && request.resource.data.name.size() < 100
+        && request.resource.data.phone is string
+        && request.resource.data.phone.size() >= 8 && request.resource.data.phone.size() < 20
+        && request.resource.data.kts_ref is string;
+      allow read, update, delete: if isFounder();
+    }
+
+    // Clip KTS Creator nộp duyệt — chính chủ tạo + xem của mình; chỉ Founder duyệt/sửa/xoá
+    // (pilot founder duyệt tay — KHÔNG cơ chế tự động, đúng ĐIỀU KIỆN DỪNG CỨNG #3).
+    match /clips_draft/{id} {
+      allow read: if isFounder() || (signedIn() && resource.data.ktsUid == request.auth.uid);
+      allow create: if (isFounder() || (signedIn() && isKts()))
+        && request.resource.data.ktsUid == request.auth.uid
+        && request.resource.data.status == 'cho_duyet';
+      allow update, delete: if isFounder();
+    }
   }
 }

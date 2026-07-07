@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>[BẢN NHÁP] Landing KTS Creator — App Làm Nhà</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="aln-tokens.css">
+<style>
+:root{
+  --bg:#080c14; --bg2:#0e1422; --bg3:#141b2e;
+  --card:rgba(14,20,34,.88); --border:rgba(255,255,255,.07); --border-g:rgba(201,168,76,.18);
+  --muted:rgba(228,212,176,.38); --text:#f0e6cc; --text2:rgba(240,230,204,.62);
+  --gold:#C9A84C; --gold2:#e8d07a; --gold-bg:rgba(201,168,76,.08); --gold-glow:rgba(201,168,76,.22);
+  --green:#3dd68c; --red:#f06060;
+  --r:14px; --mono:'JetBrains Mono',monospace; --sans:'DM Sans',sans-serif;
+  --serif:'Cormorant Garamond',serif; --syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px;scroll-behavior:smooth}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:1rem;line-height:1.6}
+a{color:var(--gold);text-decoration:none}
+
+/* Ribbon BẢN NHÁP — nhắc mọi lúc đây là môi trường cách ly, chưa nghiệm thu */
+.draft-ribbon{
+  position:sticky;top:0;z-index:200;background:linear-gradient(90deg,#7a1f1f,#a83232);
+  color:#fff;text-align:center;padding:6px 12px;font-family:var(--mono);
+  font-size:var(--text-2xs);letter-spacing:.08em;font-weight:700;
+}
+
+.page{max-width:640px;margin:0 auto;padding:0 20px 90px;position:relative;z-index:1}
+.hero{padding:40px 0 20px;text-align:center}
+.hero-eyebrow{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px}
+.ey-line{flex:1;max-width:50px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.55))}
+.ey-text{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);opacity:.8}
+
+.pf-card{
+  background:var(--card);border:1px solid var(--border-g);border-radius:var(--r);
+  padding:26px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;backdrop-filter:blur(8px);
+}
+.pf-avatar{
+  width:76px;height:76px;border-radius:50%;flex-shrink:0;overflow:hidden;
+  background:var(--gold-bg);border:2px solid var(--border-g);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:var(--text-xl);color:var(--gold);
+}
+.pf-avatar img{width:100%;height:100%;object-fit:cover}
+.pf-name{font-family:var(--serif);font-size:var(--text-2xl);font-weight:400;color:var(--text)}
+.pf-badge{
+  display:inline-flex;align-items:center;gap:5px;margin-top:6px;
+  font-size:var(--text-2xs);font-weight:800;letter-spacing:.08em;font-family:var(--mono);
+  padding:3px 11px;border-radius:99px;border:1px solid rgba(201,168,76,.5);
+  background:var(--gold-bg);color:var(--gold);
+}
+.pf-summary{margin-top:10px;font-size:var(--text-sm);color:var(--text2);line-height:1.7}
+
+.cta-row{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}
+.btn{
+  flex:1;min-width:180px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 20px;border-radius:99px;border:none;cursor:pointer;
+  font-family:var(--syne);font-weight:700;font-size:var(--text-sm);letter-spacing:.02em;
+  transition:transform .25s,box-shadow .25s;
+}
+.btn-gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a1400;
+  box-shadow:0 8px 22px rgba(201,168,76,.22),inset 0 1px 0 rgba(255,255,255,.28)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(201,168,76,.3)}
+.btn-outline{background:transparent;border:1px solid var(--border-g);color:var(--text)}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+
+.trust-note{
+  margin-top:26px;padding:14px 16px;border-radius:var(--r);
+  background:rgba(201,168,76,.05);border:1px solid var(--border-g);
+  font-size:var(--text-2xs);color:var(--text2);line-height:1.7;
+}
+.trust-note b{color:var(--gold)}
+
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+
+/* Modal lead */
+.modal-veil{position:fixed;inset:0;background:rgba(4,6,12,.7);z-index:400;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-veil.show{display:flex}
+.modal{
+  width:100%;max-width:420px;background:var(--bg2);border:1px solid var(--border-g);border-radius:var(--r);
+  padding:26px;position:relative;
+}
+.modal h3{font-family:var(--serif);font-size:var(--text-xl);font-weight:400;margin-bottom:6px}
+.modal p.sub{font-size:var(--text-xs);color:var(--muted);margin-bottom:18px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:var(--text-2xs);color:var(--muted);margin-bottom:6px;font-family:var(--mono);letter-spacing:.05em}
+.field input[type=text],.field input[type=tel]{
+  width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text);font-size:var(--text-sm);font-family:var(--sans);
+}
+.field input:focus{outline:none;border-color:var(--gold)}
+.chk-row{display:flex;gap:8px;align-items:flex-start;margin:16px 0;font-size:var(--text-2xs);color:var(--text2);line-height:1.6}
+.chk-row input{margin-top:3px}
+.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
+.modal-err{color:var(--red);font-size:var(--text-2xs);margin-top:8px;display:none}
+.modal-success{text-align:center;padding:10px 0}
+.modal-success i{font-size:40px;color:var(--green)}
+</style>
+</head>
+<body>
+
+<div class="draft-ribbon">⚠ BẢN NHÁP — kts_landing_draft.html · KHÔNG chia sẻ công khai · chờ Founder duyệt</div>
+
+<div class="page">
+  <div class="hero">
+    <div class="hero-eyebrow">
+      <span class="ey-line"></span><span class="ey-text">App Làm Nhà</span><span class="ey-line"></span>
+    </div>
+  </div>
+
+  <div id="content">
+    <div class="empty" id="loadingState">Đang tải hồ sơ KTS...</div>
+  </div>
+</div>
+
+<div class="modal-veil" id="modalVeil">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script type="module">
+import {
+  app, db, doc, getDoc, collection, addDoc, getDocs, query, where, limit, serverTimestamp
+} from './firebase-config.js';
+import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+const $ = id => document.getElementById(id);
+function escH(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+const params = new URLSearchParams(location.search);
+const KTS_CODE = (params.get('code') || '').trim().toUpperCase();
+const UTM_SOURCE = (params.get('utm_source') || 'khac').trim().toLowerCase();
+const CLIP_REF = (params.get('clip') || '').trim();
+
+const ZALO_OA_URL = 'https://zalo.me/alnsanthietke';
+
+const auth = getAuth(app);
+let authReady = false;
+signInAnonymously(auth).catch(e => console.error('anon-auth lỗi:', e));
+onAuthStateChanged(auth, u => { authReady = !!u; });
+
+let KTS_PROFILE = null;
+
+async function loadProfile(){
+  if(!KTS_CODE){
+    $('content').innerHTML = '<div class="empty">Thiếu mã định danh KTS trong đường dẫn.<br>Vui lòng dùng đúng link <b>?code=KTS-XXXX</b>.</div>';
+    return;
+  }
+  try {
+    const q = query(collection(db, 'kts_profiles_draft'), where('ktsCode', '==', KTS_CODE), limit(1));
+    const snap = await getDocs(q);
+    if(snap.empty){
+      $('content').innerHTML = '<div class="empty">Không tìm thấy hồ sơ KTS với mã <b>'+escH(KTS_CODE)+'</b>.</div>';
+      return;
+    }
+    const d = snap.docs[0];
+    KTS_PROFILE = Object.assign({ uid: d.id }, d.data());
+    if(KTS_PROFILE.active === false){
+      $('content').innerHTML = '<div class="empty">Hồ sơ KTS này hiện tạm ngưng hiển thị.</div>';
+      return;
+    }
+    render();
+  } catch(e){
+    console.error(e);
+    $('content').innerHTML = '<div class="empty">Lỗi tải hồ sơ (' + escH(e.code||e.message) + ')</div>';
+  }
+}
+
+function render(){
+  const p = KTS_PROFILE;
+  $('content').innerHTML =
+    '<div class="pf-card">'
+      + '<div class="pf-avatar">' + (p.avatarUrl ? '<img src="'+escH(p.avatarUrl)+'">' : escH((p.name||'K')[0].toUpperCase())) + '</div>'
+      + '<div style="flex:1;min-width:200px">'
+        + '<div class="pf-name">' + escH(p.name || 'Kiến trúc sư ALN') + '</div>'
+        + (p.badgeFounder ? '<div class="pf-badge"><i class="ph-duotone ph-medal"></i>KTS SÁNG LẬP</div>' : '')
+        + '<div class="pf-summary">' + escH(p.portfolioSummary || 'Kiến trúc sư đối tác trên sàn App Làm Nhà.') + '</div>'
+      + '</div>'
+    + '</div>'
+    + '<div class="cta-row">'
+      + '<button class="btn btn-gold" onclick="openLeadModal()"><i class="ph-duotone ph-hand-heart"></i>Bắt đầu Bước 1</button>'
+      + '<a class="btn btn-outline" href="'+ZALO_OA_URL+'" target="_blank" rel="noopener"><i class="ph-duotone ph-chat-circle-dots"></i>Nhắn Zalo OA ALN</a>'
+    + '</div>'
+    + '<div class="trust-note"><b>ⓘ</b> Mọi trao đổi &amp; giao dịch dự án diễn ra qua kênh chính thức App Làm Nhà,'
+      + ' được bảo vệ bởi Quy trình 4 bước và Quỹ bảo đảm. Trang này không hiển thị số điện thoại/Zalo cá nhân của KTS.</div>';
+}
+
+window.openLeadModal = function(){
+  $('modalBody').innerHTML =
+    '<h3>Bắt đầu Bước 1</h3>'
+    + '<p class="sub">Để lại thông tin, đội ngũ App Làm Nhà sẽ liên hệ trong 24h để bắt đầu tư vấn cùng '
+      + escH((KTS_PROFILE && KTS_PROFILE.name) || 'KTS') + '.</p>'
+    + '<div class="field"><label>HỌ VÀ TÊN</label><input type="text" id="ldName" placeholder="Nguyễn Văn A"></div>'
+    + '<div class="field"><label>SỐ ĐIỆN THOẠI</label><input type="tel" id="ldPhone" placeholder="09xxxxxxxx"></div>'
+    + '<label class="chk-row"><input type="checkbox" id="ldConsent">Tôi đồng ý để App Làm Nhà liên hệ tư vấn theo Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân.</label>'
+    + '<button class="btn btn-gold" style="width:100%" id="ldSubmit" onclick="submitLead()">Gửi thông tin</button>'
+    + '<div class="modal-err" id="ldErr"></div>';
+  $('modalVeil').classList.add('show');
+};
+window.closeModal = function(){ $('modalVeil').classList.remove('show'); };
+
+window.submitLead = async function(){
+  const name = $('ldName').value.trim();
+  const phone = $('ldPhone').value.trim();
+  const consent = $('ldConsent').checked;
+  const err = $('ldErr');
+  err.style.display = 'none';
+  if(name.length < 2){ err.textContent = 'Vui lòng nhập họ tên.'; err.style.display='block'; return; }
+  if(phone.length < 8){ err.textContent = 'Vui lòng nhập số điện thoại hợp lệ.'; err.style.display='block'; return; }
+  if(!consent){ err.textContent = 'Vui lòng đồng ý điều khoản để tiếp tục.'; err.style.display='block'; return; }
+  const btn = $('ldSubmit');
+  btn.disabled = true; btn.textContent = 'Đang gửi...';
+  try {
+    if(!authReady){ await new Promise(r => setTimeout(r, 500)); }
+    await addDoc(collection(db, 'leads_draft'), {
+      name, phone,
+      utm_source: UTM_SOURCE,
+      kts_ref: KTS_CODE,
+      clip_ref: CLIP_REF || null,
+      status: 'moi',
+      createdAt: serverTimestamp()
+    });
+    $('modalBody').innerHTML =
+      '<div class="modal-success"><i class="ph-duotone ph-check-circle"></i>'
+      + '<h3 style="margin-top:12px">Đã ghi nhận!</h3>'
+      + '<p class="sub">Cảm ơn bạn — đội ngũ App Làm Nhà sẽ liên hệ trong 24h.</p></div>';
+    setTimeout(closeModal, 2600);
+  } catch(e){
+    console.error(e);
+    btn.disabled = false; btn.textContent = 'Gửi thông tin';
+    err.textContent = 'Lỗi gửi: ' + (e.message || e.code); err.style.display = 'block';
+  }
+};
+
+loadProfile();
+</script>
+</body>
+</html>
