@@ -461,11 +461,20 @@ async function doRegister(){
       var ud = JSON.stringify({ name: name, userId: username, role: 'cn', badge: 'Chủ nhà', uid: uid });
       try { localStorage.setItem('aln_user', ud); } catch(e){}
       try { sessionStorage.setItem('aln_user', ud); } catch(e){}
+      /* Nếu khách đăng ký TỪ diễn đàn (forum lưu forumReturn ≤30') → quay lại forum, không đá sang client_CN */
+      var _fwd = null;
+      try {
+        var _fr = JSON.parse(sessionStorage.getItem('forumReturn') || 'null');
+        if(_fr && (Date.now() - (_fr.t || 0) < 30 * 60000)){
+          sessionStorage.removeItem('forumReturn');
+          _fwd = 'forum.html' + (_fr.thread ? '?thread=' + encodeURIComponent(_fr.thread) : '');
+        }
+      } catch(e){}
       document.getElementById('redirectMsg').textContent = 'Chào mừng, ' + name + '!';
-      document.getElementById('redirectSub').textContent = 'Đang vào trang Chủ nhà...';
+      document.getElementById('redirectSub').textContent = _fwd ? 'Đang quay lại diễn đàn...' : 'Đang vào trang Chủ nhà...';
       document.getElementById('redirectOverlay').classList.add('show');
       setTimeout(function(){
-        window.location.replace('client_CN.html?u=' + encodeURIComponent(username) + '&r=cn');
+        window.location.replace(_fwd || ('client_CN.html?u=' + encodeURIComponent(username) + '&r=cn'));
       }, 900);
     } else {
       /* KTS/DN: sign out + màn hình chờ */

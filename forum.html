@@ -468,7 +468,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
     </div>
     <div class="tb-guest" id="tbGuest" style="display:none">
       <a class="g-login" onclick="requireLogin()">Đăng nhập</a>
-      <a class="g-reg" href="register.html">Đăng ký miễn phí</a>
+      <a class="g-reg" href="register.html" onclick="return forumGoRegister()">Đăng ký miễn phí</a>
     </div>
     <a class="tb-link" id="tbBack" href="#"><i class="ph-duotone ph-arrow-left"></i>Dashboard</a>
     <button class="btn-post" id="btnPost" style="display:none" onclick="openPostModal()">
@@ -509,7 +509,7 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
     <div class="lm-logo">ALN</div>
     <div class="lm-title" id="lmTitle">Đăng nhập hoặc tạo tài khoản miễn phí để đặt câu hỏi cho KTS</div>
     <div class="lm-sub">Miễn phí — hỏi trực tiếp Kiến trúc sư đã xác minh, xem giá vật liệu, theo dõi công trình thực tế.</div>
-    <a class="lm-btn-primary" id="lmRegBtn" href="register.html">Đăng ký miễn phí</a>
+    <a class="lm-btn-primary" id="lmRegBtn" href="register.html" onclick="return forumGoRegister()">Đăng ký miễn phí</a>
     <a class="lm-btn-ghost" id="lmLoginBtn" href="login.html">Tôi đã có tài khoản — Đăng nhập</a>
     <div class="lm-note">Bạn vẫn đọc được các chủ đề công khai mà không cần đăng nhập.</div>
   </div>
@@ -835,6 +835,17 @@ window.requireLogin = function(){
   $('loginModal').classList.add('open');
 };
 window.closeLoginModal = function(){ $('loginModal').classList.remove('open'); };
+
+/* Khách bấm "Đăng ký miễn phí" → lưu vị trí forum để register.html đưa họ QUAY LẠI forum sau khi tạo tài khoản */
+window.forumGoRegister = function(){
+  try {
+    sessionStorage.setItem('forumReturn', JSON.stringify({
+      thread: openThreadId || null, scroll: window.scrollY || 0, t: Date.now()
+    }));
+  } catch(e){}
+  location.href = 'register.html';
+  return false;
+};
 
 /* Mở lại thread từ ?thread=ID hoặc từ sessionStorage sau khi đăng nhập (≤30 phút) */
 let _deepLinkDone = false;
