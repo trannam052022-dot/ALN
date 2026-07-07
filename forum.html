@@ -713,7 +713,6 @@ let reportTarget = null;     // {targetType, postId, commentId}
 let reportReason = 'lach_san';
 let postsUnsub = null;
 let toastTimer = null;
-let KTSC_FOUNDER_UIDS = new Set(); // uid các KTS có badge "Sáng lập" (kts_profiles_draft) — Hạng mục D3
 
 /* ════ HELPERS ════ */
 const $ = id => document.getElementById(id);
@@ -1011,24 +1010,6 @@ function rankBadge(rank){
   const pri = (rank === 'chuyen_gia' || rank === 'co_van') ? ' title="Huy hiệu cao — được ưu tiên nhận dự án"' : '';
   return '<span class="rank-badge"'+pri+' style="color:'+m[1]+';background:'+m[2]+';border:1px solid '+m[1]+'44">'+m[3]+m[0]+'</span>';
 }
-/* Huy hiệu "KTS Sáng lập" (chương trình KTS Creator ALN — Hạng mục D3, kts_profiles_draft.badgeFounder) */
-function founderBadge(uid){
-  if(!uid || !KTSC_FOUNDER_UIDS.has(uid)) return '';
-  return '<span class="rank-badge" title="Thuộc thế hệ KTS Sáng lập đầu tiên của ALN" style="color:#98690a;background:rgba(152,105,10,.12);border:1px solid #98690a44"><i class="ph-duotone ph-medal"></i> KTS Sáng lập</span>';
-}
-/* Nạp 1 lần danh sách KTS có huy hiệu Sáng lập (đọc công khai, không cần đăng nhập) rồi
-   render lại feed/thread đang mở để hiện huy hiệu — không chặn luồng auth/posts chính. */
-async function loadFounderBadges(){
-  try {
-    const snap = await getDocs(query(collection(db, 'kts_profiles_draft'), where('badgeFounder', '==', true)));
-    const uids = new Set();
-    snap.forEach(d => uids.add(d.id));
-    KTSC_FOUNDER_UIDS = uids;
-    if(ALL_POSTS.length) renderFeed();
-    if(openThreadId) renderThread();
-  } catch(e){ console.warn('[forum] founder badges', e.message); }
-}
-loadFounderBadges();
 /* Phễu chốt: KTS gợi ý cho thread Tư vấn Dự án (server điền p.suggestedKts) */
 function suggestedKtsHtml(p){
   if(catOf(p) !== 'tu_van_du_an' || !Array.isArray(p.suggestedKts) || !p.suggestedKts.length) return '';
@@ -1077,7 +1058,7 @@ function renderCard(p){
     + '<div class="tc-top">'
       + '<div class="tc-avatar">'+av+'</div>'
       + '<div style="flex:1;min-width:0">'
-        + '<div class="tc-name">'+authorNameHtml(p)+roleBadge(p.authorRole)+rankBadge(p.authorRank)+founderBadge(p.authorUid)+'</div>'
+        + '<div class="tc-name">'+authorNameHtml(p)+roleBadge(p.authorRole)+rankBadge(p.authorRank)+'</div>'
         + '<div class="tc-time">'+timeAgo(p.createdAt)+'</div>'
       + '</div>'
       + (p.status==='pending' ? '<span class="badge-pending">CHỜ DUYỆT</span>' : '')
@@ -1308,7 +1289,7 @@ function renderThread(){
     + '<div class="tc-top">'
       + '<div class="tc-avatar">'+av+'</div>'
       + '<div style="flex:1;min-width:0">'
-        + '<div class="tc-name">'+authorNameHtml(p)+roleBadge(p.authorRole)+rankBadge(p.authorRank)+founderBadge(p.authorUid)+'</div>'
+        + '<div class="tc-name">'+authorNameHtml(p)+roleBadge(p.authorRole)+rankBadge(p.authorRank)+'</div>'
         + '<div class="tc-time">'+timeAgo(p.createdAt)+'</div>'
       + '</div>'
       + (p.status==='pending' ? '<span class="badge-pending">CHỜ DUYỆT</span>' : '')
@@ -1373,7 +1354,7 @@ function renderComment(p, c, isReply){
     + '<div class="cm-avatar">'+av+'</div>'
     + '<div class="cm-bubble'+(c.isBestAnswer?' best':'')+'">'
       + '<div class="cm-head">'
-        + '<span class="cm-name">'+nameHtml+'</span>'+roleBadge(c.authorRole)+rankBadge(c.authorRank)+founderBadge(c.authorUid)
+        + '<span class="cm-name">'+nameHtml+'</span>'+roleBadge(c.authorRole)+rankBadge(c.authorRank)
         + (c.isBestAnswer ? '<span class="badge-ba"><i class="ph-duotone ph-seal-check"></i>Best Answer</span>' : '')
         + (c.status==='pending' ? '<span class="badge-pending">CHỜ DUYỆT</span>' : '')
         + '<span class="cm-time">'+timeAgo(c.createdAt)+'</span>'
