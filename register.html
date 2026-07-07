@@ -186,7 +186,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
         <span id="pendingNoteText"></span>
       </div>
 
-      <div class="field">
+      <div class="field" id="fieldName">
         <label><i class="ph-duotone ph-user-circle" style="font-size:13px"></i> Họ và tên</label>
         <div class="field-wrap">
           <i class="fi ph-duotone ph-user-circle"></i>
@@ -194,7 +194,15 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
         </div>
       </div>
 
-      <div class="field">
+      <div class="field" id="fieldPhone" style="display:none">
+        <label><i class="ph-duotone ph-phone" style="font-size:13px"></i> Số điện thoại</label>
+        <div class="field-wrap">
+          <i class="fi ph-duotone ph-phone"></i>
+          <input type="tel" id="inputPhone" placeholder="09xxxxxxxx" autocomplete="tel" inputmode="numeric" onkeydown="if(event.key==='Enter')doRegister()">
+        </div>
+      </div>
+
+      <div class="field" id="fieldUser">
         <label><i class="ph-duotone ph-at" style="font-size:13px"></i> Tên đăng nhập</label>
         <div class="username-wrap field-wrap">
           <i class="fi ph-duotone ph-at"></i>
@@ -207,7 +215,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
         <div class="field-hint"><i class="ph-duotone ph-info" style="font-size:10px"></i> Tự sinh từ tên · có thể chỉnh sửa · chỉ dùng a–z, 0–9, dấu chấm</div>
       </div>
 
-      <div class="field field-pw">
+      <div class="field field-pw" id="fieldPw">
         <label><i class="ph-duotone ph-lock" style="font-size:13px"></i> Mật khẩu</label>
         <div class="field-wrap">
           <i class="fi ph-duotone ph-lock"></i>
@@ -217,7 +225,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
         <div class="pw-strength" id="pwStrength"><span></span><span></span><span></span><span></span></div>
       </div>
 
-      <div class="field field-pw">
+      <div class="field field-pw" id="fieldPw2">
         <label><i class="ph-duotone ph-lock-key" style="font-size:13px"></i> Xác nhận mật khẩu</label>
         <div class="field-wrap">
           <i class="fi ph-duotone ph-lock-key"></i>
@@ -254,8 +262,8 @@ var ROLE_META = {
   dn:  { icon:'<i class="ph-duotone ph-buildings"></i>',  title:'Doanh nghiệp',  desc:'Quản lý danh mục dự án & đội ngũ kiến trúc sư',   color:'var(--blue)',  bg:'rgba(56,189,248,.1)', pending:true  },
 };
 var PENDING_NOTES = {
-  kts: 'Tài khoản KTS sẽ được Founder xem xét trong 24 giờ làm việc. Chuẩn bị thông tin hành nghề để điền sau khi được duyệt.',
-  dn:  'Tài khoản Doanh nghiệp cần Founder xác nhận tư cách pháp nhân. Chuẩn bị giấy tờ đăng ký kinh doanh.',
+  kts: 'KTS đăng ký nhanh bằng tên + SĐT ở Phòng chờ, rồi nộp hồ sơ hành nghề (portfolio, CCHN) để Founder xét duyệt.',
+  dn:  'Doanh nghiệp đăng ký nhanh bằng tên + SĐT ở Phòng chờ, rồi nộp hồ sơ pháp nhân (GPKD, mã số thuế) để Founder xét duyệt.',
 };
 
 function switchRole(role){
@@ -279,6 +287,19 @@ function renderCardTop(){
   var pn = document.getElementById('pendingNote');
   document.getElementById('pendingNoteText').textContent = PENDING_NOTES[activeRole] || '';
   pn.style.display = m.pending ? 'flex' : 'none';
+
+  /* CN: chỉ Tên + SĐT. KTS/DN: ẩn form, bấm là sang Phòng chờ nộp hồ sơ đầy đủ. */
+  var isCn = activeRole === 'cn';
+  function _show(id, on){ var el = document.getElementById(id); if(el) el.style.display = on ? '' : 'none'; }
+  _show('fieldName', isCn);
+  _show('fieldPhone', isCn);
+  _show('fieldUser', false);
+  _show('fieldPw', false);
+  _show('fieldPw2', false);
+  var btn = document.getElementById('btnReg');
+  if(btn) btn.innerHTML = isCn
+    ? '<i class="ph-duotone ph-user-plus" style="margin-right:6px"></i> Tạo tài khoản'
+    : '<i class="ph-duotone ph-arrow-right" style="margin-right:6px"></i> Vào Phòng chờ nộp hồ sơ';
 }
 
 function removeDiacritics(str){
@@ -402,18 +423,20 @@ function resetBtn(){
 
 async function doRegister(){
   hideError();
-  var name     = document.getElementById('inputName').value.trim();
-  var username = document.getElementById('inputUser').value.trim().toLowerCase();
-  var pw       = document.getElementById('inputPw').value;
-  var pw2      = document.getElementById('inputPw2').value;
 
-  if(!name)     { showError('Vui lòng nhập họ và tên.'); return; }
-  if(!username) { showError('Vui lòng nhập tên đăng nhập.'); return; }
-  if(!/^[a-z]{2,4}\.[a-z][a-z0-9]{1,}$/.test(username)){ showError('Tên đăng nhập không hợp lệ. Ví dụ: cn.tenban'); return; }
-  if(!pw)       { showError('Vui lòng nhập mật khẩu.'); return; }
-  if(pw.length < 8){ showError('Mật khẩu tối thiểu 8 ký tự.'); return; }
-  if(pw !== pw2){ showError('Mật khẩu xác nhận không khớp.'); return; }
-  if(!_usernameValid){ showError('Tên đăng nhập chưa hợp lệ hoặc đã tồn tại. Vui lòng kiểm tra lại.'); return; }
+  /* KTS & DN: không đăng ký ở đây — sang Phòng chờ đăng ký nhanh + nộp hồ sơ đầy đủ */
+  if(activeRole === 'kts' || activeRole === 'dn'){
+    var room = activeRole === 'kts' ? 'architect' : 'business';
+    window.location.href = 'aln-giu-cho/phong-cho.html?room=' + room;
+    return;
+  }
+
+  /* CN: chỉ Tên + SĐT */
+  var name  = document.getElementById('inputName').value.trim();
+  var phone = document.getElementById('inputPhone').value.replace(/[\s.\-()]/g, '');
+
+  if(!name){ showError('Vui lòng nhập họ và tên.'); return; }
+  if(!/^0\d{8,10}$/.test(phone)){ showError('Số điện thoại chưa hợp lệ (VD: 0909xxxxxx).'); return; }
 
   var btn = document.getElementById('btnReg');
   btn.disabled = true;
@@ -425,16 +448,19 @@ async function doRegister(){
       new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('SDK_TIMEOUT')); }, 15000); })
     ]);
 
-    var email = username + '@aln.vn';
+    var email = phone + '@aln.vn';
 
-    /* Kiểm tra username lần cuối */
-    var uq   = fb.query(fb.collection(fb.db,'users'), fb.where('username','==',username), fb.lim(1));
-    var usnap = await fb.getDocs(uq);
-    if(!usnap.empty){ showError('Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.'); resetBtn(); return; }
-
-    /* Tạo Firebase Auth */
-    var cred = await fb.createUserWithEmailAndPassword(fb.auth, email, pw);
-    var uid  = cred.user.uid;
+    /* Tạo (hoặc đăng nhập nếu SĐT đã có) tài khoản bằng SĐT — mật khẩu = SĐT */
+    var uid;
+    try {
+      var cred = await fb.createUserWithEmailAndPassword(fb.auth, email, phone);
+      uid = cred.user.uid;
+    } catch(e){
+      if(e && e.code === 'auth/email-already-in-use'){
+        var c2 = await fb.signInWithEmailAndPassword(fb.auth, email, phone);
+        uid = c2.user.uid;
+      } else throw e;
+    }
 
     /* Công người giới thiệu (KTS) — do link định danh /kts/{code} lưu ở localStorage */
     var ktsRef = null;
@@ -443,59 +469,44 @@ async function doRegister(){
       if(_r && typeof _r.code === 'string' && /^KTS-\d+$/.test(_r.code)) ktsRef = _r.code;
     } catch(e){}
 
-    /* Ghi Firestore */
-    await fb.setDoc(fb.doc(fb.db,'users',uid), {
-      username:  username,
-      name:      name,
-      role:      activeRole,
-      email:     email,
-      status:    activeRole === 'cn' ? 'active' : 'pending',
-      plan: 'free', credits: {},
-      kts_ref:   ktsRef,
-      createdAt: fb.serverTimestamp(),
-    });
+    /* Ghi users nếu chưa có (tránh ghi đè tài khoản cũ) */
+    var uref = fb.doc(fb.db, 'users', uid);
+    var usnap = await fb.getDoc(uref);
+    if(!usnap.exists()){
+      await fb.setDoc(uref, {
+        username: phone, name: name, phone: phone, role: 'cn', email: email,
+        status: 'active', plan: 'free', credits: {}, kts_ref: ktsRef,
+        createdAt: fb.serverTimestamp(),
+      });
+    } else if(ktsRef){
+      await fb.setDoc(uref, { kts_ref: ktsRef }, { merge: true });
+    }
     if(ktsRef){ try { localStorage.removeItem('aln_kts_ref'); } catch(e){} }
 
-    if(activeRole === 'cn'){
-      /* CN: redirect ngay */
-      var ud = JSON.stringify({ name: name, userId: username, role: 'cn', badge: 'Chủ nhà', uid: uid });
-      try { localStorage.setItem('aln_user', ud); } catch(e){}
-      try { sessionStorage.setItem('aln_user', ud); } catch(e){}
-      /* Nếu khách đăng ký TỪ diễn đàn (forum lưu forumReturn ≤30') → quay lại forum, không đá sang client_CN */
-      var _fwd = null;
-      try {
-        var _fr = JSON.parse(sessionStorage.getItem('forumReturn') || 'null');
-        if(_fr && (Date.now() - (_fr.t || 0) < 30 * 60000)){
-          sessionStorage.removeItem('forumReturn');
-          _fwd = 'forum.html' + (_fr.thread ? '?thread=' + encodeURIComponent(_fr.thread) : '');
-        }
-      } catch(e){}
-      document.getElementById('redirectMsg').textContent = 'Chào mừng, ' + name + '!';
-      document.getElementById('redirectSub').textContent = _fwd ? 'Đang quay lại diễn đàn...' : 'Đang vào trang Chủ nhà...';
-      document.getElementById('redirectOverlay').classList.add('show');
-      setTimeout(function(){
-        window.location.replace(_fwd || ('client_CN.html?u=' + encodeURIComponent(username) + '&r=cn'));
-      }, 900);
-    } else {
-      /* KTS/DN: sign out + màn hình chờ */
-      await fb.signOut(fb.auth);
-      document.getElementById('successDesc').textContent =
-        activeRole === 'kts'
-          ? 'Hồ sơ KTS của bạn đang chờ Founder xem xét. Bạn sẽ được thông báo trong vòng 24 giờ làm việc.'
-          : 'Tài khoản Doanh nghiệp đang chờ xác nhận tư cách pháp nhân. Vui lòng liên hệ quản trị viên.';
-      document.getElementById('successInfo').innerHTML =
-        '<b>Tên đăng nhập:</b> ' + username + '<br>' +
-        '<b>Vai trò:</b> ' + ROLE_META[activeRole].title + '<br>' +
-        '<b>Trạng thái:</b> Đang chờ Founder xét duyệt';
-      document.getElementById('successOverlay').classList.add('show');
-    }
+    var ud = JSON.stringify({ name: name, userId: phone, role: 'cn', badge: 'Chủ nhà', uid: uid });
+    try { localStorage.setItem('aln_user', ud); } catch(e){}
+    try { sessionStorage.setItem('aln_user', ud); } catch(e){}
+
+    /* Đăng ký TỪ diễn đàn → quay lại forum; ngược lại vào client_CN */
+    var _fwd = null;
+    try {
+      var _fr = JSON.parse(sessionStorage.getItem('forumReturn') || 'null');
+      if(_fr && (Date.now() - (_fr.t || 0) < 30 * 60000)){
+        sessionStorage.removeItem('forumReturn');
+        _fwd = 'forum.html' + (_fr.thread ? '?thread=' + encodeURIComponent(_fr.thread) : '');
+      }
+    } catch(e){}
+    document.getElementById('redirectMsg').textContent = 'Chào mừng, ' + name + '!';
+    document.getElementById('redirectSub').textContent = _fwd ? 'Đang quay lại diễn đàn...' : 'Đang vào trang Chủ nhà...';
+    document.getElementById('redirectOverlay').classList.add('show');
+    setTimeout(function(){
+      window.location.replace(_fwd || ('client_CN.html?u=' + encodeURIComponent(phone) + '&r=cn'));
+    }, 900);
 
   } catch(err){
     var code = (err && err.code) || '';
-    if(code === 'auth/email-already-in-use'){
-      showError('Tên đăng nhập đã được dùng. Vui lòng chọn tên khác.');
-    } else if(code === 'auth/weak-password'){
-      showError('Mật khẩu quá yếu. Vui lòng dùng ít nhất 8 ký tự có chữ hoa và số.');
+    if(code === 'auth/wrong-password' || code === 'auth/invalid-credential'){
+      showError('Số điện thoại này đã được đăng ký. Vui lòng dùng "Đăng nhập" để vào.');
     } else if(code === 'auth/network-request-failed'){
       showError('Lỗi kết nối mạng. Vui lòng kiểm tra Internet và thử lại.');
     } else if(err && err.message === 'SDK_TIMEOUT'){
@@ -514,14 +525,14 @@ regenerateUsername();
 <script type="module">
 import {
   auth, db, signOut,
-  createUserWithEmailAndPassword,
-  doc, setDoc, collection, getDocs, query, where, limit, serverTimestamp
+  createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  doc, getDoc, setDoc, collection, getDocs, query, where, limit, serverTimestamp
 } from "./firebase-config.js";
 
 window.__ALN_FB_RESOLVE({
   auth, db, signOut,
-  createUserWithEmailAndPassword,
-  doc, setDoc,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  doc, getDoc, setDoc,
   collection, getDocs,
   query, where,
   lim: limit,

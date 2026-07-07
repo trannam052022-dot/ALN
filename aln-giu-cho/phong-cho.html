@@ -465,6 +465,8 @@ function validPhone(p){return/^0\d{9}$/.test(p);}
 
 var selectedRoom='architect';
 var ROOM_LABEL={architect:'KTS',designer:'Designer NT',business:'Doanh nghiệp',cn:'Chủ nhà'};
+/* Map phòng → role chuẩn hệ thống (rules/dashboard/login dùng kts/dn/designer/cn) */
+var ROLE_CANON={architect:'kts',designer:'designer',business:'dn',cn:'cn'};
 var ROOM_CARD={
   architect:{title:'Giữ chỗ ngay',sub:'KTS — điền 2 ô, xong trong 30 giây',btn:'Giữ chỗ &amp; Vào phòng chờ'},
   designer: {title:'Giữ chỗ ngay',sub:'Designer — điền 2 ô, xong trong 30 giây',btn:'Giữ chỗ &amp; Vào phòng chờ'},
@@ -495,6 +497,13 @@ window.SELECTED_VUNG_VI='';
     document.getElementById('vungBadgeText').textContent='Khu vực của bạn: '+VUNG_VI[v];
     badge.style.display='flex';
   }
+})();
+/* Chọn sẵn phòng từ URL ?room=architect|designer|business|cn (register.html đẩy KTS/DN sang) */
+(function(){
+  var rm=new URLSearchParams(location.search).get('room');
+  if(!rm) return;
+  var el=document.querySelector('#roomTabs .rtab[data-room="'+rm+'"]');
+  if(el) pickRoom(rm,el);
 })();
 function showLogin(){document.getElementById('panelRegister').style.display='none';document.getElementById('panelLogin').style.display='';}
 function showRegister(){document.getElementById('panelLogin').style.display='none';document.getElementById('panelRegister').style.display='';}
@@ -659,7 +668,7 @@ window.doRegister=async function(){
       const deadline=Date.now()+RESERVE_DAYS*864e5;
       const uref=doc(db,'users',uid);
       const usnap=await getDoc(uref);
-      if(!usnap.exists()) await setDoc(uref,{name,phone,role:selectedRoom,region,regionVi,status:'reserved',profileSubmitted:false,createdAt:serverTimestamp()});
+      if(!usnap.exists()) await setDoc(uref,{name,phone,role:ROLE_CANON[selectedRoom]||selectedRoom,region,regionVi,status:'pending',profileSubmitted:false,createdAt:serverTimestamp()});
       else if(region) await setDoc(uref,{region,regionVi},{merge:true});
       const rref=doc(db,'reservations',uid);
       const rsnap=await getDoc(rref);
@@ -718,7 +727,11 @@ function renderDash(){
     document.getElementById('cdMsg').innerHTML='Hồ sơ đã gửi — ALN đang xem xét, bạn sẽ được thông báo sớm.';
   } else {
     lbl.textContent='Nộp hồ sơ ngay';
-    cta.onclick = (r.role==='architect') ? function(){ location.href='../kts-apply.html'; } : openUploadSheet;
+    cta.onclick = function(){
+      var APPLY={architect:'../kts-apply.html', business:'../dn-studio.html', designer:'../designer-apply.html'};
+      var dest=APPLY[r.role];
+      if(dest) location.href=dest; else openUploadSheet();
+    };
     cta.disabled=false;
     setSteps(true,false,false,false);
   }
