@@ -436,6 +436,13 @@ async function doRegister(){
     var cred = await fb.createUserWithEmailAndPassword(fb.auth, email, pw);
     var uid  = cred.user.uid;
 
+    /* Công người giới thiệu (KTS) — do link định danh /kts/{code} lưu ở localStorage */
+    var ktsRef = null;
+    try {
+      var _r = JSON.parse(localStorage.getItem('aln_kts_ref') || 'null');
+      if(_r && typeof _r.code === 'string' && /^KTS-\d+$/.test(_r.code)) ktsRef = _r.code;
+    } catch(e){}
+
     /* Ghi Firestore */
     await fb.setDoc(fb.doc(fb.db,'users',uid), {
       username:  username,
@@ -444,8 +451,10 @@ async function doRegister(){
       email:     email,
       status:    activeRole === 'cn' ? 'active' : 'pending',
       plan: 'free', credits: {},
+      kts_ref:   ktsRef,
       createdAt: fb.serverTimestamp(),
     });
+    if(ktsRef){ try { localStorage.removeItem('aln_kts_ref'); } catch(e){} }
 
     if(activeRole === 'cn'){
       /* CN: redirect ngay */
