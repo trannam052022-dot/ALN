@@ -3650,7 +3650,7 @@ window.alnLogout = async function(){
 import { auth, db, onAuthStateChanged, doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, query, where, serverTimestamp } from "./firebase-config.js";
 
 function ktscEsc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-const KTSC_LANDING_BASE = location.origin + location.pathname.replace(/kts_dashboard\.html$/, 'kts_landing_draft.html');
+const KTSC_LANDING_BASE = location.origin + location.pathname.replace(/kts_dashboard\.html$/, 'kts/');
 const KTSC_FORMAT_LABEL = { '1':'Ý tưởng 2D', '2':'Timelapse 3D', '3':'Bóc hồ sơ thi công', '4':'Nhận tiền đúng hạn' };
 const KTSC_STATUS_LABEL = { cho_duyet:'Chờ duyệt', dat_chuan:'Đạt chuẩn', tu_choi:'Từ chối' };
 const KTSC_SCRIPTS = {
@@ -3716,7 +3716,7 @@ function ktscRenderCode(){
   const codeEl = document.getElementById('ktscCode');
   const linkEl = document.getElementById('ktscLink');
   if (codeEl) codeEl.textContent = KTSC_PROFILE.ktsCode;
-  if (linkEl) linkEl.textContent = KTSC_LANDING_BASE + '?code=' + KTSC_PROFILE.ktsCode;
+  if (linkEl) linkEl.textContent = KTSC_LANDING_BASE + KTSC_PROFILE.ktsCode;
 }
 
 async function ktscLoadClips(){

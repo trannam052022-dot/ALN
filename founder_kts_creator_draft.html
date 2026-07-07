@@ -170,7 +170,7 @@ import {
 
 const $ = id => document.getElementById(id);
 function escH(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-const LANDING_BASE = location.origin + location.pathname.replace(/founder_kts_creator_draft\.html$/, 'kts_landing_draft.html');
+const LANDING_BASE = location.origin + location.pathname.replace(/founder_kts_creator_draft\.html$/, 'kts/');
 
 let LEADS = [], PROFILES = [], CLIPS = [];
 const FORMAT_LABEL = { '1':'Ý tưởng 2D', '2':'Timelapse 3D', '3':'Bóc hồ sơ thi công', '4':'Nhận tiền đúng hạn' };
@@ -247,7 +247,7 @@ function renderProfiles(){
     '<tr><td>'+escH(p.ktsCode)+'</td><td>'+escH(p.name)+'</td>'
     + '<td>'+(p.badgeFounder ? '<span class="pill pill-gold">Sáng lập</span>' : '—')+'</td>'
     + '<td>'+(p.active===false ? '<span class="pill pill-red">Tạm ngưng</span>' : '<span class="pill pill-green">Hoạt động</span>')+'</td>'
-    + '<td style="font-family:var(--mono);font-size:var(--text-2xs)">'+escH(LANDING_BASE+'?code='+p.ktsCode)+'</td>'
+    + '<td style="font-family:var(--mono);font-size:var(--text-2xs)">'+escH(LANDING_BASE+p.ktsCode)+'</td>'
     + '<td><button class="btn btn-outline btn-sm" onclick="toggleActive(\''+p.uid+'\')">'+(p.active===false?'Bật lại':'Tạm ngưng')+'</button></td></tr>'
   )).join('');
 }
