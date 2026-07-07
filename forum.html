@@ -666,6 +666,7 @@ const OPEN_CATEGORIES = ['hoi_kts', 'tu_van_du_an', 'showcase', 'bang_tin'];
 const KTS_POST_CATEGORIES = ['hoi_kts', 'hoi_dap', 'vat_lieu', 'showcase', 'nghe'];
 const ROLE_LABEL = { kts:'KTS', designer:'Designer', founder:'Founder ALN', cn:'Chủ nhà', dn:'Doanh nghiệp' };
 const BACK_BY_ROLE = { kts:'kts_dashboard.html', designer:'designer_dashboard.html', founder:'founder_panel.html', dn:'client_DN.html', cn:'client_CN.html' };
+const BACK_LABEL_BY_ROLE = { kts:'Văn phòng KTS', designer:'Studio Nội thất', founder:'Bảng điều hành', dn:'Trang Doanh nghiệp', cn:'Văn phòng KTS của bạn' };
 const DISCLAIMER = 'Nội dung tư vấn trên diễn đàn là ý kiến tham khảo của cá nhân KTS, không phải hồ sơ thiết kế có chữ ký chủ trì theo NĐ 175/2024 và không thay thế hợp đồng dịch vụ. Mọi giao dịch qua sàn ALN mới được bảo vệ bởi Quy trình 4 bước.';
 const BLOCK_MSG = 'Trao đổi dự án thực hiện qua kênh chat sàn ALN để được bảo vệ bởi Quy trình 4 bước.';
 
@@ -781,6 +782,7 @@ onAuthStateChanged(auth, async user => {
   setTbRole(USER.role);
   $('tbBack').style.display = 'inline-flex';
   $('tbBack').href = BACK_BY_ROLE[USER.role] || 'login.html';
+  $('tbBack').innerHTML = '<i class="ph-duotone ph-arrow-left"></i>' + (BACK_LABEL_BY_ROLE[USER.role] || 'Trang của tôi');
   $('authVeil').remove();
 
   if((profile.status || 'active') !== 'active'){
