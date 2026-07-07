@@ -683,6 +683,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   <div class="nav-section">Cá nhân</div>
   <a class="nav-item" data-tab="myprofile"><span class="icon"><i class="ph-duotone ph-user-circle"></i></span> Hồ sơ</a>
   <a class="nav-item" data-tab="reputation"><span class="icon"><i class="ph-duotone ph-star"></i></span> Uy tín</a>
+  <a class="nav-item" data-tab="ktscreator"><span class="icon"><i class="ph-duotone ph-video-camera"></i></span> KTS Creator</a>
   <a class="nav-item" data-tab="settings"><span class="icon"><i class="ph-duotone ph-gear"></i></span> Cài đặt</a>
 
   <div class="nav-sep"></div>
@@ -1489,6 +1490,55 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--text)">Nộp hồ sơ trễ 6 giờ</div><div style="font-size:11px;color:var(--muted)">1 tuần trước</div></div>
           <div style="font-size:13px;font-weight:700;color:var(--red)">-1.0đ</div>
         </div>
+      </div>
+    </div>
+
+    <!-- ═══ KTS CREATOR ALN (pilot nội bộ — clip ngắn, lead theo mã định danh) ═══ -->
+    <div class="sec-label ktscreator-section"><i class="ph-duotone ph-video-camera" style="font-size:13px"></i> KTS Creator</div>
+    <div class="card" style="padding:20px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px">Link định danh của bạn</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div id="ktscCode" style="font-family:var(--mono);font-weight:700;color:var(--gold);background:var(--gold-bg);border-radius:8px;padding:7px 12px;font-size:13px">—</div>
+        <div id="ktscLink" style="flex:1;min-width:200px;font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;word-break:break-all">—</div>
+        <button onclick="ktscCopyLink()" style="padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text);font-size:12px;font-weight:600;cursor:pointer">Copy</button>
+      </div>
+      <div id="ktscCopyOk" style="display:none;color:var(--green);font-size:11px;margin-top:6px">Đã copy!</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6">Dùng đúng link này (kèm watermark) trên mọi bản đăng TikTok/Facebook/YouTube — không gắn SĐT/Zalo cá nhân.</div>
+    </div>
+
+    <div class="card" style="padding:20px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px">Nộp clip đạt chuẩn</div>
+      <input id="ktscTitle" type="text" placeholder="Tiêu đề clip" style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text);font-size:12px;font-family:inherit;outline:none;margin-bottom:8px">
+      <select id="ktscFormat" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text);font-size:12px;font-family:inherit;outline:none;margin-bottom:8px">
+        <option value="1">1 — Ý tưởng 2D (60s)</option>
+        <option value="2">2 — Timelapse 3D</option>
+        <option value="3">3 — Bóc hồ sơ thi công</option>
+        <option value="4">4 — Nhận tiền đúng hạn</option>
+      </select>
+      <div id="ktscUrlList"></div>
+      <button onclick="ktscAddUrlRow()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;margin-bottom:10px">+ Thêm URL</button>
+      <label style="display:flex;gap:8px;align-items:flex-start;font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:10px">
+        <input id="ktscCommit" type="checkbox" style="margin-top:2px">
+        Mọi bản đăng đều có watermark + link định danh, KHÔNG gắn SĐT/Zalo cá nhân.
+      </label>
+      <button id="ktscSubmitBtn" onclick="ktscSubmitClip()" style="width:100%;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#98690a,#b8860b);color:#fff;font-size:12px;font-weight:700;cursor:pointer">Nộp duyệt</button>
+      <div id="ktscErr" style="display:none;color:var(--red);font-size:11px;margin-top:8px"></div>
+      <div id="ktscOk" style="display:none;color:var(--green);font-size:11px;margin-top:8px">Đã nộp — chờ Founder duyệt.</div>
+    </div>
+
+    <div class="card" style="padding:20px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px">Clip của tôi</div>
+      <div id="ktscClipList" style="font-size:12px;color:var(--muted)">Đang tải...</div>
+    </div>
+
+    <div class="card" style="padding:20px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px">Kho kit</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="icon-512.png" download style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text2);font-size:11px;font-weight:600;text-decoration:none">Logo/watermark</a>
+        <button onclick="ktscDownloadScript(1)" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer">Kịch bản #1</button>
+        <button onclick="ktscDownloadScript(2)" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer">Kịch bản #2</button>
+        <button onclick="ktscDownloadScript(3)" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer">Kịch bản #3</button>
+        <button onclick="ktscDownloadScript(4)" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer">Kịch bản #4</button>
       </div>
     </div>
 
@@ -2673,7 +2723,7 @@ function alnNotify(title, body){
     if(!first) return;
     var cont = first.parentElement;
     var SKIP = /modal|toast|popup|fab|veil|overlay|aln|chat/i;
-    var MARK = [['wallet-section','wallet'],['proposal-section','proposal'],['review-section','review'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip'],['myproj-section','myproj'],['myprofile-section','myprofile'],['reputation-section','reputation'],['settings-section','settings'],['library-section','library']];
+    var MARK = [['wallet-section','wallet'],['proposal-section','proposal'],['review-section','review'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip'],['myproj-section','myproj'],['myprofile-section','myprofile'],['reputation-section','reputation'],['ktscreator-section','ktscreator'],['settings-section','settings'],['library-section','library']];
     var groups = { dashboard: [] };
     var cur = 'dashboard';
     Array.prototype.forEach.call(cont.children, function(k){
@@ -3593,6 +3643,158 @@ window.alnLogout = async function(){
   try { localStorage.removeItem("aln_user"); sessionStorage.removeItem("aln_user"); } catch(e){}
   window.location.replace("login.html");
 };
+</script>
+
+<!-- ═══ ALN — KTS CREATOR (pilot nội bộ, xem TONG_HOP_PHUONG_AN_KTS_CREATOR.md) ═══ -->
+<script type="module">
+import { auth, db, onAuthStateChanged, doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, query, where, serverTimestamp } from "./firebase-config.js";
+
+function ktscEsc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+const KTSC_LANDING_BASE = location.origin + location.pathname.replace(/kts_dashboard\.html$/, 'kts_landing_draft.html');
+const KTSC_FORMAT_LABEL = { '1':'Ý tưởng 2D', '2':'Timelapse 3D', '3':'Bóc hồ sơ thi công', '4':'Nhận tiền đúng hạn' };
+const KTSC_STATUS_LABEL = { cho_duyet:'Chờ duyệt', dat_chuan:'Đạt chuẩn', tu_choi:'Từ chối' };
+const KTSC_SCRIPTS = {
+  1: "KỊCH BẢN #1 — Ý TƯỞNG 2D (60s)\n\nHook 0-8s: nêu đúng nỗi lo của chủ nhà.\n8-40s: trình bày ý tưởng 2D — mặt bằng, công năng.\n40-55s: vì sao hợp lý.\n55-60s: CTA \"Bắt đầu Bước 1 qua link ở bio\".\nLƯU Ý: watermark + link định danh mọi bản đăng, không SĐT/Zalo cá nhân.",
+  2: "KỊCH BẢN #2 — TIMELAPSE 3D\n\nTimelapse dựng 3D + nhạc nền, CTA cuối clip \"Bắt đầu Bước 1 qua link ở bio\".\nLƯU Ý: watermark + link định danh mọi bản đăng, không SĐT/Zalo cá nhân.",
+  3: "KỊCH BẢN #3 — BÓC HỒ SƠ THI CÔNG\n\nGiải thích minh bạch 6 hạng mục hồ sơ thi công, chống đi đêm.\nLƯU Ý: không lộ thông tin công trình/khách hàng chưa đồng ý, không SĐT/Zalo cá nhân.",
+  4: "KỊCH BẢN #4 — NHẬN TIỀN ĐÚNG HẠN\n\nChia sẻ trải nghiệm nhận tiền đúng hạn qua Quỹ bảo đảm 4 bước.\nLƯU Ý: không tiết lộ số tiền cụ thể của khách chưa đồng ý, không SĐT/Zalo cá nhân."
+};
+window.ktscDownloadScript = function(n){
+  const blob = new Blob([KTSC_SCRIPTS[n]], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'kich-ban-kts-creator-' + n + '.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+window.ktscAddUrlRow = function(){
+  const list = document.getElementById('ktscUrlList');
+  if (!list || list.children.length >= 10) return;
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:6px;margin-bottom:6px';
+  row.innerHTML = '<input type="text" placeholder="https://... (TikTok/Facebook/YouTube/ALN)" style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text);font-size:12px;font-family:inherit;outline:none">'
+    + '<button onclick="this.parentElement.remove()" style="padding:0 10px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer">✕</button>';
+  list.appendChild(row);
+};
+window.ktscCopyLink = function(){
+  const link = document.getElementById('ktscLink');
+  const ok = document.getElementById('ktscCopyOk');
+  if (!link) return;
+  navigator.clipboard.writeText(link.textContent).then(function(){
+    if (ok) { ok.style.display = 'block'; setTimeout(function(){ ok.style.display = 'none'; }, 2000); }
+  });
+};
+
+let KTSC_ME = null, KTSC_PROFILE = null;
+
+function ktscGenCode(existingCodes){
+  let max = 0;
+  existingCodes.forEach(function(c){
+    const m = /^KTS-(\d{4,})$/.exec(c || '');
+    if (m) max = Math.max(max, parseInt(m[1], 10));
+  });
+  return 'KTS-' + String(max + 1).padStart(4, '0');
+}
+
+async function ktscEnsureProfile(uid, name){
+  const ref = doc(db, 'kts_profiles_draft', uid);
+  const snap = await getDoc(ref);
+  if (snap.exists()) return Object.assign({ uid: uid }, snap.data());
+  const allSnap = await getDocs(collection(db, 'kts_profiles_draft'));
+  const codes = [];
+  allSnap.forEach(function(d){ codes.push(d.data().ktsCode); });
+  const code = ktscGenCode(codes);
+  const profile = {
+    ktsCode: code, name: name || 'Kiến trúc sư ALN', avatarUrl: '', portfolioSummary: '',
+    badgeFounder: false, active: true, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+  };
+  await setDoc(ref, profile);
+  return Object.assign({ uid: uid }, profile);
+}
+
+function ktscRenderCode(){
+  const codeEl = document.getElementById('ktscCode');
+  const linkEl = document.getElementById('ktscLink');
+  if (codeEl) codeEl.textContent = KTSC_PROFILE.ktsCode;
+  if (linkEl) linkEl.textContent = KTSC_LANDING_BASE + '?code=' + KTSC_PROFILE.ktsCode;
+}
+
+async function ktscLoadClips(){
+  const box = document.getElementById('ktscClipList');
+  if (!box) return;
+  try {
+    const q = query(collection(db, 'clips_draft'), where('ktsUid', '==', KTSC_ME.uid));
+    const snap = await getDocs(q);
+    const items = [];
+    snap.forEach(function(d){ items.push(Object.assign({ id: d.id }, d.data())); });
+    items.sort(function(a, b){ return ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0); });
+    if (!items.length) { box.innerHTML = 'Chưa có clip nào.'; return; }
+    box.innerHTML = items.map(function(c){
+      const pillColor = c.status === 'dat_chuan' ? 'var(--green)' : (c.status === 'tu_choi' ? 'var(--red)' : 'var(--amber)');
+      const pillBg = c.status === 'dat_chuan' ? 'var(--green-bg)' : (c.status === 'tu_choi' ? 'var(--red-bg)' : 'var(--amber-bg)');
+      return '<div style="padding:10px 0;border-bottom:1px solid var(--border)">'
+        + '<div style="font-size:12px;font-weight:600;color:var(--text)">' + ktscEsc(c.title) + '</div>'
+        + '<div style="font-size:11px;color:var(--muted);margin-top:3px">Format ' + ktscEsc(c.format) + ' — ' + ktscEsc(KTSC_FORMAT_LABEL[c.format] || '')
+          + ' · <span style="padding:1px 8px;border-radius:99px;background:' + pillBg + ';color:' + pillColor + ';font-weight:700">' + (KTSC_STATUS_LABEL[c.status] || c.status) + '</span></div>'
+        + (c.status === 'tu_choi' && c.rejectReason ? '<div style="font-size:11px;color:var(--red);margin-top:3px">Lý do: ' + ktscEsc(c.rejectReason) + '</div>' : '')
+        + '</div>';
+    }).join('');
+  } catch (e) {
+    box.innerHTML = 'Lỗi tải clip (' + ktscEsc(e.code || e.message) + ')';
+  }
+}
+
+window.ktscSubmitClip = async function(){
+  const errEl = document.getElementById('ktscErr');
+  const okEl = document.getElementById('ktscOk');
+  if (errEl) errEl.style.display = 'none';
+  if (okEl) okEl.style.display = 'none';
+  if (!KTSC_ME || !KTSC_PROFILE) return;
+  const title = (document.getElementById('ktscTitle').value || '').trim();
+  const format = document.getElementById('ktscFormat').value;
+  const urls = Array.prototype.map.call(document.querySelectorAll('#ktscUrlList input'), function(i){ return i.value.trim(); }).filter(Boolean);
+  const commit = document.getElementById('ktscCommit').checked;
+  if (title.length < 3) { errEl.textContent = 'Vui lòng nhập tiêu đề clip.'; errEl.style.display = 'block'; return; }
+  if (urls.length < 1) { errEl.textContent = 'Cần ít nhất 1 URL bản đăng.'; errEl.style.display = 'block'; return; }
+  if (urls.length > 10) { errEl.textContent = 'Tối đa 10 URL.'; errEl.style.display = 'block'; return; }
+  if (!commit) { errEl.textContent = 'Vui lòng xác nhận cam kết trước khi nộp.'; errEl.style.display = 'block'; return; }
+  const btn = document.getElementById('ktscSubmitBtn');
+  btn.disabled = true;
+  try {
+    await addDoc(collection(db, 'clips_draft'), {
+      ktsUid: KTSC_ME.uid, ktsCode: KTSC_PROFILE.ktsCode, ktsName: KTSC_PROFILE.name,
+      title: title, format: format, urls: urls, commitNoContact: true,
+      status: 'cho_duyet', createdAt: serverTimestamp()
+    });
+    okEl.style.display = 'block';
+    document.getElementById('ktscTitle').value = '';
+    document.getElementById('ktscUrlList').innerHTML = '';
+    window.ktscAddUrlRow();
+    document.getElementById('ktscCommit').checked = false;
+    ktscLoadClips();
+  } catch (e) {
+    errEl.textContent = 'Lỗi nộp clip: ' + (e.message || e.code); errEl.style.display = 'block';
+  } finally { btn.disabled = false; }
+};
+
+onAuthStateChanged(auth, async function(user){
+  if (!user) return; // guard chính (script trên) đã xử lý chuyển hướng
+  try {
+    let snap = await getDoc(doc(db, 'users', user.uid));
+    const profile = snap.exists() ? snap.data()
+      : (user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2' ? { role: 'founder', name: 'KTS. Trần Đại Long' } : null);
+    if (!profile || (profile.role !== 'kts' && profile.role !== 'founder')) return;
+    KTSC_ME = { uid: user.uid, name: profile.name };
+    KTSC_PROFILE = await ktscEnsureProfile(user.uid, profile.name);
+    ktscRenderCode();
+    if (!document.querySelector('#ktscUrlList input')) window.ktscAddUrlRow();
+    await ktscLoadClips();
+  } catch (e) {
+    const box = document.getElementById('ktscClipList');
+    if (box) box.textContent = 'Lỗi tải KTS Creator (' + (e.message || e.code) + ')';
+    console.warn('[KTS Creator]', e);
+  }
+});
 </script>
 
 <!-- ═══ ALN — GỬI PHƯƠNG ÁN (ảnh) → Storage + Firestore ═══ -->
