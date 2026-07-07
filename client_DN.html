@@ -55,9 +55,10 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .sidebar-cn::-webkit-scrollbar-thumb{background:rgba(212,160,23,.3);border-radius:99px}
 .main-cn{margin-left:240px;flex:1;min-width:0;overflow-x:hidden}
 /* Sidebar brand */
-.dn-sidebar-brand{padding:16px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(212,160,23,.06) 0%,transparent 100%)}
-.dn-logo-mark{width:30px;height:30px;border-radius:var(--r-sm);border:1px solid rgba(212,160,23,.4);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);background:rgba(212,160,23,.08)}
-.dn-logo-text{font-family:var(--syne);font-weight:800;font-size:13px;letter-spacing:.04em;color:var(--text)}
+.dn-sidebar-brand{padding:20px 18px 16px;border-bottom:1px solid var(--border);margin-top:20px}
+.dn-sidebar-brand-top{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.dn-sidebar-brand-name{font-family:var(--serif);font-style:italic;font-weight:700;font-size:19px;color:var(--text);margin-top:4px;letter-spacing:-.01em}
+.dn-sidebar-brand-name::after{content:"";display:block;width:26px;height:2px;background:var(--gold);margin-top:9px;border-radius:2px}
 /* Sidebar profile card */
 .dn-sidebar-profile{padding:14px 16px 12px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(152,105,10,.04) 0%,transparent 100%)}
 .dn-profile-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#98690a,#b8860b);color:#fff;font-family:var(--syne);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px rgba(152,105,10,.28);border:2px solid rgba(152,105,10,.3)}
@@ -674,8 +675,8 @@ button,.btn,a[role="button"]{transition:transform .25s var(--ease),box-shadow .2
   <nav class="sidebar-cn" id="sidebarCN">
     <!-- Brand header -->
     <div class="dn-sidebar-brand">
-      <div class="dn-logo-mark"><i class="ph-duotone ph-buildings"></i></div>
-      <div class="dn-logo-text">ALN <span style="color:var(--gold)">Corp.</span></div>
+      <div class="dn-sidebar-brand-top">Không gian Doanh nghiệp</div>
+      <div class="dn-sidebar-brand-name">ALN Workspace</div>
     </div>
 
     <!-- Company profile card -->
@@ -725,6 +726,87 @@ button,.btn,a[role="button"]{transition:transform .25s var(--ease),box-shadow .2
 
   <!-- MAIN -->
   <div class="main-cn">
+    <style id="officeMastheadStyle">
+.office-masthead{
+  --om-bg:#0e1424; --om-panel:#131d33; --om-line:rgba(212,168,64,.4); --om-line2:rgba(224,182,84,.2); --om-gold:#e0b654;
+  --om-cream:#f0ead6; --om-sub:#9aa8bd; --om-online:#3dd68c;
+  background:var(--om-bg); border:3px solid var(--om-gold); border-radius:16px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
+  padding:32px 34px 22px; margin:20px 24px 0; position:relative;
+}
+.om-top-row{display:flex;justify-content:space-between;align-items:stretch;gap:24px;flex-wrap:wrap}
+.om-sign{flex:1;min-width:220px}
+.om-sign-eyebrow{font-family:var(--syne);font-size:13px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--om-gold);margin-bottom:10px}
+.om-sign-title{font-family:var(--serif);font-style:italic;font-weight:600;font-size:32px;color:var(--om-cream);letter-spacing:.01em;line-height:1.18}
+.om-sign-rule{width:46px;height:1px;background:var(--om-gold);opacity:.55;margin:10px 0 12px}
+.om-status{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--om-gold);background:rgba(255,255,255,.025);border:1px solid rgba(198,154,52,.22);padding:6px 14px;border-radius:99px;letter-spacing:.02em}
+.om-status-dot{width:6px;height:6px;border-radius:50%;background:var(--om-online);box-shadow:0 0 7px var(--om-online);animation:omBlink 2.2s infinite;flex-shrink:0}
+.om-status.closed .om-status-dot{background:#8a6d3a;box-shadow:none;animation:none}
+@keyframes omBlink{0%,100%{opacity:1}50%{opacity:.35}}
+.om-kts-card{display:flex;align-items:center;gap:14px;background:var(--om-panel);border:2px solid var(--om-gold);border-radius:12px;padding:14px 20px;flex-shrink:0;position:relative;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.om-kts-av{width:48px;height:48px;border-radius:50%;background:var(--om-bg);border:1px solid var(--om-gold);outline:1px solid rgba(198,154,52,.25);outline-offset:2px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-weight:600;font-size:17px;color:var(--om-gold);flex-shrink:0}
+.om-kts-divider{width:1px;align-self:stretch;background:var(--om-line2);flex-shrink:0}
+.om-kts-info{min-width:0}
+.om-kts-label{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--om-sub)}
+.om-kts-name{font-family:var(--serif);font-size:17px;font-weight:600;font-style:italic;color:var(--om-cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;margin-top:2px}
+.om-kts-online{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--om-online);margin-top:4px;letter-spacing:.03em}
+.om-online-dot{width:5px;height:5px;border-radius:50%;background:var(--om-online);box-shadow:0 0 5px var(--om-online);flex-shrink:0}
+.om-knock-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:2px;border:1px solid var(--om-gold);background:var(--om-gold);color:#171008;font-family:var(--syne);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .25s;white-space:nowrap;box-shadow:0 2px 10px rgba(198,154,52,.18)}
+.om-knock-btn:hover{background:transparent;color:var(--om-gold);box-shadow:none}
+.om-knock-btn.closed{background:transparent;color:var(--om-gold);box-shadow:none}
+.om-knock-btn.closed:hover{background:var(--om-gold);color:#171008}
+.om-rooms{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.om-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:2px;border:1px solid rgba(198,154,52,.18);background:transparent;color:var(--om-sub);font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.om-chip i{color:var(--om-gold);opacity:.75}
+.om-chip:hover{border-color:var(--om-gold);color:var(--om-cream)}
+.om-chip.active{border-color:var(--om-gold);color:var(--om-gold);background:rgba(198,154,52,.07)}
+.om-activity{margin-top:14px;display:flex;flex-direction:column;gap:6px;min-height:16px}
+.om-activity-item{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--om-sub);letter-spacing:.01em}
+.om-activity-item b{color:var(--om-cream);font-weight:600}
+.om-activity-dot{width:3px;height:3px;border-radius:50%;background:var(--om-gold);flex-shrink:0}
+.om-activity-empty{font-size:11px;color:var(--om-sub);opacity:.55;font-style:italic;font-family:var(--serif)}
+@media(max-width:700px){
+  .om-top-row{flex-direction:column}
+  .om-kts-card{width:100%}
+  .om-sign-title{font-size:22px}
+}
+@media(min-width:769px){
+  .topbar{display:none}
+}
+</style>
+
+<div class="office-masthead" id="officeMasthead">
+  <div class="om-top-row">
+    <div class="om-sign">
+      <div class="om-sign-eyebrow">Mạng lưới KTS toàn quốc</div>
+      <div class="om-sign-title">Văn phòng KTS của bạn</div>
+      <div class="om-sign-rule"></div>
+      <div class="om-status" id="omStatusWrap"><span class="om-status-dot"></span><span id="omStatusText">Đang mở cửa · Giờ 8:00–18:00</span></div>
+    </div>
+    <div class="om-kts-card">
+      <div class="om-kts-av" id="omKtsAv">KT</div>
+      <div class="om-kts-divider"></div>
+      <div class="om-kts-info">
+        <div class="om-kts-label">KTS phụ trách</div>
+        <div class="om-kts-name" id="omKtsName">—</div>
+        <div class="om-kts-online"><span class="om-online-dot"></span>Trực tuyến</div>
+      </div>
+      <button class="om-knock-btn" id="omKnockBtn" onclick="omGoRoom('meeting')">
+        <i class="ph-duotone ph-door-open"></i><span id="omKnockLabel">Gõ cửa</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="om-rooms" id="omRooms">
+    <button class="om-chip active" data-room="desk" onclick="omGoRoom('desk')"><i class="ph-duotone ph-note-pencil"></i>Bàn làm việc</button>
+    <button class="om-chip" data-room="meeting" onclick="omGoRoom('meeting')"><i class="ph-duotone ph-users-three"></i>Phòng họp</button>
+    <button class="om-chip" data-room="archive" onclick="omGoRoom('archive')"><i class="ph-duotone ph-archive"></i>Kho hồ sơ</button>
+    <button class="om-chip" data-room="progress" onclick="omGoRoom('progress')"><i class="ph-duotone ph-chart-line-up"></i>Bảng tiến độ</button>
+  </div>
+
+  <div class="om-activity" id="omActivity"></div>
+</div>
+
     <div id="mainContent"><!-- injected --></div>
   </div>
 
@@ -2136,7 +2218,7 @@ function renderMain(){
 
   /* Inject HTML */
   document.getElementById('mainContent').innerHTML = `
-    <div class="cn-header">
+    <div class="cn-header" id="dnAnchorDesk">
 
       <!-- ══ PROJECT INFO ══ -->
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
@@ -2200,7 +2282,7 @@ function renderMain(){
       </div>
 
       <!-- TIẾN ĐỘ — COMPACT -->
-      <div class="card" style="padding:14px 18px">
+      <div class="card" id="dnAnchorProgress" style="padding:14px 18px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <div class="ct" style="margin:0;border:none;padding:0">
             <i class="ph-duotone ph-path" style="color:var(--gold)"></i> Tiến độ thực hiện
@@ -2502,7 +2584,7 @@ function renderMain(){
       </div>
 
       <!-- KHO TÀI LIỆU -->
-      <div class="card">
+      <div class="card" id="dnAnchorArchive">
         <div class="ct">
           <i class="ph-duotone ph-folder-open"></i> Kho Tài liệu & Bản vẽ
           <span class="pill p-blue" style="margin-left:auto;font-size:10px">${totalDocs} file</span>
@@ -5140,6 +5222,83 @@ window.hkLeave = function(){
   document.getElementById('hkFrame').src = 'about:blank';
   document.getElementById('hkModal').style.display = 'none';
 };
+</script>
+
+<script>
+(function(){
+  function $(id){return document.getElementById(id);}
+  function initials(name){
+    var nm=(name||'').replace(/^KTS\.\s*/,'').trim();
+    var pts=nm.split(' ').filter(Boolean);
+    if(!pts.length) return 'KT';
+    return (pts[0][0]+(pts.length>1?pts[pts.length-1][0]:'')).toUpperCase();
+  }
+  function updateOfficeStatus(){
+    var h=new Date().getHours();
+    var open = h>=8 && h<18;
+    var wrap=$('omStatusWrap'); var txt=$('omStatusText');
+    if(wrap){ wrap.classList.toggle('closed', !open); }
+    if(txt){ txt.textContent = open ? 'Đang mở cửa · Giờ 8:00–18:00' : 'Văn phòng đã đóng cửa · để lại lời nhắn'; }
+    var kb=$('omKnockLabel');
+    if(kb) kb.textContent = open ? 'Gõ cửa' : 'Để lại lời nhắn';
+    var btn=$('omKnockBtn');
+    if(btn) btn.classList.toggle('closed', !open);
+    return open;
+  }
+  function renderOmActivity(){
+    var el=$('omActivity'); if(!el) return;
+    var src = (typeof NOTIFS !== 'undefined') ? NOTIFS : [];
+    var list = src.slice(0,3);
+    if(!list.length){ el.innerHTML='<div class="om-activity-empty">Chưa có hoạt động mới trong văn phòng</div>'; return; }
+    el.innerHTML = list.map(function(n){
+      return '<div class="om-activity-item"><span class="om-activity-dot"></span>'+n.body+'</div>';
+    }).join('');
+  }
+  function updateMasthead(){
+    updateOfficeStatus();
+    var p=(window.PROJECTS_CLIENT||[]).find(function(x){return x.id===window.activeProj;});
+    var ktsName=(p&&p.kts)||'KTS. Trần Long';
+    var nEl=$('omKtsName'); if(nEl) nEl.textContent=ktsName;
+    var aEl=$('omKtsAv');
+    var avatarUrl = (p && p.ktsUid && window._dnUserCache && window._dnUserCache[p.ktsUid] && window._dnUserCache[p.ktsUid].avatarURL) || null;
+    if(aEl){
+      if(avatarUrl){ aEl.innerHTML='<img src="'+avatarUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">'; }
+      else { aEl.textContent=initials(ktsName); }
+    }
+    renderOmActivity();
+  }
+  window.omGoRoom=function(room){
+    document.querySelectorAll('.om-chip').forEach(function(c){c.classList.toggle('active', c.getAttribute('data-room')===room);});
+    if(room==='meeting'){ if(typeof toggleZaloPopup==='function') toggleZaloPopup(); return; }
+    var idMap={desk:'dnAnchorDesk', archive:'dnAnchorArchive', progress:'dnAnchorProgress'};
+    var el=document.getElementById(idMap[room]);
+    if(el){
+      var y = el.getBoundingClientRect().top + window.scrollY - 70;
+      window.scrollTo({top:Math.max(y,0), behavior:'smooth'});
+    }
+  };
+  function wireHooks(){
+    if(typeof window.renderMain==='function' && !window.renderMain.__omWrapped){
+      var origRM=window.renderMain;
+      window.renderMain=function(){ var r=origRM.apply(this,arguments); updateMasthead(); return r; };
+      window.renderMain.__omWrapped=true;
+    }
+    if(typeof window._addNotif==='function' && !window._addNotif.__omWrapped){
+      var origAN=window._addNotif;
+      window._addNotif=function(){ var r=origAN.apply(this,arguments); renderOmActivity(); return r; };
+      window._addNotif.__omWrapped=true;
+    }
+  }
+  updateOfficeStatus();
+  var tries=0;
+  var poll=setInterval(function(){
+    wireHooks();
+    updateMasthead();
+    tries++;
+    if(tries>60) clearInterval(poll);
+  },500);
+  setInterval(updateOfficeStatus, 60000);
+})();
 </script>
 </body>
 </html>
