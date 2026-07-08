@@ -135,7 +135,12 @@ a{color:inherit;text-decoration:none}
   .hero-visual svg{max-width:280px}
   .hero-slider{max-width:320px;margin:0 auto}
   .hs-slide{height:340px}
+  .hbv-wrap{height:340px}
 }
+
+/* ── HERO BANNER VIDEO (thay khối 3 ảnh, xem HTML bên dưới) ── */
+.hbv-wrap{height:460px}
+.hbv-wrap video{width:100%;height:100%;object-fit:cover;display:block}
 
 /* ── SECTION HEADER ── */
 .sec{padding:104px 0}
@@ -580,6 +585,14 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
         <div class="trust-chip"><i class="ph-duotone ph-eye"></i>Theo dõi tiến độ real-time</div>
       </div>
     </div>
+    <div class="hero-visual hero-slider hbv-wrap" id="heroBannerVideo">
+      <video id="alnBannerVideo" autoplay muted playsinline preload="metadata" poster="assets/video/home-banner-1-poster.jpg">
+        <source id="alnBannerSource" src="assets/video/home-banner-1.mp4" type="video/mp4">
+      </video>
+      <span class="hero-photo-tag">ALN Studio</span>
+      <div class="hs-cap">Thi công thực tế — Biệt thự Luxury Q1</div>
+    </div>
+    <!-- HERO SLIDER CŨ (3 ảnh) — giữ lại để rollback, đã thay bằng video ở trên
     <div class="hero-visual hero-slider" id="heroSlider">
       <div class="hs-track" id="hsTrack">
         <div class="hs-slide">
@@ -604,6 +617,7 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
         <span class="hs-dot" onclick="heroSlideTo(2)"></span>
       </div>
     </div>
+    -->
     <div class="hero-visual hero-visual-svg" style="display:none">
       <svg viewBox="0 0 480 460" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -1268,6 +1282,28 @@ function heroSlideInit(){
   el.addEventListener('mouseleave', function(){ heroSlideResetTimer(); });
 }
 window.addEventListener('DOMContentLoaded', heroSlideInit);
+
+// ── Hero banner video (chỉ 1 video lúc này; thêm video 2 vào ALN_BANNER_PLAYLIST sau) ──
+window.ALN_BANNER_PLAYLIST = [
+  { src: 'assets/video/home-banner-1.mp4', poster: 'assets/video/home-banner-1-poster.jpg' }
+];
+window.ALN_BANNER_IDX = 0;
+function alnBannerInit(){
+  var video = document.getElementById('alnBannerVideo');
+  var source = document.getElementById('alnBannerSource');
+  if(!video){ return; }
+  if(!source){ return; }
+  video.addEventListener('ended', function(){
+    window.ALN_BANNER_IDX = (window.ALN_BANNER_IDX + 1) % window.ALN_BANNER_PLAYLIST.length;
+    var next = window.ALN_BANNER_PLAYLIST[window.ALN_BANNER_IDX];
+    video.poster = next.poster;
+    source.src = next.src;
+    video.load();
+    video.play().catch(function(){});
+  });
+  video.play().catch(function(){});
+}
+window.addEventListener('DOMContentLoaded', alnBannerInit);
 
 function toggleMobileNav(){
   var el = document.getElementById('mobile-nav');
