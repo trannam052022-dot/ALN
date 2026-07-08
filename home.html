@@ -590,7 +590,7 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
         <source id="alnBannerSource" src="assets/video/home-banner-1.mp4" type="video/mp4">
       </video>
       <span class="hero-photo-tag">ALN Studio</span>
-      <div class="hs-cap">Thi công thực tế — Biệt thự Luxury Q1</div>
+      <div class="hs-cap" id="alnBannerCap">Thi công thực tế — Biệt thự Luxury Q1</div>
     </div>
     <!-- HERO SLIDER CŨ (3 ảnh) — giữ lại để rollback, đã thay bằng video ở trên
     <div class="hero-visual hero-slider" id="heroSlider">
@@ -1283,14 +1283,16 @@ function heroSlideInit(){
 }
 window.addEventListener('DOMContentLoaded', heroSlideInit);
 
-// ── Hero banner video (chỉ 1 video lúc này; thêm video 2 vào ALN_BANNER_PLAYLIST sau) ──
+// ── Hero banner video (2 video chạy nối tiếp rồi lặp) ──
 window.ALN_BANNER_PLAYLIST = [
-  { src: 'assets/video/home-banner-1.mp4', poster: 'assets/video/home-banner-1-poster.jpg' }
+  { src: 'assets/video/home-banner-1.mp4', poster: 'assets/video/home-banner-1-poster.jpg', label: 'Thi công thực tế — Biệt thự Luxury Q1' },
+  { src: 'assets/video/home-banner-2.mp4', poster: 'assets/video/home-banner-2-poster.jpg', label: 'Thi công thực tế — Villa A Tùng Q10' }
 ];
 window.ALN_BANNER_IDX = 0;
 function alnBannerInit(){
   var video = document.getElementById('alnBannerVideo');
   var source = document.getElementById('alnBannerSource');
+  var cap = document.getElementById('alnBannerCap');
   if(!video){ return; }
   if(!source){ return; }
   video.addEventListener('ended', function(){
@@ -1298,6 +1300,7 @@ function alnBannerInit(){
     var next = window.ALN_BANNER_PLAYLIST[window.ALN_BANNER_IDX];
     video.poster = next.poster;
     source.src = next.src;
+    if(cap){ cap.textContent = next.label; }
     video.load();
     video.play().catch(function(){});
   });
