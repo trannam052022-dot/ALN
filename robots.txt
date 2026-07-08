@@ -1,6 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /kts_landing_draft.html
-Disallow: /founder_kts_creator_draft.html
 
 Sitemap: https://applamnha.vn/sitemap.xml
