@@ -10,6 +10,63 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a0a0c">
 <link rel="apple-touch-icon" href="icon-192.png">
+<!-- Meta Pixel (ALN Pixel) -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1656666692225878');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel -->
+<script>
+/* Bắt UTM/fbclid từ URL quảng cáo → localStorage (last-touch, giữ 7 ngày).
+   window.alnGetUtm/alnGetFbp/alnGetFbc dùng ở doRegister để ghi kèm user CN
+   mới — cùng pattern đã dùng ở tuyen-kts.html/phong-cho.html/home.html. */
+(function(){
+  try{
+    var parts = location.search.substring(1).split('&');
+    var utm = {}; var found = false;
+    for (var i = 0; i < parts.length; i++) {
+      var kv = parts[i].split('=');
+      if (kv.length < 2 || !kv[1]) continue;
+      var k = decodeURIComponent(kv[0]);
+      var v = decodeURIComponent(kv[1].replace(/\+/g, ' '));
+      if (k.indexOf('utm_') === 0) { utm[k.substring(4)] = v.slice(0, 120); found = true; }
+      if (k === 'fbclid') { utm.fbclid = v.slice(0, 200); found = true; }
+    }
+    if (found) { utm.ts = Date.now(); localStorage.setItem('aln_utm', JSON.stringify(utm)); }
+  }catch(e){}
+  window.alnGetUtm = function(){
+    try{
+      var s = localStorage.getItem('aln_utm');
+      if (!s) return {};
+      var o = JSON.parse(s);
+      if (o.ts && Date.now() - o.ts > 7 * 864e5) return {};
+      return o;
+    }catch(e){ return {}; }
+  };
+  window.alnGetCookie = function(name){
+    var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : '';
+  };
+  window.alnGetFbp = function(){ return window.alnGetCookie('_fbp'); };
+  window.alnGetFbc = function(){
+    var c = window.alnGetCookie('_fbc');
+    if (c) return c;
+    var u = window.alnGetUtm();
+    if (u.fbclid) return 'fb.1.' + Date.now() + '.' + u.fbclid;
+    return '';
+  };
+})();
+</script>
 <style>
 :root{
   --ink:#08080a;--ink2:#111114;--ink3:#18181c;--ink4:#222228;
@@ -473,11 +530,23 @@ async function doRegister(){
     var uref = fb.doc(fb.db, 'users', uid);
     var usnap = await fb.getDoc(uref);
     if(!usnap.exists()){
+      /* Metadata quảng cáo — onCnRegistered (functions/ktsFunnel.js) đọc các
+         field này để bắn CAPI CompleteRegistration server-side, dedup với
+         Pixel client bên dưới qua event_id 'cnreg-'+uid. */
+      var utm = window.alnGetUtm ? window.alnGetUtm() : {};
+      var fbp = window.alnGetFbp ? window.alnGetFbp() : '';
+      var fbc = window.alnGetFbc ? window.alnGetFbc() : '';
       await fb.setDoc(uref, {
         username: phone, name: name, phone: phone, role: 'cn', email: email,
         status: 'active', plan: 'free', credits: {}, kts_ref: ktsRef,
+        utm: utm, fbp: fbp, fbc: fbc, sourceUrl: location.origin + location.pathname,
         createdAt: fb.serverTimestamp(),
       });
+      try {
+        if (window.fbq) fbq('track', 'CompleteRegistration',
+          { content_name: 'register-cn', content_category: 'cn-funnel' },
+          { eventID: 'cnreg-' + uid });
+      } catch(e){}
     } else if(ktsRef){
       await fb.setDoc(uref, { kts_ref: ktsRef }, { merge: true });
     }

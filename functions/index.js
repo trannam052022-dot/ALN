@@ -2070,3 +2070,5 @@ exports.onKtsReservationCreated = ktsFunnel.onKtsReservationCreated;
 
 /* ── Phễu ads chủ nhà: form lead nhanh (home.html) → CAPI Lead, xem functions/ktsFunnel.js ── */
 exports.onHomeLeadCreated = ktsFunnel.onHomeLeadCreated;
+/* ── Phễu ads chủ nhà: đăng ký CN (register.html, kể cả từ diễn đàn "Hỏi KTS") → CAPI CompleteRegistration ── */
+exports.onCnRegistered = ktsFunnel.onCnRegistered;

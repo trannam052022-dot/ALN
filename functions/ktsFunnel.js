@@ -341,3 +341,39 @@ exports.onHomeLeadCreated = onDocumentCreated(
     }
   }
 );
+
+/* ══════════════════════════════════════════════════════════════════
+   4. onCnRegistered — đăng ký Chủ nhà qua register.html (role:'cn'),
+   kể cả khi đi từ nút "Hỏi KTS Miễn Phí" trên diễn đàn (forum.html →
+   requireLogin → register.html, xem forumGoRegister). Bắn CAPI
+   CompleteRegistration server-side; dedup với Pixel client qua
+   event_id 'cnreg-'+uid (xem register.html hàm doRegister).
+══════════════════════════════════════════════════════════════════ */
+exports.onCnRegistered = onDocumentCreated(
+  {
+    document: "users/{uid}",
+    region: "asia-southeast1",
+    secrets: [FB_CAPI_TOKEN],
+  },
+  async (event) => {
+    const snap = event.data;
+    if (!snap) return;
+    const u = snap.data() || {};
+    if (u.role !== "cn") return; // chỉ bắn cho Chủ nhà — KTS/DN đi phễu riêng (ktsFunnel/onKtsReservationCreated)
+    try {
+      await sendCapiEvent({
+        eventName: "CompleteRegistration",
+        eventId: "cnreg-" + event.params.uid,
+        sourceUrl: typeof u.sourceUrl === "string" ? u.sourceUrl.slice(0, 300) : SITE_URL + "register.html",
+        phone: u.phone || "",
+        email: "",
+        fbp: typeof u.fbp === "string" ? u.fbp : "",
+        fbc: typeof u.fbc === "string" ? u.fbc : "",
+        utm: u.utm,
+        contentName: "register-cn",
+      });
+    } catch (e) {
+      console.error("[onCnRegistered] CAPI:", e.message);
+    }
+  }
+);
