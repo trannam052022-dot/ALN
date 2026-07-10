@@ -1,7 +1,8 @@
 /**
- * ktsFunnel — phễu tuyển KTS chạy quảng cáo (asia-southeast1)
+ * ktsFunnel — phễu tuyển KTS + phễu lead chủ nhà chạy quảng cáo (asia-southeast1)
  *
- * 2 hàm phục vụ chiến dịch ads tuyển KTS:
+ * 3 hàm phục vụ đo lường ads (2 hàm đầu cho KTS, hàm 3 cho chủ nhà — tái dùng
+ * chung sendCapiEvent()):
  *
  * 1. submitKtsApplication (onCall) — kts-apply.html gọi sau khi đã tạo Auth user
  *    và upload file lên Storage phía client. Ghi users/{uid} + ktsApplications/{uid}
@@ -300,6 +301,40 @@ exports.onKtsReservationCreated = onDocumentCreated(
       });
     } catch (e) {
       console.error("[onKtsReservationCreated] CAPI:", e.message);
+    }
+  }
+);
+
+/* ══════════════════════════════════════════════════════════════════
+   3. onLandingLeadCreated — form lead nhanh (Tên+SĐT) trên home.html,
+   dành cho chủ nhà. Bắn CAPI Lead server-side; dedup với Pixel client
+   qua event_id 'lead-'+id (id = landingLeads doc id, sinh phía client
+   trước khi setDoc, xem home.html hàm leadSubmit).
+══════════════════════════════════════════════════════════════════ */
+exports.onLandingLeadCreated = onDocumentCreated(
+  {
+    document: "landingLeads/{id}",
+    region: "asia-southeast1",
+    secrets: [FB_CAPI_TOKEN],
+  },
+  async (event) => {
+    const snap = event.data;
+    if (!snap) return;
+    const r = snap.data() || {};
+    try {
+      await sendCapiEvent({
+        eventName: "Lead",
+        eventId: "lead-" + event.params.id,
+        sourceUrl: typeof r.sourceUrl === "string" ? r.sourceUrl.slice(0, 300) : SITE_URL + "home.html",
+        phone: r.phone || "",
+        email: "",
+        fbp: typeof r.fbp === "string" ? r.fbp : "",
+        fbc: typeof r.fbc === "string" ? r.fbc : "",
+        utm: r.utm,
+        contentName: "home-lead-form",
+      });
+    } catch (e) {
+      console.error("[onLandingLeadCreated] CAPI:", e.message);
     }
   }
 );

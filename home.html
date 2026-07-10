@@ -516,6 +516,47 @@ fbq('track', 'PageView');
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></noscript>
 <!-- End Meta Pixel -->
+<script>
+/* Bắt UTM/fbclid từ URL quảng cáo → localStorage (last-touch, giữ 7 ngày).
+   window.alnGetUtm/alnGetFbp/alnGetFbc dùng khi ghi landingLeads (form lead
+   nhanh chủ nhà) — cùng pattern đã dùng ở tuyen-kts.html/phong-cho.html. */
+(function(){
+  try{
+    var parts = location.search.substring(1).split('&');
+    var utm = {}; var found = false;
+    for (var i = 0; i < parts.length; i++) {
+      var kv = parts[i].split('=');
+      if (kv.length < 2 || !kv[1]) continue;
+      var k = decodeURIComponent(kv[0]);
+      var v = decodeURIComponent(kv[1].replace(/\+/g, ' '));
+      if (k.indexOf('utm_') === 0) { utm[k.substring(4)] = v.slice(0, 120); found = true; }
+      if (k === 'fbclid') { utm.fbclid = v.slice(0, 200); found = true; }
+    }
+    if (found) { utm.ts = Date.now(); localStorage.setItem('aln_utm', JSON.stringify(utm)); }
+  }catch(e){}
+  window.alnGetUtm = function(){
+    try{
+      var s = localStorage.getItem('aln_utm');
+      if (!s) return {};
+      var o = JSON.parse(s);
+      if (o.ts && Date.now() - o.ts > 7 * 864e5) return {};
+      return o;
+    }catch(e){ return {}; }
+  };
+  window.alnGetCookie = function(name){
+    var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : '';
+  };
+  window.alnGetFbp = function(){ return window.alnGetCookie('_fbp'); };
+  window.alnGetFbc = function(){
+    var c = window.alnGetCookie('_fbc');
+    if (c) return c;
+    var u = window.alnGetUtm();
+    if (u.fbclid) return 'fb.1.' + Date.now() + '.' + u.fbclid;
+    return '';
+  };
+})();
+</script>
 </head>
 <body>
 
@@ -673,6 +714,34 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
           <text x="360" y="408" text-anchor="middle">C4</text>
         </g>
       </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ LEAD NHANH — CHỦ NHÀ (đo lường ads, chỉ Tên + SĐT) ═══ -->
+<section class="sec" id="leadQuick" style="padding-top:0">
+  <div class="wrap">
+    <div class="tool-panel" id="leadPanel" style="max-width:640px;margin:0 auto">
+      <div id="leadFormWrap">
+        <div class="eyebrow" style="margin-bottom:14px;justify-content:center;display:flex"><span class="ln"></span>NHẬN TƯ VẤN MIỄN PHÍ<span class="ln"></span></div>
+        <div class="field" style="margin-bottom:14px">
+          <label>Họ và tên</label>
+          <input type="text" id="leadName" placeholder="Nguyễn Văn A">
+        </div>
+        <div class="field" style="margin-bottom:18px">
+          <label>Số điện thoại</label>
+          <input type="tel" id="leadPhone" placeholder="09xxxxxxxx" inputmode="numeric" onkeydown="if(event.key==='Enter'){leadSubmit();}">
+        </div>
+        <div class="est-cta">
+          <button class="btn btn-gold" id="leadBtn" onclick="leadSubmit()"><i class="ph-duotone ph-phone-call"></i> Gửi thông tin, ALN gọi lại</button>
+        </div>
+        <div id="leadErr" style="display:none;color:var(--red);font-size:12px;text-align:center;margin-top:10px"></div>
+      </div>
+      <div id="leadSuccess" style="display:none;text-align:center;padding:20px 0">
+        <i class="ph-duotone ph-check-circle" style="font-size:40px;color:var(--green)"></i>
+        <div style="font-family:var(--serif);font-size:20px;font-style:italic;margin:12px 0 6px">Đã nhận thông tin!</div>
+        <div style="color:var(--sub);font-size:13px">ALN sẽ liên hệ lại trong thời gian sớm nhất.</div>
+      </div>
     </div>
   </div>
 </section>
@@ -1742,8 +1811,10 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ libClo
 import { app } from './firebase-config.js';
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+import { getFirestore, doc, setDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const auth = getAuth(app);
+const dbLead = getFirestore(app);
 const functions = getFunctions(app, 'asia-southeast1');
 const callAlnChat = httpsCallable(functions, 'alnChat');
 
@@ -1765,6 +1836,60 @@ window.mymySend = async function(text, history) {
     role: null
   });
   return res.data.reply;
+};
+
+/* Lead nhanh chủ nhà (#leadQuick) — ghi landingLeads, Founder Panel đã có
+   sẵn UI quản lý (khu "Lead — landingLeads"). CAPI Lead server-side bắn ở
+   functions/ktsFunnel.js (onLandingLeadCreated), dedup qua event_id
+   'lead-'+id với Pixel client dưới đây. */
+window.leadSubmit = async function(){
+  const nameEl = document.getElementById('leadName');
+  const phoneEl = document.getElementById('leadPhone');
+  const errEl = document.getElementById('leadErr');
+  const btn = document.getElementById('leadBtn');
+  errEl.style.display = 'none';
+
+  const name = (nameEl.value || '').trim();
+  const phone = (phoneEl.value || '').replace(/[\s.\-()]/g, '');
+  if (!name) { errEl.textContent = 'Vui lòng nhập họ tên.'; errEl.style.display = 'block'; return; }
+  if (!/^0\d{8,10}$/.test(phone)) { errEl.textContent = 'SĐT chưa đúng (VD: 0909xxxxxx).'; errEl.style.display = 'block'; return; }
+
+  const btnLabel = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin"></i> Đang gửi...';
+
+  try {
+    if (!authReady) {
+      await new Promise((resolve) => {
+        const unsub = onAuthStateChanged(auth, (u) => { if (u) { unsub(); resolve(); } });
+      });
+    }
+    const ref = doc(collection(dbLead, 'landingLeads'));
+    const utm = window.alnGetUtm ? window.alnGetUtm() : {};
+    const fbp = window.alnGetFbp ? window.alnGetFbp() : '';
+    const fbc = window.alnGetFbc ? window.alnGetFbc() : '';
+    await setDoc(ref, {
+      name, phone,
+      status: 'moi',
+      source: (utm && utm.source) || 'direct',
+      utm, fbp, fbc,
+      sourceUrl: location.origin + location.pathname,
+      createdAt: serverTimestamp(),
+    });
+    try {
+      if (window.fbq) fbq('track', 'Lead',
+        { content_name: 'home-lead-form', content_category: 'cn-funnel' },
+        { eventID: 'lead-' + ref.id });
+    } catch (e) {}
+
+    document.getElementById('leadFormWrap').style.display = 'none';
+    document.getElementById('leadSuccess').style.display = 'block';
+  } catch (e) {
+    errEl.textContent = 'Có lỗi xảy ra, vui lòng thử lại. (' + (e && e.message ? e.message : 'lỗi không rõ') + ')';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = btnLabel;
+  }
 };
 </script>
 
