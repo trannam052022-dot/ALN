@@ -1811,20 +1811,11 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ libClo
 import { app } from './firebase-config.js';
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
-import { getFirestore, doc, setDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-import { initializeAppCheck, ReCaptchaV3Provider, getToken as getAppCheckToken } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js';
 
 const auth = getAuth(app);
-const dbLead = getFirestore(app);
 const functions = getFunctions(app, 'asia-southeast1');
 const callAlnChat = httpsCallable(functions, 'alnChat');
-/* Không có getAppCheck() trong SDK này — gọi lại initializeAppCheck() với ĐÚNG
-   options như firebase-config.js đã gọi thì trả về đúng instance đã có sẵn
-   (idempotent), dùng để lấy token trước khi ghi landingLeads. */
-const appCheckInst = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider('6LeuZi8tAAAAAMfnZOHxH_xnLM8C0OpnexVgKFPb'),
-  isTokenAutoRefreshEnabled: true
-});
+const callSubmitHomeLead = httpsCallable(functions, 'submitHomeLead', { timeout: 20000 });
 
 let authReady = false;
 signInAnonymously(auth).catch((e) => console.error('MyMy anon-auth lỗi:', e));
@@ -1846,10 +1837,13 @@ window.mymySend = async function(text, history) {
   return res.data.reply;
 };
 
-/* Lead nhanh chủ nhà (#leadQuick) — ghi landingLeads, Founder Panel đã có
-   sẵn UI quản lý (khu "Lead — landingLeads"). CAPI Lead server-side bắn ở
-   functions/ktsFunnel.js (onLandingLeadCreated), dedup qua event_id
-   'lead-'+id với Pixel client dưới đây. */
+/* Lead nhanh chủ nhà (#leadQuick) — gửi qua Cloud Function submitHomeLead
+   (server ghi landingLeads bằng Admin SDK, xem functions/ktsFunnel.js).
+   Không ghi Firestore thẳng từ client nữa: rules landingLeads đòi token
+   App Check mà nhiều thiết bị thật không được cấp (reCAPTCHA bị chặn /
+   điểm thấp) → permission-denied, mất lead. Không cần đăng nhập ẩn danh
+   trước khi gửi. CAPI Lead server-side bắn ở onHomeLeadCreated, dedup
+   qua event_id 'lead-'+id với Pixel client dưới đây. */
 window.leadSubmit = async function(){
   const nameEl = document.getElementById('leadName');
   const phoneEl = document.getElementById('leadPhone');
@@ -1867,56 +1861,28 @@ window.leadSubmit = async function(){
   btn.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin"></i> Đang gửi...';
 
   try {
-    if (!authReady) {
-      await Promise.race([
-        new Promise((resolve) => {
-          const unsub = onAuthStateChanged(auth, (u) => { if (u) { unsub(); resolve(); } });
-        }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('AUTH_TIMEOUT')), 15000)),
-      ]);
-    }
-    /* Chờ token App Check thật sự sẵn sàng trước khi ghi — landingLeads bắt
-       buộc request.app != null, form này nằm ngay đầu trang nên khách có thể
-       bấm gửi trước khi reCAPTCHA kịp lấy token lần đầu (race condition). */
-    try {
-      await Promise.race([
-        getAppCheckToken(appCheckInst),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('APPCHECK_TIMEOUT')), 15000)),
-      ]);
-    } catch (acErr) {
-      throw new Error('APPCHECK_TIMEOUT');
-    }
-    const ref = doc(collection(dbLead, 'landingLeads'));
     const utm = window.alnGetUtm ? window.alnGetUtm() : {};
-    const fbp = window.alnGetFbp ? window.alnGetFbp() : '';
-    const fbc = window.alnGetFbc ? window.alnGetFbc() : '';
-    await Promise.race([
-      setDoc(ref, {
-        name, phone,
-        status: 'moi',
-        source: (utm && utm.source) || 'direct',
-        utm, fbp, fbc,
-        sourceUrl: location.origin + location.pathname,
-        createdAt: serverTimestamp(),
-      }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('SUBMIT_TIMEOUT')), 15000)),
-    ]);
+    const res = await callSubmitHomeLead({
+      name, phone, utm,
+      fbp: window.alnGetFbp ? window.alnGetFbp() : '',
+      fbc: window.alnGetFbc ? window.alnGetFbc() : '',
+      sourceUrl: location.origin + location.pathname,
+    });
+    const leadId = (res && res.data && res.data.id) || '';
     try {
-      if (window.fbq) fbq('track', 'Lead',
+      if (window.fbq && leadId) fbq('track', 'Lead',
         { content_name: 'home-lead-form', content_category: 'cn-funnel' },
-        { eventID: 'lead-' + ref.id });
+        { eventID: 'lead-' + leadId });
     } catch (e) {}
 
     document.getElementById('leadFormWrap').style.display = 'none';
     document.getElementById('leadSuccess').style.display = 'block';
   } catch (e) {
-    let msg = 'Có lỗi xảy ra, vui lòng thử lại.';
-    if (e && e.message === 'AUTH_TIMEOUT') msg = 'Kết nối chậm, không xác thực được. Kiểm tra mạng và thử lại.';
-    else if (e && e.message === 'SUBMIT_TIMEOUT') msg = 'Gửi quá lâu không phản hồi. Kiểm tra mạng và thử lại.';
-    else if (e && e.message === 'APPCHECK_TIMEOUT') msg = 'Không lấy được token bảo mật (App Check). Thử tải lại trang rồi gửi lại.';
-    /* Tạm thời hiện thẳng mã lỗi gốc để debug trên điện thoại (không cần DevTools).
-       Sau khi hết lỗi thì gọn lại thành thông báo thân thiện. */
-    else msg = 'Lỗi: [' + (e && e.code ? e.code : '?') + '] ' + (e && e.message ? e.message : 'không rõ nguyên nhân');
+    const code = (e && e.code) ? String(e.code).replace('functions/', '') : '?';
+    let msg;
+    if (code === 'invalid-argument' && e.message) msg = e.message;
+    else if (code === 'deadline-exceeded') msg = 'Gửi quá lâu không phản hồi. Kiểm tra mạng và thử lại.';
+    else msg = 'Không gửi được (' + code + '). Vui lòng thử lại hoặc gọi 0909 82 9696.';
     errEl.textContent = msg;
     errEl.style.display = 'block';
     btn.disabled = false;

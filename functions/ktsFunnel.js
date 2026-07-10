@@ -343,6 +343,63 @@ exports.onHomeLeadCreated = onDocumentCreated(
 );
 
 /* ══════════════════════════════════════════════════════════════════
+   3b. submitHomeLead (onCall) — home.html gọi thay vì setDoc thẳng vào
+   landingLeads. Lý do: rules landingLeads đòi request.app != null
+   (App Check) — trên thiết bị thật token hay không được cấp (reCAPTCHA
+   bị chặn / điểm thấp) → permission-denied, MẤT LEAD dù khách là người
+   thật. Ghi server-side bằng Admin SDK không phụ thuộc App Check phía
+   khách; validate chặt tại đây (cửa cuối). CAPI Lead vẫn tự bắn qua
+   onHomeLeadCreated (số 3) vì doc vẫn được tạo trong landingLeads —
+   trả về id để client bắn Pixel với eventID 'lead-'+id (Meta dedup).
+══════════════════════════════════════════════════════════════════ */
+exports.submitHomeLead = onCall(
+  { region: "asia-southeast1" },
+  async (request) => {
+    const d = request.data || {};
+    const name = String(d.name || "").trim().slice(0, 100);
+    const phone = String(d.phone || "").replace(/[\s.\-()]/g, "");
+    if (!name) throw new HttpsError("invalid-argument", "Vui lòng nhập họ tên.");
+    if (!/^0\d{8,10}$/.test(phone)) throw new HttpsError("invalid-argument", "SĐT chưa đúng (VD: 0909xxxxxx).");
+
+    const db = admin.firestore();
+
+    /* Chống gửi trùng: cùng SĐT trong 10 phút → trả lại lead cũ, không tạo
+       mới (không orderBy để khỏi cần composite index — so createdAt tại đây) */
+    try {
+      const dup = await db.collection("landingLeads").where("phone", "==", phone).limit(5).get();
+      const cutoff = Date.now() - 10 * 60 * 1000;
+      for (const docSnap of dup.docs) {
+        const t = docSnap.get("createdAt");
+        if (t && typeof t.toMillis === "function" && t.toMillis() > cutoff) {
+          return { ok: true, id: docSnap.id, dup: true };
+        }
+      }
+    } catch (e) {
+      console.warn("[submitHomeLead] check trùng lỗi (bỏ qua):", e.message);
+    }
+
+    const raw = request.rawRequest || {};
+    const headers = raw.headers || {};
+    const ip = String(headers["x-forwarded-for"] || "").split(",")[0].trim() || raw.ip || "";
+    const utm = cleanUtm(d.utm);
+    const ref = db.collection("landingLeads").doc();
+    await ref.set({
+      name, phone,
+      status: "moi",
+      utm,
+      source: utm.source || "direct",
+      fbp: typeof d.fbp === "string" ? d.fbp.slice(0, 200) : "",
+      fbc: typeof d.fbc === "string" ? d.fbc.slice(0, 200) : "",
+      sourceUrl: typeof d.sourceUrl === "string" ? d.sourceUrl.slice(0, 300) : "",
+      ip: String(ip).slice(0, 60),
+      ua: String(headers["user-agent"] || "").slice(0, 400),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    return { ok: true, id: ref.id };
+  }
+);
+
+/* ══════════════════════════════════════════════════════════════════
    4. onCnRegistered — đăng ký Chủ nhà qua register.html (role:'cn'),
    kể cả khi đi từ nút "Hỏi KTS Miễn Phí" trên diễn đàn (forum.html →
    requireLogin → register.html, xem forumGoRegister). Bắn CAPI
