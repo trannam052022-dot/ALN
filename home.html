@@ -1894,8 +1894,9 @@ window.leadSubmit = async function(){
     let msg = 'Có lỗi xảy ra, vui lòng thử lại.';
     if (e && e.message === 'AUTH_TIMEOUT') msg = 'Kết nối chậm, không xác thực được. Kiểm tra mạng và thử lại.';
     else if (e && e.message === 'SUBMIT_TIMEOUT') msg = 'Gửi quá lâu không phản hồi. Kiểm tra mạng và thử lại.';
-    else if (e && e.code === 'permission-denied') msg = 'Không có quyền gửi (App Check). Báo cho ALN kiểm tra lại.';
-    else if (e && e.message) msg = 'Có lỗi xảy ra: ' + e.message;
+    /* Tạm thời hiện thẳng mã lỗi gốc để debug trên điện thoại (không cần DevTools).
+       Sau khi hết lỗi thì gọn lại thành thông báo thân thiện. */
+    else msg = 'Lỗi: [' + (e && e.code ? e.code : '?') + '] ' + (e && e.message ? e.message : 'không rõ nguyên nhân');
     errEl.textContent = msg;
     errEl.style.display = 'block';
     btn.disabled = false;
