@@ -1860,22 +1860,28 @@ window.leadSubmit = async function(){
 
   try {
     if (!authReady) {
-      await new Promise((resolve) => {
-        const unsub = onAuthStateChanged(auth, (u) => { if (u) { unsub(); resolve(); } });
-      });
+      await Promise.race([
+        new Promise((resolve) => {
+          const unsub = onAuthStateChanged(auth, (u) => { if (u) { unsub(); resolve(); } });
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('AUTH_TIMEOUT')), 15000)),
+      ]);
     }
     const ref = doc(collection(dbLead, 'landingLeads'));
     const utm = window.alnGetUtm ? window.alnGetUtm() : {};
     const fbp = window.alnGetFbp ? window.alnGetFbp() : '';
     const fbc = window.alnGetFbc ? window.alnGetFbc() : '';
-    await setDoc(ref, {
-      name, phone,
-      status: 'moi',
-      source: (utm && utm.source) || 'direct',
-      utm, fbp, fbc,
-      sourceUrl: location.origin + location.pathname,
-      createdAt: serverTimestamp(),
-    });
+    await Promise.race([
+      setDoc(ref, {
+        name, phone,
+        status: 'moi',
+        source: (utm && utm.source) || 'direct',
+        utm, fbp, fbc,
+        sourceUrl: location.origin + location.pathname,
+        createdAt: serverTimestamp(),
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('SUBMIT_TIMEOUT')), 15000)),
+    ]);
     try {
       if (window.fbq) fbq('track', 'Lead',
         { content_name: 'home-lead-form', content_category: 'cn-funnel' },
@@ -1885,7 +1891,12 @@ window.leadSubmit = async function(){
     document.getElementById('leadFormWrap').style.display = 'none';
     document.getElementById('leadSuccess').style.display = 'block';
   } catch (e) {
-    errEl.textContent = 'Có lỗi xảy ra, vui lòng thử lại. (' + (e && e.message ? e.message : 'lỗi không rõ') + ')';
+    let msg = 'Có lỗi xảy ra, vui lòng thử lại.';
+    if (e && e.message === 'AUTH_TIMEOUT') msg = 'Kết nối chậm, không xác thực được. Kiểm tra mạng và thử lại.';
+    else if (e && e.message === 'SUBMIT_TIMEOUT') msg = 'Gửi quá lâu không phản hồi. Kiểm tra mạng và thử lại.';
+    else if (e && e.code === 'permission-denied') msg = 'Không có quyền gửi (App Check). Báo cho ALN kiểm tra lại.';
+    else if (e && e.message) msg = 'Có lỗi xảy ra: ' + e.message;
+    errEl.textContent = msg;
     errEl.style.display = 'block';
     btn.disabled = false;
     btn.innerHTML = btnLabel;
