@@ -50,6 +50,49 @@ h1{font-size:38px;font-weight:700;text-align:center;line-height:1.2;color:#fff;m
 .step .n{font-weight:600;color:var(--gold);flex-shrink:0}
 .foot{text-align:center;font-size:11px;font-weight:400;color:rgba(243,233,207,.36);margin-top:22px;letter-spacing:.04em}
 </style>
+<!-- ── Meta Pixel (ALN Pixel) — landing quảng cáo tuyển KTS ── -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1656666692225878');
+fbq('track', 'PageView');
+fbq('track', 'ViewContent', { content_name: 'tuyen-kts', content_category: 'kts-funnel' });
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></noscript>
+<script>
+/* Bắt UTM/fbclid từ URL quảng cáo → localStorage (last-touch, giữ 7 ngày)
+   + gắn tiếp query string vào link CTA để UTM đi theo sang phòng chờ. */
+(function(){
+  try{
+    var parts = location.search.substring(1).split('&');
+    var utm = {}; var found = false;
+    for (var i = 0; i < parts.length; i++) {
+      var kv = parts[i].split('=');
+      if (kv.length < 2 || !kv[1]) continue;
+      var k = decodeURIComponent(kv[0]);
+      var v = decodeURIComponent(kv[1].replace(/\+/g, ' '));
+      if (k.indexOf('utm_') === 0) { utm[k.substring(4)] = v.slice(0, 120); found = true; }
+      if (k === 'fbclid') { utm.fbclid = v.slice(0, 200); found = true; }
+    }
+    if (found) { utm.ts = Date.now(); localStorage.setItem('aln_utm', JSON.stringify(utm)); }
+  }catch(e){}
+  document.addEventListener('DOMContentLoaded', function(){
+    if (!location.search) return;
+    var links = document.querySelectorAll('a.cta');
+    for (var i = 0; i < links.length; i++) {
+      var href = links[i].getAttribute('href') || '';
+      if (href.indexOf('?') === -1) links[i].setAttribute('href', href + location.search);
+    }
+  });
+})();
+</script>
 </head>
 <body>
   <main class="post">
@@ -72,7 +115,7 @@ h1{font-size:38px;font-weight:700;text-align:center;line-height:1.2;color:#fff;m
     <div class="sec"><svg class="icn" viewBox="0 0 24 24"><path d="M13 3 4 14h7l-1 7 9-11h-7l1-7Z"/></svg> ĐĂNG KÝ NHANH ĐỂ GIỮ CHỖ:</div>
     <div class="li"><svg class="icn" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/></svg><span>Chỉ cần Thông tin cá nhân — họ tên, SĐT</span></div>
 
-    <a class="cta" href="https://trannam052022-dot.github.io/ALN/aln-giu-cho/phong-cho.html" target="_blank" rel="noopener">
+    <a class="cta" href="aln-giu-cho/phong-cho.html">
       <span class="row">ĐĂNG KÝ GIỮ CHỖ <svg class="icn" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       <span class="sub">Vào Phòng chờ — giữ chỗ KTS của bạn</span>
     </a>

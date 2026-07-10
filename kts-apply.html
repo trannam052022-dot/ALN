@@ -241,6 +241,15 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
 .toast.show{opacity:1}
 .toast.err{border-color:rgba(240,96,96,.35);color:#f09898}
 
+/* ── KHỐI "KHÁCH TÌM BẠN" (màn hình đầu — khớp thông điệp các biến thể quảng cáo) ── */
+.ktb-box{background:linear-gradient(135deg,rgba(201,168,76,.07) 0%,rgba(201,168,76,.03) 100%);border:1px solid rgba(201,168,76,.28);border-radius:var(--r);padding:18px 20px;margin-bottom:22px;text-align:left}
+.ktb-label{font-family:var(--syne);font-size:var(--text-xs);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.ktb-label i{font-size:15px}
+.ktb-list{list-style:none;display:flex;flex-direction:column;gap:9px}
+.ktb-list li{font-size:var(--text-sm);color:var(--text2);display:flex;gap:9px;line-height:1.55}
+.ktb-list li i{color:var(--gold);flex-shrink:0;margin-top:2px;font-size:14px}
+.ktb-list b{color:var(--gold2);font-weight:600}
+
 @media(max-width:480px){
   .hero-title{font-size:28px}
   .hero{padding:40px 0 28px}
@@ -250,6 +259,62 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
 }
 </style>
 <link rel="stylesheet" href="aln-tokens.css">
+<!-- ── Meta Pixel (ALN Pixel) + bắt UTM cho quảng cáo tuyển KTS ── -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1656666692225878');
+fbq('track', 'PageView');
+fbq('track', 'ViewContent', { content_name: 'kts-apply', content_category: 'kts-funnel' });
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></noscript>
+<script>
+/* Bắt UTM/fbclid từ URL quảng cáo → localStorage (last-touch, giữ 7 ngày).
+   window.alnGetUtm/alnGetFbp/alnGetFbc dùng ở module submit để ghi kèm hồ sơ. */
+(function(){
+  try{
+    var parts = location.search.substring(1).split('&');
+    var utm = {}; var found = false;
+    for (var i = 0; i < parts.length; i++) {
+      var kv = parts[i].split('=');
+      if (kv.length < 2 || !kv[1]) continue;
+      var k = decodeURIComponent(kv[0]);
+      var v = decodeURIComponent(kv[1].replace(/\+/g, ' '));
+      if (k.indexOf('utm_') === 0) { utm[k.substring(4)] = v.slice(0, 120); found = true; }
+      if (k === 'fbclid') { utm.fbclid = v.slice(0, 200); found = true; }
+    }
+    if (found) { utm.ts = Date.now(); localStorage.setItem('aln_utm', JSON.stringify(utm)); }
+  }catch(e){}
+  window.alnGetUtm = function(){
+    try{
+      var s = localStorage.getItem('aln_utm');
+      if (!s) return {};
+      var o = JSON.parse(s);
+      if (o.ts && Date.now() - o.ts > 7 * 864e5) return {};
+      return o;
+    }catch(e){ return {}; }
+  };
+  window.alnGetCookie = function(name){
+    var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : '';
+  };
+  window.alnGetFbp = function(){ return window.alnGetCookie('_fbp'); };
+  window.alnGetFbc = function(){
+    var c = window.alnGetCookie('_fbc');
+    if (c) return c;
+    var u = window.alnGetUtm();
+    if (u.fbclid) return 'fb.1.' + Date.now() + '.' + u.fbclid;
+    return '';
+  };
+})();
+</script>
 </head>
 <body>
 
@@ -290,6 +355,15 @@ input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
         <em>Tiền đã chờ sẵn rồi</em>
       </h1>
       <p class="hero-sub">Khách hàng chuyển tiền cho ALN trước khi bạn bắt đầu làm. Không còn cảnh làm xong đi đòi tiền. Không sợ bùng.</p>
+
+      <div class="ktb-box">
+        <div class="ktb-label"><i class="ph-duotone ph-magnet"></i> Khách tìm bạn — không phải ngược lại</div>
+        <ul class="ktb-list">
+          <li><i class="ph-duotone ph-megaphone"></i><span>ALN kéo chủ nhà về sàn bằng quảng cáo, SEO hơn 20 tỉnh và diễn đàn — <b>bạn không phải đi săn khách</b></span></li>
+          <li><i class="ph-duotone ph-map-pin"></i><span>Dự án được <b>match đúng khu vực bạn đăng ký</b> — có khách là hệ thống báo thẳng cho bạn</span></li>
+          <li><i class="ph-duotone ph-lock-key"></i><span>Khách <b>chuyển tiền trước</b> vào ALN — bạn chỉ việc thiết kế, tiền về theo từng chặng</span></li>
+        </ul>
+      </div>
 
       <div class="stats-row" style="background:rgba(201,168,76,.055);border:1px solid rgba(201,168,76,.16);border-radius:12px;margin-bottom:26px">
         <div class="stat-item">
@@ -701,8 +775,10 @@ function validateStep(n) {
     return true;
   }
   if (n === 2) {
-    if (!cvFiles[0] && !document.getElementById('f_cv').files[0]) {
-      showToast('Vui lòng đính kèm CV / Hồ sơ năng lực', true); return false;
+    var hasCv = cvFiles[0] || document.getElementById('f_cv').files[0];
+    var hasDrive = /^https:\/\//.test((document.getElementById('f_drive').value || '').trim());
+    if (!hasCv && !hasDrive) {
+      showToast('Vui lòng đính kèm CV hoặc dán link Google Drive hồ sơ', true); return false;
     }
     return true;
   }
@@ -851,7 +927,7 @@ function submitApply() {
 
 <script type="module">
 import {
-  auth, db, createUserWithEmailAndPassword, setDoc, doc, serverTimestamp,
+  app, auth, createUserWithEmailAndPassword,
   storage, storageRef, uploadBytes, getDownloadURL
 } from './firebase-config.js';
 
@@ -881,8 +957,20 @@ window._doSubmit = async function() {
     var provEls   = document.querySelectorAll('#provWorkGrid input:checked');
     var provWork  = Array.from(provEls).map(function(el){ return el.value; });
 
-    var cred = await createUserWithEmailAndPassword(auth, uname + '@aln.vn', pw);
-    var uid  = cred.user.uid;
+    var uid;
+    try {
+      var cred = await createUserWithEmailAndPassword(auth, uname + '@aln.vn', pw);
+      uid = cred.user.uid;
+    } catch (authErr) {
+      // Retry sau khi lần gửi trước gãy giữa chừng: account đã tạo và còn phiên
+      // đăng nhập → dùng lại, không bắt user đổi tên đăng nhập.
+      if (authErr.code === 'auth/email-already-in-use' &&
+          auth.currentUser && auth.currentUser.email === uname + '@aln.vn') {
+        uid = auth.currentUser.uid;
+      } else {
+        throw authErr;
+      }
+    }
 
     var avatarFile = document.getElementById('f_avatar').files[0];
     var cvFile     = window.cvFiles && window.cvFiles[0];
@@ -896,22 +984,26 @@ window._doSubmit = async function() {
       certUrls.push(await uploadFile('kts-profiles/' + uid + '/cert_' + i + '.' + (certList[i].name.split('.').pop() || 'pdf'), certList[i]));
     }
 
-    await setDoc(doc(db, 'users', uid), {
-      username: uname, name: name, role: 'kts',
-      email: email || (uname + '@aln.vn'),
-      province: provHome,
-      homeProvince: provHome,
-      serviceProvinces: provWork.length ? provWork : [provHome],
-      nhanLeadEmail: true,   // nhận email báo dự án mới trong khu vực (tắt được ở hồ sơ KTS)
-      status: 'pending', plan: 'free', credits: {}, createdAt: serverTimestamp()
-    });
-    await setDoc(doc(db, 'ktsApplications', uid), {
-      uid: uid, name: name, phone: phone, email: email || '',
+    // Ghi hồ sơ SERVER-SIDE qua Cloud Function: users + ktsApplications atomic,
+    // kèm UTM quảng cáo, bắn CAPI CompleteRegistration, gửi email xác nhận.
+    var fnsMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
+    var fns = fnsMod.getFunctions(app, 'asia-southeast1');
+    var submitFn = fnsMod.httpsCallable(fns, 'submitKtsApplication');
+    await submitFn({
+      name: name, phone: phone, email: email,
       boMon: bomon, years: years, specialties: specs, cchn: cchn, bio: bio,
-      province_home: provHome, provinces_work: provWork,
+      province_home: provHome, provinces_work: provWork.length ? provWork : [provHome],
       avatarUrl: avatarUrl, cvUrl: cvUrl, certUrls: certUrls, driveUrl: driveUrl,
-      username: uname, status: 'pending', submittedAt: serverTimestamp()
+      username: uname,
+      utm: window.alnGetUtm(), fbp: window.alnGetFbp(), fbc: window.alnGetFbc(),
+      sourceUrl: location.origin + location.pathname
     });
+
+    // Pixel client — cùng eventID 'reg-'+uid với CAPI để Facebook dedup
+    try {
+      if (window.fbq) fbq('track', 'CompleteRegistration',
+        { content_name: 'kts-apply' }, { eventID: 'reg-' + uid });
+    } catch (e) {}
 
     document.getElementById('successUname').textContent = uname;
     window.setStep(4);
@@ -921,6 +1013,7 @@ window._doSubmit = async function() {
     if (err.code === 'auth/email-already-in-use') msg = 'Tên đăng nhập đã tồn tại — hãy tạo lại tên khác';
     if (err.code === 'auth/weak-password')        msg = 'Mật khẩu quá yếu (tối thiểu 8 ký tự)';
     if (err.code === 'storage/unauthorized')      msg = 'Lỗi quyền upload — vui lòng thử lại';
+    if (err.code && String(err.code).indexOf('functions/') === 0 && err.message) msg = err.message;
     window.showToast(msg, true);
     btn.disabled = false;
     btn.innerHTML = '<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi hồ sơ';

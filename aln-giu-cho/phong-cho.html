@@ -287,6 +287,62 @@ input::placeholder{color:var(--muted)}
 .toast.show{opacity:1}.toast.err{border-color:rgba(240,96,96,.35);color:#f09898}
 </style>
 <link rel="stylesheet" href="../aln-tokens.css">
+<!-- ── Meta Pixel (ALN Pixel) — điểm chuyển đổi Lead của quảng cáo tuyển KTS ── -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1656666692225878');
+fbq('track', 'PageView');
+fbq('track', 'ViewContent', { content_name: 'phong-cho', content_category: 'kts-funnel' });
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></noscript>
+<script>
+/* Bắt UTM/fbclid từ URL quảng cáo → localStorage (last-touch, giữ 7 ngày).
+   window.alnGetUtm/alnGetFbp/alnGetFbc dùng ở doRegister để ghi kèm reservation. */
+(function(){
+  try{
+    var parts = location.search.substring(1).split('&');
+    var utm = {}; var found = false;
+    for (var i = 0; i < parts.length; i++) {
+      var kv = parts[i].split('=');
+      if (kv.length < 2 || !kv[1]) continue;
+      var k = decodeURIComponent(kv[0]);
+      var v = decodeURIComponent(kv[1].replace(/\+/g, ' '));
+      if (k.indexOf('utm_') === 0) { utm[k.substring(4)] = v.slice(0, 120); found = true; }
+      if (k === 'fbclid') { utm.fbclid = v.slice(0, 200); found = true; }
+    }
+    if (found) { utm.ts = Date.now(); localStorage.setItem('aln_utm', JSON.stringify(utm)); }
+  }catch(e){}
+  window.alnGetUtm = function(){
+    try{
+      var s = localStorage.getItem('aln_utm');
+      if (!s) return {};
+      var o = JSON.parse(s);
+      if (o.ts && Date.now() - o.ts > 7 * 864e5) return {};
+      return o;
+    }catch(e){ return {}; }
+  };
+  window.alnGetCookie = function(name){
+    var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : '';
+  };
+  window.alnGetFbp = function(){ return window.alnGetCookie('_fbp'); };
+  window.alnGetFbc = function(){
+    var c = window.alnGetCookie('_fbc');
+    if (c) return c;
+    var u = window.alnGetUtm();
+    if (u.fbclid) return 'fb.1.' + Date.now() + '.' + u.fbclid;
+    return '';
+  };
+})();
+</script>
 </head>
 <body>
 
@@ -617,6 +673,25 @@ const RESERVE_DAYS=3;
 let CURRENT=null, cdTimer=null;
 const uploads={portfolio:[],projects:[],license:[]};
 
+/* Metadata quảng cáo ghi kèm reservation — onKtsReservationCreated (functions)
+   đọc các field này để bắn CAPI Lead server-side */
+function adMeta(){
+  return {
+    utm: window.alnGetUtm ? window.alnGetUtm() : {},
+    fbp: window.alnGetFbp ? window.alnGetFbp() : '',
+    fbc: window.alnGetFbc ? window.alnGetFbc() : '',
+    sourceUrl: location.origin + location.pathname
+  };
+}
+/* Pixel Lead client — cùng eventID 'lead-'+uid với CAPI để Facebook dedup */
+function fireLeadPixel(uid, role){
+  try{
+    if (window.fbq) fbq('track','Lead',
+      { content_name:'giu-cho-'+role, content_category:'kts-funnel' },
+      { eventID:'lead-'+uid });
+  }catch(e){}
+}
+
 /* Auth state */
 onAuthStateChanged(auth, async (user)=>{
   if(!user){ showView('viewAuth'); return; }
@@ -660,7 +735,10 @@ window.doRegister=async function(){
       /* Ghi reservations để Founder thấy trong Phòng chờ */
       const rref=doc(db,'reservations',uid);
       const rsnap=await getDoc(rref);
-      if(!rsnap.exists()) await setDoc(rref,{uid,name,phone,role:'cn',region,regionVi,status:'active',profileSubmitted:true,reservedAt:serverTimestamp()});
+      if(!rsnap.exists()){
+        await setDoc(rref,{uid,name,phone,role:'cn',region,regionVi,status:'active',profileSubmitted:true,reservedAt:serverTimestamp(),...adMeta()});
+        fireLeadPixel(uid,'cn');
+      }
       showToast('Tạo tài khoản thành công ✓ Đang vào...');
       setTimeout(function(){ location.href='../client_CN.html'; },1000);
     } else {
@@ -673,7 +751,8 @@ window.doRegister=async function(){
       const rref=doc(db,'reservations',uid);
       const rsnap=await getDoc(rref);
       if(!rsnap.exists()){
-        await setDoc(rref,{uid,name,phone,role:selectedRoom,region,regionVi,status:'reserved',profileSubmitted:false,reminderCount:0,reservedAt:serverTimestamp(),deadlineMs:deadline});
+        await setDoc(rref,{uid,name,phone,role:selectedRoom,region,regionVi,status:'reserved',profileSubmitted:false,reminderCount:0,reservedAt:serverTimestamp(),deadlineMs:deadline,...adMeta()});
+        fireLeadPixel(uid,selectedRoom);
         CURRENT={uid,name,phone,role:selectedRoom,region,regionVi,status:'reserved',profileSubmitted:false,deadlineMs:deadline};
       } else {
         CURRENT={...rsnap.data(),uid};

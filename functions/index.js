@@ -2061,3 +2061,9 @@ Object.assign(exports, require("./forum"));
 
 /* ── Email báo lead khu vực cho KTS (opt-in nhanLeadEmail), xem functions/notifyKtsLeadEmail.js ── */
 exports.notifyKtsLeadEmail = require("./notifyKtsLeadEmail").notifyKtsLeadEmail;
+
+/* ── Phễu ads tuyển KTS: submit hồ sơ server-side + CAPI Lead/CompleteRegistration + email xác nhận,
+   xem functions/ktsFunnel.js. Cần secret FB_CAPI_TOKEN trước khi deploy. ── */
+const ktsFunnel = require("./ktsFunnel");
+exports.submitKtsApplication = ktsFunnel.submitKtsApplication;
+exports.onKtsReservationCreated = ktsFunnel.onKtsReservationCreated;
