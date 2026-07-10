@@ -1812,6 +1812,7 @@ import { app } from './firebase-config.js';
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
 import { getFirestore, doc, setDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getAppCheck, getToken as getAppCheckToken } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js';
 
 const auth = getAuth(app);
 const dbLead = getFirestore(app);
@@ -1867,6 +1868,17 @@ window.leadSubmit = async function(){
         new Promise((_, reject) => setTimeout(() => reject(new Error('AUTH_TIMEOUT')), 15000)),
       ]);
     }
+    /* Chờ token App Check thật sự sẵn sàng trước khi ghi — landingLeads bắt
+       buộc request.app != null, form này nằm ngay đầu trang nên khách có thể
+       bấm gửi trước khi reCAPTCHA kịp lấy token lần đầu (race condition). */
+    try {
+      await Promise.race([
+        getAppCheckToken(getAppCheck(app)),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('APPCHECK_TIMEOUT')), 15000)),
+      ]);
+    } catch (acErr) {
+      throw new Error('APPCHECK_TIMEOUT');
+    }
     const ref = doc(collection(dbLead, 'landingLeads'));
     const utm = window.alnGetUtm ? window.alnGetUtm() : {};
     const fbp = window.alnGetFbp ? window.alnGetFbp() : '';
@@ -1894,6 +1906,7 @@ window.leadSubmit = async function(){
     let msg = 'Có lỗi xảy ra, vui lòng thử lại.';
     if (e && e.message === 'AUTH_TIMEOUT') msg = 'Kết nối chậm, không xác thực được. Kiểm tra mạng và thử lại.';
     else if (e && e.message === 'SUBMIT_TIMEOUT') msg = 'Gửi quá lâu không phản hồi. Kiểm tra mạng và thử lại.';
+    else if (e && e.message === 'APPCHECK_TIMEOUT') msg = 'Không lấy được token bảo mật (App Check). Thử tải lại trang rồi gửi lại.';
     /* Tạm thời hiện thẳng mã lỗi gốc để debug trên điện thoại (không cần DevTools).
        Sau khi hết lỗi thì gọn lại thành thông báo thân thiện. */
     else msg = 'Lỗi: [' + (e && e.code ? e.code : '?') + '] ' + (e && e.message ? e.message : 'không rõ nguyên nhân');
