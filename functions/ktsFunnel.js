@@ -306,12 +306,15 @@ exports.onKtsReservationCreated = onDocumentCreated(
 );
 
 /* ══════════════════════════════════════════════════════════════════
-   3. onLandingLeadCreated — form lead nhanh (Tên+SĐT) trên home.html,
+   3. onHomeLeadCreated — form lead nhanh (Tên+SĐT) trên home.html,
    dành cho chủ nhà. Bắn CAPI Lead server-side; dedup với Pixel client
    qua event_id 'lead-'+id (id = landingLeads doc id, sinh phía client
    trước khi setDoc, xem home.html hàm leadSubmit).
+   LƯU Ý: đặt tên khác 'onLandingLeadCreated' vì tên đó đã có 1 Cloud
+   Function 1st Gen cũ deploy sẵn trên production (không rõ nguồn gốc,
+   chưa dám đụng) — Firebase chặn nâng cấp 1st→2nd Gen cùng tên.
 ══════════════════════════════════════════════════════════════════ */
-exports.onLandingLeadCreated = onDocumentCreated(
+exports.onHomeLeadCreated = onDocumentCreated(
   {
     document: "landingLeads/{id}",
     region: "asia-southeast1",
@@ -334,7 +337,7 @@ exports.onLandingLeadCreated = onDocumentCreated(
         contentName: "home-lead-form",
       });
     } catch (e) {
-      console.error("[onLandingLeadCreated] CAPI:", e.message);
+      console.error("[onHomeLeadCreated] CAPI:", e.message);
     }
   }
 );

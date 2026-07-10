@@ -2069,4 +2069,4 @@ exports.submitKtsApplication = ktsFunnel.submitKtsApplication;
 exports.onKtsReservationCreated = ktsFunnel.onKtsReservationCreated;
 
 /* ── Phễu ads chủ nhà: form lead nhanh (home.html) → CAPI Lead, xem functions/ktsFunnel.js ── */
-exports.onLandingLeadCreated = ktsFunnel.onLandingLeadCreated;
+exports.onHomeLeadCreated = ktsFunnel.onHomeLeadCreated;
