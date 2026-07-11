@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
+const crypto = require("crypto");
 const { v1: firestoreV1 } = require("@google-cloud/firestore");
 
 const ANTHROPIC_KEY = defineSecret("ANTHROPIC_API_KEY");
@@ -530,6 +531,18 @@ exports.postCamNangToFacebook = onRequest(
       ", match=" + (receivedSecret === configuredSecret)
     );
     if (!configuredSecret || receivedSecret !== configuredSecret) {
+      // Chỉ báo Founder khi payload đúng hình dạng bài Cẩm nang (title+url) —
+      // endpoint này public trên internet, bot/scanner dò URL ngẫu nhiên cũng
+      // ra 401 nhưng không nên làm founder bị spam push oan vì noise đó.
+      const body = req.body || {};
+      if (body.title && body.url && typeof body.title === "string" && typeof body.url === "string") {
+        console.error("[postCamNangToFacebook] Secret không khớp — bài \"" + (body.slug || body.title) + "\" bị từ chối.");
+        await notifyFounder(
+          "⚠️ Đăng Cẩm nang lên Facebook thất bại",
+          `Bài "${body.title}" (${body.slug || "?"}) bị từ chối do secret không khớp — kiểm tra CAM_NANG_FB_SECRET giữa GitHub Actions và Firebase Secret Manager có đồng bộ không.`,
+          { type: "CAM_NANG_FB_POST_FAILED", slug: body.slug || "" }
+        );
+      }
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
@@ -580,6 +593,46 @@ exports.postCamNangToFacebook = onRequest(
         { type: "CAM_NANG_FB_POST_FAILED", slug: slug || "" }
       );
       res.status(500).json({ error: e.message || "Lỗi đăng bài" });
+    }
+  }
+);
+
+/* ── Giám sát lỗi JS phía client (window.onerror/unhandledrejection, xem
+   error-monitor.js) → ghi Firestore errors/ qua Admin SDK. Client KHÔNG ghi
+   thẳng Firestore (App Check hay fail cho khách vãng lai — xem bài học ở
+   duToanLeads.js) và không cần biết chuyện xoay findings với founder ngay —
+   dedup theo hash(message+url) làm doc ID nên chỉ 1 write, không cần đọc
+   trước; đếm gộp vào dailyDigest 08:00 thay vì dashboard riêng. Không thu
+   thập tên/SĐT/uid — chỉ message/stack/url/user-agent. */
+exports.logClientError = onRequest(
+  { region: "asia-southeast1", cors: true },
+  async (req, res) => {
+    if (req.method !== "POST") {
+      res.status(405).end();
+      return;
+    }
+    try {
+      const body = req.body || {};
+      const message = typeof body.message === "string" ? body.message.trim().slice(0, 500) : "";
+      if (!message) {
+        res.status(400).end();
+        return;
+      }
+      const stack = typeof body.stack === "string" ? body.stack.slice(0, 1000) : "";
+      const url = typeof body.url === "string" ? body.url.slice(0, 300) : "";
+      const userAgent = (req.get("user-agent") || "").slice(0, 300);
+
+      const dedupKey = crypto.createHash("md5").update(message + "|" + url).digest("hex");
+      await db.collection("errors").doc(dedupKey).set({
+        message, stack, url, userAgent,
+        count: admin.firestore.FieldValue.increment(1),
+        lastSeen: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+
+      res.status(204).end();
+    } catch (e) {
+      console.error("[logClientError]", e);
+      res.status(500).end();
     }
   }
 );
@@ -1873,12 +1926,13 @@ exports.dailyDigest = functions
     try {
       const yesterday = admin.firestore.Timestamp.fromMillis(Date.now() - 24 * 3600 * 1000);
 
-      const [leadsSnap, ktsSnap, dnSnap, desSnap, matchSnap] = await Promise.all([
+      const [leadsSnap, ktsSnap, dnSnap, desSnap, matchSnap, errorsSnap] = await Promise.all([
         db.collection("landingLeads").get(),
         db.collection("ktsApplications").where("status", "==", "pending").count().get(),
         db.collection("dnApplications").where("status", "==", "pending").count().get(),
         db.collection("designerApplications").where("status", "==", "pending").count().get(),
         db.collection("matchingRequests").where("status", "==", "pending_founder").count().get(),
+        db.collection("errors").where("lastSeen", ">=", yesterday).get(),
       ]);
 
       let newLeads = 0, staleLeads = 0;
@@ -1895,7 +1949,13 @@ exports.dailyDigest = functions
       const desPending = desSnap.data().count;
       const matchPending = matchSnap.data().count;
 
-      const total = newLeads + staleLeads + ktsPending + dnPending + desPending + matchPending;
+      let jsErrorTypes = 0, jsErrorCount = 0;
+      errorsSnap.forEach((d) => {
+        jsErrorTypes++;
+        jsErrorCount += d.data().count || 1;
+      });
+
+      const total = newLeads + staleLeads + ktsPending + dnPending + desPending + matchPending + jsErrorTypes;
       if (total === 0) return null; // không có gì cần chú ý, khỏi làm phiền
 
       const parts = [];
@@ -1905,6 +1965,7 @@ exports.dailyDigest = functions
       if (ktsPending) parts.push(`${ktsPending} đơn KTS chờ duyệt`);
       if (dnPending) parts.push(`${dnPending} đơn DN chờ duyệt`);
       if (desPending) parts.push(`${desPending} đơn Designer chờ duyệt`);
+      if (jsErrorTypes) parts.push(`🐞 ${jsErrorTypes} loại lỗi JS (${jsErrorCount} lần) trong 24h qua`);
 
       await notifyFounder(
         "☀️ Tổng hợp sáng nay",
