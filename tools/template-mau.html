@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESCRIPTION}}">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="{{CANONICAL}}">
+<meta property="og:type" content="article">
+<meta property="og:url" content="{{CANONICAL}}">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="{{DESCRIPTION}}">
+<meta property="og:image" content="{{OG_IMAGE}}">
+<meta property="og:site_name" content="App Làm Nhà">
+<meta property="og:locale" content="vi_VN">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+{{JSONLD_PRODUCT}}
+</script>
+<script type="application/ld+json">
+{{JSONLD_FAQ}}
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="../aln-tokens.css">
+<link rel="stylesheet" href="../cam-nang/cam-nang.css">
+<link rel="stylesheet" href="mau-nha.css">
+<link rel="icon" href="../icon-192.png" type="image/png">
+<meta name="theme-color" content="#98690a">
+</head>
+<body>
+
+<header id="cn-nav">
+  <div class="wrap cn-nav-inner">
+    <a href="/" class="cn-brand">
+      <div class="cn-logo"><img src="../icon-192.png" alt="ALN"></div>
+      <div class="cn-name">ALN<small>Kho mẫu nhà</small></div>
+    </a>
+    <div class="cn-nav-links">
+      <a class="cn-nav-link" href="/">Trang chủ</a>
+      <a class="cn-nav-link" href="index.html">Kho mẫu</a>
+      <a class="cn-nav-link" href="../cam-nang/index.html">Cẩm nang</a>
+    </div>
+    <a class="btn btn-gold" href="/#pricing"><i class="ph-duotone ph-file-text"></i>Nhận báo giá</a>
+  </div>
+</header>
+
+<main>
+  <div class="cn-article-head">
+    <div class="wrap">
+      <nav class="cn-crumb" aria-label="Breadcrumb">
+        <a href="/">Trang chủ</a><span class="sep">›</span>
+        <a href="index.html">Kho mẫu</a><span class="sep">›</span>
+        <a href="{{LOAI_SLUG}}.html">{{LOAI_LABEL}}</a><span class="sep">›</span>
+        <span class="cur">{{TEN}}</span>
+      </nav>
+    </div>
+  </div>
+
+  <div class="cn-article-body">
+    <h1 class="cn-h1">{{TEN}}</h1>
+
+    <div class="cn-meta">
+      <span>Mã mẫu {{ID}}</span><span class="dot"></span>
+      <span>Thiết kế bởi {{KTS_TAC_GIA}}</span>
+    </div>
+
+    <div class="mn-gallery">
+{{GALLERY_HTML}}
+    </div>
+
+    <div class="mn-specs">
+      <div class="mn-spec"><span class="k">Kích thước</span><span class="v">{{NGANG}} × {{DAI}} m</span></div>
+      <div class="mn-spec"><span class="k">Số tầng</span><span class="v">{{TANG}}</span></div>
+      <div class="mn-spec"><span class="k">Phòng ngủ</span><span class="v">{{PHONG_NGU}}</span></div>
+      <div class="mn-spec"><span class="k">Phòng tắm</span><span class="v">{{PHONG_TAM}}</span></div>
+      <div class="mn-spec"><span class="k">Diện tích đất</span><span class="v">{{DIEN_TICH_DAT}} m²</span></div>
+      <div class="mn-spec"><span class="k">Diện tích sàn</span><span class="v">{{DIEN_TICH_SAN}} m²</span></div>
+      <div class="mn-spec"><span class="k">Phong cách</span><span class="v">{{PHONG_CACH_LABEL}}</span></div>
+      <div class="mn-spec mn-spec-wide"><span class="k">Dự toán xây dựng tham khảo</span><span class="v">{{DU_TOAN_TU}} – {{DU_TOAN_DEN}}</span></div>
+    </div>
+    <p class="mn-disclaimer"><i class="ph-duotone ph-info"></i> Dự toán xây dựng chỉ mang tính tham khảo theo đơn giá thị trường, chưa gồm phí thiết kế {{GIA_BAN_MAU}}. Dự toán chính xác cần kiến trúc sư khảo sát thực tế lô đất.</p>
+
+    <div class="cn-prose">
+{{MO_TA_HTML}}
+    </div>
+
+    <div id="mn-lead" class="mn-lead">
+      <h2 id="mn-lead-title">Nhận hồ sơ mẫu này</h2>
+      <p class="mn-lead-sub">Để lại tên và số điện thoại, kiến trúc sư khu vực sẽ liên hệ trong ít phút.</p>
+      <form id="mnLeadForm" class="mn-lead-form">
+        <input type="hidden" id="mnCta" value="mua">
+        <div class="mn-lead-row">
+          <input type="text" id="mnName" placeholder="Họ và tên" required maxlength="100">
+          <input type="tel" id="mnPhone" placeholder="Số điện thoại (VD: 0909xxxxxx)" required maxlength="15">
+        </div>
+        <input type="text" id="mnRegion" placeholder="Khu vực dự định xây (không bắt buộc)" maxlength="80">
+        <button type="submit" class="btn btn-gold mn-lead-submit"><i class="ph-duotone ph-paper-plane-tilt"></i><span id="mnSubmitLabel">Gửi yêu cầu</span></button>
+        <p id="mnLeadMsg" class="mn-lead-msg" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <div class="cn-cta-end">
+      <h2>Quan tâm mẫu nhà này?</h2>
+      <p>Miễn phí tư vấn phương án + dự toán sơ bộ, không ràng buộc.</p>
+      <div class="cn-cta-btns">
+        <a class="btn btn-gold mn-cta-open" href="#mn-lead" data-cta="mua"><i class="ph-duotone ph-file-text"></i>Mua mẫu này — nhận hồ sơ trong 48h</a>
+        <a class="btn btn-on-navy mn-cta-open" href="#mn-lead" data-cta="tuvan"><i class="ph-duotone ph-chat-circle-dots"></i>Tư vấn miễn phí với KTS</a>
+      </div>
+    </div>
+
+    <div class="mn-trust">
+      <i class="ph-duotone ph-shield-check"></i>
+      <p>Mọi giao dịch qua ALN đều theo <strong>Quy trình 4 bước đảm bảo</strong> — tiền giữ trung gian, kiến trúc sư xác thực CCHN, thanh toán theo từng chặng. <a href="/#process">Xem quy trình 4 bước</a>.</p>
+    </div>
+  </div>
+
+  <div class="wrap cn-related">
+    <h2>Mẫu tương tự</h2>
+    <div class="cn-related-grid mn-related-grid">
+{{RELATED_HTML}}
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="cn-brand"><div class="cn-logo"><img src="../icon-192.png" alt="ALN"></div><div class="cn-name" style="font-size:15px">ALN</div></div>
+        <p>ALN là nền tảng kết nối kiến trúc sư và đơn vị thi công đã thẩm định, thanh toán trực tiếp minh bạch từng chặng C1–C4.</p>
+      </div>
+      <div class="foot-col">
+        <h5>Điều hướng</h5>
+        <a href="/#why">Vì sao chọn ALN</a>
+        <a href="/#process">Quy trình C1–C4</a>
+        <a href="/#pricing">Bảng giá</a>
+        <a href="index.html">Kho mẫu</a>
+        <a href="../cam-nang/index.html">Cẩm nang</a>
+      </div>
+      <div class="foot-col">
+        <h5>Truy cập</h5>
+        <a href="../login.html">Đăng nhập</a>
+        <a href="../register.html">Đăng ký chủ nhà</a>
+        <a href="../kts-apply.html">Đăng ký KTS</a>
+      </div>
+      <div class="foot-col">
+        <h5>Liên hệ</h5>
+        <a href="tel:0909829696"><i class="ph-duotone ph-phone" style="margin-right:6px;color:var(--gold)"></i>0909 82 9696</a>
+        <a href="https://applamnha.vn" target="_blank" rel="noopener"><i class="ph-duotone ph-globe" style="margin-right:6px;color:var(--gold)"></i>applamnha.vn</a>
+        <p><i class="ph-duotone ph-map-pin" style="margin-right:6px;color:var(--gold)"></i>TP. Hồ Chí Minh</p>
+      </div>
+    </div>
+    <div class="foot-bottom">© ALN — App Làm Nhà Corp. · applamnha.vn</div>
+  </div>
+</footer>
+
+<script type="module">
+import { app } from '../firebase-config.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+
+const functions = getFunctions(app, 'asia-southeast1');
+const callSubmitMauLead = httpsCallable(functions, 'submitMauLead', { timeout: 20000 });
+
+function getUtmFromUrl() {
+  const p = new URLSearchParams(location.search);
+  const utm = {};
+  ['source', 'medium', 'campaign', 'content', 'term'].forEach((k) => {
+    const v = p.get('utm_' + k);
+    if (v) utm[k] = v;
+  });
+  return utm;
+}
+
+document.querySelectorAll('.mn-cta-open').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const cta = btn.getAttribute('data-cta') || 'mua';
+    document.getElementById('mnCta').value = cta;
+    document.getElementById('mn-lead-title').textContent =
+      cta === 'tuvan' ? 'Tư vấn miễn phí với KTS' : 'Nhận hồ sơ mẫu này';
+    document.getElementById('mnSubmitLabel').textContent =
+      cta === 'tuvan' ? 'Đặt lịch tư vấn' : 'Nhận hồ sơ trong 48h';
+  });
+});
+
+const form = document.getElementById('mnLeadForm');
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('mnLeadMsg');
+  const btn = form.querySelector('.mn-lead-submit');
+  const name = document.getElementById('mnName').value.trim();
+  const phone = document.getElementById('mnPhone').value.trim();
+  const region = document.getElementById('mnRegion').value.trim();
+  const cta = document.getElementById('mnCta').value;
+  if (!name || !/^0\d{8,10}$/.test(phone.replace(/[\s.\-()]/g, ''))) {
+    msg.textContent = 'Vui lòng nhập đúng họ tên và số điện thoại (VD: 0909xxxxxx).';
+    msg.className = 'mn-lead-msg err';
+    return;
+  }
+  btn.disabled = true;
+  msg.textContent = 'Đang gửi...';
+  msg.className = 'mn-lead-msg';
+  try {
+    await callSubmitMauLead({
+      name, phone, region, cta,
+      mauId: '{{ID}}',
+      mauTen: '{{TEN_JS}}',
+      area: {{DIEN_TICH_SAN}},
+      budget: '{{BUDGET_BUCKET}}',
+      utm: getUtmFromUrl(),
+      sourceUrl: location.href,
+    });
+    msg.textContent = 'Đã nhận thông tin — ALN sẽ liên hệ trong ít phút. Cảm ơn bạn!';
+    msg.className = 'mn-lead-msg ok';
+    form.reset();
+  } catch (err) {
+    console.error('[submitMauLead]', err);
+    msg.textContent = 'Có lỗi khi gửi, vui lòng thử lại hoặc gọi 0909 82 9696.';
+    msg.className = 'mn-lead-msg err';
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>

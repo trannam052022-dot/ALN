@@ -2078,3 +2078,7 @@ exports.onHomeLeadCreated = ktsFunnel.onHomeLeadCreated;
 exports.submitHomeLead = ktsFunnel.submitHomeLead;
 /* ── Phễu ads chủ nhà: đăng ký CN (register.html, kể cả từ diễn đàn "Hỏi KTS") → CAPI CompleteRegistration ── */
 exports.onCnRegistered = ktsFunnel.onCnRegistered;
+
+/* ── Kho mẫu nhà (mau/*.html, SEO_BAN_GIAO.md Phase 1): CTA form ghi lead server-side,
+   xem functions/mauLeads.js. Ghi vào collection leads/ chung với lead diễn đàn. ── */
+exports.submitMauLead = require("./mauLeads").submitMauLead;
