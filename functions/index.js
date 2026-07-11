@@ -530,6 +530,18 @@ exports.postCamNangToFacebook = onRequest(
       ", match=" + (receivedSecret === configuredSecret)
     );
     if (!configuredSecret || receivedSecret !== configuredSecret) {
+      // Chỉ báo Founder khi payload đúng hình dạng bài Cẩm nang (title+url) —
+      // endpoint này public trên internet, bot/scanner dò URL ngẫu nhiên cũng
+      // ra 401 nhưng không nên làm founder bị spam push oan vì noise đó.
+      const body = req.body || {};
+      if (body.title && body.url && typeof body.title === "string" && typeof body.url === "string") {
+        console.error("[postCamNangToFacebook] Secret không khớp — bài \"" + (body.slug || body.title) + "\" bị từ chối.");
+        await notifyFounder(
+          "⚠️ Đăng Cẩm nang lên Facebook thất bại",
+          `Bài "${body.title}" (${body.slug || "?"}) bị từ chối do secret không khớp — kiểm tra CAM_NANG_FB_SECRET giữa GitHub Actions và Firebase Secret Manager có đồng bộ không.`,
+          { type: "CAM_NANG_FB_POST_FAILED", slug: body.slug || "" }
+        );
+      }
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
