@@ -326,7 +326,8 @@ async function logBlocked(uid, profile, kind, reason, text) {
   }
 }
 
-/* Chấm điểm lead theo MARKETING.md */
+/* Chấm điểm lead theo MARKETING.md — export để functions/mauLeads.js (Kho mẫu nhà)
+   dùng chung, tránh 2 nơi tính điểm lệch nhau. */
 function scoreLead(brief) {
   let s = 0;
   if (brief.budget === ">=2ty") s += 3; else if (brief.budget === "1-2ty") s += 2; else s += 1;
@@ -336,6 +337,7 @@ function scoreLead(brief) {
   const tier = s >= 7 ? "nong" : s >= 4 ? "am" : "nguoi";
   return { score: s, tier };
 }
+exports.scoreLead = scoreLead;
 
 /* ── 3 CẤP BẬC KTS (huy hiệu) suy từ điểm uy tín — bậc cao được ưu tiên nhận dự án ──
    Điểm: Best Answer +5, được tim +1, Showcase ghim +3, trả lời đầu tu_van x2(+5). */
