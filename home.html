@@ -25,10 +25,27 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "ALN — App Làm Nhà",
-  "url": "https://trannam052022-dot.github.io/ALN/",
-  "description": "Nền tảng quản lý công trình xây dựng, kết nối chủ nhà với KTS và đơn vị thi công đã thẩm định."
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://applamnha.vn/#organization",
+      "name": "App Làm Nhà (ALN)",
+      "url": "https://applamnha.vn/",
+      "logo": "https://applamnha.vn/icon-512.png",
+      "description": "Nền tảng quản lý công trình xây dựng, kết nối chủ nhà với KTS và đơn vị thi công đã thẩm định.",
+      "areaServed": "VN",
+      "telephone": "+84909829696",
+      "email": "contact@applamnha.vn"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://applamnha.vn/#website",
+      "name": "App Làm Nhà",
+      "url": "https://applamnha.vn/",
+      "inLanguage": "vi",
+      "publisher": { "@id": "https://applamnha.vn/#organization" }
+    }
+  ]
 }
 </script>
 
