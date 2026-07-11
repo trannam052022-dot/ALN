@@ -352,6 +352,12 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
 .est-result .lbl{font-size:var(--text-md);color:var(--sub)}
 .est-result .val{font-family:var(--mono);font-weight:700;font-size:32px;color:var(--gold);letter-spacing:-.01em}
 .est-cta{margin-top:24px;display:flex;justify-content:center;position:relative}
+.dt60-q{font-family:var(--syne);font-weight:700;font-size:var(--text-lg);color:var(--text);text-align:center;margin-bottom:22px;position:relative}
+.dt60-row{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;position:relative}
+.dt60-choice{display:inline-block;padding:16px 22px;min-width:130px;text-align:center;border-radius:var(--r-sm);border:1.5px solid var(--border2);background:var(--bg);color:var(--text2);font-family:var(--syne);font-weight:700;font-size:var(--text-sm);text-decoration:none;transition:all .2s var(--ease);box-shadow:var(--shadow-sm)}
+.dt60-choice:hover{border-color:var(--gold);color:var(--text);transform:translateY(-2px)}
+.dt60-note{margin-top:22px;text-align:center;font-size:var(--text-sm);color:var(--muted);position:relative}
+.dt60-note a{color:var(--gold)}
 @media(max-width:640px){.est-grid{grid-template-columns:1fr}.tool-panel{padding:30px 22px}.est-result .val{font-size:26px}}
 
 .loban-tool{max-width:1060px;margin:0 auto}
@@ -997,37 +1003,22 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
   </div>
 </section>
 
-<!-- ═══ CƯỚC TÍNH CHI PHÍ ═══ -->
+<!-- ═══ DỰ TOÁN 60 GIÂY ═══ -->
 <section class="sec" id="uoctinh">
   <div class="wrap">
     <div class="sec-head">
-      <div class="eyebrow"><span class="ln"></span>ƯỚC TÍNH NHANH<span class="ln"></span></div>
-      <h2>Tạm tính <em>chi phí thiết kế</em></h2>
-      <p>Chọn thể loại và nhập diện tích để xem mức phí tham khảo theo bảng giá ALN.</p>
+      <div class="eyebrow"><span class="ln"></span>DỰ TOÁN 60 GIÂY<span class="ln"></span></div>
+      <h2>Dự toán <em>chi phí xây nhà</em> 60 giây</h2>
+      <p>Trả lời 5 câu hỏi nhanh (chọn nút, không cần gõ) để xem ngay khoảng chi phí xây nhà tham khảo.</p>
     </div>
     <div class="tool-panel">
-      <div class="est-grid">
-        <div class="field">
-          <label>Thể loại</label>
-          <select id="estType" onchange="estUpdate()">
-            <option value="nhapho">Nhà phố (kiến trúc) — 120.000đ/m² sàn</option>
-            <option value="bietthu">Biệt thự (kiến trúc) — 160.000đ/m² sàn</option>
-            <option value="ntnhapho">Nội thất nhà phố — 120.000đ/m² sử dụng</option>
-            <option value="ntbietthu">Nội thất biệt thự — 180.000đ/m² sử dụng</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Diện tích (m²)</label>
-          <input id="estArea" type="number" min="0" inputmode="numeric" value="200" oninput="estUpdate()">
-        </div>
+      <div class="dt60-q">Bạn muốn xây loại công trình nào?</div>
+      <div class="dt60-row">
+        <a class="dt60-choice" href="du-toan/?loai=nha-pho">Nhà phố</a>
+        <a class="dt60-choice" href="du-toan/?loai=nha-cap-4">Nhà cấp 4</a>
+        <a class="dt60-choice" href="du-toan/?loai=biet-thu">Biệt thự</a>
       </div>
-      <div class="est-result">
-        <div class="lbl">Phí thiết kế tạm tính <span style="font-size:12px;color:var(--muted)">(chưa gồm VAT)</span></div>
-        <div class="val" id="estVal">24.000.000đ</div>
-      </div>
-      <div class="est-cta">
-        <button class="btn btn-gold" onclick="mymyOpen()"><i class="ph-duotone ph-chat-circle-dots"></i>Nhận báo giá chi tiết từ MyMy</button>
-      </div>
+      <p class="dt60-note">Chỉ cần xem phí thiết kế? <a href="#pricing">Xem bảng giá phía trên</a>.</p>
     </div>
   </div>
 </section>
@@ -1558,8 +1549,6 @@ function mymySendClick(){
 
 <script>
 /* ═══ Công cụ ước tính chi phí (dùng đúng bảng giá ALN) ═══ */
-var ALN_PRICE = { nhapho: 120000, bietthu: 160000, ntnhapho: 120000, ntbietthu: 180000 };
-
 function alnFmt(n){
   n = Math.round(n);
   var s = String(n);
@@ -1571,14 +1560,6 @@ function alnFmt(n){
     if(c % 3 === 0 && i > 0){ out = '.' + out; }
   }
   return out;
-}
-
-function estUpdate(){
-  var t = document.getElementById('estType').value;
-  var a = parseFloat(document.getElementById('estArea').value);
-  if(isNaN(a) || a < 0){ a = 0; }
-  var total = (ALN_PRICE[t] || 0) * a;
-  document.getElementById('estVal').textContent = alnFmt(total) + 'đ';
 }
 
 /* ═══ Thước Lỗ Ban phong thủy ═══ */
@@ -1698,7 +1679,6 @@ function lbUpdate(){
 }
 
 window.addEventListener('DOMContentLoaded', function(){
-  if(document.getElementById('estVal')){ estUpdate(); }
   if(document.getElementById('lbResults')){ lbRenderPresets(); lbUpdate(); }
 });
 </script>
