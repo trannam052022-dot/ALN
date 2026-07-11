@@ -1,5 +1,5 @@
 ---
-title: "Xây nhà trọn gói tại Cà Mau 2026: chi phí, nền đất yếu & nhà thầu"
+title: "Chi phí xây nhà tại Cà Mau 2026: nền đất yếu, chọn kiến trúc sư"
 slug: xay-nha-tron-goi-ca-mau
 category: khu-vuc
 description: "Chi phí xây nhà tại Cà Mau 2026: phần thô khoảng 4,3 triệu/m², trọn gói hoàn thiện 5–7 triệu/m². Lưu ý nền đất yếu nhất nước, sụt lún, nhiễm mặn quanh năm, ép cọc sâu, giấy phép và vai trò kiến trúc sư khu vực."
@@ -15,7 +15,7 @@ keywords:
   - thiết kế nhà cà mau
 ---
 
-# Xây nhà trọn gói tại Cà Mau 2026: chi phí, nền đất yếu & nhà thầu
+# Chi phí xây nhà tại Cà Mau 2026: nền đất yếu, chọn kiến trúc sư
 
 > **Nội dung chính**
 > - Chi phí xây nhà tại Cà Mau 2026: **phần thô khoảng 4,3 triệu/m²**, trọn gói hoàn thiện tiêu chuẩn khá **5–7 triệu/m²**.

@@ -1,5 +1,5 @@
 ---
-title: "Xây nhà trọn gói tại TP.HCM 2026: chi phí, giấy phép & chọn nhà thầu"
+title: "Chi phí xây nhà tại TP.HCM 2026: giấy phép, chọn kiến trúc sư"
 slug: xay-nha-tron-goi-tphcm
 category: khu-vuc
 description: "Chi phí xây nhà tại TP.HCM 2026: phần thô khoảng 4,5 triệu/m², trọn gói hoàn thiện 5,5–8 triệu/m². Bài viết bóc tách chi phí theo quận, lưu ý nền đất yếu, giấy phép và vai trò kiến trúc sư khu vực."
@@ -16,7 +16,7 @@ keywords:
   - kiến trúc sư tphcm
 ---
 
-# Xây nhà trọn gói tại TP.HCM 2026: chi phí, giấy phép & chọn nhà thầu
+# Chi phí xây nhà tại TP.HCM 2026: giấy phép, chọn kiến trúc sư
 
 > **Nội dung chính**
 > - Chi phí xây nhà tại TP.HCM 2026: **phần thô khoảng 4,5 triệu/m²**, trọn gói hoàn thiện tiêu chuẩn khá **5,5–8 triệu/m²**.
