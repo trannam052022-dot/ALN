@@ -2058,8 +2058,8 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;display:flex;flex-direction:column">
-      <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Kết quả AI</div>
-      <div id="mktOutput" style="flex:1;background:var(--raised);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:13px;line-height:1.75;color:var(--text2);white-space:pre-wrap;min-height:220px">Nội dung sẽ hiện ở đây sau khi bấm "Tạo nội dung với AI"...</div>
+      <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Kết quả AI <span style="text-transform:none;letter-spacing:0;color:var(--sub);font-family:var(--sans)">— bấm vào để sửa trực tiếp</span></div>
+      <div id="mktOutput" contenteditable="plaintext-only" spellcheck="false" style="flex:1;background:var(--raised);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:13px;line-height:1.75;color:var(--text2);white-space:pre-wrap;min-height:220px;outline:none;cursor:text" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">Nội dung sẽ hiện ở đây sau khi bấm "Tạo nội dung với AI"...</div>
       <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
         <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:7px"><i class="ph-duotone ph-image"></i> Ảnh kèm bài (không bắt buộc)</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -6395,7 +6395,7 @@ window.saveCompanySettings = async function() {
   };
 
   window.mktCopy = function(){
-    var text = document.getElementById('mktOutput').textContent;
+    var text = document.getElementById('mktOutput').innerText;
     navigator.clipboard.writeText(text);
     var btn = event.currentTarget;
     var old = btn.innerHTML;
@@ -6405,7 +6405,7 @@ window.saveCompanySettings = async function() {
 
   // Đăng thẳng nội dung ô Kết quả AI lên Trang Facebook
   window.mktPostFb = async function(evt){
-    var text = (document.getElementById('mktOutput').textContent || '').trim();
+    var text = (document.getElementById('mktOutput').innerText || '').trim();
     if(!text || text.indexOf('Nội dung sẽ hiện') === 0){ alert('Chưa có nội dung để đăng.'); return; }
     var imgEl = document.getElementById('mktImgUrl');
     var imgUrl = imgEl ? (imgEl.value || '').trim() : '';
