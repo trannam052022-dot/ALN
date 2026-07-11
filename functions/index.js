@@ -2086,3 +2086,7 @@ exports.submitMauLead = require("./mauLeads").submitMauLead;
 /* ── Tool "Dự toán xây nhà 60 giây" (du-toan/*.html, SEO_BAN_GIAO.md Phase 2):
    CTA form ghi lead server-side, xem functions/duToanLeads.js. ── */
 exports.submitDuToanLead = require("./duToanLeads").submitDuToanLead;
+
+/* ── Trang dịch vụ thiết kế theo tỉnh (thiet-ke-nha/*.html, SEO_BAN_GIAO.md
+   Phase 3): CTA form ghi lead server-side, xem functions/localLeads.js. ── */
+exports.submitLocalLead = require("./localLeads").submitLocalLead;
