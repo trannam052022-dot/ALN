@@ -24,7 +24,8 @@ có được Google tìm thấy hay không. Chưa đăng ký = Google có thể 
 2. Google đưa cho bạn 1 dòng mã dạng:
    `<meta name="google-site-verification" content="XXXXXXXX...">`
 3. **Copy nguyên dòng đó**, gửi vào Claude Code và nói:
-   *"Chèn thẻ meta verify Google này vào home.html rồi push"*.
+   *"Chèn thẻ meta verify Google này vào index.html rồi push"*
+   (index.html là file mà địa chỉ applamnha.vn/ trả về — KHÔNG phải home.html).
 4. Chờ 2–3 phút cho GitHub Pages cập nhật, quay lại Google bấm **"Xác minh"**.
    (Nếu báo lỗi, chờ thêm 5 phút rồi bấm lại — Pages build hơi chậm.)
 
