@@ -143,6 +143,7 @@
           <div class="dt-slider-val"><input type="number" id="dtAreaInput" min="10" max="2000" step="1" value="150" inputmode="numeric"> m²</div>
           <div class="dt-slider-marks"><span>50 m²</span><span>500 m²</span></div>
         </div>
+        <p class="dt-hint" style="font-size:var(--text-sm);color:var(--sub,#64748b);margin:10px 0 0">Mẹo: diện tích sàn ≈ 100% trệt + 100% mỗi lầu + 30–50% diện tích mái/sân.</p>
         <div class="dt-actions">
           <button class="btn btn-gold dt-next" type="button" data-next="4">Tiếp tục</button>
         </div>
@@ -263,7 +264,7 @@
 </footer>
 
 <script>
-var DON_GIA = {"_ghiChu":"⚠️ SỐ LIỆU GIẢ ĐỊNH — KHÔNG PHẢI GIÁ THẬT. Đây là bảng đơn giá tham khảo dùng để dựng logic tool Dự toán 60 giây (Phase 2, SEO_BAN_GIAO.md). Chủ dự án BẮT BUỘC phải hiệu chỉnh donGiaThoM2/heSoLoai/heSoVung theo đơn giá thị trường thật (khảo sát nhà thầu/KTS đối tác) TRƯỚC KHI chạy quảng cáo trả phí vào trang tool này — nếu chạy ads với số liệu giả định, khách hàng nhận báo giá sai lệch có thể gây mất lòng tin. Sau khi sửa file này, chạy lại: node tools/gen-dutoan.js && node tools/gen-sitemap.js","namApDung":2026,"donGiaThoM2":{"co-ban":3500000,"kha":4500000,"cao-cap":6000000},"heSoLoai":{"nha-pho":1,"nha-cap-4":0.85,"biet-thu":1.3},"heSoVung":{"hcm":1.1,"ba-ria-vung-tau":1,"dong-nai":0.95,"binh-duong":0.95,"khac":1},"bocTach":{"tho":0.6,"hoanThien":0.3,"duPhong":0.1}};
+var DON_GIA = {"_ghiChu":"⚠️ SỐ LIỆU THAM KHẢO — hiệu chỉnh 07/2026 theo mức giá trong kịch bản Facebook seeding (đã Founder xác nhận sát thị trường): nhà phố thô ~3.5-4.5tr/m², full ~5.5-7tr/m²; cấp 4 thô ~3-3.5tr/m², trọn gói ~5-6tr/m². donGiaTronGoiM2 là GIÁ TỔNG (đã gồm hoàn thiện) — tool hiển thị tổng rồi bóc tách theo bocTach (thô 60% / hoàn thiện 30% / dự phòng 10%). Vẫn cần xác minh thêm với nhà thầu/KTS đối tác trước khi chạy quảng cáo trả phí. Sau khi sửa file này, chạy lại: node tools/gen-dutoan.js && node tools/gen-sitemap.js","namApDung":2026,"donGiaTronGoiM2":{"co-ban":5500000,"kha":6300000,"cao-cap":7200000},"heSoLoai":{"nha-pho":1,"nha-cap-4":0.85,"biet-thu":1.3},"heSoVung":{"hcm":1.1,"ba-ria-vung-tau":1,"dong-nai":0.95,"binh-duong":0.95,"khac":1},"bocTach":{"tho":0.6,"hoanThien":0.3,"duPhong":0.1}};
 var TINH_LIST = [{"slug":"vung-tau","ten":"Vũng Tàu","heSoVungKey":"ba-ria-vung-tau"},{"slug":"ba-ria","ten":"Bà Rịa","heSoVungKey":"ba-ria-vung-tau"},{"slug":"tp-hcm","ten":"TP.HCM","heSoVungKey":"hcm"},{"slug":"bien-hoa","ten":"Biên Hòa","heSoVungKey":"dong-nai"},{"slug":"dong-nai","ten":"Đồng Nai","heSoVungKey":"dong-nai"},{"slug":"binh-duong","ten":"Bình Dương","heSoVungKey":"binh-duong"}];
 var MAU_LIST = [{"slug":"mau-nha-pho-5x16-3-tang-3-phong-ngu","ten":"Mẫu nhà phố 5×16m 3 tầng 3 phòng ngủ hiện đại","loai":"nha-pho","dienTichSan":200,"giaBanMau":12000000},{"slug":"mau-nha-pho-5x20-4-tang-4-phong-ngu","ten":"Mẫu nhà phố 5×20m 4 tầng 4 phòng ngủ hiện đại","loai":"nha-pho","dienTichSan":330,"giaBanMau":15000000},{"slug":"mau-biet-thu-14x18-2-tang-4-phong-ngu","ten":"Mẫu biệt thự 14×18m 2 tầng 4 phòng ngủ tân cổ điển","loai":"biet-thu","dienTichSan":300,"giaBanMau":28000000},{"slug":"mau-nha-cap-4-20x20-san-vuon-3-phong-ngu","ten":"Mẫu nhà cấp 4 sân vườn 20×20m 3 phòng ngủ mái Thái","loai":"nha-cap-4","dienTichSan":150,"giaBanMau":20000000},{"slug":"mau-nha-2-tang-15x20-san-vuon-4-phong-ngu","ten":"Mẫu nhà vườn 2 tầng 15×20m 4 phòng ngủ hiện đại","loai":"nha-2-tang","dienTichSan":280,"giaBanMau":26000000}];
 var PRESELECT_TINH = "vung-tau";
@@ -372,7 +373,7 @@ document.getElementById('dtCalcBtn').addEventListener('click', function () {
     alert('Vui lòng hoàn thành đủ 5 bước trước khi xem kết quả.');
     return;
   }
-  var donGia = DON_GIA.donGiaThoM2[state.mucHoanThien] * DON_GIA.heSoLoai[state.loai] * dtHeSoVungFor(state.tinh);
+  var donGia = DON_GIA.donGiaTronGoiM2[state.mucHoanThien] * DON_GIA.heSoLoai[state.loai] * dtHeSoVungFor(state.tinh);
   var giua = state.dienTich * donGia;
   var min = giua * 0.9, max = giua * 1.1;
   lastResult = { min: min, max: max, giua: giua };

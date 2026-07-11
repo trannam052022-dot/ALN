@@ -1,10 +1,10 @@
 {
-  "_ghiChu": "⚠️ SỐ LIỆU GIẢ ĐỊNH — KHÔNG PHẢI GIÁ THẬT. Đây là bảng đơn giá tham khảo dùng để dựng logic tool Dự toán 60 giây (Phase 2, SEO_BAN_GIAO.md). Chủ dự án BẮT BUỘC phải hiệu chỉnh donGiaThoM2/heSoLoai/heSoVung theo đơn giá thị trường thật (khảo sát nhà thầu/KTS đối tác) TRƯỚC KHI chạy quảng cáo trả phí vào trang tool này — nếu chạy ads với số liệu giả định, khách hàng nhận báo giá sai lệch có thể gây mất lòng tin. Sau khi sửa file này, chạy lại: node tools/gen-dutoan.js && node tools/gen-sitemap.js",
+  "_ghiChu": "⚠️ SỐ LIỆU THAM KHẢO — hiệu chỉnh 07/2026 theo mức giá trong kịch bản Facebook seeding (đã Founder xác nhận sát thị trường): nhà phố thô ~3.5-4.5tr/m², full ~5.5-7tr/m²; cấp 4 thô ~3-3.5tr/m², trọn gói ~5-6tr/m². donGiaTronGoiM2 là GIÁ TỔNG (đã gồm hoàn thiện) — tool hiển thị tổng rồi bóc tách theo bocTach (thô 60% / hoàn thiện 30% / dự phòng 10%). Vẫn cần xác minh thêm với nhà thầu/KTS đối tác trước khi chạy quảng cáo trả phí. Sau khi sửa file này, chạy lại: node tools/gen-dutoan.js && node tools/gen-sitemap.js",
   "namApDung": 2026,
-  "donGiaThoM2": {
-    "co-ban": 3500000,
-    "kha": 4500000,
-    "cao-cap": 6000000
+  "donGiaTronGoiM2": {
+    "co-ban": 5500000,
+    "kha": 6300000,
+    "cao-cap": 7200000
   },
   "heSoLoai": {
     "nha-pho": 1.0,
