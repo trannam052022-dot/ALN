@@ -97,6 +97,7 @@
           <div class="dt-slider-val"><input type="number" id="dtAreaInput" min="10" max="2000" step="1" value="150" inputmode="numeric"> m²</div>
           <div class="dt-slider-marks"><span>50 m²</span><span>500 m²</span></div>
         </div>
+        <p class="dt-hint" style="font-size:var(--text-sm);color:var(--sub,#64748b);margin:10px 0 0">Mẹo: diện tích sàn ≈ 100% trệt + 100% mỗi lầu + 30–50% diện tích mái/sân.</p>
         <div class="dt-actions">
           <button class="btn btn-gold dt-next" type="button" data-next="4">Tiếp tục</button>
         </div>
@@ -316,7 +317,7 @@ document.getElementById('dtCalcBtn').addEventListener('click', function () {
     alert('Vui lòng hoàn thành đủ 5 bước trước khi xem kết quả.');
     return;
   }
-  var donGia = DON_GIA.donGiaThoM2[state.mucHoanThien] * DON_GIA.heSoLoai[state.loai] * dtHeSoVungFor(state.tinh);
+  var donGia = DON_GIA.donGiaTronGoiM2[state.mucHoanThien] * DON_GIA.heSoLoai[state.loai] * dtHeSoVungFor(state.tinh);
   var giua = state.dienTich * donGia;
   var min = giua * 0.9, max = giua * 1.1;
   lastResult = { min: min, max: max, giua: giua };
