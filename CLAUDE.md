@@ -2,6 +2,15 @@
 
 > File này giúp Claude Code tự nạp context mỗi phiên. Đặt ở thư mục gốc repo: `C:\Users\HP\Documents\ALN\CLAUDE.md`
 
+## NGUYÊN TẮC ĐỊNH VỊ ALN (bắt buộc, không suy diễn)
+
+- **ALN là Tổng thầu THIẾT KẾ** (không phải thi công) — ký HĐ trực tiếp với khách hàng, tiền khách trả là doanh thu ALN, ALN chịu trách nhiệm toàn bộ hợp đồng, KTS là CTV/nhà thầu phụ theo Quy trình 4 bước C1–C4.
+- **CẤM:** "xây nhà trọn gói", "ALN là nhà thầu/tổng thầu thi công" — mảng thi công chưa được phép triển khai (chưa có chứng chỉ năng lực). Nếu nhắc thi công, luôn ghi **"đơn vị thi công đối tác"** (chủ thể khác ALN).
+- **CẤM:** "giữ tiền trung gian", "bên trung gian", "giữ hộ tiền" khi mô tả ALN với khách hàng — tự mâu thuẫn với việc ký HĐ trực tiếp, gây cảm giác kém uy tín.
+- **Câu chuẩn thay thế:** *"ALN là Tổng thầu Thiết kế — ký hợp đồng trực tiếp với khách hàng, trực tiếp chịu trách nhiệm toàn bộ dự án. Thanh toán theo Quy trình 4 bước đảm bảo (C1–C4)."* Bản rút gọn: *"Tổng thầu Thiết kế — hợp đồng trực tiếp, thanh toán theo Quy trình 4 bước đảm bảo."*
+- **Ngữ cảnh thuật ngữ** (không lẫn nhau): khách hàng → **"Quy trình 4 bước đảm bảo"**; KTS → **"Tiền đã có sẵn tại ALN chờ bạn"**; nội bộ → **"Quỹ bảo đảm 4 bước"**.
+- Trước khi publish nội dung mới (Cẩm nang, trang mẫu, trang tỉnh...), đối chiếu với lint content (đã thêm ở Phase 3) để chặn tái phạm.
+
 ## Tổng quan
 
 Nền tảng theo dõi công trình xây dựng. **Frontend tĩnh** (HTML/JS thuần) host trên **GitHub Pages**, **backend Firebase** (Auth + Firestore + Storage + FCM + Cloud Functions).
