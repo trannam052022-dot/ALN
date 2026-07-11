@@ -356,6 +356,22 @@ if (dtAreaInput) {
 var dtTinhSelect = document.getElementById('dtTinhSelect');
 if (PRESELECT_TINH && dtTinhSelect) dtTinhSelect.value = PRESELECT_TINH;
 
+/* ?loai= từ widget trang chủ: nếu hợp lệ thì chọn sẵn bước 1 và mở thẳng
+   bước 2. Độc lập với PRESELECT_TINH của trang tỉnh (loai đánh dấu nút
+   bước 1, tinh chỉ khoá select bước 5) — hai cơ chế chạy song song được.
+   Param sai/thiếu → bỏ qua, wizard bắt đầu từ bước 1 như cũ. */
+(function initPreselectLoai() {
+  var m = /[?&]loai=([^&#]*)/.exec(window.location.search);
+  if (!m) return;
+  var v = decodeURIComponent(m[1]);
+  if (!DON_GIA.heSoLoai.hasOwnProperty(v)) return;
+  var btn = document.querySelector('.dt-choice[data-field="loai"][data-value="' + v + '"]');
+  if (!btn) return;
+  state.loai = v;
+  btn.classList.add('on');
+  dtGoStep(2);
+})();
+
 function dtPickRelatedMau(loai, dienTich) {
   var pool = MAU_LIST.slice();
   pool.sort(function (a, b) {
