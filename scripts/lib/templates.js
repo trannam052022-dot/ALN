@@ -80,7 +80,7 @@ function footer(paths) {
     '    <div class="foot-grid">\n' +
     '      <div class="foot-brand">\n' +
     '        <div class="cn-brand"><div class="cn-logo"><img src="' + paths.root + 'icon-192.png" alt="ALN"></div><div class="cn-name" style="font-size:15px">ALN</div></div>\n' +
-    '        <p>ALN là nền tảng kết nối kiến trúc sư và đơn vị thi công đã thẩm định, thanh toán trực tiếp minh bạch từng chặng C1–C4.</p>\n' +
+    '        <p>ALN là Tổng thầu Thiết kế, phối hợp KTS và đơn vị thi công đối tác đã thẩm định. Thanh toán theo Quy trình 4 bước đảm bảo, minh bạch từng chặng C1–C4.</p>\n' +
     '      </div>\n' +
     '      <div class="foot-col">\n' +
     '        <h5>Điều hướng</h5>\n' +
