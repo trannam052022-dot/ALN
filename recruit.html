@@ -298,12 +298,12 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 20px;
     <div class="why-card">
       <div class="why-icon"><i class="ph-duotone ph-chart-line-up" style="color:var(--gold)"></i></div>
       <div class="why-title">Thu nhập minh bạch</div>
-      <div class="why-desc">Hoa hồng rõ ràng theo % tổng giá trị công trình, được thỏa thuận từ đầu và ghi vào hệ thống.</div>
+      <div class="why-desc">Thù lao rõ ràng theo từng dự án, thỏa thuận từ đầu và ghi nhận minh bạch trên hệ thống.</div>
     </div>
     <div class="why-card">
       <div class="why-icon"><i class="ph-duotone ph-handshake" style="color:var(--gold)"></i></div>
       <div class="why-title">Kết nối trực tiếp</div>
-      <div class="why-desc">Founder ALN giới thiệu bạn đến đúng Chủ nhà phù hợp, không qua trung gian ngoài.</div>
+      <div class="why-desc">Nhận dự án qua hệ thống — ALN phân dự án minh bạch theo bộ môn và khu vực, không qua trung gian ngoài.</div>
     </div>
     <div class="why-card">
       <div class="why-icon"><i class="ph-duotone ph-device-mobile" style="color:var(--gold)"></i></div>
@@ -353,7 +353,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 20px;
     <div class="step">
       <div class="step-num">04</div>
       <div class="step-title">Nhận dự án đầu tiên</div>
-      <div class="step-desc">Founder ghép đôi bạn với Chủ nhà phù hợp. Dự án bắt đầu — thu nhập theo từng giai đoạn hoàn thành.</div>
+      <div class="step-desc">Hệ thống ALN ghép dự án phù hợp với bạn theo bộ môn và khu vực. Dự án bắt đầu — thu nhập theo từng giai đoạn hoàn thành.</div>
     </div>
   </div>
 </div>
@@ -412,7 +412,7 @@ var chatBusy = false;
 var BOT_RULES = [
   { kw:['xin chào','hello','chào','hi ','bắt đầu','giới thiệu','bạn là ai'], reply:'Xin chào! Tôi là trợ lý tuyển dụng của <b>ALN</b> — nền tảng kết nối Kiến trúc sư, Doanh nghiệp và Chủ nhà.<br><br>Tôi có thể giúp bạn tìm hiểu về các cơ hội nghề nghiệp, yêu cầu, thu nhập, và hướng dẫn đăng ký. Bạn muốn hỏi về vai trò nào?' },
   { kw:['kts','kiến trúc sư','architect','thiết kế kiến trúc','kiến trúc'], reply:'<b>Kiến trúc sư (KTS)</b> trên ALN nhận dự án thiết kế công trình cao cấp theo 4 giai đoạn: C1 (Thiết kế cơ sở) → C2 (Triển khai) → C3 (Hồ sơ thi công) → C4 (Giám sát).<br><br>Thu nhập theo % tổng giá trị công trình, thanh toán escrow an toàn sau mỗi giai đoạn được duyệt.<br><br><a href="kts-apply.html">→ Đăng ký KTS ngay</a>' },
-  { kw:['dn','doanh nghiệp','nhà thầu','thi công','xây dựng','contractor','công ty xây'], reply:'<b>Doanh nghiệp thi công</b> trên ALN được founder giới thiệu trực tiếp với Chủ nhà đã xác minh. Hệ thống quản lý tiến độ minh bạch, thanh toán escrow theo giai đoạn.<br><br>Yêu cầu: pháp nhân đầy đủ, ≥5 năm kinh nghiệm, hồ sơ năng lực.<br><br><a href="dn-studio.html">→ Đăng ký Doanh nghiệp</a>' },
+  { kw:['dn','doanh nghiệp','nhà thầu','thi công','xây dựng','contractor','công ty xây'], reply:'<b>Doanh nghiệp thi công</b> trên ALN nhận công trình qua hệ thống — ALN phân công trình minh bạch theo khu vực và năng lực với Chủ nhà đã xác minh. Hệ thống quản lý tiến độ minh bạch, thanh toán escrow theo giai đoạn.<br><br>Yêu cầu: pháp nhân đầy đủ, ≥5 năm kinh nghiệm, hồ sơ năng lực.<br><br><a href="dn-studio.html">→ Đăng ký Doanh nghiệp</a>' },
   { kw:['designer','nội thất','interior','thiết kế nội','trang trí','decor'], reply:'<b>Designer Nội thất</b> trên ALN thiết kế không gian sống cho Chủ nhà cao cấp — đa phong cách (Modern, Classic, Japandi, Scandinavian, Tropical…).<br><br>Dashboard riêng, quản lý dự án <code>DES-XXXX</code>, portfolio được xây dựng qua từng công trình.<br><br><a href="designer-apply.html">→ Đăng ký Designer NT</a>' },
   { kw:['đăng ký','apply','tham gia','join','ứng tuyển','nộp hồ sơ','ứng tuyển'], reply:'Quy trình đăng ký 3 bước đơn giản:<br><br>• Điền thông tin + tải portfolio/hồ sơ<br>• Founder xét duyệt 24–48h<br>• Kích hoạt tài khoản + nhận dự án<br><br><b>Chọn vai trò:</b><br><a href="kts-apply.html">→ Đăng ký KTS</a><br><a href="dn-studio.html">→ Đăng ký Doanh nghiệp</a><br><a href="designer-apply.html">→ Đăng ký Designer NT</a>' },
   { kw:['thu nhập','lương','tiền','phí','hoa hồng','bao nhiêu','pay','income','kiếm'], reply:'Thu nhập tính theo <b>% tổng giá trị công trình</b>, được thỏa thuận khi ký hợp đồng với Chủ nhà.<br><br>ALN sử dụng <b>escrow</b> — tiền được giữ an toàn và giải ngân theo từng giai đoạn hoàn thành và được duyệt. Không lo bị quỵt tiền.' },
