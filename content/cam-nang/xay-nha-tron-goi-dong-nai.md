@@ -1,5 +1,5 @@
 ---
-title: "Xây nhà trọn gói tại Đồng Nai 2026: chi phí, giấy phép & nhà thầu"
+title: "Chi phí xây nhà tại Đồng Nai 2026: giấy phép, chọn kiến trúc sư"
 slug: xay-nha-tron-goi-dong-nai
 category: khu-vuc
 description: "Chi phí xây nhà tại Đồng Nai 2026: phần thô khoảng 4,3 triệu/m², trọn gói hoàn thiện 5–7,5 triệu/m². Bóc tách chi phí ở Biên Hòa, Long Thành, Nhơn Trạch, lưu ý nền đất ven sông và vai trò kiến trúc sư khu vực."
@@ -15,7 +15,7 @@ keywords:
   - thiết kế nhà đồng nai
 ---
 
-# Xây nhà trọn gói tại Đồng Nai 2026: chi phí, giấy phép & nhà thầu
+# Chi phí xây nhà tại Đồng Nai 2026: giấy phép, chọn kiến trúc sư
 
 > **Nội dung chính**
 > - Chi phí xây nhà tại Đồng Nai 2026: **phần thô khoảng 4,3 triệu/m²**, trọn gói hoàn thiện tiêu chuẩn khá **5–7,5 triệu/m²**.

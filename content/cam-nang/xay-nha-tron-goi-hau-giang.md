@@ -1,5 +1,5 @@
 ---
-title: "Xây nhà trọn gói tại Hậu Giang 2026: chi phí, nền đất & nhà thầu"
+title: "Chi phí xây nhà tại Hậu Giang 2026: nền đất, chọn kiến trúc sư"
 slug: xay-nha-tron-goi-hau-giang
 category: khu-vuc
 description: "Chi phí xây nhà tại Hậu Giang 2026: phần thô khoảng 4,2 triệu/m², trọn gói hoàn thiện 5–7 triệu/m². Lưu ý nền phù sa phèn yếu, kênh rạch, ép cọc, giấy phép và vai trò kiến trúc sư khu vực."
@@ -15,7 +15,7 @@ keywords:
   - thiết kế nhà hậu giang
 ---
 
-# Xây nhà trọn gói tại Hậu Giang 2026: chi phí, nền đất & nhà thầu
+# Chi phí xây nhà tại Hậu Giang 2026: nền đất, chọn kiến trúc sư
 
 > **Nội dung chính**
 > - Chi phí xây nhà tại Hậu Giang 2026: **phần thô khoảng 4,2 triệu/m²**, trọn gói hoàn thiện tiêu chuẩn khá **5–7 triệu/m²**.

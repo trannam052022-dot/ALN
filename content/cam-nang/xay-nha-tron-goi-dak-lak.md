@@ -1,5 +1,5 @@
 ---
-title: "Xây nhà trọn gói tại Đắk Lắk 2026: chi phí, nền đất & nhà thầu"
+title: "Chi phí xây nhà tại Đắk Lắk 2026: nền đất, chọn kiến trúc sư"
 slug: xay-nha-tron-goi-dak-lak
 category: khu-vuc
 description: "Chi phí xây nhà tại Đắk Lắk 2026: phần thô khoảng 4,2 triệu/m², trọn gói hoàn thiện 5–7 triệu/m². Đất đỏ bazan cao ráo nền tốt quanh Buôn Ma Thuột, đất rộng nhà vườn, giấy phép và vai trò kiến trúc sư khu vực."
@@ -15,7 +15,7 @@ keywords:
   - thiết kế nhà đắk lắk
 ---
 
-# Xây nhà trọn gói tại Đắk Lắk 2026: chi phí, nền đất & nhà thầu
+# Chi phí xây nhà tại Đắk Lắk 2026: nền đất, chọn kiến trúc sư
 
 > **Nội dung chính**
 > - Chi phí xây nhà tại Đắk Lắk 2026: **phần thô khoảng 4,2 triệu/m²**, trọn gói hoàn thiện tiêu chuẩn khá **5–7 triệu/m²**.

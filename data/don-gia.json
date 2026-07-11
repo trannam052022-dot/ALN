@@ -1,0 +1,26 @@
+{
+  "_ghiChu": "⚠️ SỐ LIỆU GIẢ ĐỊNH — KHÔNG PHẢI GIÁ THẬT. Đây là bảng đơn giá tham khảo dùng để dựng logic tool Dự toán 60 giây (Phase 2, SEO_BAN_GIAO.md). Chủ dự án BẮT BUỘC phải hiệu chỉnh donGiaThoM2/heSoLoai/heSoVung theo đơn giá thị trường thật (khảo sát nhà thầu/KTS đối tác) TRƯỚC KHI chạy quảng cáo trả phí vào trang tool này — nếu chạy ads với số liệu giả định, khách hàng nhận báo giá sai lệch có thể gây mất lòng tin. Sau khi sửa file này, chạy lại: node tools/gen-dutoan.js && node tools/gen-sitemap.js",
+  "namApDung": 2026,
+  "donGiaThoM2": {
+    "co-ban": 3500000,
+    "kha": 4500000,
+    "cao-cap": 6000000
+  },
+  "heSoLoai": {
+    "nha-pho": 1.0,
+    "nha-cap-4": 0.85,
+    "biet-thu": 1.3
+  },
+  "heSoVung": {
+    "hcm": 1.1,
+    "ba-ria-vung-tau": 1.0,
+    "dong-nai": 0.95,
+    "binh-duong": 0.95,
+    "khac": 1.0
+  },
+  "bocTach": {
+    "tho": 0.6,
+    "hoanThien": 0.3,
+    "duPhong": 0.1
+  }
+}

@@ -1,5 +1,5 @@
 ---
-title: "Xây nhà trọn gói tại Đồng Tháp 2026: chi phí, chống lũ & nhà thầu"
+title: "Chi phí xây nhà tại Đồng Tháp 2026: chống lũ, chọn kiến trúc sư"
 slug: xay-nha-tron-goi-dong-thap
 category: khu-vuc
 description: "Chi phí xây nhà tại Đồng Tháp 2026: phần thô khoảng 4,2 triệu/m², trọn gói hoàn thiện 5–7 triệu/m². Lưu ý vùng trũng Đồng Tháp Mười ngập lũ, tôn nền cao, ép cọc, giấy phép và vai trò kiến trúc sư khu vực."
@@ -15,7 +15,7 @@ keywords:
   - thiết kế nhà đồng tháp
 ---
 
-# Xây nhà trọn gói tại Đồng Tháp 2026: chi phí, chống lũ & nhà thầu
+# Chi phí xây nhà tại Đồng Tháp 2026: chống lũ, chọn kiến trúc sư
 
 > **Nội dung chính**
 > - Chi phí xây nhà tại Đồng Tháp 2026: **phần thô khoảng 4,2 triệu/m²**, trọn gói hoàn thiện tiêu chuẩn khá **5–7 triệu/m²**.

@@ -1,5 +1,5 @@
 ---
-title: "Xây nhà trọn gói tại Vũng Tàu 2026: chi phí, chống mặn & nhà thầu"
+title: "Chi phí xây nhà tại Vũng Tàu 2026: chống mặn, chọn kiến trúc sư"
 slug: xay-nha-tron-goi-vung-tau
 category: khu-vuc
 description: "Chi phí xây nhà tại Bà Rịa - Vũng Tàu 2026: phần thô khoảng 4,5 triệu/m², trọn gói hoàn thiện 5,5–8 triệu/m². Lưu ý chống ăn mòn nhiễm mặn ven biển, nền cát, giấy phép và vai trò kiến trúc sư khu vực."
@@ -15,7 +15,7 @@ keywords:
   - thiết kế nhà bà rịa vũng tàu
 ---
 
-# Xây nhà trọn gói tại Vũng Tàu 2026: chi phí, chống mặn & nhà thầu
+# Chi phí xây nhà tại Vũng Tàu 2026: chống mặn, chọn kiến trúc sư
 
 > **Nội dung chính**
 > - Chi phí xây nhà tại Bà Rịa - Vũng Tàu 2026: **phần thô khoảng 4,5 triệu/m²**, trọn gói hoàn thiện tiêu chuẩn khá **5,5–8 triệu/m²**.

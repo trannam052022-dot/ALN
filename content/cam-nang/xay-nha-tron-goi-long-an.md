@@ -1,5 +1,5 @@
 ---
-title: "Xây nhà trọn gói tại Long An 2026: chi phí, nền đất & nhà thầu"
+title: "Chi phí xây nhà tại Long An 2026: nền đất, chọn kiến trúc sư"
 slug: xay-nha-tron-goi-long-an
 category: khu-vuc
 description: "Chi phí xây nhà tại Long An 2026: phần thô khoảng 4,3 triệu/m², trọn gói hoàn thiện 5–7,5 triệu/m². Lưu ý nền đất phèn yếu vùng Đức Hòa, Bến Lức, Cần Giuộc, giấy phép và vai trò kiến trúc sư khu vực."
@@ -15,7 +15,7 @@ keywords:
   - thiết kế nhà long an
 ---
 
-# Xây nhà trọn gói tại Long An 2026: chi phí, nền đất & nhà thầu
+# Chi phí xây nhà tại Long An 2026: nền đất, chọn kiến trúc sư
 
 > **Nội dung chính**
 > - Chi phí xây nhà tại Long An 2026: **phần thô khoảng 4,3 triệu/m²**, trọn gói hoàn thiện tiêu chuẩn khá **5–7,5 triệu/m²**.

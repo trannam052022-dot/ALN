@@ -1,5 +1,5 @@
 ---
-title: "Xây nhà trọn gói tại Đắk Nông 2026: chi phí, nền đất & nhà thầu"
+title: "Chi phí xây nhà tại Đắk Nông 2026: nền đất, chọn kiến trúc sư"
 slug: xay-nha-tron-goi-dak-nong
 category: khu-vuc
 description: "Chi phí xây nhà tại Đắk Nông 2026: phần thô khoảng 4,2 triệu/m², trọn gói hoàn thiện 5–7 triệu/m². Đất đỏ bazan đồi dốc mạnh quanh Gia Nghĩa, san nền taluy, giấy phép và vai trò kiến trúc sư khu vực."
@@ -15,7 +15,7 @@ keywords:
   - thiết kế nhà đắk nông
 ---
 
-# Xây nhà trọn gói tại Đắk Nông 2026: chi phí, nền đất & nhà thầu
+# Chi phí xây nhà tại Đắk Nông 2026: nền đất, chọn kiến trúc sư
 
 > **Nội dung chính**
 > - Chi phí xây nhà tại Đắk Nông 2026: **phần thô khoảng 4,2 triệu/m²**, trọn gói hoàn thiện tiêu chuẩn khá **5–7 triệu/m²**.
