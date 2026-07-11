@@ -1,0 +1,49 @@
+/* ═══════════════════════════════════════════════════════════
+   thiet-ke-nha.css — Style riêng cho trang dịch vụ thiết kế theo tỉnh
+   (thiet-ke-nha/{tinh}.html, SEO_BAN_GIAO.md Phase 3)
+   Dùng chung token/nav/footer/breadcrumb/prose từ cam-nang.css và khối
+   lead-form/trust từ mau-nha.css, chỉ thêm phần riêng: khối 4 bước C1-C4,
+   lưới link chéo tỉnh.
+   Import: <link rel="stylesheet" href="../cam-nang/cam-nang.css">
+           <link rel="stylesheet" href="../mau/mau-nha.css">
+           <link rel="stylesheet" href="thiet-ke-nha.css">
+═══════════════════════════════════════════════════════════ */
+
+.tk-hero{padding:56px 0 8px;text-align:center}
+.tk-hero h1{font-family:var(--serif);font-weight:400;font-size:36px;line-height:1.18;letter-spacing:-.01em;color:var(--text);margin-bottom:14px}
+.tk-hero h1 em{font-style:italic;font-weight:700;color:var(--gold2)}
+.tk-hero p{font-size:var(--text-md);color:var(--text2);max-width:600px;margin:0 auto;line-height:1.7}
+@media(max-width:640px){.tk-hero h1{font-size:26px}}
+
+.tk-body{max-width:760px;margin:0 auto;padding:0 24px}
+
+/* ── 4 bước đảm bảo (C1-C4) ── */
+.tk-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;margin:28px 0;box-shadow:var(--shadow-sm)}
+.tk-step{background:var(--bg2);padding:20px 16px}
+.tk-step .n{font-family:var(--serif);font-style:italic;font-weight:700;font-size:26px;color:var(--gold);line-height:1;margin-bottom:8px}
+.tk-step h5{font-family:var(--syne);font-weight:700;font-size:12.5px;color:var(--text);margin-bottom:6px}
+.tk-step p{font-size:11.5px;color:var(--sub);line-height:1.5;margin:0}
+@media(max-width:640px){.tk-steps{grid-template-columns:1fr 1fr}}
+
+/* ── Tool dự toán CTA giữa bài (nền navy, giống cn-cta-mid) ── */
+.tk-tool-cta{background:var(--navy);border-radius:var(--r);padding:26px 28px;margin:32px 0;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;box-shadow:var(--shadow-md)}
+.tk-tool-cta p{color:var(--on-navy);font-family:var(--syne);font-weight:700;font-size:var(--text-md);line-height:1.4;margin:0;flex:1;max-width:480px}
+@media(max-width:560px){.tk-tool-cta{flex-direction:column;align-items:flex-start;text-align:left}}
+
+/* ── Mẫu nhà gợi ý ── */
+.tk-mau-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0 8px}
+@media(max-width:640px){.tk-mau-grid{grid-template-columns:1fr}}
+
+/* ── Link chéo các tỉnh khác ── */
+.tk-related-tinh{padding:10px 0 20px}
+.tk-related-tinh h4{font-family:var(--syne);font-weight:700;font-size:var(--text-sm);color:var(--text);margin-bottom:12px;text-align:center}
+.tk-tinh-links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.tk-tinh-links a{padding:9px 18px;border-radius:99px;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-family:var(--syne);font-weight:700;font-size:12px;transition:all .2s}
+.tk-tinh-links a:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── Khối "Khu vực phục vụ" ở footer trang chủ ── */
+.foot-areas{border-top:1px solid var(--border);padding-top:18px;margin-top:18px}
+.foot-areas h5{font-family:var(--syne);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;font-weight:700}
+.foot-areas-links{display:flex;flex-wrap:wrap;gap:8px 16px}
+.foot-areas-links a{font-size:var(--text-sm);color:var(--sub)}
+.foot-areas-links a:hover{color:var(--gold)}
