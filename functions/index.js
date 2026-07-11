@@ -2082,3 +2082,7 @@ exports.onCnRegistered = ktsFunnel.onCnRegistered;
 /* ── Kho mẫu nhà (mau/*.html, SEO_BAN_GIAO.md Phase 1): CTA form ghi lead server-side,
    xem functions/mauLeads.js. Ghi vào collection leads/ chung với lead diễn đàn. ── */
 exports.submitMauLead = require("./mauLeads").submitMauLead;
+
+/* ── Tool "Dự toán xây nhà 60 giây" (du-toan/*.html, SEO_BAN_GIAO.md Phase 2):
+   CTA form ghi lead server-side, xem functions/duToanLeads.js. ── */
+exports.submitDuToanLead = require("./duToanLeads").submitDuToanLead;
