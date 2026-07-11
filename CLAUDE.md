@@ -215,6 +215,13 @@ Claude PHẢI HỎI trước khi:
 - Xoá dữ liệu Firestore
 - Thay đổi cấu trúc `firebase.json` / `firestore.indexes.json`
 
+**Ngoại lệ duy nhất cho "Xoá dữ liệu Firestore"** — được tự xoá KHÔNG cần hỏi trước CHỈ KHI thoả cả 3 điều kiện:
+1. Dữ liệu có dấu hiệu test rõ ràng (SĐT test, tên chứa "Test", hoặc field đánh dấu test).
+2. Do chính Claude tạo ra và xoá trong CÙNG một phiên làm việc liên tục (không xoá dữ liệu tạo ở phiên trước hoặc không rõ nguồn gốc).
+3. Luôn báo cáo lại ngay sau khi xoá (không được xoá âm thầm).
+
+Thiếu bất kỳ điều kiện nào ở trên, hoặc có bất kỳ nghi ngờ nào về việc dữ liệu có thể không phải do Claude tạo ra trong phiên hiện tại — vẫn PHẢI HỎI trước như quy định gốc.
+
 ## CÒN LẠI (cập nhật 04/07/2026)
 
 ### ✅ Đã xong (từng nằm trong danh sách này)
