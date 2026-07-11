@@ -456,7 +456,10 @@ exports.postToFacebook = onCall(
       throw new HttpsError("invalid-argument", "Thiếu nội dung bài");
     }
     const hasImg = imageUrl && typeof imageUrl === "string" && /^https:\/\//.test(imageUrl.trim());
-    const token = FB_PAGE_TOKEN.value();
+    // trim() vì secret nhập tay qua "firebase functions:secrets:set" có thể
+    // dính khoảng trắng/xuống dòng thừa lúc paste — FB báo "Cannot parse
+    // access token" dù token gốc đúng.
+    const token = (FB_PAGE_TOKEN.value() || "").trim();
     // Log AN TOÀN (chỉ độ dài, không log giá trị) — đối chiếu với log cùng
     // dạng ở postCamNangToFacebook khi cần so token 2 hàm có khớp không.
     console.log("[postToFacebook] FB_PAGE_TOKEN.length=" + (token ? token.length : 0));
@@ -539,7 +542,8 @@ exports.postCamNangToFacebook = onRequest(
       .filter(Boolean)
       .join("\n\n");
     const hasImg = typeof imageUrl === "string" && /^https:\/\//.test(imageUrl.trim());
-    const token = FB_PAGE_TOKEN.value();
+    // trim() cùng lý do với postToFacebook — secret paste tay có thể dính ký tự thừa.
+    const token = (FB_PAGE_TOKEN.value() || "").trim();
     // Log AN TOÀN (chỉ độ dài, không log giá trị) — so với log cùng dạng ở
     // postToFacebook (đăng tay, đang chạy được) để biết 2 hàm có đang dùng
     // đúng CÙNG version FB_PAGE_TOKEN hay không (Secret Manager pin theo
