@@ -1,20 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /founder_panel.html
-Disallow: /founder_forum.html
-Disallow: /founder_kts_creator_draft.html
-Disallow: /kts_dashboard.html
-Disallow: /designer_dashboard.html
-Disallow: /ks_dashboard.html
-Disallow: /client_CN.html
-Disallow: /client_DN.html
-Disallow: /seed.html
-Disallow: /login.html
-Disallow: /board-editor.html
-Disallow: /kts_landing_draft.html
-Disallow: /ALN_MatranKy_KhungBV.html
-Disallow: /_archive/
-Disallow: /test/
-Disallow: /scripts/
 
 Sitemap: https://applamnha.vn/sitemap.xml
