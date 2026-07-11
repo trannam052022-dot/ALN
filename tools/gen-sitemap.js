@@ -4,11 +4,18 @@
  *
  * Cách chạy (từ gốc repo):  node tools/gen-sitemap.js
  *
+ * NGUYÊN TẮC (whitelist nghiêm ngặt): sitemap CHỈ chứa trang public muốn Google
+ * xếp hạng tìm kiếm — KHÔNG phải mọi trang crawl được. Trang chỉ phục vụ 1 luồng
+ * cụ thể (đăng ký, form nội bộ, landing quảng cáo trả phí) KHÔNG được liệt ở đây
+ * dù không bị chặn trong robots.txt. Mọi trang bị Disallow trong robots.txt chắc
+ * chắn không được thêm vào STATIC_PAGES/SCAN_DIRS bên dưới.
+ *
  * Nguồn URL:
- *  1. STATIC_PAGES — danh sách trang tĩnh cố định (sửa tay khi thêm trang lẻ).
- *  2. Quét thư mục cam-nang/  — mỗi bài là 1 thư mục con chứa index.html.
- *  3. Quét thư mục mau/       — trang mẫu nhà tự sinh (Trụ 1), file *.html.
- *  4. Quét thư mục du-toan/   — tool dự toán + biến thể tỉnh (Trụ 2), file *.html.
+ *  1. STATIC_PAGES — danh sách trang tĩnh cố định đã DUYỆT (sửa tay khi thêm trang
+ *     lẻ — chỉ thêm trang thật sự muốn organic search tìm thấy).
+ *  2. Quét thư mục cam-nang/     — nội dung SEO (mỗi bài 1 thư mục con index.html).
+ *  3. Quét thư mục mau/          — trang mẫu nhà tự sinh (Trụ 1), file *.html.
+ *  4. Quét thư mục du-toan/      — tool dự toán + biến thể tỉnh (Trụ 2), file *.html.
  *  5. Quét thư mục thiet-ke-nha/ — trang dịch vụ theo tỉnh (Trụ 3), file *.html.
  *
  * lastmod lấy từ git (ngày commit cuối của file); nếu không có git thì bỏ qua.
@@ -22,21 +29,13 @@ const { execSync } = require('child_process');
 const BASE_URL = 'https://applamnha.vn';
 const ROOT = path.join(__dirname, '..');
 
-// [đường dẫn, changefreq, priority]
+// Trang tĩnh đã DUYỆT cho sitemap — whitelist, KHÔNG quét toàn bộ *.html ở gốc repo.
+// { file: đường dẫn kiểm tra tồn tại, url: URL tương đối (rỗng = trang chủ '/') }
 const STATIC_PAGES = [
-  ['home.html', 'weekly', '1.0'],
-  ['forum.html', 'daily', '0.9'],
-  ['register.html', 'monthly', '0.6'],
-  ['kts-apply.html', 'monthly', '0.5'],
-  ['dn-studio.html', 'monthly', '0.5'],
-  ['designer-apply.html', 'monthly', '0.5'],
-  ['ks-apply.html', 'monthly', '0.5'],
-  ['recruit.html', 'monthly', '0.6'],
-  ['tuyen-kts.html', 'monthly', '0.6'],
-  ['aln-giu-cho/phong-cho.html', 'monthly', '0.5'],
-  ['aln-giu-cho/giu-cho.html', 'monthly', '0.5'],
-  ['privacy.html', 'yearly', '0.3'],
-  ['cam-nang/', 'weekly', '0.9'],
+  { file: 'index.html', url: '', cf: 'weekly', pr: '1.0' },       // trang chủ (root — GitHub Pages trả về index.html)
+  { file: 'recruit.html', url: 'recruit.html', cf: 'monthly', pr: '0.6' },
+  { file: 'forum.html', url: 'forum.html', cf: 'daily', pr: '0.8' },
+  { file: 'cam-nang/index.html', url: 'cam-nang/', cf: 'weekly', pr: '0.9' },
 ];
 
 // [thư mục, kiểu quét, changefreq, priority]
@@ -77,14 +76,14 @@ function push(loc, cf, pr, lastmod) {
   entries.push(urlEntry(loc, cf, pr, lastmod));
 }
 
-// 1. Trang tĩnh cố định
-for (const [p, cf, pr] of STATIC_PAGES) {
-  const abs = path.join(ROOT, p.endsWith('/') ? p + 'index.html' : p);
+// 1. Trang tĩnh đã duyệt
+for (const { file, url, cf, pr } of STATIC_PAGES) {
+  const abs = path.join(ROOT, file);
   if (!fs.existsSync(abs)) {
-    console.warn('  [bỏ qua] không thấy file: ' + p);
+    console.warn('  [bỏ qua] không thấy file: ' + file);
     continue;
   }
-  push(BASE_URL + '/' + p, cf, pr, null);
+  push(BASE_URL + '/' + url, cf, pr, gitLastmod(file));
 }
 
 // 2. Quét thư mục
