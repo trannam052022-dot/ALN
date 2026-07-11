@@ -1814,7 +1814,7 @@ function hoiKtsBank() {
       ans:[
         {k:KP.thinh, d:D[0], h:8, best:true, t:"Câu hỏi triệu đô 😄 Kinh nghiệm gọn: (1) Có hồ sơ thiết kế + dự toán khối lượng RÕ trước khi ký nhà thầu — 80% phát sinh đến từ bản vẽ mù mờ; (2) Chốt vật liệu (gạch, thiết bị vệ sinh, cửa...) theo bảng cụ thể, đừng 'để sau tính'; (3) Đừng đổi ý giữa chừng — mỗi lần đổi là tiền; (4) Dự phòng sẵn 10–15%. Làm được 4 điều này thì nhà anh gần như không bất ngờ về tiền."},
         {k:KP.son, d:D[1], h:4, t:"Chí lý. Em thêm: hợp đồng nhà thầu phải ghi rõ hạng mục nào có, hạng mục nào chưa (thường thiếu: đổ xà bần, điện nước hoàn thiện, chống thấm...). Đọc kỹ phần 'ngoài hợp đồng' kẻo dính."},
-        {k:KP.nhan, d:D[3], h:3, t:"Và nên giữ lại một phần thanh toán cuối gắn với nghiệm thu — đây đúng tinh thần cách ALN giữ tiền theo giai đoạn để bảo vệ chủ nhà."},
+        {k:KP.nhan, d:D[3], h:3, t:"Và nên giữ lại một phần thanh toán cuối gắn với nghiệm thu — đây đúng tinh thần Quy trình 4 bước đảm bảo của ALN, thanh toán theo từng giai đoạn để bảo vệ chủ nhà."},
       ] },
     { asker:"Chị Diệu · Củ Chi", qh:3, title:"Đất hẻm nhỏ xe ba gác vào không lọt, xây có bị đội giá không?",
       q:"Đất nhà em trong hẻm 2m, xe tải không vào được. Em lo chi phí vận chuyển vật tư đội lên nhiều. Thực tế thế nào ạ?",
