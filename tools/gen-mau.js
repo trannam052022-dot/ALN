@@ -108,12 +108,11 @@ function faqFor(m) {
   ];
 }
 
-function jsonLdProduct(m, canonical, ogImage) {
-  return JSON.stringify({
+function jsonLdProduct(m, canonical) {
+  const obj = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: m.ten,
-    image: ogImage,
     description: metaDescription(m),
     sku: m.id,
     offers: {
@@ -123,7 +122,11 @@ function jsonLdProduct(m, canonical, ogImage) {
       price: m.giaBanMau,
       availability: 'https://schema.org/InStock',
     },
-  }, null, 2);
+  };
+  // CHỈ gắn "image" khi mẫu có ảnh thật (m.anh[0]) — TUYỆT ĐỐI không mượn ảnh
+  // của mẫu khác làm ảnh đại diện (sai sản phẩm, vi phạm chuẩn Product schema).
+  if (Array.isArray(m.anh) && m.anh[0]) obj.image = m.anh[0];
+  return JSON.stringify(obj, null, 2);
 }
 function jsonLdFaq(m) {
   return JSON.stringify({
@@ -154,7 +157,10 @@ function renderMauPage(template, m, all) {
   const canonical = BASE_URL + '/mau/' + m.slug + '.html';
   const title = buildTitle(m);
   const description = metaDescription(m);
-  const ogImage = BASE_URL + '/assets/demo/aln-demo-biet-thu-vuon.jpg'; // fallback tạm — thay khi có ảnh thật từng mẫu
+  // Ảnh đại diện (og:image): dùng ảnh thật của CHÍNH mẫu này nếu có; nếu chưa
+  // có, dùng logo thương hiệu trung tính (icon-512.png) — TUYỆT ĐỐI không
+  // mượn ảnh của mẫu khác (sai sản phẩm khi chia sẻ lên mạng xã hội).
+  const ogImage = (Array.isArray(m.anh) && m.anh[0]) ? m.anh[0] : (BASE_URL + '/icon-512.png');
   const related = pickRelated(all, m, 4);
 
   const map = {
@@ -162,7 +168,7 @@ function renderMauPage(template, m, all) {
     DESCRIPTION: escHtml(description),
     CANONICAL: canonical,
     OG_IMAGE: ogImage,
-    JSONLD_PRODUCT: jsonLdProduct(m, canonical, ogImage),
+    JSONLD_PRODUCT: jsonLdProduct(m, canonical),
     JSONLD_FAQ: jsonLdFaq(m),
     LOAI_SLUG: m.loai,
     LOAI_LABEL: LOAI_LABEL[m.loai],
