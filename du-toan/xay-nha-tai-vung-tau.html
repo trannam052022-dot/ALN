@@ -140,7 +140,7 @@
         <h3>Diện tích sàn ước tính?</h3>
         <div class="dt-slider-wrap">
           <input type="range" id="dtAreaSlider" min="50" max="500" step="10" value="150">
-          <div class="dt-slider-val"><span id="dtAreaVal">150</span> m²</div>
+          <div class="dt-slider-val"><input type="number" id="dtAreaInput" min="10" max="2000" step="1" value="150" inputmode="numeric"> m²</div>
           <div class="dt-slider-marks"><span>50 m²</span><span>500 m²</span></div>
         </div>
         <div class="dt-actions">
@@ -323,11 +323,22 @@ function dtGoStep(n) {
 })();
 
 var dtSlider = document.getElementById('dtAreaSlider');
-var dtSliderVal = document.getElementById('dtAreaVal');
+var dtAreaInput = document.getElementById('dtAreaInput');
 if (dtSlider) {
   dtSlider.addEventListener('input', function () {
-    dtSliderVal.textContent = dtSlider.value;
+    dtAreaInput.value = dtSlider.value;
     state.dienTich = Number(dtSlider.value);
+  });
+}
+if (dtAreaInput) {
+  /* Cho phép gõ diện tích chính xác thay vì chỉ kéo thanh trượt — đồng bộ
+     ngược sang slider (kẹp trong 50-500 vì đó là khoảng slider thể hiện
+     được, nhưng state.dienTich vẫn giữ đúng số khách gõ, không bị kẹp). */
+  dtAreaInput.addEventListener('input', function () {
+    var v = Number(dtAreaInput.value);
+    if (!isFinite(v) || v <= 0) return;
+    state.dienTich = v;
+    dtSlider.value = Math.max(50, Math.min(500, v));
   });
 }
 
@@ -401,7 +412,7 @@ document.getElementById('dtRestart').addEventListener('click', function () {
   state.mucHoanThien = null; state.tinh = PRESELECT_TINH || null;
   var choices = document.querySelectorAll('.dt-choice.on');
   for (var i = 0; i < choices.length; i++) choices[i].classList.remove('on');
-  if (dtSlider) { dtSlider.value = 150; dtSliderVal.textContent = '150'; }
+  if (dtSlider) { dtSlider.value = 150; dtAreaInput.value = 150; }
   if (dtTinhSelect) dtTinhSelect.value = PRESELECT_TINH || '';
   document.getElementById('dtResult').classList.remove('show');
   document.getElementById('dtLead').classList.remove('show');
