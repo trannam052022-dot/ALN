@@ -932,6 +932,7 @@ body {
     <button class="fsub" id="tabPricing"  onclick="switchTab('pricing')" ><i class="ph-duotone ph-tag"></i>Khung giá</button>
     <button class="fsub" id="tabKhomau"  onclick="switchTab('khomau')" ><i class="ph-duotone ph-house-line"></i>Kho mẫu</button>
     <button class="fsub" id="tabMkt"  onclick="switchTab('mkt')" ><i class="ph-duotone ph-magic-wand"></i>Trợ lý Marketing</button>
+    <button class="fsub" id="tabSeo"  onclick="switchTab('seo')" ><i class="ph-duotone ph-chart-line-up"></i>SEO &amp; Analytics</button>
     <button class="fsub" id="tabHoikien" onclick="switchTab('hoikien')"><i class="ph-duotone ph-video-camera"></i>Hội Kiến<span id="hoikienBadge" style="display:none;background:#ef4444;color:#fff;border-radius:99px;font-size:9px;padding:1px 5px;margin-left:2px;font-weight:800">0</span></button>
     <a href="founder_forum.html" class="fsub" style="text-decoration:none"><i class="ph-duotone ph-chats-circle"></i>Quản trị Diễn đàn</a>
     <a href="aln_community.html" class="fsub" style="text-decoration:none"><i class="ph-duotone ph-campfire"></i>Nhịp sống</a>
@@ -2094,6 +2095,32 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- ══ PANEL: KHO HỒ SƠ MẪU (GÓI KINH TẾ) ══ -->
+<!-- ══ SEO & ANALYTICS — Search Console + GA4 (Cloud Function seoReportNow) ══ -->
+<div id="panelSeo" style="display:none;flex-direction:column;flex:1;overflow-y:auto;padding:24px 28px">
+  <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px">VẬN HÀNH · SEO &amp; ANALYTICS</div>
+  <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1);margin-bottom:6px">Theo dõi ALN trên Google</div>
+  <div style="font-size:13px;color:var(--sub);margin-bottom:18px;max-width:80ch">Số liệu 7 ngày gần nhất: Search Console (ALN <b>hiện ra</b> trên Google ở vị trí nào, từ khóa gì) + Google Analytics (khách <b>thực sự vào</b> trang nào). Vị trí trung bình <b style="color:var(--green)">≤ 10 = trang đầu</b>. Cron 08:30 mỗi sáng tự lưu lịch sử và đẩy thông báo.</div>
+
+  <!-- Cấu hình -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:18px">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:1;min-width:220px">
+        <label style="display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">URL site trong Search Console</label>
+        <input id="seoCfgSite" placeholder="https://applamnha.vn/" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:13px">
+      </div>
+      <div style="flex:1;min-width:180px">
+        <label style="display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">GA4 Property ID (số, xem Admin → Property details)</label>
+        <input id="seoCfgGa4" placeholder="VD: 456789123" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-size:13px">
+      </div>
+      <button class="fsub" onclick="seoSaveConfig()" style="padding:9px 16px"><i class="ph-duotone ph-floppy-disk"></i> Lưu cấu hình</button>
+      <button class="fsub" id="seoRefreshBtn" onclick="seoRefresh()" style="padding:9px 16px;background:var(--gold);color:#fff;border-color:transparent"><i class="ph-duotone ph-arrows-clockwise"></i> Cập nhật số liệu</button>
+    </div>
+    <div id="seoCfgStatus" style="font-size:12px;color:var(--sub);margin-top:8px"></div>
+  </div>
+
+  <div id="seoContent"><div style="font-size:13px;color:var(--sub)">Đang tải…</div></div>
+</div>
+
 <div id="panelKhomau" style="display:none;flex-direction:column;flex:1;overflow-y:auto;padding:24px 28px">
   <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px">VẬN HÀNH · KHO MẪU</div>
   <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1);margin-bottom:6px">Kho hồ sơ mẫu — gói kinh tế</div>
@@ -3084,7 +3111,7 @@ window.ALNRealtime = (() => {
 ══════════════════════════════════════════ */
 
 function switchTab(t){
-  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','pending','payments','report','leads','recruit','company','pricing','khomau','mkt','hoikien','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
+  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','pending','payments','report','leads','recruit','company','pricing','khomau','mkt','seo','hoikien','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
   var activeStyle  = 'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.15);color:var(--blue);white-space:nowrap';
   var inactiveStyle= 'padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:var(--raised);color:var(--sub);white-space:nowrap';
   var liveStyles = {
@@ -3132,6 +3159,7 @@ function switchTab(t){
   if(t==='pricing')  initPricingPanel();
   if(t==='khomau')   initKhomauPanel();
   if(t==='mkt')      initMktDrafts();
+  if(t==='seo')      { if(typeof window.initSeoPanel==='function') window.initSeoPanel(); }
   if(t==='hoikien')  { if(typeof window.hkFounderRender==='function') window.hkFounderRender(); }
   if(t==='waitRoom') loadWaitRoom();
   if(t==='matching')   loadMatchingPanel();
@@ -7321,6 +7349,250 @@ window.exportProjectsCSV = async function() {
     a.click(); URL.revokeObjectURL(url);
   } catch(e) { alert('Export lỗi: ' + e.message); }
 };
+</script>
+
+<script>
+/* ══════════════════════════════════════════
+   SEO & ANALYTICS — Cloud Function seoReportNow (functions/seoAnalytics.js)
+   Kéo Search Console + GA4 qua callable (Admin SDK phía server, không cần mở
+   rules cho collection seoReports). Cấu hình lưu settings/seoReport.
+══════════════════════════════════════════ */
+(function(){
+  var _seoFn = null;
+  var _seoLoaded = false;
+
+  async function seoGetFn(){
+    if(_seoFn) return _seoFn;
+    var mod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
+    var fns = mod.getFunctions(app, 'asia-southeast1');
+    _seoFn = mod.httpsCallable(fns, 'seoReportNow');
+    return _seoFn;
+  }
+
+  function esc(s){
+    return String(s === undefined || s === null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function posColor(p){
+    if(!p) return 'var(--dim)';
+    if(p <= 10) return 'var(--green)';
+    if(p <= 20) return 'var(--amber)';
+    return 'var(--sub)';
+  }
+  function shortPath(u){
+    var s = String(u || '').replace(/^https?:\/\/[^/]+/, '');
+    return s === '' ? '/' : s;
+  }
+
+  function tile(label, value, sub, color){
+    return '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;flex:1;min-width:140px">' +
+      '<div style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">' + label + '</div>' +
+      '<div style="font-family:var(--mono);font-size:24px;font-weight:700;color:' + (color || 'var(--text1)') + '">' + value + '</div>' +
+      (sub ? '<div style="font-size:11px;color:var(--sub);margin-top:4px">' + sub + '</div>' : '') +
+      '</div>';
+  }
+
+  function gscTable(title, rows, keyHeader, isPage){
+    var h = '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px">' +
+      '<div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:10px">' + title + '</div>';
+    if(!rows || !rows.length){
+      return h + '<div style="font-size:12px;color:var(--sub)">Chưa có dữ liệu trong 7 ngày qua.</div></div>';
+    }
+    h += '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
+      '<thead><tr>' +
+      '<th style="text-align:left;color:var(--dim);font-weight:600;padding:4px 6px">' + keyHeader + '</th>' +
+      '<th style="text-align:right;color:var(--dim);font-weight:600;padding:4px 6px">Nhấp</th>' +
+      '<th style="text-align:right;color:var(--dim);font-weight:600;padding:4px 6px">Hiển thị</th>' +
+      '<th style="text-align:right;color:var(--dim);font-weight:600;padding:4px 6px">Vị trí</th>' +
+      '</tr></thead><tbody>';
+    rows.forEach(function(r){
+      var key = isPage ? shortPath(r.key) : r.key;
+      h += '<tr style="border-top:1px solid var(--border)">' +
+        '<td style="padding:6px;color:var(--text1);max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + esc(r.key) + '">' + esc(key) + '</td>' +
+        '<td style="padding:6px;text-align:right;color:var(--text1)">' + r.clicks + '</td>' +
+        '<td style="padding:6px;text-align:right;color:var(--sub)">' + r.impressions + '</td>' +
+        '<td style="padding:6px;text-align:right;font-weight:700;color:' + posColor(r.position) + '">' + r.position + '</td>' +
+        '</tr>';
+    });
+    return h + '</tbody></table></div>';
+  }
+
+  function ga4Table(rows){
+    var h = '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px">' +
+      '<div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:10px">Khách vào trang nào (GA4, 7 ngày)</div>';
+    if(!rows || !rows.length){
+      return h + '<div style="font-size:12px;color:var(--sub)">Chưa có dữ liệu — GA4 mới gắn thì cần vài ngày tích luỹ.</div></div>';
+    }
+    h += '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
+      '<thead><tr>' +
+      '<th style="text-align:left;color:var(--dim);font-weight:600;padding:4px 6px">Trang</th>' +
+      '<th style="text-align:right;color:var(--dim);font-weight:600;padding:4px 6px">Lượt xem</th>' +
+      '<th style="text-align:right;color:var(--dim);font-weight:600;padding:4px 6px">Khách</th>' +
+      '</tr></thead><tbody>';
+    rows.forEach(function(r){
+      h += '<tr style="border-top:1px solid var(--border)">' +
+        '<td style="padding:6px;color:var(--text1);max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + esc(r.path) + '">' + esc(r.path) + '</td>' +
+        '<td style="padding:6px;text-align:right;color:var(--text1)">' + r.pageViews + '</td>' +
+        '<td style="padding:6px;text-align:right;color:var(--sub)">' + r.activeUsers + '</td>' +
+        '</tr>';
+    });
+    return h + '</tbody></table></div>';
+  }
+
+  function historyTable(reports){
+    var h = '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px">' +
+      '<div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:10px">Xu hướng theo ngày (cron 08:30 tự lưu)</div>';
+    if(!reports || !reports.length){
+      return h + '<div style="font-size:12px;color:var(--sub)">Chưa có lịch sử — sẽ tự tích luỹ mỗi sáng, hoặc bấm "Cập nhật số liệu".</div></div>';
+    }
+    h += '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
+      '<thead><tr>' +
+      '<th style="text-align:left;color:var(--dim);font-weight:600;padding:4px 6px">Ngày</th>' +
+      '<th style="text-align:right;color:var(--dim);font-weight:600;padding:4px 6px">Nhấp</th>' +
+      '<th style="text-align:right;color:var(--dim);font-weight:600;padding:4px 6px">Hiển thị</th>' +
+      '<th style="text-align:right;color:var(--dim);font-weight:600;padding:4px 6px">Vị trí TB</th>' +
+      '<th style="text-align:right;color:var(--dim);font-weight:600;padding:4px 6px">Khách web</th>' +
+      '</tr></thead><tbody>';
+    reports.forEach(function(r){
+      var g = r.gsc && r.gsc.ok ? r.gsc.totals : null;
+      var a = r.ga4 && r.ga4.ok ? r.ga4.totals : null;
+      h += '<tr style="border-top:1px solid var(--border)">' +
+        '<td style="padding:6px;color:var(--text1)">' + esc(r.date) + '</td>' +
+        '<td style="padding:6px;text-align:right;color:var(--text1)">' + (g ? g.clicks : '—') + '</td>' +
+        '<td style="padding:6px;text-align:right;color:var(--sub)">' + (g ? g.impressions : '—') + '</td>' +
+        '<td style="padding:6px;text-align:right;font-weight:700;color:' + posColor(g ? g.position : 0) + '">' + (g ? g.position : '—') + '</td>' +
+        '<td style="padding:6px;text-align:right;color:var(--sub)">' + (a ? a.activeUsers : '—') + '</td>' +
+        '</tr>';
+    });
+    return h + '</tbody></table></div>';
+  }
+
+  function setupGuide(){
+    return '<div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:16px 18px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.7">' +
+      '<b style="color:var(--amber)">Cần cấp quyền 1 lần (5 phút) rồi số liệu tự chảy về:</b><br>' +
+      '1. Bật 2 API cho project <b>aln-platform</b>: <a href="https://console.cloud.google.com/apis/library/searchconsole.googleapis.com?project=aln-platform" target="_blank" rel="noopener" style="color:var(--gold)">Search Console API</a> và <a href="https://console.cloud.google.com/apis/library/analyticsdata.googleapis.com?project=aln-platform" target="_blank" rel="noopener" style="color:var(--gold)">Analytics Data API</a> (bấm Enable).<br>' +
+      '2. Search Console → Cài đặt → Người dùng và quyền → Thêm <b style="font-family:var(--mono);font-size:11px">aln-platform@appspot.gserviceaccount.com</b> (quyền Đầy đủ).<br>' +
+      '3. GA4 → Quản trị → Quản lý quyền truy cập tài sản → Thêm cùng email đó (vai trò Người xem).<br>' +
+      '4. Điền cấu hình ở trên (URL site đúng như trong Search Console; GA4 Property ID là dãy số ở Quản trị → Chi tiết tài sản) → Lưu → Cập nhật số liệu.' +
+      '</div>';
+  }
+
+  function renderSeo(snapshot, reports){
+    var box = document.getElementById('seoContent');
+    if(!box) return;
+    var h = '';
+    var needSetup = !snapshot || (snapshot.gsc && !snapshot.gsc.ok) || (snapshot.ga4 && !snapshot.ga4.ok);
+    if(needSetup) h += setupGuide();
+
+    if(snapshot && snapshot.gsc && !snapshot.gsc.ok){
+      h += '<div style="background:var(--red-bg,rgba(239,68,68,.08));border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#ef4444">' + esc(snapshot.gsc.error) + '</div>';
+    }
+    if(snapshot && snapshot.ga4 && !snapshot.ga4.ok){
+      h += '<div style="background:var(--red-bg,rgba(239,68,68,.08));border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#ef4444">' + esc(snapshot.ga4.error) + '</div>';
+    }
+
+    if(snapshot && snapshot.gsc && snapshot.gsc.ok){
+      var t = snapshot.gsc.totals;
+      var posLabel = t.position && t.position <= 10 ? 'TRANG ĐẦU' : (t.position ? 'trang ~' + Math.ceil(t.position / 10) : '—');
+      h += '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px">' +
+        tile('Lượt nhấp (Google)', t.clicks, 'CTR ' + t.ctr + '%') +
+        tile('Lượt hiển thị', t.impressions, snapshot.gsc.range.startDate + ' → ' + snapshot.gsc.range.endDate) +
+        tile('Vị trí trung bình', t.position || '—', posLabel, posColor(t.position)) +
+        (snapshot.ga4 && snapshot.ga4.ok
+          ? tile('Khách vào web (GA4)', snapshot.ga4.totals.activeUsers, snapshot.ga4.totals.pageViews + ' lượt xem trang')
+          : '') +
+        '</div>';
+      h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:16px">' +
+        gscTable('Từ khóa khách tìm thấy ALN', snapshot.gsc.queries, 'Từ khóa', false) +
+        gscTable('Trang được hiện trên Google', snapshot.gsc.pages, 'Trang', true) +
+        '</div>';
+    } else if(snapshot && snapshot.ga4 && snapshot.ga4.ok){
+      h += '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px">' +
+        tile('Khách vào web (GA4)', snapshot.ga4.totals.activeUsers, snapshot.ga4.totals.pageViews + ' lượt xem trang') +
+        '</div>';
+    }
+
+    if(snapshot && snapshot.ga4 && snapshot.ga4.ok){
+      h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:16px">' +
+        ga4Table(snapshot.ga4.pages) +
+        historyTable(reports) +
+        '</div>';
+    } else {
+      h += '<div style="margin-bottom:16px">' + historyTable(reports) + '</div>';
+    }
+
+    box.innerHTML = h;
+  }
+
+  async function seoLoadConfig(){
+    try {
+      var fs = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      var db2 = fs.getFirestore(app);
+      var snap = await fs.getDoc(fs.doc(db2, 'settings', 'seoReport'));
+      var cfg = snap.exists() ? snap.data() : {};
+      var elSite = document.getElementById('seoCfgSite');
+      var elGa4 = document.getElementById('seoCfgGa4');
+      if(elSite && !elSite.value) elSite.value = cfg.gscSiteUrl || 'https://applamnha.vn/';
+      if(elGa4 && !elGa4.value) elGa4.value = cfg.ga4PropertyId || '';
+    } catch(e){ console.error('[seo] load config', e); }
+  }
+
+  window.seoSaveConfig = async function(){
+    var st = document.getElementById('seoCfgStatus');
+    try {
+      var fs = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      var db2 = fs.getFirestore(app);
+      await fs.setDoc(fs.doc(db2, 'settings', 'seoReport'), {
+        gscSiteUrl: document.getElementById('seoCfgSite').value.trim(),
+        ga4PropertyId: document.getElementById('seoCfgGa4').value.trim(),
+        updatedAt: fs.serverTimestamp()
+      }, { merge: true });
+      if(st) st.textContent = 'Đã lưu cấu hình. Bấm "Cập nhật số liệu" để kéo số liệu mới.';
+    } catch(e){
+      if(st) st.textContent = 'Lỗi lưu: ' + (e.message || e);
+    }
+  };
+
+  window.seoRefresh = async function(){
+    var btn = document.getElementById('seoRefreshBtn');
+    var st = document.getElementById('seoCfgStatus');
+    if(btn){ btn.disabled = true; btn.style.opacity = '.6'; }
+    if(st) st.textContent = 'Đang kéo số liệu từ Google (5-10 giây)…';
+    try {
+      var fn = await seoGetFn();
+      var res = await fn({ action: 'refresh' });
+      var data = res.data || {};
+      if(data.notConfigured){
+        if(st) st.textContent = 'Chưa có cấu hình — điền URL site / GA4 Property ID rồi bấm Lưu trước.';
+        renderSeo(null, []);
+      } else {
+        var hist = await fn({ action: 'history' });
+        renderSeo(data.snapshot, (hist.data && hist.data.reports) || []);
+        if(st) st.textContent = 'Đã cập nhật lúc ' + new Date().toLocaleTimeString('vi-VN') + '.';
+      }
+    } catch(e){
+      if(st) st.textContent = 'Lỗi: ' + (e.message || e);
+    }
+    if(btn){ btn.disabled = false; btn.style.opacity = '1'; }
+  };
+
+  window.initSeoPanel = async function(){
+    await seoLoadConfig();
+    if(_seoLoaded) return;
+    _seoLoaded = true;
+    try {
+      var fn = await seoGetFn();
+      var hist = await fn({ action: 'history' });
+      var reports = (hist.data && hist.data.reports) || [];
+      renderSeo(reports.length ? reports[0] : null, reports);
+      var st = document.getElementById('seoCfgStatus');
+      if(st && reports.length) st.textContent = 'Đang xem báo cáo đã lưu ngày ' + reports[0].date + ' — bấm "Cập nhật số liệu" để lấy mới nhất.';
+    } catch(e){
+      console.error('[seo] init', e);
+      renderSeo(null, []);
+    }
+  };
+})();
 </script>
 
 <!-- ══ PHÒNG HỘI KIẾN — nút vàng nổi (trên nút Giám sát push) ══ -->

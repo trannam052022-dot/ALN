@@ -161,3 +161,35 @@ Pages mặc định). Nếu sau này đổi sang domain khác, báo Claude Code 
 nhật lại toàn bộ URL trong `robots.txt`, `sitemap.xml`, thẻ `canonical` và
 `og:url` trên tất cả các trang — đây là việc Claude Code làm được, không
 cần làm tay.
+
+## 9. Báo cáo SEO tự động trong Founder Panel (cấp quyền 1 lần — 5 phút)
+
+Tab **Vận hành → SEO & Analytics** trong founder_panel kéo số liệu Search
+Console (vị trí, hiển thị, nhấp) + Google Analytics (khách vào trang nào)
+về một chỗ, và cron `seoDailyReport` 08:30 mỗi sáng tự lưu lịch sử + đẩy
+thông báo. Trước khi có số liệu, cần cấp quyền cho service account của
+Firebase — làm đúng 4 bước, mỗi bước 1 phút:
+
+### Bước 1 — Bật 2 API (đăng nhập trannam052022@gmail.com)
+- Mở https://console.cloud.google.com/apis/library/searchconsole.googleapis.com?project=aln-platform → bấm **Enable**.
+- Mở https://console.cloud.google.com/apis/library/analyticsdata.googleapis.com?project=aln-platform → bấm **Enable**.
+
+### Bước 2 — Cấp quyền Search Console
+- Vào https://search.google.com/search-console → chọn property applamnha.vn
+- **Cài đặt (Settings) → Người dùng và quyền (Users and permissions) → Thêm người dùng**
+- Email: `aln-platform@appspot.gserviceaccount.com` — quyền **Đầy đủ (Full)**.
+
+### Bước 3 — Cấp quyền GA4
+- Vào https://analytics.google.com → **Quản trị (Admin) → Quản lý quyền truy cập tài sản (Property access management)**
+- Thêm cùng email trên, vai trò **Người xem (Viewer)**.
+- Nhân tiện copy **Property ID**: Quản trị → Chi tiết tài sản (Property details) → dãy số ở góc phải (VD `456789123`).
+
+### Bước 4 — Điền cấu hình trong Founder Panel
+- Mở founder_panel → **Vận hành → SEO & Analytics**.
+- URL site: điền đúng như dạng property trong Search Console
+  (URL-prefix: `https://applamnha.vn/` — hoặc nếu là Domain property thì `sc-domain:applamnha.vn`).
+- GA4 Property ID: dãy số vừa copy → **Lưu cấu hình** → **Cập nhật số liệu**.
+
+Sau đó không phải làm gì nữa: mỗi sáng 08:30 hệ thống tự kéo số liệu, lưu
+vào `seoReports/{ngày}` để vẽ xu hướng vị trí theo thời gian, và đẩy push
+"SEO & Analytics sáng nay" cho Founder. Vị trí trung bình **≤ 10 = trang đầu**.

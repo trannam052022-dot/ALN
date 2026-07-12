@@ -97,6 +97,7 @@ Khi CN duyệt proposal: `projects/{pid}.stage` tự advance C1→C2→C3→C4, 
 | Function | Lịch | Tác dụng |
 |----------|------|---------|
 | `dailyDigest` | 08:00 | Tổng hợp cho Founder: lead mới/quá hạn + đơn KTS/DN/Designer chờ duyệt |
+| `seoDailyReport` | 08:30 | Kéo Search Console + GA4 (`functions/seoAnalytics.js`) → lưu `seoReports/{date}` + push Founder. Config `settings/seoReport`; panel đọc qua callable `seoReportNow` (không cần mở rules). Cấp quyền: docs/SEO_VIEC_TAY.md mục 9 |
 | `reservationLifecycle` | 09:00 | Giữ chỗ ≤48h chưa nộp → nhắc (tối đa 3 lần); quá 3 ngày → `expired` + báo Founder |
 | `projectSlaNudge` | 09:10 | Dự án/designProjects đứng bánh >5 ngày (`SLA_STALL_DAYS`, theo `updatedAt`) → cờ `sla_warn` + nhắc KTS/Designer + báo Founder; tự gỡ cờ khi chạy lại |
 | `weeklyMarketingDrafts` | Thứ 2 07:00 | AI soạn bài Marketing tuần |

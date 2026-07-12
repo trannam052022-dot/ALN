@@ -2181,3 +2181,35 @@ exports.submitDuToanLead = require("./duToanLeads").submitDuToanLead;
 /* ── Trang dịch vụ thiết kế theo tỉnh (thiet-ke-nha/*.html, SEO_BAN_GIAO.md
    Phase 3): CTA form ghi lead server-side, xem functions/localLeads.js. ── */
 exports.submitLocalLead = require("./localLeads").submitLocalLead;
+
+/* ── SEO & Analytics: kéo Search Console + GA4 cho Founder, xem functions/seoAnalytics.js.
+   Cần cấp quyền service account trước khi có số liệu — docs/SEO_VIEC_TAY.md. ── */
+const seoAnalytics = require("./seoAnalytics");
+exports.seoReportNow = seoAnalytics.seoReportNow;
+
+/* Cron 08:30 giờ VN (sau dailyDigest 08:00 để không dồn 2 push cùng lúc):
+   lưu seoReports/{date} làm lịch sử xu hướng + đẩy tóm tắt cho Founder.
+   Chưa cấu hình settings/seoReport thì im lặng bỏ qua. */
+exports.seoDailyReport = functions
+  .region("asia-southeast1")
+  .pubsub.schedule("30 8 * * *")
+  .timeZone("Asia/Ho_Chi_Minh")
+  .onRun(async () => {
+    try {
+      const snap = await seoAnalytics.buildSeoSnapshot(db);
+      if (!snap) return null;
+      const parts = [];
+      if (snap.gsc && snap.gsc.ok) {
+        const t = snap.gsc.totals;
+        parts.push(`Google 7 ngày: ${t.clicks} nhấp · ${t.impressions} hiển thị · vị trí TB ${t.position}`);
+      }
+      if (snap.ga4 && snap.ga4.ok) {
+        parts.push(`Web 7 ngày: ${snap.ga4.totals.activeUsers} khách · ${snap.ga4.totals.pageViews} lượt xem`);
+      }
+      if (!parts.length) return null;
+      await notifyFounder("📈 SEO & Analytics sáng nay", parts.join(" — "), { type: "SEO_REPORT" });
+    } catch (e) {
+      console.error("[seoDailyReport] Lỗi:", e);
+    }
+    return null;
+  });
