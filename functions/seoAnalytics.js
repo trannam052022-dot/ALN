@@ -181,13 +181,26 @@ async function buildSeoSnapshot(db) {
   const ga4PropertyId = String(cfg.ga4PropertyId || "").trim();
   if (!gscSiteUrl && !ga4PropertyId) return null;
 
-  const token = await getAccessToken();
   const snapshot = {
     date: isoDate(new Date()),
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
     gsc: { ok: false, error: "Chưa cấu hình URL site Search Console" },
     ga4: { ok: false, error: "Chưa cấu hình GA4 Property ID" },
   };
+
+  // Token hỏng (thiếu quyền IAM, metadata…) không được đánh sập cả hàm —
+  // ghi lỗi vào cả 2 mục để panel hiện nguyên nhân thật thay vì "INTERNAL".
+  let token = null;
+  try {
+    token = await getAccessToken();
+  } catch (e) {
+    console.error("[seoAnalytics] getAccessToken:", e);
+    const msg = "Không lấy được token service account: " + (e.message || e).toString().slice(0, 300);
+    snapshot.gsc = { ok: false, error: msg };
+    snapshot.ga4 = { ok: false, error: msg };
+    await db.collection("seoReports").doc(snapshot.date).set(snapshot, { merge: true });
+    return snapshot;
+  }
 
   if (gscSiteUrl) {
     try {
@@ -219,23 +232,25 @@ const seoReportNow = onCall({ region: "asia-southeast1" }, async (request) => {
   const db = admin.firestore();
   const action = (request.data && request.data.action) || "refresh";
 
-  if (action === "history") {
-    const snap = await db
-      .collection("seoReports")
-      .orderBy(admin.firestore.FieldPath.documentId(), "desc")
-      .limit(30)
-      .get();
-    return { reports: snap.docs.map((d) => { const v = d.data(); delete v.createdAt; return v; }) };
-  }
-
   try {
+    if (action === "history") {
+      const snap = await db
+        .collection("seoReports")
+        .orderBy(admin.firestore.FieldPath.documentId(), "desc")
+        .limit(30)
+        .get();
+      return { reports: snap.docs.map((d) => { const v = d.data(); delete v.createdAt; return v; }) };
+    }
+
     const snapshot = await buildSeoSnapshot(db);
     if (!snapshot) return { notConfigured: true };
     delete snapshot.createdAt; // FieldValue không serialize được qua callable
     return { snapshot };
   } catch (e) {
-    console.error("[seoReportNow]", e);
-    throw new HttpsError("internal", e.message || "Lỗi kéo số liệu");
+    // Luôn trả HttpsError có message thật — client mà thấy "INTERNAL" trần
+    // nghĩa là crash ngoài handler (xem firebase functions:log)
+    console.error("[seoReportNow]", action, e);
+    throw new HttpsError("internal", (e.message || String(e)).slice(0, 400));
   }
 });
 
