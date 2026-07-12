@@ -223,8 +223,27 @@ KHÔNG mua backlink số lượng lớn giá rẻ — dễ bị Google phạt, m
 - [ ] Báo online mảng bất động sản/đời sống (CafeLand, Batdongsan.com.vn
       mục tin tức, báo tỉnh): bài PR hoặc trích dẫn chuyên gia — KTS ALN
       trả lời phỏng vấn về xu hướng xây nhà, kèm link.
+- [ ] Báo ngành uy tín cao (cần bài chuyên môn thật, không phải PR thuần):
+      Tạp chí Kiến trúc Việt Nam (kientrucvietnam.org.vn) và Tạp chí
+      Xây dựng — Bộ Xây dựng (tapchixaydung.vn). Gửi theo thể lệ toà soạn.
 - [ ] Đối tác: đơn vị thi công đối tác, cửa hàng VLXD, sàn BĐS địa phương —
       trao đổi đặt link giới thiệu lẫn nhau (chỉ đối tác thật).
+
+**Mẫu email gửi bài cho báo ngành:**
+
+> Kính gửi Ban biên tập [Tên tạp chí],
+>
+> Tôi là [Tên], đại diện App Làm Nhà (ALN) — nền tảng kết nối chủ nhà với
+> kiến trúc sư có chứng chỉ hành nghề, vận hành theo mô hình Tổng thầu
+> Thiết kế minh bạch 4 giai đoạn (C1–C4).
+>
+> Tôi muốn gửi tới Quý toà soạn bài viết về [chủ đề: vd "minh bạch hoá quy
+> trình thanh toán thiết kế nhà ở dân dụng" / "vai trò kiến trúc sư địa
+> phương trong xây nhà vùng nông thôn"], phù hợp định hướng nội dung của
+> tạp chí. Rất mong nhận được phản hồi và thể lệ cụ thể để tôi hoàn thiện
+> bài viết đúng yêu cầu.
+>
+> Trân trọng, [Tên, chức danh, SĐT liên hệ]
 
 **Đo kết quả:** Search Console → Liên kết (Links) ở menu trái — xem site nào
 đang trỏ về. Số liên kết tăng đều + vị trí từ khóa cải thiện trong tab
