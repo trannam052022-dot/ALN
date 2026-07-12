@@ -225,7 +225,13 @@ async function buildSeoSnapshot(db) {
 
 /* ── Callable cho founder_panel (rules Firestore không cần mở collection mới:
       đọc/ghi đều qua Admin SDK ở đây, chỉ Founder gọi được) ── */
-const seoReportNow = onCall({ region: "asia-southeast1" }, async (request) => {
+/* serviceAccount ghim cứng: hàm v2 mặc định chạy bằng SA compute
+   (…-compute@developer.gserviceaccount.com) — KHÁC email appspot mà Founder
+   đã cấp quyền trong Search Console/GA4, gây 403 dù cấp đúng. Ghim về appspot
+   cho khớp docs/SEO_VIEC_TAY.md mục 9 (cron v1 seoDailyReport vốn đã chạy appspot). */
+const seoReportNow = onCall(
+  { region: "asia-southeast1", serviceAccount: "aln-platform@appspot.gserviceaccount.com" },
+  async (request) => {
   if (!request.auth || request.auth.uid !== FOUNDER_UID) {
     throw new HttpsError("permission-denied", "Chỉ Founder mới xem được báo cáo này");
   }
