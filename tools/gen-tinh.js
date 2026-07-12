@@ -112,7 +112,7 @@ function renderIndexPage(tinhList) {
     '        <div class="mn-cat-thumb"><i class="ph-duotone ph-map-pin"></i><span>' + escHtml(t.ten) + '</span></div>\n' +
     '        <div class="mn-cat-body">\n' +
     '          <h3>Thiết kế nhà tại ' + escHtml(t.ten) + '</h3>\n' +
-    '          <p style="font-size:var(--text-sm);color:var(--sub)">KTS xác thực, thanh toán Escrow an toàn</p>\n' +
+    '          <p style="font-size:var(--text-sm);color:var(--sub)">KTS xác thực, thanh toán theo Quy trình 4 bước đảm bảo</p>\n' +
     '        </div>\n' +
     '      </a>'
   )).join('\n');
@@ -123,14 +123,14 @@ function renderIndexPage(tinhList) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-<title>Thiết kế nhà theo tỉnh — KTS xác thực, Escrow an toàn | App Làm Nhà</title>
-<meta name="description" content="App Làm Nhà kết nối kiến trúc sư đã xác thực chứng chỉ hành nghề theo từng tỉnh, thanh toán qua Escrow an toàn theo từng chặng C1–C4.">
+<title>Thiết kế nhà theo tỉnh — KTS xác thực, 4 bước đảm bảo | ALN</title>
+<meta name="description" content="App Làm Nhà kết nối kiến trúc sư đã xác thực chứng chỉ hành nghề theo từng tỉnh, hợp đồng trực tiếp, thanh toán theo Quy trình 4 bước đảm bảo C1–C4.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="${BASE_URL}/thiet-ke-nha/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="${BASE_URL}/thiet-ke-nha/">
-<meta property="og:title" content="Thiết kế nhà theo tỉnh — KTS xác thực, Escrow an toàn | App Làm Nhà">
-<meta property="og:description" content="Kiến trúc sư đã xác thực chứng chỉ hành nghề theo từng tỉnh, thanh toán qua Escrow an toàn theo từng chặng C1–C4.">
+<meta property="og:title" content="Thiết kế nhà theo tỉnh — KTS xác thực, 4 bước đảm bảo | ALN">
+<meta property="og:description" content="Kiến trúc sư đã xác thực chứng chỉ hành nghề theo từng tỉnh, thanh toán theo Quy trình 4 bước đảm bảo C1–C4.">
 <meta property="og:site_name" content="App Làm Nhà">
 <meta property="og:locale" content="vi_VN">
 <meta name="twitter:card" content="summary_large_image">
@@ -143,6 +143,15 @@ function renderIndexPage(tinhList) {
 <link rel="stylesheet" href="thiet-ke-nha.css">
 <link rel="icon" href="../icon-192.png" type="image/png">
 <meta name="theme-color" content="#98690a">
+<!-- Google Analytics 4 (ALN — G-5CSL1TF0RC, tách riêng khỏi property TK.HOUSE) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5CSL1TF0RC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5CSL1TF0RC');
+</script>
+<!-- End GA4 -->
 </head>
 <body>
 
@@ -218,8 +227,8 @@ function main() {
   let count = 0;
   for (const t of tinhList) {
     const canonical = BASE_URL + '/thiet-ke-nha/' + t.slug + '.html';
-    const title = ('Thiết kế nhà tại ' + t.ten + ' — KTS xác thực, Escrow an toàn | App Làm Nhà').slice(0, 70);
-    const description = ('Thiết kế nhà tại ' + t.ten + ': kiến trúc sư đã xác thực chứng chỉ hành nghề, thanh toán qua Escrow an toàn theo từng chặng C1–C4, không ứng trước toàn bộ.').slice(0, 158);
+    const title = ('Thiết kế nhà tại ' + t.ten + ' — KTS xác thực, 4 bước đảm bảo | ALN').slice(0, 65);
+    const description = ('Thiết kế nhà tại ' + t.ten + ': KTS đã xác thực chứng chỉ hành nghề, hợp đồng trực tiếp với ALN, thanh toán theo Quy trình 4 bước đảm bảo C1–C4. Tư vấn miễn phí.').slice(0, 158);
     const mauSuggest = pickMauSuggest(mauList, 3);
     const relatedTinh = pickRelatedTinh(tinhList, t, 3);
 
@@ -231,7 +240,7 @@ function main() {
       TEN: escHtml(t.ten),
       TEN_JS: t.ten.replace(/'/g, "\\'"),
       TINH_SLUG: t.slug,
-      H1: 'Thiết kế nhà tại ' + escHtml(t.ten) + ' — KTS xác thực, thanh toán Escrow an toàn',
+      H1: 'Thiết kế nhà tại ' + escHtml(t.ten) + ' — KTS xác thực, thanh toán 4 bước đảm bảo',
       GIOI_THIEU: escHtml(t.gioiThieuThietKe),
       DUTOAN_HREF: '../du-toan/xay-nha-tai-' + t.slug + '.html',
       MAU_CARDS_HTML: mauCardsHtml(mauSuggest),

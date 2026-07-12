@@ -193,3 +193,39 @@ Firebase — làm đúng 4 bước, mỗi bước 1 phút:
 Sau đó không phải làm gì nữa: mỗi sáng 08:30 hệ thống tự kéo số liệu, lưu
 vào `seoReports/{ngày}` để vẽ xu hướng vị trí theo thời gian, và đẩy push
 "SEO & Analytics sáng nay" cho Founder. Vị trí trung bình **≤ 10 = trang đầu**.
+
+## 10. Xây backlink — checklist theo thứ tự dễ → khó (mỗi tuần làm 1-2 mục)
+
+Backlink = trang web khác trỏ link về applamnha.vn. Với domain mới, vài chục
+link nền tảng (foundation links) + vài link chất lượng là đủ tạo khác biệt.
+KHÔNG mua backlink số lượng lớn giá rẻ — dễ bị Google phạt, mất công gỡ.
+
+### Nhóm 1 — Miễn phí, làm ngay (link nền tảng)
+- [ ] Google Business Profile (mục 5) — điền website applamnha.vn vào hồ sơ.
+- [ ] Fanpage Facebook "App Làm Nhà": mục Giới thiệu → thêm website; mỗi bài
+      đăng Cẩm nang kèm link bài viết (workflow FB tự làm nếu đã bật).
+- [ ] Tạo kênh: YouTube / TikTok / Zalo OA (khi được duyệt) — phần mô tả kênh
+      đều có link về site.
+- [ ] Đăng ký doanh nghiệp trên các danh bạ: Trang Vàng (yellowpages.vn),
+      1900.com.vn, các danh bạ doanh nghiệp tỉnh — điền đúng tên "App Làm Nhà",
+      địa chỉ, SĐT 0909 82 9696, website (NAP nhất quán giúp SEO local).
+
+### Nhóm 2 — Nội dung đi "làm khách" (mỗi tháng 1-2 bài)
+- [ ] Diễn đàn xây dựng/nhà đất VN (webtretho, otofun mục nhà cửa, forum
+      xây dựng...): trả lời câu hỏi thật về chi phí xây nhà, dẫn link bài
+      Cẩm nang tương ứng khi đúng ngữ cảnh. KHÔNG spam link trần.
+- [ ] Nhóm Facebook "xây nhà", "review kiến trúc sư" theo tỉnh: chia sẻ bài
+      Cẩm nang tỉnh đó (bài chi phí theo tỉnh rất hợp).
+- [ ] Guest post trên blog/báo địa phương về nhà cửa: chủ động gửi bài
+      "Chi phí xây nhà tại X 2026" rút gọn, xin 1 link về bài gốc.
+
+### Nhóm 3 — Chất lượng cao (khi có nguồn lực)
+- [ ] Báo online mảng bất động sản/đời sống (CafeLand, Batdongsan.com.vn
+      mục tin tức, báo tỉnh): bài PR hoặc trích dẫn chuyên gia — KTS ALN
+      trả lời phỏng vấn về xu hướng xây nhà, kèm link.
+- [ ] Đối tác: đơn vị thi công đối tác, cửa hàng VLXD, sàn BĐS địa phương —
+      trao đổi đặt link giới thiệu lẫn nhau (chỉ đối tác thật).
+
+**Đo kết quả:** Search Console → Liên kết (Links) ở menu trái — xem site nào
+đang trỏ về. Số liên kết tăng đều + vị trí từ khóa cải thiện trong tab
+SEO & Analytics của founder_panel là đúng hướng.

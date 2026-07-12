@@ -1,12 +1,12 @@
 ---
-title: "Chi phí xây nhà tại Lâm Đồng (Đà Lạt) 2026: đất dốc, chọn kiến trúc sư"
+title: "Xây nhà trọn gói Đà Lạt – Lâm Đồng 2026: giá m², đất dốc"
 slug: xay-nha-tron-goi-lam-dong
 category: khu-vuc
-description: "Chi phí xây nhà tại Lâm Đồng - Đà Lạt 2026: phần thô khoảng 4,5 triệu/m², trọn gói hoàn thiện 5,5–8 triệu/m². Lưu ý địa hình dốc mạnh, khí hậu lạnh ẩm, chống thấm giữ ấm, giấy phép và vai trò kiến trúc sư khu vực."
+description: "Giá xây nhà trọn gói Đà Lạt – Lâm Đồng 2026: thô ~4,5 triệu/m², hoàn thiện 5,5–8 triệu/m². Lưu ý đất dốc, khí hậu lạnh ẩm. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Lâm Đồng Đà Lạt"
 date: 2026-07-04
-updated: 2026-07-04
+updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
   - xây nhà trọn gói lâm đồng

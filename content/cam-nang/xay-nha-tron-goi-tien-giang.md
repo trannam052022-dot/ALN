@@ -1,12 +1,12 @@
 ---
-title: "Chi phí xây nhà tại Tiền Giang 2026: nền đất, chọn kiến trúc sư"
+title: "Xây nhà trọn gói Tiền Giang 2026: giá 5–7,5 triệu/m², nền yếu"
 slug: xay-nha-tron-goi-tien-giang
 category: khu-vuc
-description: "Chi phí xây nhà tại Tiền Giang 2026: phần thô khoảng 4,3 triệu/m², trọn gói hoàn thiện 5–7,5 triệu/m². Lưu ý nền phù sa yếu ven sông Tiền, nhiễm mặn vùng Gò Công, giấy phép và vai trò kiến trúc sư khu vực."
+description: "Giá xây nhà trọn gói Tiền Giang 2026: thô ~4,3 triệu/m², hoàn thiện 5–7,5 triệu/m². Lưu ý nền yếu ven sông Tiền, mặn vùng Gò Công. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Tiền Giang"
 date: 2026-07-04
-updated: 2026-07-04
+updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
   - xây nhà trọn gói tiền giang

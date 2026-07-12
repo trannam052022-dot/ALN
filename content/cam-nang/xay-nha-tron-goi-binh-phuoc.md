@@ -1,12 +1,12 @@
 ---
-title: "Chi phí xây nhà tại Bình Phước 2026: nền đất, chọn kiến trúc sư"
+title: "Xây nhà trọn gói Bình Phước 2026: giá 5–7 triệu/m², đất bazan"
 slug: xay-nha-tron-goi-binh-phuoc
 category: khu-vuc
-description: "Chi phí xây nhà tại Bình Phước 2026: phần thô khoảng 4,2 triệu/m², trọn gói hoàn thiện 5–7 triệu/m². Đất đỏ bazan cao ráo, đất rộng, lưu ý địa hình đồi dốc, giấy phép và vai trò kiến trúc sư khu vực."
+description: "Giá xây nhà trọn gói Bình Phước 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý đất đỏ bazan cao ráo, địa hình đồi dốc. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Bình Phước"
 date: 2026-07-04
-updated: 2026-07-04
+updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
   - xây nhà trọn gói bình phước

@@ -1,12 +1,12 @@
 ---
-title: "Chi phí xây nhà tại Vĩnh Long 2026: nền đất, chọn kiến trúc sư"
+title: "Xây nhà trọn gói Vĩnh Long 2026: giá 5–7 triệu/m², nền yếu"
 slug: xay-nha-tron-goi-vinh-long
 category: khu-vuc
-description: "Chi phí xây nhà tại Vĩnh Long 2026: phần thô khoảng 4,2 triệu/m², trọn gói hoàn thiện 5–7 triệu/m². Lưu ý nền phù sa yếu giữa sông Tiền - sông Hậu, cù lao, ép cọc, giấy phép và vai trò kiến trúc sư khu vực."
+description: "Giá xây nhà trọn gói Vĩnh Long 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý nền phù sa yếu, cù lao, ép cọc. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Vĩnh Long"
 date: 2026-07-04
-updated: 2026-07-04
+updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
   - xây nhà trọn gói vĩnh long

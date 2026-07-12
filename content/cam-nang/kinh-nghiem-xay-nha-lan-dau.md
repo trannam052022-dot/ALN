@@ -1,11 +1,11 @@
 ---
-title: "Kinh nghiệm xây nhà lần đầu: 10 điều cần biết trước khi khởi công (2026)"
+title: "Kinh nghiệm xây nhà lần đầu: 10 điều cần biết (2026)"
 slug: kinh-nghiem-xay-nha-lan-dau
 category: kinh-nghiem-lam-nha
 description: "Xây nhà lần đầu cần chuẩn bị gì? 10 kinh nghiệm thực tế từ ngân sách, pháp lý, chọn kiến trúc sư đến giám sát thi công — tránh phát sinh, tránh rủi ro."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 date: 2026-07-11
-updated: 2026-07-11
+updated: 2026-07-12
 publishDate: 2026-07-11
 facebook: true
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"

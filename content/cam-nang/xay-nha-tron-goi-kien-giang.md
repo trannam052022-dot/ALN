@@ -1,12 +1,12 @@
 ---
-title: "Chi phí xây nhà tại Kiên Giang 2026: chống mặn, chọn kiến trúc sư"
+title: "Xây nhà trọn gói Kiên Giang 2026: giá m², lưu ý Phú Quốc"
 slug: xay-nha-tron-goi-kien-giang
 category: khu-vuc
-description: "Chi phí xây nhà tại Kiên Giang 2026: phần thô khoảng 4,3 triệu/m² (đất liền), Phú Quốc cao hơn do vận chuyển. Lưu ý nền yếu ven biển, nhiễm mặn, giấy phép và vai trò kiến trúc sư khu vực."
+description: "Giá xây nhà trọn gói Kiên Giang 2026: thô ~4,3 triệu/m² đất liền, Phú Quốc cao hơn. Lưu ý nền yếu ven biển, nhiễm mặn, cách chọn KTS. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Kiên Giang"
 date: 2026-07-04
-updated: 2026-07-04
+updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
   - xây nhà trọn gói kiên giang

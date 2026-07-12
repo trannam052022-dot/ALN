@@ -150,7 +150,10 @@ function metaDescription(m) {
 function buildTitle(m) {
   const base = m.ten + ' — Dự toán ' + fmtTy(m.duToanTu) + '–' + fmtTy(m.duToanDen);
   const withBrand = base + ' | App Làm Nhà';
-  return withBrand.length <= 65 ? withBrand : base;
+  if (withBrand.length <= 65) return withBrand;
+  if (base.length <= 65) return base;
+  // Tên mẫu dài (kèm phong cách): rút gọn phần dự toán để title không bị Google cắt
+  return m.ten + ' — từ ' + fmtTy(m.duToanTu);
 }
 
 function renderMauPage(template, m, all) {
@@ -240,6 +243,15 @@ function pageShell({ title, description, canonical, heading, intro, filtersHtml,
 <link rel="stylesheet" href="mau-nha.css">
 <link rel="icon" href="../icon-192.png" type="image/png">
 <meta name="theme-color" content="#98690a">
+<!-- Google Analytics 4 (ALN — G-5CSL1TF0RC, tách riêng khỏi property TK.HOUSE) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5CSL1TF0RC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5CSL1TF0RC');
+</script>
+<!-- End GA4 -->
 </head>
 <body>
 
