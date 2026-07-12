@@ -9,7 +9,7 @@
 - **CẤM:** "giữ tiền trung gian", "bên trung gian", "giữ hộ tiền" khi mô tả ALN với khách hàng — tự mâu thuẫn với việc ký HĐ trực tiếp, gây cảm giác kém uy tín.
 - **Câu chuẩn thay thế:** *"ALN là Tổng thầu Thiết kế — ký hợp đồng trực tiếp với khách hàng, trực tiếp chịu trách nhiệm toàn bộ dự án. Thanh toán theo Quy trình 4 bước đảm bảo (C1–C4)."* Bản rút gọn: *"Tổng thầu Thiết kế — hợp đồng trực tiếp, thanh toán theo Quy trình 4 bước đảm bảo."*
 - **Ngữ cảnh thuật ngữ** (không lẫn nhau): khách hàng → **"Quy trình 4 bước đảm bảo"**; KTS → **"Tiền đã có sẵn tại ALN chờ bạn"**; nội bộ → **"Quỹ bảo đảm 4 bước"**.
-- Trước khi publish nội dung mới (Cẩm nang, trang mẫu, trang tỉnh...), đối chiếu với lint content (đã thêm ở Phase 3) để chặn tái phạm.
+- Trước khi publish nội dung mới (Cẩm nang, trang mẫu, trang tỉnh...), chạy `node scripts/lint-content.js` để chặn tái phạm (quy trình đầy đủ: skill `.claude/skills/lint-content-aln/`). ERROR phải sửa hết; WARN review theo ngữ cảnh.
 
 ## Tổng quan
 
