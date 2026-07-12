@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <script src="error-monitor.js"></script>
 <script>
 window.KTS_PROJECT_ID = null; // sẽ được điền từ Firestore
 window.KTS_PROJECT_DATA = null;
@@ -11,42 +10,15 @@ window.KTS_PROJECT_DATA = null;
 <meta name="format-detection" content="telephone=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Văn phòng KTS — App Làm Nhà</title>
+<title>KTS Dashboard — kts.applamnha.vn</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"/><style>.ph-spin{animation:phspin 1s linear infinite;display:inline-block}@keyframes phspin{to{transform:rotate(360deg)}}
-/* ── C2 SUBMIT MODAL ── */
-#c2SubmitModal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(7,18,32,.8);backdrop-filter:blur(6px)}
-#c2SubmitModal.open{display:flex}
-.c2m-card{position:relative;background:#0d1b2a;border:1px solid #1c2a3a;border-radius:16px;padding:28px 24px;width:min(92vw,420px);font-family:'DM Sans',sans-serif;color:#e0d4b0;box-shadow:0 24px 80px rgba(0,0,0,.7)}
-.c2m-corner{position:absolute;width:12px;height:12px;border-color:#c9a84c55;border-style:solid}
-.c2m-corner.tl{top:0;left:0;border-width:1.5px 0 0 1.5px;border-radius:20px 0 0 0}
-.c2m-corner.tr{top:0;right:0;border-width:1.5px 1.5px 0 0;border-radius:0 20px 0 0}
-.c2m-corner.bl{bottom:0;left:0;border-width:0 0 1.5px 1.5px;border-radius:0 0 0 20px}
-.c2m-corner.br{bottom:0;right:0;border-width:0 0 1.5px 1.5px;border-radius:0 0 20px 0}
-.c2m-step{font-size:10px;color:#6a8aaa;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
-.c2m-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:21px;color:#c9a84c;margin-bottom:6px}
-.c2m-desc{font-size:12px;color:#8a9ab0;line-height:1.7;margin-bottom:16px}
-.c2m-notice{font-size:11px;color:#a0b8cc;background:#102030;border:1px solid #1c2a3a;border-radius:8px;padding:9px 11px;margin-bottom:12px;line-height:1.6}
-.c2m-file-row{display:flex;align-items:center;gap:9px;background:#102030;border:1px solid #1c2a3a;border-radius:7px;padding:7px 11px;margin-bottom:7px;font-size:12px}
-.c2m-progress-track{height:6px;background:#1c2a3a;border-radius:3px;margin:14px 0;overflow:hidden}
-.c2m-progress-bar{height:100%;background:#c9a84c;border-radius:3px;transition:width .4s ease;width:0%}
-.c2m-pct{font-size:11px;color:#6a8aaa;text-align:center}
-.c2m-success-icon{font-size:44px;text-align:center;margin-bottom:10px}
-.c2m-success-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;color:#c9a84c;text-align:center;margin-bottom:10px}
-.c2m-divider{height:1px;background:#1c2a3a;margin:12px 0}
-.c2m-confirm-item{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:#8aaac8;margin-bottom:6px}
-.c2m-check{color:#5ab87a;font-weight:700;flex-shrink:0}
-.c2m-btn{width:100%;padding:11px 0;border-radius:9px;border:none;font-weight:700;font-size:13px;cursor:pointer;margin-top:8px;font-family:'DM Sans',sans-serif}
-.c2m-btn-primary{background:#c9a84c;color:#071220}
-.c2m-btn-primary:disabled{opacity:.4;cursor:not-allowed}
-.c2m-btn-ghost{background:transparent;border:1px solid #1c2a3a;color:#8a9ab0}
-.c2m-error{font-size:11px;color:#c85a3a;margin-bottom:8px}
 /* ── DỰ ÁN CỦA TÔI ── */
 .proj-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;cursor:pointer;transition:.18s}
-.proj-card:hover{border-color:rgba(152,105,10,.4);background:rgba(152,105,10,.04)}
+.proj-card:hover{border-color:rgba(212,160,23,.4);background:rgba(212,160,23,.04)}
 .proj-card-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.proj-card-id{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--gold);background:rgba(152,105,10,.12);padding:2px 8px;border-radius:99px}
+.proj-card-id{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--gold);background:rgba(212,160,23,.12);padding:2px 8px;border-radius:99px}
 .proj-card-name{font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .proj-card-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}
 .proj-progress-bar{display:flex;height:6px;border-radius:99px;overflow:hidden;gap:2px;margin-bottom:8px}
@@ -70,15 +42,15 @@ window.KTS_PROJECT_DATA = null;
 .mpl-wrap.open .mpl-left{border-right:1px solid var(--border)}
 .mpl-search{padding:10px;border-bottom:1px solid var(--border);flex-shrink:0}
 .mpl-search input{width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:6px;padding:6px 9px;font-size:12px;color:var(--text);font-family:inherit;outline:none;box-sizing:border-box}
-.mpl-search input:focus{border-color:rgba(152,105,10,.4)}
+.mpl-search input:focus{border-color:rgba(212,160,23,.4)}
 .mpl-filters{display:flex;gap:5px;padding:7px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
 .mpl-fb{flex:1;padding:4px 2px;border-radius:5px;border:1px solid var(--border);background:var(--ink3);font-size:10px;font-weight:600;color:var(--text2);cursor:pointer;text-align:center;font-family:inherit;transition:.12s}
 .mpl-fb.on{background:var(--gold);color:#1a1400;border-color:var(--gold)}
 .mpl-list{overflow-y:auto;flex:1;max-height:440px}
 .mpl-grp{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 12px 4px}
 .mpl-item{padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px;align-items:flex-start;border-left:2px solid transparent;transition:.12s}
-.mpl-item:hover{background:rgba(152,105,10,.05)}
-.mpl-item.on{background:rgba(152,105,10,.07);border-left-color:var(--blue)}
+.mpl-item:hover{background:rgba(212,160,23,.05)}
+.mpl-item.on{background:rgba(37,99,235,.07);border-left-color:var(--blue)}
 .mpl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
 .mpl-nm{font-size:12px;font-weight:600;color:var(--text);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .mpl-sub{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:2px}
@@ -89,83 +61,67 @@ window.KTS_PROJECT_DATA = null;
 
 /* ── HỒ SƠ CỦA TÔI ── */
 .profile-avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px;background:var(--ink2);border-radius:var(--r);border:1px solid var(--border);margin-bottom:12px}
-.profile-avatar-img{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid rgba(152,105,10,.4)}
-.profile-avatar-init{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#98690a,#b8860b);color:#000;font-size:28px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:var(--syne)}
-.profile-upload-btn{padding:8px 18px;border-radius:8px;border:1px solid rgba(152,105,10,.4);background:rgba(152,105,10,.08);color:var(--gold);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
-.profile-upload-btn:hover{background:rgba(152,105,10,.15)}
+.profile-avatar-img{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid rgba(212,160,23,.4)}
+.profile-avatar-init{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#d4a017,#e8c44a);color:#000;font-size:28px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:var(--syne)}
+.profile-upload-btn{padding:8px 18px;border-radius:8px;border:1px solid rgba(212,160,23,.4);background:rgba(212,160,23,.08);color:var(--gold);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.profile-upload-btn:hover{background:rgba(212,160,23,.15)}
 .profile-field{margin-bottom:10px}
 .profile-field label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px}
 .profile-field input{width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box}
-.profile-field input:focus{outline:none;border-color:rgba(152,105,10,.5)}
-.profile-save-btn{width:100%;padding:11px;background:linear-gradient(135deg,#98690a,#b8860b);border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer;margin-top:4px}
-.profile-view-btn{width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(152,105,10,.45);background:rgba(152,105,10,.07);color:#b8860b;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;transition:all .15s;box-sizing:border-box}
-.profile-view-btn:hover{background:rgba(152,105,10,.15);border-color:rgba(152,105,10,.7);color:#98690a}
-/* -- THU VIEN NOI THAT -- */
-.lib-cat-btn{padding:5px 12px;border-radius:99px;border:1px solid var(--border);background:var(--ink3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
-.lib-cat-btn.on{background:var(--amber);color:#1a1000;border-color:var(--amber)}
-.lib-item{background:var(--ink2);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .18s;display:flex;flex-direction:column}
-.lib-item:hover{border-color:rgba(152,105,10,.5);transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.25)}
-.lib-item-thumb{width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;font-size:52px;background:var(--ink3)}
-.lib-item-body{padding:12px}
-.lib-item-cat{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:4px}
-.lib-item-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
-.lib-item-size{font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:6px}
-.lib-item-price{font-size:12px;font-weight:700;color:var(--green)}
+.profile-field input:focus{outline:none;border-color:rgba(212,160,23,.5)}
+.profile-save-btn{width:100%;padding:11px;background:linear-gradient(135deg,#d4a017,#e8c44a);border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer;margin-top:4px}
 </style>
 <style>
 :root {
-  --ink: #f7f9fb;
+  --ink: #f0f4f8;
   --ink2: #ffffff;
-  --ink3: #eef2f6;
-  --border: #e1e7ee;
-  --border2: #c9d3de;
-  --muted: #5b6b7f;
+  --ink3: #f8fafc;
+  --border: #e2e8f0;
+  --border2: #cbd5e1;
+  --muted: #94a3b8;
   --sub: rgba(0,0,0,.05);
-  --text: #1a2634;
-  --text2: #3d4b5c;
-  --accent: #98690a;
-  --accent2: #b8860b;
-  --accent-bg: rgba(152,105,10,.09);
-  --gold: #98690a;
-  --gold2: #b8860b;
-  --gold-bg: rgba(152,105,10,.09);
-  --purple: #98690a;
-  --purple-bg: rgba(152,105,10,.10);
-  --green: #15803d;
-  --green-bg: rgba(21,128,61,.1);
+  --text: #1e293b;
+  --text2: #475569;
+  /* ⚠ DEMO — màu mới đề xuất (tối hơn cho nền sáng) */
+  --accent: #a06828;
+  --accent2: #c8913a;
+  --accent-bg: rgba(160,104,40,.12);
+  --gold: #a06828;
+  --gold-bg: rgba(160,104,40,.11);
+  --purple: #7b52b8;
+  --purple-bg: rgba(123,82,184,.1);
+  --green: #4a8a62;
+  --green-bg: rgba(74,138,98,.1);
   --red: #dc2626;
   --red-bg: rgba(220,38,38,.1);
-  --amber: #98690a;
-  --amber-bg: rgba(152,105,10,.10);
-  --blue: #98690a;
-  --blue-bg: rgba(152,105,10,.10);
-  --r: 14px;
-  --r-sm: 10px;
-  --ease: cubic-bezier(.16,1,.3,1);
-  --sh: 0 1px 2px rgba(38,28,8,.04), 0 3px 10px rgba(38,28,8,.05);
-  --sh-lg: 0 6px 16px rgba(38,28,8,.06), 0 18px 42px rgba(38,28,8,.08);
+  --amber: #a06828;
+  --amber-bg: rgba(160,104,40,.1);
+  --blue: #2d6490;
+  --blue-bg: rgba(45,100,144,.1);
+  --r: 10px;
+  --r-sm: 7px;
+  --sh: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --sh-lg: 0 4px 16px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.06);
   --serif: 'Cormorant Garamond', serif;
   --sans: 'DM Sans', sans-serif;
   --mono: 'JetBrains Mono', monospace;
-  --syne: 'Cormorant Garamond', serif;
+  --syne: 'Syne', sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{font-size:13px;scroll-behavior:smooth}
-@media(min-width:1440px){html{font-size:14px}}
-@media(min-width:1920px){html{font-size:16px}}
-body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:100vh;font-size:1rem;line-height:1.6;overflow-x:hidden}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:100vh;font-size:13px;line-height:1.6}
 
 /* SCROLLBAR */
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:var(--ink2)}
-::-webkit-scrollbar-thumb{background:rgba(152,105,10,.3);border-radius:99px}
+::-webkit-scrollbar-thumb{background:rgba(212,160,23,.3);border-radius:99px}
 
 /* ── SIDEBAR ── */
 .layout{display:flex;min-height:100vh}
 .sidebar{width:210px;background:var(--ink2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:50;transition:transform .25s}
-.sidebar-logo{padding:16px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(152,105,10,.06) 0%,transparent 100%)}
+.sidebar-logo{padding:16px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(212,160,23,.06) 0%,transparent 100%)}
 
-.logo-mark{width:30px;height:30px;border-radius:var(--r-sm);border:1px solid rgba(152,105,10,.4);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);background:rgba(152,105,10,.08)}
+.logo-mark{width:30px;height:30px;border-radius:var(--r-sm);border:1px solid rgba(212,160,23,.4);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);background:rgba(212,160,23,.08)}
 .logo-text{font-family:var(--syne);font-weight:800;font-size:14px;letter-spacing:.04em;color:var(--text)}
 .logo-text span{color:var(--gold)}
 
@@ -177,7 +133,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .nav-section{padding:16px 18px 5px;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
 .nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;margin:1px 0;font-size:13px;font-weight:450;color:var(--text2);cursor:pointer;transition:all .12s;text-decoration:none;border-left:2px solid transparent;background:none}
 .nav-item:hover{background:rgba(0,0,0,.04);color:var(--text)}
-.nav-item.active{background:rgba(152,105,10,.07);color:var(--blue);font-weight:600;border-left-color:var(--blue)}
+.nav-item.active{background:rgba(37,99,235,.07);color:var(--blue);font-weight:600;border-left-color:var(--blue)}
 .nav-item .icon{width:16px;text-align:center;font-size:13px;opacity:.7}
 .nav-item.active .icon{opacity:1}
 .nav-badge{margin-left:auto;background:var(--text2);color:#fff;border-radius:99px;padding:1px 7px;font-size:10px;font-weight:600}
@@ -186,7 +142,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
 .kts-hero{display:none}
 .kts-profile{display:flex;align-items:center;gap:10px}
-.kts-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#98690a,#b8860b);color:#000;display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-weight:800;font-size:13px;flex-shrink:0}
+.kts-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4a017,#e8c44a);color:#000;display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-weight:800;font-size:13px;flex-shrink:0}
 .kts-name{font-family:var(--serif);font-size:13px;font-weight:600;font-style:italic;color:var(--text)}
 .kts-rank{font-size:10px;color:var(--muted)}
 
@@ -196,7 +152,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .page-title{font-family:var(--serif);font-weight:600;font-style:italic;font-size:15px;color:var(--text);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
 .topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .notif-btn{position:relative;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;cursor:pointer;color:var(--text2);transition:all .15s;font-size:12px;flex-shrink:0}
-.notif-btn:hover{background:rgba(152,105,10,.1);border-color:rgba(152,105,10,.3)}
+.notif-btn:hover{background:rgba(212,160,23,.1);border-color:rgba(212,160,23,.3)}
 .notif-dot{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--red);border:1.5px solid var(--ink2)}
 .topbar-date{font-family:var(--mono);font-size:11px;color:var(--muted)}
 @media(max-width:600px){
@@ -295,7 +251,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .wp-main{border-color:var(--green);background:var(--green-bg)}
 .wp-locked{border-color:var(--amber);background:var(--amber-bg)}
 .wp-pending{border-color:var(--blue);background:var(--blue-bg)}
-.wp-tax{border-color:rgba(152,105,10,.2)}
+.wp-tax{border-color:rgba(212,160,23,.2)}
 
 .wp-label{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:5px}
 .wp-main .wp-label{color:var(--green)}
@@ -326,8 +282,8 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 ══════════════════════════════════════════ */
 .upload-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media(max-width:700px){.upload-grid{grid-template-columns:1fr 1fr}}
-.upload-slot{border:1.5px dashed rgba(152,105,10,.25);border-radius:var(--r-sm);padding:12px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
-.upload-slot:hover{border-color:var(--gold);background:rgba(152,105,10,.06)}
+.upload-slot{border:1.5px dashed rgba(212,160,23,.25);border-radius:var(--r-sm);padding:12px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.upload-slot:hover{border-color:var(--gold);background:rgba(212,160,23,.06)}
 .upload-slot.has-file{border-style:solid;border-color:var(--green);background:var(--green-bg)}
 .upload-slot.has-error{border-style:solid;border-color:var(--red);background:var(--red-bg)}
 .upload-slot.required-empty{border-color:var(--amber)}
@@ -373,8 +329,8 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .vip-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:4px}
 @media(max-width:900px){.vip-grid{grid-template-columns:1fr 1fr}}
 .vip-card{border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 10px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
-.vip-card:hover:not(.disabled){transform:translateY(-2px);box-shadow:0 4px 20px rgba(152,105,10,.2)}
-.vip-card.featured{border-color:var(--gold);background:rgba(152,105,10,.06)}
+.vip-card:hover:not(.disabled){transform:translateY(-2px);box-shadow:0 4px 20px rgba(212,160,23,.2)}
+.vip-card.featured{border-color:var(--gold);background:rgba(212,160,23,.06)}
 .vip-card.disabled{opacity:.5;cursor:not-allowed}
 .vip-icon{font-size:20px;margin-bottom:5px}
 .vip-name{font-family:var(--syne);font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px}
@@ -402,7 +358,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .modal-bg.open{display:flex}
 .modal{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);width:100%;max-width:460px;box-shadow:var(--sh-lg);animation:fadeUp .2s ease}
 @keyframes fadeUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
-.modal-head{padding:16px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(152,105,10,.05) 0%,transparent 100%)}
+.modal-head{padding:16px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(212,160,23,.05) 0%,transparent 100%)}
 .modal-head h3{font-family:var(--serif);font-weight:600;font-style:italic;font-size:15px;color:var(--text)}
 .modal-close{background:var(--ink3);border:none;color:var(--text2);width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center}
 .modal-body{padding:16px 20px}
@@ -440,12 +396,21 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 @media(max-width:768px){
   .sidebar { transform: translateX(-100%); }
   .sidebar.mobile-open { transform: translateX(0); box-shadow: 4px 0 32px rgba(0,0,0,.6); }
+  /* overlay chỉ hiện khi mở menu (JS điều khiển) */
   .main { margin-left: 0 !important; }
   .topbar-hamburger { display: flex !important; }
   .topbar { padding: 0 12px !important; height:48px !important; }
   .page-title { font-size:14px !important; }
+  /* stat cards: 3 cột ngang ngay cả trên mobile */
   .grid3 { grid-template-columns: repeat(3,1fr) !important; gap:8px !important; }
   .grid2, .grid2-3 { grid-template-columns: 1fr !important; }
+@media(max-width:600px){
+  .stat-card { padding:10px 10px !important; }
+  /* iPhone brightness fix */
+  body { background-color: #f0f4f8 !important; }
+  .card, .stat-card { background-color: #ffffff !important; border-color: #e2e8f0 !important; }
+  .sidebar { background-color: #ffffff !important; }
+}
   .stat-label { font-size:8px !important; letter-spacing:.4px !important; margin-bottom:3px !important; }
   .stat-val { font-size:16px !important; }
   .stat-badge { font-size:8px !important; padding:1px 5px !important; }
@@ -455,24 +420,16 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   .drawing-grid { grid-template-columns: 1fr 1fr !important; }
   .vip-grid { grid-template-columns: repeat(3,1fr) !important; }
   .content { padding: 10px 12px 50px; }
+  /* SLA clock nhỏ hơn */
   .clock-ring svg { width:100px !important; height:100px !important; }
   .clock-time { font-size:16px !important; }
   .sec-label { margin: 12px 0 8px !important; }
   .sla-card { padding:12px !important; }
 }
-@media(max-width:600px){
-  .stat-card { padding:10px !important; }
-  body { background-color: #f0f4f8 !important; }
-  .card, .stat-card { background-color: #ffffff !important; border-color: #e2e8f0 !important; }
-  .sidebar { background-color: #ffffff !important; }
-  .grid3 { grid-template-columns: 1fr 1fr !important; }
-  .kwc-icon { width:28px !important; height:28px !important; font-size:13px !important; }
-}
 @media(max-width:480px){
   .wallet-grid { grid-template-columns: 1fr; }
   .upload-grid { grid-template-columns: 1fr !important; }
   .vip-grid { grid-template-columns: 1fr 1fr !important; }
-  .grid3 { grid-template-columns: 1fr 1fr !important; }
   input, textarea, select { font-size: 16px !important; }
 }
 
@@ -524,8 +481,8 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 .pf-social a:hover{background:var(--blue-bg);color:var(--blue);border-color:var(--blue)}
 
 /* ── SIDEBAR PROFILE CARD ── */
-.sidebar-profile{display:flex;align-items:center;gap:11px;padding:14px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(152,105,10,.06) 0%,transparent 100%)}
-.sidebar-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#98690a,#b8860b);color:#fff;font-family:var(--syne);font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px rgba(152,105,10,.35);border:2px solid rgba(152,105,10,.4);overflow:hidden;position:relative}
+.sidebar-profile{display:flex;align-items:center;gap:11px;padding:14px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(212,160,23,.06) 0%,transparent 100%)}
+.sidebar-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#d4a017,#e8c44a);color:#fff;font-family:var(--syne);font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px rgba(212,160,23,.35);border:2px solid rgba(212,160,23,.4);overflow:hidden;position:relative}
 .sidebar-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .sidebar-info{flex:1;min-width:0}
 .sidebar-nm{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
@@ -544,114 +501,20 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 /* ── FADE-IN STAGGER for proj-cards ── */
 @keyframes fadeInUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .proj-card-anim{animation:fadeInUp .38s ease both}
-
-/* ── 1920px FONT SCALE ── */
-@media (min-width: 1920px) {
-  .sidebar-brand-top { font-size: 11px; }
-  .sidebar-brand-name { font-size: 19px; }
-  .nav-section { font-size: 11px; }
-  .nav-item { font-size: 16px; }
-  .nav-item .icon { font-size: 16px; }
-  .nav-badge { font-size: 12px; }
-  .kts-av { font-size: 16px; }
-  .kts-name { font-size: 16px; }
-  .kts-rank { font-size: 12px; }
-  .page-title { font-size: 18px; max-width: 200px; }
-  .topbar-date { font-size: 13px; }
-  .notif-btn { font-size: 14px; }
-  .card-title { font-size: 18px; }
-  .proj-card-id { font-size: 13px; }
-  .proj-card-name { font-size: 16px; }
-  .proj-card-status { font-size: 12px; }
-  .proj-meta { font-size: 13px; }
-  .proj-detail-label { font-size: 11px; }
-  .proj-detail-val { font-size: 16px; }
-  .kwc-label { font-size: 12px; }
-  .mpl-search input { font-size: 14px; }
-  .mpl-fb { font-size: 12px; }
-  .mpl-grp { font-size: 11px; }
-  .mpl-nm { font-size: 14px; }
-  .mpl-sub { font-size: 12px; }
-  .mpl-empty { font-size: 16px; }
-  .profile-field label { font-size: 12px; }
-  .profile-field input { font-size: 16px; }
-}
 </style>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#f0f4f8">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="aln-tokens.css">
-  <script src="https://www.google.com/recaptcha/api.js?render=6LeuZi8tAAAAAMfnZOHxH_xnLM8C0OpnexVgKFPb"></script>
-<style id="aln-polish">
-/* ALN KTS WORKSPACE — he thiet ke chuyen nghiep (studio) */
-/* FONT */
-.stat-val,.wp-amount,.vip-name,.logo-text,.kts-av,.sidebar-av{font-family:var(--serif)!important}
-.stat-val{font-weight:600!important;font-style:italic;letter-spacing:0!important;color:var(--text)!important;font-size:32px!important;line-height:1.05}
-.logo-text{font-weight:700!important;font-style:italic;letter-spacing:0!important}
-/* LAYOUT */
-.layout{background:var(--ink)}
-.content{max-width:1200px;margin:0 auto;padding:34px 40px 80px}
-@media(max-width:640px){.content{padding:22px 18px 64px}}
-/* SIDEBAR */
-.sidebar{width:240px;background:var(--ink2);border-right:1px solid var(--border);box-shadow:1px 0 0 rgba(38,28,8,.02)}
-.main{margin-left:240px}
-@media(max-width:768px){.main{margin-left:0}.sidebar{width:240px}}
-.sidebar-brand{padding:24px 22px 18px}
-.sidebar-brand-name{font-family:var(--serif);font-style:italic;font-weight:700;font-size:21px;letter-spacing:-.01em}
-.sidebar-brand-name::after{content:"";display:block;width:26px;height:2px;background:var(--gold);margin-top:10px;border-radius:2px}
-.sidebar-av{width:42px!important;height:42px!important;font-size:17px!important;color:#fff!important;box-shadow:0 4px 12px rgba(152,105,10,.25)}
-.sidebar-nm{font-size:15px}
-.nav-item{padding:10px 22px;margin:1px 10px;border-radius:9px;border-left:none!important;font-size:13.5px;color:var(--text2);gap:11px;transition:background .2s var(--ease),color .2s}
-.nav-item .icon{opacity:.6;font-size:15px}
-.nav-item:hover{background:rgba(152,105,10,.06);color:var(--text)}
-.nav-item.active{background:var(--gold-bg)!important;color:var(--gold)!important;font-weight:700!important;border-left-color:transparent!important}
-.nav-item.active .icon{opacity:1;color:var(--gold)}
-.nav-item.active .nav-badge{background:var(--gold)!important;color:#fff!important}
-/* TOPBAR */
-.topbar{height:64px;padding:0 22px;background:rgba(255,255,255,.86);backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2)}
-.page-title{font-family:var(--serif);font-style:italic;font-weight:700;font-size:18px;max-width:none}
-#ktsTopbarLogo{background:var(--gold-bg)!important;color:var(--gold)!important;border:1px solid var(--border2)!important;letter-spacing:.08em!important}
-.notif-btn{border-radius:10px;padding:8px 11px}
-/* CARDS */
-.card{border-radius:16px;padding:22px 24px;box-shadow:var(--sh);border:1px solid var(--border);transition:box-shadow .4s var(--ease),transform .4s var(--ease),border-color .4s}
-.card:hover{box-shadow:var(--sh-lg);border-color:var(--border2)}
-.card-title{font-family:var(--serif);font-style:italic;font-weight:700;font-size:19px;color:var(--text)}
-.card-title .ct-icon{width:30px;height:30px;border-radius:9px;font-size:14px;background:var(--gold-bg)!important;color:var(--gold)!important}
-.card-title i,.ct-icon{color:var(--gold)!important}
-/* KPI */
-.stat-spark{display:none!important}
-.stat-card{padding:22px 24px 20px;border-radius:16px;box-shadow:var(--sh);transition:transform .4s var(--ease),box-shadow .4s var(--ease),border-color .4s}
-.stat-card::before{display:none!important}
-.stat-card:hover{transform:translateY(-4px);box-shadow:var(--sh-lg);border-color:var(--border2)}
-.stat-label{font-size:10px;letter-spacing:.12em;color:var(--muted);margin-bottom:14px;font-weight:700}
-.stat-label i{color:var(--gold)!important;font-size:15px}
-.stat-sub{font-size:11.5px;color:var(--muted);margin-top:8px}
-.stat-badge{margin-top:10px;background:var(--gold-bg)!important;color:var(--gold)!important;font-weight:700}
-.stat-badge.sb-green{background:var(--green-bg)!important;color:var(--green)!important}
-/* SECTION LABELS — noi bat vang dam */
-.sec-label{font-family:var(--syne);font-size:12.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);margin:36px 0 15px;gap:11px}
-.sec-label::before{content:"";width:20px;height:3px;background:var(--gold);border-radius:2px;flex:none}
-.sec-label::after{background:var(--border)}
-/* SLA */
-.sla-card{border-radius:16px;border-left:3px solid var(--gold);padding:24px;box-shadow:var(--sh)}
-.sla-card.normal{border-left-color:var(--gold)}
-#slaDisplay{font-size:44px!important}
-/* BUTTONS */
-.btn{border-radius:10px;font-weight:600;transition:transform .25s var(--ease),background .2s,color .2s,border-color .2s,box-shadow .25s}
-.btn-primary{background:var(--text)!important;color:#fff!important}
-.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 24px rgba(38,28,8,.18)}
-.btn-gold{background:linear-gradient(135deg,var(--gold2),var(--gold))!important;color:#1a1400!important;box-shadow:0 4px 12px rgba(152,105,10,.2)}
-.btn-gold:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 26px rgba(152,105,10,.3)}
-.quick-action:hover{transform:translateY(-3px)}
-.qa-icon{background:var(--gold-bg)!important;color:var(--gold)!important}
-.sla-demo-row{display:none!important}
-</style>
 </head>
 <body>
+<div style="position:fixed;top:0;left:0;right:0;z-index:9999999;background:rgba(220,38,38,.92);backdrop-filter:blur(8px);padding:7px 20px;display:flex;align-items:center;justify-content:space-between;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:#fff">
+  <span>⚠ DEMO MÀU NỀN SÁNG — không phải trang thật</span>
+  <a href="kts_dashboard.html" style="color:#fff;opacity:.8;text-decoration:none;font-size:11px;border:1px solid rgba(255,255,255,.4);padding:3px 10px;border-radius:5px">→ Về trang thật</a>
+</div>
 <!-- ═══ ALN AUTH VEIL — che trang đến khi xác thực xong ═══ -->
-<div id="alnAuthVeil" style="position:fixed;inset:0;background:#f7f9fb;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
-  <div style="width:38px;height:38px;border:3px solid rgba(152,105,10,.15);border-top-color:#98690a;border-radius:50%;animation:alnspin .8s linear infinite"></div>
-  <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:#5b6b7f">Đang xác thực...</div>
+<div id="alnAuthVeil" style="position:fixed;inset:0;background:#f0f4f8;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+  <div style="width:38px;height:38px;border:3px solid rgba(37,99,235,.15);border-top-color:#2563eb;border-radius:50%;animation:alnspin .8s linear infinite"></div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:#64748b">Đang xác thực...</div>
   <style>@keyframes alnspin{to{transform:rotate(360deg)}}</style>
 </div>
 
@@ -679,17 +542,11 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   <a class="nav-item" data-tab="review"><span class="icon"><i class="ph-duotone ph-clipboard-text"></i></span> Bảng Review <span class="nav-badge" id="reviewBadge" style="display:none">0</span></a>
   <a class="nav-item" data-tab="c3"><span class="icon"><i class="ph-duotone ph-upload-simple"></i></span> Nộp hồ sơ</a>
 
-  <a class="nav-item" data-tab="library"><span class="icon"><i class="ph-duotone ph-couch"></i></span> Thư viện nội thất</a>
   <div class="nav-sep"></div>
   <div class="nav-section">Cá nhân</div>
   <a class="nav-item" data-tab="myprofile"><span class="icon"><i class="ph-duotone ph-user-circle"></i></span> Hồ sơ</a>
   <a class="nav-item" data-tab="reputation"><span class="icon"><i class="ph-duotone ph-star"></i></span> Uy tín</a>
-  <a class="nav-item" data-tab="ktscreator"><span class="icon"><i class="ph-duotone ph-video-camera"></i></span> KTS Creator</a>
   <a class="nav-item" data-tab="settings"><span class="icon"><i class="ph-duotone ph-gear"></i></span> Cài đặt</a>
-
-  <div class="nav-sep"></div>
-  <a class="nav-item" href="forum.html" style="color:var(--amber);font-weight:600"><span class="icon"><i class="ph-duotone ph-chats-circle"></i></span> Diễn đàn ALN</a>
-  <a class="nav-item" href="aln_community.html" style="color:var(--amber);font-weight:600"><span class="icon"><i class="ph-duotone ph-butterfly"></i></span> Nhịp sống ALN</a>
 
 </nav>
 
@@ -703,113 +560,31 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <i class="ph-duotone ph-list"></i>
     </button>
     <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
-      <div id="ktsTopbarLogo" style="background:linear-gradient(135deg,rgba(184,134,11,.2),rgba(184,134,11,.12));color:#b8860b;padding:4px 10px;border-radius:var(--r-sm);border:1.5px solid rgba(184,134,11,.45);font-family:var(--syne);font-size:11px;font-weight:800;letter-spacing:.06em;white-space:nowrap;flex-shrink:0">App Làm Nhà Corp.</div>
-      <div class="page-title">Văn phòng KTS</div>
+      <div id="ktsTopbarLogo" style="background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(96,165,250,.12));color:#60a5fa;padding:4px 10px;border-radius:var(--r-sm);border:1.5px solid rgba(96,165,250,.45);font-family:var(--syne);font-size:11px;font-weight:800;letter-spacing:.06em;white-space:nowrap;flex-shrink:0">App Làm Nhà Corp.</div>
+      <div class="page-title">Bảng KTS</div>
     </div>
     <div class="topbar-right">
       <div class="topbar-date" id="ktsTopbarClock">05/06/2026 · 09:42</div>
-      <div class="notif-btn" onclick="toggleNotif()"><i class="ph-duotone ph-bell"></i><div class="notif-dot" id="notifDot" style="display:none"></div></div>
+      <div class="notif-btn" onclick="toggleNotif()"><i class="ph-duotone ph-bell"></i><div class="notif-dot"></div></div>
       <div id="notifPanel" style="display:none;position:fixed;top:56px;right:8px;width:min(300px,calc(100vw - 16px));background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:12px;box-shadow:var(--sh-lg);z-index:50;max-height:70vh;overflow-y:auto">
-        <div style="font-family:var(--serif);font-weight:600;font-style:italic;font-size:14px;color:var(--text);margin-bottom:8px">Thông báo</div>
-        <div class="notif-list" id="notifList"><div style="font-size:12px;color:var(--muted);text-align:center;padding:14px 0">Chưa có thông báo</div></div>
+        <div style="font-family:var(--serif);font-weight:600;font-style:italic;font-size:14px;color:var(--text);margin-bottom:8px">Thông báo mới</div>
+        <div class="notif-list">
+          <div class="notif-item ni-red"><div class="ni-icon"><i class="ph-duotone ph-clock-countdown"></i></div><div><div class="ni-text"><b>SLA cảnh báo</b> — Chủ nhà Nguyễn Văn A vừa gửi yêu cầu sửa C2 lần 2. Bạn có 48h!</div><div class="ni-time">5 phút trước</div></div></div>
+          <div class="notif-item ni-amber"><div class="ni-icon"><i class="ph-duotone ph-lock"></i></div><div><div class="ni-text"><b>Ví tạm ứng</b> — 1,920,000đ đã được ghi nhận (40% C2). Chờ CN duyệt để mở khóa.</div><div class="ni-time">12 phút trước</div></div></div>
+          <div class="notif-item ni-green"><div class="ni-icon"><i class="ph-duotone ph-money"></i></div><div><div class="ni-text"><b>Giải ngân C1</b> — +1,878,220đ đã về ví chính.</div><div class="ni-time">2 ngày trước</div></div></div>
+        </div>
       </div>
       <div style="font-size:10px;font-weight:700;background:var(--green-bg);color:var(--green);border:1px solid rgba(34,201,122,.3);padding:3px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0"><i class="ph-duotone ph-circle" style="font-size:6px;margin-right:3px"></i>Online</div>
     </div>
   </header>
 
-  <div class="content" style="position: relative">
-
-<style id="officeMastheadKtsStyle">
-.office-masthead-kts{
-  --om-bg:#0e1424; --om-panel:#131d33; --om-line:rgba(212,168,64,.4); --om-line2:rgba(224,182,84,.2); --om-gold:#e0b654;
-  --om-cream:#f0ead6; --om-sub:#9aa8bd; --om-online:#3dd68c;
-  background:var(--om-bg); border:3px solid var(--om-gold); border-radius:16px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
-  padding:36px 38px 26px; position:relative; margin-bottom:28px;
-}
-.omk-grid-overlay{
-  position:absolute; inset:0; pointer-events:none; opacity:.12;
-  background-image:
-    repeating-linear-gradient(0deg, rgba(184,134,11,.5) 0px, rgba(184,134,11,.5) 1px, transparent 1px, transparent 32px),
-    repeating-linear-gradient(90deg, rgba(184,134,11,.5) 0px, rgba(184,134,11,.5) 1px, transparent 1px, transparent 32px);
-}
-.omk-frame{position:relative}
-.omk-frame-corner{display:none}
-.omk-frame-corner.tl{top:-14px;left:-14px;border-top:1px solid;border-left:1px solid}
-.omk-frame-corner.tr{top:-14px;right:-14px;border-top:1px solid;border-right:1px solid}
-.omk-frame-corner.bl{bottom:-14px;left:-14px;border-bottom:1px solid;border-left:1px solid}
-.omk-frame-corner.br{bottom:-14px;right:-14px;border-bottom:1px solid;border-right:1px solid}
-.omk-titleblock{position:relative;padding:2px 4px}
-.omk-eyebrow{font-family:var(--syne);font-size:13px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--om-gold);margin-bottom:10px}
-.omk-title{font-family:var(--serif);font-style:italic;font-weight:600;font-size:38px;color:var(--om-cream);letter-spacing:.01em;line-height:1.18}
-.omk-title-rule{width:46px;height:1px;background:var(--om-gold);opacity:.55;margin:11px 0 13px}
-.omk-meta-row{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;color:var(--om-sub);flex-wrap:wrap;margin-bottom:12px;letter-spacing:.02em}
-.omk-meta-sep{width:1px;height:11px;background:var(--om-line2);opacity:.9}
-.omk-meta-item{color:var(--om-sub)}
-.om-status{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--om-gold);background:rgba(255,255,255,.025);border:1px solid rgba(198,154,52,.22);padding:6px 14px;border-radius:99px;letter-spacing:.02em}
-.om-status-dot{width:6px;height:6px;border-radius:50%;background:var(--om-online);box-shadow:0 0 7px var(--om-online);animation:omkBlink 2.2s infinite;flex-shrink:0}
-.om-status.closed .om-status-dot{background:#8a6d3a;box-shadow:none;animation:none}
-@keyframes omkBlink{0%,100%{opacity:1}50%{opacity:.35}}
-.om-staff-row{position:relative;display:flex;align-items:center;gap:0;flex-wrap:wrap;margin-top:22px;padding-top:16px;border-top:1px solid var(--om-line2)}
-.om-staff{display:flex;align-items:center;gap:9px;padding:0 18px}
-.om-staff:first-child{padding-left:0}
-.om-staff+.om-staff{border-left:1px solid var(--om-line2)}
-.om-staff-av{position:relative;width:29px;height:29px;border-radius:50%;background:var(--om-bg);border:1px solid rgba(240,234,214,.22);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:11px;font-weight:600;color:var(--om-cream);flex-shrink:0}
-.om-dot-on{position:absolute;bottom:-1px;right:-1px;width:7px;height:7px;border-radius:50%;background:var(--om-online);border:1.5px solid var(--om-bg)}
-.om-staff-name{font-size:11px;font-weight:600;color:var(--om-cream);letter-spacing:.01em}
-.om-staff-role{font-size:9px;color:var(--om-sub);letter-spacing:.03em;margin-top:1px}
-.om-rooms{position:relative;display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
-.om-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:2px;border:1px solid rgba(198,154,52,.18);background:transparent;color:var(--om-sub);font-family:var(--syne);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s}
-.om-chip i{color:var(--om-gold);opacity:.75}
-.om-chip:hover{border-color:var(--om-gold);color:var(--om-cream)}
-.om-chip.active{border-color:var(--om-gold);color:var(--om-gold);background:rgba(198,154,52,.07)}
-.om-activity{position:relative;margin-top:16px;display:flex;flex-direction:column;gap:6px;min-height:0}
-.om-activity-item{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--om-sub);letter-spacing:.01em}
-.om-activity-item b{color:var(--om-cream);font-weight:600}
-.om-activity-dot{width:3px;height:3px;border-radius:50%;background:var(--om-gold);flex-shrink:0}
-.om-activity-empty{font-size:11px;color:var(--om-sub);opacity:.55;font-style:italic;font-family:var(--serif)}
-.om-footer{position:relative;margin-top:16px;padding-top:14px;border-top:1px solid var(--om-line2);font-size:10px;color:var(--om-sub);display:flex;align-items:center;gap:7px;letter-spacing:.02em}
-.om-footer i{color:var(--om-gold)}
-@media(max-width:700px){
-  .omk-title{font-size:26px}
-  .office-masthead-kts{padding:24px 20px 16px}
-  .om-staff{padding:0 14px}
-}
-@media(min-width:769px){
-  .topbar{display:none}
-  .content{padding-top:22px}
-}
-</style>
-
-<div class="office-masthead-kts" id="officeMastheadKts" style="width: 100%; max-width: 1114px; min-height: 294px">
-  <div class="omk-frame">
-    <div class="omk-frame-corner tl"></div>
-    <div class="omk-frame-corner tr"></div>
-    <div class="omk-frame-corner bl"></div>
-    <div class="omk-frame-corner br"></div>
-    <div class="omk-titleblock">
-      <div class="omk-eyebrow">Mạng lưới Kiến trúc sư toàn quốc</div>
-      <div class="omk-title">Văn phòng KTS</div>
-      <div class="omk-title-rule"></div>
-      <div class="om-status" id="omkStatusWrap"><span class="om-status-dot"></span><span id="omkStatusText">Đang mở cửa · Giờ 8:00–18:00</span></div>
-    </div>
-  </div>
-
-  <div class="om-rooms" id="omkRooms">
-    <button class="om-chip active" data-room="desk" onclick="omkGoRoom('desk')"><i class="ph-duotone ph-note-pencil"></i>Bàn làm việc</button>
-    <button class="om-chip" data-room="meeting" onclick="omkGoRoom('meeting')"><i class="ph-duotone ph-users-three"></i>Phòng họp</button>
-    <button class="om-chip" data-room="archive" onclick="omkGoRoom('archive')"><i class="ph-duotone ph-archive"></i>Kho hồ sơ</button>
-    <button class="om-chip" data-room="progress" onclick="omkGoRoom('progress')"><i class="ph-duotone ph-chart-line-up"></i>Bảng tiến độ</button>
-  </div>
-
-  <div class="om-activity" id="omkActivity"></div>
-</div>
+  <div class="content">
 
     <!-- GREETING -->
     <div style="margin-bottom:22px">
       <div style="font-size:12px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:10px">
         <span id="greetingDate">—</span>
-        <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(21,128,61,.2);padding:2px 9px;border-radius:99px"><span style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block"></span>Online</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(22,163,74,.2);padding:2px 9px;border-radius:99px"><span style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block"></span>Online</span>
       </div>
       <div style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--text);letter-spacing:-.4px;line-height:1.15" id="greetingName">KTS. Trần Đại Long</div>
     </div>
@@ -826,7 +601,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       </div>
       <div class="stat-card s-green">
         <div class="stat-label"><i class="ph-duotone ph-wallet"></i> Ví khả dụng</div>
-        <div class="stat-val" id="heroWallet">0đ</div>
+        <div class="stat-val" id="heroWallet">3.87M</div>
         <div class="stat-sub">Tổng số dư VND</div>
         <svg class="stat-spark" viewBox="0 0 64 24" width="64" height="24" xmlns="http://www.w3.org/2000/svg">
           <polyline points="0,18 10,14 20,16 30,12 40,8 52,10 64,4" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -855,9 +630,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     ══════════════════════════════════ -->
     <div class="dash-2col">
     <div><!-- LEFT: SLA -->
-    <div class="sec-label no-line sla-section" id="ktsAnchorDesk" style="justify-content:space-between">
+    <div class="sec-label no-line sla-section" style="justify-content:space-between">
       <span>Nhiệm vụ ưu tiên</span>
-      <span style="font-size:10px;font-weight:600;color:var(--amber);background:var(--amber-bg);border:1px solid rgba(152,105,10,.2);padding:2px 9px;border-radius:99px;letter-spacing:0;text-transform:none">1 đang chờ</span>
+      <span style="font-size:10px;font-weight:600;color:var(--amber);background:var(--amber-bg);border:1px solid rgba(217,119,6,.2);padding:2px 9px;border-radius:99px;letter-spacing:0;text-transform:none">1 đang chờ</span>
     </div>
     <div class="sla-card normal" id="slaCard">
       <div class="sla-glow"></div>
@@ -867,7 +642,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <div>
           <div style="font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:baseline;gap:6px">
             <span id="slaProjName">Biệt thự Vườn Tân Cổ Điển</span>
-            <span style="font-size:10px;font-weight:500;color:var(--muted)" id="slaProjId"></span>
+            <span style="font-size:10px;font-weight:500;color:var(--muted)" id="slaProjId">#ALN-9921</span>
           </div>
           <div style="font-size:11px;color:var(--muted);margin-top:3px">Chủ nhà gửi <span id="revLabel">yêu cầu sửa lần 2</span></div>
         </div>
@@ -884,7 +659,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
       <!-- Reward / penalty info -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-        <div style="background:var(--green-bg);border:1px solid rgba(21,128,61,.2);border-radius:var(--r-sm);padding:10px 12px">
+        <div style="background:var(--green-bg);border:1px solid rgba(22,163,74,.2);border-radius:var(--r-sm);padding:10px 12px">
           <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:4px">+0.2 uy tín nếu đúng hạn</div>
           <div style="font-size:10px;color:var(--muted)">Còn <b id="bonusCountdown" style="color:var(--green)">07:22:45</b></div>
         </div>
@@ -929,15 +704,15 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <div style="display:flex;flex-direction:column">
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
             <span style="font-size:12px;color:var(--text2)">Ví chính (khả dụng)</span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--green)" id="quickWalletMain">0đ</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--green)">3.87M</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
             <span style="font-size:12px;color:var(--text2)">Chờ giải ngân <span style="color:var(--amber);font-size:10px;font-weight:700;background:var(--amber-bg);padding:1px 5px;border-radius:4px">C3</span></span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--amber)" id="quickWalletPending">0đ</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--amber)">18.75M</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
             <span style="font-size:12px;color:var(--text2)">Thuế TNCN tích lũy</span>
-            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--red)" id="quickWalletTax">0đ</span>
+            <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--red)">297K</span>
           </div>
         </div>
         <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px;justify-content:center;border-color:var(--border)" onclick="window.ktsShowTab('wallet')">
@@ -993,22 +768,22 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
             <svg viewBox="0 0 400 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:90px">
               <defs>
                 <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#98690a" stop-opacity=".15"/>
-                  <stop offset="100%" stop-color="#98690a" stop-opacity="0"/>
+                  <stop offset="0%" stop-color="#7c3aed" stop-opacity=".15"/>
+                  <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
                 </linearGradient>
               </defs>
-              <line x1="0" y1="0"  x2="400" y2="0"  stroke="#e1e7ee" stroke-width=".8"/>
-              <line x1="0" y1="30" x2="400" y2="30" stroke="#e1e7ee" stroke-width=".8"/>
-              <line x1="0" y1="60" x2="400" y2="60" stroke="#e1e7ee" stroke-width=".8"/>
-              <line x1="0" y1="72" x2="400" y2="72" stroke="#e1e7ee" stroke-width=".8"/>
+              <line x1="0" y1="0"  x2="400" y2="0"  stroke="#e2e8f0" stroke-width=".8"/>
+              <line x1="0" y1="30" x2="400" y2="30" stroke="#e2e8f0" stroke-width=".8"/>
+              <line x1="0" y1="60" x2="400" y2="60" stroke="#e2e8f0" stroke-width=".8"/>
+              <line x1="0" y1="72" x2="400" y2="72" stroke="#e2e8f0" stroke-width=".8"/>
               <path d="M0,72 C40,68 60,64 100,56 S160,46 200,44 S260,36 300,24 S360,8 400,4 L400,72 L0,72Z" fill="url(#cg)"/>
-              <path d="M0,72 C40,68 60,64 100,56 S160,46 200,44 S260,36 300,24 S360,8 400,4" fill="none" stroke="#98690a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="400" cy="4" r="4.5" fill="#98690a" stroke="#fff" stroke-width="2"/>
-              <text x="0"   y="86" font-size="9" fill="#8a96a5" text-anchor="middle" font-family="sans-serif">01</text>
-              <text x="100" y="86" font-size="9" fill="#8a96a5" text-anchor="middle" font-family="sans-serif">08</text>
-              <text x="200" y="86" font-size="9" fill="#8a96a5" text-anchor="middle" font-family="sans-serif">15</text>
-              <text x="300" y="86" font-size="9" fill="#8a96a5" text-anchor="middle" font-family="sans-serif">22</text>
-              <text x="400" y="86" font-size="9" fill="#8a96a5" text-anchor="middle" font-family="sans-serif">30</text>
+              <path d="M0,72 C40,68 60,64 100,56 S160,46 200,44 S260,36 300,24 S360,8 400,4" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="400" cy="4" r="4.5" fill="#7c3aed" stroke="#fff" stroke-width="2"/>
+              <text x="0"   y="86" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="sans-serif">01</text>
+              <text x="100" y="86" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="sans-serif">08</text>
+              <text x="200" y="86" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="sans-serif">15</text>
+              <text x="300" y="86" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="sans-serif">22</text>
+              <text x="400" y="86" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="sans-serif">30</text>
             </svg>
           </div>
         </div>
@@ -1069,7 +844,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <!-- ══════════════════════════════════
          MODULE 2 — WALLET
     ══════════════════════════════════ -->
-    <div class="sec-label wallet-section"><i class="ph-duotone ph-wallet" style="font-size:13px"></i> Ví thu nhập</div>
+    <div class="sec-label wallet-section"><i class="ph-duotone ph-wallet" style="font-size:13px"></i> Ví thu nhập & Payout Lock</div>
     <div class="grid2-3" style="gap:12px">
       <div class="card">
         <div class="card-title"><div class="ct-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-wallet"></i></div>Tổng quan Ví</div>
@@ -1077,52 +852,82 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           <!-- Ví chính -->
           <div class="wallet-pocket wp-main">
             <div class="wp-label"><i class="ph-duotone ph-circle" style="font-size:7px"></i> Ví chính</div>
-            <div class="wp-amount" id="walletMainAmt">—</div>
+            <div class="wp-amount">3,878,220đ</div>
             <div class="wp-sub">Khả dụng · Rút được ngay</div>
             <button class="btn btn-sm btn-green" style="margin-top:7px;width:100%" onclick="openWithdrawModal()"><i class="ph-duotone ph-sign-out"></i> Rút tiền</button>
           </div>
 
           <!-- Ví tạm ứng — PAYOUT LOCK -->
           <div class="wallet-pocket wp-locked" id="lockedWallet">
-            <div class="wp-label"><i class="ph-duotone ph-lock" style="font-size:7px"></i> Chờ giải ngân</div>
-            <div class="wp-amount" id="lockedAmount">0đ</div>
-            <div class="wp-sub">Chặng đã duyệt · chờ chuyển khoản</div>
+            <div class="wp-label"><i class="ph-duotone ph-lock" style="font-size:7px"></i> Ví tạm ứng (C2)</div>
+            <div class="wp-amount" id="lockedAmount">1,920,000đ</div>
+            <div class="wp-sub">40% C2 · 8% tổng HĐ</div>
             <div class="lock-seal">
               <i class="ph-duotone ph-lock"></i>
-              Chờ Founder xác nhận
+              PAYOUT LOCK · Chờ CN duyệt
             </div>
           </div>
 
           <!-- Chờ giải ngân -->
           <div class="wallet-pocket wp-pending">
-            <div class="wp-label"><i class="ph-duotone ph-hourglass-medium" style="font-size:7px"></i> Tổng gốc theo chặng</div>
-            <div class="wp-amount" id="walletGrossAmt">0đ</div>
-            <div class="wp-sub">Giá trị chặng đã duyệt (trước khấu trừ)</div>
+            <div class="wp-label"><i class="ph-duotone ph-hourglass-medium" style="font-size:7px"></i> Chờ giải ngân</div>
+            <div class="wp-amount">0đ</div>
+            <div class="wp-sub">Maker→Checker xử lý</div>
           </div>
 
           <!-- Thuế đã khấu trừ -->
           <div class="wallet-pocket wp-tax">
-            <div class="wp-label"><i class="ph-duotone ph-receipt" style="font-size:7px"></i> Đã khấu trừ</div>
-            <div class="wp-amount" style="color:var(--muted)" id="walletDeductAmt">0đ</div>
-            <div class="wp-sub">20% phí sàn + 7% thuế TNCN</div>
+            <div class="wp-label"><i class="ph-duotone ph-receipt" style="font-size:7px"></i> Thuế đã KT</div>
+            <div class="wp-amount" style="color:var(--muted)">297,780đ</div>
+            <div class="wp-sub">7% · Sàn nộp hộ</div>
           </div>
         </div>
 
         <div class="dv"></div>
-        <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">Phân tích thu nhập</div>
-        <div id="walletBreakdown" style="font-size:11px;color:var(--muted);background:var(--ink3);border-radius:var(--r-sm);padding:10px;border:1px solid var(--border)">Chưa có giao dịch nào.</div>
+        <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">Phân tích thu nhập Chặng 2</div>
+        <div style="font-size:11px;color:var(--muted);background:var(--ink3);border-radius:var(--r-sm);padding:10px;border:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>CN nạp C2 (20% HĐ)</span><span style="color:var(--text);font-weight:600;font-family:var(--mono)">4,800,000đ</span></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Phí sàn (13%)</span><span style="color:var(--red);font-family:var(--mono)">−624,000đ</span></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Thuế 7% (GTGT+TNCN)</span><span style="color:var(--red);font-family:var(--mono)">−297,780đ</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0 0;font-weight:700;color:var(--green)"><span>KTS nhận NET</span><span style="font-family:var(--mono);font-size:13px">3,878,220đ</span></div>
+        </div>
         <div style="margin-top:8px;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:6px;background:var(--amber-bg);border:1px solid rgba(255,170,51,.2);border-radius:5px;padding:7px 10px">
           <i class="ph-duotone ph-info" style="color:var(--amber)"></i>
-          <span>Khoản <b style="color:var(--amber)">chờ giải ngân</b> sẽ vào Ví chính khi Founder xác nhận đã chuyển tiền. Số hiển thị là thực nhận sau khấu trừ.</span>
+          <span><b style="color:var(--amber)">1,920,000đ (tạm ứng)</b> sẽ tự động gộp vào ví chính khi Chủ nhà bấm Duyệt C2. Không thể rút trước.</span>
         </div>
       </div>
 
       <!-- TX history -->
       <div class="card">
         <div class="card-title"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-list-bullets"></i></div>Lịch sử giao dịch</div>
-        $1
-          <div style="text-align:center;padding:20px;font-size:11px;color:var(--muted)">Đang tải lịch sử giao dịch...</div>
-        $2 style="width:100%;margin-top:8px" onclick="showToast('Xem toàn bộ lịch sử GD','t-blue')">Xem thêm <i class="ph-duotone ph-caret-down"></i></button>
+        <div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ph-duotone ph-lock"></i></div>
+            <div class="tx-info"><div class="tx-title">Ví tạm ứng C2 kích hoạt</div><div class="tx-meta">#9921 · 05/06 09:42</div></div>
+            <div class="tx-amount tx-lock">+1,920,000đ</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-money"></i></div>
+            <div class="tx-info"><div class="tx-title">Giải ngân C1 — #9921</div><div class="tx-meta">Checker APPROVE · 03/06</div></div>
+            <div class="tx-amount tx-pos">+1,878,220đ</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--red-bg);color:var(--red)"><i class="ph-duotone ph-receipt"></i></div>
+            <div class="tx-info"><div class="tx-title">Thuế khấu trừ C1</div><div class="tx-meta">5% GTGT + 2% TNCN · 03/06</div></div>
+            <div class="tx-amount tx-neg">−141,780đ</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--green-bg);color:var(--green)"><i class="ph-duotone ph-money"></i></div>
+            <div class="tx-info"><div class="tx-title">Giải ngân C2 — #9834</div><div class="tx-meta">Checker APPROVE · 28/05</div></div>
+            <div class="tx-amount tx-pos">+8,040,000đ</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-bank"></i></div>
+            <div class="tx-info"><div class="tx-title">Rút về Vietcombank</div><div class="tx-meta">**** 4521 · 25/05</div></div>
+            <div class="tx-amount tx-neg">−6,000,000đ</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:8px" onclick="showToast('Xem toàn bộ lịch sử GD','t-blue')">Xem thêm <i class="ph-duotone ph-caret-down"></i></button>
       </div>
     </div>
 
@@ -1134,60 +939,34 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       .pa-inp{width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:var(--sans);font-size:13px;box-sizing:border-box}
       .pa-inp:focus{outline:none;border-color:var(--gold)}
       .pa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px}
-      .pa-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:1.5px dashed rgba(152,105,10,.35);border-radius:10px;padding:18px;cursor:pointer;transition:all .15s;min-height:90px}
-      .pa-drop:hover{border-color:var(--gold);background:rgba(152,105,10,.05)}
-      .pa-drop.dragover{border-color:var(--gold);background:rgba(152,105,10,.12);border-style:solid}
+      .pa-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:1.5px dashed rgba(212,160,23,.35);border-radius:10px;padding:18px;cursor:pointer;transition:all .15s;min-height:90px}
+      .pa-drop:hover{border-color:var(--gold);background:rgba(212,160,23,.05)}
+      .pa-drop.dragover{border-color:var(--gold);background:rgba(212,160,23,.12);border-style:solid}
       .pa-thumb{position:relative;width:96px;height:96px;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--ink3)}
       .pa-thumb img{width:100%;height:100%;object-fit:cover;display:block}
       .pa-thumb .pa-x{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center}
       .pa-thumb .pa-x:hover{background:var(--red)}
       .pa-thumb .pa-nm{position:absolute;left:0;right:0;bottom:0;font-size:8px;color:#fff;background:rgba(0,0,0,.55);padding:2px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     </style>
-    <div class="sec-label proposal-section">📐 Gửi phương án thiết kế cho Chủ nhà</div>
+    <div class="sec-label proposal-section">📐 Gửi phương án thiết kế (ảnh) cho Chủ nhà</div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
         <div>
-          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-image-square"></i></div>Phương án — <span id="paProjTitle"></span></div>
-          <div style="font-size:11px;color:var(--muted)">Chặng C1 &amp; C2 yêu cầu trình bày qua <b style="color:var(--gold)">ALN Board PA</b> — chuẩn hóa chất lượng trình bày cho khách hàng</div>
+          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-image-square"></i></div>Gửi phương án — <span id="paProjTitle">#ALN-9921</span></div>
+          <div style="font-size:11px;color:var(--muted)">Chọn chặng · chọn ảnh JPG/PNG · điền tên &amp; mô tả → Chủ nhà xem ảnh rồi chốt qua chat ALN</div>
         </div>
       </div>
 
-      <!-- PRIMARY: Board PA -->
-      <div style="background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.25);border-radius:10px;padding:14px 16px;margin-bottom:14px">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <i class="ph-duotone ph-layout" style="font-size:20px;color:var(--gold)"></i>
-          <div>
-            <div style="font-size:13px;font-weight:700;color:var(--text)">Tạo Board PA <span style="font-size:10px;background:var(--gold);color:#080c14;border-radius:4px;padding:1px 7px;font-weight:800;margin-left:4px">BẮT BUỘC C1 · C2</span></div>
-            <div style="font-size:11px;color:var(--muted);margin-top:1px">Upload ảnh phối cảnh · điền thông tin công trình · export &amp; nộp trong 1 bước</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <label class="pa-lbl" style="margin:0;white-space:nowrap">Chặng</label>
-          <select id="paStage" class="pa-inp" style="width:auto;flex:0 0 auto">
+      <div class="pa-grid">
+        <div>
+          <label class="pa-lbl">Chặng</label>
+          <select id="paStage" class="pa-inp">
             <option value="C1">C1 — Ý tưởng 2D</option>
             <option value="C2" selected>C2 — Phối cảnh 3D</option>
             <option value="C3">C3 — Hồ sơ KT</option>
             <option value="C4">C4 — Dự toán &amp; BH</option>
           </select>
-          <button class="btn btn-primary" onclick="window.openBoardEditor()" style="background:var(--gold);border-color:var(--gold);color:#080c14;font-weight:800">
-            <i class="ph-duotone ph-layout"></i> Mở Board PA →
-          </button>
         </div>
-      </div>
-
-      <!-- FALLBACK: ảnh rời -->
-      <div style="margin-bottom:8px">
-        <button onclick="this.parentElement.nextElementSibling.style.display=this.parentElement.nextElementSibling.style.display==='none'?'block':'none'" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:0;font-family:var(--sans);display:flex;align-items:center;gap:4px">
-          <i class="ph-duotone ph-warning" style="color:var(--amber)"></i> Dự phòng: Gửi ảnh rời (chỉ dùng khi Board PA lỗi kỹ thuật)
-          <i class="ph-duotone ph-caret-down" style="font-size:10px"></i>
-        </button>
-      </div>
-      <div style="display:none">
-        <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--amber)">
-          ⚠️ Chỉ sử dụng khi Board PA không load được. Ảnh rời không đạt chuẩn trình bày ALN.
-        </div>
-
-      <div class="pa-grid">
         <div>
           <label class="pa-lbl">Loại phương án</label>
           <select id="paFolder" class="pa-inp">
@@ -1224,18 +1003,6 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <button class="btn btn-ghost btn-sm" onclick="alnResetProposalForm()"><i class="ph-duotone ph-arrow-counter-clockwise"></i> Xóa form</button>
       </div>
 
-      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Nộp hồ sơ tài liệu C2 (file PDF/ZIP) kèm xác định vị trí</div>
-        <label class="pa-drop" id="c2FileDrop" for="c2FileInput" style="margin-bottom:8px">
-          <input type="file" id="c2FileInput" multiple style="display:none" onchange="c2HandleFiles(this.files)">
-          <div id="c2DropHint"><i class="ph-duotone ph-file-arrow-up" style="font-size:22px;color:var(--gold)"></i><div style="margin-top:5px;font-size:12px;color:var(--muted)"><b>Kéo &amp; thả</b> hoặc <b>bấm để chọn</b> hồ sơ C2<br>PDF · ZIP · RAR · PNG</div></div>
-        </label>
-        <div id="c2FilePreview" style="margin-bottom:8px"></div>
-        <button class="btn btn-primary" id="submitC2Btn" onclick="c2OpenModal()"><i class="ph-duotone ph-map-pin"></i> Nộp Hồ sơ C2</button>
-      </div>
-
-      </div><!-- /fallback collapse -->
-
       <div style="margin-top:16px">
         <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Phương án đã gửi (chặng <span id="paListStageLbl">C2</span>)</div>
         <div id="paSentList" style="display:flex;flex-direction:column;gap:6px"><div style="color:var(--muted);font-size:12px">Đang tải...</div></div>
@@ -1245,7 +1012,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <!-- ══════════════════════════════════
          MODULE 2c — BẢNG REVIEW DỰ ÁN
     ══════════════════════════════════ -->
-    <div class="sec-label review-section" id="ktsAnchorArchive"><i class="ph-duotone ph-clipboard-text" style="font-size:13px"></i> Bảng Review & Tài liệu dự án</div>
+    <div class="sec-label review-section"><i class="ph-duotone ph-clipboard-text" style="font-size:13px"></i> Bảng Review & Tài liệu dự án</div>
     <div class="card">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
         <div>
@@ -1284,7 +1051,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
         <div>
-          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-folder-open"></i></div>Cổng nộp Hồ sơ C3 — <span id="c3ProjId"></span></div>
+          <div class="card-title" style="margin-bottom:3px"><div class="ct-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-folder-open"></i></div>Cổng nộp Hồ sơ C3 — <span id="c3ProjId">#ALN-9921</span></div>
           <div style="font-size:11px;color:var(--muted)">3 hạng mục bắt buộc · 3 tùy chọn (bật khi cần) · Auto-scan · Excel 0% lỗi hàm</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
@@ -1301,24 +1068,20 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <!-- Validation bar -->
       <div class="c3-validation-bar" id="validationBar">
         <div style="font-size:10px;font-weight:700;color:var(--muted);width:100%;margin-bottom:3px">TRẠNG THÁI KIỂM TRA TỰ ĐỘNG:</div>
-        <div class="cv-item"><div class="cv-dot" style="background:rgba(152,105,10,.3)"></div><span id="v-arch" style="color:var(--muted)">Kiến trúc</span></div>
-        <div class="cv-item"><div class="cv-dot" style="background:rgba(152,105,10,.3)"></div><span id="v-struct" style="color:var(--muted)">Kết cấu</span></div>
-        <div class="cv-item"><div class="cv-dot" style="background:rgba(152,105,10,.3)"></div><span id="v-mep" style="color:var(--muted)">M&E</span></div>
-        <div class="cv-item"><div class="cv-dot" style="background:rgba(152,105,10,.3)"></div><span id="v-steel" style="color:var(--muted)">Thép Excel</span></div>
-        <div class="cv-item"><div class="cv-dot" style="background:rgba(152,105,10,.3)"></div><span id="v-mat" style="color:var(--muted)">Vật tư</span></div>
-        <div class="cv-item"><div class="cv-dot" style="background:rgba(152,105,10,.3)"></div><span id="v-budget" style="color:var(--muted)">Dự toán</span></div>
+        <div class="cv-item"><div class="cv-dot" style="background:rgba(212,160,23,.3)"></div><span id="v-arch" style="color:var(--muted)">Kiến trúc</span></div>
+        <div class="cv-item"><div class="cv-dot" style="background:rgba(212,160,23,.3)"></div><span id="v-struct" style="color:var(--muted)">Kết cấu</span></div>
+        <div class="cv-item"><div class="cv-dot" style="background:rgba(212,160,23,.3)"></div><span id="v-mep" style="color:var(--muted)">M&E</span></div>
+        <div class="cv-item"><div class="cv-dot" style="background:rgba(212,160,23,.3)"></div><span id="v-steel" style="color:var(--muted)">Thép Excel</span></div>
+        <div class="cv-item"><div class="cv-dot" style="background:rgba(212,160,23,.3)"></div><span id="v-mat" style="color:var(--muted)">Vật tư</span></div>
+        <div class="cv-item"><div class="cv-dot" style="background:rgba(212,160,23,.3)"></div><span id="v-budget" style="color:var(--muted)">Dự toán</span></div>
       </div>
 
       <!-- Scan result (shown after submit) -->
       <div class="scan-result" id="scanResult"></div>
 
-      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center">
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
         <button class="btn btn-ghost btn-sm" onclick="simUploadDemo()"><i class="ph-duotone ph-lightning"></i> [Demo] Upload 6 file mẫu</button>
         <button class="btn btn-ghost btn-sm" onclick="simUploadError()"><i class="ph-duotone ph-bug"></i> [Demo] File Excel lỗi hàm</button>
-        <div style="flex:1"></div>
-        <button class="btn btn-ghost btn-sm" onclick="window.openKhungBV()" style="border-color:rgba(184,134,11,.4);color:#b8860b">
-          <i class="ph-duotone ph-frame-corners"></i> Khung bản vẽ &amp; Ma trận ký
-        </button>
         <button class="btn btn-primary" id="submitC3Btn" disabled onclick="submitC3()"><i class="ph-duotone ph-cloud-arrow-up"></i> Nộp Hồ sơ C3</button>
       </div>
     </div>
@@ -1349,7 +1112,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           <div class="card-title" style="margin-bottom:2px"><div class="ct-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-crown"></i></div>Gói nâng cấp hiển thị & Đẩy tin</div>
           <div style="font-size:11px;color:var(--muted)">Thanh toán bằng Ví chính · Có hiệu lực ngay lập tức</div>
         </div>
-        <div style="font-size:12px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(34,201,122,.3);padding:5px 12px;border-radius:99px"><i class="ph-duotone ph-wallet"></i> <span id="vipWalletPill">Ví: 0đ</span></div>
+        <div style="font-size:12px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid rgba(34,201,122,.3);padding:5px 12px;border-radius:99px"><i class="ph-duotone ph-wallet"></i> Ví: 3,878,220đ</div>
       </div>
 
       <div class="vip-grid" id="vipGrid"><!-- injected by JS --></div>
@@ -1362,7 +1125,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
 
 
     <!-- ═══ DỰ ÁN CỦA TÔI ═══ -->
-    <div class="sec-label myproj-section" id="ktsAnchorProgress"><i class="ph-duotone ph-briefcase" style="font-size:13px"></i> Dự án của tôi</div>
+    <div class="sec-label myproj-section"><i class="ph-duotone ph-briefcase" style="font-size:13px"></i> Dự án của tôi</div>
     <div id="myProjList">
       <div style="color:var(--muted);font-size:13px;text-align:center;padding:24px">Đang tải...</div>
     </div>
@@ -1378,22 +1141,6 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       </label>
       <input type="file" id="profileAvatarInput" accept="image/*" style="display:none" onchange="uploadProfileAvatar(this)">
       <div id="profileUploadStatus" style="font-size:11px;color:var(--muted)"></div>
-    </div>
-
-    <!-- Chữ ký số -->
-    <div style="background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:12px">
-      <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:10px">CHỮ KÝ ĐIỆN TỬ</div>
-      <div id="sigPreviewWrap" style="background:#fff;border-radius:6px;height:72px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;overflow:hidden;border:1px dashed #ccc">
-        <span id="sigPreviewEmpty" style="font-size:11px;color:#aaa">Chưa có chữ ký</span>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <label class="profile-upload-btn" for="sigInput" style="margin:0">
-          <i class="ph-duotone ph-pen-nib"></i> Upload chữ ký scan
-        </label>
-        <input type="file" id="sigInput" accept="image/*" style="display:none" onchange="uploadSignature(this)">
-        <span id="sigUploadStatus" style="font-size:11px;color:var(--muted)"></span>
-      </div>
-      <div style="font-size:10px;color:var(--muted);margin-top:7px">Ảnh PNG/JPG nền trắng · Tỷ lệ 3:1 · Dùng khi ký khung bản vẽ C3</div>
     </div>
     <div class="profile-field">
       <label>Họ tên</label>
@@ -1411,119 +1158,9 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <label>Chứng chỉ hành nghề</label>
       <input type="text" id="profileLicense" placeholder="KTS-2021-xxxxx">
     </div>
-    <div class="profile-field">
-      <label>Giới tính</label>
-      <select id="profileGender" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;outline:none">
-        <option value="">— Không muốn nói —</option>
-        <option value="nam">Nam</option>
-        <option value="nu">Nữ</option>
-      </select>
-    </div>
-    <!-- ─── Tỉnh/Thành gốc ─── -->
-    <div class="profile-field">
-      <label>Tỉnh/Thành gốc</label>
-      <select id="profileHomeProvince" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;outline:none">
-        <option value="">— Chọn tỉnh thành —</option>
-        <option value="HCM">TP. Hồ Chí Minh</option>
-        <option value="HN">Hà Nội</option>
-        <option value="DN">Đà Nẵng</option>
-        <option value="CT">Cần Thơ</option>
-        <option value="HP">Hải Phòng</option>
-        <option value="BD">Bình Dương</option>
-        <option value="DNai">Đồng Nai</option>
-        <option value="BR-VT">Vũng Tàu</option>
-        <option value="LA">Long An</option>
-        <option value="TG">Tiền Giang</option>
-        <option value="AG">An Giang</option>
-        <option value="KG">Kiên Giang</option>
-        <option value="DL">Đắk Lắk</option>
-        <option value="KH">Khánh Hòa</option>
-        <option value="BDinh">Bình Định</option>
-        <option value="NA">Nghệ An</option>
-        <option value="TH">Thanh Hóa</option>
-        <option value="OTHER">Tỉnh/Thành khác</option>
-      </select>
-    </div>
-
-    <!-- ─── Địa điểm tạm thời ─── -->
-    <div style="background:rgba(34,211,238,.05);border:1px solid rgba(34,211,238,.2);border-radius:10px;padding:12px 14px;margin-bottom:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <div style="font-size:10px;font-weight:700;color:var(--cyan);letter-spacing:.1em;text-transform:uppercase"><i class="ph-duotone ph-map-pin"></i> Địa điểm tạm thời</div>
-        <div id="tempLocBadge" style="display:none;font-size:9px;font-weight:700;padding:2px 9px;border-radius:99px;background:rgba(34,211,238,.18);color:var(--cyan)">Đang bật</div>
-      </div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Đang công tác ở tỉnh khác? Bật để được gợi ý dự án nơi đó.</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <div>
-          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Đang ở tại</div>
-          <select id="tempLocProvince" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
-            <option value="">— Chọn tỉnh —</option>
-            <option value="HCM">TP. Hồ Chí Minh</option>
-            <option value="HN">Hà Nội</option>
-            <option value="DN">Đà Nẵng</option>
-            <option value="CT">Cần Thơ</option>
-            <option value="HP">Hải Phòng</option>
-            <option value="BD">Bình Dương</option>
-            <option value="DNai">Đồng Nai</option>
-            <option value="BR-VT">Vũng Tàu</option>
-            <option value="LA">Long An</option>
-            <option value="TG">Tiền Giang</option>
-            <option value="AG">An Giang</option>
-            <option value="KG">Kiên Giang</option>
-            <option value="DL">Đắk Lắk</option>
-            <option value="KH">Khánh Hòa</option>
-            <option value="BDinh">Bình Định</option>
-            <option value="NA">Nghệ An</option>
-            <option value="TH">Thanh Hóa</option>
-            <option value="OTHER">Tỉnh/Thành khác</option>
-          </select>
-        </div>
-        <div>
-          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Đến ngày</div>
-          <input type="date" id="tempLocUntil" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
-        </div>
-      </div>
-      <div style="display:flex;gap:6px">
-        <button onclick="setTempLocation()" style="flex:1;padding:8px;border-radius:7px;background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.35);color:var(--cyan);font-size:11px;font-weight:700;cursor:pointer"><i class="ph-duotone ph-check-circle"></i> Bật vị trí tạm</button>
-        <button onclick="clearTempLocation()" id="clearTempBtn" style="display:none;padding:8px 14px;border-radius:7px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);color:var(--red);font-size:11px;font-weight:700;cursor:pointer"><i class="ph-duotone ph-x-circle"></i> Tắt</button>
-      </div>
-    </div>
-
-    <!-- ─── Tài khoản nhận thanh toán ─── -->
-    <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:12px 14px;margin-bottom:12px">
-      <div style="font-size:10px;font-weight:700;color:var(--green);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px"><i class="ph-duotone ph-bank"></i> Tài khoản nhận thanh toán</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Founder dùng thông tin này để chuyển tiền mỗi khi bạn được duyệt chặng. Tự cập nhật, không ai khác sửa được.</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <div>
-          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Ngân hàng</div>
-          <input type="text" id="bankName" placeholder="Vietcombank" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
-        </div>
-        <div>
-          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Số tài khoản</div>
-          <input type="text" id="bankAccountNumber" placeholder="0123456789" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
-        </div>
-      </div>
-      <div style="margin-bottom:10px">
-        <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Chủ tài khoản</div>
-        <input type="text" id="bankAccountHolder" placeholder="NGUYEN VAN A" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none;text-transform:uppercase">
-      </div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <div id="qrPreviewWrap" style="width:64px;height:64px;border-radius:8px;background:var(--ink2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">
-          <i class="ph-duotone ph-qr-code" style="font-size:24px;color:var(--muted)" id="qrPlaceholderIcon"></i>
-        </div>
-        <div style="flex:1">
-          <button type="button" onclick="document.getElementById('qrCodeInput').click()" style="padding:7px 12px;border-radius:7px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:var(--green);font-size:11px;font-weight:700;cursor:pointer"><i class="ph-duotone ph-upload-simple"></i> Tải ảnh mã QR</button>
-          <input type="file" id="qrCodeInput" accept="image/*" style="display:none" onchange="uploadPaymentQr(this)">
-          <div id="qrUploadStatus" style="font-size:10px;color:var(--muted);margin-top:4px"></div>
-        </div>
-      </div>
-    </div>
-
     <button class="profile-save-btn" onclick="saveProfile()">
       <i class="ph-duotone ph-floppy-disk"></i> Lưu hồ sơ
     </button>
-    <a id="btnViewPublicProfile" href="#" class="profile-view-btn">
-      <i class="ph-duotone ph-user-circle"></i> Xem hồ sơ công khai
-    </a>
 
     <!-- ═══ UY TÍN ═══ -->
     <div class="sec-label reputation-section"><i class="ph-duotone ph-seal-check" style="font-size:13px"></i> Uy tín & Xếp hạng</div>
@@ -1535,7 +1172,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           <div style="font-size:14px;color:var(--muted)">/100</div>
         </div>
         <div style="background:var(--ink3);border-radius:99px;height:8px;overflow:hidden;margin-bottom:8px">
-          <div style="height:100%;width:84.5%;background:linear-gradient(90deg,#98690a,#b8860b);border-radius:99px;transition:width .6s ease"></div>
+          <div style="height:100%;width:84.5%;background:linear-gradient(90deg,#d4a017,#e8c44a);border-radius:99px;transition:width .6s ease"></div>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted)">
           <span>Chuẩn KTS</span><span style="color:var(--gold);font-weight:600">Còn 15.5đ lên PRO ★</span>
@@ -1544,17 +1181,17 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <div class="card" style="padding:20px">
         <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Hạng hiện tại</div>
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-          <div style="width:48px;height:48px;border-radius:12px;background:var(--gold-bg);border:1.5px solid rgba(152,105,10,.3);display:flex;align-items:center;justify-content:center;font-size:22px">⭐</div>
+          <div style="width:48px;height:48px;border-radius:12px;background:var(--gold-bg);border:1.5px solid rgba(212,160,23,.3);display:flex;align-items:center;justify-content:center;font-size:22px">⭐</div>
           <div>
             <div style="font-size:15px;font-weight:700;color:var(--text)">Chuẩn KTS</div>
             <div style="font-size:11px;color:var(--muted);margin-top:2px">Hạng 3 / 5 cấp độ</div>
           </div>
         </div>
         <div style="display:flex;gap:6px">
-          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--green-bg);border:1px solid rgba(21,128,61,.2)"><div style="font-size:9px;color:var(--green);font-weight:700">Mới</div><div style="font-size:9px;color:var(--muted)">0–30đ</div></div>
-          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--blue-bg);border:1px solid rgba(152,105,10,.2)"><div style="font-size:9px;color:var(--blue);font-weight:700">Tiêu Chuẩn</div><div style="font-size:9px;color:var(--muted)">30–60</div></div>
-          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--gold-bg);border:1.5px solid rgba(152,105,10,.4)"><div style="font-size:9px;color:var(--gold);font-weight:700">✓ Chuẩn KTS</div><div style="font-size:9px;color:var(--muted)">60–100</div></div>
-          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--purple-bg);border:1px solid rgba(152,105,10,.2)"><div style="font-size:9px;color:var(--purple);font-weight:700">PRO</div><div style="font-size:9px;color:var(--muted)">100+</div></div>
+          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--green-bg);border:1px solid rgba(22,163,74,.2)"><div style="font-size:9px;color:var(--green);font-weight:700">Mới</div><div style="font-size:9px;color:var(--muted)">0–30đ</div></div>
+          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--blue-bg);border:1px solid rgba(37,99,235,.2)"><div style="font-size:9px;color:var(--blue);font-weight:700">Tiêu Chuẩn</div><div style="font-size:9px;color:var(--muted)">30–60</div></div>
+          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--gold-bg);border:1.5px solid rgba(212,160,23,.4)"><div style="font-size:9px;color:var(--gold);font-weight:700">✓ Chuẩn KTS</div><div style="font-size:9px;color:var(--muted)">60–100</div></div>
+          <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--purple-bg);border:1px solid rgba(124,58,237,.2)"><div style="font-size:9px;color:var(--purple);font-weight:700">PRO</div><div style="font-size:9px;color:var(--muted)">100+</div></div>
           <div style="flex:1;text-align:center;padding:6px 4px;border-radius:7px;background:var(--ink3);border:1px solid var(--border)"><div style="font-size:9px;color:var(--muted);font-weight:700">VIP Gold</div><div style="font-size:9px;color:var(--muted)">150+</div></div>
         </div>
       </div>
@@ -1580,55 +1217,6 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       </div>
     </div>
 
-    <!-- ═══ KTS CREATOR ALN (pilot nội bộ — clip ngắn, lead theo mã định danh) ═══ -->
-    <div class="sec-label ktscreator-section"><i class="ph-duotone ph-video-camera" style="font-size:13px"></i> KTS Creator</div>
-    <div class="card" style="padding:20px;margin-bottom:14px">
-      <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px">Link định danh của bạn</div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <div id="ktscCode" style="font-family:var(--mono);font-weight:700;color:var(--gold);background:var(--gold-bg);border-radius:8px;padding:7px 12px;font-size:13px">—</div>
-        <div id="ktscLink" style="flex:1;min-width:200px;font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;word-break:break-all">—</div>
-        <button onclick="ktscCopyLink()" style="padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text);font-size:12px;font-weight:600;cursor:pointer">Copy</button>
-      </div>
-      <div id="ktscCopyOk" style="display:none;color:var(--green);font-size:11px;margin-top:6px">Đã copy!</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6">Dùng đúng link này (kèm watermark) trên mọi bản đăng TikTok/Facebook/YouTube — không gắn SĐT/Zalo cá nhân.</div>
-    </div>
-
-    <div class="card" style="padding:20px;margin-bottom:14px">
-      <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px">Nộp clip đạt chuẩn</div>
-      <input id="ktscTitle" type="text" placeholder="Tiêu đề clip" style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text);font-size:12px;font-family:inherit;outline:none;margin-bottom:8px">
-      <select id="ktscFormat" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text);font-size:12px;font-family:inherit;outline:none;margin-bottom:8px">
-        <option value="1">1 — Ý tưởng 2D (60s)</option>
-        <option value="2">2 — Timelapse 3D</option>
-        <option value="3">3 — Bóc hồ sơ thi công</option>
-        <option value="4">4 — Nhận tiền đúng hạn</option>
-      </select>
-      <div id="ktscUrlList"></div>
-      <button onclick="ktscAddUrlRow()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;margin-bottom:10px">+ Thêm URL</button>
-      <label style="display:flex;gap:8px;align-items:flex-start;font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:10px">
-        <input id="ktscCommit" type="checkbox" style="margin-top:2px">
-        Mọi bản đăng đều có watermark + link định danh, KHÔNG gắn SĐT/Zalo cá nhân.
-      </label>
-      <button id="ktscSubmitBtn" onclick="ktscSubmitClip()" style="width:100%;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#98690a,#b8860b);color:#fff;font-size:12px;font-weight:700;cursor:pointer">Nộp duyệt</button>
-      <div id="ktscErr" style="display:none;color:var(--red);font-size:11px;margin-top:8px"></div>
-      <div id="ktscOk" style="display:none;color:var(--green);font-size:11px;margin-top:8px">Đã nộp — chờ Founder duyệt.</div>
-    </div>
-
-    <div class="card" style="padding:20px;margin-bottom:14px">
-      <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px">Clip của tôi</div>
-      <div id="ktscClipList" style="font-size:12px;color:var(--muted)">Đang tải...</div>
-    </div>
-
-    <div class="card" style="padding:20px;margin-bottom:14px">
-      <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px">Kho kit</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <a href="icon-512.png" download style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text2);font-size:11px;font-weight:600;text-decoration:none">Logo/watermark</a>
-        <button onclick="ktscDownloadScript(1)" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer">Kịch bản #1</button>
-        <button onclick="ktscDownloadScript(2)" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer">Kịch bản #2</button>
-        <button onclick="ktscDownloadScript(3)" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer">Kịch bản #3</button>
-        <button onclick="ktscDownloadScript(4)" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer">Kịch bản #4</button>
-      </div>
-    </div>
-
     <!-- ═══ CÀI ĐẶT ═══ -->
     <div class="sec-label settings-section"><i class="ph-duotone ph-gear" style="font-size:13px"></i> Cài đặt</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
@@ -1646,11 +1234,6 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
           <div style="display:flex;align-items:center;justify-content:space-between">
             <div><div style="font-size:12px;font-weight:500;color:var(--text)">Đánh giá từ Chủ nhà</div><div style="font-size:11px;color:var(--muted)">Khi có review mới</div></div>
             <label style="position:relative;display:inline-block;width:38px;height:22px;cursor:pointer"><input type="checkbox" style="opacity:0;width:0;height:0"><span style="position:absolute;inset:0;background:var(--border2);border-radius:99px;transition:.2s"><span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.2s"></span></span></label>
-          </div>
-          <style>.lead-sw{position:relative;display:inline-block;width:38px;height:22px;cursor:pointer}.lead-sw input{opacity:0;width:0;height:0}.lead-sw .track{position:absolute;inset:0;background:var(--border2);border-radius:99px;transition:.2s}.lead-sw .knob{position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.2s}.lead-sw input:checked+.track{background:var(--green)}.lead-sw input:checked+.track .knob{transform:translateX(16px)}</style>
-          <div style="display:flex;align-items:center;justify-content:space-between">
-            <div><div style="font-size:12px;font-weight:500;color:var(--text)">Email dự án mới</div><div style="font-size:11px;color:var(--muted)">Nhận email khi có chủ nhà cần tư vấn trong khu vực bạn</div></div>
-            <label class="lead-sw"><input type="checkbox" id="tgLeadEmail" onchange="toggleLeadEmail(this)"><span class="track"><span class="knob"></span></span></label>
           </div>
         </div>
       </div>
@@ -1670,47 +1253,6 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       </div>
     </div>
 
-
-    <!-- THU VIEN NOI THAT -->
-    <div class="sec-label library-section"><i class="ph-duotone ph-couch" style="font-size:13px"></i> Thư viện nội thất</div>
-    <div class="card" style="padding:14px 16px;margin-bottom:14px"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div style="position:relative;flex:1;min-width:180px"><i class="ph-duotone ph-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px"></i><input id="libSearch" type="text" placeholder="Tìm bàn, ghế, tủ..." oninput="filterLibrary()" style="width:100%;box-sizing:border-box;padding:8px 10px 8px 32px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text);font-size:12px;font-family:inherit;outline:none"></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="lib-cat-btn on" onclick="setLibCat('all',this)">Tất cả</button><button class="lib-cat-btn" onclick="setLibCat('living',this)">Phòng khách</button><button class="lib-cat-btn" onclick="setLibCat('bedroom',this)">Phòng ngủ</button><button class="lib-cat-btn" onclick="setLibCat('kitchen',this)">Bếp &amp; Ăn</button><button class="lib-cat-btn" onclick="setLibCat('office',this)">Làm việc</button><button class="lib-cat-btn" onclick="setLibCat('outdoor',this)">Sân vườn</button></div></div></div>
-    <div id="libGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px"></div>
-    <div id="libEmpty" style="display:none;text-align:center;padding:40px;color:var(--muted);font-size:13px">Không tìm thấy sản phẩm</div>
-    <div id="libModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center"><div style="background:var(--ink2);border:1px solid var(--border);border-radius:16px;width:min(92vw,480px);max-height:85vh;overflow-y:auto;padding:24px;position:relative"><button onclick="document.getElementById('libModal').style.display='none'" style="position:absolute;top:14px;right:14px;background:var(--ink3);border:1px solid var(--border);border-radius:8px;width:30px;height:30px;cursor:pointer;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center"><i class="ph-duotone ph-x"></i></button><div id="libModalContent"></div></div></div>
-<script>
-var LIB_DATA=[
-  {id:'l01',cat:'living',emoji:'\ud83d\udecb\ufe0f',name:'Sofa g\u00f3c L',size:'280\xd7160\xd785 cm',mat:'V\u1ea3i b\u1ecdc / Da t\u1ed5ng h\u1ee3p',price:'8\u201335 tr',note:'Ph\u00f9 h\u1ee3p ph\u00f2ng kh\u00e1ch t\u1eeb 18m\xb2.',tags:['sofa','gh\u1ebf']},
-  {id:'l02',cat:'living',emoji:'\ud83e\ude91',name:'Gh\u1ebf \u0111\u01a1n armchair',size:'80\xd785\xd790 cm',mat:'G\u1ed7 + v\u1ea3i b\u1ecdc',price:'3\u201312 tr',note:'\u0110\u1eb7t g\u00f3c ph\u00f2ng kh\u00e1ch \u0111\u1ec3 t\u1ea1o \u0111i\u1ec3m nh\u1ea5n.',tags:['gh\u1ebf']},
-  {id:'l03',cat:'living',emoji:'\ud83e\udeb5',name:'B\u00e0n tr\u00e0',size:'120\xd760\xd745 cm',mat:'G\u1ed7 s\u1ed3i / \u0110\u00e1 marble',price:'2\u201318 tr',note:'Chi\u1ec1u cao l\u00fd t\u01b0\u1edfng b\u1eb1ng m\u1eb7t ng\u1ed3i sofa -5cm.',tags:['b\u00e0n']},
-  {id:'l04',cat:'living',emoji:'\ud83d\udcfa',name:'K\u1ec7 TV',size:'160\xd740\xd750 cm',mat:'G\u1ed7 MDF / G\u1ed7 t\u1ef1 nhi\u00ean',price:'3\u201320 tr',note:'Ch\u1ecdn m\u00e0u t\u01b0\u01a1ng ph\u1ea3n nh\u1eb9 v\u1edbi t\u01b0\u1eddng.',tags:['k\u1ec7']},
-  {id:'l05',cat:'living',emoji:'\ud83e\udeb4',name:'K\u1ec7 trang tr\u00ed \u0111\u1ee9ng',size:'40\xd730\xd7180 cm',mat:'G\u1ed7 / S\u1eaft',price:'1.5\u20138 tr',note:'D\u00f9ng \u0111\u1ec3 \u0111\u1eb7t c\u00e2y c\u1ea3nh, s\u00e1ch.',tags:['k\u1ec7']},
-  {id:'l06',cat:'living',emoji:'\ud83d\udca1',name:'\u0110\u00e8n s\u00e0n',size:'Cao 150\u2013180 cm',mat:'S\u1eaft s\u01a1n t\u0129nh \u0111i\u1ec7n',price:'1.2\u20136 tr',note:'Th\u00eam \u00e1nh s\u00e1ng \u1ea5m g\u00f3c gh\u1ebf.',tags:['\u0111\u00e8n']},
-  {id:'b01',cat:'bedroom',emoji:'\ud83d\udecd\ufe0f',name:'Gi\u01b0\u1eddng Queen',size:'160\xd7200\xd735 cm',mat:'G\u1ed7 t\u1ef1 nhi\u00ean / MDF',price:'5\u201328 tr',note:'Kho\u1ea3ng c\u00e1ch 2 b\u00ean gi\u01b0\u1eddng t\u1ed1i thi\u1ec3u 60 cm.',tags:['gi\u01b0\u1eddng']},
-  {id:'b02',cat:'bedroom',emoji:'\ud83d\udecc',name:'Gi\u01b0\u1eddng King',size:'180\xd7200\xd735 cm',mat:'G\u1ed7 s\u1ed3i / G\u1ed7 \u00f3c ch\u00f3',price:'10\u201345 tr',note:'C\u1ea7n ph\u00f2ng t\u1ed1i thi\u1ec3u 4\xd74m.',tags:['gi\u01b0\u1eddng']},
-  {id:'b03',cat:'bedroom',emoji:'\ud83d\uddc4\ufe0f',name:'T\u1ee7 qu\u1ea7n \u00e1o 2 c\u00e1nh',size:'100\xd760\xd7200 cm',mat:'MDF ph\u1ee7 melamine',price:'4\u201315 tr',note:'Ch\u1ecdn c\u00e1nh l\u00f9a n\u1ebfu ph\u00f2ng nh\u1ecf h\u01a1n 12m\xb2.',tags:['t\u1ee7']},
-  {id:'b04',cat:'bedroom',emoji:'\ud83d\udeaa',name:'T\u1ee7 qu\u1ea7n \u00e1o 4 c\u00e1nh',size:'200\xd760\xd7220 cm',mat:'MDF / G\u1ed7 t\u1ef1 nhi\u00ean',price:'8\u201330 tr',note:'T\u00edch h\u1ee3p g\u01b0\u01a1ng v\u00e0 ng\u0103n k\u00e9o.',tags:['t\u1ee7']},
-  {id:'b05',cat:'bedroom',emoji:'\ud83e\udee6',name:'B\u00e0n ph\u1ea5n / Vanity',size:'90\xd745\xd7140 cm',mat:'G\u1ed7 + G\u01b0\u01a1ng',price:'3\u201312 tr',note:'\u0110\u1eb7t c\u1ea1nh c\u1eeda s\u1ed5 t\u1eadn d\u1ee5ng \u00e1nh s\u00e1ng.',tags:['b\u00e0n']},
-  {id:'b06',cat:'bedroom',emoji:'\ud83c\udf19',name:'\u0110\u00e8n \u0111\u1ea7u gi\u01b0\u1eddng',size:'Cao 55\u201370 cm',mat:'S\u1ee9 / V\u1ea3i / Kim lo\u1ea1i',price:'0.5\u20133 tr',note:'Ch\u1ecdn nhi\u1ec7t \u0111\u1ed9 m\u00e0u 2700\u20133000K.',tags:['\u0111\u00e8n']},
-  {id:'k01',cat:'kitchen',emoji:'\ud83c\udf7d\ufe0f',name:'B\u00e0n \u0103n 4 ng\u01b0\u1eddi',size:'120\xd770\xd775 cm',mat:'G\u1ed7 / \u0110\u00e1 / K\u00ednh',price:'3\u201316 tr',note:'Kho\u1ea3ng c\u00e1ch t\u1ed1i thi\u1ec3u \u0111\u1ebfn t\u01b0\u1eddng: 90 cm.',tags:['b\u00e0n']},
-  {id:'k02',cat:'kitchen',emoji:'\ud83e\ude91',name:'Gh\u1ebf \u0103n',size:'45\xd750\xd788 cm',mat:'G\u1ed7 / Nh\u1ef1a / \u0110\u1ec7m b\u1ecdc',price:'0.8\u20134 tr',note:'Chi\u1ec1u cao m\u1eb7t gh\u1ebf chu\u1ea9n 45 cm.',tags:['gh\u1ebf']},
-  {id:'k03',cat:'kitchen',emoji:'\ud83c\udfe0',name:'T\u1ee7 b\u1ebfp d\u01b0\u1edbi',size:'60\xd760\xd785 cm/module',mat:'G\u1ed7 c\u00f4ng nghi\u1ec7p + Acrylic',price:'2\u20138 tr/module',note:'Module 60 cm l\u00e0 chu\u1ea9n ph\u1ed5 bi\u1ebfn.',tags:['t\u1ee7','b\u1ebfp']},
-  {id:'k04',cat:'kitchen',emoji:'\ud83d\uddc3\ufe0f',name:'T\u1ee7 b\u1ebfp tr\u00ean',size:'60\xd730\xd770 cm/module',mat:'MDF ph\u1ee7 melamine / Acrylic',price:'1.5\u20135 tr/module',note:'Kho\u1ea3ng c\u00e1ch m\u1eb7t b\u1ebfp \u2192 t\u1ee7 tr\u00ean t\u1ed1i thi\u1ec3u 55 cm.',tags:['t\u1ee7','b\u1ebfp']},
-  {id:'k05',cat:'kitchen',emoji:'\ud83e\ude91',name:'Gh\u1ebf qu\u1ea7y / Bar stool',size:'45\xd745\xd765\u201375 cm',mat:'S\u1eaft / G\u1ed7 / Da',price:'1.2\u20136 tr',note:'Ph\u00f9 h\u1ee3p \u0111\u1ea3o b\u1ebfp ho\u1eb7c qu\u1ea7y bar mini.',tags:['gh\u1ebf','b\u1ebfp']},
-  {id:'o01',cat:'office',emoji:'\ud83d\udcbc',name:'B\u00e0n l\u00e0m vi\u1ec7c',size:'120\xd760\xd775 cm',mat:'MDF / G\u1ed7 s\u1ed3i / S\u1eaft',price:'2\u201312 tr',note:'Chi\u1ec1u cao chu\u1ea9n 72\u201375 cm.',tags:['b\u00e0n']},
-  {id:'o02',cat:'office',emoji:'\ud83e\ude91',name:'Gh\u1ebf ergonomic',size:'65\xd765\xd790\u2013105 cm',mat:'L\u01b0\u1edbi tho\u00e1t nhi\u1ec7t / \u0110\u1ec7m foam',price:'3\u201320 tr',note:'Ch\u1ecdn gh\u1ebf c\u00f3 \u0111i\u1ec1u ch\u1ec9nh l\u01b0ng t\u1ef1a.',tags:['gh\u1ebf']},
-  {id:'o03',cat:'office',emoji:'\ud83d\udcda',name:'K\u1ec7 s\u00e1ch',size:'80\xd730\xd7180 cm',mat:'G\u1ed7 / S\u1eaft',price:'2\u201310 tr',note:'K\u1ebft h\u1ee3p \u0111\u00e8n chi\u1ebfu s\u00e1ng k\u1ec7.',tags:['k\u1ec7']},
-  {id:'o04',cat:'office',emoji:'\ud83d\uddc4\ufe0f',name:'T\u1ee7 h\u1ed3 s\u01a1',size:'45\xd760\xd7132 cm',mat:'S\u1eaft s\u01a1n t\u0129nh \u0111i\u1ec7n',price:'2\u20137 tr',note:'4 ng\u0103n k\u00e9o, c\u00f3 kh\u00f3a b\u1ea3o m\u1eadt.',tags:['t\u1ee7']},
-  {id:'g01',cat:'outdoor',emoji:'\ud83c\udf3f',name:'B\u1ed9 b\u00e0n gh\u1ebf s\u00e2n v\u01b0\u1eddn',size:'B\u00e0n 120\xd770 cm, 4 gh\u1ebf',mat:'Nh\u00f4m / G\u1ed7 teak / M\u00e2y nh\u1ef1a',price:'5\u201325 tr',note:'Ch\u1ecdn ch\u1ea5t li\u1ec7u ch\u1ecbu n\u1eafng m\u01b0a.',tags:['b\u00e0n','gh\u1ebf']},
-  {id:'g02',cat:'outdoor',emoji:'\ud83d\udecb\ufe0f',name:'Sofa ngo\u00e0i tr\u1eddi',size:'220\xd790\xd780 cm',mat:'M\u00e2y nh\u1ef1a / \u0110\u1ec7m ch\u1ed1ng n\u01b0\u1edbc',price:'8\u201335 tr',note:'\u0110\u1ec7m c\u1ea7n tho\u00e1t n\u01b0\u1edbc v\u00e0 ch\u1ed1ng n\u1ea5m m\u1ed1c.',tags:['sofa']},
-  {id:'g03',cat:'outdoor',emoji:'\ud83e\ude91',name:'X\u00edch \u0111u / Swing chair',size:'R\u1ed9ng 90 cm',mat:'M\u00e2y nh\u1ef1a / V\u1ea3i ch\u1ed1ng UV',price:'3\u201312 tr',note:'C\u1ea7n \u0111i\u1ec3m treo ch\u1ecbu t\u1ea3i t\u1ed1i thi\u1ec3u 150 kg.',tags:['gh\u1ebf']},
-  {id:'g04',cat:'outdoor',emoji:'\u2602\ufe0f',name:'\u00d4 che n\u1eafng (Parasol)',size:'\u0110\u01b0\u1eddng k\u00ednh 250\u2013300 cm',mat:'V\u1ea3i polyester ch\u1ed1ng UV / Tr\u1ee5 nh\u00f4m',price:'2\u20138 tr',note:'Ch\u1ecdn lo\u1ea1i \u0111i\u1ec1u ch\u1ec9nh g\u00f3c nghi\u00eang.',tags:['\u00f4']},
-];
-var _libCat='all';
-function setLibCat(cat,btn){_libCat=cat;document.querySelectorAll('.lib-cat-btn').forEach(function(b){b.classList.remove('on');});if(btn)btn.classList.add('on');filterLibrary();}
-function filterLibrary(){var q=(document.getElementById('libSearch').value||'').toLowerCase();var items=LIB_DATA.filter(function(d){return(_libCat==='all'||d.cat===_libCat)&&(!q||d.name.toLowerCase().includes(q)||(d.tags&&d.tags.some(function(t){return t.includes(q);})));});var grid=document.getElementById('libGrid');var empty=document.getElementById('libEmpty');if(!items.length){grid.innerHTML='';empty.style.display='block';return;}empty.style.display='none';var CL={living:'Ph\u00f2ng kh\u00e1ch',bedroom:'Ph\u00f2ng ng\u1ee7',kitchen:'B\u1ebfp & \u0102n',office:'L\u00e0m vi\u1ec7c',outdoor:'S\u00e2n v\u01b0\u1eddn'};grid.innerHTML=items.map(function(d){return'<div class="lib-item" onclick="openLibItem(\''+d.id+'\')"><div class="lib-item-thumb">'+d.emoji+'</div><div class="lib-item-body"><div class="lib-item-cat">'+(CL[d.cat]||d.cat)+'</div><div class="lib-item-name">'+d.name+'</div><div class="lib-item-size">\ud83d\udcd0 '+d.size+'</div><div class="lib-item-price">'+d.price+'</div></div></div>';}).join('');}
-function openLibItem(id){var d=LIB_DATA.find(function(x){return x.id===id;});if(!d)return;var CL={living:'Ph\u00f2ng kh\u00e1ch',bedroom:'Ph\u00f2ng ng\u1ee7',kitchen:'B\u1ebfp & \u0102n',office:'L\u00e0m vi\u1ec7c',outdoor:'S\u00e2n v\u01b0\u1eddn'};document.getElementById('libModalContent').innerHTML='<div style="text-align:center;font-size:64px;margin-bottom:12px">'+d.emoji+'</div><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:14px">'+d.name+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"><div style="background:var(--ink3);border-radius:8px;padding:10px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">K\u00cdCH TH\u01af\u1edcC</div><div style="font-size:12px;font-weight:600;color:var(--text)">'+d.size+'</div></div><div style="background:var(--ink3);border-radius:8px;padding:10px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">GI\u00c1 THAM KH\u1ea2O</div><div style="font-size:13px;font-weight:700;color:var(--green)">'+d.price+'</div></div><div style="background:var(--ink3);border-radius:8px;padding:10px;grid-column:1/-1"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">CH\u1ea4T LI\u1ec6U G\u1ee2I \u00dd</div><div style="font-size:12px;color:var(--text)">'+d.mat+'</div></div></div><div style="background:rgba(152,105,10,.08);border:1px solid rgba(152,105,10,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);line-height:1.7"><span style="color:var(--amber);font-weight:700">\ud83d\udca1 L\u01b0u \u00fd thi\u1ebft k\u1ebf:</span> '+d.note+'</div>';var modal=document.getElementById('libModal');modal.style.display='flex';modal.onclick=function(e){if(e.target===modal)modal.style.display='none';};}  
-(function(){function tryInit(){var g=document.getElementById('libGrid');if(g){filterLibrary();}else{setTimeout(tryInit,200);}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tryInit);else tryInit();})();
-</script>
     <!-- PAGE FOOTER -->
     <footer class="page-footer">
       <div class="pf-copy">© 2026 STUDIO KTS ALN. All rights reserved.</div>
@@ -1735,7 +1277,7 @@ function openLibItem(id){var d=LIB_DATA.find(function(x){return x.id===id;});if(
       <div style="background:var(--amber-bg);border:1px solid rgba(255,170,51,.3);border-radius:7px;padding:10px;font-size:11px;color:var(--amber);margin-bottom:14px"><i class="ph-duotone ph-clock"></i> <b>Đang trong SLA 48h</b> — Nộp sớm để nhận thưởng điểm uy tín!</div>
       <div class="form-row">
         <label class="form-label">Phối cảnh 3D cập nhật (*.zip / *.rar / *.png)</label>
-        <label style="display:flex;flex-direction:column;align-items:center;gap:8px;border:1.5px dashed rgba(152,105,10,.3);border-radius:var(--r-sm);padding:18px;cursor:pointer;transition:.2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(152,105,10,.3)'">
+        <label style="display:flex;flex-direction:column;align-items:center;gap:8px;border:1.5px dashed rgba(212,160,23,.3);border-radius:var(--r-sm);padding:18px;cursor:pointer;transition:.2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(212,160,23,.3)'">
           <input id="revFileInput" type="file" style="display:none" accept=".zip,.rar,.png,.jpg,.pdf" onchange="handleRevFile(this)">
           <div id="revFileIcon" style="font-size:26px">📁</div>
           <div id="revFileLabel" style="font-size:12px;color:var(--muted)">Kéo thả hoặc click để chọn file</div>
@@ -1757,7 +1299,7 @@ function openLibItem(id){var d=LIB_DATA.find(function(x){return x.id===id;});if(
 <div class="modal-bg" id="chatModal">
   <div class="modal" style="max-width:480px;width:100%">
     <div class="modal-head">
-      <h3><i class="ph-duotone ph-chats-circle" style="color:var(--blue)"></i> Chat — Dự án <span id="chatModalProjId"></span></h3>
+      <h3><i class="ph-duotone ph-chats-circle" style="color:var(--blue)"></i> Chat — Dự án <span id="chatModalProjId">ALN-9921</span></h3>
       <div style="display:flex;align-items:center;gap:6px;margin-left:auto;margin-right:10px">
         <div id="chatStatusDot" style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div>
         <span id="chatStatusTxt" style="font-size:10px;color:var(--sub)">Kết nối</span>
@@ -1789,18 +1331,19 @@ function openLibItem(id){var d=LIB_DATA.find(function(x){return x.id===id;});if(
     <div class="modal-head"><h3><i class="ph-duotone ph-bank" style="color:var(--green)"></i> Rút tiền về ngân hàng</h3><button class="modal-close" onclick="closeModal('withdrawModal')">✕</button></div>
     <div class="modal-body">
       <div class="form-info" style="margin-bottom:12px">
-        <div class="fi-row"><span class="k">Ngân hàng</span><span class="v" id="wdBank">Chưa cập nhật — vào Hồ sơ để thêm</span></div>
-        <div class="fi-row"><span class="k">Chủ TK</span><span class="v" id="wdHolder">—</span></div>
-        <div class="fi-row"><span class="k">Ví chính</span><span class="v" style="color:var(--green)" id="wdAvail">0đ</span></div>
+        <div class="fi-row"><span class="k">Ngân hàng</span><span class="v">Vietcombank ****4521</span></div>
+        <div class="fi-row"><span class="k">Chủ TK</span><span class="v">TRAN LE MINH</span></div>
+        <div class="fi-row"><span class="k">Ví chính</span><span class="v" style="color:var(--green)">3,878,220đ</span></div>
+        <div class="fi-row"><span class="k">Ví tạm ứng</span><span class="v" style="color:var(--amber)">1,920,000đ 🔒</span></div>
       </div>
       <div class="form-row">
-        <label class="form-label">Số tiền muốn rút</label>
-        $10$20$3 oninput="updateWithdraw(this.value)">
+        <label class="form-label">Số tiền muốn rút (tối đa 3,878,220đ)</label>
+        <input type="number" style="background:var(--ink3);border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-family:inherit;font-size:15px;font-weight:700;outline:none;width:100%" id="withdrawAmt" value="3878220" max="3878220" oninput="updateWithdraw(this.value)">
       </div>
       <div class="form-info">
-        <div class="fi-row"><span class="k">Số tiền rút</span><span class="v" id="wAmt">0đ</span></div>
+        <div class="fi-row"><span class="k">Số tiền rút</span><span class="v" id="wAmt">3,878,220đ</span></div>
         <div class="fi-row"><span class="k">Phí chuyển khoản</span><span class="v" style="color:var(--red)">0đ (miễn phí)</span></div>
-        <div class="fi-row total"><span class="k" style="font-weight:700">Thực nhận</span><span class="v" id="wNet">0đ</span></div>
+        <div class="fi-row total"><span class="k" style="font-weight:700">Thực nhận</span><span class="v" id="wNet">3,878,220đ</span></div>
       </div>
       <div style="font-size:10px;color:var(--muted);margin-top:8px"><i class="ph-duotone ph-info"></i> Xử lý trong 1-2 giờ làm việc. Cần OTP xác thực.</div>
     </div>
@@ -1956,7 +1499,7 @@ window.ALNRealtime = (() => {
 
 </script>
 <script>
-let walletBalance = 0; // cập nhật từ payments thật trong _updateWallet
+let walletBalance = 3878220;
 let slaSeconds = 31*3600 + 22*60 + 45;
 let bonusSeconds = 7*3600 + 22*60 + 45;
 const totalSla = 48*3600;
@@ -2129,7 +1672,7 @@ function removeC3File(e, id) {
   delete uploadedFiles[id];
   const vKey = c3Slots.find(s=>s.id===id).vKey;
   const span = document.getElementById(vKey);
-  span.previousElementSibling.style.background = 'rgba(152,105,10,.3)';
+  span.previousElementSibling.style.background = 'rgba(212,160,23,.3)';
   span.style.color = 'var(--muted)';
   span.textContent = span.textContent.replace(' ✓','');
   updateUploadState();
@@ -2343,29 +1886,9 @@ function confirmWithdraw() {
   showToast('🏦 Yêu cầu rút tiền đã gửi! OTP sẽ được gửi về SĐT đăng ký.', 't-green');
 }
 
-var _KTS_NOTIFS = [];
-function _addNotif(icon, body, projId) {
-  _KTS_NOTIFS.unshift({ icon, body, projId, ts: 'Vừa xong', unread: true });
-  var dot = document.getElementById('notifDot');
-  if (dot) dot.style.display = 'block';
-  var list = document.getElementById('notifList');
-  if (list) list.innerHTML = _KTS_NOTIFS.map(function(n) {
-    return '<div class="notif-item' + (n.unread ? ' ni-amber' : '') + '" onclick="selectProj(\'' + (n.projId||'') + '\');document.getElementById(\'notifPanel\').style.display=\'none\'">'
-      + '<div class="ni-icon">' + n.icon + '</div>'
-      + '<div><div class="ni-text">' + n.body + '</div><div class="ni-time">' + n.ts + '</div></div></div>';
-  }).join('');
-}
 function toggleNotif() {
   const p = document.getElementById('notifPanel');
-  const show = p.style.display === 'none';
-  p.style.display = show ? '' : 'none';
-  if (show) {
-    _KTS_NOTIFS.forEach(function(n){ n.unread = false; });
-    var dot = document.getElementById('notifDot');
-    if (dot) dot.style.display = 'none';
-    var list = document.getElementById('notifList');
-    if (list && _KTS_NOTIFS.length === 0) list.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:14px 0">Chưa có thông báo</div>';
-  }
+  p.style.display = p.style.display==='none' ? '' : 'none';
 }
 document.addEventListener('click', e => {
   if(!e.target.closest('.notif-btn') && !e.target.closest('#notifPanel'))
@@ -2387,7 +1910,6 @@ function fmtShort(n) {
 let toastTimer;
 function showToast(msg, type='t-blue') {
   const t = document.getElementById('toast');
-  if (!t) return;
   t.textContent = msg; t.className = 'show '+type;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>t.className='', 4000);
@@ -2409,10 +1931,9 @@ ALNRealtime.init({
     document.getElementById('chatStatusTxt').textContent = mode;
   },
   onMessage: (d) => {
-    const _isReplay = !!d._replay;
     // Tranh chấp
-    if(d.type==='DISPUTE_OPENED' && d.projectId===(window.KTS_PROJECT_ID||'')) {
-      if(!_isReplay){ showToast('⚠️ Chủ nhà đã mở tranh chấp C3 — dòng tiền bị đóng băng!', 't-red'); _addNotif('<i class="ph-duotone ph-warning"></i>','<b>Tranh chấp</b> — Chủ nhà mở tranh chấp C3. Dòng tiền bị đóng băng!', d.projectId); }
+    if(d.type==='DISPUTE_OPENED' && d.projectId===(window.KTS_PROJECT_ID||'ALN-9921')) {
+      showToast('⚠️ Chủ nhà đã mở tranh chấp C3 — dòng tiền bị đóng băng!', 't-red');
       try{document.getElementById('lockedWallet').style.borderColor='var(--red)';}catch(e){}
       try{document.getElementById('lockedAmount').style.color='var(--red)';}catch(e){}
     }
@@ -2443,7 +1964,7 @@ ALNRealtime.init({
     // DN gửi tài liệu cho KTS
     if(d.type==='DN_FILE_UPLOADED' && Array.isArray(d.audience) && d.audience.includes('kts')) {
       const _dnMsg = `📁 ${d.senderName||'Doanh nghiệp'} gửi ${d.count||1} tài liệu — dự án ${d.projectId||''} · Xem: Bảng Review → Tài liệu`;
-      if(!_isReplay){ showToast(_dnMsg, 't-blue'); _addNotif('<i class="ph-duotone ph-folder"></i>', `<b>${d.senderName||'DN'}</b> gửi ${d.count||1} tài liệu`, d.projectId); }
+      showToast(_dnMsg, 't-blue');
       _alnReceive({ text: _dnMsg, senderName: d.senderName||'Doanh nghiệp', _role:'dn', ts: Date.now(), _replay: d._replay });
       if(!d._replay && typeof window._alnWatchDocs === 'function') {
         window._alnWatchDocs(d.projectId);
@@ -2455,7 +1976,7 @@ ALNRealtime.init({
     // CN gửi tài liệu cho KTS
     if(d.type==='CN_FILE_UPLOADED' && Array.isArray(d.audience) && d.audience.includes('kts')) {
       const _cnMsg = `📁 ${d.senderName||'Chủ nhà'} gửi ${d.count||1} tài liệu — dự án ${d.projectId||''} · Xem: Bảng Review → Tài liệu`;
-      if(!_isReplay){ showToast(_cnMsg, 't-blue'); _addNotif('<i class="ph-duotone ph-folder"></i>', `<b>${d.senderName||'Chủ nhà'}</b> gửi ${d.count||1} tài liệu`, d.projectId); }
+      showToast(_cnMsg, 't-blue');
       _alnReceive({ text: _cnMsg, senderName: d.senderName||'Chủ nhà', _role:'cn', ts: Date.now(), _replay: d._replay });
       if(!d._replay && typeof window._alnWatchDocs === 'function') {
         window._alnWatchDocs(d.projectId);
@@ -2465,14 +1986,12 @@ ALNRealtime.init({
       }
     }
     // Rating nhận được
-    if(d.type==='KTS_RATED' && !_isReplay) {
+    if(d.type==='KTS_RATED') {
       showToast(`⭐ Bạn nhận được đánh giá ${d.score}/5 sao cho Chặng ${d.stage} — ${d.projName}`, 't-green');
-      _addNotif('⭐', `<b>${d.projName}</b>: Chặng ${d.stage} được đánh giá ${d.score}/5 sao`, d.projectId);
     }
     // Stage approved
-    if(d.type==='STAGE_APPROVED' && !_isReplay) {
+    if(d.type==='STAGE_APPROVED') {
       showToast(`✅ Chặng ${d.stage} đã được phê duyệt — giải ngân đang xử lý`, 't-green');
-      _addNotif('<i class="ph-duotone ph-check-circle"></i>', `<b>Giải ngân Chặng ${d.stage}</b> được duyệt — đang xử lý`, d.projectId);
       try {
         var _sMsg = '✅ Chủ nhà DUYỆT Chặng ' + (d.stage||'') + ' — dự án ' + (d.projName||d.projectId||'') + '. Giải ngân đang xử lý.';
         alnThreads.cn.push({ mine:false, text:_sMsg, senderName:'Hệ thống ALN', ts:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}) });
@@ -2503,7 +2022,7 @@ function _ktsRenderMsg(d, isMine) {
   el.style.cssText = `display:flex;flex-direction:column;align-items:${isMine?'flex-end':'flex-start'};gap:2px`;
   el.innerHTML = `
     ${!isMine?`<div style="font-size:9px;color:var(--muted);padding:0 4px">${d.senderName||d._role}</div>`:''}
-    <div style="background:${isMine?'var(--accent-bg)':'var(--ink2)'};border:1px solid ${isMine?'rgba(152,105,10,.2)':'var(--border)'};padding:8px 12px;border-radius:${isMine?'10px 2px 10px 10px':'2px 10px 10px 10px'};max-width:80%;font-size:12px;color:var(--text);word-break:break-word">
+    <div style="background:${isMine?'var(--accent-bg)':'var(--ink2)'};border:1px solid ${isMine?'rgba(212,160,23,.2)':'var(--border)'};padding:8px 12px;border-radius:${isMine?'10px 2px 10px 10px':'2px 10px 10px 10px'};max-width:80%;font-size:12px;color:var(--text);word-break:break-word">
       ${d.text}
       <span style="display:block;font-size:9px;color:var(--muted);margin-top:3px;text-align:${isMine?'right':'left'}">${time}</span>
     </div>`;
@@ -2518,7 +2037,7 @@ function ktsSendChat() {
   const msg = {
     type: 'ALN_CHAT',
     audience: ['cn'],
-    projectId: window.KTS_PROJECT_ID ,
+    projectId: window.KTS_PROJECT_ID || 'ALN-9921',
     text,
     senderName: _ktsName,
     senderRole: 'kts',
@@ -2547,7 +2066,7 @@ window.submitC3_realtime = function() {
     if(!f) return;
     ALNRealtime.send({
       type: 'KTS_DOC_UPLOAD',
-      projectId: window.KTS_PROJECT_ID ,
+      projectId: window.KTS_PROJECT_ID || 'ALN-9921',
       ktsName: _ktsName,
       doc: {
         id: 'D_' + Date.now() + '_' + s.id,
@@ -2565,7 +2084,7 @@ window.submitC3_realtime = function() {
   // Thông báo tổng hợp
   ALNRealtime.send({
     type: 'KTS_C3_SUBMITTED',
-    projectId: window.KTS_PROJECT_ID ,
+    projectId: window.KTS_PROJECT_ID || 'ALN-9921',
     ktsName: _ktsName,
     fileCount: Object.keys(uploadedFiles).length,
   });
@@ -2603,22 +2122,22 @@ document.querySelectorAll('.sidebar .nav-item').forEach(el => {
 
 <!-- ═══ TRAO ĐỔI QUA SÀN ALN (KTS) — hội thoại theo đối tác ═══ -->
 <style>
-#alnFab{position:fixed;bottom:84px;right:20px;z-index:500;width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(152,105,10,.5);cursor:pointer;background:linear-gradient(135deg,#98690a,#b8860b);color:#000;box-shadow:0 8px 24px rgba(152,105,10,.35);display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform .15s}
+#alnFab{position:fixed;bottom:84px;right:20px;z-index:500;width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(212,160,23,.5);cursor:pointer;background:linear-gradient(135deg,#d4a017,#e8c44a);color:#000;box-shadow:0 8px 24px rgba(212,160,23,.35);display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform .15s}
 #alnFab:hover{transform:scale(1.06)}
 #alnBadge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;border-radius:99px;min-width:18px;height:18px;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;padding:0 4px}
-#alnPopup{position:fixed;bottom:152px;right:20px;z-index:501;width:330px;background:#111114;border:1px solid rgba(152,105,10,.35);border-radius:14px;box-shadow:0 12px 48px rgba(0,0,0,.65);display:none;flex-direction:column;overflow:hidden}
+#alnPopup{position:fixed;bottom:152px;right:20px;z-index:501;width:330px;background:#111114;border:1px solid rgba(212,160,23,.35);border-radius:14px;box-shadow:0 12px 48px rgba(0,0,0,.65);display:none;flex-direction:column;overflow:hidden}
 #alnPopup.open{display:flex}
-.aln-call-btn{width:30px;height:30px;border-radius:50%;border:1px solid rgba(152,105,10,.4);background:rgba(152,105,10,.12);color:#98690a;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:background .15s}
-.aln-call-btn:hover{background:rgba(152,105,10,.25)}
+.aln-call-btn{width:30px;height:30px;border-radius:50%;border:1px solid rgba(212,160,23,.4);background:rgba(212,160,23,.12);color:#d4a017;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:background .15s}
+.aln-call-btn:hover{background:rgba(212,160,23,.25)}
 .aln-tab{flex:1;background:none;border:none;border-bottom:2px solid transparent;color:rgba(240,235,224,.5);font-size:11px;font-weight:700;padding:9px 4px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit}
-.aln-tab.active{color:#98690a;border-bottom-color:#98690a;background:rgba(152,105,10,.06)}
+.aln-tab.active{color:#d4a017;border-bottom-color:#d4a017;background:rgba(212,160,23,.06)}
 .aln-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;display:none}
 @media(max-width:768px){#alnFab{bottom:74px;right:14px;width:48px;height:48px;font-size:17px}#alnPopup{width:calc(100vw - 24px);right:12px;bottom:132px;max-height:65vh}}
 </style>
 <button id="alnFab" onclick="toggleAlnBox()" aria-label="Trao đổi qua sàn ALN"><i class="ph-duotone ph-chats-circle"></i><span id="alnBadge">1</span></button>
 <div id="alnPopup">
-  <div style="background:linear-gradient(135deg,rgba(152,105,10,.18),rgba(152,105,10,.08));border-bottom:1px solid rgba(152,105,10,.25);padding:12px 14px;display:flex;align-items:center;gap:10px">
-    <div style="width:34px;height:34px;border-radius:9px;background:rgba(152,105,10,.15);border:1px solid rgba(152,105,10,.35);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#98690a;font-family:Arial,sans-serif;flex-shrink:0">ALN</div>
+  <div style="background:linear-gradient(135deg,rgba(212,160,23,.18),rgba(212,160,23,.08));border-bottom:1px solid rgba(212,160,23,.25);padding:12px 14px;display:flex;align-items:center;gap:10px">
+    <div style="width:34px;height:34px;border-radius:9px;background:rgba(212,160,23,.15);border:1px solid rgba(212,160,23,.35);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#d4a017;font-family:Arial,sans-serif;flex-shrink:0">ALN</div>
     <div style="flex:1;min-width:0">
       <div style="color:#F0EBE0;font-weight:700;font-size:13px">Trao đổi qua sàn ALN</div>
       <div id="alnSubTxt" style="color:rgba(240,235,224,.5);font-size:10px">Đang trao đổi với: Chủ nhà</div>
@@ -2634,7 +2153,7 @@ document.querySelectorAll('.sidebar .nav-item').forEach(el => {
   <div id="alnBody" style="height:270px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#18181c"></div>
   <div style="display:flex;gap:8px;padding:10px;border-top:1px solid rgba(255,255,255,.06);background:#111114">
     <textarea id="alnInput" rows="1" placeholder="Nhắn tin cho Chủ nhà..." style="flex:1;background:#18181c;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 10px;font-size:12px;color:#F0EBE0;outline:none;resize:none;font-family:inherit" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();alnSendMsg();}"></textarea>
-    <button onclick="alnSendMsg()" style="background:linear-gradient(135deg,#98690a,#b8860b);border:none;border-radius:8px;width:38px;cursor:pointer;color:#000;flex-shrink:0"><i class="ph-duotone ph-paper-plane-tilt" style="font-size:12px"></i></button>
+    <button onclick="alnSendMsg()" style="background:linear-gradient(135deg,#d4a017,#e8c44a);border:none;border-radius:8px;width:38px;cursor:pointer;color:#000;flex-shrink:0"><i class="ph-duotone ph-paper-plane-tilt" style="font-size:12px"></i></button>
   </div>
 </div>
 <script>
@@ -2675,7 +2194,7 @@ function _alnRender(){
   body.innerHTML = alnThreads[_alnThread].map(m=>`
     <div style="display:flex;flex-direction:column;align-items:${m.mine?'flex-end':'flex-start'};gap:2px">
       ${!m.mine?`<div style="font-size:9px;color:rgba(240,235,224,.4);padding:0 4px">${m.senderName||''}</div>`:''}
-      <div style="background:${m.mine?'rgba(152,105,10,.15)':'#111114'};color:#F0EBE0;border:1px solid ${m.mine?'rgba(152,105,10,.3)':'rgba(255,255,255,.08)'};padding:8px 12px;border-radius:${m.mine?'10px 2px 10px 10px':'2px 10px 10px 10px'};max-width:80%;font-size:12px;word-break:break-word">${m.text}
+      <div style="background:${m.mine?'rgba(212,160,23,.15)':'#111114'};color:#F0EBE0;border:1px solid ${m.mine?'rgba(212,160,23,.3)':'rgba(255,255,255,.08)'};padding:8px 12px;border-radius:${m.mine?'10px 2px 10px 10px':'2px 10px 10px 10px'};max-width:80%;font-size:12px;word-break:break-word">${m.text}
         <span style="display:block;font-size:9px;opacity:.6;margin-top:3px;text-align:${m.mine?'right':'left'}">${m.ts}</span>
       </div>
     </div>`).join('');
@@ -2703,12 +2222,12 @@ function alnSendMsg(){
   const inp = document.getElementById('alnInput'); const txt = (inp?inp.value.trim():''); if(!txt) return;
   const DANGER=['zalo riêng','số điện thoại','ngoài sàn','tiền mặt','chuyển khoản trực tiếp','không qua sàn','tài khoản cá nhân','liên hệ riêng','nhắn riêng','giá riêng','phí ngoài','thanh toán ngoài','giao dịch ngoài','hợp đồng riêng'];
   const matched = DANGER.find(kw=>txt.toLowerCase().includes(kw));
-  if(matched){ showToast(`⚠️ Tin nhắn bị chặn — vi phạm: "${matched}". Mọi giao dịch phải qua sàn ALN.`, 't-red'); inp.value=''; try{ALNRealtime.send({type:'NLP_ALERT',projectId: window.KTS_PROJECT_ID ,keyword:matched,msg:txt})}catch(e){} return; }
+  if(matched){ showToast(`⚠️ Tin nhắn bị chặn — vi phạm: "${matched}". Mọi giao dịch phải qua sàn ALN.`, 't-red'); inp.value=''; try{ALNRealtime.send({type:'NLP_ALERT',projectId: window.KTS_PROJECT_ID || 'ALN-9921',keyword:matched,msg:txt})}catch(e){} return; }
   alnThreads[_alnThread].push({ mine:true, text:txt, ts:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}) });
   _alnRender(); inp.value='';
   // Đồng bộ luồng Chủ nhà vào modal "Chat — Dự án" cũ
   if(_alnThread === 'cn'){ try{ _ktsRenderMsg({ senderName:_ktsName, text:txt, ts:Date.now() }, true); }catch(e){} }
-  ALNRealtime.send({ type:'ALN_CHAT', audience:[_alnThread], projectId: window.KTS_PROJECT_ID , text:txt, senderName:_ktsName, senderRole:'kts' });
+  ALNRealtime.send({ type:'ALN_CHAT', audience:[_alnThread], projectId: window.KTS_PROJECT_ID || 'ALN-9921', text:txt, senderName:_ktsName, senderRole:'kts' });
 }
 </script>
 
@@ -2809,8 +2328,8 @@ function alnNotify(title, body){
     var first = document.querySelector('.sec-label.wallet-section');
     if(!first) return;
     var cont = first.parentElement;
-    var SKIP = /modal|toast|popup|fab|veil|overlay|aln|chat|masthead/i;
-    var MARK = [['wallet-section','wallet'],['proposal-section','proposal'],['review-section','review'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip'],['myproj-section','myproj'],['myprofile-section','myprofile'],['reputation-section','reputation'],['ktscreator-section','ktscreator'],['settings-section','settings'],['library-section','library']];
+    var SKIP = /modal|toast|popup|fab|veil|overlay|aln|chat/i;
+    var MARK = [['wallet-section','wallet'],['proposal-section','proposal'],['review-section','review'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip'],['myproj-section','myproj'],['myprofile-section','myprofile'],['reputation-section','reputation'],['settings-section','settings']];
     var groups = { dashboard: [] };
     var cur = 'dashboard';
     Array.prototype.forEach.call(cont.children, function(k){
@@ -2858,14 +2377,14 @@ const REQUIRED_ROLE = "kts";
 
 /* ══ KTS PROJECT: Firestore realtime ══ */
 function _startKtsProjectListen(uid) {
-  const q = uid
-    ? query(collection(db, 'projects'), where('kts.uid', '==', uid), orderBy('updatedAt', 'desc'))
-    : query(collection(db, 'projects'), orderBy('updatedAt', 'desc'));
+  const q = query(
+    collection(db, 'projects'),
+    where('kts.uid', '==', uid),
+    orderBy('updatedAt', 'desc')
+  );
   onSnapshot(q, snap => {
     if (snap.empty) {
       console.log('[KTS] Chưa có dự án nào được giao');
-      renderMyProjects([]);
-      if (typeof renderDashProjList === 'function') renderDashProjList([]);
       return;
     }
     // Lấy dự án đầu tiên (mới nhất)
@@ -2874,7 +2393,7 @@ function _startKtsProjectListen(uid) {
     window.KTS_PROJECT_DATA = d.data();
     const p = d.data();
     const _isDNp = !!(p.dn && p.dn.uid);
-    const _displayId = p.code || d.id;
+    const _displayId = _isDNp ? 'ALN-DN-'+(p.CODE||p.code||d.id.replace(/^ALN-/,'')) : 'ALN-CN-'+(p.CHUNHA||d.id.replace(/^ALN-/,''));
 
     // Cập nhật tất cả chỗ hiển thị project ID
     const _setTxt = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
@@ -2903,9 +2422,7 @@ function _startKtsProjectListen(uid) {
       return { id:d2.id, ...dd, progress:[pg.C1||0, pg.C2||0, pg.C3||0, pg.C4||0] };
     });
     window._KTS_ALL_PROJECTS = allProjs;
-    try { if (typeof window.hkSync === 'function') window.hkSync(allProjs, 'projects'); } catch(e){ console.warn('[hkSync]', e); }
     renderMyProjects(allProjs);
-    _updateWallet(allProjs);
     if (typeof renderDashProjList === 'function') renderDashProjList(allProjs);
     if (typeof renderProjCards === 'function') renderProjCards(allProjs);
     const _rvPicker = document.getElementById('rvProjPicker');
@@ -2934,19 +2451,15 @@ window.openKtsWork = function(pid, uid) {
   panel.style.display = 'block';
   panel.innerHTML = '<div class="kts-work-grid">'
     + '<div class="kts-work-card" onclick="window.ktsShowTab(\'proposal\')">'
-        + '<div class="kwc-icon" style="background:rgba(152,105,10,.14);color:var(--gold)"><i class="ph-duotone ph-paper-plane-tilt"></i></div>'
+        + '<div class="kwc-icon" style="background:rgba(212,160,23,.14);color:var(--gold)"><i class="ph-duotone ph-paper-plane-tilt"></i></div>'
         + '<div class="kwc-label">Gửi phương án</div>'
       + '</div>'
-    + '<div class="kts-work-card" onclick="window.openBoardEditor()">'
-        + '<div class="kwc-icon" style="background:rgba(152,105,10,.08);color:var(--gold)"><i class="ph-duotone ph-layout"></i></div>'
-        + '<div class="kwc-label">Tạo Board PA</div>'
-      + '</div>'
     + '<div class="kts-work-card" onclick="window.ktsShowTab(\'review\')">'
-        + '<div class="kwc-icon" style="background:rgba(152,105,10,.12);color:var(--blue)"><i class="ph-duotone ph-clipboard-text"></i></div>'
+        + '<div class="kwc-icon" style="background:rgba(37,99,235,.12);color:var(--blue)"><i class="ph-duotone ph-clipboard-text"></i></div>'
         + '<div class="kwc-label">Bảng Review</div>'
       + '</div>'
     + '<div class="kts-work-card" onclick="window.ktsShowTab(\'c3\')">'
-        + '<div class="kwc-icon" style="background:rgba(21,128,61,.12);color:var(--green)"><i class="ph-duotone ph-upload-simple"></i></div>'
+        + '<div class="kwc-icon" style="background:rgba(22,163,74,.12);color:var(--green)"><i class="ph-duotone ph-upload-simple"></i></div>'
         + '<div class="kwc-label">Nộp hồ sơ</div>'
       + '</div>'
     + '</div>';
@@ -2957,7 +2470,7 @@ window.switchKtsProject = function(pid) {
   window.KTS_PROJECT_ID = pid;
   window.KTS_PROJECT_DATA = pr;
   const _isDNpr = !!(pr.dn && pr.dn.uid);
-  const _displayId = pr.code || pid;
+  const _displayId = _isDNpr ? 'ALN-DN-'+(pr.CODE||pr.code||pid.replace(/^ALN-/,'')) : 'ALN-CN-'+(pr.CHUNHA||pid.replace(/^ALN-/,''));
   const _setTxt = function(id, v){ const el=document.getElementById(id); if(el) el.textContent=v; };
   _setTxt('paProjTitle', '#' + _displayId);
   _setTxt('slaProjId', '#' + _displayId);
@@ -3063,7 +2576,7 @@ function renderProjCards(projs) {
     var color = SC[p.status] || 'var(--muted)';
     var label = SL[p.status] || p.status;
     var isDNcard = !!(p.dn && p.dn.uid);
-    var did = p.code || p.id;
+    var did = isDNcard ? 'ALN-DN-'+(p.CODE||p.code||(p.id||'').replace(/^ALN-/,'')) : 'ALN-CN-'+(p.CHUNHA||(p.id||'').replace(/^ALN-/,''));
     var prog = p.progress || [0,0,0,0];
     var earnPct = (prog[0]||0)*0.10 + (prog[1]||0)*0.20 + (prog[2]||0)*0.60 + (prog[3]||0)*0.10;
     var earnPctDisp = Math.round(earnPct * 100);
@@ -3127,8 +2640,7 @@ function renderMyProjects(projects) {
     const isOn = p.id === window._mplActiveId;
     const showCN = asCN !== undefined ? asCN : (window._mplFilter === 'cn');
     const client = showCN ? (p.cn&&p.cn.name)||'—' : (p.dn&&p.dn.name)||'—';
-    const _isDNp = !!(p.dn && p.dn.uid);
-    const mCode = (/^ALN-(CN|DN)-/.test(p.code||p.id) ? (p.code||p.id) : (_isDNp ? 'ALN-DN-' : 'ALN-CN-') + (p.code||p.id).replace(/^ALN-/,''));
+    const mCode = showCN ? 'ALN-CN-'+(p.CHUNHA||p.id.replace(/^ALN-/,'')) : 'ALN-DN-'+(p.CODE||p.code||p.id.replace(/^ALN-/,''));
     return `<div class="mpl-item${isOn?' on':''}" data-pid="${p.id}" onclick="window.mplSelect('${p.id}')">
       <div class="mpl-dot" style="background:${S_DOT[p.status]||'var(--muted)'}"></div>
       <div style="flex:1;min-width:0">
@@ -3177,7 +2689,7 @@ function renderMyProjects(projects) {
     const stClr = S_CLR[p.status] || '';
     const pid = p.id;
     const isDN = !!(p.dn && p.dn.uid);
-    const detCode = (/^ALN-(CN|DN)-/.test(p.code||pid) ? (p.code||pid) : (isDN ? 'ALN-DN-' : 'ALN-CN-') + (p.code||pid).replace(/^ALN-/,''));
+    const detCode = isDN ? 'ALN-DN-'+(p.CODE||p.code||pid.replace(/^ALN-/,'')) : 'ALN-CN-'+(p.CHUNHA||pid.replace(/^ALN-/,''));
     const bar = prog.map((v,i) => `<div style="flex:${pcts[i]};height:7px;background:${v>0?SCOLS[i]:'rgba(0,0,0,.1)'};border-radius:99px"></div>`).join('');
     const stages = ['C1','C2','C3','C4'].map((c,i) =>
       `<span style="color:${prog[i]>0?SCOLS[i]:'var(--muted)'};font-weight:${prog[i]>0?700:400}">${c}&nbsp;${Math.round((prog[i]||0)*100)}%</span>`
@@ -3198,7 +2710,7 @@ function renderMyProjects(projects) {
       <div style="font-size:10px;margin-bottom:16px">${stages}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
         <div class="proj-detail-item"><div class="proj-detail-label">Phí thiết kế</div><div class="proj-detail-val">${fmtM2(p.totalFee||0)}đ</div></div>
-        <div class="proj-detail-item"><div class="proj-detail-label">Escrow</div><div class="proj-detail-val">${fmtM2(p.escrowBalance||0)}đ</div></div>
+        <div class="proj-detail-item"><div class="proj-detail-label">Chờ giải ngân</div><div class="proj-detail-val">${fmtM2(p.escrowBalance||0)}đ</div></div>
         <div class="proj-detail-item"><div class="proj-detail-label">Chặng</div><div class="proj-detail-val">${p.stage||'C1'}</div></div>
         <div class="proj-detail-item"><div class="proj-detail-label">Loại</div><div class="proj-detail-val" style="font-size:11px;color:${isDN?'var(--gold)':'var(--green)'}">${isDN?'Doanh nghiệp':'Chủ nhà'}</div></div>
       </div>
@@ -3207,10 +2719,6 @@ function renderMyProjects(projects) {
         <div class="kts-work-card" onclick="window.switchKtsProject&&window.switchKtsProject('${pid}');window.ktsShowTab('proposal')">
           <div class="kwc-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ph-duotone ph-paper-plane-tilt"></i></div>
           <div class="kwc-label">Gửi phương án</div>
-        </div>
-        <div class="kts-work-card" onclick="window.switchKtsProject&&window.switchKtsProject('${pid}');window.openBoardEditor()">
-          <div class="kwc-icon" style="background:rgba(201,168,76,.08);color:var(--gold)"><i class="ph-duotone ph-layout"></i></div>
-          <div class="kwc-label">Tạo Board PA</div>
         </div>
         <div class="kts-work-card" onclick="window.switchKtsProject&&window.switchKtsProject('${pid}');window.ktsShowTab('review')">
           <div class="kwc-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ph-duotone ph-clipboard-text"></i></div>
@@ -3310,67 +2818,6 @@ window.uploadProfileAvatar = async function uploadProfileAvatar(input) {
   }
 }
 
-// Upload mã QR nhận thanh toán
-window.uploadPaymentQr = async function uploadPaymentQr(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const status = document.getElementById('qrUploadStatus');
-  status.textContent = 'Đang upload...';
-  try {
-    const uid = window.__ALN_UID;
-    const ext = file.name.split('.').pop();
-    const ref = storageRef(storage, `payment-qr/${uid}/qr.${ext}`);
-    await uploadBytes(ref, file);
-    const url = await getDownloadURL(ref);
-    await setDoc(doc(db,'users',uid), {qrCodeUrl: url}, {merge:true});
-    _showQr(url);
-    status.textContent = '✓ Đã cập nhật mã QR';
-    showToast('Đã cập nhật mã QR nhận thanh toán','t-green');
-  } catch(e) {
-    status.textContent = 'Lỗi: ' + e.message;
-    showToast('Upload thất bại: ' + e.code,'t-red');
-  }
-};
-
-function _showQr(url) {
-  const wrap = document.getElementById('qrPreviewWrap');
-  if (!wrap || !url) return;
-  wrap.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
-}
-
-window.uploadSignature = async function(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const status = document.getElementById('sigUploadStatus');
-  status.textContent = 'Đang upload...';
-  try {
-    const uid = window.__ALN_UID;
-    const ref = storageRef(storage, `kts-profiles/${uid}/signature.png`);
-    await uploadBytes(ref, file);
-    const url = await getDownloadURL(ref);
-    await setDoc(doc(db,'users',uid), {signatureUrl: url}, {merge:true});
-    _showSignature(url);
-    status.textContent = '✓ Đã lưu chữ ký';
-    showToast('Đã cập nhật chữ ký điện tử','t-green');
-  } catch(e) {
-    status.textContent = 'Lỗi: ' + e.message;
-    showToast('Upload thất bại','t-red');
-  }
-};
-
-function _showSignature(url) {
-  const wrap = document.getElementById('sigPreviewWrap');
-  const empty = document.getElementById('sigPreviewEmpty');
-  if (!wrap) return;
-  if (url) {
-    if (empty) empty.style.display = 'none';
-    let img = wrap.querySelector('img');
-    if (!img) { img = document.createElement('img'); wrap.appendChild(img); }
-    img.src = url;
-    img.style.cssText = 'max-width:100%;max-height:68px;object-fit:contain;padding:4px';
-  }
-}
-
 function _showAvatar(url) {
   const wrap = document.getElementById('profileAvatarWrap');
   if (!wrap) return;
@@ -3391,33 +2838,16 @@ function _getInitials() {
 }
 
 // Lưu hồ sơ
-/* Bật/tắt nhận email dự án mới (lead khu vực) — lưu users/{uid}.nhanLeadEmail */
-window.toggleLeadEmail = async function toggleLeadEmail(el) {
-  const uid = window.__ALN_UID;
-  if (!uid) { el.checked = !el.checked; showToast('Chưa đăng nhập','t-red'); return; }
-  try {
-    await setDoc(doc(db,'users',uid), { nhanLeadEmail: el.checked }, {merge:true});
-    showToast(el.checked ? '✅ Đã BẬT email dự án mới' : 'Đã TẮT email dự án mới', 't-green');
-  } catch(e) { el.checked = !el.checked; showToast('Lỗi lưu: '+(e.message||e),'t-red'); }
-};
-
 window.saveProfile = async function saveProfile() {
   const uid = window.__ALN_UID;
   if (!uid) { showToast('Chưa đăng nhập','t-red'); return; }
   const btn = document.querySelector('.profile-save-btn');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin"></i> Đang lưu...'; }
   const data = {
-    name:         (document.getElementById('profileName')||{}).value.trim() || '',
-    email:        (document.getElementById('profileEmail')||{}).value.trim() || '',
-    phone:        (document.getElementById('profilePhone')||{}).value.trim() || '',
-    license:      (document.getElementById('profileLicense')||{}).value.trim() || '',
-    gender:       (document.getElementById('profileGender')||{}).value || '',
-    homeProvince: (document.getElementById('profileHomeProvince')||{}).value || '',
-    bankAccount: {
-      bankName:       (document.getElementById('bankName')||{}).value.trim() || '',
-      accountNumber:  (document.getElementById('bankAccountNumber')||{}).value.trim() || '',
-      accountHolder:  (document.getElementById('bankAccountHolder')||{}).value.trim().toUpperCase() || '',
-    },
+    name:    (document.getElementById('profileName')||{}).value.trim() || '',
+    email:   (document.getElementById('profileEmail')||{}).value.trim() || '',
+    phone:   (document.getElementById('profilePhone')||{}).value.trim() || '',
+    license: (document.getElementById('profileLicense')||{}).value.trim() || '',
   };
   try {
     await setDoc(doc(db,'users',uid), data, {merge:true});
@@ -3443,159 +2873,16 @@ window.saveProfile = async function saveProfile() {
   }
 }
 
-// Cập nhật Ví thu nhập từ dữ liệu Firestore thật
-function _updateWallet(allProjs) {
-  var paid = 0, pending = 0, grossPaid = 0, grossPending = 0, txItems = [];
-  var fmtVN = function(v) { return v.toLocaleString('vi-VN') + 'đ'; };
-  // Số hiển thị là THỰC NHẬN — đã trừ 20% phí sàn + 7% thuế TNCN trên số gốc mỗi chặng
-  var _netOf = function(pay) { return pay.netAmount != null ? pay.netAmount : Math.round((pay.amount || 0) * 0.73); };
-  (allProjs || []).forEach(function(p) {
-    var pays = p.payments || {};
-    ['C1','C2','C3','C4'].forEach(function(stage) {
-      var pay = pays[stage];
-      if (!pay) return;
-      var net = _netOf(pay);
-      var projCode = p.code || p.id;
-      var dateStr = '';
-      if (pay.status === 'paid') {
-        paid += net;
-        grossPaid += (pay.amount || 0);
-        dateStr = pay.paidAt && pay.paidAt.toDate ? pay.paidAt.toDate().toLocaleDateString('vi-VN') : '';
-        txItems.push({ type:'paid', label:'Giải ngân ' + stage + ' — ' + projCode, sub:'Founder đã xác nhận' + (dateStr ? ' · ' + dateStr : ''), amount: net });
-      } else if (pay.status === 'pending') {
-        pending += net;
-        grossPending += (pay.amount || 0);
-        dateStr = pay.stagedAt && pay.stagedAt.toDate ? pay.stagedAt.toDate().toLocaleDateString('vi-VN') : '';
-        txItems.push({ type:'lock', label:'Chờ xác nhận ' + stage + ' — ' + projCode, sub:'Chờ Founder chuyển tiền' + (dateStr ? ' · ' + dateStr : ''), amount: net });
-      }
-    });
-  });
-  var mainEl = document.getElementById('walletMainAmt');
-  if (mainEl) mainEl.textContent = fmtVN(paid);
-  var lockEl = document.getElementById('lockedAmount');
-  if (lockEl) lockEl.textContent = pending > 0 ? fmtVN(pending) : '0đ';
-  var grossAll = grossPaid + grossPending;
-  var gEl = document.getElementById('walletGrossAmt');
-  if (gEl) gEl.textContent = fmtVN(grossAll);
-  var dEl = document.getElementById('walletDeductAmt');
-  if (dEl) dEl.textContent = fmtVN(grossAll - paid - pending);
-  var bEl = document.getElementById('walletBreakdown');
-  if (bEl) {
-    if (grossAll > 0) {
-      bEl.innerHTML = ''
-        + '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Giá trị chặng đã duyệt (gốc)</span><span style="color:var(--text);font-weight:600;font-family:var(--mono)">' + fmtVN(grossAll) + '</span></div>'
-        + '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Phí sàn (20%)</span><span style="color:var(--red);font-family:var(--mono)">−' + fmtVN(Math.round(grossAll*0.20)) + '</span></div>'
-        + '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>Thuế TNCN (7%)</span><span style="color:var(--red);font-family:var(--mono)">−' + fmtVN(Math.round(grossAll*0.07)) + '</span></div>'
-        + '<div style="display:flex;justify-content:space-between;padding:6px 0 0;font-weight:700;color:var(--green)"><span>Thực nhận NET</span><span style="font-family:var(--mono);font-size:13px">' + fmtVN(paid + pending) + '</span></div>';
-    } else {
-      bEl.textContent = 'Chưa có giao dịch nào.';
-    }
-  }
-  var wdA = document.getElementById('wdAvail');
-  if (wdA) wdA.textContent = fmtVN(paid);
-  var wdI = document.getElementById('withdrawAmt');
-  if (wdI) { wdI.max = paid; wdI.value = paid; }
-  try { walletBalance = paid; } catch(e) {}
-  var heroW = document.getElementById('heroWallet');
-  if (heroW) heroW.textContent = paid >= 1e6 ? (paid/1e6).toFixed(2) + 'M' : fmtVN(paid);
-  var qwM = document.getElementById('quickWalletMain');
-  if (qwM) qwM.textContent = fmtVN(paid);
-  var qwP = document.getElementById('quickWalletPending');
-  if (qwP) qwP.textContent = fmtVN(pending);
-  var vipP = document.getElementById('vipWalletPill');
-  if (vipP) vipP.textContent = 'Ví: ' + fmtVN(paid);
-  var qwT = document.getElementById('quickWalletTax');
-  if (qwT) qwT.textContent = fmtVN(Math.round(grossAll * 0.07));
-  var txEl = document.getElementById('walletTxList');
-  if (txEl) {
-    if (!txItems.length) {
-      txEl.innerHTML = '<div style="text-align:center;padding:20px;font-size:11px;color:var(--muted)">Chưa có giao dịch nào</div>';
-    } else {
-      txEl.innerHTML = txItems.map(function(tx) {
-        var isLock = tx.type === 'lock';
-        return '<div class="tx-row">'
-          + '<div class="tx-icon" style="background:var(' + (isLock ? '--amber-bg);color:var(--amber' : '--green-bg);color:var(--green') + ')"><i class="ph-duotone ph-' + (isLock ? 'lock' : 'money') + '"></i></div>'
-          + '<div class="tx-info"><div class="tx-title">' + tx.label + '</div><div class="tx-meta">' + tx.sub + '</div></div>'
-          + '<div class="tx-amount ' + (isLock ? 'tx-lock' : 'tx-pos') + '">+' + fmtVN(tx.amount) + '</div>'
-          + '</div>';
-      }).join('');
-    }
-  }
-}
-
 // Điền form profile từ Firestore sau khi load
 function _fillProfileForm(profile) {
   if (!profile) return;
   const set = (id,v) => { const el=document.getElementById(id); if(el&&v) el.value=v; };
-  set('profileName',         profile.name);
-  set('profileEmail',        profile.email);
-  set('profilePhone',        profile.phone);
-  set('profileLicense',      profile.license);
-  const gEl = document.getElementById('profileGender');
-  if (gEl && profile.gender) gEl.value = profile.gender;
-  const hpEl = document.getElementById('profileHomeProvince');
-  if (hpEl && (profile.homeProvince || profile.province)) hpEl.value = profile.homeProvince || profile.province;
-  _updateTempLocUI(profile.temporaryLocation);
+  set('profileName',    profile.name);
+  set('profileEmail',   profile.email);
+  set('profilePhone',   profile.phone);
+  set('profileLicense', profile.license);
   if (profile.avatarURL) _showAvatar(profile.avatarURL);
-  if (profile.signatureUrl) _showSignature(profile.signatureUrl);
-  const ba = profile.bankAccount || {};
-  set('bankName',            ba.bankName);
-  set('bankAccountNumber',   ba.accountNumber);
-  set('bankAccountHolder',   ba.accountHolder);
-  if (profile.qrCodeUrl) _showQr(profile.qrCodeUrl);
-  const wdB = document.getElementById('wdBank');
-  if (wdB) wdB.textContent = ba.bankName ? (ba.bankName + (ba.accountNumber ? ' · ' + ba.accountNumber : '')) : 'Chưa cập nhật — vào Hồ sơ để thêm';
-  const wdH = document.getElementById('wdHolder');
-  if (wdH) wdH.textContent = ba.accountHolder || '—';
 }
-
-function _updateTempLocUI(tl) {
-  var badge    = document.getElementById('tempLocBadge');
-  var clearBtn = document.getElementById('clearTempBtn');
-  var isActive = false;
-  if (tl && tl.province) {
-    var untilMs = tl.until
-      ? (tl.until.seconds ? tl.until.seconds * 1000 : +new Date(tl.until))
-      : 0;
-    isActive = untilMs > Date.now();
-  }
-  if (badge)    badge.style.display    = isActive ? 'block'       : 'none';
-  if (clearBtn) clearBtn.style.display = isActive ? 'inline-flex' : 'none';
-  if (isActive) {
-    var sel = document.getElementById('tempLocProvince');
-    if (sel) sel.value = tl.province;
-    var until = new Date(tl.until.seconds ? tl.until.seconds * 1000 : tl.until);
-    var dateEl = document.getElementById('tempLocUntil');
-    if (dateEl) dateEl.value = until.toISOString().split('T')[0];
-  }
-}
-
-window.setTempLocation = async function() {
-  const uid = window.__ALN_UID;
-  if (!uid) return;
-  const province = (document.getElementById('tempLocProvince')||{}).value;
-  const untilStr = (document.getElementById('tempLocUntil')||{}).value;
-  if (!province) { showToast('Vui lòng chọn tỉnh thành', 't-red'); return; }
-  if (!untilStr) { showToast('Vui lòng chọn ngày kết thúc', 't-red'); return; }
-  const untilDate = new Date(untilStr);
-  untilDate.setHours(23, 59, 59, 999);
-  if (untilDate <= new Date()) { showToast('Ngày kết thúc phải là tương lai', 't-red'); return; }
-  try {
-    await setDoc(doc(db,'users',uid), { temporaryLocation: { province, until: untilDate } }, {merge:true});
-    showToast('Đã bật địa điểm tạm thời', 't-green');
-    _updateTempLocUI({ province, until: { seconds: untilDate.getTime()/1000 } });
-  } catch(e) { showToast('Lỗi: ' + (e.message||e.code), 't-red'); }
-};
-
-window.clearTempLocation = async function() {
-  const uid = window.__ALN_UID;
-  if (!uid) return;
-  try {
-    await setDoc(doc(db,'users',uid), { temporaryLocation: null }, {merge:true});
-    showToast('Đã tắt địa điểm tạm thời', 't-green');
-    _updateTempLocUI(null);
-  } catch(e) { showToast('Lỗi: ' + (e.message||e.code), 't-red'); }
-};
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -3657,8 +2944,6 @@ onAuthStateChanged(auth, async (user) => {
 
     // ── WEB PUSH (FCM): đăng ký token tự động khi đã có quyền thông báo ──
     window.__ALN_UID = user.uid;
-    var _pvBtn = document.getElementById('btnViewPublicProfile');
-    if(_pvBtn) _pvBtn.href = 'profile.html?uid=' + user.uid;
     window.alnInitPush = async function(){
       try {
         if (!('serviceWorker' in navigator) || !('Notification' in window)) return;
@@ -3687,16 +2972,12 @@ onAuthStateChanged(auth, async (user) => {
     window.alnInitPush();
 
     // ── LOAD DỰ ÁN KTS TỪ FIRESTORE ──
-    // Founder xem tất cả projects (giám sát), KTS chỉ xem của mình
-    _startKtsProjectListen(profile.role === 'founder' ? null : user.uid);
+    _startKtsProjectListen(user.uid);
     // Điền form profile
     _fillProfileForm(profile);
     // Điền username vào Cài đặt
     const suEl = document.getElementById('settingUsername');
     if (suEl && profile.username) suEl.textContent = profile.username;
-    // Toggle "Email dự án mới": chỉ BẬT khi đã opt-in thật (=== true) — KTS cũ chưa có field → hiện TẮT
-    const tgLE = document.getElementById('tgLeadEmail');
-    if (tgLE) tgLE.checked = profile.nhanLeadEmail === true;
 
     // Hồ sơ KTS đầu sidebar: tên + avatar theo tài khoản đăng nhập
     try {
@@ -3718,7 +2999,7 @@ onAuthStateChanged(auth, async (user) => {
     const veil = document.getElementById("alnAuthVeil");
     if (veil) veil.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:14px;font-family:sans-serif">'
       + '<div style="color:#475569;font-size:14px;text-align:center;padding:0 24px">Không kiểm tra được phiên đăng nhập.<br>Vui lòng kiểm tra mạng và thử lại.</div>'
-      + '<button onclick="location.reload()" style="background:linear-gradient(135deg,#98690a,#b8860b);border:none;border-radius:8px;padding:11px 26px;font-weight:700;font-size:13px;cursor:pointer;color:#000">Thử lại</button>'
+      + '<button onclick="location.reload()" style="background:linear-gradient(135deg,#d4a017,#e8c44a);border:none;border-radius:8px;padding:11px 26px;font-weight:700;font-size:13px;cursor:pointer;color:#000">Thử lại</button>'
       + '<button onclick="window.location.replace(\'login.html\')" style="background:none;border:1px solid rgba(240,235,224,.25);border-radius:8px;padding:9px 22px;font-size:12px;cursor:pointer;color:rgba(240,235,224,.7)">Về trang đăng nhập</button>'
       + '</div>';
   }
@@ -3730,158 +3011,6 @@ window.alnLogout = async function(){
   try { localStorage.removeItem("aln_user"); sessionStorage.removeItem("aln_user"); } catch(e){}
   window.location.replace("login.html");
 };
-</script>
-
-<!-- ═══ ALN — KTS CREATOR (pilot nội bộ, xem TONG_HOP_PHUONG_AN_KTS_CREATOR.md) ═══ -->
-<script type="module">
-import { auth, db, onAuthStateChanged, doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, query, where, serverTimestamp } from "./firebase-config.js";
-
-function ktscEsc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-const KTSC_LANDING_BASE = location.origin + location.pathname.replace(/kts_dashboard\.html$/, 'kts/');
-const KTSC_FORMAT_LABEL = { '1':'Ý tưởng 2D', '2':'Timelapse 3D', '3':'Bóc hồ sơ thi công', '4':'Nhận tiền đúng hạn' };
-const KTSC_STATUS_LABEL = { cho_duyet:'Chờ duyệt', dat_chuan:'Đạt chuẩn', tu_choi:'Từ chối' };
-const KTSC_SCRIPTS = {
-  1: "KỊCH BẢN #1 — Ý TƯỞNG 2D (60s)\n\nHook 0-8s: nêu đúng nỗi lo của chủ nhà.\n8-40s: trình bày ý tưởng 2D — mặt bằng, công năng.\n40-55s: vì sao hợp lý.\n55-60s: CTA \"Bắt đầu Bước 1 qua link ở bio\".\nLƯU Ý: watermark + link định danh mọi bản đăng, không SĐT/Zalo cá nhân.",
-  2: "KỊCH BẢN #2 — TIMELAPSE 3D\n\nTimelapse dựng 3D + nhạc nền, CTA cuối clip \"Bắt đầu Bước 1 qua link ở bio\".\nLƯU Ý: watermark + link định danh mọi bản đăng, không SĐT/Zalo cá nhân.",
-  3: "KỊCH BẢN #3 — BÓC HỒ SƠ THI CÔNG\n\nGiải thích minh bạch 6 hạng mục hồ sơ thi công, chống đi đêm.\nLƯU Ý: không lộ thông tin công trình/khách hàng chưa đồng ý, không SĐT/Zalo cá nhân.",
-  4: "KỊCH BẢN #4 — NHẬN TIỀN ĐÚNG HẠN\n\nChia sẻ trải nghiệm nhận tiền đúng hạn qua Quỹ bảo đảm 4 bước.\nLƯU Ý: không tiết lộ số tiền cụ thể của khách chưa đồng ý, không SĐT/Zalo cá nhân."
-};
-window.ktscDownloadScript = function(n){
-  const blob = new Blob([KTSC_SCRIPTS[n]], { type: 'text/plain;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'kich-ban-kts-creator-' + n + '.txt';
-  a.click();
-  URL.revokeObjectURL(a.href);
-};
-window.ktscAddUrlRow = function(){
-  const list = document.getElementById('ktscUrlList');
-  if (!list || list.children.length >= 10) return;
-  const row = document.createElement('div');
-  row.style.cssText = 'display:flex;gap:6px;margin-bottom:6px';
-  row.innerHTML = '<input type="text" placeholder="https://... (TikTok/Facebook/YouTube/ALN)" style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text);font-size:12px;font-family:inherit;outline:none">'
-    + '<button onclick="this.parentElement.remove()" style="padding:0 10px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer">✕</button>';
-  list.appendChild(row);
-};
-window.ktscCopyLink = function(){
-  const link = document.getElementById('ktscLink');
-  const ok = document.getElementById('ktscCopyOk');
-  if (!link) return;
-  navigator.clipboard.writeText(link.textContent).then(function(){
-    if (ok) { ok.style.display = 'block'; setTimeout(function(){ ok.style.display = 'none'; }, 2000); }
-  });
-};
-
-let KTSC_ME = null, KTSC_PROFILE = null;
-
-function ktscGenCode(existingCodes){
-  let max = 0;
-  existingCodes.forEach(function(c){
-    const m = /^KTS-(\d{4,})$/.exec(c || '');
-    if (m) max = Math.max(max, parseInt(m[1], 10));
-  });
-  return 'KTS-' + String(max + 1).padStart(4, '0');
-}
-
-async function ktscEnsureProfile(uid, name){
-  const ref = doc(db, 'kts_profiles_draft', uid);
-  const snap = await getDoc(ref);
-  if (snap.exists()) return Object.assign({ uid: uid }, snap.data());
-  const allSnap = await getDocs(collection(db, 'kts_profiles_draft'));
-  const codes = [];
-  allSnap.forEach(function(d){ codes.push(d.data().ktsCode); });
-  const code = ktscGenCode(codes);
-  const profile = {
-    ktsCode: code, name: name || 'Kiến trúc sư ALN', avatarUrl: '', portfolioSummary: '',
-    badgeFounder: false, active: true, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
-  };
-  await setDoc(ref, profile);
-  return Object.assign({ uid: uid }, profile);
-}
-
-function ktscRenderCode(){
-  const codeEl = document.getElementById('ktscCode');
-  const linkEl = document.getElementById('ktscLink');
-  if (codeEl) codeEl.textContent = KTSC_PROFILE.ktsCode;
-  if (linkEl) linkEl.textContent = KTSC_LANDING_BASE + KTSC_PROFILE.ktsCode;
-}
-
-async function ktscLoadClips(){
-  const box = document.getElementById('ktscClipList');
-  if (!box) return;
-  try {
-    const q = query(collection(db, 'clips_draft'), where('ktsUid', '==', KTSC_ME.uid));
-    const snap = await getDocs(q);
-    const items = [];
-    snap.forEach(function(d){ items.push(Object.assign({ id: d.id }, d.data())); });
-    items.sort(function(a, b){ return ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0); });
-    if (!items.length) { box.innerHTML = 'Chưa có clip nào.'; return; }
-    box.innerHTML = items.map(function(c){
-      const pillColor = c.status === 'dat_chuan' ? 'var(--green)' : (c.status === 'tu_choi' ? 'var(--red)' : 'var(--amber)');
-      const pillBg = c.status === 'dat_chuan' ? 'var(--green-bg)' : (c.status === 'tu_choi' ? 'var(--red-bg)' : 'var(--amber-bg)');
-      return '<div style="padding:10px 0;border-bottom:1px solid var(--border)">'
-        + '<div style="font-size:12px;font-weight:600;color:var(--text)">' + ktscEsc(c.title) + '</div>'
-        + '<div style="font-size:11px;color:var(--muted);margin-top:3px">Format ' + ktscEsc(c.format) + ' — ' + ktscEsc(KTSC_FORMAT_LABEL[c.format] || '')
-          + ' · <span style="padding:1px 8px;border-radius:99px;background:' + pillBg + ';color:' + pillColor + ';font-weight:700">' + (KTSC_STATUS_LABEL[c.status] || c.status) + '</span></div>'
-        + (c.status === 'tu_choi' && c.rejectReason ? '<div style="font-size:11px;color:var(--red);margin-top:3px">Lý do: ' + ktscEsc(c.rejectReason) + '</div>' : '')
-        + '</div>';
-    }).join('');
-  } catch (e) {
-    box.innerHTML = 'Lỗi tải clip (' + ktscEsc(e.code || e.message) + ')';
-  }
-}
-
-window.ktscSubmitClip = async function(){
-  const errEl = document.getElementById('ktscErr');
-  const okEl = document.getElementById('ktscOk');
-  if (errEl) errEl.style.display = 'none';
-  if (okEl) okEl.style.display = 'none';
-  if (!KTSC_ME || !KTSC_PROFILE) return;
-  const title = (document.getElementById('ktscTitle').value || '').trim();
-  const format = document.getElementById('ktscFormat').value;
-  const urls = Array.prototype.map.call(document.querySelectorAll('#ktscUrlList input'), function(i){ return i.value.trim(); }).filter(Boolean);
-  const commit = document.getElementById('ktscCommit').checked;
-  if (title.length < 3) { errEl.textContent = 'Vui lòng nhập tiêu đề clip.'; errEl.style.display = 'block'; return; }
-  if (urls.length < 1) { errEl.textContent = 'Cần ít nhất 1 URL bản đăng.'; errEl.style.display = 'block'; return; }
-  if (urls.length > 10) { errEl.textContent = 'Tối đa 10 URL.'; errEl.style.display = 'block'; return; }
-  if (!commit) { errEl.textContent = 'Vui lòng xác nhận cam kết trước khi nộp.'; errEl.style.display = 'block'; return; }
-  const btn = document.getElementById('ktscSubmitBtn');
-  btn.disabled = true;
-  try {
-    await addDoc(collection(db, 'clips_draft'), {
-      ktsUid: KTSC_ME.uid, ktsCode: KTSC_PROFILE.ktsCode, ktsName: KTSC_PROFILE.name,
-      title: title, format: format, urls: urls, commitNoContact: true,
-      status: 'cho_duyet', createdAt: serverTimestamp()
-    });
-    okEl.style.display = 'block';
-    document.getElementById('ktscTitle').value = '';
-    document.getElementById('ktscUrlList').innerHTML = '';
-    window.ktscAddUrlRow();
-    document.getElementById('ktscCommit').checked = false;
-    ktscLoadClips();
-  } catch (e) {
-    errEl.textContent = 'Lỗi nộp clip: ' + (e.message || e.code); errEl.style.display = 'block';
-  } finally { btn.disabled = false; }
-};
-
-onAuthStateChanged(auth, async function(user){
-  if (!user) return; // guard chính (script trên) đã xử lý chuyển hướng
-  try {
-    let snap = await getDoc(doc(db, 'users', user.uid));
-    const profile = snap.exists() ? snap.data()
-      : (user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2' ? { role: 'founder', name: 'KTS. Trần Đại Long' } : null);
-    if (!profile || (profile.role !== 'kts' && profile.role !== 'founder')) return;
-    KTSC_ME = { uid: user.uid, name: profile.name };
-    KTSC_PROFILE = await ktscEnsureProfile(user.uid, profile.name);
-    ktscRenderCode();
-    if (!document.querySelector('#ktscUrlList input')) window.ktscAddUrlRow();
-    await ktscLoadClips();
-  } catch (e) {
-    const box = document.getElementById('ktscClipList');
-    if (box) box.textContent = 'Lỗi tải KTS Creator (' + (e.message || e.code) + ')';
-    console.warn('[KTS Creator]', e);
-  }
-});
 </script>
 
 <!-- ═══ ALN — GỬI PHƯƠNG ÁN (ảnh) → Storage + Firestore ═══ -->
@@ -3981,7 +3110,7 @@ window.alnSubmitProposal = async function(){
   const desc  =((document.getElementById('paDesc')   ||{}).value||'').trim();
   const btn = document.getElementById('paSubmitBtn');
 
-  const PID = window.KTS_PROJECT_ID ;
+  const PID = window.KTS_PROJECT_ID || 'ALN-9921';
 
   // Mục 1: bắt buộc nhập tên
   if(!name){
@@ -3998,8 +3127,8 @@ window.alnSubmitProposal = async function(){
   const total=_paFiles.length;
   const _kpd = window.KTS_PROJECT_DATA || {};
   const _isDNpa = !!(_kpd.dn && _kpd.dn.uid);
-  const _dpid = _kpd.code || PID;
-  paStatus(`<div style="background:var(--ink3);border:1px solid rgba(152,105,10,.3);border-radius:8px;padding:10px 12px">
+  const _dpid = _isDNpa ? 'ALN-DN-'+(_kpd.CODE||_kpd.code||PID.replace(/^ALN-/,'')) : 'ALN-CN-'+(_kpd.CHUNHA||PID.replace(/^ALN-/,''));
+  paStatus(`<div style="background:var(--ink3);border:1px solid rgba(212,160,23,.3);border-radius:8px;padding:10px 12px">
     <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">📋 Sắp gửi <b>${total} ảnh</b> · Chặng <b>${stage}</b> · <b>${name}</b></div>
     <div style="font-size:10px;color:var(--sub);margin-bottom:10px">Dự án ${_dpid} — Chủ nhà &amp; DN nhận ngay sau khi gửi.</div>
     <div style="display:flex;gap:8px">
@@ -4073,46 +3202,6 @@ window.alnSubmitProposal = async function(){
   }; // end _paDoUpload
 }; // end alnSubmitProposal
 
-window.openBoardEditor = function() {
-  var pid   = window.KTS_PROJECT_ID || '';
-  var stage = (document.getElementById('paStage') || {}).value || 'C1';
-  var data  = window.KTS_PROJECT_DATA || {};
-  var name   = (data.name || '').toUpperCase();
-  var loc    = (data.location || data.address || '').toUpperCase();
-  var type   = (data.projectType || 'PRIVATE RESIDENCE').toUpperCase();
-  var client = (data.cn && (data.cn.name || data.cn.username) || data.clientName || '').toUpperCase();
-  var cnuid  = (data.cn && data.cn.uid) || '';
-  var params = new URLSearchParams({ pid: pid, stage: stage, role: 'kts', name: name, location: loc, type: type, client: client, cnuid: cnuid });
-  window.open('board-editor.html?' + params.toString(), '_blank');
-};
-
-window.openKhungBV = function() {
-  var pid    = window.KTS_PROJECT_ID || '';
-  var data   = window.KTS_PROJECT_DATA || {};
-  var name   = (data.name || '').toUpperCase();
-  var addr   = (data.location || data.address || '').toUpperCase();
-  var client = (data.cn && (data.cn.name || data.cn.username) || '').toUpperCase();
-  var params = new URLSearchParams({ pid: pid, stage: 'C3', role: 'kts', name: name, address: addr, client: client, code: 'KT-01' });
-  window.open('ALN_MatranKy_KhungBV.html?' + params.toString(), '_blank');
-};
-
-/* ── C2 file picker helpers ── */
-window._c2PickedFiles = [];
-window.c2HandleFiles = function(fileList) {
-  window._c2PickedFiles = Array.from(fileList || []);
-  var preview = document.getElementById('c2FilePreview');
-  if (!preview) return;
-  if (!window._c2PickedFiles.length) { preview.innerHTML = ''; return; }
-  preview.innerHTML = window._c2PickedFiles.map(function(f) {
-    return '<div style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text2);padding:4px 0;border-bottom:1px solid var(--border)"><i class="ph-duotone ph-file" style="color:var(--gold)"></i>' + f.name + '</div>';
-  }).join('');
-};
-window.c2OpenModal = function() {
-  if (typeof window.openC2Modal === 'function') {
-    window.openC2Modal(window._c2PickedFiles || []);
-  }
-};
-
 /* Danh sách phương án đã gửi (theo chặng đang chọn) — cập nhật trực tiếp */
 function paWatch(stage){
   const box=document.getElementById('paSentList');
@@ -4120,8 +3209,7 @@ function paWatch(stage){
   if(!box) return;
   if(_paUnsub){ try{_paUnsub();}catch(e){} _paUnsub=null; }
   box.innerHTML='<div style="color:var(--muted);font-size:12px">Đang tải...</div>';
-  const PID = window.KTS_PROJECT_ID ;
-  if(!PID){ box.innerHTML='<div style="color:var(--muted);font-size:12px">Chưa có dự án nào được giao.</div>'; return; }
+  const PID = window.KTS_PROJECT_ID || 'ALN-9921';
   try{
     const qy=query(collection(db,'projects',PID,'stages',stage,'proposals'), orderBy('order','desc'));
     _paUnsub=onSnapshot(qy, snap=>{
@@ -4244,7 +3332,7 @@ function _watchDocs(pid) {
   if (projIdEl) {
     const _kd = window.KTS_PROJECT_DATA || {};
     const _isDNwd = !!(_kd.dn && _kd.dn.uid);
-    projIdEl.textContent = '#' + (_kd.code || pid);
+    projIdEl.textContent = '#' + (_isDNwd ? 'ALN-DN-'+(_kd.CODE||_kd.code||pid.replace(/^ALN-/,'')) : 'ALN-CN-'+(_kd.CHUNHA||pid.replace(/^ALN-/,'')));
   }
   if (!list) return;
   if (_rvDocUnsub) { try { _rvDocUnsub(); } catch(e) {} _rvDocUnsub = null; }
@@ -4273,7 +3361,7 @@ function _watchDocs(pid) {
         const isImg = ['JPG','JPEG','PNG','GIF','WEBP'].includes(ext);
         const roleLabel = upRole==='kts' ? 'KTS' : upRole==='dn' ? 'DN' : 'CN';
         const roleColor = upRole==='kts' ? 'var(--gold)' : upRole==='dn' ? 'var(--blue)' : 'var(--green)';
-        const dlBtn = dc.url ? `<a href="${dc.url}" target="_blank" style="flex-shrink:0;width:30px;height:30px;border-radius:7px;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none;border:1px solid rgba(152,105,10,.2)" title="Tải về"><i class="ph-duotone ph-download-simple"></i></a>` : '';
+        const dlBtn = dc.url ? `<a href="${dc.url}" target="_blank" style="flex-shrink:0;width:30px;height:30px;border-radius:7px;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none;border:1px solid rgba(37,99,235,.2)" title="Tải về"><i class="ph-duotone ph-download-simple"></i></a>` : '';
         const meta = `<div style="font-size:10px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:5px"><span style="color:${roleColor};font-weight:700;background:${roleColor}1a;padding:1px 6px;border-radius:4px">${roleLabel}</span><span>${upName}</span><span>·</span><span>${dc.date || ''}</span></div>`;
         if (isImg && dc.url) {
           const _ua = dc.url.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
@@ -4393,7 +3481,7 @@ window.submitC3 = async function() {
   }
 
   if (failed === 0) {
-    if (sr) sr.innerHTML = `<div style="padding:10px 14px;background:var(--green-bg);border:1px solid rgba(21,128,61,.2);border-radius:8px;font-size:12px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:8px">
+    if (sr) sr.innerHTML = `<div style="padding:10px 14px;background:var(--green-bg);border:1px solid rgba(22,163,74,.2);border-radius:8px;font-size:12px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:8px">
       <i class="ph-duotone ph-check-circle" style="font-size:18px"></i>
       <span>Đã upload ${done}/${total} tài liệu C3 thành công — chờ Founder thẩm định</span>
     </div>`;
@@ -4401,7 +3489,7 @@ window.submitC3 = async function() {
     showToast('Đã nộp Hồ sơ C3 thành công!', 't-green');
     if (typeof window._alnWatchDocs === 'function') window._alnWatchDocs(pid);
   } else {
-    if (sr) sr.innerHTML = `<div style="padding:10px 14px;background:var(--amber-bg);border:1px solid rgba(152,105,10,.2);border-radius:8px;font-size:12px;color:var(--amber);font-weight:600;display:flex;align-items:center;gap:8px">
+    if (sr) sr.innerHTML = `<div style="padding:10px 14px;background:var(--amber-bg);border:1px solid rgba(217,119,6,.2);border-radius:8px;font-size:12px;color:var(--amber);font-weight:600;display:flex;align-items:center;gap:8px">
       <i class="ph-duotone ph-warning" style="font-size:18px"></i>
       <span>Upload ${done}/${total} — ${failed} tệp lỗi. Kiểm tra Storage rules rồi thử lại.</span>
     </div>`;
@@ -4466,369 +3554,6 @@ window.submitRev = async function() {
     if (typeof showToast === 'function') showToast('Lỗi upload: ' + ((e && e.code) || (e && e.message) || e), 't-red');
   }
 };
-/* ══ C2 SUBMIT MODAL — locationService + upload ══ */
-window._c2mFiles = []; // files cần upload cho C2
-
-window.openC2Modal = function(files) {
-  window._c2mFiles = files || [];
-  var modal = document.getElementById('c2SubmitModal');
-  var fileList = document.getElementById('c2mFileList');
-  if (!window._c2mFiles.length) {
-    fileList.innerHTML = '<div style="font-size:11px;color:#c85a3a;padding:6px 0">⚠ Chưa có file đính kèm</div>';
-  } else {
-    fileList.innerHTML = window._c2mFiles.map(function(f) {
-      return '<div class="c2m-file-row"><span style="font-size:15px;color:#c9a84c">📄</span><span style="flex:1;font-size:12px;color:#e0d4b0">' + f.name + '</span></div>';
-    }).join('');
-  }
-  document.getElementById('c2mStep1').style.display = '';
-  document.getElementById('c2mStep2').style.display = 'none';
-  document.getElementById('c2mStep3').style.display = 'none';
-  document.getElementById('c2mErr').style.display = 'none';
-  document.getElementById('c2mConfirmBtn').disabled = false;
-  modal.classList.add('open');
-};
-
-window.closeC2Modal = function() {
-  document.getElementById('c2SubmitModal').classList.remove('open');
-};
-
-function c2mSetProgress(pct, label) {
-  document.getElementById('c2mBar').style.width = pct + '%';
-  document.getElementById('c2mPct').textContent = label;
-}
-
-window.c2mDoSubmit = async function() {
-  var pid = window.KTS_PROJECT_ID;
-  if (!pid) return;
-  var uid = (auth.currentUser && auth.currentUser.uid) || '';
-
-  document.getElementById('c2mStep1').style.display = 'none';
-  document.getElementById('c2mStep2').style.display = '';
-  c2mSetProgress(15, 'Đang xác định vị trí…');
-
-  var locResult = null;
-  var locDenied = false;
-  var locTime   = '';
-
-  try {
-    locResult = await new Promise(function(resolve, reject) {
-      if (!navigator.geolocation) { reject(new Error('no-geo')); return; }
-      navigator.geolocation.getCurrentPosition(
-        async function(pos) {
-          var lat = pos.coords.latitude;
-          var lng = pos.coords.longitude;
-          try {
-            await updateDoc(doc(db, 'users', uid), {
-              lastSeenLocation: { latitude: lat, longitude: lng },
-              lastSeenAt: serverTimestamp()
-            });
-            await addDoc(collection(db, 'locationLogs'), {
-              userId: uid, projectId: pid, stage: 'C2',
-              location: { latitude: lat, longitude: lng },
-              recordedAt: serverTimestamp(), action: 'c2_submit'
-            });
-          } catch(e) {}
-          locTime = new Date().toLocaleString('vi-VN');
-          resolve({ latitude: lat, longitude: lng });
-        },
-        function(err) { reject(err); },
-        { timeout: 10000, maximumAge: 60000 }
-      );
-    });
-  } catch(e) {
-    locDenied = true;
-    try { await updateDoc(doc(db, 'projects', pid), { locationDenied: true, locationDeniedAt: serverTimestamp() }); } catch(e2) {}
-  }
-
-  c2mSetProgress(55, 'Đang tải hồ sơ lên…');
-
-  var files = window._c2mFiles || [];
-  var uploaderName = (window.KTS_USER && window.KTS_USER.name) || 'KTS';
-  var today = new Date().toLocaleDateString('vi-VN');
-  var uploadedNames = [];
-  for (var i = 0; i < files.length; i++) {
-    var f = files[i];
-    try {
-      var ref = storageRef(storage, 'projects/' + pid + '/c2/' + Date.now() + '_' + f.name);
-      await uploadBytes(ref, f);
-      var url = await getDownloadURL(ref);
-      await addDoc(collection(db, 'projects', pid, 'documents'), {
-        name: f.name, folder: 'c2', label: 'Hồ sơ C2',
-        url: url, stage: 'C2',
-        uploader: { uid: uid, name: uploaderName, role: 'kts' },
-        date: today
-      });
-      uploadedNames.push(f.name);
-    } catch(e) { console.error('[C2 upload]', f.name, e); }
-  }
-
-  try {
-    await updateDoc(doc(db, 'projects', pid), {
-      locationMonitoring: true,
-      c2StartedAt: serverTimestamp(),
-      monitoredPair: { ktsId: uid, cnId: (window.KTS_PROJECT_DATA && window.KTS_PROJECT_DATA.cn && window.KTS_PROJECT_DATA.cn.uid) || '' },
-      suspicionStatus: 'ok',
-      suspicionSignals: []
-    });
-  } catch(e) {}
-
-  c2mSetProgress(100, 'Hoàn tất!');
-  await new Promise(function(r){ setTimeout(r, 350); });
-
-  document.getElementById('c2mStep2').style.display = 'none';
-  document.getElementById('c2mStep3').style.display = '';
-
-  var items = '';
-  if (locResult && !locDenied) {
-    items += '<div class="c2m-confirm-item"><span class="c2m-check">✓</span><span>Vị trí đã ghi · ' + locTime + '<br><span style="font-size:10px;color:#3a5878">' + locResult.latitude.toFixed(5) + ', ' + locResult.longitude.toFixed(5) + '</span></span></div>';
-  } else {
-    items += '<div class="c2m-confirm-item" style="color:#c85a3a"><span>⛔</span><span>Vị trí không được cấp phép — đã ghi nhận</span></div>';
-  }
-  uploadedNames.forEach(function(n) {
-    items += '<div class="c2m-confirm-item"><span class="c2m-check">✓</span><span>' + n + ' đã gửi</span></div>';
-  });
-  if (!uploadedNames.length) {
-    items += '<div class="c2m-confirm-item"><span style="color:#c9a84c">•</span><span>Không có file được upload</span></div>';
-  }
-  document.getElementById('c2mSuccessItems').innerHTML = items;
-};
-</script>
-
-<!-- ══ C2 SUBMIT MODAL ══ -->
-<div id="c2SubmitModal">
-  <div class="c2m-card">
-    <span class="c2m-corner tl"></span><span class="c2m-corner tr"></span>
-    <span class="c2m-corner bl"></span><span class="c2m-corner br"></span>
-
-    <!-- Bước 1: Xác nhận -->
-    <div id="c2mStep1">
-      <div class="c2m-step">Bước 1 / 3 — Xác nhận</div>
-      <div class="c2m-title">Nộp bản C2</div>
-      <div class="c2m-desc">Xem lại hồ sơ và vị trí trước khi nộp chính thức cho Chủ nhà.</div>
-      <div style="font-size:11px;color:#6a8aaa;margin-bottom:7px">Hồ sơ đính kèm</div>
-      <div id="c2mFileList"></div>
-      <div class="c2m-notice">📍 ALN sẽ xác định vị trí của bạn để hoàn tất C2.<br>Vị trí chỉ được dùng để bảo vệ quyền lợi hợp pháp của bạn.</div>
-      <div class="c2m-error" id="c2mErr" style="display:none"></div>
-      <button class="c2m-btn c2m-btn-primary" id="c2mConfirmBtn" onclick="c2mDoSubmit()">Xác nhận nộp bản</button>
-      <button class="c2m-btn c2m-btn-ghost" onclick="closeC2Modal()" style="margin-top:6px">Huỷ</button>
-    </div>
-
-    <!-- Bước 2: Đang xử lý -->
-    <div id="c2mStep2" style="display:none">
-      <div class="c2m-step">Bước 2 / 3 — Đang xử lý</div>
-      <div class="c2m-title">Đang gửi…</div>
-      <div class="c2m-desc">ALN đang xác định vị trí và hồ sơ của bạn để hoàn tất C2.</div>
-      <div class="c2m-progress-track"><div class="c2m-progress-bar" id="c2mBar"></div></div>
-      <div class="c2m-pct" id="c2mPct">Đang xác định vị trí…</div>
-    </div>
-
-    <!-- Bước 3: Hoàn tất -->
-    <div id="c2mStep3" style="display:none">
-      <div class="c2m-success-icon">🏠</div>
-      <div class="c2m-success-title">Bản 3D đã chạm tay Chủ nhà rồi!</div>
-      <div class="c2m-divider"></div>
-      <div id="c2mSuccessItems"></div>
-      <button class="c2m-btn c2m-btn-primary" onclick="closeC2Modal()" style="margin-top:14px">Về trang dự án</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ PHÒNG HỘI KIẾN — họp video theo dự án, Jitsi nhúng trong trang ══ -->
-<style>
-@keyframes hkPulse{0%,100%{box-shadow:0 0 0 0 rgba(152,105,10,.55)}50%{box-shadow:0 0 0 14px rgba(152,105,10,0)}}
-.hk-live-btn{animation:hkPulse 1.6s infinite;background:linear-gradient(135deg,#98690a,#b8860b);color:#fff;border:none;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px}
-.hk-idle-btn{background:linear-gradient(135deg,#b8860b,#98690a);color:#fff;border:none;border-radius:99px;padding:12px 20px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px rgba(152,105,10,.4);display:flex;align-items:center;gap:7px}.hk-idle-btn:hover{filter:brightness(1.12)}
-.hk-pick{background:var(--ink2,#0d1320);border:1px solid var(--border,rgba(255,255,255,.12));border-radius:12px;padding:10px;margin-bottom:8px;max-height:300px;overflow-y:auto;min-width:280px;box-shadow:0 12px 34px rgba(0,0,0,.5)}
-.hk-pick-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:8px}
-.hk-pick-row:hover{background:rgba(255,255,255,.04)}
-</style>
-<div id="hkModal" style="display:none;position:fixed;inset:0;z-index:99999;background:#000">
-  <div style="position:absolute;top:0;left:0;right:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:linear-gradient(rgba(0,0,0,.72),transparent)">
-    <div style="color:#b8860b;font-weight:800;font-size:14px">🏛 Phòng Hội Kiến — <span id="hkRoomLabel"></span><div style="font-weight:500;font-size:11.5px;color:#ffe08a;margin-top:4px;max-width:640px;line-height:1.4"><i class="ph-duotone ph-info"></i> Nếu màn hình hỏi đăng nhập: <b>Kiến trúc sư</b> bấm "Đăng nhập" để mở phòng · <b>Chủ nhà</b> chỉ cần chờ vài giây, KHÔNG cần đăng nhập.</div></div>
-    <button onclick="hkLeave()" style="background:rgba(239,68,68,.9);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:800;font-size:12px;cursor:pointer">Rời phòng</button>
-  </div>
-  <iframe id="hkFrame" allow="camera; microphone; fullscreen; display-capture; autoplay" style="width:100%;height:100%;border:0"></iframe>
-</div>
-<div id="hkDock" style="display:none;position:fixed;left:16px;bottom:16px;z-index:9000;flex-direction:column;align-items:flex-start;gap:8px"></div>
-
-<script type="module">
-import { db as hkDb, doc as hkDoc, updateDoc as hkUpdateDoc, serverTimestamp as hkTs } from "./firebase-config.js";
-
-var HK_LIST = [];
-var HK_COLL = 'projects';
-var HK_CAN_OPEN = true; // KTS được mở phòng cho dự án của mình
-
-function hkUser(){
-  var u = {};
-  try { u = JSON.parse(sessionStorage.getItem('aln_user') || localStorage.getItem('aln_user') || '{}'); } catch(e){}
-  return { uid: window.__ALN_UID || u.uid || '', name: u.name || 'Thành viên ALN', role: u.role || 'kts' };
-}
-// Phòng quên đóng quá 4 giờ coi như đã kết thúc
-function hkIsActive(m){
-  if (!m || !m.active) return false;
-  var t = m.openedAt && m.openedAt.toMillis ? m.openedAt.toMillis() : 0;
-  if (t && Date.now() - t > 4*3600*1000) return false;
-  return true;
-}
-window.hkSync = function(list, coll){ HK_LIST = list || []; HK_COLL = coll || HK_COLL; hkRenderDock(); };
-
-function hkRenderDock(){
-  var dock = document.getElementById('hkDock');
-  if (!dock) return;
-  var act = HK_LIST.filter(function(p){ return hkIsActive(p.meeting); });
-  var html = '';
-  html += '<div id="hkPicker" class="hk-pick" style="display:none"></div>';
-  act.forEach(function(p){
-    var label = (p.code || p.id) + '';
-    html += '<button class="hk-live-btn" onclick="hkJoin(\'' + (p.meeting.roomId||'') + '\',\'' + label.replace(/'/g,'') + '\')">🏛 Phiên họp đang diễn ra — Mời vào <span style="font-weight:400;font-size:11px;opacity:.85">(' + label + ')</span></button>';
-  });
-  if (HK_CAN_OPEN) html += '<button class="hk-idle-btn" onclick="hkTogglePicker()">🏛 Phòng Hội Kiến</button>';
-  dock.innerHTML = html;
-  dock.style.display = (act.length || HK_CAN_OPEN) ? 'flex' : 'none';
-}
-
-window.hkTogglePicker = function(){
-  var pk = document.getElementById('hkPicker');
-  if (!pk) return;
-  if (pk.style.display !== 'none') { pk.style.display = 'none'; return; }
-  if (!HK_LIST.length) { pk.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--muted,#8090ae)">Chưa có dự án nào.</div>'; pk.style.display='block'; return; }
-  var rows = '<div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#b8860b;padding:4px 10px 8px">Mở phiên họp cho dự án</div>';
-  HK_LIST.forEach(function(p){
-    var label = (p.code || p.id) + (p.name ? ' — ' + p.name : '');
-    if (label.length > 42) label = label.slice(0,42) + '…';
-    var active = hkIsActive(p.meeting);
-    rows += '<div class="hk-pick-row">'
-      + '<div style="font-size:12px;color:var(--text,#dce6f4);font-weight:600">' + label + '</div>'
-      + (active
-        ? '<span style="display:flex;gap:6px"><button onclick="hkJoin(\'' + (p.meeting.roomId||'') + '\',\'' + (p.code||p.id) + '\')" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:#3dd68c;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">Vào</button>'
-          + '<button onclick="hkClose(\'' + p.id + '\')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f06060;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">Kết thúc</button></span>'
-        : '<button onclick="hkOpen(\'' + p.id + '\')" style="background:rgba(152,105,10,.12);border:1px solid rgba(152,105,10,.35);color:#b8860b;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">Mở phiên họp</button>')
-      + '</div>';
-  });
-  pk.innerHTML = rows;
-  pk.style.display = 'block';
-};
-
-window.hkOpen = async function(docId){
-  var p = HK_LIST.filter(function(x){ return x.id === docId; })[0];
-  if (!p) return;
-  var u = hkUser();
-  var rand = Math.random().toString(36).slice(2, 8);
-  var roomId = 'ALN-HoiKien-' + String(p.code || p.id).replace(/[^A-Za-z0-9]/g, '') + '-' + rand;
-  try {
-    await hkUpdateDoc(hkDoc(hkDb, HK_COLL, docId), {
-      meeting: { active: true, roomId: roomId, openedBy: { uid: u.uid, name: u.name, role: u.role }, openedAt: hkTs() },
-      updatedAt: hkTs(),
-    });
-    hkJoin(roomId, p.code || p.id);
-  } catch(e) { alert('Lỗi mở phòng: ' + (e.message || e.code)); }
-};
-
-window.hkClose = async function(docId){
-  if (!confirm('Kết thúc phiên họp này? Mọi người sẽ không vào lại được bằng link cũ.')) return;
-  try {
-    await hkUpdateDoc(hkDoc(hkDb, HK_COLL, docId), { 'meeting.active': false, 'meeting.closedAt': hkTs(), updatedAt: hkTs() });
-  } catch(e) { alert('Lỗi đóng phòng: ' + (e.message || e.code)); }
-};
-
-window.hkJoin = function(roomId, label){
-  if (!roomId) return;
-  var u = hkUser();
-  var f = document.getElementById('hkFrame');
-  f.src = 'https://meet.jit.si/' + roomId + '?lang=vi'
-    + '#userInfo.displayName=%22' + encodeURIComponent(u.name) + '%22'
-    + '&config.prejoinPageEnabled=false'
-    + '&config.disableDeepLinking=true'
-    + '&config.defaultLanguage=%22vi%22'
-    + '&interfaceConfig.DISABLE_JOIN_LEAVE_NOTIFICATIONS=true'
-    + '&interfaceConfig.DISABLE_FOCUS_INDICATOR=true'
-    + '&interfaceConfig.RECENT_LIST_ENABLED=false'
-    + '&config.disableInviteFunctions=true'
-    + '&config.disableProfile=true'
-    + '&config.hideConferenceSubject=true'
-    + '&config.disableModeratorIndicator=true'
-    + '&interfaceConfig.MOBILE_APP_PROMO=false'
-    + '&interfaceConfig.SHOW_JITSI_WATERMARK=false'
-    + '&interfaceConfig.SHOW_WATERMARK_FOR_GUESTS=false'
-    + '&interfaceConfig.HIDE_INVITE_MORE_HEADER=true'
-    + '&interfaceConfig.TOOLBAR_BUTTONS=%5B%22microphone%22%2C%22camera%22%2C%22desktop%22%2C%22chat%22%2C%22tileview%22%2C%22fullscreen%22%2C%22hangup%22%5D';
-  var lb = document.getElementById('hkRoomLabel');
-  if (lb) lb.textContent = label || '';
-  document.getElementById('hkModal').style.display = 'block';
-  var pk = document.getElementById('hkPicker');
-  if (pk) pk.style.display = 'none';
-};
-
-// Dữ liệu dự án có thể đã về TRƯỚC khi module này nạp — vẽ dock ngay nếu có sẵn
-if (Array.isArray(window._KTS_ALL_PROJECTS)) { HK_LIST = window._KTS_ALL_PROJECTS; hkRenderDock(); } else { hkRenderDock(); }
-
-window.hkLeave = function(){
-  document.getElementById('hkFrame').src = 'about:blank';
-  document.getElementById('hkModal').style.display = 'none';
-};
-</script>
-
-<script>
-(function(){
-  function $(id){return document.getElementById(id);}
-  function initials(name){
-    var nm=(name||'').replace(/^KTS\.\s*/,'').trim();
-    var pts=nm.split(' ').filter(Boolean);
-    if(!pts.length) return 'KT';
-    return (pts[0][0]+(pts.length>1?pts[pts.length-1][0]:'')).toUpperCase();
-  }
-  function updateOfficeStatus(){
-    var h=new Date().getHours();
-    var open = h>=8 && h<18;
-    var wrap=$('omkStatusWrap'); var txt=$('omkStatusText');
-    if(wrap){ wrap.classList.toggle('closed', !open); }
-    if(txt){ txt.textContent = open ? 'Đang mở cửa · Giờ 8:00–18:00' : 'Văn phòng đã đóng cửa · để lại lời nhắn'; }
-    return open;
-  }
-  function renderOmkActivity(){
-    var el=$('omkActivity'); if(!el) return;
-    var src = (typeof _KTS_NOTIFS !== 'undefined') ? _KTS_NOTIFS : [];
-    var list = src.slice(0,3);
-    if(!list.length){ el.innerHTML=''; return; }
-    el.innerHTML = list.map(function(n){
-      return '<div class="om-activity-item"><span class="om-activity-dot"></span>'+n.body+'</div>';
-    }).join('');
-  }
-  function updateMasthead(){
-    updateOfficeStatus();
-    renderOmkActivity();
-  }
-  window.omkGoRoom=function(room){
-    document.querySelectorAll('#omkRooms .om-chip').forEach(function(c){c.classList.toggle('active', c.getAttribute('data-room')===room);});
-    if(room==='meeting'){ if(typeof openChatModal==='function') openChatModal(); return; }
-    var tabMap={desk:'dashboard', archive:'review', progress:'myproj'};
-    if(typeof window.ktsShowTab==='function'){
-      var navEl = document.querySelector('.sidebar .nav-item[data-tab="'+tabMap[room]+'"]');
-      window.ktsShowTab(tabMap[room], navEl);
-    }
-    setTimeout(function(){
-      var idMap={desk:'ktsAnchorDesk', archive:'ktsAnchorArchive', progress:'ktsAnchorProgress'};
-      var el=document.getElementById(idMap[room]);
-      if(el){ var y = el.getBoundingClientRect().top + window.scrollY - 70; window.scrollTo({top:Math.max(y,0), behavior:'smooth'}); }
-    },80);
-  };
-  function wireHooks(){
-    if(typeof window._addNotif==='function' && !window._addNotif.__omWrapped){
-      var origAN=window._addNotif;
-      window._addNotif=function(){ var r=origAN.apply(this,arguments); renderOmkActivity(); return r; };
-      window._addNotif.__omWrapped=true;
-    }
-  }
-  updateOfficeStatus();
-  var tries=0;
-  var poll=setInterval(function(){
-    wireHooks();
-    updateMasthead();
-    tries++;
-    if(tries>60) clearInterval(poll);
-  },500);
-  setInterval(updateOfficeStatus, 60000);
-})();
 </script>
 </body>
 </html>
