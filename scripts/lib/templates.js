@@ -108,11 +108,23 @@ function footer(paths) {
   );
 }
 
+// Thẻ GA4 chung — mọi trang sinh tự động đều phải có để đo lường đầy đủ (G-5CSL1TF0RC)
+var GA4_SNIPPET =
+  '<!-- Google Analytics 4 (ALN — G-5CSL1TF0RC, tách riêng khỏi property TK.HOUSE) -->\n' +
+  '<script async src="https://www.googletagmanager.com/gtag/js?id=G-5CSL1TF0RC"></script>\n' +
+  '<script>\n' +
+  '  window.dataLayer = window.dataLayer || [];\n' +
+  '  function gtag(){dataLayer.push(arguments);}\n' +
+  "  gtag('js', new Date());\n" +
+  "  gtag('config', 'G-5CSL1TF0RC');\n" +
+  '</script>\n' +
+  '<!-- End GA4 -->\n';
+
 function page(headHtml, bodyHtml) {
   return (
     '<!DOCTYPE html>\n' +
     '<html lang="vi">\n' +
-    '<head>\n' + headHtml + '\n</head>\n' +
+    '<head>\n' + headHtml + '\n' + GA4_SNIPPET + '</head>\n' +
     '<body>\n\n' + bodyHtml + '\n\n</body>\n' +
     '</html>\n'
   );
