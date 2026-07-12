@@ -234,9 +234,11 @@ const seoReportNow = onCall({ region: "asia-southeast1" }, async (request) => {
 
   try {
     if (action === "history") {
+      // orderBy field 'date' (mỗi doc đều có, trùng doc ID) — dùng index
+      // đơn tự động của Firestore; orderBy documentId desc đòi composite index.
       const snap = await db
         .collection("seoReports")
-        .orderBy(admin.firestore.FieldPath.documentId(), "desc")
+        .orderBy("date", "desc")
         .limit(30)
         .get();
       return { reports: snap.docs.map((d) => { const v = d.data(); delete v.createdAt; return v; }) };
