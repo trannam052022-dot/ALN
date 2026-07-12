@@ -5,7 +5,7 @@ category: chi-phi-bao-gia
 description: "Giá thiết kế nội thất 2026: nhà phố 120.000đ/m², biệt thự 180.000đ/m². Bài viết giải thích chi phí gồm gì và khác gì so với thiết kế kiến trúc."
 image: /images/cam-nang/gia-thiet-ke-noi-that.jpg
 date: 2026-07-06
-updated: 2026-07-06
+updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
   - giá thiết kế nội thất
@@ -69,6 +69,12 @@ Phí thiết kế nội thất cũng chia theo bốn mốc như các hạng mụ
 
 **Giá này đã gồm phí thiết kế kiến trúc chưa?**
 Chưa. Kiến trúc và nội thất là hai hạng mục riêng. Xem thêm [Chi phí thiết kế nhà phố 2026](/cam-nang/chi-phi-thiet-ke-nha-pho/) và [Chi phí thiết kế biệt thự 2026](/cam-nang/chi-phi-thiet-ke-biet-thu/).
+
+**Phí thiết kế nội thất nhà phố bao nhiêu?**
+Phí thiết kế nội thất nhà phố tại App Làm Nhà là 120.000đ/m² diện tích sàn cần thiết kế, áp dụng năm 2026.
+
+**Đơn giá thiết kế nội thất biệt thự là bao nhiêu?**
+Đơn giá thiết kế nội thất biệt thự là 180.000đ/m² diện tích sàn — cao hơn nhà phố do yêu cầu chi tiết và vật liệu cao cấp hơn.
 
 ---
 

@@ -5,7 +5,7 @@ category: chi-phi-bao-gia
 description: "Đơn giá thiết kế nhà phố 2026 là 120.000đ/m². Bài viết bóc tách chi phí theo diện tích, hạng mục hồ sơ và cách thanh toán an toàn theo mốc."
 image: /images/cam-nang/chi-phi-thiet-ke-nha-pho.jpg
 date: 2026-07-06
-updated: 2026-07-06
+updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
   - chi phí thiết kế nhà phố
@@ -114,6 +114,9 @@ Không. Bạn duyệt phương án mặt bằng và concept ở Mốc 2 (mới g
 
 **Nhà nhỏ, diện tích ít thì có bị tính phí tối thiểu không?**
 Với công trình diện tích nhỏ, chính sách phí có thể khác đôi chút. Cách nhanh nhất là hỏi trực tiếp để được báo con số cụ thể.
+
+**Giá thiết kế xây dựng nhà phố 2026 là bao nhiêu?**
+Giá thiết kế xây dựng nhà phố năm 2026 là 120.000đ/m² diện tích sàn xây dựng, đã bao gồm hồ sơ kiến trúc, kết cấu, điện nước và hồ sơ xin phép xây dựng.
 
 ---
 
