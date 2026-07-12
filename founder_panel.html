@@ -1490,6 +1490,11 @@ document.addEventListener('DOMContentLoaded', function() {
         <i class="ph-duotone ph-map-pin-area"></i> KS Vùng
         <span id="pendingCountKs" style="background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.25);border-radius:99px;font-size:9px;padding:1px 7px;font-weight:700">0</span>
       </button>
+      <button id="pendingTabKtv" onclick="switchPendingTab('ktv')"
+        style="padding:7px 18px;border-radius:7px 7px 0 0;border:1px solid var(--border);border-bottom:none;font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;background:var(--card);color:var(--sub)">
+        <i class="ph-duotone ph-ruler"></i> KTV
+        <span id="pendingCountKtv" style="background:rgba(34,211,238,.1);color:var(--cyan);border:1px solid rgba(34,211,238,.25);border-radius:99px;font-size:9px;padding:1px 7px;font-weight:700">0</span>
+      </button>
     </div>
   </div>
   <!-- List -->
@@ -3629,10 +3634,12 @@ function switchPendingTab(role){
   var tabDn  = document.getElementById('pendingTabDn');
   var tabDes = document.getElementById('pendingTabDes');
   var tabKs  = document.getElementById('pendingTabKs');
+  var tabKtv = document.getElementById('pendingTabKtv');
   if(tabKts){ tabKts.style.background = role==='kts'      ? 'var(--raised)' : 'var(--card)'; tabKts.style.color = role==='kts'      ? 'var(--amber)'  : 'var(--sub)'; }
   if(tabDn) { tabDn.style.background  = role==='dn'       ? 'var(--raised)' : 'var(--card)'; tabDn.style.color  = role==='dn'       ? 'var(--blue)'   : 'var(--sub)'; }
   if(tabDes){ tabDes.style.background = role==='designer' ? 'var(--raised)' : 'var(--card)'; tabDes.style.color = role==='designer' ? 'var(--purple)' : 'var(--sub)'; }
   if(tabKs) { tabKs.style.background  = role==='ks'       ? 'var(--raised)' : 'var(--card)'; tabKs.style.color  = role==='ks'       ? 'var(--gold)'   : 'var(--sub)'; }
+  if(tabKtv){ tabKtv.style.background = role==='ktv'      ? 'var(--raised)' : 'var(--card)'; tabKtv.style.color = role==='ktv'      ? 'var(--cyan)'   : 'var(--sub)'; }
   renderPending();
 }
 
@@ -3645,22 +3652,24 @@ function renderPending(){
   var nDn  = all.filter(function(u){ return u.role==='dn';  }).length;
   var nDes = all.filter(function(u){ return u.role==='designer'; }).length;
   var nKs  = all.filter(function(u){ return u.role==='ks'; }).length;
+  var nKtv = all.filter(function(u){ return u.role==='ktv'; }).length;
   var elK = document.getElementById('pendingCountKts'); if(elK) elK.textContent = nKts;
   var elD = document.getElementById('pendingCountDn');  if(elD) elD.textContent = nDn;
   var elDes = document.getElementById('pendingCountDes'); if(elDes) elDes.textContent = nDes;
   var elKs  = document.getElementById('pendingCountKs');  if(elKs)  elKs.textContent  = nKs;
+  var elKtv = document.getElementById('pendingCountKtv'); if(elKtv) elKtv.textContent = nKtv;
   // Lọc theo tab đang chọn
   var users = all.filter(function(u){ return u.role === _pendingActiveTab; });
   if(users.length === 0){
-    var emptyLabel = _pendingActiveTab==='kts' ? 'Không có KTS nào đang chờ duyệt' : _pendingActiveTab==='designer' ? 'Không có Designer nào đang chờ duyệt' : _pendingActiveTab==='ks' ? 'Không có KS Vùng nào đang chờ duyệt' : 'Không có Doanh nghiệp nào đang chờ duyệt';
+    var emptyLabel = _pendingActiveTab==='kts' ? 'Không có KTS nào đang chờ duyệt' : _pendingActiveTab==='designer' ? 'Không có Designer nào đang chờ duyệt' : _pendingActiveTab==='ks' ? 'Không có KS Vùng nào đang chờ duyệt' : _pendingActiveTab==='ktv' ? 'Không có KTV nào đang chờ duyệt' : 'Không có Doanh nghiệp nào đang chờ duyệt';
     list.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--dim);font-size:13px">'
       +'<i class="ph-duotone ph-check-circle" style="font-size:36px;display:block;margin-bottom:12px;color:var(--green)"></i>'
       +emptyLabel+'</div>';
     return;
   }
-  var ROLE_COLOR = {kts:'var(--amber)', dn:'var(--blue)', cn:'var(--green)', designer:'var(--purple)', ks:'var(--gold)'};
-  var ROLE_LABEL = {kts:'Kiến trúc sư', dn:'Doanh nghiệp', cn:'Chủ nhà', designer:'Designer NT', ks:'KS Vùng'};
-  var ROLE_ICON  = {kts:'ph-pencil-ruler', dn:'ph-buildings', cn:'ph-house-line', designer:'ph-paint-brush-household', ks:'ph-map-pin-area'};
+  var ROLE_COLOR = {kts:'var(--amber)', dn:'var(--blue)', cn:'var(--green)', designer:'var(--purple)', ks:'var(--gold)', ktv:'var(--cyan)'};
+  var ROLE_LABEL = {kts:'Kiến trúc sư', dn:'Doanh nghiệp', cn:'Chủ nhà', designer:'Designer NT', ks:'KS Vùng', ktv:'KTV'};
+  var ROLE_ICON  = {kts:'ph-pencil-ruler', dn:'ph-buildings', cn:'ph-house-line', designer:'ph-paint-brush-household', ks:'ph-map-pin-area', ktv:'ph-ruler'};
   list.innerHTML = users.map(function(u){
     var app = u.app || {};
     var ts  = u.createdAt ? (u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString('vi-VN') : u.createdAt) : '—';
@@ -4976,7 +4985,7 @@ window._founderUpdateZipPass = async function(pid, pass) {
 window.founderApprovePending = async function(uid, role) {
   try {
     var userUpdate = { status:'active', approvedNotified: false };
-    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : role==='ks' ? 'ksApplications' : null;
+    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : role==='ks' ? 'ksApplications' : role==='ktv' ? 'ktvApplications' : null;
     if(role==='kts' && appColl) {
       try {
         var appSnap = await getDoc(doc(db,appColl,uid));
@@ -5002,7 +5011,7 @@ window.founderRejectPending = async function(uid, role) {
   if(!confirm('Xác nhận từ chối tài khoản này?')) return;
   try {
     await updateDoc(doc(db,'users',uid), { status:'rejected' });
-    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : role==='ks' ? 'ksApplications' : null;
+    var appColl = role==='kts' ? 'ktsApplications' : role==='dn' ? 'dnApplications' : role==='designer' ? 'designerApplications' : role==='ks' ? 'ksApplications' : role==='ktv' ? 'ktvApplications' : null;
     if(appColl){ try{ await updateDoc(doc(db,appColl,uid), { status:'rejected', reviewedAt:serverTimestamp() }); }catch(e){} }
     window.PENDING_USERS = (window.PENDING_USERS||[]).filter(function(u){ return u.uid!==uid; });
     renderPending(); _updatePendingBadge();
@@ -5081,7 +5090,7 @@ async function _startPendingListen() {
       var base = snap.docs.map(function(d){ return Object.assign({uid:d.id}, d.data()); });
       var enriched = await Promise.all(base.map(async function(u) {
         try {
-          var appColl = u.role==='kts' ? 'ktsApplications' : u.role==='dn' ? 'dnApplications' : u.role==='designer' ? 'designerApplications' : u.role==='ks' ? 'ksApplications' : null;
+          var appColl = u.role==='kts' ? 'ktsApplications' : u.role==='dn' ? 'dnApplications' : u.role==='designer' ? 'designerApplications' : u.role==='ks' ? 'ksApplications' : u.role==='ktv' ? 'ktvApplications' : null;
           if(appColl){
             var aSnap = await getDoc(doc(db, appColl, u.uid));
             if(aSnap.exists()) return Object.assign({}, u, {app: aSnap.data()});

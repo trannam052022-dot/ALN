@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <script src="error-monitor.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng ký KTV — App Làm Nhà</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+:root{
+  --bg:#080c14;--bg2:#0e1422;--card:rgba(14,20,34,.88);
+  --border:rgba(255,255,255,.07);--border-g:rgba(201,168,76,.18);
+  --muted:rgba(228,212,176,.38);--text:#f0e6cc;--text2:rgba(240,230,204,.62);
+  --gold:#C9A84C;--gold2:#e8d07a;--green:#3dd68c;--red:#f06060;
+  --r:14px;--mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;
+  --serif:'Cormorant Garamond',serif;--syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:1rem;line-height:1.6;
+  background-image:linear-gradient(rgba(201,168,76,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.022) 1px,transparent 1px);
+  background-size:56px 56px;}
+body::before{content:'';position:fixed;top:-15%;left:50%;transform:translateX(-50%);width:700px;height:500px;
+  background:radial-gradient(ellipse,rgba(201,168,76,.11) 0%,transparent 68%);pointer-events:none;z-index:0;}
+a{color:var(--gold);text-decoration:none}
+input::placeholder,textarea::placeholder{color:rgba(228,212,176,.22)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:99px}
+.page{max-width:540px;margin:0 auto;padding:0 20px 72px;position:relative;z-index:1}
+/* HERO */
+.hero{padding:52px 0 36px;text-align:center;position:relative}
+.hero-deco{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.hero-eyebrow{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px}
+.ey-line{flex:1;max-width:64px;height:1px}
+.ey-line-l{background:linear-gradient(90deg,transparent,rgba(201,168,76,.55))}
+.ey-line-r{background:linear-gradient(270deg,transparent,rgba(201,168,76,.55))}
+.ey-text{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);opacity:.8}
+.hero-title{font-family:var(--serif);font-size:38px;font-weight:300;color:var(--text);line-height:1.15;margin-bottom:12px}
+.hero-title em{font-style:italic;font-weight:600;color:var(--gold2)}
+.hero-sub{font-size:12px;color:var(--muted);max-width:320px;margin:0 auto 28px;line-height:1.75}
+.benefit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.benefit-card{background:rgba(201,168,76,.055);border:1px solid rgba(201,168,76,.16);border-radius:10px;padding:14px;text-align:left}
+.benefit-icon{font-size:20px;margin-bottom:6px}
+.benefit-title{font-family:var(--syne);font-size:11px;font-weight:700;color:var(--gold);margin-bottom:3px}
+.benefit-desc{font-size:10px;color:var(--muted);line-height:1.5}
+/* STEPPER */
+.stepper-wrap{padding:28px 0 0}
+.stepper{display:flex;align-items:flex-start;position:relative}
+.stepper-track{position:absolute;top:14px;left:calc(100%/6);right:calc(100%/6);height:1px;background:rgba(255,255,255,.08);z-index:0}
+.stepper-fill{position:absolute;top:14px;left:calc(100%/6);height:1px;background:linear-gradient(90deg,var(--gold),rgba(201,168,76,.45));z-index:1;width:0%;transition:width .4s ease}
+.step-item{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;z-index:2}
+.step-circle{width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:600;color:var(--muted);transition:all .25s}
+.step-item.active .step-circle{border-color:var(--gold);background:rgba(201,168,76,.14);color:var(--gold);box-shadow:0 0 14px rgba(201,168,76,.35)}
+.step-item.done .step-circle{border-color:rgba(201,168,76,.35);background:rgba(201,168,76,.07);color:rgba(201,168,76,.65)}
+.step-label{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:7px;text-align:center;line-height:1.2}
+.step-item.active .step-label,.step-item.done .step-label{color:rgba(201,168,76,.65)}
+/* CARD */
+.card{background:var(--card);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid var(--border-g);border-radius:var(--r);padding:26px 24px;margin-top:22px;box-shadow:0 24px 72px rgba(0,0,0,.55)}
+.card-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.05)}
+.card-badge{font-family:var(--mono);font-size:9px;font-weight:700;color:rgba(201,168,76,.6);background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.18);border-radius:6px;padding:4px 9px;white-space:nowrap;margin-top:2px;flex-shrink:0}
+.card-title{font-family:var(--syne);font-size:16px;font-weight:700;color:var(--text);line-height:1.2}
+.card-sub{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.45}
+/* FIELDS */
+.field{margin-bottom:20px}
+.field label{display:block;font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.field label .req{color:rgba(201,168,76,.75);margin-left:2px;font-size:8px}
+.field input,.field select,.field textarea{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.11);border-radius:0;padding:8px 0 10px;color:var(--text);font-size:14px;font-family:var(--sans);outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-bottom-color:var(--gold)}
+.field select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath fill='%23C9A84C' opacity='.6' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 2px center;padding-right:20px}
+.field select option{background:#141b2e;color:var(--text)}
+.field textarea{border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 13px;background:rgba(255,255,255,.025);resize:vertical;min-height:88px}
+.field textarea:focus{border-color:rgba(201,168,76,.38)}
+.char-count{font-size:10px;color:var(--muted);text-align:right;margin-top:4px;font-family:var(--mono)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+/* USERNAME */
+.uname-card{background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(201,168,76,.11));border:1px solid rgba(201,168,76,.22);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.uname-left{flex:1;min-width:0}
+.uname-eyebrow{font-family:var(--syne);font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,168,76,.45);margin-bottom:4px}
+.uname-val{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uname-domain{font-family:var(--mono);font-size:10px;color:rgba(201,168,76,.38);margin-top:2px}
+.uname-regen{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.25);border-radius:8px;padding:7px 12px;color:rgba(201,168,76,.8);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:5px;flex-shrink:0}
+.uname-regen:hover{background:rgba(201,168,76,.14);color:var(--gold)}
+/* CONTRACT */
+.contract-box{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px;margin-bottom:18px}
+.contract-title{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,168,76,.6);margin-bottom:12px}
+.contract-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px;line-height:1.5}
+.contract-row:last-child{border-bottom:none}
+.contract-key{color:var(--muted);min-width:110px;flex-shrink:0;font-weight:600}
+.contract-val{color:var(--text2)}
+.contract-val.hi{color:var(--gold);font-weight:700}
+/* AGREE */
+.agree-row{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:rgba(255,255,255,.025);border-radius:8px;border:1px solid rgba(255,255,255,.06)}
+.agree-row input[type=checkbox]{width:15px;height:15px;flex-shrink:0;margin-top:2px;accent-color:var(--gold);cursor:pointer}
+.agree-row span{font-size:11px;color:var(--text2);line-height:1.55}
+/* BUTTONS */
+.btn-row{display:flex;gap:10px;margin-top:26px}
+.btn{flex:1;padding:13px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:var(--syne);display:flex;align-items:center;justify-content:center;gap:7px;transition:all .22s;letter-spacing:.04em}
+.btn-primary{background:linear-gradient(100deg,#a07830 0%,#e8d07a 45%,#C9A84C 100%);background-size:200% 100%;background-position:0%;color:#0a0a10}
+.btn-primary:hover:not(:disabled){background-position:100%;box-shadow:0 0 32px rgba(201,168,76,.32),0 4px 16px rgba(0,0,0,.4)}
+.btn-primary:disabled{opacity:.38;cursor:not-allowed}
+.btn-ghost{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);color:var(--text2)}
+.btn-ghost:hover{border-color:rgba(201,168,76,.3);color:rgba(201,168,76,.8);background:rgba(201,168,76,.04)}
+.ph-spin{animation:phspin 1s linear infinite;display:inline-block}
+@keyframes phspin{to{transform:rotate(360deg)}}
+/* SUCCESS */
+.success-wrap{text-align:center;padding:18px 0 8px}
+.success-icon{width:80px;height:80px;border-radius:50%;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.22);display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--gold);margin:0 auto 18px}
+.success-title{font-family:var(--serif);font-size:30px;font-weight:600;color:var(--text);margin-bottom:8px;line-height:1.2}
+.success-sub{font-size:12px;color:var(--text2);line-height:1.7;max-width:310px;margin:0 auto 20px}
+.success-uname{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--gold);background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.22);border-radius:8px;padding:10px 22px;display:inline-block;margin-bottom:22px}
+.next-steps{text-align:left;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px 16px}
+.next-steps li{font-size:12px;color:var(--text2);padding:5px 0;display:flex;align-items:flex-start;gap:10px;line-height:1.5;list-style:none}
+.next-steps li i{color:var(--gold);flex-shrink:0;margin-top:1px;font-size:14px}
+.page-footer{text-align:center;padding:28px 0 0;font-size:10px;color:var(--muted)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(14,20,34,.97);border:1px solid rgba(255,255,255,.1);color:var(--text);font-size:12px;font-weight:500;padding:10px 22px;border-radius:99px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.7);opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+.toast.err{border-color:rgba(240,96,96,.35);color:#f09898}
+@media(max-width:480px){
+  .hero-title{font-size:28px}.hero{padding:40px 0 28px}
+  .card{padding:18px 16px}.field-row{grid-template-columns:1fr}
+  .benefit-grid{grid-template-columns:1fr}
+}
+</style>
+<link rel="stylesheet" href="aln-tokens.css">
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <div class="hero-deco" aria-hidden="true">
+      <svg viewBox="0 0 540 180" xmlns="http://www.w3.org/2000/svg" fill="none" style="width:100%;height:100%;position:absolute;top:0;left:0">
+        <path d="M8 8 L8 32 M8 8 L32 8" stroke="rgba(201,168,76,.38)" stroke-width="1.5"/>
+        <path d="M532 8 L532 32 M532 8 L508 8" stroke="rgba(201,168,76,.38)" stroke-width="1.5"/>
+        <path d="M8 172 L8 148 M8 172 L32 172" stroke="rgba(201,168,76,.38)" stroke-width="1.5"/>
+        <path d="M532 172 L532 148 M532 172 L508 172" stroke="rgba(201,168,76,.38)" stroke-width="1.5"/>
+        <polygon points="270,10 278,18 270,26 262,18" fill="none" stroke="rgba(201,168,76,.28)" stroke-width="1"/>
+      </svg>
+    </div>
+    <div style="position:relative">
+      <div class="hero-eyebrow">
+        <span class="ey-line ey-line-l"></span>
+        <span class="ey-text">App Làm Nhà Corp.</span>
+        <span class="ey-line ey-line-r"></span>
+      </div>
+      <h1 class="hero-title">Trở thành<br><em>KTV ALN</em></h1>
+      <p class="hero-sub">Triển khai hồ sơ bản vẽ từ phương án KTS đã chốt với Chủ nhà — lực lượng kỹ thuật xương sống của mỗi dự án ALN</p>
+      <div class="benefit-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">📐</div>
+          <div class="benefit-title">Triển khai hồ sơ kỹ thuật</div>
+          <div class="benefit-desc">Nhận triển khai bản vẽ từ phương án đã được duyệt — đầu vào rõ ràng, không sửa đi sửa lại theo cảm hứng</div>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">🤝</div>
+          <div class="benefit-title">Phối hợp cùng KTS chủ trì</div>
+          <div class="benefit-desc">Làm việc theo nhóm dự án với KTS trong hệ thống — hồ sơ chuẩn ALN, thư viện CAD chuẩn dùng chung</div>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">⏱️</div>
+          <div class="benefit-title">Chủ động thời gian</div>
+          <div class="benefit-desc">Nhận việc theo dự án, làm từ xa, deadline rõ theo từng chặng C1–C4</div>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">📈</div>
+          <div class="benefit-title">Nguồn việc ổn định</div>
+          <div class="benefit-desc">Hệ thống phân việc theo năng lực — làm tốt, được ưu tiên dự án lớn hơn</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- STEPPER -->
+  <div class="stepper-wrap">
+    <div class="stepper" id="stepper">
+      <div class="stepper-track"></div>
+      <div class="stepper-fill" id="stepFill"></div>
+      <div class="step-item active" data-s="1">
+        <div class="step-circle">01</div>
+        <div class="step-label">Thông tin</div>
+      </div>
+      <div class="step-item" data-s="2">
+        <div class="step-circle">02</div>
+        <div class="step-label">Tài khoản</div>
+      </div>
+      <div class="step-item" data-s="3">
+        <div class="step-circle">03</div>
+        <div class="step-label">Hoàn tất</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BƯỚC 01 -->
+  <div class="card" id="step1">
+    <div class="card-header">
+      <div class="card-badge">Bước 01</div>
+      <div>
+        <div class="card-title">Thông tin cá nhân</div>
+        <div class="card-sub">Founder sẽ liên hệ Zalo xác minh trực tiếp</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Họ và tên đầy đủ <span class="req">✦</span></label>
+      <input type="text" id="f_name" placeholder="VD: Nguyễn Văn An" autocomplete="name">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Số điện thoại Zalo <span class="req">✦</span></label>
+        <input type="tel" id="f_phone" placeholder="0901 234 567">
+      </div>
+      <div class="field">
+        <label>Email liên hệ</label>
+        <input type="email" id="f_email" placeholder="email@example.com">
+      </div>
+    </div>
+    <div class="field">
+      <label>Tỉnh / Thành phố đang sinh sống <span class="req">✦</span></label>
+      <select id="f_province">
+        <option value="">Chọn tỉnh / thành phố…</option>
+        <option value="HCM">TP. Hồ Chí Minh</option>
+        <option value="HN">Hà Nội</option>
+        <option value="DN">Đà Nẵng</option>
+        <option value="CT">Cần Thơ</option>
+        <option value="HP">Hải Phòng</option>
+        <option value="BD">Bình Dương</option>
+        <option value="DNai">Đồng Nai</option>
+        <option value="BR-VT">Bà Rịa – Vũng Tàu</option>
+        <option value="LA">Long An</option>
+        <option value="TG">Tiền Giang</option>
+        <option value="KH">Khánh Hòa</option>
+        <option value="BDinh">Bình Định</option>
+        <option value="NA">Nghệ An</option>
+        <option value="TH">Thanh Hóa</option>
+        <option value="OTHER">Tỉnh khác</option>
+      </select>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Phần mềm chính thành thạo <span class="req">✦</span></label>
+        <select id="f_industry">
+          <option value="">Chọn…</option>
+          <option value="autocad">AutoCAD</option>
+          <option value="revit">Revit</option>
+          <option value="sketchup">SketchUp</option>
+          <option value="3dsmax">3ds Max</option>
+          <option value="other">Phần mềm khác</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Kinh nghiệm triển khai hồ sơ <span class="req">✦</span></label>
+        <select id="f_numkts">
+          <option value="">Chọn…</option>
+          <option value="0-1">Dưới 1 năm</option>
+          <option value="1-3">1 – 3 năm</option>
+          <option value="3-5">3 – 5 năm</option>
+          <option value="5+">Trên 5 năm</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Kinh nghiệm triển khai & bộ hồ sơ từng làm <span class="req">✦</span></label>
+      <textarea id="f_bio" placeholder="Loại công trình từng triển khai (nhà phố, biệt thự…), số bộ hồ sơ đã hoàn thành, phần mềm sử dụng…" maxlength="500"></textarea>
+      <div class="char-count"><span id="bioCount">0</span> / 500</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep(2)">Tiếp theo <i class="ph-duotone ph-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- BƯỚC 02 -->
+  <div class="card" id="step2" style="display:none">
+    <div class="card-header">
+      <div class="card-badge">Bước 02</div>
+      <div>
+        <div class="card-title">Tài khoản & Cam kết</div>
+        <div class="card-sub">Đọc kỹ điều khoản trước khi đăng ký</div>
+      </div>
+    </div>
+    <div class="contract-box">
+      <div class="contract-title">📋 Điều khoản KTV ALN</div>
+      <div class="contract-row">
+        <span class="contract-key">Vai trò</span>
+        <span class="contract-val">KTV ALN — Kỹ thuật viên triển khai hồ sơ bản vẽ</span>
+      </div>
+      <div class="contract-row">
+        <span class="contract-key">Nhiệm vụ</span>
+        <span class="contract-val">Triển khai bản vẽ kỹ thuật theo phương án đã duyệt · phối hợp KTS chủ trì hoàn thiện hồ sơ theo chặng · đảm bảo tiến độ và chuẩn hồ sơ ALN</span>
+      </div>
+      <div class="contract-row">
+        <span class="contract-key">Quyền lợi</span>
+        <span class="contract-val hi">Thù lao theo từng bộ hồ sơ hoàn thành — mức cụ thể xác nhận với Founder trước khi nhận việc</span>
+      </div>
+      <div class="contract-row">
+        <span class="contract-key">Bảo mật</span>
+        <span class="contract-val">Không tiết lộ thông tin KH / KTS ra ngoài hệ thống ALN</span>
+      </div>
+      <div class="contract-row">
+        <span class="contract-key">Thời hạn</span>
+        <span class="contract-val">Theo từng dự án — hợp tác dài hạn khi đảm bảo chất lượng và tiến độ</span>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:22px">
+      <label>Định danh ALN</label>
+      <div class="uname-card">
+        <div class="uname-left">
+          <div class="uname-eyebrow">Tên đăng nhập</div>
+          <div class="uname-val" id="unameDisplay">ktv.an0000</div>
+          <div class="uname-domain">@aln.vn</div>
+        </div>
+        <button class="uname-regen" onclick="regenUsername()">
+          <i class="ph-duotone ph-arrows-clockwise"></i> Tạo lại
+        </button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Mật khẩu <span class="req">✦</span></label>
+      <input type="password" id="f_pw" placeholder="Tối thiểu 8 ký tự" autocomplete="new-password">
+    </div>
+    <div class="field">
+      <label>Xác nhận mật khẩu <span class="req">✦</span></label>
+      <input type="password" id="f_pw2" placeholder="Nhập lại mật khẩu" autocomplete="new-password">
+    </div>
+    <div class="agree-row" style="margin-top:4px">
+      <input type="checkbox" id="f_agree">
+      <span>Tôi đã đọc và đồng ý với tất cả điều khoản KTV ALN nêu trên.</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goStep(1)"><i class="ph-duotone ph-arrow-left"></i> Quay lại</button>
+      <button class="btn btn-primary" id="submitBtn" onclick="submitApply()">
+        <i class="ph-duotone ph-paper-plane-tilt"></i> Gửi đăng ký
+      </button>
+    </div>
+  </div>
+
+  <!-- BƯỚC 03 -->
+  <div class="card" id="step3" style="display:none">
+    <div class="success-wrap">
+      <div class="success-icon"><i class="ph-duotone ph-check-circle"></i></div>
+      <h2 class="success-title">Đăng ký thành công!</h2>
+      <p class="success-sub">Founder sẽ liên hệ qua Zalo để xác minh và hướng dẫn bước tiếp theo trong vòng 1–2 ngày làm việc.</p>
+      <div class="success-uname" id="successUname">ktv.an0000</div>
+      <ul class="next-steps">
+        <li><i class="ph-duotone ph-clock"></i> Hồ sơ đang chờ Founder xét duyệt</li>
+        <li><i class="ph-duotone ph-phone"></i> Founder gọi Zalo xác minh trực tiếp</li>
+        <li><i class="ph-duotone ph-map-pin"></i> Sau duyệt: nhận dự án triển khai đầu tiên</li>
+        <li><i class="ph-duotone ph-sign-in"></i> Đăng nhập tại <a href="login.html">login.html</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="page-footer">© 2025 App Làm Nhà Corp. · <a href="login.html">Đăng nhập</a></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var currentStep = 1;
+var generatedUsername = '';
+
+function setStep(n) {
+  for (var i = 1; i <= 3; i++) {
+    var c = document.getElementById('step' + i);
+    if (c) c.style.display = i === n ? 'block' : 'none';
+  }
+  document.querySelectorAll('.step-item').forEach(function(el) {
+    var s = parseInt(el.getAttribute('data-s'));
+    el.classList.remove('active', 'done');
+    if (s === n) el.classList.add('active');
+    else if (s < n) el.classList.add('done');
+  });
+  var fill = document.getElementById('stepFill');
+  if (fill) fill.style.width = ((n - 1) / 2 * 75) + '%';
+  currentStep = n;
+  window.scrollTo(0, 0);
+}
+window.setStep = setStep;
+
+function goStep(n) {
+  if (n > currentStep && !validateStep(currentStep)) return;
+  if (n === 2) {
+    generatedUsername = genUsername(document.getElementById('f_name').value.trim());
+    document.getElementById('unameDisplay').textContent = generatedUsername;
+  }
+  setStep(n);
+}
+
+function validateStep(n) {
+  if (n === 1) {
+    var name = document.getElementById('f_name').value.trim();
+    var phone = document.getElementById('f_phone').value.trim();
+    var province = document.getElementById('f_province').value;
+    var industry = document.getElementById('f_industry').value;
+    var numkts = document.getElementById('f_numkts').value;
+    var bio = document.getElementById('f_bio').value.trim();
+    if (!name) { showToast('Vui lòng nhập họ và tên', true); return false; }
+    if (!phone || phone.replace(/\D/g,'').length < 9) { showToast('Số điện thoại Zalo chưa hợp lệ', true); return false; }
+    if (!province) { showToast('Vui lòng chọn tỉnh / thành phố', true); return false; }
+    if (!industry) { showToast('Vui lòng chọn phần mềm thành thạo', true); return false; }
+    if (!numkts) { showToast('Vui lòng chọn số năm kinh nghiệm', true); return false; }
+    if (!bio || bio.length < 30) { showToast('Giới thiệu tối thiểu 30 ký tự', true); return false; }
+    return true;
+  }
+  if (n === 2) {
+    var pw = document.getElementById('f_pw').value;
+    var pw2 = document.getElementById('f_pw2').value;
+    if (pw.length < 8) { showToast('Mật khẩu tối thiểu 8 ký tự', true); return false; }
+    if (pw !== pw2) { showToast('Mật khẩu xác nhận không khớp', true); return false; }
+    if (!document.getElementById('f_agree').checked) { showToast('Vui lòng đồng ý với điều khoản KTV', true); return false; }
+    return true;
+  }
+  return true;
+}
+
+function removeVietnameseTones(s) {
+  s = s.toLowerCase();
+  s = s.replace(/[àáâãăạảấầẩẫắằẳẵặ]/g,'a');
+  s = s.replace(/[èéêẹẻẽếềểễệ]/g,'e');
+  s = s.replace(/[ìíĩịỉ]/g,'i');
+  s = s.replace(/[òóôõơọỏốồổỗộớờởỡợ]/g,'o');
+  s = s.replace(/[ùúũưụủứừửữự]/g,'u');
+  s = s.replace(/[ỳýỵỷỹ]/g,'y');
+  s = s.replace(/[đ]/g,'d');
+  s = s.replace(/[^a-z0-9\s]/g,'');
+  return s.trim();
+}
+function genUsername(fullName) {
+  var slug = removeVietnameseTones(fullName || 'ktv');
+  var parts = slug.split(/\s+/).filter(function(p){ return p.length > 0; });
+  var given = parts.length > 0 ? parts[parts.length - 1] : 'ktv';
+  return 'ktv.' + given + String(Math.floor(1000 + Math.random() * 9000));
+}
+function regenUsername() {
+  generatedUsername = genUsername(document.getElementById('f_name').value.trim() || 'ktv');
+  document.getElementById('unameDisplay').textContent = generatedUsername;
+}
+window.generatedUsername = generatedUsername;
+
+document.getElementById('f_bio').addEventListener('input', function() {
+  document.getElementById('bioCount').textContent = this.value.length;
+});
+
+var _tt = null;
+function showToast(msg, isErr) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isErr ? ' err' : '');
+  clearTimeout(_tt);
+  _tt = setTimeout(function() { el.className = 'toast'; }, 3000);
+}
+window.showToast = showToast;
+
+function submitApply() {
+  if (!validateStep(2)) return;
+  window._doSubmit();
+}
+</script>
+
+<script type="module">
+import {
+  auth, db, createUserWithEmailAndPassword, setDoc, doc, serverTimestamp
+} from './firebase-config.js';
+
+window._doSubmit = async function() {
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph-duotone ph-spinner ph-spin"></i> Đang gửi…';
+  try {
+    var name     = document.getElementById('f_name').value.trim();
+    var phone    = document.getElementById('f_phone').value.trim();
+    var email    = document.getElementById('f_email').value.trim();
+    var province = document.getElementById('f_province').value;
+    var industry = document.getElementById('f_industry').value;
+    var numkts   = document.getElementById('f_numkts').value;
+    var bio      = document.getElementById('f_bio').value.trim();
+    var uname    = window.generatedUsername || document.getElementById('unameDisplay').textContent;
+    var pw       = document.getElementById('f_pw').value;
+
+    var cred = await createUserWithEmailAndPassword(auth, uname + '@aln.vn', pw);
+    var uid  = cred.user.uid;
+
+    await setDoc(doc(db, 'users', uid), {
+      username: uname, name: name, role: 'ktv',
+      email: email || (uname + '@aln.vn'),
+      province: province, status: 'pending', plan: 'free', credits: {}, createdAt: serverTimestamp()
+    });
+    await setDoc(doc(db, 'ktvApplications', uid), {
+      uid: uid, name: name, phone: phone, email: email || '',
+      province: province, software: industry, expYears: numkts, bio: bio,
+      username: uname, status: 'pending', submittedAt: serverTimestamp()
+    });
+
+    document.getElementById('successUname').textContent = uname;
+    window.setStep(3);
+  } catch(err) {
+    console.error(err);
+    var msg = 'Có lỗi xảy ra, vui lòng thử lại';
+    if (err.code === 'auth/email-already-in-use') msg = 'Tên đăng nhập đã tồn tại — hãy tạo lại';
+    if (err.code === 'auth/weak-password')        msg = 'Mật khẩu quá yếu (tối thiểu 8 ký tự)';
+    window.showToast(msg, true);
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi đăng ký';
+  }
+};
+</script>
+</body>
+</html>

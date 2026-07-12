@@ -92,6 +92,36 @@ exports.onDesignerApply = functions
     );
   });
 
+/* ── KS Vùng đăng ký mới ── */
+exports.onKsApply = functions
+  .region("asia-southeast1")
+  .firestore.document("ksApplications/{uid}")
+  .onCreate(async (snap) => {
+    const d = snap.data() || {};
+    const detail = [d.province, d.industry].filter(Boolean).join(" · ");
+
+    await notifyFounder(
+      "🛠 KS Vùng đăng ký",
+      `${d.name || "KS"} ${detail ? "— " + detail : ""} — chờ duyệt`,
+      { type: "NEW_KS_APPLICATION", uid: snap.id, name: d.name || "" }
+    );
+  });
+
+/* ── KTV đăng ký mới ── */
+exports.onKtvApply = functions
+  .region("asia-southeast1")
+  .firestore.document("ktvApplications/{uid}")
+  .onCreate(async (snap) => {
+    const d = snap.data() || {};
+    const detail = [d.software, d.expYears ? d.expYears + " năm" : ""].filter(Boolean).join(" · ");
+
+    await notifyFounder(
+      "📐 KTV đăng ký",
+      `${d.name || "KTV"} ${detail ? "— " + detail : ""} — chờ duyệt`,
+      { type: "NEW_KTV_APPLICATION", uid: snap.id, name: d.name || "" }
+    );
+  });
+
 /* ── KTS đăng ký mới ── */
 exports.onKtsApply = functions
   .region("asia-southeast1")

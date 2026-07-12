@@ -44,7 +44,7 @@ service cloud.firestore {
       // cho tới khi Founder duyệt. Founder (seed.html / admin) tạo tự do.
       allow create: if isFounder() || (
         signedIn() && request.auth.uid == uid &&
-        request.resource.data.role in ['cn','kts','dn','designer','ks'] &&
+        request.resource.data.role in ['cn','kts','dn','designer','ks','ktv'] &&
         (request.resource.data.role == 'cn'
           ? request.resource.data.status == 'active'
           : request.resource.data.status == 'pending')
@@ -144,6 +144,24 @@ service cloud.firestore {
     }
 
     match /ctvApplications/{uid} {
+      allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow create: if signedIn() && request.auth.uid == uid;
+      allow update: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow delete: if isFounder();
+    }
+
+    // KS Vùng (ks-apply.html) — thiếu block này từ 28/06 khi đổi tên CTV→KS
+    // (trang ghi ksApplications nhưng rules chỉ có ctvApplications cũ → form
+    // hỏng âm thầm: tạo được tài khoản nhưng đơn bị deny, founder không thấy).
+    match /ksApplications/{uid} {
+      allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow create: if signedIn() && request.auth.uid == uid;
+      allow update: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow delete: if isFounder();
+    }
+
+    // KTV — Kỹ thuật viên triển khai hồ sơ (ktv-apply.html), cùng pattern.
+    match /ktvApplications/{uid} {
       allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
       allow create: if signedIn() && request.auth.uid == uid;
       allow update: if isFounder() || (signedIn() && request.auth.uid == uid);
