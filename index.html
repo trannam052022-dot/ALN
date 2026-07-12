@@ -315,6 +315,11 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
 .foot-areas-links{display:flex;flex-wrap:wrap;gap:8px 18px}
 .foot-areas-links a{font-size:var(--text-sm);color:var(--sub)}
 .foot-areas-links a:hover{color:var(--gold)}
+.foot-region{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:8px}
+.foot-region .fr-name{font-size:var(--text-sm);font-weight:700;color:var(--text2);white-space:nowrap}
+.foot-region a{font-size:var(--text-sm);color:var(--sub)}
+.foot-region a:hover{color:var(--gold)}
+.foot-region .fr-soon{font-size:var(--text-xs);color:var(--muted);font-style:italic}
 @media(max-width:960px){.foot-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.foot-grid{grid-template-columns:1fr;gap:24px}}
 
@@ -1309,14 +1314,24 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
       </div>
     </div>
     <div class="foot-areas">
-      <h5>Khu vực phục vụ</h5>
-      <div class="foot-areas-links">
-        <a href="thiet-ke-nha/vung-tau.html">Thiết kế nhà tại Vũng Tàu</a>
-        <a href="thiet-ke-nha/ba-ria.html">Thiết kế nhà tại Bà Rịa</a>
+      <h5>Mạng lưới KTS theo khu vực</h5>
+      <div class="foot-region">
+        <span class="fr-name">Miền Nam:</span>
         <a href="thiet-ke-nha/tp-hcm.html">Thiết kế nhà tại TP.HCM</a>
-        <a href="thiet-ke-nha/bien-hoa.html">Thiết kế nhà tại Biên Hòa</a>
-        <a href="thiet-ke-nha/dong-nai.html">Thiết kế nhà tại Đồng Nai</a>
-        <a href="thiet-ke-nha/binh-duong.html">Thiết kế nhà tại Bình Dương</a>
+        <a href="thiet-ke-nha/binh-duong.html">Bình Dương</a>
+        <a href="thiet-ke-nha/dong-nai.html">Đồng Nai</a>
+        <a href="thiet-ke-nha/bien-hoa.html">Biên Hòa</a>
+        <a href="thiet-ke-nha/ba-ria.html">Bà Rịa</a>
+        <a href="thiet-ke-nha/vung-tau.html">Vũng Tàu</a>
+      </div>
+      <div class="foot-region">
+        <span class="fr-name">Miền Tây:</span><span class="fr-soon">(sắp ra mắt)</span>
+      </div>
+      <div class="foot-region">
+        <span class="fr-name">Tây Nguyên:</span><span class="fr-soon">(sắp ra mắt)</span>
+      </div>
+      <div class="foot-region">
+        <span class="fr-name">Miền Trung · Miền Bắc:</span><span class="fr-soon">(sắp ra mắt)</span>
       </div>
     </div>
     <div class="foot-bottom">© ALN — App Làm Nhà Corp. · applamnha.vn</div>
