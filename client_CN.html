@@ -2178,7 +2178,37 @@ function renderMain(){
         for (let i=0;i<stageOrder.length;i++){
           if (pays[stageOrder[i]] && pays[stageOrder[i]].status === 'pending') { payStage = stageOrder[i]; break; }
         }
-        if (!payStage) return '';
+        // Không còn chặng chờ thu → hiện BIÊN NHẬN chặng đã xác nhận gần nhất,
+        // để khách biết chắc ALN đã nhận tiền (không để card biến mất — yêu cầu Founder 13/07)
+        if (!payStage) {
+          let paidStage = null;
+          for (let i=stageOrder.length-1;i>=0;i--){
+            if (pays[stageOrder[i]] && pays[stageOrder[i]].status === 'paid') { paidStage = stageOrder[i]; break; }
+          }
+          if (!paidStage) return '';
+          const paidPay = pays[paidStage];
+          const paidDate = (paidPay.paidAt && paidPay.paidAt.toDate) ? paidPay.paidAt.toDate().toLocaleDateString('vi-VN') : '';
+          return `
+        <div class="card" style="padding:14px 18px;border:1.5px solid rgba(21,128,61,.35)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:6px">
+            <div class="ct" style="margin:0;border:none;padding:0"><i class="ph-duotone ph-seal-check" style="color:var(--green)"></i> Thanh toán chặng ${paidStage}</div>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--sub)">${STGPCT[stageOrder.indexOf(paidStage)]}% hợp đồng</span>
+          </div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+            <div style="flex-shrink:0;width:140px;height:140px;background:var(--green-bg);border-radius:10px;display:flex;align-items:center;justify-content:center">
+              <svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="var(--green)" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:8px">
+              <div>
+                <div style="font-size:10px;color:var(--sub)">Đã nhận</div>
+                <div style="font-family:var(--syne);font-size:22px;font-weight:800;color:var(--green)">${fmtFull(paidPay.amount||0)}đ</div>
+              </div>
+              <div><span class="pill p-green"><i class="ph-duotone ph-check-circle"></i> ALN đã xác nhận nhận tiền${paidDate?' · '+paidDate:''}</span></div>
+              <div style="font-size:10px;color:var(--muted);line-height:1.5">Khoản thanh toán chặng ${paidStage} đã hoàn tất. Khi bước sang chặng tiếp theo, mã QR mới sẽ hiện tại đây.</div>
+            </div>
+          </div>
+        </div>`;
+        }
         const pay = pays[payStage];
         const amount = pay.amount || 0;
         const reported = !!pay.reportedAt;
