@@ -3998,7 +3998,7 @@ async function saveCreateProj(){
   errEl.style.display = 'none';
   if(!name){ errEl.textContent = 'Vui lòng nhập tên công trình.'; errEl.style.display = ''; return; }
   if(!fee)  { errEl.textContent = 'Vui lòng nhập tổng phí.'; errEl.style.display = ''; return; }
-  if(!cnUid){ errEl.textContent = 'Vui lòng chọn Chủ nhà.'; errEl.style.display = ''; return; }
+  if(!cnUid && !dnUid){ errEl.textContent = 'Vui lòng chọn Chủ nhà hoặc Doanh nghiệp (ít nhất một).'; errEl.style.display = ''; return; }
   if(!ktsUid){ errEl.textContent = 'Vui lòng chọn Kiến trúc sư.'; errEl.style.display = ''; return; }
 
   // Cảnh báo nếu CN/DN đã chọn đang có sẵn dự án chưa xong — hiếm khi 1 khách làm 2 dự án cùng lúc
@@ -4023,7 +4023,7 @@ async function saveCreateProj(){
     var fb = window._cpFb;
     var users = await fb.loadUsers();
 
-    var cnUser  = users.cn.find(function(u){ return u.uid === cnUid; }) || {};
+    var cnUser  = cnUid ? (users.cn.find(function(u){ return u.uid === cnUid; }) || null) : null;
     var ktsUser = users.kts.find(function(u){ return u.uid === ktsUid; }) || {};
     var dnUser  = dnUid ? (users.dn.find(function(u){ return u.uid === dnUid; }) || null) : null;
 
@@ -4033,7 +4033,7 @@ async function saveCreateProj(){
       meetingProvince: province,
       totalFee:       fee,
       escrow:         escrow,
-      cn:  { uid: cnUser.uid,  name: cnUser.name,  username: cnUser.username  || cnUser.phone  || cnUser.uid  },
+      cn:  cnUser ? { uid: cnUser.uid,  name: cnUser.name,  username: cnUser.username  || cnUser.phone  || cnUser.uid  } : null,
       kts: { uid: ktsUser.uid, name: ktsUser.name, username: ktsUser.username || ktsUser.phone || ktsUser.uid },
       dn:  dnUser ? { uid: dnUser.uid, name: dnUser.name, username: dnUser.username || dnUser.phone || dnUser.uid } : null,
     });
@@ -5161,7 +5161,7 @@ window._cpFb = {
   createProject: async function(data) {
     const _suffix = String(1000 + Math.floor(Math.random() * 8999));
     const pid = (data.dn && data.dn.uid && !data.cn) ? 'ALN-DN-' + _suffix : 'ALN-CN-' + _suffix;
-    const memberUids = [data.cn.uid, data.kts.uid, data.dn && data.dn.uid].filter(Boolean);
+    const memberUids = [data.cn && data.cn.uid, data.kts.uid, data.dn && data.dn.uid].filter(Boolean);
     // C1 (10%) là tiền cọc ký HĐ — thu NGAY khi tạo dự án, không chờ duyệt phương án
     // (khác C2/C3/C4 — vẫn thu SAU khi duyệt phương án như quy trình cũ).
     const c1Amount = Math.round((data.totalFee || 0) * 0.10);
@@ -5171,7 +5171,7 @@ window._cpFb = {
       name: data.name,
       address: data.address || '',
       meetingProvince: data.meetingProvince || '',
-      cn:  data.cn,
+      cn:  data.cn || null,
       kts: data.kts,
       dn:  data.dn || null,
       memberUids,
