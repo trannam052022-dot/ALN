@@ -534,6 +534,39 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
               <option value="nu">Nữ</option>
             </select>
           </div>
+
+          <!-- ── Tài khoản nhận tiền — Founder dùng để chuyển tiền mỗi khi được duyệt chặng ── -->
+          <div style="border-top:1px solid var(--border);margin:14px 0 12px;padding-top:12px">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px"><i class="ph-duotone ph-bank" style="color:var(--violet,#7c3aed)"></i> Tài khoản nhận tiền</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Founder dùng thông tin này để chuyển tiền mỗi khi bạn được duyệt chặng. Tự cập nhật, không ai khác sửa được.</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+              <div>
+                <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Ngân hàng</div>
+                <select id="bankSelect" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+                  <option value="">— Chọn ngân hàng —</option>
+                  <option value="970436|Vietcombank">Vietcombank</option>
+                  <option value="970407|Techcombank">Techcombank</option>
+                  <option value="970416|ACB">ACB</option>
+                  <option value="970422|MB Bank">MB Bank</option>
+                  <option value="970418|BIDV">BIDV</option>
+                  <option value="970415|VietinBank">VietinBank</option>
+                  <option value="970405|Agribank">Agribank</option>
+                  <option value="970423|TPBank">TPBank</option>
+                  <option value="970432|VPBank">VPBank</option>
+                  <option value="970403|Sacombank">Sacombank</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Số tài khoản</div>
+                <input type="text" id="bankAccountNumber" placeholder="0123456789" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+              </div>
+            </div>
+            <div>
+              <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Chủ tài khoản</div>
+              <input type="text" id="bankAccountHolder" placeholder="NGUYEN VAN A" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none;text-transform:uppercase">
+            </div>
+          </div>
+
           <button class="profile-save-btn" onclick="desSaveProfile()">
             <i class="ph-duotone ph-floppy-disk"></i> Lưu thông tin
           </button>
@@ -965,8 +998,16 @@ window._desFbSaveProfile = async function() {
   var spec   = (document.getElementById('profileSpecialty')||{}).value || '';
   var yrs    = parseInt((document.getElementById('profileYears')||{}).value)||0;
   var gender = (document.getElementById('profileGender')||{}).value || '';
+  var bankSel = (document.getElementById('bankSelect')||{}).value || '';
+  var bankParts = bankSel.split('|');
+  var bankAccount = {
+    bankId:        bankParts[0] || '',
+    bankName:      bankParts[1] || '',
+    accountNumber: ((document.getElementById('bankAccountNumber')||{}).value || '').trim(),
+    accountHolder: ((document.getElementById('bankAccountHolder')||{}).value || '').trim().toUpperCase(),
+  };
   try {
-    await updateDoc(doc(db, 'users', u.uid), { name: name, specialty: spec, years: yrs, gender: gender, updatedAt: serverTimestamp() });
+    await updateDoc(doc(db, 'users', u.uid), { name: name, specialty: spec, years: yrs, gender: gender, bankAccount: bankAccount, updatedAt: serverTimestamp() });
     showToast('Đã lưu hồ sơ', 't-green');
   } catch(e) { showToast('Lỗi: ' + (e.code||e.message), 't-red'); }
 };
@@ -1025,6 +1066,20 @@ onAuthStateChanged(auth, async function(user) {
   var py = document.getElementById('profileYears'); if(py) py.value = profile.years||'';
   var pe = document.getElementById('profileEmail'); if(pe) pe.value = profile.email||(profile.username+'@aln.vn')||'';
   var pg = document.getElementById('profileGender'); if(pg && profile.gender) pg.value = profile.gender;
+
+  /* tài khoản nhận tiền */
+  var ba = profile.bankAccount || {};
+  var bSel = document.getElementById('bankSelect');
+  if (bSel) {
+    if (ba.bankId && ba.bankName) {
+      bSel.value = ba.bankId + '|' + ba.bankName;
+    } else if (ba.bankName) {
+      var _opt = Array.prototype.find.call(bSel.options, function(o){ return o.value && o.value.split('|')[1].toLowerCase() === ba.bankName.trim().toLowerCase(); });
+      if (_opt) bSel.value = _opt.value;
+    }
+  }
+  var bNo = document.getElementById('bankAccountNumber'); if(bNo) bNo.value = ba.accountNumber||'';
+  var bHo = document.getElementById('bankAccountHolder'); if(bHo) bHo.value = ba.accountHolder||'';
 
   /* load avatar */
   if (profile.avatarURL) {
