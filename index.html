@@ -1961,6 +1961,14 @@ window.leadSubmit = async function(){
         { eventID: 'lead-' + leadId });
     } catch (e) {}
 
+    try {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'lead_form_submit',
+        'form_name': 'tu_van_mien_phi_trang_chu'
+      });
+    } catch (e) {}
+
     document.getElementById('leadFormWrap').style.display = 'none';
     document.getElementById('leadSuccess').style.display = 'block';
   } catch (e) {
