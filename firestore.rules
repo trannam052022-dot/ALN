@@ -172,6 +172,32 @@ service cloud.firestore {
       allow delete: if isFounder();
     }
 
+    // Việc KTS giao KTV triển khai bản vẽ (kts_dashboard tab "Giao việc KTV" ↔ ktv_dashboard)
+    match /ktvTasks/{tid} {
+      function isKtv() {
+        return request.auth != null &&
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ktv' &&
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'active';
+      }
+      // Đọc: Founder · KTS tạo việc · KTV được giao · KTV active thấy việc đang mở
+      allow read: if isFounder()
+        || (signedIn() && (resource.data.ktsUid == request.auth.uid || resource.data.ktvUid == request.auth.uid))
+        || (resource.data.status == 'open' && isKtv());
+      // Tạo: chỉ KTS active, và phải tự đứng tên ktsUid
+      allow create: if isFounder() || (isKts() && request.resource.data.ktsUid == request.auth.uid);
+      // Sửa: KTS chủ việc toàn quyền · KTV nhận việc mở (chỉ khi chưa ai nhận) ·
+      //      KTV được giao cập nhật tiến độ/file (không đổi được ktsUid/ktvUid)
+      allow update: if isFounder()
+        || (signedIn() && resource.data.ktsUid == request.auth.uid)
+        || (isKtv() && resource.data.status == 'open' && resource.data.ktvUid == null
+            && request.resource.data.ktvUid == request.auth.uid)
+        || (signedIn() && resource.data.ktvUid == request.auth.uid
+            && request.resource.data.ktsUid == resource.data.ktsUid
+            && request.resource.data.ktvUid == resource.data.ktvUid);
+      // Xoá: Founder hoặc KTS chủ việc (nút Huỷ việc)
+      allow delete: if isFounder() || (signedIn() && resource.data.ktsUid == request.auth.uid);
+    }
+
     // Module Giữ chỗ — mỗi user chỉ đọc/ghi bản ghi của chính mình
     match /reservations/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
