@@ -2366,8 +2366,7 @@ function renderMain(){
               ${ba && ba.bankName ? `<div style="font-size:11px;color:var(--text2)">${ba.bankName} · <span style="font-family:var(--mono)">${ba.accountNumber}</span>${ba.accountHolder?' · '+ba.accountHolder:''}</div>` : ''}
               <div style="font-size:11px;color:var(--text2)">Nội dung CK: <span style="font-family:var(--mono);font-weight:700">${addInfo}</span></div>
               ${reported
-                ? `<div><span class="pill p-amber"><i class="ph-duotone ph-paper-plane-tilt"></i> Đã báo · chờ ALN xác nhận</span></div>
-                   <button onclick="undoReportPaymentDN('${p.id}','${payStage}')" style="align-self:flex-start;background:none;border:none;font-size:10px;color:var(--sub);text-decoration:underline;cursor:pointer;padding:0">Báo nhầm? Huỷ báo</button>`
+                ? `<div><span class="pill p-amber"><i class="ph-duotone ph-paper-plane-tilt"></i> Chờ xác nhận</span></div>`
                 : `<div><span class="pill p-gray"><i class="ph-duotone ph-clock"></i> Chờ chuyển khoản</span></div>
                    <button onclick="reportPaymentDN('${p.id}','${payStage}')" style="align-self:flex-start;background:var(--gold);color:#211703;border:none;border-radius:9px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer"><i class="ph-duotone ph-check"></i> Đã chuyển khoản</button>`
               }
@@ -3536,13 +3535,9 @@ window.reportPaymentDN = async function(pid, stage) {
     await updateDoc(doc(db, 'projects', pid), patch);
   } catch(e) { console.error('[DN reportPaymentDN]', e.code, e.message); }
 };
-window.undoReportPaymentDN = async function(pid, stage) {
-  try {
-    var patch = {};
-    patch['payments.' + stage + '.reportedAt'] = null;
-    await updateDoc(doc(db, 'projects', pid), patch);
-  } catch(e) { console.error('[DN undoReportPaymentDN]', e.code, e.message); }
-};
+// Không có hàm huỷ báo — khách bấm "Đã chuyển khoản" thì không tự xoá được nữa,
+// tránh lỗ hổng báo tiền rồi âm thầm xoá trong khi Founder đã nhận thông báo (yêu cầu Founder 13/07).
+// Nếu khách báo nhầm, Founder tự sửa trực tiếp field payments.{stage}.reportedAt trong Firestore Console.
 
 function _startProjectsListenDN() {
   var uid = (auth.currentUser && auth.currentUser.uid) || window.__ALN_UID || null;
