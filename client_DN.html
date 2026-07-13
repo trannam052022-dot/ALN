@@ -2663,6 +2663,14 @@ function selectProj(id){
   // Sync Zalo widget to new KTS
   const p2 = window.PROJECTS_CLIENT.find(x=>x.id===id);
   if(p2){ zpKts=p2.kts; if(zpOpen) _zpInit(); }
+  // Founder giám sát nhiều doanh nghiệp khác nhau — tên sidebar phải đổi theo đúng dự án đang chọn
+  if (window.__ALN_UID === 'h4kEguPEyMcwJwl89stc0Q6j2si2' && p2) {
+    var _fName = p2.dn || 'Doanh nghiệp';
+    var _fNameEl = document.getElementById('dnSidebarName');
+    if (_fNameEl) _fNameEl.textContent = _fName;
+    var _fAvEl = document.getElementById('dnSidebarAv');
+    if (_fAvEl) { var _fw=_fName.trim().split(/\s+/); _fAvEl.textContent=_fw.length>=2?(_fw[0][0]+_fw[_fw.length-1][0]).toUpperCase():_fName.slice(0,2).toUpperCase(); }
+  }
 }
 
 
@@ -3841,7 +3849,7 @@ onAuthStateChanged(auth, async (user) => {
 
     // Cập nhật sidebar tên DN từ Firestore
     // Nếu Founder xem trang này → hiện tên DN thật, không hiện tên Founder
-    let _displayName = profile.role === 'founder' ? 'Công ty TK House' : (profile.name || '');
+    let _displayName = profile.role === 'founder' ? 'Đang tải...' : (profile.name || '');
     const _sbName = document.getElementById('dnSidebarName');
     if (_sbName) _sbName.textContent = _displayName;
     const _sbAv = document.getElementById('dnSidebarAv');

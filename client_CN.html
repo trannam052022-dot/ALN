@@ -2610,6 +2610,14 @@ function selectProj(id){
   document.querySelector('.sidebar-cn').classList.remove('open');
   const p2 = window.PROJECTS_CLIENT.find(x=>x.id===id);
   if(p2){ zpKts=p2.kts; if(zpOpen) _zpInit(); }
+  // Founder giám sát nhiều chủ nhà khác nhau — tên sidebar phải đổi theo đúng dự án đang chọn
+  if (window.__ALN_UID === 'h4kEguPEyMcwJwl89stc0Q6j2si2' && p2) {
+    var _fName = p2.cn || 'Chủ nhà';
+    var _fNameEl = document.getElementById('cnSidebarName');
+    if (_fNameEl) _fNameEl.textContent = _fName;
+    var _fAvEl = document.getElementById('cnSidebarAv');
+    if (_fAvEl) { var _fw=_fName.trim().split(/\s+/); _fAvEl.textContent=_fw.length>=2?(_fw[0][0]+_fw[_fw.length-1][0]).toUpperCase():_fName.slice(0,2).toUpperCase(); }
+  }
 }
 
 /* Notifications */
@@ -3657,8 +3665,10 @@ onAuthStateChanged(auth, async (user) => {
     window.__cnAuthGender = profile.gender || '';
 
     // Cập nhật sidebar tên CN từ Firestore
-    // Nếu Founder xem trang này → hiện tên CN thật, không hiện tên Founder
-    let _displayName = profile.role === 'founder' ? 'Trần Nam' : (profile.name || '');
+    // Nếu Founder xem trang này → hiện tên CN thật của dự án đang chọn (selectProj sẽ ghi đè
+    // ngay khi danh sách dự án tải xong), KHÔNG hardcode 1 tên cố định vì Founder có thể giám
+    // sát nhiều chủ nhà khác nhau.
+    let _displayName = profile.role === 'founder' ? 'Đang tải...' : (profile.name || '');
     const _sbName = document.getElementById('cnSidebarName');
     if (_sbName) _sbName.textContent = _displayName;
     const _sbAv = document.getElementById('cnSidebarAv');

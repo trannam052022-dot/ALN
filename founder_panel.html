@@ -4001,6 +4001,20 @@ async function saveCreateProj(){
   if(!cnUid){ errEl.textContent = 'Vui lòng chọn Chủ nhà.'; errEl.style.display = ''; return; }
   if(!ktsUid){ errEl.textContent = 'Vui lòng chọn Kiến trúc sư.'; errEl.style.display = ''; return; }
 
+  // Cảnh báo nếu CN/DN đã chọn đang có sẵn dự án chưa xong — hiếm khi 1 khách làm 2 dự án cùng lúc
+  var _existing = (window.DN_PROJECTS || []).filter(function(p) {
+    var raw = p._raw || {};
+    if (raw.stage === 'done') return false;
+    var sameCn = cnUid && raw.cn && raw.cn.uid === cnUid;
+    var sameDn = dnUid && raw.dn && raw.dn.uid === dnUid;
+    return sameCn || sameDn;
+  });
+  if (_existing.length) {
+    var _list = _existing.map(function(p){ return '• ' + p.id + ' — ' + p.name + ' (chặng ' + (p._raw.stage||'C1') + ')'; }).join('\n');
+    var _ok = confirm('Chủ nhà/DN này đang có ' + _existing.length + ' dự án chưa hoàn thành:\n\n' + _list + '\n\nHiếm khi 1 khách làm 2 dự án cùng lúc — bấm OK nếu chắc chắn vẫn muốn tạo thêm.');
+    if (!_ok) return;
+  }
+
   var btn = document.getElementById('cp_btn');
   btn.disabled = true;
   btn.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin"></i> Đang tạo...';
