@@ -3593,7 +3593,8 @@ window._cnFbApprovePA = async function(projId, stage, paId) {
       var pct = PAYMENT_PCT[stage] || 0;
       var amount = Math.round((pd.totalFee || 0) * pct); // totalFee đơn vị đồng — số gốc theo chặng
       var netAmount = Math.round(amount * (1 - PLATFORM_FEE_PCT - INCOME_TAX_PCT)); // KTS thực nhận sau phí sàn + thuế TNCN (theo settings/paymentFees)
-      if (amount > 0 && pd.kts && pd.kts.uid) {
+      var alreadyStaged = pd.payments && pd.payments[stage]; // C1 đã được ghi sẵn lúc tạo dự án (cọc ký HĐ) — không ghi đè, giữ nguyên trạng thái đã báo/đã xác nhận nếu có
+      if (amount > 0 && pd.kts && pd.kts.uid && !alreadyStaged) {
         progressPatch['payments.' + stage] = {
           amount: amount,
           netAmount: netAmount,

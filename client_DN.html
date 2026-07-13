@@ -1055,6 +1055,7 @@ const STGNAME={C1:'Ý tưởng 2D',C2:'Phối cảnh 3D',C3:'Hồ sơ KT',C4:'D�
 const ICON={pdf:'ph-file-pdf',img:'ph-file-image',dwg:'ph-file-code',xlsx:'ph-file-xls',zip:'ph-file-zip'};
 const ICOLOR={pdf:'#ef4444',img:'var(--cyan)',dwg:'var(--amber)',xlsx:'var(--green)',zip:'var(--purple)'};
 function fmtM(v){if(v>=1e9)return(v/1e9).toFixed(1)+'T';if(v>=1e6)return(v/1e6).toFixed(1)+'M';return(v/1e3).toFixed(0)+'K'}
+function fmtFull(v){return Math.round(v||0).toLocaleString('vi-VN')}
 
 /* ════════════════════════════════════════
    REVIEW FUNCTIONS
@@ -2328,6 +2329,54 @@ function renderMain(){
         </div>
       </div>
 
+      <!-- ══ THANH TOÁN CHẶNG — QR chuyển khoản ══ -->
+      ${(()=>{
+        const pays = (p._raw && p._raw.payments) || {};
+        const stageOrder = ['C1','C2','C3','C4'];
+        let payStage = null;
+        for (let i=0;i<stageOrder.length;i++){
+          if (pays[stageOrder[i]] && pays[stageOrder[i]].status === 'pending') { payStage = stageOrder[i]; break; }
+        }
+        if (!payStage) return '';
+        const pay = pays[payStage];
+        const amount = pay.amount || 0;
+        const reported = !!pay.reportedAt;
+        const ba = window.ALN_BANK_ACCOUNT || null;
+        const addInfo = p.id + ' ' + payStage;
+        let qrHTML = '<div style="font-size:10px;color:var(--muted);text-align:center;padding:8px;line-height:1.5">Đang cập nhật<br>tài khoản thanh toán</div>';
+        if (ba && ba.bankId && ba.accountNumber) {
+          const qrUrl = 'https://img.vietqr.io/image/' + ba.bankId + '-' + ba.accountNumber + '-compact2.png?amount=' + amount + '&addInfo=' + encodeURIComponent(addInfo) + '&accountName=' + encodeURIComponent(ba.accountHolder||'');
+          qrHTML = '<img src="' + qrUrl + '" alt="QR chuyển khoản" style="width:100%;height:100%;object-fit:contain;border-radius:6px">';
+        }
+        return `
+        <div class="card" style="padding:14px 18px;border:1.5px dashed var(--gold2)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:6px">
+            <div class="ct" style="margin:0;border:none;padding:0"><i class="ph-duotone ph-qr-code" style="color:var(--gold)"></i> Thanh toán chặng ${payStage}</div>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--sub)">${STGPCT[stageOrder.indexOf(payStage)]}% hợp đồng</span>
+          </div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap">
+            <div style="flex-shrink:0;width:140px;height:140px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:6px;display:flex;align-items:center;justify-content:center">
+              ${qrHTML}
+            </div>
+            <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:8px">
+              <div>
+                <div style="font-size:10px;color:var(--sub)">Số tiền chuyển</div>
+                <div style="font-family:var(--syne);font-size:22px;font-weight:800;color:var(--gold)">${fmtFull(amount)}đ</div>
+              </div>
+              ${ba && ba.bankName ? `<div style="font-size:11px;color:var(--text2)">${ba.bankName} · <span style="font-family:var(--mono)">${ba.accountNumber}</span>${ba.accountHolder?' · '+ba.accountHolder:''}</div>` : ''}
+              <div style="font-size:11px;color:var(--text2)">Nội dung CK: <span style="font-family:var(--mono);font-weight:700">${addInfo}</span></div>
+              ${reported
+                ? `<div><span class="pill p-amber"><i class="ph-duotone ph-paper-plane-tilt"></i> Đã báo · chờ ALN xác nhận</span></div>
+                   <button onclick="undoReportPaymentDN('${p.id}','${payStage}')" style="align-self:flex-start;background:none;border:none;font-size:10px;color:var(--sub);text-decoration:underline;cursor:pointer;padding:0">Báo nhầm? Huỷ báo</button>`
+                : `<div><span class="pill p-gray"><i class="ph-duotone ph-clock"></i> Chờ chuyển khoản</span></div>
+                   <button onclick="reportPaymentDN('${p.id}','${payStage}')" style="align-self:flex-start;background:var(--gold);color:#211703;border:none;border-radius:9px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer"><i class="ph-duotone ph-check"></i> Đã chuyển khoản</button>`
+              }
+              <div style="font-size:10px;color:var(--muted);line-height:1.5">Quét QR bằng app ngân hàng để tự điền số tiền + nội dung. Sau khi chuyển xong, bấm nút trên để báo ALN kiểm tra.</div>
+            </div>
+          </div>
+        </div>`;
+      })()}
+
       <!-- REVIEW PANEL C1/C2 — phần phương án bị ẩn ở DN do đã bỏ tab 'pa' (KTS↔Chủ nhà). Giữ khối để 'Gửi tài liệu' + 'Kho' vẫn render. -->
       ${(()=>{
         const rv = REVIEW_DATA[p.id];
@@ -3459,6 +3508,32 @@ function _adaptProjectDN(id, d) {
   var prog = d.progress || {};
   return { id:id, code:d.CODE||d.code||id, name:d.name||'', cn:(d.cn&&d.cn.name)||'', kts:(d.kts&&d.kts.name)||'', dn:(d.dn&&d.dn.name)||'', ktsUid:(d.kts&&d.kts.uid)||'', cnUid:(d.cn&&d.cn.uid)||'', stage:d.stage||'C1', status:d.status||'on_track', progress:[prog.C1||0,prog.C2||0,prog.C3||0,prog.C4||0], total:d.totalFee||0, escrow:d.escrowBalance||0, _raw:d };
 }
+/* ══ Tài khoản nhận tiền ALN — settings/bankAccount, Founder cấu hình, DN chỉ đọc ══ */
+function _startBankAccountListenDN() {
+  try {
+    onSnapshot(doc(db, 'settings', 'bankAccount'), function(snap) {
+      window.ALN_BANK_ACCOUNT = snap.exists() ? snap.data() : null;
+      if (typeof window.renderMain === 'function') { try { window.renderMain(); } catch(e) {} }
+    }, function(err) {
+      console.error('[DN] settings/bankAccount Firestore error:', err.code, err.message);
+    });
+  } catch(e) { console.error('[DN] _startBankAccountListenDN', e); }
+}
+window.reportPaymentDN = async function(pid, stage) {
+  try {
+    var patch = {};
+    patch['payments.' + stage + '.reportedAt'] = serverTimestamp();
+    await updateDoc(doc(db, 'projects', pid), patch);
+  } catch(e) { console.error('[DN reportPaymentDN]', e.code, e.message); }
+};
+window.undoReportPaymentDN = async function(pid, stage) {
+  try {
+    var patch = {};
+    patch['payments.' + stage + '.reportedAt'] = null;
+    await updateDoc(doc(db, 'projects', pid), patch);
+  } catch(e) { console.error('[DN undoReportPaymentDN]', e.code, e.message); }
+};
+
 function _startProjectsListenDN() {
   var uid = (auth.currentUser && auth.currentUser.uid) || window.__ALN_UID || null;
   var isFounder = (uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2');
@@ -3704,7 +3779,8 @@ window._dnFbApprovePA = async function(projId, stage, paId) {
       var pct = PAYMENT_PCT[stage] || 0;
       var amount = Math.round((pd.totalFee || 0) * pct); // totalFee đơn vị đồng — số gốc theo chặng
       var netAmount = Math.round(amount * (1 - PLATFORM_FEE_PCT - INCOME_TAX_PCT)); // KTS thực nhận sau phí sàn + thuế TNCN (theo settings/paymentFees)
-      if (amount > 0 && pd.kts && pd.kts.uid) {
+      var alreadyStaged = pd.payments && pd.payments[stage]; // C1 đã được ghi sẵn lúc tạo dự án (cọc ký HĐ) — không ghi đè, giữ nguyên trạng thái đã báo/đã xác nhận nếu có
+      if (amount > 0 && pd.kts && pd.kts.uid && !alreadyStaged) {
         progressPatch['payments.' + stage] = {
           amount: amount,
           netAmount: netAmount,
@@ -3841,6 +3917,7 @@ onAuthStateChanged(auth, async (user) => {
 
     // ── LOAD PROJECTS REALTIME TỪ FIRESTORE ──
     try { _startProjectsListenDN(); } catch(e){ console.error("[DN listen]", e); }
+    try { _startBankAccountListenDN(); } catch(e){ console.error("[DN bankAccount listen]", e); }
 
     // ── ĐẨY FILE LÊN MÂY (Firebase Storage) ──
     window.alnUploadFile = async function(file, path){
