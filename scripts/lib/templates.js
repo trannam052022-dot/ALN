@@ -120,12 +120,28 @@ var GA4_SNIPPET =
   '</script>\n' +
   '<!-- End GA4 -->\n';
 
+// GTM — chèn cao nhất trong <head> và ngay sau <body> theo yêu cầu chuẩn của Google
+var GTM_HEAD_SNIPPET =
+  '<!-- Google Tag Manager -->\n' +
+  "<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':\n" +
+  "new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],\n" +
+  "j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=\n" +
+  "'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);\n" +
+  "})(window,document,'script','dataLayer','GTM-MB7VRGR5');</script>\n" +
+  '<!-- End Google Tag Manager -->\n';
+
+var GTM_BODY_SNIPPET =
+  '<!-- Google Tag Manager (noscript) -->\n' +
+  '<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MB7VRGR5"\n' +
+  'height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>\n' +
+  '<!-- End Google Tag Manager (noscript) -->\n';
+
 function page(headHtml, bodyHtml) {
   return (
     '<!DOCTYPE html>\n' +
     '<html lang="vi">\n' +
-    '<head>\n' + headHtml + '\n' + GA4_SNIPPET + '</head>\n' +
-    '<body>\n\n' + bodyHtml + '\n\n</body>\n' +
+    '<head>\n' + GTM_HEAD_SNIPPET + headHtml + '\n' + GA4_SNIPPET + '</head>\n' +
+    '<body>\n' + GTM_BODY_SNIPPET + '\n' + bodyHtml + '\n\n</body>\n' +
     '</html>\n'
   );
 }
