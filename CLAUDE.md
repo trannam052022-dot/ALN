@@ -67,7 +67,7 @@ Quy ước: `username + "@aln.vn"` = email đăng nhập (email ảo).
 
 ## 4 tài khoản thật (Auth + Firestore `users/{uid}`)
 
-Mật khẩu: KHÔNG ghi trong repo public (hỏi Founder). Lưu ý bảo mật: mật khẩu cũ từng lộ trong lịch sử Git → đã yêu cầu Founder đổi toàn bộ (13/07/2026). TUYỆT ĐỐI không commit mật khẩu/secret vào repo này.
+Mật khẩu: KHÔNG ghi trong repo public (hỏi Founder). Lưu ý bảo mật: mật khẩu cũ từng lộ trong lịch sử Git → Founder đã đổi toàn bộ 4 tài khoản qua Admin SDK (13/07/2026), đã bật 2FA cho Google + GitHub. TUYỆT ĐỐI không commit mật khẩu/secret vào repo này.
 
 | Vai | Username | UID | name |
 |-----|----------|-----|------|
