@@ -4760,7 +4760,7 @@ function _updatePaymentsBadge() {
 }
 
 /* ── BÁO CÁO DOANH THU, THU NHẬP & THANH TOÁN (KTS / DESIGNER / DN) ── */
-var REPORT_PAYMENT_PCT = { C1:0.20, C2:0.30, C3:0.30, C4:0.20 };
+var REPORT_PAYMENT_PCT = { C1:0.10, C2:0.20, C3:0.60, C4:0.10 };
 
 function _fmtVND(v) { return (v||0).toLocaleString('vi-VN') + 'đ'; }
 
@@ -5305,7 +5305,7 @@ function _startFounderDesignListen() {
 
 // Founder duyệt 1 chặng cho dự án Designer NT — vì Chủ nhà/DN chưa có UI duyệt
 // đề xuất Designer trên trang riêng, Founder thao tác thay để tính tiền đúng lúc.
-var DESIGN_PAYMENT_PCT = { C1:0.20, C2:0.30, C3:0.30, C4:0.20 };
+var DESIGN_PAYMENT_PCT = { C1:0.10, C2:0.20, C3:0.60, C4:0.10 };
 window.founderApproveDesignStage = async function(pid, stage) {
   var NEXT = { C1:'C2', C2:'C3', C3:'C4' };
   try {
