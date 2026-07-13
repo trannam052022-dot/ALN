@@ -11,6 +11,10 @@
 - **Ngữ cảnh thuật ngữ** (không lẫn nhau): khách hàng → **"Quy trình 4 bước đảm bảo"**; KTS → **"Tiền đã có sẵn tại ALN chờ bạn"**; nội bộ → **"Quỹ bảo đảm 4 bước"**.
 - Trước khi publish nội dung mới (Cẩm nang, trang mẫu, trang tỉnh...), đối chiếu với lint content (đã thêm ở Phase 3) để chặn tái phạm.
 
+## Tài liệu chiến lược → repo private
+
+Từ 13/07/2026, các tài liệu chiến lược/vận hành nội bộ (MARKETING.md, MONETIZATION_KTS.md, SEO_BAN_GIAO.md, docs/SEO_VIEC_TAY.md, BAN_GIAO_*, CHECKLIST_*, CHANGES.md...) đã **chuyển sang repo private `ALN-private`** — không còn trong repo public này (đối thủ đọc được repo public). Tài liệu chiến lược MỚI phải đưa vào repo private, KHÔNG commit vào đây. Code tham chiếu tên các file đó (vd `docs/SEO_VIEC_TAY.md` trong seoAnalytics.js) là trỏ tới repo private.
+
 ## Tổng quan
 
 Nền tảng theo dõi công trình xây dựng. **Frontend tĩnh** (HTML/JS thuần) host trên **GitHub Pages**, **backend Firebase** (Auth + Firestore + Storage + FCM + Cloud Functions).
@@ -63,7 +67,7 @@ Quy ước: `username + "@aln.vn"` = email đăng nhập (email ảo).
 
 ## 4 tài khoản thật (Auth + Firestore `users/{uid}`)
 
-Mật khẩu chung: `Test@1234`
+Mật khẩu: KHÔNG ghi trong repo public (hỏi Founder). Lưu ý bảo mật: mật khẩu cũ từng lộ trong lịch sử Git → đã yêu cầu Founder đổi toàn bộ (13/07/2026). TUYỆT ĐỐI không commit mật khẩu/secret vào repo này.
 
 | Vai | Username | UID | name |
 |-----|----------|-----|------|
