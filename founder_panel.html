@@ -5037,6 +5037,7 @@ window.renderPayments = function renderPayments() {
         + '<div style="font-size:11px;color:var(--dim);margin-top:2px">' + pay.roleLabel + ': <b style="color:var(--text2)">' + pay.personName + '</b> · Chặng <b style="color:var(--amber)">' + pay.stage + '</b>' + dateStr + '</div>'
         + '<div id="' + bankId + '" style="font-size:10.5px;color:var(--dim);margin-top:4px;font-family:var(--mono)">Đang tải TK ngân hàng...</div>'
       + '</div>'
+      + '<div id="payqr-' + pay.coll + '-' + pay.projId + '-' + pay.stage + '" style="width:84px;height:84px;flex-shrink:0;display:none;background:#fff;border:1px solid var(--border);border-radius:8px;padding:3px;align-items:center;justify-content:center;overflow:hidden"></div>'
       + '<div style="text-align:right;flex-shrink:0">'
         + '<div style="font-family:var(--mono);font-size:17px;font-weight:700;color:var(--green)">' + fmtAmt(pay.netAmount) + 'đ</div>'
         + '<div style="font-size:9.5px;color:var(--dim);font-family:var(--mono)">gốc ' + fmtAmt(pay.amount) + 'đ · trừ 27%</div>'
@@ -5045,13 +5046,18 @@ window.renderPayments = function renderPayments() {
     + '</div>';
   }).join('');
   pending.forEach(function(pay) {
-    _fillBankInfo('bankinfo-' + pay.coll + '-' + pay.projId + '-' + pay.stage, pay.personUid);
+    var suffix = pay.coll + '-' + pay.projId + '-' + pay.stage;
+    _fillBankInfo('bankinfo-' + suffix, pay.personUid, {
+      qrElId: 'payqr-' + suffix,
+      amount: pay.netAmount,
+      addInfo: pay.projId + ' ' + pay.stage,
+    });
   });
   _updatePaymentsBadge();
 };
 
 var _bankInfoCache = {};
-async function _fillBankInfo(elId, uid) {
+async function _fillBankInfo(elId, uid, qrOpts) {
   var el = document.getElementById(elId);
   if (!el) return;
   if (!uid) { el.textContent = '— chưa có UID người nhận —'; return; }
@@ -5065,8 +5071,22 @@ async function _fillBankInfo(elId, uid) {
     if (!el) return;
     if (ba.bankName || ba.accountNumber) {
       el.textContent = (ba.bankName || '—') + ' · ' + (ba.accountNumber || '—') + (ba.accountHolder ? ' · ' + ba.accountHolder : '');
+      if (!ba.bankId) el.textContent += ' · (chưa chọn NH trong Hồ sơ — không tạo được QR)';
     } else {
       el.textContent = 'Chưa cập nhật tài khoản ngân hàng';
+    }
+    // QR chuyển tiền CHO KTS/Designer — Founder quét bằng app ngân hàng rồi tự quyết
+    // định chuyển, không có gì tự động (yêu cầu Founder 13/07).
+    if (qrOpts && qrOpts.qrElId && ba.bankId && ba.accountNumber) {
+      var qrEl = document.getElementById(qrOpts.qrElId);
+      if (qrEl) {
+        var qrUrl = 'https://img.vietqr.io/image/' + ba.bankId + '-' + ba.accountNumber + '-compact.png'
+          + '?amount=' + (qrOpts.amount || 0)
+          + '&addInfo=' + encodeURIComponent(qrOpts.addInfo || '')
+          + '&accountName=' + encodeURIComponent(ba.accountHolder || '');
+        qrEl.innerHTML = '<img src="' + qrUrl + '" alt="QR chuyển tiền" style="width:100%;height:100%;object-fit:contain">';
+        qrEl.style.display = 'flex';
+      }
     }
   } catch(e) {
     if (el) el.textContent = 'Lỗi tải TK ngân hàng';

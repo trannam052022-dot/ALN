@@ -1495,7 +1495,19 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
         <div>
           <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Ngân hàng</div>
-          <input type="text" id="bankName" placeholder="Vietcombank" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+          <select id="bankSelect" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+            <option value="">— Chọn ngân hàng —</option>
+            <option value="970436|Vietcombank">Vietcombank</option>
+            <option value="970407|Techcombank">Techcombank</option>
+            <option value="970416|ACB">ACB</option>
+            <option value="970422|MB Bank">MB Bank</option>
+            <option value="970418|BIDV">BIDV</option>
+            <option value="970415|VietinBank">VietinBank</option>
+            <option value="970405|Agribank">Agribank</option>
+            <option value="970423|TPBank">TPBank</option>
+            <option value="970432|VPBank">VPBank</option>
+            <option value="970403|Sacombank">Sacombank</option>
+          </select>
         </div>
         <div>
           <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Số tài khoản</div>
@@ -3413,11 +3425,16 @@ window.saveProfile = async function saveProfile() {
     license:      (document.getElementById('profileLicense')||{}).value.trim() || '',
     gender:       (document.getElementById('profileGender')||{}).value || '',
     homeProvince: (document.getElementById('profileHomeProvince')||{}).value || '',
-    bankAccount: {
-      bankName:       (document.getElementById('bankName')||{}).value.trim() || '',
-      accountNumber:  (document.getElementById('bankAccountNumber')||{}).value.trim() || '',
-      accountHolder:  (document.getElementById('bankAccountHolder')||{}).value.trim().toUpperCase() || '',
-    },
+    bankAccount: (function(){
+      var sel = (document.getElementById('bankSelect')||{}).value || '';
+      var parts = sel.split('|');
+      return {
+        bankId:         parts[0] || '',
+        bankName:       parts[1] || '',
+        accountNumber:  (document.getElementById('bankAccountNumber')||{}).value.trim() || '',
+        accountHolder:  (document.getElementById('bankAccountHolder')||{}).value.trim().toUpperCase() || '',
+      };
+    })(),
   };
   try {
     await setDoc(doc(db,'users',uid), data, {merge:true});
@@ -3539,7 +3556,16 @@ function _fillProfileForm(profile) {
   if (profile.avatarURL) _showAvatar(profile.avatarURL);
   if (profile.signatureUrl) _showSignature(profile.signatureUrl);
   const ba = profile.bankAccount || {};
-  set('bankName',            ba.bankName);
+  const bSel = document.getElementById('bankSelect');
+  if (bSel) {
+    if (ba.bankId && ba.bankName) {
+      bSel.value = ba.bankId + '|' + ba.bankName;
+    } else if (ba.bankName) {
+      // Hồ sơ cũ chỉ có tên gõ tay — thử khớp với dropdown theo tên (không phân biệt hoa thường)
+      const _opt = Array.from(bSel.options).find(o => o.value && o.value.split('|')[1].toLowerCase() === ba.bankName.trim().toLowerCase());
+      if (_opt) bSel.value = _opt.value;
+    }
+  }
   set('bankAccountNumber',   ba.accountNumber);
   set('bankAccountHolder',   ba.accountHolder);
   if (profile.qrCodeUrl) _showQr(profile.qrCodeUrl);
