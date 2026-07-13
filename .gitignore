@@ -67,3 +67,6 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+
+# Repo private (tài liệu chiến lược) nằm trong thư mục này — KHÔNG commit vào repo public
+aln-private/
