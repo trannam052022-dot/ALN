@@ -1515,6 +1515,12 @@ document.addEventListener('DOMContentLoaded', function() {
       <i class="ph-duotone ph-arrow-clockwise"></i> Tải lại
     </button>
   </div>
+  <div id="reportedPaymentsWrap" style="display:none;padding:16px 20px;border-bottom:1px solid var(--red-bd);background:var(--red-bg)">
+    <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--red);margin-bottom:2px;text-transform:uppercase;letter-spacing:.06em"><i class="ph-duotone ph-bell-ringing"></i> Khách báo đã chuyển khoản — cần kiểm tra</div>
+    <div style="font-size:10.5px;color:var(--sub);margin-bottom:10px">Chủ nhà/DN tự báo qua QR, chưa xác nhận thật — kiểm tra sao kê ngân hàng trước khi xử lý.</div>
+    <div id="reportedPaymentsContent" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+
   <div style="padding:14px 20px;background:rgba(16,185,129,.04);border-bottom:1px solid rgba(16,185,129,.12);font-size:11px;color:var(--sub)">
     <i class="ph-duotone ph-info" style="color:var(--green)"></i>
     Khi Chủ nhà/DN duyệt chặng, hệ thống tạo lệnh thanh toán. Sau khi bạn đã chuyển tiền thực tế cho KTS/Designer, bấm <b style="color:var(--green)">Xác nhận đã chuyển</b> để ghi nhận.
@@ -1560,6 +1566,40 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
     <button onclick="feeSaveConfig()" style="padding:9px 18px;border-radius:8px;border:none;background:var(--gold);color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-floppy-disk"></i> Lưu cấu hình</button>
     <div id="feeConfigMsg" style="display:none;margin-top:10px;padding:9px 12px;border-radius:7px;font-size:12px"></div>
+  </div>
+
+  <!-- ─── Tài khoản nhận tiền ALN — QR chuyển khoản cho Chủ nhà/DN ─── -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:24px">
+    <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text1);margin-bottom:4px"><i class="ph-duotone ph-qr-code"></i> Tài khoản nhận tiền ALN (QR cho Chủ nhà/DN)</div>
+    <div style="font-size:12px;color:var(--sub);margin-bottom:14px;max-width:70ch">Chưa cấu hình thì trang Chủ nhà/DN chỉ hiện "Đang cập nhật tài khoản thanh toán", không hiện QR sai.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:12px">
+      <div>
+        <label style="display:block;font-size:10px;font-weight:700;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Ngân hàng</label>
+        <select id="bankAccountBankSelect" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-family:var(--sans);font-size:13px;outline:none">
+          <option value="">— Chọn ngân hàng —</option>
+          <option value="970436|Vietcombank">Vietcombank</option>
+          <option value="970407|Techcombank">Techcombank</option>
+          <option value="970416|ACB">ACB</option>
+          <option value="970422|MB Bank">MB Bank</option>
+          <option value="970418|BIDV">BIDV</option>
+          <option value="970415|VietinBank">VietinBank</option>
+          <option value="970405|Agribank">Agribank</option>
+          <option value="970423|TPBank">TPBank</option>
+          <option value="970432|VPBank">VPBank</option>
+          <option value="970403|Sacombank">Sacombank</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:10px;font-weight:700;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Số tài khoản</label>
+        <input type="text" id="bankAccountNoInput" placeholder="VD: 0123456789" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-family:var(--mono);font-size:13px;outline:none">
+      </div>
+      <div>
+        <label style="display:block;font-size:10px;font-weight:700;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Chủ tài khoản</label>
+        <input type="text" id="bankAccountHolderInput" placeholder="VD: CÔNG TY TNHH APP LÀM NHÀ" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);color:var(--text1);font-family:var(--sans);font-size:13px;outline:none">
+      </div>
+    </div>
+    <button onclick="bankAccountSaveConfig()" style="padding:9px 18px;border-radius:8px;border:none;background:var(--gold);color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-floppy-disk"></i> Lưu tài khoản</button>
+    <div id="bankAccountMsg" style="display:none;margin-top:10px;padding:9px 12px;border-radius:7px;font-size:12px"></div>
   </div>
 
   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
@@ -4727,6 +4767,30 @@ function _pendingPayments() {
   return result;
 }
 
+/* ── Khách/DN tự báo đã chuyển khoản qua QR — chờ Founder kiểm tra sao kê ── */
+function _reportedPayments() {
+  var result = [];
+  (window.DN_PROJECTS || []).forEach(function(p) {
+    var raw = p._raw || {};
+    var payments = raw.payments || {};
+    ['C1','C2','C3','C4'].forEach(function(stage) {
+      var pay = payments[stage];
+      if (pay && pay.reportedAt && pay.status !== 'paid' && !pay.founderChecked) {
+        result.push({ coll: 'projects', projId: p.id, projName: p.name || p.id, personName: p.cn || p.dn || '—', stage: stage, amount: pay.amount || 0, reportedAt: pay.reportedAt });
+      }
+    });
+  });
+  return result;
+}
+
+window.founderAckPaymentReport = async function(coll, projId, stage) {
+  try {
+    var patch = {};
+    patch['payments.' + stage + '.founderChecked'] = true;
+    await updateDoc(doc(db, coll, projId), patch);
+  } catch(e) { console.error('[founderAckPaymentReport]', e); }
+};
+
 window.renderDesignApprovals = function renderDesignApprovals() {
   var el = document.getElementById('designApprovalsContent');
   if (!el) return;
@@ -4918,6 +4982,28 @@ window.repFixBadAmounts = async function() {
 };
 
 window.renderPayments = function renderPayments() {
+  var reportedWrap = document.getElementById('reportedPaymentsWrap');
+  var reportedEl = document.getElementById('reportedPaymentsContent');
+  if (reportedWrap && reportedEl) {
+    var reported = _reportedPayments();
+    if (!reported.length) {
+      reportedWrap.style.display = 'none';
+    } else {
+      reportedWrap.style.display = 'block';
+      var fmtAmtR = function(v) { return v >= 1000000 ? (v/1000000).toFixed(1).replace('.0','') + ' tr' : (v/1000).toFixed(0) + 'K'; };
+      reportedEl.innerHTML = reported.map(function(r) {
+        var timeStr = (r.reportedAt && r.reportedAt.toDate) ? r.reportedAt.toDate().toLocaleString('vi-VN') : '';
+        return '<div style="background:var(--surface);border:1px solid var(--red-bd);border-radius:9px;padding:12px 14px;display:flex;align-items:center;gap:12px">'
+          + '<div style="flex:1;min-width:0;font-size:12.5px;color:var(--text1)">'
+            + '<b>' + r.personName + '</b> vừa báo đã chuyển <b style="color:var(--red)">' + fmtAmtR(r.amount) + 'đ</b>'
+            + ' — ' + r.projId + ' · Chặng <b>' + r.stage + '</b>'
+            + (timeStr ? '<div style="font-size:10px;color:var(--dim);margin-top:2px">Báo lúc ' + timeStr + '</div>' : '')
+          + '</div>'
+          + '<button onclick="founderAckPaymentReport(\'' + r.coll + '\',\'' + r.projId + '\',\'' + r.stage + '\')" style="flex-shrink:0;padding:6px 12px;background:var(--raised);border:1px solid var(--border);border-radius:7px;font-size:10.5px;font-weight:600;color:var(--sub);cursor:pointer;white-space:nowrap">Đã kiểm tra</button>'
+        + '</div>';
+      }).join('');
+    }
+  }
   var el = document.getElementById('paymentsContent');
   if (!el) return;
   var pending = _pendingPayments();
@@ -5282,6 +5368,52 @@ window.feeSaveConfig = async function() {
   }
 };
 
+/* ── TÀI KHOẢN NHẬN TIỀN ALN — settings/bankAccount, dùng tạo QR cho Chủ nhà/DN ── */
+var _bankAccountCfg = null;
+
+function _startBankAccountConfigListen() {
+  onSnapshot(doc(db, 'settings', 'bankAccount'), function(snap) {
+    _bankAccountCfg = snap.exists() ? snap.data() : null;
+    _fillBankAccountForm();
+  }, function(err) {
+    console.error('[Founder] settings/bankAccount Firestore error:', err.code, err.message);
+  });
+}
+
+window._fillBankAccountForm = function _fillBankAccountForm() {
+  var sel = document.getElementById('bankAccountBankSelect');
+  var no = document.getElementById('bankAccountNoInput');
+  var holder = document.getElementById('bankAccountHolderInput');
+  if (!sel || !no || !holder) return;
+  if (!_bankAccountCfg) return;
+  if (document.activeElement !== sel && _bankAccountCfg.bankId) sel.value = _bankAccountCfg.bankId + '|' + (_bankAccountCfg.bankName || '');
+  if (document.activeElement !== no) no.value = _bankAccountCfg.accountNumber || '';
+  if (document.activeElement !== holder) holder.value = _bankAccountCfg.accountHolder || '';
+};
+
+window.bankAccountSaveConfig = async function() {
+  var sel = document.getElementById('bankAccountBankSelect');
+  var no = document.getElementById('bankAccountNoInput');
+  var holder = document.getElementById('bankAccountHolderInput');
+  var msgEl = document.getElementById('bankAccountMsg');
+  var selParts = (sel.value || '').split('|');
+  var bankId = selParts[0] || '';
+  var bankName = selParts[1] || '';
+  var accountNumber = (no.value || '').trim();
+  var accountHolder = (holder.value || '').trim();
+  if (!bankId || !accountNumber || !accountHolder) { alert('Điền đủ ngân hàng, số tài khoản, chủ tài khoản.'); return; }
+  try {
+    if (msgEl) { msgEl.style.display = 'block'; msgEl.style.background = 'var(--raised)'; msgEl.style.color = 'var(--sub)'; msgEl.textContent = 'Đang lưu...'; }
+    await setDoc(doc(db, 'settings', 'bankAccount'), {
+      bankId: bankId, bankName: bankName, accountNumber: accountNumber, accountHolder: accountHolder,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+    if (msgEl) { msgEl.style.background = 'rgba(16,185,129,.08)'; msgEl.style.color = 'var(--green)'; msgEl.textContent = '✓ Đã lưu — QR chuyển khoản sẽ hiện ngay trên trang Chủ nhà/DN.'; }
+  } catch(e) {
+    if (msgEl) { msgEl.style.background = 'rgba(239,68,68,.08)'; msgEl.style.color = '#ef4444'; msgEl.textContent = '❌ Lỗi: ' + (e.message || e.code); }
+  }
+};
+
 /* ── DỰ ÁN DESIGNER NT (designProjects) — song song với projects/ KTS ── */
 function _adaptDesignForFounder(id, d) {
   var prog = d.progress || {};
@@ -5625,6 +5757,7 @@ onAuthStateChanged(auth, async (user) => {
     try { _startFounderListen(); } catch(e){ console.error('[Founder listen]', e); }
     try { _startFounderDesignListen(); } catch(e){ console.error('[Founder design listen]', e); }
     try { _startFeeConfigListen(); } catch(e){ console.error('[Founder fee config listen]', e); }
+    try { _startBankAccountConfigListen(); } catch(e){ console.error('[Founder bankAccount config listen]', e); }
     try { _startPendingListen(); } catch(e){ console.error('[Founder pending]', e); }
 
     // ── Đến từ founder_forum.html "Tạo dự án từ đây" (invite intent:project) ──

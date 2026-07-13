@@ -214,6 +214,33 @@ exports.onStageAdvanced = functions
     return null;
   });
 
+/* ── Chủ nhà/DN tự báo đã chuyển khoản qua QR — thông báo đặc biệt cho Founder,
+   khác hẳn thông báo thường (icon 💰 riêng, không tự ẩn) để tránh bị lẫn ── */
+exports.onPaymentReported = functions
+  .region("asia-southeast1")
+  .firestore.document("projects/{pid}")
+  .onUpdate(async (change, context) => {
+    const before = change.before.data() || {};
+    const after  = change.after.data()  || {};
+    const beforePayments = before.payments || {};
+    const afterPayments  = after.payments  || {};
+    const projName = after.name || context.params.pid;
+    const payerName = (after.cn && after.cn.name) || (after.dn && after.dn.name) || "Khách hàng";
+
+    for (const stage of ["C1", "C2", "C3", "C4"]) {
+      const b = beforePayments[stage] || {};
+      const a = afterPayments[stage] || {};
+      if (!b.reportedAt && a.reportedAt) {
+        await notifyFounder(
+          "💰 Cần xác nhận chuyển khoản",
+          `${payerName} vừa báo đã chuyển ${(a.amount || 0).toLocaleString("vi-VN")}đ — ${projName} · chặng ${stage}`,
+          { type: "PAYMENT_REPORTED", pid: context.params.pid, stage }
+        );
+      }
+    }
+    return null;
+  });
+
 /* ── Phòng Hội Kiến — họp video theo dự án ──
    Khi meeting.active chuyển false→true: báo đẩy cho mọi thành viên + LUÔN báo
    Founder (giám sát). Ghi nhật ký meetingLogs bằng Admin SDK (client không
