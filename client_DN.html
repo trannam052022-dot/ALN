@@ -688,7 +688,7 @@ button,.btn,a[role="button"]{transition:transform .25s var(--ease),box-shadow .2
           <div id="dnSidebarName" style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">App Làm Nhà Corp.</div>
           <div style="font-size:10px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:5px">
             <span style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0;animation:pulse-dn 2s ease-in-out infinite"></span>
-            Doanh nghiệp · Online
+            <span id="dnSidebarSub">Doanh nghiệp · Online</span>
           </div>
         </div>
       </div>
@@ -2670,6 +2670,8 @@ function selectProj(id){
     if (_fNameEl) _fNameEl.textContent = _fName;
     var _fAvEl = document.getElementById('dnSidebarAv');
     if (_fAvEl) { var _fw=_fName.trim().split(/\s+/); _fAvEl.textContent=_fw.length>=2?(_fw[0][0]+_fw[_fw.length-1][0]).toUpperCase():_fName.slice(0,2).toUpperCase(); }
+    var _fSubEl = document.getElementById('dnSidebarSub');
+    if (_fSubEl) _fSubEl.textContent = (p2.code || id) + ' · Đang xem';
   }
 }
 
