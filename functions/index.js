@@ -26,6 +26,7 @@ const PAGE_BY_ROLE = {
   designer:    "designer_dashboard.html",
   dn:          "client_DN.html",
   cn:          "client_CN.html",
+  ktv:         "ktv_dashboard.html",
   community:   "aln_community.html",
   reservation: "aln-giu-cho/phong-cho.html",
 };
@@ -237,6 +238,68 @@ exports.onPaymentReported = functions
           { type: "PAYMENT_REPORTED", pid: context.params.pid, stage }
         );
       }
+    }
+    return null;
+  });
+
+/* ── Giao việc KTV — thông báo 2 chiều KTS ↔ KTV ── */
+exports.onKtvTaskWrite = functions
+  .region("asia-southeast1")
+  .firestore.document("ktvTasks/{tid}")
+  .onWrite(async (change, context) => {
+    const before = change.before.exists ? change.before.data() : null;
+    const after  = change.after.exists  ? change.after.data()  : null;
+    if (!after) return null; // xoá task — không cần báo
+
+    const title = after.title || "Việc triển khai bản vẽ";
+    const projLabel = after.projectId ? `${after.projectId}` : "";
+
+    // Tạo mới
+    if (!before) {
+      if (after.mode === "direct" && after.ktvUid) {
+        await notifyUser(
+          after.ktvUid,
+          "🛠 Việc mới từ KTS " + (after.ktsName || ""),
+          `${title} — ${projLabel}${after.deadline ? " · có hạn chót" : ""}`,
+          { type: "KTV_TASK_NEW", tid: context.params.tid },
+          "ktv"
+        );
+      } else if (after.mode === "open") {
+        // Việc mở — báo mọi KTV đang hoạt động (giới hạn 30 người tránh spam quota)
+        const snap = await db.collection("users")
+          .where("role", "==", "ktv").where("status", "==", "active")
+          .limit(30).get();
+        await Promise.all(snap.docs.map((d) => notifyUser(
+          d.id,
+          "📢 Việc mở mới — nhận trước làm trước",
+          `${title} — ${projLabel} · KTS ${after.ktsName || ""}`,
+          { type: "KTV_TASK_OPEN", tid: context.params.tid },
+          "ktv"
+        )));
+      }
+      return null;
+    }
+
+    // Chuyển trạng thái
+    if (before.status === after.status) return null;
+    const ktsUid = after.ktsUid;
+    const ktvUid = after.ktvUid;
+    if (after.status === "in_progress" && ktsUid) {
+      await notifyUser(ktsUid, "✅ KTV đã nhận việc",
+        `${after.ktvName || "KTV"} nhận "${title}" — ${projLabel}`,
+        { type: "KTV_TASK_CLAIMED", tid: context.params.tid }, "kts");
+    } else if (after.status === "submitted" && ktsUid) {
+      await notifyUser(ktsUid, "📥 KTV đã nộp bài — chờ bạn duyệt",
+        `${after.ktvName || "KTV"} nộp "${title}" — ${projLabel}`,
+        { type: "KTV_TASK_SUBMITTED", tid: context.params.tid }, "kts");
+    } else if (after.status === "done" && ktvUid) {
+      await notifyUser(ktvUid, "🎉 KTS đã duyệt bài của bạn",
+        `"${title}" — ${projLabel} hoàn thành`,
+        { type: "KTV_TASK_DONE", tid: context.params.tid }, "ktv");
+    } else if (after.status === "revise" && ktvUid) {
+      await notifyUser(ktvUid, "✏️ KTS yêu cầu sửa",
+        `"${title}" — ${projLabel}${after.ktsNote ? ": " + String(after.ktsNote).slice(0, 80) : ""}`,
+        { type: "KTV_TASK_REVISE", tid: context.params.tid }, "ktv");
     }
     return null;
   });

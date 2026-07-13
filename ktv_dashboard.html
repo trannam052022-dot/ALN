@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <script src="error-monitor.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALN — KTV Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+:root{
+  --bg:#080c14;--bg2:#0e1422;--bg3:#141b2e;
+  --card:rgba(14,20,34,.92);--border:rgba(255,255,255,.07);
+  --border-c:rgba(34,211,238,.18);--muted:rgba(176,212,228,.38);
+  --text:#ccecf0;--text2:rgba(204,236,240,.62);
+  --cyan:#22d3ee;--cyan2:#7aeaf8;
+  --gold:#C9A84C;--green:#3dd68c;--red:#f06060;--amber:#f59e0b;
+  --r:12px;--mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;--serif:'Cormorant Garamond',serif;
+  --syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:1rem;
+  background-image:linear-gradient(rgba(34,211,238,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.015) 1px,transparent 1px);
+  background-size:56px 56px;}
+body::before{content:'';position:fixed;top:-20%;left:50%;transform:translateX(-50%);width:800px;height:500px;
+  background:radial-gradient(ellipse,rgba(34,211,238,.07) 0%,transparent 65%);pointer-events:none;z-index:0;}
+a{color:var(--cyan);text-decoration:none}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(34,211,238,.25);border-radius:99px}
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;padding:0 24px;height:52px;
+  background:rgba(8,12,20,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.06);}
+.topbar-logo{font-family:var(--syne);font-size:13px;font-weight:800;letter-spacing:.18em;color:var(--cyan);text-transform:uppercase}
+.topbar-sep{width:1px;height:20px;background:rgba(255,255,255,.1)}
+.topbar-title{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+.topbar-grow{flex:1}
+.topbar-prov{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--cyan);background:rgba(34,211,238,.1);
+  border:1px solid rgba(34,211,238,.22);border-radius:6px;padding:3px 10px}
+.topbar-name{font-size:12px;font-weight:600;color:var(--text2)}
+.topbar-logout{background:transparent;border:1px solid rgba(255,255,255,.1);color:var(--muted);font-size:11px;
+  border-radius:7px;padding:5px 12px;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:5px;transition:all .15s}
+.topbar-logout:hover{border-color:rgba(34,211,238,.3);color:rgba(34,211,238,.8)}
+/* LAYOUT */
+.layout{max-width:900px;margin:0 auto;padding:28px 20px 72px;position:relative;z-index:1}
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.stat-card{background:var(--card);border:1px solid var(--border-c);border-radius:var(--r);padding:16px 18px;
+  display:flex;align-items:flex-start;gap:14px}
+.stat-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.stat-icon.cyan{background:rgba(34,211,238,.1)}
+.stat-icon.amber{background:rgba(245,158,11,.1)}
+.stat-icon.green{background:rgba(61,214,140,.1)}
+.stat-label{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.stat-val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);line-height:1}
+.stat-sub{font-size:10px;color:var(--muted);margin-top:3px}
+/* TABS */
+.tabs{display:flex;gap:2px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:3px;margin-bottom:20px}
+.tab{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--syne);transition:all .18s;text-align:center}
+.tab.active{background:rgba(34,211,238,.12);color:var(--cyan);border:1px solid rgba(34,211,238,.22);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+/* SECTION */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-family:var(--syne);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.badge-count{background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.22);color:var(--cyan);
+  font-family:var(--mono);font-size:10px;font-weight:700;border-radius:99px;padding:2px 9px}
+/* TASK CARD */
+.task-card{background:var(--card);border:1px solid var(--border-c);border-radius:var(--r);padding:18px 20px;margin-bottom:14px;transition:border-color .2s}
+.task-card:hover{border-color:rgba(34,211,238,.35)}
+.task-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.task-title{font-family:var(--syne);font-size:14px;font-weight:700;color:var(--text);flex:1;min-width:0}
+.task-proj{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
+.st-badge{font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap;flex-shrink:0}
+.st-open{background:rgba(34,211,238,.1);color:var(--cyan);border:1px solid rgba(34,211,238,.28)}
+.st-assigned{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.28)}
+.st-progress{background:rgba(34,211,238,.12);color:var(--cyan);border:1px solid rgba(34,211,238,.28)}
+.st-submitted{background:rgba(201,168,76,.12);color:var(--gold);border:1px solid rgba(201,168,76,.28)}
+.st-done{background:rgba(61,214,140,.12);color:var(--green);border:1px solid rgba(61,214,140,.28)}
+.st-revise{background:rgba(240,96,96,.1);color:var(--red);border:1px solid rgba(240,96,96,.25)}
+.task-desc{font-size:12px;color:var(--text2);line-height:1.6;padding:10px 12px;background:rgba(255,255,255,.025);border-radius:8px;margin-bottom:10px;white-space:pre-wrap}
+.task-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.meta-chip{font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 9px;border-radius:99px;border:1px solid rgba(255,255,255,.1);color:var(--muted);background:rgba(255,255,255,.03)}
+.meta-chip.deadline{border-color:rgba(245,158,11,.28);color:var(--amber)}
+.revise-note{padding:10px 12px;background:rgba(240,96,96,.07);border:1px solid rgba(240,96,96,.2);border-radius:8px;font-size:11px;color:#f5b8b8;margin-bottom:12px;line-height:1.5}
+.revise-note b{color:var(--red)}
+/* FILES */
+.file-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:7px;margin-bottom:5px;font-size:11px}
+.file-row a{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-size{font-family:var(--mono);font-size:9px;color:var(--muted);flex-shrink:0}
+/* BUTTONS */
+.btn{padding:9px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;
+  font-family:var(--syne);display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .2s}
+.btn-claim{background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.3);color:var(--cyan);width:100%}
+.btn-claim:hover{background:rgba(34,211,238,.2);box-shadow:0 0 20px rgba(34,211,238,.15)}
+.btn-submit{background:rgba(61,214,140,.12);border:1px solid rgba(61,214,140,.3);color:var(--green)}
+.btn-submit:hover{background:rgba(61,214,140,.2)}
+.btn-upload{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--text2)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.upload-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:4px}
+/* PROFILE */
+.pcard{background:var(--card);border:1px solid var(--border-c);border-radius:var(--r);padding:22px;max-width:560px}
+.pfield{margin-bottom:14px}
+.pfield label{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+.pfield input,.pfield select{width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:8px;
+  padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--sans);outline:none;transition:border-color .2s}
+.pfield input:focus,.pfield select:focus{border-color:rgba(34,211,238,.38)}
+.pfield select option{background:var(--bg2);color:var(--text)}
+.psave{background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.3);color:var(--cyan);padding:10px 22px;
+  border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--syne);display:inline-flex;align-items:center;gap:7px}
+.psave:hover{background:rgba(34,211,238,.2)}
+/* EMPTY / LOADER / TOAST */
+.empty{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty-icon{font-size:36px;margin-bottom:14px;opacity:.4}
+.empty-text{font-size:13px;line-height:1.6}
+.loader{display:flex;align-items:center;justify-content:center;gap:8px;padding:36px;color:var(--muted);font-size:12px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(14,20,34,.97);
+  border:1px solid rgba(255,255,255,.1);color:var(--text);font-size:12px;font-weight:500;
+  padding:10px 22px;border-radius:99px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.7);
+  opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;max-width:90vw}
+.toast.show{opacity:1}
+.toast.ok{border-color:rgba(61,214,140,.35);color:#7dffc0}
+.toast.err{border-color:rgba(240,96,96,.35);color:#f09898}
+@media(max-width:600px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .stats-row .stat-card:last-child{grid-column:span 2}
+  .topbar{padding:0 14px}
+}
+@keyframes phspin{to{transform:rotate(360deg)}}
+</style>
+<link rel="stylesheet" href="aln-tokens.css">
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <span class="topbar-logo">ALN</span>
+  <div class="topbar-sep"></div>
+  <span class="topbar-title">KTV — Triển khai bản vẽ</span>
+  <div class="topbar-grow"></div>
+  <span class="topbar-prov" id="topProvince">…</span>
+  <span class="topbar-name" id="topName"></span>
+  <button class="topbar-logout" onclick="doLogout()">
+    <i class="ph-duotone ph-sign-out"></i> Đăng xuất
+  </button>
+</div>
+
+<div class="layout">
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon cyan"><i class="ph-duotone ph-briefcase"></i></div>
+      <div>
+        <div class="stat-label">Việc đang mở</div>
+        <div class="stat-val" id="statOpen">—</div>
+        <div class="stat-sub">Chờ KTV nhận</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon amber"><i class="ph-duotone ph-pencil-ruler"></i></div>
+      <div>
+        <div class="stat-label">Đang làm</div>
+        <div class="stat-val" id="statDoing">—</div>
+        <div class="stat-sub">Việc của bạn</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><i class="ph-duotone ph-check-circle"></i></div>
+      <div>
+        <div class="stat-label">Hoàn thành</div>
+        <div class="stat-val" id="statDone">—</div>
+        <div class="stat-sub">Đã được KTS duyệt</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" id="tabMine" onclick="switchTab('mine')">
+      <i class="ph-duotone ph-clipboard-text"></i> Việc của tôi <span id="tabMineCount"></span>
+    </button>
+    <button class="tab" id="tabOpen" onclick="switchTab('open')">
+      <i class="ph-duotone ph-megaphone"></i> Việc đang mở <span id="tabOpenCount"></span>
+    </button>
+    <button class="tab" id="tabProfile" onclick="switchTab('profile')">
+      <i class="ph-duotone ph-user-circle"></i> Hồ sơ
+    </button>
+  </div>
+
+  <!-- PANEL: MY TASKS -->
+  <div id="panelMine">
+    <div class="section-head">
+      <span class="section-title">Việc được giao cho bạn</span>
+      <span class="badge-count" id="countMine">0</span>
+    </div>
+    <div id="listMine"><div class="loader"><i class="ph-duotone ph-spinner" style="animation:phspin 1s linear infinite"></i> Đang tải…</div></div>
+  </div>
+
+  <!-- PANEL: OPEN POOL -->
+  <div id="panelOpen" style="display:none">
+    <div class="section-head">
+      <span class="section-title">Việc đang mở — ai nhận trước được trước</span>
+      <span class="badge-count" id="countOpen">0</span>
+    </div>
+    <div id="listOpen"><div class="loader"><i class="ph-duotone ph-spinner" style="animation:phspin 1s linear infinite"></i> Đang tải…</div></div>
+  </div>
+
+  <!-- PANEL: PROFILE -->
+  <div id="panelProfile" style="display:none">
+    <div class="section-head"><span class="section-title">Hồ sơ cá nhân</span></div>
+    <div class="pcard">
+      <div class="pfield">
+        <label>Họ và tên</label>
+        <input type="text" id="profileName">
+      </div>
+      <div class="pfield">
+        <label>Số điện thoại</label>
+        <input type="text" id="profilePhone" placeholder="09xxxxxxxx">
+      </div>
+      <div style="border-top:1px solid rgba(255,255,255,.08);margin:16px 0 14px;padding-top:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px"><i class="ph-duotone ph-bank" style="color:var(--cyan)"></i> Tài khoản nhận tiền</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Dùng khi có thù lao qua hệ thống sau này. Tự cập nhật, không ai khác sửa được.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="pfield" style="margin-bottom:10px">
+            <label>Ngân hàng</label>
+            <select id="bankSelect">
+              <option value="">— Chọn ngân hàng —</option>
+              <option value="970436|Vietcombank">Vietcombank</option>
+              <option value="970407|Techcombank">Techcombank</option>
+              <option value="970416|ACB">ACB</option>
+              <option value="970422|MB Bank">MB Bank</option>
+              <option value="970418|BIDV">BIDV</option>
+              <option value="970415|VietinBank">VietinBank</option>
+              <option value="970405|Agribank">Agribank</option>
+              <option value="970423|TPBank">TPBank</option>
+              <option value="970432|VPBank">VPBank</option>
+              <option value="970403|Sacombank">Sacombank</option>
+            </select>
+          </div>
+          <div class="pfield" style="margin-bottom:10px">
+            <label>Số tài khoản</label>
+            <input type="text" id="bankAccountNumber" placeholder="0123456789">
+          </div>
+        </div>
+        <div class="pfield">
+          <label>Chủ tài khoản</label>
+          <input type="text" id="bankAccountHolder" placeholder="NGUYEN VAN A" style="text-transform:uppercase">
+        </div>
+      </div>
+      <button class="psave" onclick="saveProfile()"><i class="ph-duotone ph-floppy-disk"></i> Lưu hồ sơ</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var PROV_NAME = {
+  HCM:'TP. HCM', HN:'Hà Nội', DN:'Đà Nẵng', CT:'Cần Thơ',
+  HP:'Hải Phòng', BD:'Bình Dương', DNai:'Đồng Nai', 'BR-VT':'Vũng Tàu',
+  LA:'Long An', TG:'Tiền Giang', KH:'Khánh Hòa', BDinh:'Bình Định',
+  NA:'Nghệ An', TH:'Thanh Hóa', OTHER:'Tỉnh khác'
+};
+var ST_LABEL = {
+  open:      { cls:'st-open',      text:'Đang mở' },
+  assigned:  { cls:'st-assigned',  text:'Chờ bạn nhận' },
+  in_progress:{ cls:'st-progress', text:'Đang làm' },
+  submitted: { cls:'st-submitted', text:'Đã nộp · chờ KTS duyệt' },
+  revise:    { cls:'st-revise',    text:'KTS yêu cầu sửa' },
+  done:      { cls:'st-done',      text:'Hoàn thành ✓' }
+};
+window.MY_TASKS = [];
+window.OPEN_TASKS = [];
+
+function switchTab(t) {
+  ['mine','open','profile'].forEach(function(k){
+    var tab = document.getElementById('tab' + k.charAt(0).toUpperCase() + k.slice(1));
+    var panel = document.getElementById('panel' + k.charAt(0).toUpperCase() + k.slice(1));
+    if (tab) tab.classList.toggle('active', k === t);
+    if (panel) panel.style.display = (k === t) ? 'block' : 'none';
+  });
+}
+
+function fmtSize(b) {
+  if (!b) return '';
+  if (b >= 1048576) return (b/1048576).toFixed(1) + ' MB';
+  return Math.round(b/1024) + ' KB';
+}
+function fmtDeadline(d) {
+  if (!d) return '';
+  var dt = d.toDate ? d.toDate() : new Date(d);
+  if (isNaN(dt.getTime())) return String(d);
+  return dt.toLocaleDateString('vi-VN');
+}
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function taskCardHTML(t, isPool) {
+  var st = ST_LABEL[t.status] || { cls:'st-open', text: t.status || '' };
+  var filesHtml = (t.files || []).map(function(f){
+    return '<div class="file-row"><i class="ph-duotone ph-file" style="color:var(--cyan)"></i>'
+      + '<a href="' + esc(f.url) + '" target="_blank" rel="noopener">' + esc(f.name) + '</a>'
+      + '<span class="file-size">' + fmtSize(f.size) + '</span></div>';
+  }).join('');
+  var actions = '';
+  if (isPool) {
+    actions = '<button class="btn btn-claim" onclick="claimTask(\'' + t.id + '\')"><i class="ph-duotone ph-hand-grabbing"></i> Nhận việc này</button>';
+  } else if (t.status === 'assigned') {
+    actions = '<button class="btn btn-claim" onclick="acceptTask(\'' + t.id + '\')"><i class="ph-duotone ph-check"></i> Nhận việc</button>';
+  } else if (t.status === 'in_progress' || t.status === 'revise') {
+    actions = '<div class="upload-row">'
+      + '<label class="btn btn-upload" style="cursor:pointer"><input type="file" multiple style="display:none" onchange="uploadTaskFiles(this,\'' + t.id + '\')"><i class="ph-duotone ph-upload-simple"></i> Tải file lên</label>'
+      + ((t.files || []).length ? '<button class="btn btn-submit" onclick="submitTask(\'' + t.id + '\')"><i class="ph-duotone ph-paper-plane-tilt"></i> Nộp bài</button>' : '')
+      + '</div>';
+  }
+  return '<div class="task-card" id="task-' + t.id + '">'
+    + '<div class="task-head">'
+      + '<div style="flex:1;min-width:0"><div class="task-title">' + esc(t.title || 'Việc triển khai') + '</div>'
+      + '<div class="task-proj">' + esc(t.projectId || '') + (t.projectName ? ' · ' + esc(t.projectName) : '') + ' · KTS: ' + esc(t.ktsName || '—') + '</div></div>'
+      + '<span class="st-badge ' + st.cls + '">' + st.text + '</span>'
+    + '</div>'
+    + (t.desc ? '<div class="task-desc">' + esc(t.desc) + '</div>' : '')
+    + '<div class="task-meta">'
+      + (t.stage ? '<span class="meta-chip">Chặng ' + esc(t.stage) + '</span>' : '')
+      + (t.deadline ? '<span class="meta-chip deadline"><i class="ph-duotone ph-alarm"></i> Hạn: ' + fmtDeadline(t.deadline) + '</span>' : '')
+      + (t.mode === 'open' ? '<span class="meta-chip">Việc mở</span>' : '')
+    + '</div>'
+    + (t.status === 'revise' && t.ktsNote ? '<div class="revise-note"><b>KTS yêu cầu sửa:</b> ' + esc(t.ktsNote) + '</div>' : '')
+    + (filesHtml ? '<div style="margin-bottom:10px">' + filesHtml + '</div>' : '')
+    + actions
+  + '</div>';
+}
+
+function renderMine(list) {
+  var el = document.getElementById('listMine');
+  document.getElementById('countMine').textContent = list.length;
+  document.getElementById('tabMineCount').textContent = list.length ? ' (' + list.length + ')' : '';
+  var doing = list.filter(function(t){ return t.status === 'in_progress' || t.status === 'revise' || t.status === 'assigned'; }).length;
+  var done  = list.filter(function(t){ return t.status === 'done'; }).length;
+  document.getElementById('statDoing').textContent = doing;
+  document.getElementById('statDone').textContent = done;
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon"><i class="ph-duotone ph-clipboard"></i></div><div class="empty-text">Chưa có việc nào được giao.<br>Xem tab "Việc đang mở" để nhận việc từ các KTS.</div></div>';
+    return;
+  }
+  el.innerHTML = list.map(function(t){ return taskCardHTML(t, false); }).join('');
+}
+
+function renderOpen(list) {
+  var el = document.getElementById('listOpen');
+  document.getElementById('countOpen').textContent = list.length;
+  document.getElementById('statOpen').textContent = list.length;
+  document.getElementById('tabOpenCount').textContent = list.length ? ' (' + list.length + ')' : '';
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon"><i class="ph-duotone ph-megaphone"></i></div><div class="empty-text">Hiện không có việc mở nào chờ nhận</div></div>';
+    return;
+  }
+  el.innerHTML = list.map(function(t){ return taskCardHTML(t, true); }).join('');
+}
+
+function doLogout() { window._doLogout && window._doLogout(); }
+function claimTask(id) { window._claimTask && window._claimTask(id); }
+function acceptTask(id) { window._acceptTask && window._acceptTask(id); }
+function submitTask(id) { window._submitTask && window._submitTask(id); }
+function uploadTaskFiles(input, id) { window._uploadTaskFiles && window._uploadTaskFiles(input, id); }
+function saveProfile() { window._saveProfile && window._saveProfile(); }
+
+var _tt = null;
+function showToast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(_tt);
+  _tt = setTimeout(function() { el.className = 'toast'; }, 3000);
+}
+window.showToast = showToast;
+</script>
+
+<script type="module">
+import {
+  auth, db, storage, storageRef, uploadBytes, getDownloadURL,
+  onAuthStateChanged, signOut,
+  doc, getDoc, updateDoc,
+  collection, query, where, onSnapshot,
+  serverTimestamp
+} from './firebase-config.js';
+
+let KTV = null;
+
+onAuthStateChanged(auth, async function(user) {
+  if (!user) { location.href = 'login.html'; return; }
+  let snap = null;
+  for (let i = 0; i < 3; i++) {
+    try { snap = await getDoc(doc(db, 'users', user.uid)); break; }
+    catch(e) { await new Promise(r => setTimeout(r, 800)); }
+  }
+  const role = (snap && snap.exists()) ? snap.data().role : '';
+  if (role !== 'ktv' && role !== 'founder') {
+    const PAGE_BY_ROLE = { founder:'founder_panel.html', kts:'kts_dashboard.html', designer:'designer_dashboard.html', dn:'client_DN.html', cn:'client_CN.html', ks:'ks_dashboard.html' };
+    location.href = PAGE_BY_ROLE[role] || 'login.html'; return;
+  }
+  KTV = snap.exists() ? snap.data() : { name:'Founder', role:'founder' };
+  KTV.uid = user.uid;
+
+  document.getElementById('topName').textContent = KTV.name || '';
+  document.getElementById('topProvince').textContent = window.PROV_NAME[KTV.province] || KTV.province || '—';
+
+  /* profile form */
+  const pn = document.getElementById('profileName'); if (pn) pn.value = KTV.name || '';
+  const pp = document.getElementById('profilePhone'); if (pp) pp.value = KTV.phone || '';
+  const ba = KTV.bankAccount || {};
+  const bSel = document.getElementById('bankSelect');
+  if (bSel && ba.bankId && ba.bankName) bSel.value = ba.bankId + '|' + ba.bankName;
+  const bNo = document.getElementById('bankAccountNumber'); if (bNo) bNo.value = ba.accountNumber || '';
+  const bHo = document.getElementById('bankAccountHolder'); if (bHo) bHo.value = ba.accountHolder || '';
+
+  _startTaskListeners(user.uid);
+});
+
+function _sortByUpdated(a, b) {
+  const sb = (b.updatedAt && b.updatedAt.seconds) || 0;
+  const sa = (a.updatedAt && a.updatedAt.seconds) || 0;
+  return sb - sa;
+}
+
+function _startTaskListeners(uid) {
+  /* việc của tôi */
+  onSnapshot(query(collection(db, 'ktvTasks'), where('ktvUid', '==', uid)), function(snap) {
+    const arr = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+    arr.sort(_sortByUpdated);
+    window.MY_TASKS = arr;
+    window.renderMine(arr);
+  }, function(err) {
+    console.error('[KTV mine]', err.code, err.message);
+    document.getElementById('listMine').innerHTML = '<div class="empty"><div class="empty-text">Không thể tải dữ liệu (' + (err.code||'') + ')</div></div>';
+  });
+  /* việc đang mở */
+  onSnapshot(query(collection(db, 'ktvTasks'), where('status', '==', 'open')), function(snap) {
+    const arr = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+    arr.sort(_sortByUpdated);
+    window.OPEN_TASKS = arr;
+    window.renderOpen(arr);
+  }, function(err) {
+    console.error('[KTV open]', err.code, err.message);
+    document.getElementById('listOpen').innerHTML = '<div class="empty"><div class="empty-text">Không thể tải dữ liệu (' + (err.code||'') + ')</div></div>';
+  });
+}
+
+/* nhận việc mở (pool) — set ktvUid + chuyển in_progress */
+window._claimTask = async function(id) {
+  try {
+    await updateDoc(doc(db, 'ktvTasks', id), {
+      ktvUid: KTV.uid, ktvName: KTV.name || '',
+      status: 'in_progress', claimedAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    });
+    window.showToast('✓ Đã nhận việc — xem trong "Việc của tôi"', 'ok');
+  } catch(e) {
+    console.error('[claimTask]', e);
+    window.showToast(e.code === 'permission-denied' ? 'Việc này vừa có người khác nhận trước' : 'Lỗi: ' + (e.message||e.code), 'err');
+  }
+};
+
+/* nhận việc được giao đích danh */
+window._acceptTask = async function(id) {
+  try {
+    await updateDoc(doc(db, 'ktvTasks', id), { status: 'in_progress', claimedAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    window.showToast('✓ Đã nhận việc', 'ok');
+  } catch(e) { console.error('[acceptTask]', e); window.showToast('Lỗi: ' + (e.message||e.code), 'err'); }
+};
+
+/* upload file bản vẽ */
+window._uploadTaskFiles = async function(input, id) {
+  const files = Array.from(input.files || []);
+  if (!files.length) return;
+  const task = (window.MY_TASKS || []).find(t => t.id === id);
+  if (!task) return;
+  window.showToast('Đang tải ' + files.length + ' file lên…');
+  try {
+    const uploaded = [];
+    for (const f of files) {
+      const path = 'projects/' + (task.projectId || 'unknown') + '/ktv-tasks/' + id + '/' + Date.now() + '_' + f.name;
+      const r = storageRef(storage, path);
+      await uploadBytes(r, f);
+      const url = await getDownloadURL(r);
+      uploaded.push({ name: f.name, url: url, size: f.size });
+    }
+    const newFiles = (task.files || []).concat(uploaded);
+    await updateDoc(doc(db, 'ktvTasks', id), { files: newFiles, updatedAt: serverTimestamp() });
+    window.showToast('✓ Đã tải lên ' + uploaded.length + ' file', 'ok');
+  } catch(e) {
+    console.error('[uploadTaskFiles]', e);
+    window.showToast('Lỗi tải file: ' + (e.message||e.code), 'err');
+  }
+  input.value = '';
+};
+
+/* nộp bài */
+window._submitTask = async function(id) {
+  try {
+    await updateDoc(doc(db, 'ktvTasks', id), { status: 'submitted', submittedAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    window.showToast('✓ Đã nộp — chờ KTS duyệt', 'ok');
+  } catch(e) { console.error('[submitTask]', e); window.showToast('Lỗi: ' + (e.message||e.code), 'err'); }
+};
+
+/* lưu hồ sơ */
+window._saveProfile = async function() {
+  const name = (document.getElementById('profileName')||{}).value || '';
+  const phone = (document.getElementById('profilePhone')||{}).value || '';
+  const bankSel = (document.getElementById('bankSelect')||{}).value || '';
+  const parts = bankSel.split('|');
+  const bankAccount = {
+    bankId: parts[0] || '',
+    bankName: parts[1] || '',
+    accountNumber: ((document.getElementById('bankAccountNumber')||{}).value || '').trim(),
+    accountHolder: ((document.getElementById('bankAccountHolder')||{}).value || '').trim().toUpperCase(),
+  };
+  try {
+    await updateDoc(doc(db, 'users', KTV.uid), { name: name.trim(), phone: phone.trim(), bankAccount: bankAccount, updatedAt: serverTimestamp() });
+    KTV.name = name.trim();
+    document.getElementById('topName').textContent = KTV.name;
+    window.showToast('✓ Đã lưu hồ sơ', 'ok');
+  } catch(e) { console.error('[saveProfile]', e); window.showToast('Lỗi: ' + (e.message||e.code), 'err'); }
+};
+
+window._doLogout = async function() {
+  try { await signOut(auth); } catch(e) {}
+  try { localStorage.removeItem('aln_user'); sessionStorage.removeItem('aln_user'); } catch(e) {}
+  location.href = 'login.html';
+};
+</script>
+</body>
+</html>

@@ -678,6 +678,7 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
   <a class="nav-item" data-tab="wallet"><span class="icon"><i class="ph-duotone ph-wallet"></i></span> Ví & Thu nhập</a>
   <a class="nav-item" data-tab="review"><span class="icon"><i class="ph-duotone ph-clipboard-text"></i></span> Bảng Review <span class="nav-badge" id="reviewBadge" style="display:none">0</span></a>
   <a class="nav-item" data-tab="c3"><span class="icon"><i class="ph-duotone ph-upload-simple"></i></span> Nộp hồ sơ</a>
+  <a class="nav-item" data-tab="ktv"><span class="icon"><i class="ph-duotone ph-users-three"></i></span> Giao việc KTV <span class="nav-badge" id="ktvBadge" style="display:none">0</span></a>
 
   <a class="nav-item" data-tab="library"><span class="icon"><i class="ph-duotone ph-couch"></i></span> Thư viện nội thất</a>
   <div class="nav-sep"></div>
@@ -1321,6 +1322,60 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         </button>
         <button class="btn btn-primary" id="submitC3Btn" disabled onclick="submitC3()"><i class="ph-duotone ph-cloud-arrow-up"></i> Nộp Hồ sơ C3</button>
       </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         MODULE — GIAO VIỆC KTV (triển khai bản vẽ)
+    ══════════════════════════════════ -->
+    <div class="sec-label ktv-section"><i class="ph-duotone ph-users-three" style="font-size:13px"></i> Giao việc KTV — Triển khai bản vẽ</div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">Giao việc mới</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Giao đích danh cho 1 KTV, hoặc đăng việc mở để KTV nào nhận trước làm trước. Thù lao 2 bên tự thoả thuận ngoài hệ thống.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Dự án</div>
+          <select id="ktvTaskProject" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;outline:none">
+            <option value="">— Chọn dự án —</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Cách giao</div>
+          <select id="ktvTaskMode" onchange="ktvModeChanged()" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;outline:none">
+            <option value="direct">Giao đích danh 1 KTV</option>
+            <option value="open">Đăng việc mở — KTV nhận trước làm trước</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div id="ktvAssigneeWrap">
+          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Chọn KTV</div>
+          <select id="ktvTaskAssignee" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;outline:none">
+            <option value="">— Đang tải danh sách KTV —</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Hạn chót (tuỳ chọn)</div>
+          <input type="date" id="ktvTaskDeadline" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;outline:none">
+        </div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Tiêu đề việc</div>
+        <input type="text" id="ktvTaskTitle" placeholder="VD: Triển khai mặt bằng kết cấu tầng 1-2" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;outline:none">
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Mô tả yêu cầu</div>
+        <textarea id="ktvTaskDesc" rows="3" placeholder="Phạm vi công việc, tiêu chuẩn bản vẽ, layer, tỉ lệ..." style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;outline:none;resize:vertical"></textarea>
+      </div>
+      <button class="btn btn-primary" id="ktvTaskCreateBtn" onclick="ktvCreateTask()"><i class="ph-duotone ph-paper-plane-tilt"></i> Giao việc</button>
+      <div id="ktvTaskMsg" style="display:none;margin-top:10px;padding:8px 12px;border-radius:7px;font-size:12px"></div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:700;color:var(--text)">Việc đã giao</div>
+        <span id="ktvTaskCount" style="font-family:var(--mono);font-size:10px;font-weight:700;background:var(--ink3);border:1px solid var(--border);border-radius:99px;padding:2px 9px;color:var(--muted)">0</span>
+      </div>
+      <div id="ktvTaskList"><div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Đang tải…</div></div>
     </div>
 
     <!-- ══════════════════════════════════
@@ -2822,7 +2877,7 @@ function alnNotify(title, body){
     if(!first) return;
     var cont = first.parentElement;
     var SKIP = /modal|toast|popup|fab|veil|overlay|aln|chat|masthead/i;
-    var MARK = [['wallet-section','wallet'],['proposal-section','proposal'],['review-section','review'],['c3-section','c3'],['asset-section','asset'],['vip-section','vip'],['myproj-section','myproj'],['myprofile-section','myprofile'],['reputation-section','reputation'],['ktscreator-section','ktscreator'],['settings-section','settings'],['library-section','library']];
+    var MARK = [['wallet-section','wallet'],['proposal-section','proposal'],['review-section','review'],['c3-section','c3'],['ktv-section','ktv'],['asset-section','asset'],['vip-section','vip'],['myproj-section','myproj'],['myprofile-section','myprofile'],['reputation-section','reputation'],['ktscreator-section','ktscreator'],['settings-section','settings'],['library-section','library']];
     var groups = { dashboard: [] };
     var cur = 'dashboard';
     Array.prototype.forEach.call(cont.children, function(k){
@@ -2862,8 +2917,88 @@ function alnNotify(title, body){
 </script>
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
+<script>
+/* ══ GIAO VIỆC KTV — UI (script thường, logic Firestore ở module qua window._ktv*) ══ */
+var KTV_TASK_ST = {
+  open:        { color:'var(--c-cyan)',  bg:'rgba(34,211,238,.08)',  text:'Đang mở — chờ KTV nhận' },
+  assigned:    { color:'var(--amber)',   bg:'rgba(245,158,11,.08)',  text:'Đã giao — chờ KTV nhận' },
+  in_progress: { color:'var(--c-cyan)',  bg:'rgba(34,211,238,.08)',  text:'KTV đang làm' },
+  submitted:   { color:'var(--gold)',    bg:'rgba(201,168,76,.1)',   text:'KTV đã nộp — chờ bạn duyệt' },
+  revise:      { color:'var(--red)',     bg:'rgba(220,38,38,.07)',   text:'Đã yêu cầu sửa' },
+  done:        { color:'var(--green)',   bg:'rgba(21,128,61,.08)',   text:'Hoàn thành ✓' }
+};
+function _ktvEsc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function ktvModeChanged(){
+  var mode = (document.getElementById('ktvTaskMode')||{}).value;
+  var wrap = document.getElementById('ktvAssigneeWrap');
+  if (wrap) wrap.style.display = (mode === 'open') ? 'none' : '';
+}
+function ktvCreateTask(){
+  if (typeof window._ktvCreateTask === 'function') window._ktvCreateTask();
+  else if (typeof showToast === 'function') showToast('Firebase chưa sẵn sàng', 't-amber');
+}
+function ktvApproveTask(id){ if (window._ktvApproveTask) window._ktvApproveTask(id); }
+function ktvReviseTask(id){
+  var note = prompt('Nội dung yêu cầu sửa gửi cho KTV:');
+  if (note === null) return;
+  if (window._ktvReviseTask) window._ktvReviseTask(id, note.trim());
+}
+function ktvCancelTask(id){
+  if (!confirm('Huỷ việc này? KTV sẽ không thấy nó nữa.')) return;
+  if (window._ktvCancelTask) window._ktvCancelTask(id);
+}
+function renderKtsKtvTasks(){
+  var el = document.getElementById('ktvTaskList');
+  if (!el) return;
+  var list = window.KTS_KTV_TASKS || [];
+  var cnt = document.getElementById('ktvTaskCount');
+  if (cnt) cnt.textContent = list.length;
+  var badge = document.getElementById('ktvBadge');
+  var needAction = list.filter(function(t){ return t.status === 'submitted'; }).length;
+  if (badge) { badge.textContent = needAction; badge.style.display = needAction ? '' : 'none'; }
+  if (!list.length) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Chưa giao việc nào — dùng form phía trên để giao việc đầu tiên.</div>';
+    return;
+  }
+  el.innerHTML = list.map(function(t){
+    var st = KTV_TASK_ST[t.status] || { color:'var(--muted)', bg:'var(--ink3)', text: t.status||'' };
+    var files = (t.files||[]).map(function(f){
+      return '<a href="' + _ktvEsc(f.url) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;background:var(--ink3);border:1px solid var(--border);border-radius:6px;padding:3px 8px;margin:2px 4px 2px 0"><i class="ph-duotone ph-file"></i>' + _ktvEsc(f.name) + '</a>';
+    }).join('');
+    var deadline = '';
+    if (t.deadline) {
+      var dl = t.deadline.toDate ? t.deadline.toDate() : new Date(t.deadline);
+      if (!isNaN(dl.getTime())) deadline = '<span style="font-size:10px;color:var(--amber);font-family:var(--mono)"><i class="ph-duotone ph-alarm"></i> ' + dl.toLocaleDateString('vi-VN') + '</span>';
+    }
+    var actions = '';
+    if (t.status === 'submitted') {
+      actions = '<div style="display:flex;gap:8px;margin-top:8px">'
+        + '<button onclick="ktvApproveTask(\'' + t.id + '\')" style="padding:6px 14px;background:rgba(21,128,61,.1);border:1.5px solid rgba(21,128,61,.35);border-radius:7px;color:var(--green);font-size:11px;font-weight:700;cursor:pointer"><i class="ph-duotone ph-check"></i> Duyệt — đạt yêu cầu</button>'
+        + '<button onclick="ktvReviseTask(\'' + t.id + '\')" style="padding:6px 14px;background:rgba(220,38,38,.06);border:1.5px solid rgba(220,38,38,.25);border-radius:7px;color:var(--red);font-size:11px;font-weight:700;cursor:pointer"><i class="ph-duotone ph-arrow-counter-clockwise"></i> Yêu cầu sửa</button>'
+        + '</div>';
+    } else if (t.status === 'open' || t.status === 'assigned') {
+      actions = '<div style="margin-top:8px"><button onclick="ktvCancelTask(\'' + t.id + '\')" style="padding:5px 12px;background:none;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:10px;cursor:pointer">Huỷ việc</button></div>';
+    }
+    return '<div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:' + st.bg + '">'
+      + '<div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">'
+        + '<div style="flex:1;min-width:180px">'
+          + '<div style="font-size:12.5px;font-weight:700;color:var(--text)">' + _ktvEsc(t.title||'Việc triển khai') + '</div>'
+          + '<div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:2px">' + _ktvEsc(t.projectId||'') + (t.stage?' · '+_ktvEsc(t.stage):'') + ' · ' + (t.ktvName ? 'KTV: <b>' + _ktvEsc(t.ktvName) + '</b>' : (t.mode==='open'?'Việc mở':'—')) + '</div>'
+        + '</div>'
+        + deadline
+        + '<span style="font-size:10px;font-weight:700;color:' + st.color + ';white-space:nowrap">' + st.text + '</span>'
+      + '</div>'
+      + (t.desc ? '<div style="font-size:11px;color:var(--sub);margin-top:6px;white-space:pre-wrap">' + _ktvEsc(t.desc) + '</div>' : '')
+      + (files ? '<div style="margin-top:8px">' + files + '</div>' : '')
+      + actions
+    + '</div>';
+  }).join('');
+}
+window.renderKtsKtvTasks = renderKtsKtvTasks;
+</script>
+
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, storage, storageRef, uploadBytes, getDownloadURL, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, storage, storageRef, uploadBytes, getDownloadURL, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "kts";
 
@@ -3715,6 +3850,8 @@ onAuthStateChanged(auth, async (user) => {
     // ── LOAD DỰ ÁN KTS TỪ FIRESTORE ──
     // Founder xem tất cả projects (giám sát), KTS chỉ xem của mình
     _startKtsProjectListen(profile.role === 'founder' ? null : user.uid);
+    // ── GIAO VIỆC KTV ──
+    try { _ktvInit(user.uid, profile); } catch(e){ console.error('[KTV init]', e); }
     // Điền form profile
     _fillProfileForm(profile);
     // Điền username vào Cài đặt
@@ -3749,6 +3886,109 @@ onAuthStateChanged(auth, async (user) => {
       + '</div>';
   }
 });
+
+/* ══ GIAO VIỆC KTV — Firestore logic ══ */
+let _ktvMe = null;
+function _ktvInit(uid, profile) {
+  _ktvMe = { uid: uid, name: profile.name || '' };
+  // Dropdown dự án — chờ _KTS_ALL_PROJECTS load xong (listener realtime set nó)
+  const fillProjects = () => {
+    const sel = document.getElementById('ktvTaskProject');
+    if (!sel) return;
+    const projs = window._KTS_ALL_PROJECTS || [];
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— Chọn dự án —</option>' + projs.map(p =>
+      '<option value="' + p.id + '|' + String(p.name||'').replace(/"/g,'') + '|' + (p.stage||'') + '">' + p.id + ' — ' + (p.name||'') + '</option>'
+    ).join('');
+    if (cur) sel.value = cur;
+  };
+  fillProjects();
+  setInterval(fillProjects, 5000); // projects load async — refresh nhẹ định kỳ
+  // Dropdown KTV active
+  (async () => {
+    try {
+      const snap = await getDocs(query(collection(db,'users'), where('role','==','ktv'), where('status','==','active')));
+      const sel = document.getElementById('ktvTaskAssignee');
+      if (!sel) return;
+      if (snap.empty) { sel.innerHTML = '<option value="">Chưa có KTV nào được duyệt</option>'; return; }
+      sel.innerHTML = '<option value="">— Chọn KTV —</option>' + snap.docs.map(d => {
+        const u = d.data();
+        return '<option value="' + d.id + '|' + String(u.name||'').replace(/"/g,'') + '">' + (u.name||d.id) + (u.province ? ' · ' + u.province : '') + '</option>';
+      }).join('');
+    } catch(e) { console.error('[KTV list]', e); }
+  })();
+  // Listener việc đã giao
+  onSnapshot(query(collection(db,'ktvTasks'), where('ktsUid','==',uid)), (snap) => {
+    const arr = snap.docs.map(d => Object.assign({id:d.id}, d.data()));
+    arr.sort((a,b) => ((b.updatedAt&&b.updatedAt.seconds)||0) - ((a.updatedAt&&a.updatedAt.seconds)||0));
+    window.KTS_KTV_TASKS = arr;
+    if (typeof window.renderKtsKtvTasks === 'function') window.renderKtsKtvTasks();
+  }, (err) => {
+    console.error('[KTV tasks]', err.code, err.message);
+    const el = document.getElementById('ktvTaskList');
+    if (el) el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:12px">Không tải được (' + (err.code||'') + ')</div>';
+  });
+}
+
+window._ktvCreateTask = async function() {
+  const projSel = (document.getElementById('ktvTaskProject')||{}).value || '';
+  const mode = (document.getElementById('ktvTaskMode')||{}).value || 'direct';
+  const assigneeSel = (document.getElementById('ktvTaskAssignee')||{}).value || '';
+  const title = ((document.getElementById('ktvTaskTitle')||{}).value || '').trim();
+  const desc = ((document.getElementById('ktvTaskDesc')||{}).value || '').trim();
+  const deadlineStr = (document.getElementById('ktvTaskDeadline')||{}).value || '';
+  const msgEl = document.getElementById('ktvTaskMsg');
+  const showMsg = (txt, ok) => { if(msgEl){ msgEl.style.display='block'; msgEl.style.background = ok?'rgba(21,128,61,.08)':'rgba(220,38,38,.07)'; msgEl.style.color = ok?'var(--green)':'var(--red)'; msgEl.textContent = txt; } };
+  if (!projSel) { showMsg('Chọn dự án trước.', false); return; }
+  if (!title) { showMsg('Nhập tiêu đề việc.', false); return; }
+  if (mode === 'direct' && !assigneeSel) { showMsg('Chọn KTV nhận việc (hoặc đổi sang "Đăng việc mở").', false); return; }
+  const projParts = projSel.split('|');
+  const ktvParts = assigneeSel.split('|');
+  const btn = document.getElementById('ktvTaskCreateBtn');
+  if (btn) { btn.disabled = true; }
+  try {
+    await addDoc(collection(db,'ktvTasks'), {
+      projectId: projParts[0], projectName: projParts[1] || '', stage: projParts[2] || '',
+      ktsUid: _ktvMe.uid, ktsName: _ktvMe.name,
+      mode: mode,
+      ktvUid: mode === 'direct' ? ktvParts[0] : null,
+      ktvName: mode === 'direct' ? (ktvParts[1] || '') : '',
+      title: title, desc: desc,
+      deadline: deadlineStr ? new Date(deadlineStr + 'T17:00:00') : null,
+      status: mode === 'direct' ? 'assigned' : 'open',
+      files: [], ktsNote: '',
+      createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    });
+    showMsg('✓ Đã giao việc' + (mode==='open' ? ' — mọi KTV đang hoạt động sẽ thấy trong mục Việc đang mở.' : ' cho ' + (ktvParts[1]||'KTV') + '.'), true);
+    const t = document.getElementById('ktvTaskTitle'); if(t) t.value='';
+    const d = document.getElementById('ktvTaskDesc'); if(d) d.value='';
+  } catch(e) {
+    console.error('[ktvCreateTask]', e);
+    showMsg('Lỗi: ' + (e.message||e.code), false);
+  }
+  if (btn) { btn.disabled = false; }
+};
+
+window._ktvApproveTask = async function(id) {
+  try {
+    await updateDoc(doc(db,'ktvTasks',id), { status:'done', doneAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    if (typeof showToast === 'function') showToast('✓ Đã duyệt — việc hoàn thành', 't-green');
+  } catch(e) { console.error('[ktvApproveTask]', e); if(typeof showToast==='function') showToast('Lỗi: '+(e.message||e.code),'t-red'); }
+};
+
+window._ktvReviseTask = async function(id, note) {
+  try {
+    await updateDoc(doc(db,'ktvTasks',id), { status:'revise', ktsNote: note || '', updatedAt: serverTimestamp() });
+    if (typeof showToast === 'function') showToast('Đã gửi yêu cầu sửa cho KTV', 't-amber');
+  } catch(e) { console.error('[ktvReviseTask]', e); if(typeof showToast==='function') showToast('Lỗi: '+(e.message||e.code),'t-red'); }
+};
+
+window._ktvCancelTask = async function(id) {
+  try {
+    await deleteDoc(doc(db,'ktvTasks',id));
+    if (typeof showToast === 'function') showToast('Đã huỷ việc', 't-blue');
+  } catch(e) { console.error('[ktvCancelTask]', e); if(typeof showToast==='function') showToast('Lỗi: '+(e.message||e.code),'t-red'); }
+};
 
 /* Đăng xuất — gọi alnLogout() từ bất kỳ đâu (nút, console...) */
 window.alnLogout = async function(){
