@@ -92,8 +92,12 @@ service cloud.firestore {
         (resource.data.dn != null && request.auth.uid == resource.data.dn.uid)
       ));
       allow create: if isFounder();
+      // Thành viên chỉ được sửa field thuộc luồng nghiệp vụ — CẤM sửa
+      // totalFee/escrow/memberUids/designer/cn/dn (chống gian lận nội bộ).
       allow update: if isFounder() ||
-        (signedIn() && request.auth.uid in resource.data.memberUids);
+        (signedIn() && request.auth.uid in resource.data.memberUids
+          && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['stage', 'progress', 'updatedAt', 'payments']));
       allow delete: if isFounder();
 
       match /documents/{docId} {
@@ -205,8 +209,14 @@ service cloud.firestore {
         request.auth.uid == resource.data.dn.uid
       ));
       allow create: if isFounder();
+      // Thành viên chỉ được sửa field thuộc luồng nghiệp vụ (CN/DN duyệt PA
+      // → advance chặng + ghi payment record chờ Founder xác nhận). CẤM sửa
+      // totalFee/escrow/memberUids/kts/cn/dn — chống thành viên gian lận
+      // trạng thái, tự đổi số tiền hay thêm người vào dự án.
       allow update: if isFounder() ||
-        (signedIn() && request.auth.uid in resource.data.memberUids);
+        (signedIn() && request.auth.uid in resource.data.memberUids
+          && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['stage', 'progress', 'updatedAt', 'payments']));
       allow delete: if isFounder();
 
       match /documents/{docId} {
