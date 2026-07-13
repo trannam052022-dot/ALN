@@ -919,6 +919,7 @@ body {
     <button class="fsub" id="tabMgDn"   onclick="switchTab('mgDn')"  ><i class="ph-duotone ph-buildings"></i>Doanh nghiệp</button>
     <button class="fsub" id="tabMgCn"   onclick="switchTab('mgCn')"  ><i class="ph-duotone ph-house-line"></i>Chủ nhà</button>
     <button class="fsub" id="tabMgKs"   onclick="switchTab('mgKs')"  ><i class="ph-duotone ph-map-pin-area"></i>KS Vùng</button>
+    <button class="fsub" id="tabMgKtv"  onclick="switchTab('mgKtv')" ><i class="ph-duotone ph-ruler"></i>KTV</button>
     <button class="fsub" id="tabPending" onclick="switchTab('pending')"><i class="ph-duotone ph-user-plus"></i>Duyệt đăng ký<span id="pendingBadge" style="display:none;background:var(--gold);color:#08090f;border-radius:99px;font-size:9px;padding:1px 5px;margin-left:2px;font-weight:800">0</span></button>
   </span>
 
@@ -944,6 +945,7 @@ body {
     <button class="fsub" id="tabLiveDn"  onclick="switchTab('liveDn')" ><span style="width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0"></span>Doanh nghiệp</button>
     <button class="fsub" id="tabLiveCn"  onclick="switchTab('liveCn')" ><span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></span>Chủ nhà</button>
     <button class="fsub" id="tabLiveDes" onclick="switchTab('liveDes')"><span style="width:6px;height:6px;border-radius:50%;background:#a78bfa;flex-shrink:0"></span>Designer</button>
+    <button class="fsub" id="tabLiveKs"  onclick="switchTab('liveKs')" ><span style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0"></span>KS Vùng</button>
   </span>
 
 </div>
@@ -1456,6 +1458,45 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
+<!-- ══ PANEL: KTV ══ -->
+<div id="panelMgKtv" style="display:none;flex-direction:column;flex:1;overflow-y:auto;padding:20px;gap:16px">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px">
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:3px">QUẢN LÝ THÀNH VIÊN</div>
+      <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1)">Kỹ thuật viên (KTV)</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px">
+    <div class="dn-kpi"><div class="dk-l">Tổng KTV</div><div class="dk-v" id="mgKtvV0">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-circle" style="color:var(--green)"></i> Đang hoạt động</div><div class="dk-v" style="color:var(--green)" id="mgKtvV1">0</div></div>
+    <div class="dn-kpi"><div class="dk-l">⏳ Chờ duyệt</div><div class="dk-v" style="color:var(--amber)" id="mgKtvV2">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-map-pin"></i> Số tỉnh có KTV</div><div class="dk-v" style="color:var(--cyan)" id="mgKtvV3">0</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px">
+    <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:200px;background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:6px 12px">
+      <i class="ph-duotone ph-magnifying-glass" style="color:var(--dim)"></i>
+      <input type="text" id="mgKtvSearch" placeholder="Tên KTV, tỉnh..." oninput="renderMgKtv()" style="background:none;border:none;outline:none;font-family:var(--sans);font-size:12px;color:var(--text1);width:100%">
+    </div>
+    <select id="mgKtvFilterStatus" onchange="renderMgKtv()" style="background:var(--raised);border:1px solid var(--border);color:var(--text2);font-family:var(--sans);font-size:11px;padding:6px 10px;border-radius:6px;outline:none">
+      <option value="">Tất cả trạng thái</option>
+      <option value="active">Đang hoạt động</option>
+      <option value="pending">Chờ duyệt</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr>
+        <th>Tên KTV</th>
+        <th>Username</th>
+        <th>Tỉnh</th>
+        <th>Trạng thái</th>
+        <th>Đăng ký</th>
+      </tr></thead>
+      <tbody id="mgKtvBody"></tbody>
+    </table>
+  </div>
+</div>
+
 <!-- ══ PANEL: DUYỆT ĐĂNG KÝ ══ -->
 <div id="panelPending" style="display:none;flex-direction:column;flex:1;overflow:hidden">
   <!-- Header -->
@@ -1891,6 +1932,26 @@ document.addEventListener('DOMContentLoaded', function() {
     </a>
   </div>
   <iframe id="iframeDes" src="about:blank" data-src="designer_dashboard.html"
+    style="flex:1;width:100%;border:none;min-height:calc(100vh - 84px)"
+    allow="same-origin"></iframe>
+</div>
+
+<!-- ══ PANEL: LIVE KS VÙNG ══ -->
+<div id="panelLiveKs" style="display:none;flex-direction:column;flex:1;position:relative">
+  <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0">
+    <span style="width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold)"></span>
+    <span style="font-size:11px;font-weight:700;color:var(--gold);font-family:var(--mono)">LIVE — Trang KS Vùng</span>
+    <span style="font-size:10px;color:var(--dim)">ks_dashboard.html</span>
+    <button onclick="document.getElementById('iframeKs').src=document.getElementById('iframeKs').dataset.src"
+      style="margin-left:auto;padding:4px 10px;background:var(--raised);border:1px solid var(--border);color:var(--sub);border-radius:5px;font-size:10px;cursor:pointer;font-family:var(--sans)">
+      <i class="ph-duotone ph-arrow-clockwise"></i> Tải lại
+    </button>
+    <a href="ks_dashboard.html" target="_blank"
+      style="padding:4px 10px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);color:var(--gold);border-radius:5px;font-size:10px;cursor:pointer;font-family:var(--sans);text-decoration:none">
+      <i class="ph-duotone ph-arrow-square-out"></i> Mở tab mới
+    </a>
+  </div>
+  <iframe id="iframeKs" src="about:blank" data-src="ks_dashboard.html"
     style="flex:1;width:100%;border:none;min-height:calc(100vh - 84px)"
     allow="same-origin"></iframe>
 </div>
@@ -3151,7 +3212,7 @@ window.ALNRealtime = (() => {
 ══════════════════════════════════════════ */
 
 function switchTab(t){
-  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','pending','payments','report','leads','recruit','company','pricing','khomau','mkt','seo','hoikien','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes'];
+  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','mgKtv','pending','payments','report','leads','recruit','company','pricing','khomau','mkt','seo','hoikien','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes','liveKs'];
   var activeStyle  = 'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.15);color:var(--blue);white-space:nowrap';
   var inactiveStyle= 'padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:var(--raised);color:var(--sub);white-space:nowrap';
   var liveStyles = {
@@ -3161,6 +3222,7 @@ function switchTab(t){
     liveDn:  {active:'padding:5px 13px;border:1px solid rgba(59,130,246,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.2);color:var(--blue);display:flex;align-items:center;gap:5px;white-space:nowrap',   inactive:'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.08);color:var(--blue);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     liveCn:   {active:'padding:5px 13px;border:1px solid rgba(16,185,129,.5);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.2);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(16,185,129,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(16,185,129,.08);color:var(--green);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     liveDes:  {active:'padding:5px 13px;border:1px solid rgba(124,58,237,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.22);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap',   inactive:'padding:5px 13px;border:1px solid rgba(124,58,237,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.08);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap'},
+    liveKs:   {active:'padding:5px 13px;border:1px solid rgba(201,168,76,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.2);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     waitRoom:  {active:'padding:5px 13px;border:1px solid rgba(167,139,250,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.22);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(167,139,250,.3);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.1);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap'},
     matching:  {active:'padding:5px 13px;border:1px solid rgba(201,168,76,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.2);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     c2monitor: {active:'padding:5px 13px;border:1px solid rgba(239,68,68,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.2);color:#ef4444;display:flex;align-items:center;gap:5px;white-space:nowrap',     inactive:'padding:5px 13px;border:1px solid rgba(239,68,68,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.08);color:#ef4444;display:flex;align-items:center;gap:5px;white-space:nowrap'},
@@ -3190,6 +3252,7 @@ function switchTab(t){
   if(t==='mgDn')    renderMgDn();
   if(t==='mgCn')    renderMgCn();
   if(t==='mgKs')    renderMgKs();
+  if(t==='mgKtv')   renderMgKtv();
   if(t==='pending')  renderPending();
   if(t==='payments') { renderPayments(); if(typeof renderDesignApprovals==='function') renderDesignApprovals(); }
   if(t==='report')   { renderIncomeReport(); if(typeof _fillFeeConfigForm==='function') _fillFeeConfigForm(); }
@@ -3206,7 +3269,7 @@ function switchTab(t){
   if(t==='c2monitor')  loadC2MonitorPanel();
 
   // LIVE iframes: chỉ tải khi vào tab, rời tab thì giải phóng bộ nhớ
-  var IFR = { liveKts:'iframeKts', liveDn:'iframeDn', liveCn:'iframeCn', liveDes:'iframeDes' };
+  var IFR = { liveKts:'iframeKts', liveDn:'iframeDn', liveCn:'iframeCn', liveDes:'iframeDes', liveKs:'iframeKs' };
   Object.keys(IFR).forEach(function(k){
     var f = document.getElementById(IFR[k]);
     if(!f) return;
@@ -3688,6 +3751,55 @@ function _loadKsUsers() {
   var tbody = document.getElementById('mgKsBody');
   if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:28px"><i class="ph-duotone ph-spinner ph-spin"></i> Đang tải…</td></tr>';
   if(window._ksLoadFromModule) { window._ksLoadFromModule(); }
+  else { if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:28px">Module chưa sẵn sàng, thử lại sau</td></tr>'; }
+}
+
+/* ── QUẢN LÝ KTV — mirror pattern KS Vùng ── */
+var _mgKtvData = null;
+function renderMgKtv() {
+  if(window._mgKtvData) _mgKtvData = window._mgKtvData;
+  if(!_mgKtvData) {
+    _loadKtvUsers();
+    return;
+  }
+  var q   = (document.getElementById('mgKtvSearch') ? document.getElementById('mgKtvSearch').value : '').toLowerCase();
+  var fs  = document.getElementById('mgKtvFilterStatus') ? document.getElementById('mgKtvFilterStatus').value : '';
+  var PROV = {HCM:'TP. HCM',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'Vũng Tàu',LA:'Long An',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TH:'Thanh Hóa',TG:'Tiền Giang',OTHER:'Tỉnh khác'};
+  var rows = _mgKtvData.filter(function(k){
+    if(fs && k.status !== fs) return false;
+    if(q && !(k.name||'').toLowerCase().includes(q) && !(k.province||'').toLowerCase().includes(q) && !(k.username||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  var total   = _mgKtvData.length;
+  var active  = _mgKtvData.filter(function(k){ return k.status==='active'; }).length;
+  var pending = _mgKtvData.filter(function(k){ return k.status==='pending'; }).length;
+  var provs   = new Set(_mgKtvData.map(function(k){ return k.province; }).filter(Boolean)).size;
+  document.getElementById('mgKtvV0').textContent = total;
+  document.getElementById('mgKtvV1').textContent = active;
+  document.getElementById('mgKtvV2').textContent = pending;
+  document.getElementById('mgKtvV3').textContent = provs;
+  var tbody = document.getElementById('mgKtvBody');
+  if(!tbody) return;
+  if(!rows.length){ tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:28px">Không có dữ liệu</td></tr>'; return; }
+  tbody.innerHTML = rows.map(function(k){
+    var provName = PROV[k.province] || k.province || '—';
+    var sColor = k.status==='active' ? 'var(--green)' : k.status==='pending' ? 'var(--amber)' : 'var(--dim)';
+    var sLabel = k.status==='active' ? '🟢 Hoạt động' : k.status==='pending' ? '⏳ Chờ duyệt' : k.status||'—';
+    var ts = k.createdAt ? (k.createdAt.toDate ? k.createdAt.toDate().toLocaleDateString('vi-VN') : k.createdAt) : '—';
+    return '<tr>'
+      +'<td style="font-weight:700;color:var(--text1)">'+( k.name||'—')+'</td>'
+      +'<td style="font-family:var(--mono);font-size:11px;color:var(--sub)">'+( k.username||'—')+'</td>'
+      +'<td><span style="font-size:10px;font-weight:700;padding:2px 8px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.22);border-radius:5px;color:var(--cyan)">'+provName+'</span></td>'
+      +'<td style="color:'+sColor+';font-size:11px;font-weight:700">'+sLabel+'</td>'
+      +'<td style="font-size:11px;color:var(--dim)">'+ts+'</td>'
+    +'</tr>';
+  }).join('');
+}
+
+function _loadKtvUsers() {
+  var tbody = document.getElementById('mgKtvBody');
+  if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:28px"><i class="ph-duotone ph-spinner ph-spin"></i> Đang tải…</td></tr>';
+  if(window._ktvLoadFromModule) { window._ktvLoadFromModule(); }
   else { if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:28px">Module chưa sẵn sàng, thử lại sau</td></tr>'; }
 }
 
@@ -5906,6 +6018,18 @@ window._ksLoadFromModule = async function() {
   } catch(e) {
     console.error('[mgKs load]', e);
     var tbody = document.getElementById('mgKsBody');
+    if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--red);padding:28px">Lỗi tải dữ liệu: ' + (e.message||e.code) + '</td></tr>';
+  }
+};
+
+window._ktvLoadFromModule = async function() {
+  try {
+    const snap = await getDocs(query(collection(db, 'users'), where('role', '==', 'ktv')));
+    window._mgKtvData = snap.docs.map(function(d){ return Object.assign({uid:d.id}, d.data()); });
+    if(typeof renderMgKtv === 'function') renderMgKtv();
+  } catch(e) {
+    console.error('[mgKtv load]', e);
+    var tbody = document.getElementById('mgKtvBody');
     if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--red);padding:28px">Lỗi tải dữ liệu: ' + (e.message||e.code) + '</td></tr>';
   }
 };
