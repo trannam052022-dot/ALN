@@ -28,6 +28,10 @@ const firebaseConfig = {
   storageBucket: "aln-platform.firebasestorage.app",
   messagingSenderId: "1073827504988",
   appId: "1:1073827504988:web:8895fd6b68dff00a67d799",
+  // measurementId do Firebase Console tự sinh — là property GA4 riêng, KHÁC với
+  // G-5CSL1TF0RC (gtag.js gắn thủ công trên các trang). Hiện không dùng vì repo
+  // không import firebase/analytics / gọi getAnalytics() — giữ lại chỉ để khớp
+  // với config gốc trên Firebase Console, không phải tracking ID đang hoạt động.
   measurementId: "G-CGXJKGG5CQ"
 };
 
