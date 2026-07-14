@@ -687,6 +687,11 @@ button,.btn,a[role="button"]{transition:transform .25s var(--ease),box-shadow .2
         <option value="nu">Nữ</option>
       </select>
     </div>
+    <div style="padding:4px 16px">
+      <button onclick="openPwModal()" style="width:100%;display:flex;align-items:center;gap:7px;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--ink3);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
+        <i class="ph-duotone ph-lock-key" style="font-size:14px"></i> Đổi mật khẩu
+      </button>
+    </div>
     <div style="padding:8px 16px 4px">
       <a href="forum.html" style="display:flex;align-items:center;gap:7px;padding:9px 12px;border-radius:8px;border:1px solid rgba(201,168,76,.3);background:rgba(201,168,76,.07);color:#b8860b;font-size:12px;font-weight:700;text-decoration:none;transition:all .15s" onmouseover="this.style.background='rgba(201,168,76,.14)'" onmouseout="this.style.background='rgba(201,168,76,.07)'">
         <i class="ph-duotone ph-chats-circle" style="font-size:14px"></i> Diễn đàn ALN
@@ -698,6 +703,32 @@ button,.btn,a[role="button"]{transition:transform .25s var(--ease),box-shadow .2
       </a>
     </div>
   </nav>
+
+  <!-- ═══ MODAL: ĐỔI MẬT KHẨU ═══ -->
+  <div id="pwModalBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center" onclick="if(event.target===this)closePwModal()">
+    <div style="background:var(--ink2);border:1px solid var(--border);border-radius:12px;width:380px;max-width:92vw;padding:20px">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-lock-key"></i> Đổi mật khẩu</div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Mật khẩu hiện tại</div>
+        <input type="password" id="pwCurrent" style="width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Mật khẩu mới</div>
+          <input type="password" id="pwNew" style="width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Xác nhận</div>
+          <input type="password" id="pwConfirm" style="width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+        </div>
+      </div>
+      <div style="font-size:9.5px;color:var(--muted);margin-bottom:14px">Ít nhất 6 ký tự. Chỉ bạn biết mật khẩu này — ALN không lưu lại.</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button onclick="closePwModal()" style="padding:7px 16px;background:var(--ink3);border:1px solid var(--border);color:var(--muted);border-radius:6px;cursor:pointer;font-family:inherit;font-size:12px">Hủy</button>
+        <button onclick="changeMyPassword()" style="padding:7px 16px;background:#b8860b;border:none;color:#000;border-radius:6px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700">Đổi mật khẩu</button>
+      </div>
+    </div>
+  </div>
 
   <!-- MAIN -->
   <div class="main-cn">
@@ -3356,7 +3387,7 @@ function alnNotify(title, body){
 
 <!-- ═══ ALN FIREBASE AUTH GUARD — bảo vệ trang theo vai trò ═══ -->
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY, storage, storageRef, uploadBytes, getDownloadURL, app } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY, storage, storageRef, uploadBytes, getDownloadURL, app, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "./firebase-config.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js";
 const _alnFunctions = getFunctions(app, "asia-southeast1");
 window.__cnMymyCallFn = httpsCallable(_alnFunctions, "runMyMyTurnCN");
@@ -3735,6 +3766,33 @@ onAuthStateChanged(auth, async (user) => {
       var sel = document.getElementById('sidebarGender');
       if(!sel || !window.__ALN_UID) return;
       try { await updateDoc(doc(db,'users',window.__ALN_UID), { gender: sel.value }); } catch(e){}
+    };
+
+    /* ── Đổi mật khẩu tự chọn — ALN không lưu lại mật khẩu ở đâu cả ── */
+    window.openPwModal = function(){ document.getElementById('pwModalBg').style.display = 'flex'; };
+    window.closePwModal = function(){
+      document.getElementById('pwModalBg').style.display = 'none';
+      ['pwCurrent','pwNew','pwConfirm'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+    };
+    window.changeMyPassword = async function(){
+      var cur = (document.getElementById('pwCurrent')||{}).value || '';
+      var pw1 = (document.getElementById('pwNew')||{}).value || '';
+      var pw2 = (document.getElementById('pwConfirm')||{}).value || '';
+      if (!cur || !pw1 || !pw2) { showToast('Nhập đủ 3 ô', 't-red'); return; }
+      if (pw1.length < 6) { showToast('Mật khẩu mới cần ít nhất 6 ký tự', 't-red'); return; }
+      if (pw1 !== pw2) { showToast('Mật khẩu mới nhập lại không khớp', 't-red'); return; }
+      try {
+        var cred = EmailAuthProvider.credential(user.email, cur);
+        await reauthenticateWithCredential(user, cred);
+        await updatePassword(user, pw1);
+        showToast('✅ Đã đổi mật khẩu', 't-green');
+        window.closePwModal();
+      } catch(e) {
+        var msg = (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential')
+          ? 'Mật khẩu hiện tại không đúng'
+          : 'Lỗi: ' + (e.code || e.message);
+        showToast(msg, 't-red');
+      }
     };
 
     // ── WEB PUSH (FCM): đăng ký token tự động khi đã có quyền thông báo ──

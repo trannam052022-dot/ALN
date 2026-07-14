@@ -251,6 +251,26 @@ a{color:var(--cyan);text-decoration:none}
       </div>
       <button class="psave" onclick="saveProfile()"><i class="ph-duotone ph-floppy-disk"></i> Lưu hồ sơ</button>
     </div>
+
+    <div class="pcard" style="margin-top:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px"><i class="ph-duotone ph-lock-key" style="color:var(--cyan)"></i> Đổi mật khẩu</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Chỉ bạn biết mật khẩu này — ALN không lưu lại.</div>
+      <div class="pfield">
+        <label>Mật khẩu hiện tại</label>
+        <input type="password" id="pwCurrent">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="pfield">
+          <label>Mật khẩu mới</label>
+          <input type="password" id="pwNew">
+        </div>
+        <div class="pfield">
+          <label>Xác nhận</label>
+          <input type="password" id="pwConfirm">
+        </div>
+      </div>
+      <button class="psave" onclick="changeMyPassword()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--text2)"><i class="ph-duotone ph-key"></i> Đổi mật khẩu</button>
+    </div>
   </div>
 </div>
 
@@ -367,6 +387,7 @@ function acceptTask(id) { window._acceptTask && window._acceptTask(id); }
 function submitTask(id) { window._submitTask && window._submitTask(id); }
 function uploadTaskFiles(input, id) { window._uploadTaskFiles && window._uploadTaskFiles(input, id); }
 function saveProfile() { window._saveProfile && window._saveProfile(); }
+function changeMyPassword() { window._changeMyPassword && window._changeMyPassword(); }
 
 var _tt = null;
 function showToast(msg, type) {
@@ -385,7 +406,8 @@ import {
   onAuthStateChanged, signOut,
   doc, getDoc, updateDoc,
   collection, query, where, onSnapshot,
-  serverTimestamp
+  serverTimestamp,
+  updatePassword, reauthenticateWithCredential, EmailAuthProvider
 } from './firebase-config.js';
 
 let KTV = null;
@@ -523,6 +545,33 @@ window._saveProfile = async function() {
     document.getElementById('topName').textContent = KTV.name;
     window.showToast('✓ Đã lưu hồ sơ', 'ok');
   } catch(e) { console.error('[saveProfile]', e); window.showToast('Lỗi: ' + (e.message||e.code), 'err'); }
+};
+
+/* Đổi mật khẩu tự chọn — cần nhập lại mật khẩu hiện tại (Firebase bắt buộc
+   "recent login" mới cho đổi mật khẩu). ALN không lưu lại mật khẩu ở đâu cả. */
+window._changeMyPassword = async function() {
+  const cur = (document.getElementById('pwCurrent')||{}).value || '';
+  const pw1 = (document.getElementById('pwNew')||{}).value || '';
+  const pw2 = (document.getElementById('pwConfirm')||{}).value || '';
+  if (!cur || !pw1 || !pw2) { window.showToast('Nhập đủ 3 ô', 'err'); return; }
+  if (pw1.length < 6) { window.showToast('Mật khẩu mới cần ít nhất 6 ký tự', 'err'); return; }
+  if (pw1 !== pw2) { window.showToast('Mật khẩu mới nhập lại không khớp', 'err'); return; }
+  const user = auth.currentUser;
+  if (!user) return;
+  try {
+    const cred = EmailAuthProvider.credential(user.email, cur);
+    await reauthenticateWithCredential(user, cred);
+    await updatePassword(user, pw1);
+    window.showToast('✓ Đã đổi mật khẩu', 'ok');
+    document.getElementById('pwCurrent').value = '';
+    document.getElementById('pwNew').value = '';
+    document.getElementById('pwConfirm').value = '';
+  } catch(e) {
+    const msg = (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential')
+      ? 'Mật khẩu hiện tại không đúng'
+      : 'Lỗi: ' + (e.code || e.message);
+    window.showToast(msg, 'err');
+  }
 };
 
 window._doLogout = async function() {

@@ -1597,6 +1597,29 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
       <i class="ph-duotone ph-user-circle"></i> Xem hồ sơ công khai
     </a>
 
+    <!-- ═══ ĐỔI MẬT KHẨU ═══ -->
+    <div class="sec-label" style="margin-top:22px"><i class="ph-duotone ph-lock-key" style="font-size:13px"></i> Đổi mật khẩu</div>
+    <div class="card" style="padding:20px;margin-bottom:14px">
+      <div style="margin-bottom:10px">
+        <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Mật khẩu hiện tại</div>
+        <input type="password" id="pwCurrent" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">
+        <div>
+          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Mật khẩu mới</div>
+          <input type="password" id="pwNew" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Xác nhận mật khẩu mới</div>
+          <input type="password" id="pwConfirm" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+        </div>
+      </div>
+      <div style="font-size:9.5px;color:var(--muted);margin-bottom:10px">Ít nhất 6 ký tự. Đổi thành mật khẩu dễ nhớ với riêng bạn — chỉ bạn biết, ALN không lưu lại.</div>
+      <button class="profile-save-btn" onclick="changeMyPassword()" style="background:linear-gradient(135deg,#3a3a3a,#555)">
+        <i class="ph-duotone ph-key"></i> Đổi mật khẩu
+      </button>
+    </div>
+
     <!-- ═══ UY TÍN ═══ -->
     <div class="sec-label reputation-section"><i class="ph-duotone ph-seal-check" style="font-size:13px"></i> Uy tín & Xếp hạng</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
@@ -3003,7 +3026,7 @@ window.renderKtsKtvTasks = renderKtsKtvTasks;
 </script>
 
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, storage, storageRef, uploadBytes, getDownloadURL, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, storage, storageRef, uploadBytes, getDownloadURL, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "kts";
 
@@ -3600,6 +3623,33 @@ window.saveProfile = async function saveProfile() {
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph-duotone ph-floppy-disk"></i> Lưu hồ sơ'; }
   }
 }
+
+/* Đổi mật khẩu tự chọn — cần nhập lại mật khẩu hiện tại (Firebase bắt buộc
+   "recent login" mới cho đổi mật khẩu). ALN không lưu lại mật khẩu ở đâu cả. */
+window.changeMyPassword = async function changeMyPassword() {
+  const cur = (document.getElementById('pwCurrent')||{}).value || '';
+  const pw1 = (document.getElementById('pwNew')||{}).value || '';
+  const pw2 = (document.getElementById('pwConfirm')||{}).value || '';
+  if (!cur || !pw1 || !pw2) { showToast('Nhập đủ 3 ô', 't-red'); return; }
+  if (pw1.length < 6) { showToast('Mật khẩu mới cần ít nhất 6 ký tự', 't-red'); return; }
+  if (pw1 !== pw2) { showToast('Mật khẩu mới nhập lại không khớp', 't-red'); return; }
+  const user = auth.currentUser;
+  if (!user) return;
+  try {
+    const cred = EmailAuthProvider.credential(user.email, cur);
+    await reauthenticateWithCredential(user, cred);
+    await updatePassword(user, pw1);
+    showToast('Đã đổi mật khẩu — lần đăng nhập sau dùng mật khẩu mới', 't-green');
+    document.getElementById('pwCurrent').value = '';
+    document.getElementById('pwNew').value = '';
+    document.getElementById('pwConfirm').value = '';
+  } catch(e) {
+    const msg = e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential'
+      ? 'Mật khẩu hiện tại không đúng'
+      : 'Lỗi: ' + (e.code || e.message);
+    showToast(msg, 't-red');
+  }
+};
 
 // Cập nhật Ví thu nhập từ dữ liệu Firestore thật
 function _updateWallet(allProjs) {

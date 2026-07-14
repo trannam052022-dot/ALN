@@ -7,7 +7,8 @@ import {
   getAuth, initializeAuth,
   indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence, inMemoryPersistence,
   signInWithEmailAndPassword, createUserWithEmailAndPassword,
-  onAuthStateChanged, signOut
+  onAuthStateChanged, signOut,
+  updatePassword, reauthenticateWithCredential, EmailAuthProvider
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getMessaging, getToken, onMessage as onFcmMessage, isSupported as fcmSupported
@@ -81,6 +82,7 @@ export {
   app, auth, db, usernameToEmail, ALN_EMAIL_DOMAIN,
   signInWithEmailAndPassword, createUserWithEmailAndPassword,
   onAuthStateChanged, signOut,
+  updatePassword, reauthenticateWithCredential, EmailAuthProvider,
   doc, getDoc, setDoc, updateDoc, deleteDoc,
   collection, addDoc, getDocs, query, where, orderBy, limit, limitToLast,
   onSnapshot, serverTimestamp,

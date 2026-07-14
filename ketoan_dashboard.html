@@ -143,6 +143,9 @@ a{color:var(--gold)}
     <button class="tab" id="tabTax" onclick="switchKtTab('tax')">
       <i class="ph-duotone ph-receipt"></i> Báo cáo khấu trừ TNCN
     </button>
+    <button class="tab" id="tabAccount" onclick="switchKtTab('account')">
+      <i class="ph-duotone ph-lock-key"></i> Tài khoản
+    </button>
   </div>
 
   <div id="panelPending">
@@ -167,6 +170,30 @@ a{color:var(--gold)}
       <button class="btn-export" onclick="exportTaxCsv()"><i class="ph-duotone ph-download-simple"></i> Xuất CSV</button>
     </div>
     <div id="taxReportWrap"><div class="loader"><i class="ph-duotone ph-spinner" style="animation:phspin 1s linear infinite"></i> Đang tải…</div></div>
+  </div>
+
+  <div id="panelAccount" style="display:none;max-width:420px">
+    <div class="section-head">
+      <span class="section-title">Đổi mật khẩu</span>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border-c);border-radius:var(--r);padding:20px">
+      <div style="margin-bottom:12px">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Mật khẩu hiện tại</div>
+        <input type="password" id="pwCurrent" style="width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--sans);outline:none;box-sizing:border-box">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+        <div>
+          <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Mật khẩu mới</div>
+          <input type="password" id="pwNew" style="width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--sans);outline:none;box-sizing:border-box">
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Xác nhận</div>
+          <input type="password" id="pwConfirm" style="width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--sans);outline:none;box-sizing:border-box">
+        </div>
+      </div>
+      <div style="font-size:9.5px;color:var(--muted);margin-bottom:12px">Ít nhất 6 ký tự. Chỉ bạn biết mật khẩu này — ALN không lưu lại.</div>
+      <button class="btn-check" onclick="changeMyPassword()" style="width:100%;justify-content:center"><i class="ph-duotone ph-key"></i> Đổi mật khẩu</button>
+    </div>
   </div>
 </div>
 
@@ -234,8 +261,10 @@ function switchKtTab(t){
   _ktTab = t;
   document.getElementById('tabPending').classList.toggle('active', t === 'pending');
   document.getElementById('tabTax').classList.toggle('active', t === 'tax');
+  document.getElementById('tabAccount').classList.toggle('active', t === 'account');
   document.getElementById('panelPending').style.display = (t === 'pending') ? 'block' : 'none';
   document.getElementById('panelTax').style.display = (t === 'tax') ? 'block' : 'none';
+  document.getElementById('panelAccount').style.display = (t === 'account') ? 'block' : 'none';
   window._ktTaxTabActive = (t === 'tax');
   if (t === 'tax' && window._buildTaxReport) window._buildTaxReport(_taxPeriod);
 }
@@ -304,7 +333,8 @@ import {
   auth, db,
   onAuthStateChanged, signOut,
   doc, getDoc, updateDoc,
-  collection, onSnapshot, serverTimestamp
+  collection, onSnapshot, serverTimestamp,
+  updatePassword, reauthenticateWithCredential, EmailAuthProvider
 } from './firebase-config.js';
 
 let ME = null;
@@ -511,6 +541,33 @@ window._doLogout = async function(){
   try { await signOut(auth); } catch(e){}
   try { localStorage.removeItem('aln_user'); sessionStorage.removeItem('aln_user'); } catch(e){}
   location.href = 'login.html';
+};
+
+/* Đổi mật khẩu tự chọn — cần nhập lại mật khẩu hiện tại (Firebase bắt buộc
+   "recent login" mới cho đổi mật khẩu). ALN không lưu lại mật khẩu ở đâu cả. */
+window.changeMyPassword = async function(){
+  var cur = (document.getElementById('pwCurrent')||{}).value || '';
+  var pw1 = (document.getElementById('pwNew')||{}).value || '';
+  var pw2 = (document.getElementById('pwConfirm')||{}).value || '';
+  if (!cur || !pw1 || !pw2){ window.showToast('Nhập đủ 3 ô', 'err'); return; }
+  if (pw1.length < 6){ window.showToast('Mật khẩu mới cần ít nhất 6 ký tự', 'err'); return; }
+  if (pw1 !== pw2){ window.showToast('Mật khẩu mới nhập lại không khớp', 'err'); return; }
+  var user = auth.currentUser;
+  if (!user) return;
+  try {
+    var cred = EmailAuthProvider.credential(user.email, cur);
+    await reauthenticateWithCredential(user, cred);
+    await updatePassword(user, pw1);
+    window.showToast('Đã đổi mật khẩu — lần đăng nhập sau dùng mật khẩu mới', 'ok');
+    document.getElementById('pwCurrent').value = '';
+    document.getElementById('pwNew').value = '';
+    document.getElementById('pwConfirm').value = '';
+  } catch(e){
+    var msg = (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential')
+      ? 'Mật khẩu hiện tại không đúng'
+      : 'Lỗi: ' + (e.code || e.message);
+    window.showToast(msg, 'err');
+  }
 };
 </script>
 </body>
