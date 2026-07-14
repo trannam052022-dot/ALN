@@ -1116,11 +1116,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="lib-filters">
       <div class="lib-tabs" id="libTabs">
         <button class="lib-tab on" onclick="libSetCat('all',this)">Tất cả</button>
-        <button class="lib-tab" onclick="libSetCat('nhapho',this)">Nhà phố</button>
-        <button class="lib-tab" onclick="libSetCat('bietthu',this)">Biệt thự</button>
-        <button class="lib-tab" onclick="libSetCat('nhavuon',this)">Nhà vườn</button>
       </div>
-      <div class="lib-area">
+      <div class="lib-area" id="libAreaWrap" style="display:none">
         <label>Diện tích đất</label>
         <select id="libArea" onchange="libSetArea(this.value)">
           <option value="">Tất cả</option>
@@ -1752,30 +1749,15 @@ window.addEventListener('DOMContentLoaded', function(){
 <script>
 /* ═══ Kho hồ sơ mẫu (gói kinh tế) ═══ */
 var LIB_MOD_RATE = 20000; /* đ/m² — 100m² = 2.000.000đ */
-/* Dữ liệu mẫu — cập nhật mã, diện tích, số tầng, giá và đường dẫn ảnh (img) tại đây. */
-/* Dữ liệu mẫu — cập nhật mã, diện tích, số tầng, giá và ảnh (imgs) tại đây.
-   Ảnh đầu tiên trong 'imgs' là ảnh đại diện (phối cảnh); các ảnh sau là mặt bằng có kích thước. */
-var LIBRARY = [
-  { ma: 'NP-01', cat: 'nhapho',  dt: 80,  tang: 3, gia: 12000000, imgs: [
-      { src: '', cap: 'Phối cảnh mặt tiền' }, { src: '', cap: 'Mặt bằng tầng 1' }, { src: '', cap: 'Mặt bằng tầng 2' }, { src: '', cap: 'Mặt bằng tầng 3' } ] },
-  { ma: 'NP-02', cat: 'nhapho',  dt: 100, tang: 4, gia: 15000000, imgs: [
-      { src: '', cap: 'Phối cảnh mặt tiền' }, { src: '', cap: 'Mặt bằng tầng 1' }, { src: '', cap: 'Mặt bằng tầng 2' }, { src: '', cap: 'Mặt bằng tầng 3' }, { src: '', cap: 'Mặt bằng tầng 4' } ] },
-  { ma: 'NP-03', cat: 'nhapho',  dt: 60,  tang: 3, gia: 10000000, imgs: [
-      { src: '', cap: 'Phối cảnh mặt tiền' }, { src: '', cap: 'Mặt bằng tầng 1' }, { src: '', cap: 'Mặt bằng tầng 2' }, { src: '', cap: 'Mặt bằng tầng 3' } ] },
-  { ma: 'BT-01', cat: 'bietthu', dt: 250, tang: 2, gia: 28000000, imgs: [
-      { src: '', cap: 'Phối cảnh tổng thể' }, { src: '', cap: 'Mặt bằng tầng trệt' }, { src: '', cap: 'Mặt bằng tầng lầu' } ] },
-  { ma: 'BT-02', cat: 'bietthu', dt: 320, tang: 3, gia: 35000000, imgs: [
-      { src: '', cap: 'Phối cảnh tổng thể' }, { src: '', cap: 'Mặt bằng tầng trệt' }, { src: '', cap: 'Mặt bằng lầu 1' }, { src: '', cap: 'Mặt bằng lầu 2' } ] },
-  { ma: 'BT-03', cat: 'bietthu', dt: 180, tang: 2, gia: 22000000, imgs: [
-      { src: '', cap: 'Phối cảnh tổng thể' }, { src: '', cap: 'Mặt bằng tầng trệt' }, { src: '', cap: 'Mặt bằng tầng lầu' } ] },
-  { ma: 'NV-01', cat: 'nhavuon', dt: 400, tang: 1, gia: 20000000, imgs: [
-      { src: '', cap: 'Phối cảnh sân vườn' }, { src: '', cap: 'Mặt bằng tổng thể' } ] },
-  { ma: 'NV-02', cat: 'nhavuon', dt: 500, tang: 1, gia: 24000000, imgs: [
-      { src: '', cap: 'Phối cảnh sân vườn' }, { src: '', cap: 'Mặt bằng tổng thể' } ] },
-  { ma: 'NV-03', cat: 'nhavuon', dt: 300, tang: 2, gia: 26000000, imgs: [
-      { src: '', cap: 'Phối cảnh sân vườn' }, { src: '', cap: 'Mặt bằng tầng trệt' }, { src: '', cap: 'Mặt bằng tầng lầu' } ] }
-];
-var LIB_CATNAME = { nhapho: 'Nhà phố', bietthu: 'Biệt thự', nhavuon: 'Nhà vườn' };
+/* Dữ liệu mẫu — nạp động từ data/mau-nha.json (nguồn thật của Kho mẫu, dùng
+   chung với các trang mau/*.html) thay vì mảng cứng, để khỏi lệch dữ liệu
+   giữa 2 nơi hiển thị. Xem fetch() ở dưới cùng file này. */
+var LIBRARY = [];
+var LIB_CATNAME = {
+  'nha-pho': 'Nhà phố', 'nha-vuon': 'Nhà vườn', 'villa': 'Villa nghỉ dưỡng',
+  'canh-quan': 'Cảnh quan sân vườn', 'shophouse': 'Shophouse',
+  'biet-thu': 'Biệt thự', 'biet-thu-pho': 'Biệt thự phố'
+};
 var LIB_CAT = 'all';
 var LIB_AREA = '';
 
@@ -1791,6 +1773,25 @@ function libSetCat(c, btn){
 
 function libSetArea(v){ LIB_AREA = v; libRender(); }
 
+function libRenderTabs(){
+  var wrap = document.getElementById('libTabs');
+  if(!wrap){ return; }
+  var cats = {};
+  for(var i = 0; i < LIBRARY.length; i++){ cats[LIBRARY[i].cat] = true; }
+  var html = '<button class="lib-tab on" onclick="libSetCat(\'all\',this)">Tất cả</button>';
+  for(var key in LIB_CATNAME){
+    if(cats[key]){
+      html += '<button class="lib-tab" onclick="libSetCat(\'' + key + '\',this)">' + LIB_CATNAME[key] + '</button>';
+    }
+  }
+  wrap.innerHTML = html;
+
+  var hasArea = false;
+  for(var j = 0; j < LIBRARY.length; j++){ if(LIBRARY[j].dt != null){ hasArea = true; break; } }
+  var areaWrap = document.getElementById('libAreaWrap');
+  if(areaWrap){ areaWrap.style.display = hasArea ? '' : 'none'; }
+}
+
 function libRender(){
   var grid = document.getElementById('libGrid');
   if(!grid){ return; }
@@ -1804,22 +1805,25 @@ function libRender(){
   for(var i = 0; i < LIBRARY.length; i++){
     var it = LIBRARY[i];
     if(LIB_CAT !== 'all' && it.cat !== LIB_CAT){ continue; }
-    if(it.dt < lo || it.dt > hi){ continue; }
+    // Mẫu chưa có diện tích (dt=null) — chưa xác định được, không loại khi lọc theo diện tích.
+    if(LIB_AREA && it.dt != null && (it.dt < lo || it.dt > hi)){ continue; }
     count = count + 1;
     var cover = (it.imgs && it.imgs[0] && it.imgs[0].src) ? it.imgs[0].src : '';
     var imgHtml = cover ? '<img src="' + cover + '" alt="' + it.ma + '" onerror="this.style.display=&quot;none&quot;">' : '';
+    var dtLabel = (it.dt != null) ? it.dt : 'Đang cập nhật';
+    var tangLabel = (it.tang != null) ? it.tang : 'Đang cập nhật';
     html += '<div class="lib-card">' +
       '<div class="lib-thumb" onclick="libOpen(\'' + it.ma + '\')">' +
         '<div class="lib-ph"><i class="ph ph-image ph-icon"></i><span class="ph-lbl">Ảnh phối cảnh</span></div>' +
         imgHtml +
         '<span class="lib-cat">' + (LIB_CATNAME[it.cat] || '') + '</span>' +
-        '<div class="lib-thumb-hint"><i class="ph ph-magnifying-glass-plus"></i>Xem mặt bằng &amp; kích thước</div>' +
+        '<div class="lib-thumb-hint"><i class="ph ph-magnifying-glass-plus"></i>Xem chi tiết mẫu</div>' +
       '</div>' +
       '<div class="lib-body">' +
         '<div class="lib-code"># ' + it.ma + '</div>' +
         '<div class="lib-specs">' +
-          '<div class="lib-spec"><span class="v">' + it.dt + '</span><span class="k">m² đất</span></div>' +
-          '<div class="lib-spec"><span class="v">' + it.tang + '</span><span class="k">tầng</span></div>' +
+          '<div class="lib-spec"><span class="v">' + dtLabel + '</span><span class="k">m² đất</span></div>' +
+          '<div class="lib-spec"><span class="v">' + tangLabel + '</span><span class="k">tầng</span></div>' +
         '</div>' +
         '<div class="lib-price-row"><span class="k">Gói kinh tế</span><span class="lib-price">' + libMoney(it.gia) + '</span></div>' +
         '<button class="btn btn-gold lib-buy" onclick="datMua(\'' + it.ma + '\')"><i class="ph-duotone ph-shopping-cart-simple"></i>Đặt mua gói kinh tế</button>' +
@@ -1847,7 +1851,30 @@ function modFeeUpdate(){
 }
 
 window.addEventListener('DOMContentLoaded', function(){
-  if(document.getElementById('libGrid')){ libRender(); }
+  if(!document.getElementById('libGrid')){ return; }
+  fetch('data/mau-nha.json').then(function(r){ return r.json(); }).then(function(d){
+    var mau = (d && d.mau) ? d.mau : [];
+    var list = [];
+    for(var i = 0; i < mau.length; i++){
+      var m = mau[i];
+      list.push({
+        ma: m.maGoc,
+        cat: m.loai,
+        dt: (m.dienTichDat != null) ? m.dienTichDat : null,
+        tang: (m.tang != null) ? m.tang : null,
+        gia: m.giaBanMau,
+        slug: m.slug,
+        imgs: (m.anh && m.anh.length) ? [{ src: m.anh[0], cap: 'Phối cảnh tổng thể' }] : []
+      });
+    }
+    LIBRARY = list;
+    libRenderTabs();
+    libRender();
+  }).catch(function(e){
+    console.error('[khomau] Không tải được data/mau-nha.json', e);
+    var grid = document.getElementById('libGrid');
+    if(grid){ grid.innerHTML = '<div class="lib-empty">Không tải được danh sách mẫu, vui lòng thử lại sau.</div>'; }
+  });
 });
 
 function libFind(ma){
@@ -1859,12 +1886,14 @@ function libOpen(ma){
   var it = libFind(ma);
   if(!it){ return; }
   var catName = LIB_CATNAME[it.cat] || '';
+  var dtLabel = (it.dt != null) ? it.dt : 'Đang cập nhật';
+  var tangLabel = (it.tang != null) ? it.tang : 'Đang cập nhật';
   document.getElementById('libModalHead').innerHTML =
     '<span class="mh-cat">' + catName + '</span>' +
     '<div class="mh-code"># ' + it.ma + '</div>' +
     '<div class="lib-modal-specs">' +
-      '<div class="lib-spec"><span class="v">' + it.dt + '</span><span class="k">m² đất</span></div>' +
-      '<div class="lib-spec"><span class="v">' + it.tang + '</span><span class="k">tầng</span></div>' +
+      '<div class="lib-spec"><span class="v">' + dtLabel + '</span><span class="k">m² đất</span></div>' +
+      '<div class="lib-spec"><span class="v">' + tangLabel + '</span><span class="k">tầng</span></div>' +
     '</div>';
   var imgs = it.imgs || [];
   if(imgs.length === 0){ imgs = [{ src: '', cap: 'Phối cảnh' }]; }
@@ -1878,8 +1907,10 @@ function libOpen(ma){
     g += '<div class="mg-item"><div class="mg-cap"><i class="ph ' + ico + '"></i>' + im.cap + '</div>' + body + '</div>';
   }
   document.getElementById('libModalGallery').innerHTML = g;
+  var detailLink = it.slug ? ('<a class="btn btn-outline" href="mau/' + it.slug + '.html"><i class="ph-duotone ph-file-text"></i>Xem trang chi tiết</a>') : '';
   document.getElementById('libModalFoot').innerHTML =
     '<div class="lib-mf-price"><span class="k">Gói kinh tế</span><span class="lib-price">' + libMoney(it.gia) + '</span></div>' +
+    detailLink +
     '<button class="btn btn-gold" onclick="datMua(\'' + it.ma + '\')"><i class="ph-duotone ph-shopping-cart-simple"></i>Đặt mua gói kinh tế</button>';
   document.getElementById('libModal').classList.add('open');
   document.body.style.overflow = 'hidden';
