@@ -4281,11 +4281,17 @@ function closeAddModal(){
 }
 
 async function saveAddModal(){
+  // Chuẩn hoá: bỏ khoảng trắng + về chữ thường — username dùng làm email
+  // (username@aln.vn), Firebase Auth từ chối email có khoảng trắng/hoa.
   var username = (document.getElementById('af_user')||{}).value||'';
-  username = username.trim();
+  username = username.trim().toLowerCase().replace(/\s+/g, '');
   var name = document.getElementById('af_name') ? document.getElementById('af_name').value.trim() : '';
   var role = _addModalType || 'cn';
   if(!username || !name){ toast('Nhập đủ username và tên', 'warn'); return; }
+  if(!/^[a-z0-9._-]+$/.test(username)){
+    toast('Tên đăng nhập chỉ được chứa chữ không dấu, số, dấu chấm/gạch dưới — không khoảng trắng/tiếng Việt có dấu', 'warn');
+    return;
+  }
 
   var btn = document.getElementById('saveAddBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Đang tạo...'; }
