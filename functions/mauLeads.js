@@ -91,6 +91,8 @@ exports.submitMauLead = onCall(
       cta: d.cta === "tuvan" ? "tuvan" : "mua",
       utm: cleanUtm(d.utm),
       sourceUrl: typeof d.sourceUrl === "string" ? d.sourceUrl.slice(0, 300) : "",
+      fbp: typeof d.fbp === "string" ? d.fbp.slice(0, 200) : "",
+      fbc: typeof d.fbc === "string" ? d.fbc.slice(0, 200) : "",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     return { ok: true, id: ref.id };

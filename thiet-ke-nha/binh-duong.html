@@ -60,6 +60,22 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   gtag('config', 'G-5CSL1TF0RC');
 </script>
 <!-- End GA4 -->
+<!-- Meta Pixel (ALN Pixel) — chỉ dùng cho ALN, tách riêng khỏi TK.HOUSE -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1656666692225878');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel -->
 <script src="../aln-tracking.js"></script>
 <script src="../error-monitor.js"></script>
 </head>
@@ -229,6 +245,19 @@ function getUtmFromUrl() {
   return utm;
 }
 
+/* fbp/fbc — cùng pattern index.html/kts-apply.html, dùng để CAPI Lead
+   (functions/ktsFunnel.js onLeadCreated) khớp Pixel client. */
+function getCookie(name) {
+  const m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return m ? decodeURIComponent(m[1]) : '';
+}
+function getFbc() {
+  const c = getCookie('_fbc');
+  if (c) return c;
+  const fbclid = new URLSearchParams(location.search).get('fbclid');
+  return fbclid ? 'fb.1.' + Date.now() + '.' + fbclid : '';
+}
+
 const form = document.getElementById('tkLeadForm');
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -245,13 +274,23 @@ form.addEventListener('submit', async (e) => {
   msg.textContent = 'Đang gửi...';
   msg.className = 'mn-lead-msg';
   try {
-    await callSubmitLocalLead({
+    const res = await callSubmitLocalLead({
       name, phone,
       tinh: 'binh-duong',
       tinhTen: 'Bình Dương',
       utm: getUtmFromUrl(),
       sourceUrl: location.href,
+      fbp: getCookie('_fbp'),
+      fbc: getFbc(),
     });
+    const leadId = (res && res.data && res.data.id) || '';
+    try {
+      if (window.fbq && leadId) window.fbq('track', 'Lead',
+        { content_name: 'tinh-binh-duong', content_category: 'local-seo' },
+        { eventID: 'lead-' + leadId });
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'lead_form_submit', form_name: 'tinh-binh-duong' });
+    } catch (e) {}
     msg.textContent = 'Đã nhận thông tin — ALN sẽ liên hệ trong ít phút. Cảm ơn bạn!';
     msg.className = 'mn-lead-msg ok';
     form.reset();

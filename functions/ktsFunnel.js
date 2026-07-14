@@ -1,7 +1,7 @@
 /**
  * ktsFunnel — phễu tuyển KTS + phễu lead chủ nhà chạy quảng cáo (asia-southeast1)
  *
- * 3 hàm phục vụ đo lường ads (2 hàm đầu cho KTS, hàm 3 cho chủ nhà — tái dùng
+ * 4 hàm phục vụ đo lường ads (2 hàm đầu cho KTS, hàm 3-4 cho chủ nhà — tái dùng
  * chung sendCapiEvent()):
  *
  * 1. submitKtsApplication (onCall) — kts-apply.html gọi sau khi đã tạo Auth user
@@ -14,6 +14,11 @@
  * 2. onKtsReservationCreated (trigger reservations/{uid} onCreate) — bắn sự kiện Lead
  *    lên Conversions API khi có người giữ chỗ. event_id = 'lead-'+uid trùng với eventID
  *    Pixel phía client (phong-cho.html) → Facebook tự dedup, không đếm đôi.
+ *
+ * 4. onLeadCreated (trigger leads/{id} onCreate) — bắn sự kiện Lead lên Conversions
+ *    API cho 3 phễu SEO chạy ads (tỉnh/mau/du-toan, xem functions/localLeads.js,
+ *    mauLeads.js, duToanLeads.js) + lead diễn đàn (forum.js). event_id = 'lead-'+id
+ *    trùng với eventID Pixel phía client ở 3 template tools/template-*.html.
  *
  * SECRET CẦN SET TRƯỚC KHI DEPLOY:
  *   firebase functions:secrets:set FB_CAPI_TOKEN
@@ -431,6 +436,44 @@ exports.onCnRegistered = onDocumentCreated(
       });
     } catch (e) {
       console.error("[onCnRegistered] CAPI:", e.message);
+    }
+  }
+);
+
+/* ══════════════════════════════════════════════════════════════════
+   5. onLeadCreated — bắn CAPI Lead server-side cho MỌI doc mới trong
+   collection `leads` (dùng chung bởi localLeads.js/mauLeads.js/
+   duToanLeads.js/forum.js). Dedup với Pixel client qua event_id
+   'lead-'+id — id = doc.id sinh server-side, trả về cho client trong
+   response của submitLocalLead/submitMauLead/submitDuToanLead (xem 3
+   template tools/template-tinh.html, template-mau.html, template-dutoan.html).
+   Lead diễn đàn (source:'forum') không có fbp/fbc/Pixel phía client —
+   CAPI vẫn bắn được nhờ SĐT đã băm, chỉ thiếu tín hiệu khớp fbp/fbc.
+══════════════════════════════════════════════════════════════════ */
+exports.onLeadCreated = onDocumentCreated(
+  {
+    document: "leads/{id}",
+    region: "asia-southeast1",
+    secrets: [FB_CAPI_TOKEN],
+  },
+  async (event) => {
+    const snap = event.data;
+    if (!snap) return;
+    const r = snap.data() || {};
+    try {
+      await sendCapiEvent({
+        eventName: "Lead",
+        eventId: "lead-" + event.params.id,
+        sourceUrl: typeof r.sourceUrl === "string" ? r.sourceUrl.slice(0, 300) : SITE_URL,
+        phone: r.phone || "",
+        email: "",
+        fbp: typeof r.fbp === "string" ? r.fbp : "",
+        fbc: typeof r.fbc === "string" ? r.fbc : "",
+        utm: r.utm,
+        contentName: String(r.source || "leads").slice(0, 60),
+      });
+    } catch (e) {
+      console.error("[onLeadCreated] CAPI:", e.message);
     }
   }
 );
