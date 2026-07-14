@@ -2473,7 +2473,8 @@ document.addEventListener('DOMContentLoaded', function() {
         <i class="ph-duotone ph-warning"></i> Mật khẩu này chỉ hiện <b>một lần</b>. Nếu đóng mà chưa gửi/lưu kịp, dùng nút <i class="ph-duotone ph-key"></i> "Đặt lại mật khẩu" ở bảng tài khoản để tạo mật khẩu mới bất cứ lúc nào.
       </div>
     </div>
-    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:8px">
+      <button onclick="_copyCredMessage()" style="padding:8px 14px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);color:var(--blue);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:700"><i class="ph-duotone ph-chat-circle-text"></i> Copy tin nhắn mẫu</button>
       <button onclick="closeCredModal()" style="padding:8px 18px;background:var(--green);border:none;color:#04150c;border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:700">Đã lưu, đóng</button>
     </div>
   </div>
@@ -4370,6 +4371,22 @@ function _copyCred(id){
   } catch(e) {
     try { document.execCommand('copy'); toast('Đã copy', 'ok'); }
     catch(e2) { toast('Không copy được — bôi đen rồi Ctrl+C thủ công', 'warn'); }
+  }
+}
+
+/* Copy sẵn 1 đoạn tin nhắn để dán thẳng vào Zalo/SMS gửi cho người dùng —
+   founder KHÔNG cần tự gõ lại username/mật khẩu mỗi lần tạo/reset tài khoản. */
+function _copyCredMessage(){
+  var email = (document.getElementById('credEmail')||{}).value || '';
+  var pw = (document.getElementById('credPw')||{}).value || '';
+  var username = email.split('@')[0] || email;
+  var msg = 'Tài khoản ALN của bạn — Tên đăng nhập: ' + username + ' · Mật khẩu tạm: ' + pw
+    + ' · Đăng nhập tại: https://applamnha.vn/login.html\nSau khi vào được, nhớ đổi sang mật khẩu bạn tự chọn ở mục Đổi mật khẩu nhé!';
+  try {
+    navigator.clipboard.writeText(msg);
+    toast('Đã copy tin nhắn — dán thẳng vào Zalo/SMS', 'ok');
+  } catch(e) {
+    toast('Không copy được — bôi đen rồi Ctrl+C thủ công', 'warn');
   }
 }
 
