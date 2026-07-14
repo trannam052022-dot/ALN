@@ -28,6 +28,11 @@ const LOAI_LABEL = {
   'biet-thu': 'Biệt thự',
   'nha-2-tang': 'Nhà 2 tầng',
   'nha-3-tang': 'Nhà 3 tầng',
+  'nha-vuon': 'Nhà vườn',
+  'villa': 'Villa nghỉ dưỡng',
+  'canh-quan': 'Cảnh quan sân vườn',
+  'shophouse': 'Shophouse',
+  'biet-thu-pho': 'Biệt thự phố',
 };
 const PHONG_CACH_LABEL = {
   'hien-dai': 'Hiện đại',
@@ -35,6 +40,30 @@ const PHONG_CACH_LABEL = {
   'mai-thai': 'Mái Thái',
   'toi-gian': 'Tối giản',
 };
+// Mẫu batch 2 lưu thẳng tên phong cách gốc (không phải slug) — nếu không có
+// trong bảng trên thì dùng nguyên văn giá trị đã lưu.
+function phongCachLabel(m) {
+  return PHONG_CACH_LABEL[m.phongCach] || m.phongCach;
+}
+const DANG_CAP_NHAT = 'Đang cập nhật';
+function hasSpecs(m) {
+  return m.ngang != null && m.dai != null && m.tang != null && m.phongNgu != null;
+}
+function hasBudget(m) {
+  return m.duToanTu != null && m.duToanDen != null;
+}
+function kichThuocStr(m) {
+  return (m.ngang != null && m.dai != null) ? (m.ngang + ' × ' + m.dai + ' m') : DANG_CAP_NHAT;
+}
+function numOrTbd(v) {
+  return v != null ? String(v) : DANG_CAP_NHAT;
+}
+function m2OrTbd(v) {
+  return v != null ? (v + ' m²') : DANG_CAP_NHAT;
+}
+function duToanStr(m) {
+  return hasBudget(m) ? (fmtTy(m.duToanTu) + ' – ' + fmtTy(m.duToanDen)) : DANG_CAP_NHAT;
+}
 
 function fmtTy(n) {
   const ty = n / 1e9;
@@ -44,6 +73,7 @@ function fmtMoney(n) {
   return Number(n).toLocaleString('vi-VN') + 'đ';
 }
 function budgetBucket(duToanTu) {
+  if (duToanTu == null) return 'chua-ro';
   if (duToanTu >= 2e9) return '>=2ty';
   if (duToanTu >= 1e9) return '1-2ty';
   return '<1ty';
@@ -55,13 +85,20 @@ function moTaToHtml(moTa) {
   return moTa.split(/\n\n+/).map((p) => '<p>' + p.trim() + '</p>').join('\n');
 }
 function galleryCaptions(m) {
-  if (m.tang <= 1) return ['Phối cảnh mặt tiền', 'Mặt bằng tổng thể', 'Phối cảnh sân vườn'];
+  const tang = m.tang || 1;
+  if (tang <= 1) return ['Phối cảnh mặt tiền', 'Mặt bằng tổng thể', 'Phối cảnh sân vườn'];
   const caps = ['Phối cảnh mặt tiền', 'Mặt bằng tầng trệt'];
-  for (let i = 2; i < m.tang; i++) caps.push('Mặt bằng tầng ' + i);
-  caps.push('Mặt bằng tầng ' + m.tang + (m.tang > 1 ? ' (trên cùng)' : ''));
+  for (let i = 2; i < tang; i++) caps.push('Mặt bằng tầng ' + i);
+  caps.push('Mặt bằng tầng ' + tang + ' (trên cùng)');
   return caps.slice(0, 4);
 }
 function galleryHtml(m) {
+  // Đã có ảnh board thật (m.anh) — hiển thị ảnh thật, không dùng khung placeholder.
+  if (Array.isArray(m.anh) && m.anh.length) {
+    return m.anh.map((url) => (
+      '      <div class="mn-shot"><img src="' + url + '" alt="' + escHtml(m.ten) + ' — phối cảnh ALN Master Board" loading="lazy"></div>'
+    )).join('\n');
+  }
   const icons = ['ph-image', 'ph-ruler', 'ph-ruler', 'ph-ruler'];
   return galleryCaptions(m).map((cap, i) => (
     '      <div class="mn-shot"><div class="mn-shot-ph"><i class="ph-duotone ' + icons[i % icons.length] + '"></i><span>' + escHtml(cap) + '<br>đang cập nhật</span></div></div>'
@@ -73,8 +110,10 @@ function pickRelated(all, current, n) {
   const scored = others.map((x) => {
     let score = 0;
     if (x.loai === current.loai) score += 10;
-    const budgetDiff = Math.abs(x.duToanTu - current.duToanTu) / current.duToanTu;
-    score += Math.max(0, 5 - budgetDiff * 5);
+    if (hasBudget(x) && hasBudget(current)) {
+      const budgetDiff = Math.abs(x.duToanTu - current.duToanTu) / current.duToanTu;
+      score += Math.max(0, 5 - budgetDiff * 5);
+    }
     return { m: x, score };
   });
   scored.sort((a, b) => b.score - a.score);
@@ -85,7 +124,7 @@ function relatedHtml(list) {
     '      <a class="cn-related-card" href="' + m.slug + '.html">\n' +
     '        <span class="tag-gold">' + LOAI_LABEL[m.loai] + '</span>\n' +
     '        <h4>' + escHtml(m.ten) + '</h4>\n' +
-    '        <div class="mn-related-meta">' + m.ngang + '×' + m.dai + 'm · ' + m.tang + ' tầng · ' + m.phongNgu + ' PN · từ ' + fmtMoney(m.giaBanMau) + '</div>\n' +
+    '        <div class="mn-related-meta">' + (hasSpecs(m) ? (m.ngang + '×' + m.dai + 'm · ' + m.tang + ' tầng · ' + m.phongNgu + ' PN · ') : '') + 'từ ' + fmtMoney(m.giaBanMau) + '</div>\n' +
     '      </a>'
   )).join('\n');
 }
@@ -95,7 +134,9 @@ function faqFor(m) {
   return [
     {
       q: 'Mẫu này xây hết bao nhiêu?',
-      a: 'Dự toán xây dựng tham khảo cho ' + ten + ' khoảng ' + fmtTy(m.duToanTu) + ' – ' + fmtTy(m.duToanDen) + ', tuỳ mức hoàn thiện và đơn giá thực tế tại khu vực. Con số này chưa gồm phí mua hồ sơ mẫu (' + fmtMoney(m.giaBanMau) + ') và cần kiến trúc sư khảo sát lô đất thật để có con số chính xác.',
+      a: hasBudget(m)
+        ? ('Dự toán xây dựng tham khảo cho ' + ten + ' khoảng ' + fmtTy(m.duToanTu) + ' – ' + fmtTy(m.duToanDen) + ', tuỳ mức hoàn thiện và đơn giá thực tế tại khu vực. Con số này chưa gồm phí mua hồ sơ mẫu (' + fmtMoney(m.giaBanMau) + ') và cần kiến trúc sư khảo sát lô đất thật để có con số chính xác.')
+        : ('Mặt bằng, diện tích và dự toán chi tiết cho ' + ten + ' đang được ALN cập nhật. Để lại thông tin, kiến trúc sư khu vực sẽ tư vấn dự toán sơ bộ theo lô đất thực tế của bạn.'),
     },
     {
       q: 'Có sửa theo đất của tôi được không?',
@@ -141,13 +182,23 @@ function jsonLdFaq(m) {
 }
 
 function metaDescription(m) {
-  const s = m.ten + ': ' + m.ngang + '×' + m.dai + 'm, ' + m.tang + ' tầng, ' + m.phongNgu +
-    ' phòng ngủ, phong cách ' + PHONG_CACH_LABEL[m.phongCach] + '. Dự toán tham khảo ' +
-    fmtTy(m.duToanTu) + ' – ' + fmtTy(m.duToanDen) + '.';
+  let s;
+  if (hasSpecs(m) && hasBudget(m)) {
+    s = m.ten + ': ' + m.ngang + '×' + m.dai + 'm, ' + m.tang + ' tầng, ' + m.phongNgu +
+      ' phòng ngủ, phong cách ' + phongCachLabel(m) + '. Dự toán tham khảo ' +
+      fmtTy(m.duToanTu) + ' – ' + fmtTy(m.duToanDen) + '.';
+  } else {
+    s = m.ten + ': phong cách ' + phongCachLabel(m) + '. Hồ sơ thiết kế có sẵn tại App Làm Nhà, ' +
+      'mặt bằng và dự toán chi tiết đang được cập nhật.';
+  }
   return s.length > 158 ? s.slice(0, 155) + '...' : s;
 }
 
 function buildTitle(m) {
+  if (!hasBudget(m)) {
+    const plain = m.ten + ' | App Làm Nhà';
+    return plain.length <= 65 ? plain : m.ten;
+  }
   const base = m.ten + ' — Dự toán ' + fmtTy(m.duToanTu) + '–' + fmtTy(m.duToanDen);
   const withBrand = base + ' | App Làm Nhà';
   if (withBrand.length <= 65) return withBrand;
@@ -180,16 +231,14 @@ function renderMauPage(template, m, all) {
     ID: m.id,
     KTS_TAC_GIA: escHtml(m.ktsTacGia),
     GALLERY_HTML: galleryHtml(m),
-    NGANG: m.ngang,
-    DAI: m.dai,
-    TANG: m.tang,
-    PHONG_NGU: m.phongNgu,
-    PHONG_TAM: m.phongTam,
-    DIEN_TICH_DAT: m.dienTichDat,
-    DIEN_TICH_SAN: m.dienTichSan,
-    PHONG_CACH_LABEL: PHONG_CACH_LABEL[m.phongCach],
-    DU_TOAN_TU: fmtTy(m.duToanTu),
-    DU_TOAN_DEN: fmtTy(m.duToanDen),
+    KICH_THUOC: kichThuocStr(m),
+    TANG: numOrTbd(m.tang),
+    PHONG_NGU: numOrTbd(m.phongNgu),
+    PHONG_TAM: numOrTbd(m.phongTam),
+    DIEN_TICH_DAT: m2OrTbd(m.dienTichDat),
+    DIEN_TICH_SAN: m2OrTbd(m.dienTichSan),
+    PHONG_CACH_LABEL: phongCachLabel(m),
+    DU_TOAN: duToanStr(m),
     GIA_BAN_MAU: fmtMoney(m.giaBanMau),
     BUDGET_BUCKET: budgetBucket(m.duToanTu),
     MO_TA_HTML: moTaToHtml(m.moTa),
@@ -203,14 +252,26 @@ function renderMauPage(template, m, all) {
   return html;
 }
 
+function catThumbHtml(m) {
+  if (Array.isArray(m.anh) && m.anh[0]) {
+    return '<div class="mn-cat-thumb"><img src="' + m.anh[0] + '" alt="' + escHtml(m.ten) + '" loading="lazy"></div>';
+  }
+  return '<div class="mn-cat-thumb"><i class="ph-duotone ph-image"></i><span>Phối cảnh đang cập nhật</span></div>';
+}
+function catSpecsHtml(m) {
+  if (hasSpecs(m)) {
+    return '<span>' + m.ngang + '×' + m.dai + 'm</span><span>' + m.tang + ' tầng</span><span>' + m.phongNgu + ' PN</span>';
+  }
+  return '<span>Mặt bằng &amp; diện tích đang cập nhật</span>';
+}
 function catCardHtml(m) {
   return (
     '      <a class="mn-cat-card" href="' + m.slug + '.html">\n' +
-    '        <div class="mn-cat-thumb"><i class="ph-duotone ph-image"></i><span>Phối cảnh đang cập nhật</span></div>\n' +
+    '        ' + catThumbHtml(m) + '\n' +
     '        <div class="mn-cat-body">\n' +
     '          <div class="mn-cat-code">' + m.id + '</div>\n' +
     '          <h3>' + escHtml(m.ten) + '</h3>\n' +
-    '          <div class="mn-cat-specs"><span>' + m.ngang + '×' + m.dai + 'm</span><span>' + m.tang + ' tầng</span><span>' + m.phongNgu + ' PN</span></div>\n' +
+    '          <div class="mn-cat-specs">' + catSpecsHtml(m) + '</div>\n' +
     '          <div class="mn-cat-price"><span class="k">Giá hồ sơ</span><span class="v">' + fmtMoney(m.giaBanMau) + '</span></div>\n' +
     '        </div>\n' +
     '      </a>'
@@ -344,11 +405,11 @@ function renderIndexPage(all) {
     '\n    </nav>';
   const cardsHtml = all.map((m) => (
     '      <a class="mn-cat-card" href="' + m.slug + '.html" data-category="' + m.loai + '">\n' +
-    '        <div class="mn-cat-thumb"><i class="ph-duotone ph-image"></i><span>Phối cảnh đang cập nhật</span></div>\n' +
+    '        ' + catThumbHtml(m) + '\n' +
     '        <div class="mn-cat-body">\n' +
     '          <div class="mn-cat-code">' + m.id + '</div>\n' +
     '          <h3>' + escHtml(m.ten) + '</h3>\n' +
-    '          <div class="mn-cat-specs"><span>' + m.ngang + '×' + m.dai + 'm</span><span>' + m.tang + ' tầng</span><span>' + m.phongNgu + ' PN</span></div>\n' +
+    '          <div class="mn-cat-specs">' + catSpecsHtml(m) + '</div>\n' +
     '          <div class="mn-cat-price"><span class="k">Giá hồ sơ</span><span class="v">' + fmtMoney(m.giaBanMau) + '</span></div>\n' +
     '        </div>\n' +
     '      </a>'
@@ -389,6 +450,11 @@ const CATEGORY_INTRO = {
   'nha-cap-4': 'Nhà cấp 4 chỉ xây 1 tầng, phù hợp lô đất rộng ở khu vực ven đô, ngoại thành hoặc các tỉnh có quỹ đất lớn. Kết cấu móng đơn giản hơn nhà nhiều tầng nên thời gian và chi phí thi công thường thấp hơn, phù hợp gia đình muốn tiết kiệm ngân sách kết cấu để dồn cho sân vườn, cảnh quan hoặc dùng làm nhà nghỉ dưỡng. Các mẫu dưới đây thường đi kèm sân vườn bao quanh, mái dốc thoát nước tốt cho khí hậu nhiệt đới.',
   'nha-2-tang': 'Nhà 2 tầng cân bằng giữa diện tích sử dụng và chi phí xây dựng — đủ phòng chức năng cho gia đình đông thành viên mà không phải xây cao tầng như nhà phố đô thị. Phù hợp cả lô đất vừa và lô đất rộng có sân vườn xung quanh. Các mẫu dưới đây thường tách tầng trệt cho sinh hoạt chung, tầng trên cho khu vực nghỉ ngơi riêng tư, kiến trúc sư khu vực sẽ điều chỉnh theo hướng đất thực tế trước khi bàn giao hồ sơ.',
   'nha-3-tang': 'Nhà 3 tầng phù hợp gia đình cần nhiều phòng chức năng trên lô đất có diện tích vừa phải, thường gặp ở khu dân cư đô thị nơi đất hẹp nhưng nhu cầu sử dụng cao. Bố cục thường tách khu sinh hoạt chung ở tầng trệt, các tầng trên dành cho phòng ngủ riêng tư. Kiến trúc sư khu vực sẽ khảo sát kết cấu móng phù hợp và điều chỉnh mặt đứng theo quy định xây dựng địa phương trước khi hoàn thiện hồ sơ.',
+  'nha-vuon': 'Nhà vườn kết hợp không gian sống với sân vườn rộng bao quanh, phù hợp lô đất có diện tích thoải mái ở ven đô hoặc các tỉnh. Các mẫu dưới đây thiên về phong cách Á Đông, tân cổ điển nhẹ nhàng hoặc hiện đại tuỳ gu thẩm mỹ, kiến trúc sư khu vực sẽ khảo sát lô đất thật và bổ sung mặt bằng, dự toán chi tiết trước khi bàn giao hồ sơ.',
+  'villa': 'Villa nghỉ dưỡng hướng tới không gian sống resort ngay tại nhà — hồ bơi riêng, mái ngói dốc, hệ mái gỗ đua rộng — phù hợp chủ đầu tư có lô đất rộng hoặc dùng làm nhà nghỉ dưỡng cuối tuần. Kiến trúc sư khu vực sẽ khảo sát lô đất thật và bổ sung mặt bằng, dự toán chi tiết trước khi bàn giao hồ sơ.',
+  'canh-quan': 'Cảnh quan sân vườn là hạng mục hoàn thiện không gian ngoài nhà — suối nhân tạo, hồ cá Koi, nhà chòi, vườn cây — thường đi kèm một mẫu nhà hoặc biệt thự. Kiến trúc sư khu vực sẽ tư vấn phương án cảnh quan phù hợp với khuôn viên đất thực tế.',
+  'shophouse': 'Shophouse là nhà phố thương mại kết hợp ở và kinh doanh, thường ở vị trí góc hai mặt tiền hoặc trục đường đông người qua lại. Các mẫu dưới đây tối ưu tầng trệt cho buôn bán, các tầng trên cho sinh hoạt gia đình. Kiến trúc sư khu vực sẽ khảo sát lô đất thật và bổ sung mặt bằng, dự toán chi tiết trước khi bàn giao hồ sơ.',
+  'biet-thu-pho': 'Biệt thự phố là biến thể biệt thự trên lô đất phố có diện tích vừa phải, vẫn giữ được nét sang trọng tân cổ điển hoặc cổ điển châu Âu dù không có sân vườn rộng như biệt thự thông thường. Kiến trúc sư khu vực sẽ khảo sát lô đất thật và bổ sung mặt bằng, dự toán chi tiết trước khi bàn giao hồ sơ.',
 };
 
 function renderCategoryPage(loai, items, all) {
