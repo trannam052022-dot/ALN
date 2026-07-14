@@ -1563,6 +1563,10 @@ document.addEventListener('DOMContentLoaded', function() {
       </button>
     </div>
   </div>
+  <div id="keToanListWrap" style="display:none;padding:14px 20px;border-bottom:1px solid var(--border);background:rgba(201,168,76,.03)">
+    <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--gold);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em"><i class="ph-duotone ph-calculator"></i> Tài khoản Kế toán trưởng</div>
+    <div id="keToanListContent" style="display:flex;flex-direction:column;gap:6px"></div>
+  </div>
   <div id="reportedPaymentsWrap" style="display:none;padding:16px 20px;border-bottom:1px solid var(--red-bd);background:var(--red-bg)">
     <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--red);margin-bottom:2px;text-transform:uppercase;letter-spacing:.06em"><i class="ph-duotone ph-bell-ringing"></i> Khách báo đã chuyển khoản — cần kiểm tra</div>
     <div style="font-size:10.5px;color:var(--sub);margin-bottom:10px">Chủ nhà/DN tự báo qua QR, chưa xác nhận thật — kiểm tra sao kê ngân hàng trước khi xử lý.</div>
@@ -2440,6 +2444,37 @@ document.addEventListener('DOMContentLoaded', function() {
     <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">
       <button onclick="closeAddModal()" style="padding:7px 16px;background:var(--raised);border:1px solid var(--border);color:var(--sub);border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:12px">Hủy</button>
       <button onclick="saveAddModal()" style="padding:7px 16px;background:var(--blue);border:none;color:#fff;border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:700">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL HIỆN MẬT KHẨU TẠM — không đóng khi bấm ra ngoài, tránh mất mật khẩu do bấm nhầm ══ -->
+<div id="credModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:220;align-items:center;justify-content:center">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;width:420px;max-width:95vw;box-shadow:0 24px 60px rgba(0,0,0,.6)">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+      <div style="font-size:14px;font-weight:700;color:var(--green);display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-check-circle"></i> <span id="credModalTitle">Tạo tài khoản thành công</span></div>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;margin-bottom:4px">Email đăng nhập</div>
+        <div style="display:flex;gap:6px">
+          <input id="credEmail" readonly style="flex:1;background:var(--raised);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-family:var(--mono);font-size:12px;color:var(--text1)">
+          <button onclick="_copyCred('credEmail')" style="padding:8px 12px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);color:var(--blue);border-radius:6px;cursor:pointer"><i class="ph-duotone ph-copy"></i></button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;margin-bottom:4px">Mật khẩu tạm</div>
+        <div style="display:flex;gap:6px">
+          <input id="credPw" readonly style="flex:1;background:var(--raised);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--gold)">
+          <button onclick="_copyCred('credPw')" style="padding:8px 12px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);color:var(--gold);border-radius:6px;cursor:pointer"><i class="ph-duotone ph-copy"></i></button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--red);background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:7px;padding:10px 12px;line-height:1.5">
+        <i class="ph-duotone ph-warning"></i> Mật khẩu này chỉ hiện <b>một lần</b>. Nếu đóng mà chưa gửi/lưu kịp, dùng nút <i class="ph-duotone ph-key"></i> "Đặt lại mật khẩu" ở bảng tài khoản để tạo mật khẩu mới bất cứ lúc nào.
+      </div>
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+      <button onclick="closeCredModal()" style="padding:8px 18px;background:var(--green);border:none;color:#04150c;border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:700">Đã lưu, đóng</button>
     </div>
   </div>
 </div>
@@ -3379,6 +3414,7 @@ function _actionBtns(type, idx){
     +'<button onclick="openProfile(\''+type+'\','+idx+')" style="padding:3px 9px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.2);color:var(--cyan);border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--sans)" title="Xem profile"><i class="ph-duotone ph-identification-card"></i></button>'
     +'<button onclick="mgEdit(\''+type+'\','+idx+')" style="padding:3px 9px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:var(--blue);border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--sans)" title="Chỉnh sửa"><i class="ph-duotone ph-pen"></i></button>'
     +'<button onclick="mgToggleStatus(\''+type+'\','+idx+')" style="padding:3px 9px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--amber);border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--sans)" title="Kích hoạt/Tạm dừng"><i class="ph-duotone ph-toggle-right"></i></button>'
+    +'<button onclick="mgResetPassword(\''+type+'\','+idx+')" style="padding:3px 9px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);color:var(--gold);border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--sans)" title="Đặt lại mật khẩu"><i class="ph-duotone ph-key"></i></button>'
     +'<button onclick="mgDelete(\''+type+'\','+idx+')" style="padding:3px 9px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--red);border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--sans)" title="Xoá"><i class="ph-duotone ph-trash"></i></button>'
     +'</div>';
 }
@@ -4302,13 +4338,64 @@ async function saveAddModal(){
     var createUserFn = httpsCallable(fns, 'createUserByFounder');
     var result = await createUserFn({ username: username, name: name, role: role });
     var data = result.data;
-    alert('Tao thanh cong!\nUID: ' + data.uid + '\nEmail: ' + data.email + '\nMat khau tam: ' + data.tempPassword + '\n\n(Luu lai mat khau nay!)');
-    if (typeof _startFounderMgData === 'function') _startFounderMgData();
     closeAddModal();
+    showCredModal('Đã tạo tài khoản — ' + name, data.email, data.tempPassword);
+    if (typeof _startFounderMgData === 'function') _startFounderMgData();
+    if (role === 'ke_toan' && typeof _loadKeToanList === 'function') _loadKeToanList();
   } catch(e) {
     toast('Lỗi: ' + (e.message || e.code), 'warn');
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = 'Lưu'; }
+  }
+}
+
+/* ── Modal hiện mật khẩu tạm (dùng chung cho tạo mới + đặt lại mật khẩu) ── */
+function showCredModal(title, email, pw){
+  document.getElementById('credModalTitle').textContent = title;
+  document.getElementById('credEmail').value = email || '';
+  document.getElementById('credPw').value = pw || '';
+  document.getElementById('credModal').style.display = 'flex';
+}
+function closeCredModal(){
+  document.getElementById('credModal').style.display = 'none';
+}
+function _copyCred(id){
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.select();
+  el.setSelectionRange(0, 99999);
+  try {
+    navigator.clipboard.writeText(el.value);
+    toast('Đã copy', 'ok');
+  } catch(e) {
+    try { document.execCommand('copy'); toast('Đã copy', 'ok'); }
+    catch(e2) { toast('Không copy được — bôi đen rồi Ctrl+C thủ công', 'warn'); }
+  }
+}
+
+/* ── Đặt lại mật khẩu cho tài khoản KTS/DN/CN đã có (dùng chung 1 Cloud Function) ── */
+function _getMgUid(type, idx){
+  if(type==='kts') return (_mgKtsData[idx]||{}).uid || '';
+  if(type==='dn')  return (_mgDnData[idx]||{}).uid  || '';
+  if(type==='cn'){
+    var p = _mgCnData[idx];
+    return (p && p._raw && p._raw.cn && p._raw.cn.uid) || '';
+  }
+  return '';
+}
+async function mgResetPassword(type, idx){
+  var uid = _getMgUid(type, idx);
+  if(!uid){ toast('Không tìm thấy UID tài khoản này', 'warn'); return; }
+  if(!confirm('Đặt mật khẩu MỚI cho tài khoản này? Mật khẩu cũ sẽ ngừng dùng được ngay.')) return;
+  try {
+    var { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
+    var fns = getFunctions(app, 'asia-southeast1');
+    var fn = httpsCallable(fns, 'resetUserPasswordByFounder');
+    var result = await fn({ uid: uid });
+    var data = result.data;
+    showCredModal('Đã đặt lại mật khẩu', data.email, data.tempPassword);
+  } catch(e) {
+    toast('Lỗi: ' + (e.message || e.code), 'warn');
   }
 }
 
@@ -5501,6 +5588,7 @@ function _startFounderListen() {
     try { if(typeof window.hkFounderTick==='function') window.hkFounderTick(); } catch(e){}
     document.dispatchEvent(new CustomEvent('aln:projects-loaded'));
     _loadMgData();
+    _loadKeToanList();
   }, function(err){
     console.error('[Founder] Firestore error:', err.code, err.message);
     var tbody = document.getElementById('tableBody');
@@ -5917,6 +6005,45 @@ async function _loadMgData() {
     if(statsPanel && statsPanel.style.display !== 'none' && typeof renderStats==='function') renderStats();
   } catch(e){ console.error('[Founder mgData]', e); }
 }
+
+/* ── Danh sách tài khoản Kế toán trưởng (tab Thanh toán) + nút Đặt lại mật khẩu ──
+   Gắn window._loadKeToanList vì saveAddModal() gọi từ script thường (ngoài module),
+   khai báo function trần trong module KHÔNG lộ ra window tự động. */
+window._loadKeToanList = async function _loadKeToanList() {
+  var wrap = document.getElementById('keToanListWrap');
+  var content = document.getElementById('keToanListContent');
+  if (!wrap || !content) return;
+  try {
+    var q = query(collection(db, 'users'), where('role', '==', 'ke_toan'));
+    var snap = await getDocs(q);
+    if (snap.empty) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'block';
+    content.innerHTML = snap.docs.map(function(d) {
+      var u = d.data();
+      return '<div style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px">'
+        + '<div style="flex:1;min-width:0">'
+          + '<span style="font-size:12px;font-weight:600;color:var(--text1)">' + (u.name || '—') + '</span>'
+          + '<span style="font-size:10.5px;color:var(--dim);font-family:var(--mono);margin-left:8px">' + (u.username || d.id) + '</span>'
+        + '</div>'
+        + '<button onclick="_resetKeToanPw(\'' + d.id + '\')" style="padding:4px 10px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);color:var(--gold);border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-key"></i> Đặt lại mật khẩu</button>'
+      + '</div>';
+    }).join('');
+  } catch(e) { console.error('[Founder keToanList]', e); }
+};
+
+window._resetKeToanPw = async function(uid) {
+  if (!confirm('Đặt mật khẩu MỚI cho tài khoản kế toán này? Mật khẩu cũ sẽ ngừng dùng được ngay.')) return;
+  try {
+    var { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
+    var fns = getFunctions(app, 'asia-southeast1');
+    var fn = httpsCallable(fns, 'resetUserPasswordByFounder');
+    var result = await fn({ uid: uid });
+    var data = result.data;
+    if (typeof showCredModal === 'function') showCredModal('Đã đặt lại mật khẩu', data.email, data.tempPassword);
+  } catch(e) {
+    if (typeof toast === 'function') toast('Lỗi: ' + (e.message || e.code), 'warn');
+  }
+};
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {

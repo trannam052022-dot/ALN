@@ -1954,6 +1954,31 @@ exports.createUserByFounder = onCall(
   }
 );
 
+/* ── Founder đặt lại mật khẩu tạm cho tài khoản bất kỳ (KTS/DN/CN/Designer/
+   Kế toán...) — dùng khi mật khẩu tạm ban đầu bị lỡ tay đóng mất, vì email
+   @aln.vn là email ảo nên "Quên mật khẩu" chuẩn của Firebase không dùng
+   được cho các tài khoản này. Mật khẩu cũ ngừng dùng được ngay sau khi gọi. */
+exports.resetUserPasswordByFounder = onCall(
+  { region: "asia-southeast1" },
+  async (request) => {
+    if (!request.auth) throw new HttpsError("unauthenticated", "Chưa đăng nhập");
+    const FOUNDER_UIDS = ['h4kEguPEyMcwJwl89stc0Q6j2si2'];
+    if (!FOUNDER_UIDS.includes(request.auth.uid)) throw new HttpsError("permission-denied", "Chỉ Founder");
+
+    const { uid } = request.data || {};
+    if (!uid) throw new HttpsError("invalid-argument", "Thiếu uid");
+
+    const newPw = 'ALN@' + Math.random().toString(36).slice(2,8).toUpperCase();
+    try {
+      const userRecord = await admin.auth().updateUser(uid, { password: newPw });
+      return { uid, email: userRecord.email || '', tempPassword: newPw };
+    } catch(e) {
+      if (e.code === 'auth/user-not-found') throw new HttpsError("not-found", "Không tìm thấy tài khoản này");
+      throw new HttpsError("internal", e.message);
+    }
+  }
+);
+
 /* ── CHECKLIST_PHANQUYEN_DIENDAN_ALN.md PASS 3 — chuẩn hoá role trong users/{uid} +
    chừa 2 trường plan/credits (MONETIZATION_KTS.md, chỉ chừa trường, chưa có logic).
    Idempotent, chạy lại vô hại. Role không rõ (không nằm trong tập hợp lệ, kể cả sau
