@@ -332,6 +332,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="rt-label">KS Vùng</div>
       <div class="rt-dot"></div>
     </div>
+    <div class="role-tab" data-role="ke_toan" onclick="switchRole('ke_toan')">
+      <div class="rt-icon"><i class="ph-duotone ph-calculator"></i></div>
+      <div class="rt-label">Kế toán</div>
+      <div class="rt-dot"></div>
+    </div>
   </div>
 
   <!-- ── LOGIN CARD ── -->
@@ -344,7 +349,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span id="msgErrorTxt">Tên đăng nhập hoặc mật khẩu không đúng.</span>
       </div>
 
-      <div>
+      <div id="demoBlock">
         <div class="demo-label"><i class="ph-duotone ph-lightning" style="color:var(--gold);font-size:9px"></i> Tài khoản demo — nhấn để điền nhanh</div>
         <div class="demo-row" id="demoRow"></div>
       </div>
@@ -540,7 +545,11 @@ function renderCardTop(){
 }
 
 function renderDemoRow(){
-  const accs = ACCOUNTS[activeRole];
+  // Vai trò nội bộ (ks, ke_toan...) không có tài khoản demo public — ẩn cả khối
+  // thay vì để trống hoặc lỗi .map trên undefined.
+  const accs = ACCOUNTS[activeRole] || [];
+  const block = document.getElementById('demoBlock');
+  if (block) block.style.display = accs.length ? '' : 'none';
   document.getElementById('demoRow').innerHTML = accs.map(a=>`
     <button class="demo-btn" onclick="fillDemo('${a.user}','${a.pw}')">
       <div class="db-name">${a.name}</div>
