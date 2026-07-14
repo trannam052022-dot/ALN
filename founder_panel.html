@@ -947,6 +947,7 @@ body {
     <button class="fsub" id="tabLiveDes" onclick="switchTab('liveDes')"><span style="width:6px;height:6px;border-radius:50%;background:#a78bfa;flex-shrink:0"></span>Designer</button>
     <button class="fsub" id="tabLiveKs"  onclick="switchTab('liveKs')" ><span style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0"></span>KS Vùng</button>
     <button class="fsub" id="tabLiveKtv" onclick="switchTab('liveKtv')"><span style="width:6px;height:6px;border-radius:50%;background:var(--cyan);flex-shrink:0"></span>KTV</button>
+    <button class="fsub" id="tabLiveKeToan" onclick="switchTab('liveKeToan')"><span style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0"></span>Kế toán</button>
   </span>
 
 </div>
@@ -1978,6 +1979,26 @@ document.addEventListener('DOMContentLoaded', function() {
     </a>
   </div>
   <iframe id="iframeKtv" src="about:blank" data-src="ktv_dashboard.html"
+    style="flex:1;width:100%;border:none;min-height:calc(100vh - 84px)"
+    allow="same-origin"></iframe>
+</div>
+
+<!-- ══ PANEL: LIVE KẾ TOÁN ══ -->
+<div id="panelLiveKeToan" style="display:none;flex-direction:column;flex:1;position:relative">
+  <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0">
+    <span style="width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold)"></span>
+    <span style="font-size:11px;font-weight:700;color:var(--gold);font-family:var(--mono)">LIVE — Trang Kế toán trưởng</span>
+    <span style="font-size:10px;color:var(--dim)">ketoan_dashboard.html</span>
+    <button onclick="document.getElementById('iframeKeToan').src=document.getElementById('iframeKeToan').dataset.src"
+      style="margin-left:auto;padding:4px 10px;background:var(--raised);border:1px solid var(--border);color:var(--sub);border-radius:5px;font-size:10px;cursor:pointer;font-family:var(--sans)">
+      <i class="ph-duotone ph-arrow-clockwise"></i> Tải lại
+    </button>
+    <a href="ketoan_dashboard.html" target="_blank"
+      style="padding:4px 10px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);color:var(--gold);border-radius:5px;font-size:10px;cursor:pointer;font-family:var(--sans);text-decoration:none">
+      <i class="ph-duotone ph-arrow-square-out"></i> Mở tab mới
+    </a>
+  </div>
+  <iframe id="iframeKeToan" src="about:blank" data-src="ketoan_dashboard.html"
     style="flex:1;width:100%;border:none;min-height:calc(100vh - 84px)"
     allow="same-origin"></iframe>
 </div>
@@ -3238,7 +3259,7 @@ window.ALNRealtime = (() => {
 ══════════════════════════════════════════ */
 
 function switchTab(t){
-  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','mgKtv','pending','payments','report','leads','recruit','company','pricing','khomau','mkt','seo','hoikien','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes','liveKs','liveKtv'];
+  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','mgKtv','pending','payments','report','leads','recruit','company','pricing','khomau','mkt','seo','hoikien','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes','liveKs','liveKtv','liveKeToan'];
   var activeStyle  = 'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.15);color:var(--blue);white-space:nowrap';
   var inactiveStyle= 'padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:var(--raised);color:var(--sub);white-space:nowrap';
   var liveStyles = {
@@ -3250,6 +3271,7 @@ function switchTab(t){
     liveDes:  {active:'padding:5px 13px;border:1px solid rgba(124,58,237,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.22);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap',   inactive:'padding:5px 13px;border:1px solid rgba(124,58,237,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.08);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap'},
     liveKs:   {active:'padding:5px 13px;border:1px solid rgba(201,168,76,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.2);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     liveKtv:  {active:'padding:5px 13px;border:1px solid rgba(34,211,238,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(34,211,238,.18);color:var(--cyan);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(34,211,238,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(34,211,238,.08);color:var(--cyan);display:flex;align-items:center;gap:5px;white-space:nowrap'},
+    liveKeToan: {active:'padding:5px 13px;border:1px solid rgba(201,168,76,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.2);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     waitRoom:  {active:'padding:5px 13px;border:1px solid rgba(167,139,250,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.22);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap', inactive:'padding:5px 13px;border:1px solid rgba(167,139,250,.3);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(124,58,237,.1);color:#a78bfa;display:flex;align-items:center;gap:5px;white-space:nowrap'},
     matching:  {active:'padding:5px 13px;border:1px solid rgba(201,168,76,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.2);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap',  inactive:'padding:5px 13px;border:1px solid rgba(201,168,76,.28);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(201,168,76,.08);color:var(--gold);display:flex;align-items:center;gap:5px;white-space:nowrap'},
     c2monitor: {active:'padding:5px 13px;border:1px solid rgba(239,68,68,.55);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.2);color:#ef4444;display:flex;align-items:center;gap:5px;white-space:nowrap',     inactive:'padding:5px 13px;border:1px solid rgba(239,68,68,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.08);color:#ef4444;display:flex;align-items:center;gap:5px;white-space:nowrap'},
@@ -3296,7 +3318,7 @@ function switchTab(t){
   if(t==='c2monitor')  loadC2MonitorPanel();
 
   // LIVE iframes: chỉ tải khi vào tab, rời tab thì giải phóng bộ nhớ
-  var IFR = { liveKts:'iframeKts', liveDn:'iframeDn', liveCn:'iframeCn', liveDes:'iframeDes', liveKs:'iframeKs', liveKtv:'iframeKtv' };
+  var IFR = { liveKts:'iframeKts', liveDn:'iframeDn', liveCn:'iframeCn', liveDes:'iframeDes', liveKs:'iframeKs', liveKtv:'iframeKtv', liveKeToan:'iframeKeToan' };
   Object.keys(IFR).forEach(function(k){
     var f = document.getElementById(IFR[k]);
     if(!f) return;
