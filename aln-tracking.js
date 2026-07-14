@@ -12,8 +12,36 @@
     }catch(e){ return 'unknown'; }
   };
 
+  /* Nhãn trang cho event tự động: trang nào muốn tên đẹp thì đặt
+     window.ALN_PAGE_LABEL = 'homepage' TRƯỚC khi load file này; không đặt thì
+     dùng location.pathname. */
+  function pageLabelAuto(){
+    return window.ALN_PAGE_LABEL || location.pathname;
+  }
+
+  /* Tự động bắn tracking khi click link tel: — mọi trang nhúng file này đều có,
+     KHÔNG cần gắn onclick từng link. Delegation ở document nên bắt cả link
+     render sau (dùng capture để chạy trước khi rời trang). */
+  document.addEventListener('click', function(ev){
+    var el = ev.target;
+    while (el && el.getAttribute) {
+      if (el.tagName === 'A' && (el.getAttribute('href') || '').indexOf('tel:') === 0) {
+        try{
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({ event: 'aln_click_call', aln_source_page: pageLabelAuto() });
+          if (window.fbq) window.fbq('track', 'Contact', { content_name: 'Hotline' });
+          if (window.gtag) window.gtag('event', 'contact', { method: 'hotline' });
+        }catch(e){}
+        return;
+      }
+      el = el.parentNode;
+    }
+  }, true);
+
   /* Bắn dataLayer khi cuộn qua các mốc % chiều cao trang (1 lần / mốc). */
+  var scrollDepthInited = false;
   window.alnScrollDepth = function(pageLabel, thresholds){
+    scrollDepthInited = true;
     thresholds = thresholds || [25, 50, 75, 100];
     var fired = {};
     function check(){
@@ -53,5 +81,17 @@
       }
     });
   };
+
+  /* Tự init scroll depth cho trang không gọi tay (các trang SEO tĩnh).
+     Trang nào đã gọi window.alnScrollDepth('label') trong script sync thì
+     giữ nguyên label đó, không init đôi. */
+  function autoInitScroll(){
+    if (!scrollDepthInited) window.alnScrollDepth(pageLabelAuto());
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', autoInitScroll);
+  } else {
+    autoInitScroll();
+  }
 
 })();

@@ -252,6 +252,7 @@ function pageShell({ title, description, canonical, heading, intro, filtersHtml,
   gtag('config', 'G-5CSL1TF0RC');
 </script>
 <!-- End GA4 -->
+<script src="../aln-tracking.js"></script>
 </head>
 <body>
 

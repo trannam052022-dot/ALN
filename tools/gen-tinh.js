@@ -152,6 +152,7 @@ function renderIndexPage(tinhList) {
   gtag('config', 'G-5CSL1TF0RC');
 </script>
 <!-- End GA4 -->
+<script src="../aln-tracking.js"></script>
 </head>
 <body>
 
