@@ -52,6 +52,7 @@ function headTags(opts) {
   lines.push('<link rel="icon" href="' + opts.root + 'icon-192.png" type="image/png">');
   lines.push('<meta name="theme-color" content="#98690a">');
   lines.push('<script src="' + opts.root + 'aln-tracking.js"><\/script>');
+  lines.push('<script src="' + opts.root + 'error-monitor.js"><\/script>');
   return lines.join('\n');
 }
 
