@@ -21,6 +21,15 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'designer' &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'active';
     }
+    // Kế toán trưởng — chỉ đọc projects/designProjects (để đối chiếu khoản chi
+    // KTS/Designer) + ghi RIÊNG field paymentChecks (đánh dấu "đã kiểm tra"
+    // trước khi Founder tự tay chuyển tiền). Tuyệt đối không được đụng
+    // payments/totalFee/escrow — quyền xác nhận đã chuyển vẫn chỉ Founder.
+    function isKeToan() {
+      return request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ke_toan' &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'active';
+    }
     function isMemberOfProject(pid) {
       let p = get(/databases/$(database)/documents/projects/$(pid)).data;
       return request.auth.uid in p.memberUids ||
@@ -85,7 +94,7 @@ service cloud.firestore {
     }
 
     match /designProjects/{pid} {
-      allow read: if isFounder() || (signedIn() && (
+      allow read: if isFounder() || isKeToan() || (signedIn() && (
         request.auth.uid in resource.data.memberUids ||
         request.auth.uid == resource.data.designer.uid ||
         request.auth.uid == resource.data.cn.uid ||
@@ -94,10 +103,13 @@ service cloud.firestore {
       allow create: if isFounder();
       // Thành viên chỉ được sửa field thuộc luồng nghiệp vụ — CẤM sửa
       // totalFee/escrow/memberUids/designer/cn/dn (chống gian lận nội bộ).
+      // Kế toán chỉ được ghi paymentChecks (đánh dấu đã đối chiếu).
       allow update: if isFounder() ||
         (signedIn() && request.auth.uid in resource.data.memberUids
           && request.resource.data.diff(resource.data).affectedKeys()
-             .hasOnly(['stage', 'progress', 'updatedAt', 'payments']));
+             .hasOnly(['stage', 'progress', 'updatedAt', 'payments'])) ||
+        (isKeToan() && request.resource.data.diff(resource.data).affectedKeys()
+           .hasOnly(['paymentChecks', 'updatedAt']));
       allow delete: if isFounder();
 
       match /documents/{docId} {
@@ -228,7 +240,7 @@ service cloud.firestore {
       // Chỉ THÀNH VIÊN của dự án (CN/KTS/DN) hoặc Founder mới đọc được.
       // Mỗi nhánh khớp với 1 kiểu query: cn.uid (CN), kts.uid (KTS),
       // dn.uid hoặc memberUids array-contains (DN). Người lạ bị chặn.
-      allow read: if isFounder() || (signedIn() && (
+      allow read: if isFounder() || isKeToan() || (signedIn() && (
         request.auth.uid in resource.data.memberUids ||
         request.auth.uid == resource.data.cn.uid ||
         request.auth.uid == resource.data.kts.uid ||
@@ -238,11 +250,14 @@ service cloud.firestore {
       // Thành viên chỉ được sửa field thuộc luồng nghiệp vụ (CN/DN duyệt PA
       // → advance chặng + ghi payment record chờ Founder xác nhận). CẤM sửa
       // totalFee/escrow/memberUids/kts/cn/dn — chống thành viên gian lận
-      // trạng thái, tự đổi số tiền hay thêm người vào dự án.
+      // trạng thái, tự đổi số tiền hay thêm người vào dự án. Kế toán chỉ được
+      // ghi paymentChecks (đánh dấu đã đối chiếu) — không đụng payments.
       allow update: if isFounder() ||
         (signedIn() && request.auth.uid in resource.data.memberUids
           && request.resource.data.diff(resource.data).affectedKeys()
-             .hasOnly(['stage', 'progress', 'updatedAt', 'payments']));
+             .hasOnly(['stage', 'progress', 'updatedAt', 'payments'])) ||
+        (isKeToan() && request.resource.data.diff(resource.data).affectedKeys()
+           .hasOnly(['paymentChecks', 'updatedAt']));
       allow delete: if isFounder();
 
       match /documents/{docId} {

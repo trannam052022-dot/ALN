@@ -508,6 +508,7 @@ const ROLE_META = {
   designer: { icon:'<i class="ph-duotone ph-paint-brush-household"></i>', title:'Designer Nội thất', desc:'Quản lý dự án & hồ sơ nội thất', color:'#7c3aed', bg:'rgba(124,58,237,.1)' },
   ks:       { icon:'<i class="ph-duotone ph-map-pin-area"></i>', title:'KS Vùng', desc:'Xét duyệt KTS & quản lý mạng lưới địa phương', color:'var(--gold)', bg:'rgba(201,168,76,.08)' },
   founder:  { icon:'<i class="ph-duotone ph-crown"></i>', title:'Hội đồng Sáng lập', desc:'Toàn quyền quản trị hệ thống ALN', color:'var(--gold)', bg:'rgba(201,168,76,.12)' },
+  ke_toan:  { icon:'<i class="ph-duotone ph-calculator"></i>', title:'Kế toán trưởng', desc:'Đối chiếu khoản chi KTS/Designer chờ Founder chuyển', color:'var(--gold)', bg:'rgba(201,168,76,.08)' },
 };
 
 let activeRole = 'kts';
@@ -570,7 +571,7 @@ function showError(msg){
   setTimeout(()=>{ card.style.animation='shake .35s ease'; },10);
 }
 
-const FILE_BY_ROLE = { kts:'kts_dashboard.html', dn:'client_DN.html', cn:'client_CN.html', designer:'designer_dashboard.html', founder:'founder_panel.html', ks:'ks_dashboard.html', ktv:'ktv_dashboard.html' };
+const FILE_BY_ROLE = { kts:'kts_dashboard.html', dn:'client_DN.html', cn:'client_CN.html', designer:'designer_dashboard.html', founder:'founder_panel.html', ks:'ks_dashboard.html', ktv:'ktv_dashboard.html', ke_toan:'ketoan_dashboard.html' };
 /* Nếu người dùng bấm đăng nhập TỪ diễn đàn (forum.html lưu sessionStorage.forumReturn),
    sau khi login xong đưa họ QUAY LẠI forum (đúng thread) thay vì dashboard mặc định. */
 function alnReturnDest(){
@@ -630,13 +631,15 @@ async function doLogin(){
       resetLoginBtn(); return;
     }
     const effectiveRole = profile.role;
-    if(effectiveRole !== activeRole && effectiveRole !== 'founder'){
+    // founder + ke_toan: tài khoản nội bộ, không có tab riêng trên màn hình đăng
+    // nhập nên bỏ qua kiểm tra khớp tab (giống founder từ trước).
+    if(effectiveRole !== activeRole && effectiveRole !== 'founder' && effectiveRole !== 'ke_toan'){
       await fb.signOut(fb.auth);
       const roleTitle = (ROLE_META[effectiveRole] && ROLE_META[effectiveRole].title) || effectiveRole;
       showError(`Tài khoản này thuộc vai trò "${roleTitle}". Vui lòng chọn đúng loại tài khoản.`);
       resetLoginBtn(); return;
     }
-    const redirectRole = effectiveRole === 'founder' ? 'founder' : activeRole;
+    const redirectRole = (effectiveRole === 'founder' || effectiveRole === 'ke_toan') ? effectiveRole : activeRole;
     const username = profile.username || user;
     var userData = JSON.stringify({ name:profile.name||username, userId:username, role:profile.role, badge:profile.badge||'', uid:cred.user.uid });
     try { localStorage.setItem('aln_user', userData); } catch(e){}

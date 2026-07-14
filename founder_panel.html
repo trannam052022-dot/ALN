@@ -1553,9 +1553,14 @@ document.addEventListener('DOMContentLoaded', function() {
       <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:3px">ESCROW & GIẢI NGÂN</div>
       <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1)">Xác nhận Thanh toán KTS & Designer</div>
     </div>
-    <button onclick="renderPayments()" style="padding:6px 14px;background:var(--raised);border:1px solid var(--border);border-radius:7px;font-size:11px;font-weight:600;color:var(--sub);cursor:pointer;font-family:var(--sans)">
-      <i class="ph-duotone ph-arrow-clockwise"></i> Tải lại
-    </button>
+    <div style="display:flex;gap:8px">
+      <button onclick="openAddModal('ke_toan')" style="padding:6px 14px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);border-radius:7px;font-size:11px;font-weight:700;color:var(--gold);cursor:pointer;font-family:var(--sans)">
+        <i class="ph-duotone ph-plus"></i> Thêm Kế toán trưởng
+      </button>
+      <button onclick="renderPayments()" style="padding:6px 14px;background:var(--raised);border:1px solid var(--border);border-radius:7px;font-size:11px;font-weight:600;color:var(--sub);cursor:pointer;font-family:var(--sans)">
+        <i class="ph-duotone ph-arrow-clockwise"></i> Tải lại
+      </button>
+    </div>
   </div>
   <div id="reportedPaymentsWrap" style="display:none;padding:16px 20px;border-bottom:1px solid var(--red-bd);background:var(--red-bg)">
     <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--red);margin-bottom:2px;text-transform:uppercase;letter-spacing:.06em"><i class="ph-duotone ph-bell-ringing"></i> Khách báo đã chuyển khoản — cần kiểm tra</div>
@@ -4217,7 +4222,7 @@ function _updatePendingBadge(){
 var _addModalType = '';
 function openAddModal(type){
   _addModalType = type;
-  var titles = {kts:'➕ Thêm Kiến trúc sư', dn:'➕ Thêm Doanh nghiệp', cn:'➕ Thêm Chủ nhà'};
+  var titles = {kts:'➕ Thêm Kiến trúc sư', dn:'➕ Thêm Doanh nghiệp', cn:'➕ Thêm Chủ nhà', ke_toan:'➕ Thêm Kế toán trưởng'};
   document.getElementById('addModalTitle').textContent = titles[type]||'Thêm tài khoản';
   var fields = {
     kts: '<div style="display:flex;flex-direction:column;gap:12px">'
@@ -4237,6 +4242,11 @@ function openAddModal(type){
       +'<label style="font-size:11px;font-weight:600;color:var(--sub)">Họ và tên chủ nhà<input id="af_name" style="margin-top:4px;display:block;width:100%;background:var(--raised);border:1px solid var(--border);color:var(--text1);padding:8px 10px;border-radius:6px;font-family:var(--sans);font-size:12px;outline:none" placeholder="Nguyễn Văn A"></label>'
       +'<label style="font-size:11px;font-weight:600;color:var(--sub)">Tên đăng nhập<input id="af_user" style="margin-top:4px;display:block;width:100%;background:var(--raised);border:1px solid var(--border);color:var(--text1);padding:8px 10px;border-radius:6px;font-family:var(--mono);font-size:12px;outline:none" placeholder="cn.username"></label>'
       +'<label style="font-size:11px;font-weight:600;color:var(--sub)">Mật khẩu<input id="af_pw" type="password" style="margin-top:4px;display:block;width:100%;background:var(--raised);border:1px solid var(--border);color:var(--text1);padding:8px 10px;border-radius:6px;font-family:var(--sans);font-size:12px;outline:none" placeholder="••••••••"></label>'
+      +'</div>',
+    ke_toan: '<div style="display:flex;flex-direction:column;gap:12px">'
+      +'<label style="font-size:11px;font-weight:600;color:var(--sub)">Họ và tên<input id="af_name" style="margin-top:4px;display:block;width:100%;background:var(--raised);border:1px solid var(--border);color:var(--text1);padding:8px 10px;border-radius:6px;font-family:var(--sans);font-size:12px;outline:none" placeholder="Nguyễn Văn A"></label>'
+      +'<label style="font-size:11px;font-weight:600;color:var(--sub)">Tên đăng nhập<input id="af_user" style="margin-top:4px;display:block;width:100%;background:var(--raised);border:1px solid var(--border);color:var(--text1);padding:8px 10px;border-radius:6px;font-family:var(--mono);font-size:12px;outline:none" placeholder="ke_toan.username"></label>'
+      +'<div style="font-size:10.5px;color:var(--dim);line-height:1.5"><i class="ph-duotone ph-info"></i> Chỉ xem được khoản chờ chi + bấm "Đã kiểm tra" — không có quyền xác nhận đã chuyển tiền.</div>'
       +'</div>',
   };
   document.getElementById('addModalBody').innerHTML = fields[type]||'';
@@ -4898,7 +4908,8 @@ function _pendingPayments() {
     ['C1','C2','C3','C4'].forEach(function(stage) {
       var pay = payments[stage];
       if (pay && pay.status === 'pending') {
-        result.push({ coll: 'projects', roleLabel: 'KTS', projId: p.id, projName: p.name || p.id, personName: p.kts || '—', personUid: pay.ktsUid || '', stage: stage, amount: pay.amount || 0, netAmount: (pay.netAmount != null ? pay.netAmount : _fallbackNet(pay.amount)), stagedAt: pay.stagedAt });
+        var checkP = (raw.paymentChecks || {})[stage] || null;
+        result.push({ coll: 'projects', roleLabel: 'KTS', projId: p.id, projName: p.name || p.id, personName: p.kts || '—', personUid: pay.ktsUid || '', stage: stage, amount: pay.amount || 0, netAmount: (pay.netAmount != null ? pay.netAmount : _fallbackNet(pay.amount)), stagedAt: pay.stagedAt, check: checkP });
       }
     });
   });
@@ -4908,7 +4919,8 @@ function _pendingPayments() {
     ['C1','C2','C3','C4'].forEach(function(stage) {
       var pay = payments[stage];
       if (pay && pay.status === 'pending') {
-        result.push({ coll: 'designProjects', roleLabel: 'Designer', projId: p.id, projName: p.name || p.id, personName: p.designer || '—', personUid: pay.designerUid || '', stage: stage, amount: pay.amount || 0, netAmount: (pay.netAmount != null ? pay.netAmount : _fallbackNet(pay.amount)), stagedAt: pay.stagedAt });
+        var checkP2 = (raw.paymentChecks || {})[stage] || null;
+        result.push({ coll: 'designProjects', roleLabel: 'Designer', projId: p.id, projName: p.name || p.id, personName: p.designer || '—', personUid: pay.designerUid || '', stage: stage, amount: pay.amount || 0, netAmount: (pay.netAmount != null ? pay.netAmount : _fallbackNet(pay.amount)), stagedAt: pay.stagedAt, check: checkP2 });
       }
     });
   });
@@ -5170,6 +5182,7 @@ window.renderPayments = function renderPayments() {
         + '<div style="font-size:13px;font-weight:600;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + pay.projId + ' — ' + pay.projName + '</div>'
         + '<div style="font-size:11px;color:var(--dim);margin-top:2px">' + pay.roleLabel + ': <b style="color:var(--text2)">' + pay.personName + '</b> · Chặng <b style="color:var(--amber)">' + pay.stage + '</b>' + dateStr + '</div>'
         + '<div id="' + bankId + '" style="font-size:10.5px;color:var(--dim);margin-top:4px;font-family:var(--mono)">Đang tải TK ngân hàng...</div>'
+        + (pay.check ? '<div style="font-size:10.5px;color:var(--green);margin-top:4px;font-weight:600"><i class="ph-duotone ph-check-circle"></i> Kế toán đã kiểm tra' + (pay.check.checkedByName ? ' — ' + pay.check.checkedByName : '') + (pay.check.checkedAt && pay.check.checkedAt.toDate ? ' lúc ' + pay.check.checkedAt.toDate().toLocaleString('vi-VN') : '') + '</div>' : '')
       + '</div>'
       + '<div id="payqr-' + pay.coll + '-' + pay.projId + '-' + pay.stage + '" style="width:84px;height:84px;flex-shrink:0;display:none;background:#fff;border:1px solid var(--border);border-radius:8px;padding:3px;align-items:center;justify-content:center;overflow:hidden"></div>'
       + '<div style="text-align:right;flex-shrink:0">'

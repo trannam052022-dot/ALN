@@ -27,6 +27,7 @@ const PAGE_BY_ROLE = {
   dn:          "client_DN.html",
   cn:          "client_CN.html",
   ktv:         "ktv_dashboard.html",
+  ke_toan:     "ketoan_dashboard.html",
   community:   "aln_community.html",
   reservation: "aln-giu-cho/phong-cho.html",
 };
@@ -1930,7 +1931,7 @@ exports.createUserByFounder = onCall(
 
     const { username, name, role, phone } = request.data || {};
     if (!username || !name || !role) throw new HttpsError("invalid-argument", "Thiếu username/name/role");
-    const validRoles = ['cn','kts','dn','designer'];
+    const validRoles = ['cn','kts','dn','designer','ke_toan'];
     if (!validRoles.includes(role)) throw new HttpsError("invalid-argument", "Role không hợp lệ");
 
     const email = username + '@aln.vn';

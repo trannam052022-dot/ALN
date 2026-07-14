@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <script src="error-monitor.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALN — Kế toán trưởng</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+:root{
+  --bg:#080c14;--bg2:#0e1422;--bg3:#141b2e;
+  --card:rgba(14,20,34,.92);--border:rgba(255,255,255,.07);
+  --border-c:rgba(201,168,76,.18);--muted:rgba(220,204,160,.38);
+  --text:#f0ebe0;--text2:rgba(240,235,224,.62);
+  --gold:#C9A84C;--gold2:#e0c675;--green:#3dd68c;--red:#f06060;--amber:#f59e0b;
+  --r:12px;--mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;--serif:'Cormorant Garamond',serif;
+  --syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:1rem;
+  background-image:linear-gradient(rgba(201,168,76,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.015) 1px,transparent 1px);
+  background-size:56px 56px;}
+body::before{content:'';position:fixed;top:-20%;left:50%;transform:translateX(-50%);width:800px;height:500px;
+  background:radial-gradient(ellipse,rgba(201,168,76,.07) 0%,transparent 65%);pointer-events:none;z-index:0;}
+a{color:var(--gold)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(201,168,76,.25);border-radius:99px}
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;padding:0 24px;height:52px;
+  background:rgba(8,12,20,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.06);}
+.topbar-logo{font-family:var(--syne);font-size:13px;font-weight:800;letter-spacing:.18em;color:var(--gold);text-transform:uppercase}
+.topbar-sep{width:1px;height:20px;background:rgba(255,255,255,.1)}
+.topbar-title{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+.topbar-grow{flex:1}
+.topbar-name{font-size:12px;font-weight:600;color:var(--text2)}
+.topbar-logout{background:transparent;border:1px solid rgba(255,255,255,.1);color:var(--muted);font-size:11px;
+  border-radius:7px;padding:5px 12px;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:5px;transition:all .15s}
+.topbar-logout:hover{border-color:rgba(201,168,76,.3);color:rgba(201,168,76,.8)}
+.layout{max-width:900px;margin:0 auto;padding:28px 20px 72px;position:relative;z-index:1}
+.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border-c);border-radius:var(--r);padding:16px 18px;display:flex;align-items:flex-start;gap:14px}
+.stat-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.stat-icon.gold{background:rgba(201,168,76,.1)}
+.stat-icon.green{background:rgba(61,214,140,.1)}
+.stat-label{font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.stat-val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);line-height:1}
+.stat-sub{font-size:10px;color:var(--muted);margin-top:3px}
+.notice{padding:14px 16px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.18);border-radius:10px;font-size:11.5px;color:var(--text2);line-height:1.6;margin-bottom:20px}
+.notice b{color:var(--gold)}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-family:var(--syne);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.badge-count{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.22);color:var(--gold);
+  font-family:var(--mono);font-size:10px;font-weight:700;border-radius:99px;padding:2px 9px}
+.pay-card{background:var(--card);border:1px solid var(--border-c);border-radius:var(--r);padding:14px 18px;margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pay-icon{width:42px;height:42px;border-radius:10px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;color:var(--gold)}
+.pay-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pay-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.pay-bank{font-size:10.5px;color:var(--muted);margin-top:4px;font-family:var(--mono)}
+.pay-checked{font-size:10.5px;color:var(--green);margin-top:4px;font-weight:600}
+.pay-qr{width:84px;height:84px;flex-shrink:0;display:none;background:#fff;border:1px solid var(--border);border-radius:8px;padding:3px;align-items:center;justify-content:center;overflow:hidden}
+.pay-amt{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--gold)}
+.pay-amt-sub{font-size:9.5px;color:var(--muted);font-family:var(--mono)}
+.btn-check{margin-top:6px;padding:6px 14px;background:rgba(61,214,140,.14);border:1.5px solid rgba(61,214,140,.4);border-radius:7px;color:var(--green);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:var(--syne)}
+.btn-check:hover{background:rgba(61,214,140,.22)}
+.btn-check:disabled{opacity:.5;cursor:not-allowed}
+.empty{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty-icon{font-size:36px;margin-bottom:14px;opacity:.4}
+.empty-text{font-size:13px;line-height:1.6}
+.loader{display:flex;align-items:center;justify-content:center;gap:8px;padding:36px;color:var(--muted);font-size:12px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(14,20,34,.97);
+  border:1px solid rgba(255,255,255,.1);color:var(--text);font-size:12px;font-weight:500;
+  padding:10px 22px;border-radius:99px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.7);
+  opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;max-width:90vw}
+.toast.show{opacity:1}
+.toast.ok{border-color:rgba(61,214,140,.35);color:#7dffc0}
+.toast.err{border-color:rgba(240,96,96,.35);color:#f09898}
+@keyframes phspin{to{transform:rotate(360deg)}}
+@media(max-width:600px){ .topbar{padding:0 14px} .pay-card{flex-direction:column;align-items:stretch} }
+</style>
+<link rel="stylesheet" href="aln-tokens.css">
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-logo">ALN</span>
+  <div class="topbar-sep"></div>
+  <span class="topbar-title">Kế toán trưởng — Đối chiếu chi tiền</span>
+  <div class="topbar-grow"></div>
+  <span class="topbar-name" id="topName"></span>
+  <button class="topbar-logout" onclick="doLogout()">
+    <i class="ph-duotone ph-sign-out"></i> Đăng xuất
+  </button>
+</div>
+
+<div class="layout">
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon gold"><i class="ph-duotone ph-hourglass-medium"></i></div>
+      <div>
+        <div class="stat-label">Chờ đối chiếu</div>
+        <div class="stat-val" id="statPending">—</div>
+        <div class="stat-sub">Khoản chi KTS/Designer</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><i class="ph-duotone ph-check-circle"></i></div>
+      <div>
+        <div class="stat-label">Đã kiểm tra</div>
+        <div class="stat-val" id="statChecked">—</div>
+        <div class="stat-sub">Đang chờ Founder chuyển</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notice">
+    <i class="ph-duotone ph-info"></i>
+    Bạn chỉ có quyền <b>xem</b> danh sách chờ chi và bấm <b>"Đã kiểm tra"</b> sau khi đối chiếu hồ sơ/số tiền.
+    Việc chuyển tiền thật và bấm "Đã chuyển" vẫn chỉ Founder thực hiện.
+  </div>
+
+  <div class="section-head">
+    <span class="section-title">Khoản chờ chi cho KTS / Designer</span>
+    <span class="badge-count" id="countPending">0</span>
+  </div>
+  <div id="listPending"><div class="loader"><i class="ph-duotone ph-spinner" style="animation:phspin 1s linear infinite"></i> Đang tải…</div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function esc(s){ return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtAmt(v){ return v >= 1000000 ? (v/1000000).toFixed(1).replace('.0','') + ' tr' : (v/1000).toFixed(0) + 'K'; }
+var PLATFORM_FEE_PCT = 0.20, INCOME_TAX_PCT = 0.07;
+function fallbackNet(amount){ return Math.round((amount || 0) * (1 - PLATFORM_FEE_PCT - INCOME_TAX_PCT)); }
+
+var _tt = null;
+function showToast(msg, type){
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(_tt);
+  _tt = setTimeout(function(){ el.className = 'toast'; }, 3000);
+}
+
+function doLogout(){ window._doLogout && window._doLogout(); }
+function markChecked(coll, projId, stage){ window._markChecked && window._markChecked(coll, projId, stage); }
+
+function payCardHTML(pay){
+  var bankId = 'bankinfo-' + pay.coll + '-' + pay.projId + '-' + pay.stage;
+  var qrId = 'payqr-' + pay.coll + '-' + pay.projId + '-' + pay.stage;
+  var checked = pay.check;
+  return '<div class="pay-card">'
+    + '<div class="pay-icon"><i class="ph-duotone ph-money"></i></div>'
+    + '<div style="flex:1;min-width:220px">'
+      + '<div class="pay-name">' + esc(pay.projId) + ' — ' + esc(pay.projName) + '</div>'
+      + '<div class="pay-meta">' + esc(pay.roleLabel) + ': <b style="color:var(--text2)">' + esc(pay.personName) + '</b> · Chặng <b style="color:var(--amber)">' + esc(pay.stage) + '</b></div>'
+      + '<div class="pay-bank" id="' + bankId + '">Đang tải TK ngân hàng...</div>'
+      + (checked ? '<div class="pay-checked"><i class="ph-duotone ph-check-circle"></i> Đã kiểm tra' + (checked.checkedAt && checked.checkedAt.toDate ? ' lúc ' + checked.checkedAt.toDate().toLocaleString('vi-VN') : '') + '</div>' : '')
+    + '</div>'
+    + '<div class="pay-qr" id="' + qrId + '"></div>'
+    + '<div style="text-align:right;flex-shrink:0">'
+      + '<div class="pay-amt">' + fmtAmt(pay.netAmount) + 'đ</div>'
+      + '<div class="pay-amt-sub">gốc ' + fmtAmt(pay.amount) + 'đ · trừ 27%</div>'
+      + (checked
+        ? '<button class="btn-check" disabled><i class="ph-duotone ph-check"></i> Đã kiểm tra</button>'
+        : '<button class="btn-check" onclick="markChecked(\'' + pay.coll + '\',\'' + pay.projId + '\',\'' + pay.stage + '\')"><i class="ph-duotone ph-check"></i> Đã kiểm tra</button>')
+    + '</div>'
+  + '</div>';
+}
+
+function renderList(list){
+  var el = document.getElementById('listPending');
+  var pendingCount = list.filter(function(p){ return !p.check; }).length;
+  var checkedCount = list.filter(function(p){ return !!p.check; }).length;
+  document.getElementById('statPending').textContent = pendingCount;
+  document.getElementById('statChecked').textContent = checkedCount;
+  document.getElementById('countPending').textContent = list.length;
+  if (!list.length){
+    el.innerHTML = '<div class="empty"><div class="empty-icon"><i class="ph-duotone ph-check-circle"></i></div><div class="empty-text">Không có khoản nào đang chờ chi.</div></div>';
+    return;
+  }
+  el.innerHTML = list.map(payCardHTML).join('');
+}
+window.renderList = renderList;
+</script>
+
+<script type="module">
+import {
+  auth, db,
+  onAuthStateChanged, signOut,
+  doc, getDoc, updateDoc,
+  collection, onSnapshot, serverTimestamp
+} from './firebase-config.js';
+
+let ME = null;
+let PROJECTS = [];
+let DESIGN_PROJECTS = [];
+
+onAuthStateChanged(auth, async function(user){
+  if (!user){ location.href = 'login.html'; return; }
+  let snap = null;
+  for (let i = 0; i < 3; i++){
+    try { snap = await getDoc(doc(db, 'users', user.uid)); break; }
+    catch(e){ await new Promise(r => setTimeout(r, 800)); }
+  }
+  const role = (snap && snap.exists()) ? snap.data().role : '';
+  if (role !== 'ke_toan' && role !== 'founder'){
+    const PAGE_BY_ROLE = { founder:'founder_panel.html', kts:'kts_dashboard.html', designer:'designer_dashboard.html', dn:'client_DN.html', cn:'client_CN.html', ks:'ks_dashboard.html', ktv:'ktv_dashboard.html' };
+    location.href = PAGE_BY_ROLE[role] || 'login.html'; return;
+  }
+  ME = snap.exists() ? snap.data() : { name:'Founder', role:'founder' };
+  ME.uid = user.uid;
+  document.getElementById('topName').textContent = ME.name || '';
+
+  onSnapshot(collection(db, 'projects'), function(qs){
+    PROJECTS = qs.docs.map(d => Object.assign({ id: d.id }, d.data()));
+    rebuild();
+  }, function(err){ console.error('[ke_toan projects]', err.code, err.message); });
+
+  onSnapshot(collection(db, 'designProjects'), function(qs){
+    DESIGN_PROJECTS = qs.docs.map(d => Object.assign({ id: d.id }, d.data()));
+    rebuild();
+  }, function(err){ console.error('[ke_toan designProjects]', err.code, err.message); });
+});
+
+function fallbackNet(amount){ return Math.round((amount || 0) * (1 - 0.20 - 0.07)); }
+
+function rebuild(){
+  var result = [];
+  PROJECTS.forEach(function(p){
+    var payments = p.payments || {};
+    ['C1','C2','C3','C4'].forEach(function(stage){
+      var pay = payments[stage];
+      if (pay && pay.status === 'pending'){
+        result.push({
+          coll: 'projects', roleLabel: 'KTS', projId: p.code || p.id, docId: p.id,
+          projName: p.name || p.id, personName: (p.kts && p.kts.name) || '—', personUid: pay.ktsUid || '',
+          stage: stage, amount: pay.amount || 0,
+          netAmount: (pay.netAmount != null ? pay.netAmount : fallbackNet(pay.amount)),
+          check: (p.paymentChecks || {})[stage] || null,
+        });
+      }
+    });
+  });
+  DESIGN_PROJECTS.forEach(function(p){
+    var payments = p.payments || {};
+    ['C1','C2','C3','C4'].forEach(function(stage){
+      var pay = payments[stage];
+      if (pay && pay.status === 'pending'){
+        result.push({
+          coll: 'designProjects', roleLabel: 'Designer', projId: p.code || p.id, docId: p.id,
+          projName: p.name || p.id, personName: (p.designer && p.designer.name) || '—', personUid: pay.designerUid || '',
+          stage: stage, amount: pay.amount || 0,
+          netAmount: (pay.netAmount != null ? pay.netAmount : fallbackNet(pay.amount)),
+          check: (p.paymentChecks || {})[stage] || null,
+        });
+      }
+    });
+  });
+  window.renderList(result);
+  result.forEach(function(pay){
+    _fillBankInfo(pay);
+  });
+}
+
+var _bankCache = {};
+async function _fillBankInfo(pay){
+  var elId = 'bankinfo-' + pay.coll + '-' + pay.projId + '-' + pay.stage;
+  var el = document.getElementById(elId);
+  if (!el) return;
+  if (!pay.personUid){ el.textContent = '— chưa có UID người nhận —'; return; }
+  try {
+    if (!_bankCache[pay.personUid]){
+      var snap = await getDoc(doc(db, 'users', pay.personUid));
+      _bankCache[pay.personUid] = snap.exists() ? (snap.data().bankAccount || {}) : {};
+    }
+    var ba = _bankCache[pay.personUid];
+    el = document.getElementById(elId);
+    if (!el) return;
+    if (ba.bankName || ba.accountNumber){
+      el.textContent = (ba.bankName || '—') + ' · ' + (ba.accountNumber || '—') + (ba.accountHolder ? ' · ' + ba.accountHolder : '');
+      if (!ba.bankId) el.textContent += ' · (chưa chọn NH — không tạo được QR)';
+    } else {
+      el.textContent = 'Chưa cập nhật tài khoản ngân hàng';
+    }
+    var qrId = 'payqr-' + pay.coll + '-' + pay.projId + '-' + pay.stage;
+    var qrEl = document.getElementById(qrId);
+    if (qrEl && ba.bankId && ba.accountNumber){
+      var qrUrl = 'https://img.vietqr.io/image/' + ba.bankId + '-' + ba.accountNumber + '-compact.png'
+        + '?amount=' + (pay.netAmount || 0)
+        + '&addInfo=' + encodeURIComponent(pay.projId + ' ' + pay.stage)
+        + '&accountName=' + encodeURIComponent(ba.accountHolder || '');
+      qrEl.innerHTML = '<img src="' + qrUrl + '" alt="QR" style="width:100%;height:100%;object-fit:contain">';
+      qrEl.style.display = 'flex';
+    }
+  } catch(e){ if (el) el.textContent = 'Lỗi tải TK ngân hàng'; }
+}
+
+window._markChecked = async function(coll, projId, stage){
+  try {
+    var list = coll === 'projects' ? PROJECTS : DESIGN_PROJECTS;
+    var p = list.find(function(x){ return (x.code || x.id) === projId; });
+    if (!p) return;
+    var patch = {};
+    patch['paymentChecks.' + stage] = { checkedByName: ME.name || '', checkedByUid: ME.uid, checkedAt: serverTimestamp() };
+    await updateDoc(doc(db, coll, p.id), patch);
+    window.showToast('✓ Đã đánh dấu kiểm tra — chờ Founder chuyển', 'ok');
+  } catch(e){
+    console.error('[markChecked]', e);
+    window.showToast('Lỗi: ' + (e.message || e.code), 'err');
+  }
+};
+
+window._doLogout = async function(){
+  try { await signOut(auth); } catch(e){}
+  try { localStorage.removeItem('aln_user'); sessionStorage.removeItem('aln_user'); } catch(e){}
+  location.href = 'login.html';
+};
+</script>
+</body>
+</html>
