@@ -333,6 +333,7 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
   gtag('config', 'G-5CSL1TF0RC');
 </script>
 <!-- End GA4 -->
+<script src="aln-tracking.js"></script>
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -738,6 +739,8 @@ var generatedUsername = '';
 var cvFiles = [];
 var certFiles = [];
 
+if (window.alnScrollDepth) window.alnScrollDepth('kts_apply');
+
 function setStep(n) {
   for (var i = 1; i <= 4; i++) {
     var card = document.getElementById('step' + i);
@@ -1026,6 +1029,15 @@ window._doSubmit = async function() {
     try {
       if (window.fbq) fbq('track', 'CompleteRegistration',
         { content_name: 'kts-apply' }, { eventID: 'reg-' + uid });
+    } catch (e) {}
+    try {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        event: 'aln_lead_submit',
+        aln_funnel_tier: 2,
+        aln_source_page: 'kts_apply',
+        aln_ad_type_hint: window.alnAdTypeHint ? window.alnAdTypeHint() : 'unknown'
+      });
     } catch (e) {}
 
     document.getElementById('successUname').textContent = uname;

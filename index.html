@@ -557,6 +557,7 @@ footer{border-top:1px solid var(--border);padding:44px 0 28px}
   gtag('config', 'G-5CSL1TF0RC');
 </script>
 <!-- End GA4 -->
+<script src="aln-tracking.js"></script>
 
 <!-- Luôn mở trang ở ĐẦU (hero ALN Studio) — chặn trình duyệt mobile khôi
      phục vị trí cuộn của lần xem trước. Giữ nguyên hành vi khi có #hash
@@ -1319,7 +1320,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
       <div class="foot-col">
         <h5>Liên hệ</h5>
-        <a href="tel:0909829696" onclick="try{if(window.fbq)fbq('track','Contact',{content_name:'Hotline'});}catch(e){}try{if(window.gtag)gtag('event','contact',{method:'hotline'});}catch(e){}"><i class="ph-duotone ph-phone" style="margin-right:6px;color:var(--gold)"></i>0909 82 9696</a>
+        <a href="tel:0909829696" onclick="try{if(window.fbq)fbq('track','Contact',{content_name:'Hotline'});}catch(e){}try{if(window.gtag)gtag('event','contact',{method:'hotline'});}catch(e){}try{window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:'aln_click_call',aln_source_page:'homepage'});}catch(e){}"><i class="ph-duotone ph-phone" style="margin-right:6px;color:var(--gold)"></i>0909 82 9696</a>
         <a href="https://applamnha.vn" target="_blank" rel="noopener"><i class="ph-duotone ph-globe" style="margin-right:6px;color:var(--gold)"></i>applamnha.vn</a>
         <a href="https://www.facebook.com/applamnha" target="_blank" rel="noopener" onclick="try{if(window.fbq)fbq('track','Contact',{content_name:'Facebook'});}catch(e){}"><i class="ph-duotone ph-facebook-logo" style="margin-right:6px;color:var(--gold)"></i>Facebook</a>
         <a href="/cdn-cgi/l/email-protection#c1a2aeafb5a0a2b581a0b1b1ada0acafa9a0efb7af"><i class="ph-duotone ph-envelope-simple" style="margin-right:6px;color:var(--gold)"></i><span class="__cf_email__" data-cfemail="b2d1dddcc6d3d1c6f2d3c2c2ded3dfdcdad39cc4dc">[email&#160;protected]</span></a>
@@ -1472,6 +1473,7 @@ function alnBannerInit(){
     video.play().catch(function(){});
   });
   video.play().catch(function(){});
+  if (window.alnVideoProgress) window.alnVideoProgress(video, 'homepage-hero-banner');
 }
 window.addEventListener('DOMContentLoaded', alnBannerInit);
 
@@ -1966,6 +1968,12 @@ window.leadSubmit = async function(){
       dataLayer.push({
         'event': 'lead_form_submit',
         'form_name': 'tu_van_mien_phi_trang_chu'
+      });
+      dataLayer.push({
+        event: 'aln_lead_submit',
+        aln_funnel_tier: 1,
+        aln_source_page: 'homepage',
+        aln_ad_type_hint: window.alnAdTypeHint ? window.alnAdTypeHint() : 'unknown'
       });
     } catch (e) {}
 

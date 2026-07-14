@@ -76,6 +76,7 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
   };
 })();
 </script>
+<script src="aln-tracking.js"></script>
 <style>
 :root{
   --ink:#08080a;--ink2:#111114;--ink3:#18181c;--ink4:#222228;
@@ -569,6 +570,15 @@ async function doRegister(){
         if (window.fbq) fbq('track', 'CompleteRegistration',
           { content_name: 'register-cn', content_category: 'cn-funnel' },
           { eventID: 'cnreg-' + uid });
+      } catch(e){}
+      try {
+        window.dataLayer = window.dataLayer || [];
+        dataLayer.push({
+          event: 'aln_lead_submit',
+          aln_funnel_tier: 1,
+          aln_source_page: 'register',
+          aln_ad_type_hint: window.alnAdTypeHint ? window.alnAdTypeHint() : 'unknown'
+        });
       } catch(e){}
     } else if(ktsRef){
       await fb.setDoc(uref, { kts_ref: ktsRef }, { merge: true });
