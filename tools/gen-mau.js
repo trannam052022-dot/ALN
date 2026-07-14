@@ -395,7 +395,8 @@ ${cardsHtml}
 }
 
 function renderIndexPage(all) {
-  const filters = ['all', ...Object.keys(LOAI_LABEL)];
+  const usedLoai = new Set(all.map((m) => m.loai));
+  const filters = ['all', ...Object.keys(LOAI_LABEL).filter((k) => usedLoai.has(k))];
   const filtersHtml =
     '    <nav class="cn-filters" aria-label="Lọc theo loại nhà">\n' +
     filters.map((f) => (
