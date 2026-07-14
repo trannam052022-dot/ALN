@@ -1573,6 +1573,11 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
         <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Chủ tài khoản</div>
         <input type="text" id="bankAccountHolder" placeholder="NGUYEN VAN A" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none;text-transform:uppercase">
       </div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Mã số thuế cá nhân (MST)</div>
+        <input type="text" id="personalTaxCode" placeholder="0123456789" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+        <div style="font-size:9.5px;color:var(--muted);margin-top:4px">Dùng để ALN kê khai thuế TNCN đã khấu trừ (7%) đúng người khi báo cáo với cơ quan thuế.</div>
+      </div>
       <div style="display:flex;align-items:center;gap:12px">
         <div id="qrPreviewWrap" style="width:64px;height:64px;border-radius:8px;background:var(--ink2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">
           <i class="ph-duotone ph-qr-code" style="font-size:24px;color:var(--muted)" id="qrPlaceholderIcon"></i>
@@ -3560,6 +3565,7 @@ window.saveProfile = async function saveProfile() {
     license:      (document.getElementById('profileLicense')||{}).value.trim() || '',
     gender:       (document.getElementById('profileGender')||{}).value || '',
     homeProvince: (document.getElementById('profileHomeProvince')||{}).value || '',
+    taxCode:      (document.getElementById('personalTaxCode')||{}).value.trim() || '',
     bankAccount: (function(){
       var sel = (document.getElementById('bankSelect')||{}).value || '';
       var parts = sel.split('|');
@@ -3683,6 +3689,7 @@ function _fillProfileForm(profile) {
   set('profileEmail',        profile.email);
   set('profilePhone',        profile.phone);
   set('profileLicense',      profile.license);
+  set('personalTaxCode',     profile.taxCode);
   const gEl = document.getElementById('profileGender');
   if (gEl && profile.gender) gEl.value = profile.gender;
   const hpEl = document.getElementById('profileHomeProvince');

@@ -52,6 +52,19 @@ a{color:var(--gold)}
 .stat-sub{font-size:10px;color:var(--muted);margin-top:3px}
 .notice{padding:14px 16px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.18);border-radius:10px;font-size:11.5px;color:var(--text2);line-height:1.6;margin-bottom:20px}
 .notice b{color:var(--gold)}
+.tabs{display:flex;gap:2px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:3px;margin-bottom:20px}
+.tab{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--syne);transition:all .18s;text-align:center}
+.tab.active{background:rgba(201,168,76,.12);color:var(--gold);border:1px solid rgba(201,168,76,.22);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.period-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.period-btn{padding:6px 14px;border-radius:7px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)}
+.period-btn.active{background:rgba(201,168,76,.14);border-color:rgba(201,168,76,.4);color:var(--gold)}
+.btn-export{margin-left:auto;padding:6px 14px;border-radius:7px;border:1px solid rgba(61,214,140,.35);background:rgba(61,214,140,.1);color:var(--green);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)}
+.tax-table{width:100%;border-collapse:collapse;font-size:11.5px;background:var(--card);border:1px solid var(--border-c);border-radius:var(--r);overflow:hidden}
+.tax-table th{padding:9px 12px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:rgba(255,255,255,.03);border-bottom:1px solid var(--border)}
+.tax-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text2)}
+.tax-table tr:last-child td{border-bottom:none}
+.tax-table td.num{text-align:right;font-family:var(--mono)}
+.tax-missing{color:var(--red);font-size:10px}
 .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .section-title{font-family:var(--syne);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .badge-count{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.22);color:var(--gold);
@@ -123,11 +136,38 @@ a{color:var(--gold)}
     Việc chuyển tiền thật và bấm "Đã chuyển" vẫn chỉ Founder thực hiện.
   </div>
 
-  <div class="section-head">
-    <span class="section-title">Khoản chờ chi cho KTS / Designer</span>
-    <span class="badge-count" id="countPending">0</span>
+  <div class="tabs">
+    <button class="tab active" id="tabPending" onclick="switchKtTab('pending')">
+      <i class="ph-duotone ph-hourglass-medium"></i> Chờ chi
+    </button>
+    <button class="tab" id="tabTax" onclick="switchKtTab('tax')">
+      <i class="ph-duotone ph-receipt"></i> Báo cáo khấu trừ TNCN
+    </button>
   </div>
-  <div id="listPending"><div class="loader"><i class="ph-duotone ph-spinner" style="animation:phspin 1s linear infinite"></i> Đang tải…</div></div>
+
+  <div id="panelPending">
+    <div class="section-head">
+      <span class="section-title">Khoản chờ chi cho KTS / Designer</span>
+      <span class="badge-count" id="countPending">0</span>
+    </div>
+    <div id="listPending"><div class="loader"><i class="ph-duotone ph-spinner" style="animation:phspin 1s linear infinite"></i> Đang tải…</div></div>
+  </div>
+
+  <div id="panelTax" style="display:none">
+    <div class="notice">
+      <i class="ph-duotone ph-info"></i>
+      Tính trên các khoản <b>đã thực chi</b> (Founder đã bấm "Đã chuyển"), theo mốc thời gian chuyển tiền.
+      Mỗi khoản bị khấu trừ <b>7% thuế TNCN</b> — bảng dưới tổng hợp theo từng người để kê khai.
+      Người chưa điền MST trong Hồ sơ sẽ hiện cảnh báo đỏ.
+    </div>
+    <div class="period-row">
+      <button class="period-btn active" onclick="setTaxPeriod('month')">Tháng này</button>
+      <button class="period-btn" onclick="setTaxPeriod('quarter')">Quý này</button>
+      <button class="period-btn" onclick="setTaxPeriod('all')">Tất cả</button>
+      <button class="btn-export" onclick="exportTaxCsv()"><i class="ph-duotone ph-download-simple"></i> Xuất CSV</button>
+    </div>
+    <div id="taxReportWrap"><div class="loader"><i class="ph-duotone ph-spinner" style="animation:phspin 1s linear infinite"></i> Đang tải…</div></div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -187,6 +227,76 @@ function renderList(list){
   el.innerHTML = list.map(payCardHTML).join('');
 }
 window.renderList = renderList;
+
+/* ── tabs ── */
+var _ktTab = 'pending';
+function switchKtTab(t){
+  _ktTab = t;
+  document.getElementById('tabPending').classList.toggle('active', t === 'pending');
+  document.getElementById('tabTax').classList.toggle('active', t === 'tax');
+  document.getElementById('panelPending').style.display = (t === 'pending') ? 'block' : 'none';
+  document.getElementById('panelTax').style.display = (t === 'tax') ? 'block' : 'none';
+  window._ktTaxTabActive = (t === 'tax');
+  if (t === 'tax' && window._buildTaxReport) window._buildTaxReport(_taxPeriod);
+}
+
+/* ── báo cáo TNCN ── */
+var _taxPeriod = 'month';
+function setTaxPeriod(p){
+  _taxPeriod = p;
+  var btns = document.querySelectorAll('.period-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+  event.target.classList.add('active');
+  if (window._buildTaxReport) window._buildTaxReport(p);
+}
+
+var _lastTaxRows = [];
+function renderTaxReport(rows){
+  _lastTaxRows = rows || [];
+  var el = document.getElementById('taxReportWrap');
+  if (!rows || !rows.length){
+    el.innerHTML = '<div class="empty"><div class="empty-icon"><i class="ph-duotone ph-receipt"></i></div><div class="empty-text">Không có khoản chi nào đã thanh toán trong kỳ này.</div></div>';
+    return;
+  }
+  var totalGross = 0, totalTax = 0, totalNet = 0;
+  var body = rows.map(function(r){
+    totalGross += r.gross; totalTax += r.tax; totalNet += r.net;
+    return '<tr>'
+      + '<td>' + esc(r.name) + (r.taxCode ? '' : '<div class="tax-missing"><i class="ph-duotone ph-warning"></i> Chưa có MST</div>') + '</td>'
+      + '<td>' + esc(r.taxCode || '—') + '</td>'
+      + '<td class="num">' + r.count + '</td>'
+      + '<td class="num">' + r.gross.toLocaleString('vi-VN') + 'đ</td>'
+      + '<td class="num" style="color:var(--red)">' + r.tax.toLocaleString('vi-VN') + 'đ</td>'
+      + '<td class="num" style="color:var(--green)">' + r.net.toLocaleString('vi-VN') + 'đ</td>'
+    + '</tr>';
+  }).join('');
+  el.innerHTML = '<div style="overflow-x:auto"><table class="tax-table"><thead><tr>'
+    + '<th>Người nhận</th><th>MST</th><th style="text-align:right">Số khoản</th><th style="text-align:right">Tổng gốc</th><th style="text-align:right">Thuế TNCN (7%)</th><th style="text-align:right">Thực nhận</th>'
+    + '</tr></thead><tbody>' + body
+    + '<tr style="font-weight:700"><td colspan="3">Tổng cộng</td>'
+    + '<td class="num">' + totalGross.toLocaleString('vi-VN') + 'đ</td>'
+    + '<td class="num" style="color:var(--red)">' + totalTax.toLocaleString('vi-VN') + 'đ</td>'
+    + '<td class="num" style="color:var(--green)">' + totalNet.toLocaleString('vi-VN') + 'đ</td></tr>'
+    + '</tbody></table></div>';
+}
+window.renderTaxReport = renderTaxReport;
+
+function exportTaxCsv(){
+  if (!_lastTaxRows.length){ showToast('Chưa có dữ liệu để xuất', 'err'); return; }
+  var lines = ['Người nhận,MST,Số khoản,Tổng gốc,Thuế TNCN 7%,Thực nhận'];
+  _lastTaxRows.forEach(function(r){
+    lines.push([r.name, r.taxCode || '', r.count, r.gross, r.tax, r.net].join(','));
+  });
+  var blob = new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'bao-cao-khau-tru-tncn-' + _taxPeriod + '-' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 </script>
 
 <script type="module">
@@ -266,7 +376,88 @@ function rebuild(){
   result.forEach(function(pay){
     _fillBankInfo(pay);
   });
+  if (window._ktTaxTabActive) window._buildTaxReport(window._ktTaxPeriod || 'month');
 }
+
+/* ── báo cáo khấu trừ TNCN — chỉ tính khoản ĐÃ CHUYỂN (status:'paid'), theo paidAt ── */
+var _userCache = {};
+async function _getUserInfo(uid){
+  if (!uid) return { name: '—', taxCode: '' };
+  if (!_userCache[uid]){
+    try {
+      var snap = await getDoc(doc(db, 'users', uid));
+      _userCache[uid] = snap.exists() ? { name: snap.data().name || '', taxCode: snap.data().taxCode || '' } : { name: '', taxCode: '' };
+    } catch(e){ _userCache[uid] = { name: '', taxCode: '' }; }
+  }
+  return _userCache[uid];
+}
+
+function _inPeriod(dateObj, period){
+  if (period === 'all') return true;
+  var now = new Date();
+  if (period === 'month'){
+    return dateObj.getFullYear() === now.getFullYear() && dateObj.getMonth() === now.getMonth();
+  }
+  if (period === 'quarter'){
+    var q = Math.floor(now.getMonth() / 3);
+    var qd = Math.floor(dateObj.getMonth() / 3);
+    return dateObj.getFullYear() === now.getFullYear() && qd === q;
+  }
+  return true;
+}
+
+window._ktTaxTabActive = false;
+window._ktTaxPeriod = 'month';
+window._buildTaxReport = async function(period){
+  window._ktTaxTabActive = true;
+  window._ktTaxPeriod = period || 'month';
+  var paid = [];
+  function collect(list, roleField, uidField){
+    list.forEach(function(p){
+      var payments = p.payments || {};
+      ['C1','C2','C3','C4'].forEach(function(stage){
+        var pay = payments[stage];
+        if (!pay || pay.status !== 'paid' || !pay.paidAt || !pay.paidAt.toDate) return;
+        var d = pay.paidAt.toDate();
+        if (!_inPeriod(d, period)) return;
+        paid.push({
+          uid: pay[uidField] || '',
+          fallbackName: (p[roleField] && p[roleField].name) || '—',
+          amount: pay.amount || 0,
+          netAmount: (pay.netAmount != null ? pay.netAmount : fallbackNet(pay.amount)),
+        });
+      });
+    });
+  }
+  collect(PROJECTS, 'kts', 'ktsUid');
+  collect(DESIGN_PROJECTS, 'designer', 'designerUid');
+
+  var byUid = {};
+  for (var i = 0; i < paid.length; i++){
+    var it = paid[i];
+    var key = it.uid || ('_noname_' + it.fallbackName);
+    if (!byUid[key]) byUid[key] = { uid: it.uid, name: it.fallbackName, count: 0, gross: 0, net: 0 };
+    byUid[key].count += 1;
+    byUid[key].gross += it.amount;
+    byUid[key].net += it.netAmount;
+  }
+  var rows = [];
+  var keys = Object.keys(byUid);
+  for (var j = 0; j < keys.length; j++){
+    var row = byUid[keys[j]];
+    var info = await _getUserInfo(row.uid);
+    rows.push({
+      name: info.name || row.name,
+      taxCode: info.taxCode || '',
+      count: row.count,
+      gross: row.gross,
+      tax: row.gross - row.net,
+      net: row.net,
+    });
+  }
+  rows.sort(function(a, b){ return b.gross - a.gross; });
+  window.renderTaxReport(rows);
+};
 
 var _bankCache = {};
 async function _fillBankInfo(pay){

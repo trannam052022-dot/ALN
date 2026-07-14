@@ -566,6 +566,11 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
               <input type="text" id="bankAccountHolder" placeholder="NGUYEN VAN A" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none;text-transform:uppercase">
             </div>
           </div>
+          <div style="margin-top:10px">
+            <div style="font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Mã số thuế cá nhân (MST)</div>
+            <input type="text" id="personalTaxCode" placeholder="0123456789" style="width:100%;background:var(--ink2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none">
+            <div style="font-size:9.5px;color:var(--muted);margin-top:4px">Dùng để ALN kê khai thuế TNCN đã khấu trừ (7%) đúng người khi báo cáo với cơ quan thuế.</div>
+          </div>
 
           <button class="profile-save-btn" onclick="desSaveProfile()">
             <i class="ph-duotone ph-floppy-disk"></i> Lưu thông tin
@@ -1006,8 +1011,9 @@ window._desFbSaveProfile = async function() {
     accountNumber: ((document.getElementById('bankAccountNumber')||{}).value || '').trim(),
     accountHolder: ((document.getElementById('bankAccountHolder')||{}).value || '').trim().toUpperCase(),
   };
+  var taxCode = ((document.getElementById('personalTaxCode')||{}).value || '').trim();
   try {
-    await updateDoc(doc(db, 'users', u.uid), { name: name, specialty: spec, years: yrs, gender: gender, bankAccount: bankAccount, updatedAt: serverTimestamp() });
+    await updateDoc(doc(db, 'users', u.uid), { name: name, specialty: spec, years: yrs, gender: gender, bankAccount: bankAccount, taxCode: taxCode, updatedAt: serverTimestamp() });
     showToast('Đã lưu hồ sơ', 't-green');
   } catch(e) { showToast('Lỗi: ' + (e.code||e.message), 't-red'); }
 };
@@ -1080,6 +1086,7 @@ onAuthStateChanged(auth, async function(user) {
   }
   var bNo = document.getElementById('bankAccountNumber'); if(bNo) bNo.value = ba.accountNumber||'';
   var bHo = document.getElementById('bankAccountHolder'); if(bHo) bHo.value = ba.accountHolder||'';
+  var tc = document.getElementById('personalTaxCode'); if(tc) tc.value = profile.taxCode||'';
 
   /* load avatar */
   if (profile.avatarURL) {
