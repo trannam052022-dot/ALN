@@ -7,6 +7,7 @@ image: /images/cam-nang/chu-ky-kien-truc-su.jpg
 date: 2026-07-21
 updated: 2026-07-21
 publishDate: 2026-07-21
+facebook: true
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
   - chữ ký kiến trúc sư
