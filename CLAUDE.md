@@ -10,6 +10,7 @@
 - **Câu chuẩn thay thế:** *"ALN là Tổng thầu Thiết kế — ký hợp đồng trực tiếp với khách hàng, trực tiếp chịu trách nhiệm toàn bộ dự án. Thanh toán theo Quy trình 4 bước đảm bảo (C1–C4)."* Bản rút gọn: *"Tổng thầu Thiết kế — hợp đồng trực tiếp, thanh toán theo Quy trình 4 bước đảm bảo."*
 - **Ngữ cảnh thuật ngữ** (không lẫn nhau): khách hàng → **"Quy trình 4 bước đảm bảo"**; KTS → **"Tiền đã có sẵn tại ALN chờ bạn"**; nội bộ → **"Quỹ bảo đảm 4 bước"**.
 - Trước khi publish nội dung mới (Cẩm nang, trang mẫu, trang tỉnh...), đối chiếu với lint content (đã thêm ở Phase 3) để chặn tái phạm.
+- **Bài Cẩm nang MỚI (từ 15/07/2026) mặc định thêm `facebook: true` vào frontmatter** để tự động đăng Fanpage khi tới `publishDate` (cơ chế có sẵn ở `scripts/build-cam-nang.js`, chống trùng qua `content/cam-nang/.fb-posted.json`). **KHÔNG** thêm field này vào các bài Cẩm nang cũ đã publish trước ngày trên (kể cả 2 bài "hồ sơ thiết kế đủ điều kiện pháp lý" và "chữ ký kiến trúc sư có giá trị gì") — bật hàng loạt sẽ khiến cron đăng dồn nhiều bài cùng lúc lên Fanpage thật trong 1 lượt, dễ bị Facebook đánh dấu spam. Chỉ bật thủ công cho bài cũ nếu Founder yêu cầu rõ ràng.
 
 ## Tài liệu chiến lược → repo private
 
