@@ -77,6 +77,10 @@ exports.submitLocalLead = onCall(
     };
     const { score, tier } = scoreLead(brief);
 
+    const raw = request.rawRequest || {};
+    const headers = raw.headers || {};
+    const ip = String(headers["x-forwarded-for"] || "").split(",")[0].trim() || raw.ip || "";
+
     const ref = db.collection("leads").doc();
     await ref.set({
       name, phone,
@@ -94,6 +98,8 @@ exports.submitLocalLead = onCall(
       sourceUrl: typeof d.sourceUrl === "string" ? d.sourceUrl.slice(0, 300) : "",
       fbp: typeof d.fbp === "string" ? d.fbp.slice(0, 200) : "",
       fbc: typeof d.fbc === "string" ? d.fbc.slice(0, 200) : "",
+      ip: String(ip).slice(0, 60),
+      ua: String(headers["user-agent"] || "").slice(0, 400),
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     return { ok: true, id: ref.id };

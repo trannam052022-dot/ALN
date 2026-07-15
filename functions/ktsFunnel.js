@@ -340,6 +340,8 @@ exports.onHomeLeadCreated = onDocumentCreated(
         email: "",
         fbp: typeof r.fbp === "string" ? r.fbp : "",
         fbc: typeof r.fbc === "string" ? r.fbc : "",
+        ip: typeof r.ip === "string" ? r.ip : "",
+        ua: typeof r.ua === "string" ? r.ua : "",
         utm: r.utm,
         contentName: "home-lead-form",
       });
@@ -476,6 +478,8 @@ exports.onLeadCreated = onDocumentCreated(
         email: "",
         fbp: typeof r.fbp === "string" ? r.fbp : "",
         fbc: typeof r.fbc === "string" ? r.fbc : "",
+        ip: typeof r.ip === "string" ? r.ip : "",
+        ua: typeof r.ua === "string" ? r.ua : "",
         utm: r.utm,
         contentName: String(r.source || "leads").slice(0, 60),
       });
