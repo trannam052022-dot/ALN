@@ -79,7 +79,7 @@ async function sendCapiEvent(opts) {
   const token = FB_CAPI_TOKEN.value();
   if (!token || !token.trim()) {
     console.warn("[ktsFunnel] FB_CAPI_TOKEN chưa set — bỏ qua CAPI " + opts.eventName);
-    return;
+    return { ok: false, error: "no_token" };
   }
   const userData = {};
   const ph = hashPhone(opts.phone);
@@ -117,10 +117,12 @@ async function sendCapiEvent(opts) {
   );
   const json = await resp.json().catch(() => ({}));
   if (!resp.ok) {
-    console.error("[ktsFunnel] CAPI " + opts.eventName + " lỗi:", JSON.stringify(json).slice(0, 500));
-  } else {
-    console.log("[ktsFunnel] CAPI " + opts.eventName + " OK, event_id=" + opts.eventId);
+    const msg = JSON.stringify(json).slice(0, 500);
+    console.error("[ktsFunnel] CAPI " + opts.eventName + " lỗi:", msg);
+    return { ok: false, error: msg };
   }
+  console.log("[ktsFunnel] CAPI " + opts.eventName + " OK, event_id=" + opts.eventId);
+  return { ok: true };
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -449,6 +451,10 @@ exports.onCnRegistered = onDocumentCreated(
    template tools/template-tinh.html, template-mau.html, template-dutoan.html).
    Lead diễn đàn (source:'forum') không có fbp/fbc/Pixel phía client —
    CAPI vẫn bắn được nhờ SĐT đã băm, chỉ thiếu tín hiệu khớp fbp/fbc.
+
+   Ghi lại capiStatus ('sent'/'failed') + capiError vào chính doc lead
+   sau khi gọi xong, để founder tự query tỷ lệ CAPI lỗi trên Firestore
+   thay vì phải lục log Cloud Functions.
 ══════════════════════════════════════════════════════════════════ */
 exports.onLeadCreated = onDocumentCreated(
   {
@@ -460,8 +466,9 @@ exports.onLeadCreated = onDocumentCreated(
     const snap = event.data;
     if (!snap) return;
     const r = snap.data() || {};
+    let result;
     try {
-      await sendCapiEvent({
+      result = await sendCapiEvent({
         eventName: "Lead",
         eventId: "lead-" + event.params.id,
         sourceUrl: typeof r.sourceUrl === "string" ? r.sourceUrl.slice(0, 300) : SITE_URL,
@@ -474,6 +481,14 @@ exports.onLeadCreated = onDocumentCreated(
       });
     } catch (e) {
       console.error("[onLeadCreated] CAPI:", e.message);
+      result = { ok: false, error: String(e.message || "unknown").slice(0, 500) };
+    }
+    try {
+      const update = { capiStatus: result.ok ? "sent" : "failed" };
+      if (!result.ok) update.capiError = String(result.error || "unknown").slice(0, 500);
+      await snap.ref.update(update);
+    } catch (e) {
+      console.error("[onLeadCreated] update capiStatus:", e.message);
     }
   }
 );
