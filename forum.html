@@ -713,7 +713,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <script type="module">
 import {
-  app, auth, db, onAuthStateChanged,
+  app, auth, db, onAuthStateChanged, signOut,
   doc, getDoc, getDocs, collection, query, where, orderBy, limit, onSnapshot,
   storage, storageRef, uploadBytes, getDownloadURL
 } from './firebase-config.js';
@@ -846,12 +846,24 @@ function postableCats(){
 /* ════ AUTH + BOOT ════ */
 onAuthStateChanged(auth, async user => {
   if(!user){ bootGuest(); return; }
-  let snap = await getDoc(doc(db, 'users', user.uid));
+  // Diễn đàn phải đọc được công khai — phiên đăng nhập hỏng/hết hạn hay lỗi đọc
+  // hồ sơ KHÔNG được đẩy người dùng ra khỏi trang, chỉ lùi về xem như khách.
+  let snap;
+  try {
+    snap = await getDoc(doc(db, 'users', user.uid));
+  } catch(e) {
+    console.error('[forum] Lỗi đọc hồ sơ, lùi về chế độ khách:', e);
+    try { await signOut(auth); } catch(_){}
+    bootGuest();
+    return;
+  }
   let profile;
   if(!snap.exists() && user.uid === 'h4kEguPEyMcwJwl89stc0Q6j2si2'){
     profile = { role:'founder', name:'KTS. Trần Đại Long', status:'active', avatarUrl:'' };
   } else if(!snap.exists()){
-    location.replace('login.html'); return;
+    try { await signOut(auth); } catch(_){}
+    bootGuest();
+    return;
   } else {
     profile = snap.data();
   }
