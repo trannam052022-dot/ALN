@@ -88,6 +88,41 @@ jobs:
             exit 1
           fi
 
+      - name: Kiểm tra Pixel/CAPI trên phễu lead (thiet-ke-nha/mau/du-toan/recruit)
+        run: |
+          echo "=== Kiểm tra Meta Pixel + capture fbp/fbc trên các trang có form lead ==="
+          # Nhận diện trang có form lead thật (sinh từ tools/template-tinh.html /
+          # template-mau.html / template-dutoan.html) qua tên hàm callable — trang
+          # hub/index (thiet-ke-nha/index.html, mau/index.html...) không có form nên bỏ qua.
+          FAIL=0
+          while IFS= read -r f; do
+            grep -qE "'submitLocalLead'|'submitMauLead'|'submitDuToanLead'" "$f" || continue
+            N=$(grep -c "fbq('init', '1656666692225878')" "$f" || true)
+            FBP=$(grep -cE "getCookie\('_fbp'\)|alnGetFbp" "$f" || true)
+            if [ "$N" != "1" ]; then
+              echo "::error::$f có $N thẻ Meta Pixel init (cần đúng 1) — lead sẽ không đo được CPL thật"
+              FAIL=1
+            fi
+            if [ "$FBP" = "0" ]; then
+              echo "::error::$f THIẾU capture fbp/fbc — CAPI mất tín hiệu khớp với Pixel, dễ đếm trùng/thiếu"
+              FAIL=1
+            fi
+          done < <(find thiet-ke-nha mau du-toan -name "*.html" 2>/dev/null)
+          # recruit.html: landing quảng cáo, phải tự bắt UTM/fbclid trước khi chuyển
+          # sang funnel đăng ký thật (kts-apply/dn-studio/designer-apply)
+          if [ -f recruit.html ]; then
+            grep -q "fbq('init', '1656666692225878')" recruit.html || { echo "::error::recruit.html THIẾU Meta Pixel init"; FAIL=1; }
+            grep -qE "alnGetFbp|getCookie\('_fbp'\)" recruit.html || { echo "::error::recruit.html THIẾU capture fbp/fbc"; FAIL=1; }
+            grep -q "utm_" recruit.html || { echo "::error::recruit.html THIẾU bắt UTM từ URL quảng cáo"; FAIL=1; }
+          fi
+          if [ $FAIL -eq 0 ]; then
+            echo "✓ Mọi trang lead trong thiet-ke-nha/mau/du-toan + recruit.html đều đủ Pixel/CAPI tracking"
+          else
+            echo ""
+            echo "::error::Nếu trang này vừa được sửa tay (không qua tools/template-*.html), hãy sinh lại từ template hoặc thêm Pixel/CAPI thủ công theo commit bf14616"
+            exit 1
+          fi
+
       - name: Kích thước file
         run: |
           echo "=== File sizes ==="
