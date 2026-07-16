@@ -14,6 +14,18 @@ function categoryLabel(slug) {
   return CATEGORIES[slug] || slug;
 }
 
+// Chuyên mục Diễn đàn (forum.html CATS) tương ứng gần nhất với từng chuyên mục
+// Cẩm nang — dùng để dẫn link chéo SEO thẳng vào đúng nhóm câu hỏi thay vì
+// trang Diễn đàn chung chung. Không có mapping 1-1 hoàn hảo (chi-phi-bao-gia
+// không có chuyên mục Diễn đàn riêng) nên chọn chuyên mục gần nghĩa nhất.
+var FORUM_CATEGORY_MAP = {
+  'chi-phi-bao-gia': 'vat_lieu',
+  'phap-ly-giay-phep': 'hoi_dap',
+  'kinh-nghiem-lam-nha': 'hoi_kts',
+  'chon-kien-truc-su': 'hoi_kts',
+  'khu-vuc': 'hoi_kts',
+};
+
 function formatDateVN(iso) {
   var m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!m) return String(iso);
@@ -261,6 +273,28 @@ function renderRelated(article, allArticles, paths) {
   );
 }
 
+// Link chéo SEO sang Diễn đàn ALN — mời đọc câu hỏi/thảo luận thật cùng chủ
+// đề, dẫn thẳng vào đúng chuyên mục qua ?cat= (forum.html tự đọc param này
+// lúc load để chọn sẵn tab lọc). UTM riêng (utm_campaign=forum_crosslink)
+// để tách traffic nguồn Cẩm nang ra khỏi các nguồn khác khi xem báo cáo.
+function renderForumCrossLink(article, siteBase) {
+  var forumCat = FORUM_CATEGORY_MAP[article.category] || 'hoi_kts';
+  var link = siteBase + '/forum.html?cat=' + forumCat +
+    '&utm_source=camnang&utm_medium=internal_link&utm_campaign=forum_crosslink';
+  return (
+    '\n  <div class="cn-forum-cta">\n' +
+    '    <div class="cn-forum-box">\n' +
+    '      <i class="ph-duotone ph-chats-circle"></i>\n' +
+    '      <div>\n' +
+    '        <h3>Có câu hỏi khác về chủ đề này?</h3>\n' +
+    '        <p>Hỏi trực tiếp Kiến trúc sư đã xác minh trên Diễn đàn ALN — hoàn toàn miễn phí.</p>\n' +
+    '      </div>\n' +
+    '      <a class="btn" href="' + link + '"><i class="ph-duotone ph-arrow-right"></i>Đặt câu hỏi miễn phí</a>\n' +
+    '    </div>\n' +
+    '  </div>\n'
+  );
+}
+
 function renderArticlePage(article, contentHtml, allArticles, siteBase) {
   var paths = { root: '../../', cn: '../' };
   var canonical = siteBase + '/cam-nang/' + article.slug + '/';
@@ -351,6 +385,7 @@ function renderArticlePage(article, contentHtml, allArticles, siteBase) {
     '        <a class="btn btn-on-navy" href="' + paths.root + 'home.html?mymy=1#pricing"><i class="ph-duotone ph-chat-circle-dots"></i>Chat với MyMy</a>\n' +
     '      </div>\n' +
     '    </div>\n' +
+    renderForumCrossLink(article, siteBase) + '\n' +
     '  </div>\n\n' +
     renderRelated(article, allArticles, paths) + '\n' +
     '</main>\n\n' +

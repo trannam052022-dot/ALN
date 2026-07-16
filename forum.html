@@ -1046,6 +1046,12 @@ let _deepLinkDone = false;
 function maybeOpenDeepLink(){
   if(_deepLinkDone) return;
   _deepLinkDone = true;
+  // ?cat=xxx — dùng cho link chéo SEO từ Cẩm nang (templates.js), dẫn thẳng
+  // vào đúng chuyên mục thay vì "Tất cả". Bỏ qua nếu giá trị không hợp lệ.
+  try {
+    const catParam = new URL(location.href).searchParams.get('cat');
+    if(catParam && CATS[catParam]) setFilter(catParam);
+  } catch(e){}
   let tid = null;
   try { tid = new URL(location.href).searchParams.get('thread'); } catch(e){}
   if(!tid){
@@ -1579,6 +1585,7 @@ function renderComment(p, c, isReply){
   const canInvite = isTuVan && c.authorRole === 'kts' && buyerRole && c.authorUid !== USER.uid;
   const canChoose = (isTuVan || catOf(p) === 'hoi_kts') && c.authorRole === 'kts'
     && buyerRole && c.authorUid !== USER.uid && !p.chosenKts;
+  const canShareBest = c.isBestAnswer && c.authorUid === USER.uid;
   const nameHtml = c.authorRole === 'kts'
     ? '<a href="kts_profile.html?uid='+escH(c.authorUid)+'">'+escH(c.authorName)+'</a>'
     : escH(c.authorName);
@@ -1600,6 +1607,7 @@ function renderComment(p, c, isReply){
         + (canMarkBest ? '<button class="cm-act" onclick="markBest(\''+p.id+'\',\''+c.id+'\')" style="color:#3a7a3e">✔ Best Answer</button>' : '')
         + (canInvite ? '<button class="cm-act invite" onclick="inviteKts(\''+escH(c.authorUid)+'\',\''+p.id+'\')"><i class="ph-duotone ph-chats-circle"></i> Mời tư vấn</button>' : '')
         + (canChoose ? '<button class="cm-act choose" onclick="openChoose(\''+escH(c.authorUid)+'\',\''+escH(c.authorName||'KTS')+'\')"><i class="ph-duotone ph-handshake"></i> Chọn KTS này làm dự án</button>' : '')
+        + (canShareBest ? '<button class="cm-act" onclick="shareBestAnswer(\''+p.id+'\')" style="color:var(--c-blue,#4a8fff)"><i class="ph-duotone ph-share-network"></i> Chia sẻ Best Answer</button>' : '')
         + (USER.role==='founder' && isTuVan && c.authorRole==='kts' && !p.firstAnswerRewarded
             ? '<button class="cm-act" onclick="rewardFirst(\''+p.id+'\',\''+c.id+'\')" style="color:var(--gold)">⭐ Thưởng trả lời đầu ×2</button>' : '')
         + '<button class="cm-act" onclick="openReport(\'comment\',\''+p.id+'\',\''+c.id+'\')">⚑</button>'
@@ -1759,6 +1767,32 @@ window.shareInviteLink = async function(){
   try {
     await navigator.clipboard.writeText(link);
     showToast('✅ Đã copy link mời bạn — gửi cho bạn bè để nhận +15 điểm khi họ đăng bài đầu tiên');
+  } catch(e){
+    showToast(link);
+  }
+};
+
+/* KTS chia sẻ câu trả lời Best Answer của chính mình lên Facebook cá nhân —
+   mạng lưới cá nhân KTS tiếp cận tự nhiên tốt hơn Fanpage. Dùng Web Share
+   API (giống shareInviteLink) thay vì link Facebook trần: facebook.com/sharer
+   chỉ lấy được OG mặc định của trang (bot Facebook không chạy JS nên không
+   thấy title/mô tả riêng từng thread) — soạn sẵn text đầy đủ để KTS dán
+   thẳng lên bài tự đăng, không phụ thuộc link preview. */
+window.shareBestAnswer = async function(postId){
+  const p = ALL_POSTS.find(x => x.id === postId);
+  if(!p) return;
+  const link = 'https://applamnha.vn/forum.html?thread=' + encodeURIComponent(postId) + '&utm_source=facebook&utm_medium=social&utm_campaign=kts_share';
+  const qShort = (p.text || '').replace(/\s+/g, ' ').trim().slice(0, 150);
+  const text = '🏆 Câu trả lời của tôi vừa được chọn Best Answer trên Diễn đàn ALN!\n\n❓ '+qShort+'\n\nXem đầy đủ và đặt câu hỏi tại:';
+  try {
+    if(navigator.share){
+      await navigator.share({ title: 'Diễn đàn ALN', text, url: link });
+      return;
+    }
+  } catch(e){ /* user hủy share sheet — vẫn thử fallback copy bên dưới */ }
+  try {
+    await navigator.clipboard.writeText(text + ' ' + link);
+    showToast('✅ Đã copy nội dung — dán lên Facebook cá nhân của bạn để chia sẻ');
   } catch(e){
     showToast(link);
   }

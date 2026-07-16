@@ -179,6 +179,16 @@ img{max-width:100%;display:block}
 .cn-cta-end p{position:relative;color:var(--on-navy-sub);font-size:var(--text-md);margin-bottom:28px}
 .cn-cta-end .cn-cta-btns{position:relative;display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
 
+/* Link chéo sang Diễn đàn ALN — mời đọc/hỏi thêm câu hỏi thật, tách biệt CTA báo giá ở trên */
+.cn-forum-cta{margin:24px 0}
+.cn-forum-box{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px 26px}
+.cn-forum-box>i{font-size:30px;color:var(--gold);flex-shrink:0}
+.cn-forum-box>div{flex:1;min-width:200px}
+.cn-forum-box h3{font-family:var(--syne);font-weight:700;font-size:var(--text-md);color:var(--text);margin-bottom:4px}
+.cn-forum-box p{color:var(--sub);font-size:var(--text-sm)}
+.cn-forum-box .btn{background:var(--gold-bg);border-color:var(--gold);color:var(--gold)}
+.cn-forum-box .btn:hover{background:var(--gold);color:#fff}
+
 /* 3 bài liên quan */
 .cn-related{padding:20px 0 60px}
 .cn-related h2{font-family:var(--syne);font-weight:700;font-size:var(--text-lg);color:var(--text);margin-bottom:22px;text-align:center}
