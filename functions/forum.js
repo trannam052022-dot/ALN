@@ -295,6 +295,131 @@ async function addRep(uid, type, sign, refPath) {
   await ref.collection("events").add({ type, delta: pts, refPath: refPath || null, createdAt: ts() });
 }
 
+/* Điểm thưởng TĂNG TRƯỞNG (follow Fanpage + tham gia diễn đàn) — collection
+   RIÊNG BIỆT với ktsReputation ở trên. ktsReputation CHỈ xếp hạng chuyên môn
+   KTS (Chuyên gia/Cố vấn/Tân binh, ưu tiên nhận dự án) — TUYỆT ĐỐI không
+   trộn điểm follow/mời bạn vào đó. forumGrowthPoints áp dụng MỌI vai trò
+   (CN/DN/KTS). CHỈ server ghi — client không ghi trực tiếp (giống addRep). */
+const GROWTH_COL = "forumGrowthPoints";
+const GROWTH_POINTS = { postCreated: 2, bestAnswer: 10, heart: 1, referral: 15, followSelf: 5 };
+const POST_CREATED_DAILY_CAP = 3;
+
+/* Mốc badge theo điểm — 100đ KHÔNG tự cấp mã giảm giá/ưu đãi bằng tiền,
+   chỉ hiện thông báo yêu cầu Founder xác nhận tay khi ký hợp đồng. */
+const GROWTH_MILESTONES = [
+  { key: "active_member",  min: 20,  label: "Thành viên tích cực" },
+  { key: "priority_queue", min: 50,  label: "Câu hỏi được ưu tiên hiển thị đầu hàng đợi" },
+  { key: "offer_eligible", min: 100, label: "Đủ điều kiện nhận ưu đãi — liên hệ Founder xác nhận khi ký hợp đồng" },
+];
+const GROWTH_PRIORITY_MIN = GROWTH_MILESTONES.find((m) => m.key === "priority_queue").min;
+
+function todayVN() {
+  // yyyy-mm-dd theo giờ VN — dùng để reset bộ đếm điểm thưởng "đăng bài trong ngày"
+  return new Intl.DateTimeFormat("en-CA", { timeZone: VN_TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+}
+
+/* delta là SỐ ĐIỂM thực tế (đã có dấu +/-), KHÔNG tra bảng như addRep —
+   vì bestAnswer/heart cần cộng và trừ đối xứng (chọn lại/bỏ chọn), còn
+   postCreated có trần theo ngày nên tự tính delta ở nơi gọi. */
+async function addGrowthPoints(uid, type, delta, refPath) {
+  if (!delta) return;
+  const ref = fdb.collection(GROWTH_COL).doc(uid);
+  await ref.set({
+    points: inc(delta),
+    ["counts." + type]: inc(delta > 0 ? 1 : -1),
+    updatedAt: ts(),
+  }, { merge: true });
+  await ref.collection("events").add({ type, delta, refPath: refPath || null, createdAt: ts() });
+}
+
+/* postCreated: +2/bài, tối đa POST_CREATED_DAILY_CAP lần/ngày/uid (chống
+   spam đăng bài rác kiếm điểm) — đếm riêng bằng postCreatedToday/postCreatedDate
+   trên chính doc forumGrowthPoints/{uid}, transaction để tránh đếm hụt khi
+   trùng thời điểm. */
+async function grantPostCreatedPoints(uid, postId) {
+  const today = todayVN();
+  const ref = fdb.collection(GROWTH_COL).doc(uid);
+  const granted = await fdb.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const data = snap.exists ? snap.data() : {};
+    const sameDay = data.postCreatedDate === today;
+    const countToday = sameDay ? (data.postCreatedToday || 0) : 0;
+    if (countToday >= POST_CREATED_DAILY_CAP) return false;
+    tx.set(ref, {
+      points: inc(GROWTH_POINTS.postCreated),
+      ["counts.postCreated"]: inc(1),
+      postCreatedToday: sameDay ? countToday + 1 : 1,
+      postCreatedDate: today,
+      updatedAt: ts(),
+    }, { merge: true });
+    return true;
+  });
+  if (granted) {
+    await ref.collection("events").add({
+      type: "postCreated", delta: GROWTH_POINTS.postCreated,
+      refPath: COL.posts + "/" + postId, createdAt: ts(),
+    });
+  }
+}
+
+const REFERRAL_DAILY_CAP = 5;
+
+/* Mời bạn (referral): +15đ cho referrerUid khi người được mời đăng bài ĐẦU
+   TIÊN trên diễn đàn (forumPost gọi hàm này, đã tự kiểm contribBefore===0
+   và referrerUid !== uid trước khi gọi).
+
+   RỦI RO ĐÃ BIẾT VÀ CHẤP NHẬN: referrerUid do CLIENT TỰ KHAI khi gọi
+   forumPost — không bắt buộc thực sự đến từ việc bấm link ?ref=. Rủi ro
+   rộng hơn "tạo tài khoản ảo dùng link mời": về lý thuyết ai cũng có thể
+   lấy UID của MỘT TÀI KHOẢN BẤT KỲ (uid xuất hiện rải rác trong dữ liệu
+   công khai của app) rồi tự khai làm referrer khi tài khoản mới của họ
+   đăng bài đầu tiên, không cần đi qua link mời thật. Hệ thống không xác
+   minh danh tính thật nên KHÔNG THỂ chặn tuyệt đối 2 kiểu lạm dụng này.
+   REFERRAL_DAILY_CAP (5 lượt/ngày/referrerUid) CHỈ GIỚI HẠN THIỆT HẠI tối
+   đa (≤75đ/ngày/uid dù bị lạm dụng) — không loại bỏ gian lận. */
+async function grantReferralPoints(referrerUid, newUid, postId) {
+  const referrerSnap = await fdb.collection("users").doc(referrerUid).get();
+  if (!referrerSnap.exists) return; // referrerUid client gửi lên không tồn tại thật — bỏ qua, không tin client mù quáng
+
+  const today = todayVN();
+  const newRef = fdb.collection(GROWTH_COL).doc(newUid);
+  const referrerRef = fdb.collection(GROWTH_COL).doc(referrerUid);
+
+  const result = await fdb.runTransaction(async (tx) => {
+    const newSnap = await tx.get(newRef);
+    if (newSnap.exists && newSnap.data().referredBy) return "duplicate"; // đã credit trước đó — chặn lặp
+
+    const refSnap = await tx.get(referrerRef);
+    const refData = refSnap.exists ? refSnap.data() : {};
+    const sameDay = refData.referralDate === today;
+    const countToday = sameDay ? (refData.referralToday || 0) : 0;
+    const capped = countToday >= REFERRAL_DAILY_CAP;
+
+    // Luôn đánh dấu referredBy (kể cả khi capped) để không xét lại — mỗi user
+    // chỉ có đúng 1 "bài đầu tiên" nên đây cũng là chặn double-fire duy nhất.
+    tx.set(newRef, { referredBy: referrerUid, updatedAt: ts() }, { merge: true });
+    if (capped) return "capped";
+
+    tx.set(referrerRef, {
+      points: inc(GROWTH_POINTS.referral),
+      ["counts.referral"]: inc(1),
+      referralToday: sameDay ? countToday + 1 : 1,
+      referralDate: today,
+      updatedAt: ts(),
+    }, { merge: true });
+    return "granted";
+  });
+
+  if (result === "granted") {
+    await referrerRef.collection("events").add({
+      type: "referral", delta: GROWTH_POINTS.referral,
+      refPath: COL.posts + "/" + postId, createdAt: ts(),
+    });
+  } else if (result === "capped") {
+    console.warn("[forumGrowthPoints] referral bị chặn do vượt trần " + REFERRAL_DAILY_CAP + "/ngày cho referrerUid=" + referrerUid + " — kiểm tra khả năng lạm dụng");
+  }
+}
+
 /* Chính sách 3 bước: Cảnh báo (1-2) → Đề nghị khóa 90 ngày (3-4) → Đề nghị khóa vĩnh viễn (≥5).
    Bản nháp CHỈ ghi cờ đề nghị + báo Founder — KHÔNG tự khóa tài khoản thật. */
 function modStageFromCount(n) {
@@ -497,17 +622,28 @@ exports.forumPost = onCall({ region: REGION }, async (request) => {
   }
 
   /* Tiền kiểm: 3 đóng góp đầu HOẶC người hay bị chặn lách sàn (≥2 lần) → chờ duyệt.
-     Người sạch, đã qua 3 bài → đăng thẳng (hậu kiểm). */
+     Người sạch, đã qua 3 bài → đăng thẳng (hậu kiểm).
+     contribBefore giữ lại (không chỉ dùng cục bộ) để referral bên dưới biết
+     đây có phải bài ĐẦU TIÊN của user hay không. */
   let pending = false;
+  let contribBefore = 0;
   if (profile.role !== "founder") {
     const stSnap = await fdb.collection(COL.userState).doc(uid).get();
     const st = stSnap.exists ? stSnap.data() : {};
-    const contrib = st.contribCount || 0;
+    contribBefore = st.contribCount || 0;
     const blocks = st.blockCount || 0;
-    pending = contrib < NEW_ACCOUNT_FREE_AFTER || blocks >= 2;
+    pending = contribBefore < NEW_ACCOUNT_FREE_AFTER || blocks >= 2;
   }
 
   const authorRank = await safeRank(uid, profile.role);   // hạng KTS (trust signal)
+
+  /* Mốc 50đ điểm thưởng: câu hỏi được set cờ ưu tiên hiển thị đầu hàng đợi
+     (forum.html renderFeed sort riêng theo priority). Cờ chụp tại THỜI ĐIỂM
+     đăng bài (giống authorRank ở trên) — không hồi tố cho bài cũ nếu điểm
+     tăng sau đó. */
+  const growthSnap = await fdb.collection(GROWTH_COL).doc(uid).get();
+  const authorPoints = (growthSnap.exists && growthSnap.data().points) || 0;
+  const priority = authorPoints >= GROWTH_PRIORITY_MIN;
 
   const post = {
     authorUid: uid,
@@ -515,6 +651,7 @@ exports.forumPost = onCall({ region: REGION }, async (request) => {
     authorRole: profile.role,
     authorRank,
     authorAvatar: profile.avatarUrl || "",
+    priority,
     category,
     categoryVisibility: categoryVisibilityOf(category),
     tag,
@@ -537,6 +674,16 @@ exports.forumPost = onCall({ region: REGION }, async (request) => {
 
   const postRef = await fdb.collection(COL.posts).add(post);
   await fdb.collection(COL.userState).doc(uid).set({ contribCount: inc(1), updatedAt: ts() }, { merge: true });
+  await grantPostCreatedPoints(uid, postRef.id);
+
+  /* Mời bạn (referral): chỉ cộng khi đây là bài ĐẦU TIÊN của user (contribBefore
+     === 0) VÀ có referrerUid gửi lên VÀ khác chính uid hiện tại — verify thật
+     sự tồn tại + chặn credit lặp nằm trong grantReferralPoints. */
+  const referrerUidRaw = String(d.referrerUid || "").trim();
+  if (contribBefore === 0 && referrerUidRaw && referrerUidRaw !== uid) {
+    try { await grantReferralPoints(referrerUidRaw, uid, postRef.id); }
+    catch (e) { console.error("[forumPost] referral lỗi:", e); }
+  }
 
   /* Đồng bộ thread Tư vấn Dự án → lead (Speed-to-Lead Loop) */
   if (brief) {
@@ -729,6 +876,12 @@ exports.forumHeart = onCall({ region: REGION }, async (request) => {
   if (commentId && result.authorRole === "kts" && result.authorUid !== uid) {
     await addRep(result.authorUid, "heart", result.nowHearted ? 1 : -1, COL.posts + "/" + postId + "/comments/" + commentId);
   }
+  /* Điểm thưởng tăng trưởng — MỌI vai trò (khác ktsReputation ở trên chỉ tính KTS) */
+  if (commentId && result.authorUid !== uid) {
+    await addGrowthPoints(result.authorUid, "heart",
+      result.nowHearted ? GROWTH_POINTS.heart : -GROWTH_POINTS.heart,
+      COL.posts + "/" + postId + "/comments/" + commentId);
+  }
 
   return { hearted: result.nowHearted };
 });
@@ -783,11 +936,66 @@ exports.forumBestAnswer = onCall({ region: REGION }, async (request) => {
   if (info.authorRole === "kts") {
     await addRep(info.authorUid, "bestAnswer", 1, COL.posts + "/" + postId + "/comments/" + commentId);
   }
+  /* Điểm thưởng tăng trưởng — MỌI vai trò, đối xứng: gỡ Best Answer cũ thì trừ điểm lại */
+  if (info.prev) {
+    await addGrowthPoints(info.prev.authorUid, "bestAnswer", -GROWTH_POINTS.bestAnswer, COL.posts + "/" + postId);
+  }
+  await addGrowthPoints(info.authorUid, "bestAnswer", GROWTH_POINTS.bestAnswer,
+    COL.posts + "/" + postId + "/comments/" + commentId);
   await fdNotify(info.authorUid, "🏆 Câu trả lời của bạn được chọn Best Answer",
     "Chủ thớt đã đánh dấu câu trả lời hay nhất — +5 điểm uy tín",
     { type: "FORUM_BEST_ANSWER", postId, commentId });
 
   return { ok: true };
+});
+
+/* ════════════════════════════════════════════
+   4b. ĐIỂM THƯỞNG TĂNG TRƯỞNG — forumFollowFanpageClaim, forumMyPoints
+════════════════════════════════════════════ */
+
+/* Follow Fanpage (tự khai, 1 lần duy nhất) — không kiểm tra được thật sự đã
+   follow hay chưa (Facebook không cho verify phía server không có App Review
+   riêng cho việc này), nên đây là điểm thưởng "tin tưởng" mức thấp (+5),
+   giới hạn thiệt hại bằng việc chỉ cộng đúng 1 lần/uid vĩnh viễn. */
+exports.forumFollowFanpageClaim = onCall({ region: REGION }, async (request) => {
+  const { uid } = await requireAuth(request);
+  const ref = fdb.collection(GROWTH_COL).doc(uid);
+  const already = await fdb.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    if (snap.exists && snap.data().followClaimed) return true;
+    tx.set(ref, {
+      points: inc(GROWTH_POINTS.followSelf),
+      ["counts.followSelf"]: inc(1),
+      followClaimed: true,
+      updatedAt: ts(),
+    }, { merge: true });
+    return false;
+  });
+  if (!already) {
+    await ref.collection("events").add({ type: "followSelf", delta: GROWTH_POINTS.followSelf, refPath: null, createdAt: ts() });
+  }
+  return { ok: true, already };
+});
+
+/* Điểm + badge của CHÍNH người gọi — đọc qua function (không onSnapshot trực
+   tiếp) nên KHÔNG cần mở firestore.rules cho forumGrowthPoints. Kèm thêm
+   followClaimed (ngoài {points,badges,nextBadge} đã chốt) để forum.html biết
+   bật/tắt nút "Tôi đã follow" mà không phải gọi forumFollowFanpageClaim chỉ
+   để dò trạng thái (gọi hàm đó luôn cộng điểm nếu chưa claim). */
+exports.forumMyPoints = onCall({ region: REGION }, async (request) => {
+  const { uid } = await requireAuth(request);
+  const snap = await fdb.collection(GROWTH_COL).doc(uid).get();
+  const data = snap.exists ? snap.data() : {};
+  const points = data.points || 0;
+  const badges = GROWTH_MILESTONES.filter((m) => points >= m.min)
+    .map((m) => ({ key: m.key, label: m.label }));
+  const next = GROWTH_MILESTONES.find((m) => points < m.min) || null;
+  return {
+    points,
+    badges,
+    nextBadge: next ? { key: next.key, label: next.label, pointsToGo: next.min - points } : null,
+    followClaimed: !!data.followClaimed,
+  };
 });
 
 /* ════════════════════════════════════════════
@@ -2035,6 +2243,21 @@ exports.forumSummarize = onCall({ region: REGION, secrets: [ANTHROPIC_KEY] }, as
   return { summary, cached: false };
 });
 
+/* Dựng nội dung nháp Fanpage từ 1 câu hỏi + Best Answer đã kiểm chứng.
+   Dùng chung cho forumWeeklyDigest (tự động, top tuần) và
+   forumAnswerToMarketingDraft (Founder chọn tay) — tránh lệch format 2 nơi. */
+function buildForumQnaDraftContent(postId, question, answer, answerBy) {
+  const q = (question || "").trim();
+  const a = (answer || "").trim();
+  const qShort = q.slice(0, 220) + (q.length > 220 ? "…" : "");
+  const aShort = a.slice(0, 280) + (a.length > 280 ? "…" : "");
+  const link = "https://applamnha.vn/forum.html?thread=" + postId + "&utm_source=facebook&utm_medium=social&utm_campaign=forum";
+  let body = "❓ " + qShort + "\n\n💡 " + aShort;
+  if (answerBy) body += "\n(KTS " + answerBy + " trả lời)";
+  body += "\n\n👉 Xem đầy đủ và đặt câu hỏi tại Diễn đàn ALN: " + link;
+  return body;
+}
+
 /* 9.4 — Đề cử Best Answer vào Cẩm nang (Founder; chỉ nội dung đã kiểm chứng) */
 exports.forumToCamNang = onCall({ region: REGION }, async (request) => {
   const { profile } = await requireAuth(request);
@@ -2054,6 +2277,30 @@ exports.forumToCamNang = onCall({ region: REGION }, async (request) => {
     status: "draft", createdAt: ts(),
   });
   await postRef.update({ camNangId: ref.id });
+  return { ok: true, id: ref.id };
+});
+
+/* 9.4b — Founder tự chọn 1 Best Answer bất kỳ để tạo nháp Fanpage (giống
+   forumToCamNang nhưng ra marketingDrafts thay vì camNangForum). Dùng lại
+   buildForumQnaDraftContent — cùng format với draft tự động của forumWeeklyDigest. */
+exports.forumAnswerToMarketingDraft = onCall({ region: REGION }, async (request) => {
+  const { profile } = await requireAuth(request);
+  if (profile.role !== "founder") throw new HttpsError("permission-denied", "Chỉ Founder tạo nháp Fanpage");
+  const postId = String((request.data || {}).postId || "");
+  const postRef = fdb.collection(COL.posts).doc(postId);
+  const snap = await postRef.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Bài không tồn tại");
+  const p = snap.data();
+  if (!p.bestAnswerId) throw new HttpsError("failed-precondition", "Chưa có Best Answer — chỉ tạo nháp từ nội dung đã kiểm chứng");
+  const baSnap = await postRef.collection("comments").doc(p.bestAnswerId).get();
+  const ba = baSnap.exists ? baSnap.data() : null;
+  if (!ba || !ba.text) throw new HttpsError("failed-precondition", "Best Answer không còn nội dung");
+  const ref = await fdb.collection("marketingDrafts").add({
+    kind: "forum_qna", label: "Hỏi đáp Diễn đàn",
+    content: buildForumQnaDraftContent(postId, p.text || "", ba.text || "", ba.authorName || ""),
+    status: "draft", createdAt: ts(), sourcePostId: postId,
+  });
+  await postRef.update({ marketingDraftId: ref.id });
   return { ok: true, id: ref.id };
 });
 
@@ -2096,16 +2343,41 @@ exports.forumWeeklyDigest = onSchedule(
       if (p.status === "visible" && ms >= weekAgo) {
         items.push({
           id: d.id, text: (p.text || "").slice(0, 80), category: p.category,
+          bestAnswerId: p.bestAnswerId || null,
           score: (p.heartCount || 0) * 2 + (p.commentCount || 0) + (p.bestAnswerId ? 3 : 0),
         });
       }
     });
     items.sort((a, b) => b.score - a.score);
-    const top = items.slice(0, 5);
+    const top = items.slice(0, 5).map(({ bestAnswerId, ...rest }) => rest); // bestAnswerId chỉ dùng nội bộ, không lưu vào digest
     const ref = await fdb.collection(COL.digest).add({ count: items.length, top, createdAt: ts() });
     if (top.length) {
       await fdNotify(FOUNDER_UID, "📰 Bản tin diễn đàn tuần (" + items.length + " bài)",
         top.map((t) => "• " + t.text).join("\n"), { type: "FORUM_WEEKLY", digestId: ref.id });
+    }
+
+    // Với mỗi bài top tuần đã có Best Answer (nội dung đã kiểm chứng) →
+    // tạo sẵn 1 nháp Fanpage cho Founder duyệt (KHÔNG tự đăng).
+    for (const it of items.slice(0, 5)) {
+      if (!it.bestAnswerId) continue;
+      try {
+        const postSnap = await fdb.collection(COL.posts).doc(it.id).get();
+        if (!postSnap.exists) continue;
+        const p = postSnap.data();
+        const baSnap = await postSnap.ref.collection("comments").doc(it.bestAnswerId).get();
+        const ba = baSnap.exists ? baSnap.data() : null;
+        if (!ba || !ba.text) continue;
+        await fdb.collection("marketingDrafts").add({
+          kind: "forum_qna",
+          label: "Hỏi đáp Diễn đàn",
+          content: buildForumQnaDraftContent(it.id, p.text || "", ba.text || "", ba.authorName || ""),
+          status: "draft",
+          createdAt: ts(),
+          sourcePostId: it.id,
+        });
+      } catch (e) {
+        console.error("[forumWeeklyDigest] draft cho bài", it.id, e);
+      }
     }
   }
 );
