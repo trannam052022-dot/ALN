@@ -304,6 +304,15 @@ const GROWTH_COL = "forumGrowthPoints";
 const GROWTH_POINTS = { postCreated: 2, bestAnswer: 10, heart: 1, referral: 15, followSelf: 5 };
 const POST_CREATED_DAILY_CAP = 3;
 
+/* Mốc badge theo điểm — 100đ KHÔNG tự cấp mã giảm giá/ưu đãi bằng tiền,
+   chỉ hiện thông báo yêu cầu Founder xác nhận tay khi ký hợp đồng. */
+const GROWTH_MILESTONES = [
+  { key: "active_member",  min: 20,  label: "Thành viên tích cực" },
+  { key: "priority_queue", min: 50,  label: "Câu hỏi được ưu tiên hiển thị đầu hàng đợi" },
+  { key: "offer_eligible", min: 100, label: "Đủ điều kiện nhận ưu đãi — liên hệ Founder xác nhận khi ký hợp đồng" },
+];
+const GROWTH_PRIORITY_MIN = GROWTH_MILESTONES.find((m) => m.key === "priority_queue").min;
+
 function todayVN() {
   // yyyy-mm-dd theo giờ VN — dùng để reset bộ đếm điểm thưởng "đăng bài trong ngày"
   return new Intl.DateTimeFormat("en-CA", { timeZone: VN_TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
@@ -359,10 +368,15 @@ const REFERRAL_DAILY_CAP = 5;
    TIÊN trên diễn đàn (forumPost gọi hàm này, đã tự kiểm contribBefore===0
    và referrerUid !== uid trước khi gọi).
 
-   RỦI RO ĐÃ BIẾT VÀ CHẤP NHẬN: hệ thống không xác minh danh tính thật, nên
-   KHÔNG THỂ chặn tuyệt đối việc tạo tài khoản ảo hàng loạt để tự mời chính
-   mình lấy điểm. REFERRAL_DAILY_CAP (5 lượt/ngày/referrerUid) CHỈ GIỚI HẠN
-   THIỆT HẠI nếu bị lạm dụng — không loại bỏ gian lận. */
+   RỦI RO ĐÃ BIẾT VÀ CHẤP NHẬN: referrerUid do CLIENT TỰ KHAI khi gọi
+   forumPost — không bắt buộc thực sự đến từ việc bấm link ?ref=. Rủi ro
+   rộng hơn "tạo tài khoản ảo dùng link mời": về lý thuyết ai cũng có thể
+   lấy UID của MỘT TÀI KHOẢN BẤT KỲ (uid xuất hiện rải rác trong dữ liệu
+   công khai của app) rồi tự khai làm referrer khi tài khoản mới của họ
+   đăng bài đầu tiên, không cần đi qua link mời thật. Hệ thống không xác
+   minh danh tính thật nên KHÔNG THỂ chặn tuyệt đối 2 kiểu lạm dụng này.
+   REFERRAL_DAILY_CAP (5 lượt/ngày/referrerUid) CHỈ GIỚI HẠN THIỆT HẠI tối
+   đa (≤75đ/ngày/uid dù bị lạm dụng) — không loại bỏ gian lận. */
 async function grantReferralPoints(referrerUid, newUid, postId) {
   const referrerSnap = await fdb.collection("users").doc(referrerUid).get();
   if (!referrerSnap.exists) return; // referrerUid client gửi lên không tồn tại thật — bỏ qua, không tin client mù quáng
@@ -623,12 +637,21 @@ exports.forumPost = onCall({ region: REGION }, async (request) => {
 
   const authorRank = await safeRank(uid, profile.role);   // hạng KTS (trust signal)
 
+  /* Mốc 50đ điểm thưởng: câu hỏi được set cờ ưu tiên hiển thị đầu hàng đợi
+     (forum.html renderFeed sort riêng theo priority). Cờ chụp tại THỜI ĐIỂM
+     đăng bài (giống authorRank ở trên) — không hồi tố cho bài cũ nếu điểm
+     tăng sau đó. */
+  const growthSnap = await fdb.collection(GROWTH_COL).doc(uid).get();
+  const authorPoints = (growthSnap.exists && growthSnap.data().points) || 0;
+  const priority = authorPoints >= GROWTH_PRIORITY_MIN;
+
   const post = {
     authorUid: uid,
     authorName: profile.name || "",
     authorRole: profile.role,
     authorRank,
     authorAvatar: profile.avatarUrl || "",
+    priority,
     category,
     categoryVisibility: categoryVisibilityOf(category),
     tag,
@@ -924,6 +947,55 @@ exports.forumBestAnswer = onCall({ region: REGION }, async (request) => {
     { type: "FORUM_BEST_ANSWER", postId, commentId });
 
   return { ok: true };
+});
+
+/* ════════════════════════════════════════════
+   4b. ĐIỂM THƯỞNG TĂNG TRƯỞNG — forumFollowFanpageClaim, forumMyPoints
+════════════════════════════════════════════ */
+
+/* Follow Fanpage (tự khai, 1 lần duy nhất) — không kiểm tra được thật sự đã
+   follow hay chưa (Facebook không cho verify phía server không có App Review
+   riêng cho việc này), nên đây là điểm thưởng "tin tưởng" mức thấp (+5),
+   giới hạn thiệt hại bằng việc chỉ cộng đúng 1 lần/uid vĩnh viễn. */
+exports.forumFollowFanpageClaim = onCall({ region: REGION }, async (request) => {
+  const { uid } = await requireAuth(request);
+  const ref = fdb.collection(GROWTH_COL).doc(uid);
+  const already = await fdb.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    if (snap.exists && snap.data().followClaimed) return true;
+    tx.set(ref, {
+      points: inc(GROWTH_POINTS.followSelf),
+      ["counts.followSelf"]: inc(1),
+      followClaimed: true,
+      updatedAt: ts(),
+    }, { merge: true });
+    return false;
+  });
+  if (!already) {
+    await ref.collection("events").add({ type: "followSelf", delta: GROWTH_POINTS.followSelf, refPath: null, createdAt: ts() });
+  }
+  return { ok: true, already };
+});
+
+/* Điểm + badge của CHÍNH người gọi — đọc qua function (không onSnapshot trực
+   tiếp) nên KHÔNG cần mở firestore.rules cho forumGrowthPoints. Kèm thêm
+   followClaimed (ngoài {points,badges,nextBadge} đã chốt) để forum.html biết
+   bật/tắt nút "Tôi đã follow" mà không phải gọi forumFollowFanpageClaim chỉ
+   để dò trạng thái (gọi hàm đó luôn cộng điểm nếu chưa claim). */
+exports.forumMyPoints = onCall({ region: REGION }, async (request) => {
+  const { uid } = await requireAuth(request);
+  const snap = await fdb.collection(GROWTH_COL).doc(uid).get();
+  const data = snap.exists ? snap.data() : {};
+  const points = data.points || 0;
+  const badges = GROWTH_MILESTONES.filter((m) => points >= m.min)
+    .map((m) => ({ key: m.key, label: m.label }));
+  const next = GROWTH_MILESTONES.find((m) => points < m.min) || null;
+  return {
+    points,
+    badges,
+    nextBadge: next ? { key: next.key, label: next.label, pointsToGo: next.min - points } : null,
+    followClaimed: !!data.followClaimed,
+  };
 });
 
 /* ════════════════════════════════════════════

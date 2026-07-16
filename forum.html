@@ -166,6 +166,12 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
   font-size: var(--text-xs); color: var(--sub); font-weight: 700;
 }
 .tb-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.tb-points {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 99px; background: var(--gold-bg);
+  border: 1px solid rgba(152,105,10,.28); color: var(--gold);
+  font-size: var(--text-2xs); font-weight: 700; font-family: var(--mono); cursor: default;
+}
 .tb-link {
   display: inline-flex; align-items: center; gap: 5px;
   font-size: var(--text-xs); color: var(--sub); text-decoration: none;
@@ -244,12 +250,20 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
   font-family: var(--sans); white-space: nowrap; transition: transform .15s, box-shadow .15s;
 }
 .fpc-follow:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(74,143,255,.3); }
+.fpc-claim {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 14px; border-radius: 99px; border: 1px solid var(--border2);
+  background: var(--white); color: var(--text2); font-weight: 600; font-size: var(--text-xs);
+  font-family: var(--sans); white-space: nowrap; cursor: pointer; transition: all .15s;
+}
+.fpc-claim:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+.fpc-claim:disabled { cursor: default; color: var(--muted); border-color: var(--border); background: var(--cream2); }
 .fpc-close {
   border: none; background: transparent; cursor: pointer; color: var(--muted);
   font-size: 16px; line-height: 1; padding: 4px; flex-shrink: 0;
 }
 .fpc-close:hover { color: var(--text2); }
-@media (max-width: 480px) { .fpc-follow { margin-left: 0; width: 100%; justify-content: center; } }
+@media (max-width: 480px) { .fpc-follow, .fpc-claim { margin-left: 0; width: 100%; justify-content: center; } }
 
 /* ── FEED ── */
 .feed-wrap { max-width: 760px; margin: 0 auto; padding: 18px 16px 70px; }
@@ -584,6 +598,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a class="tb-link" id="lnkAdmin" href="founder_forum.html" style="display:none"><i class="ph-duotone ph-shield-star"></i>Quản trị</a>
     <div class="tb-user" id="tbUser" style="display:none">
       <div class="tb-avatar" id="tbAvatar"></div><span id="tbName"></span><span id="tbRole" style="display:none"></span>
+      <span class="tb-points" id="tbPoints" style="display:none"></span>
     </div>
     <button class="tb-link" id="btnInvite" style="display:none" onclick="shareInviteLink()" title="Mời bạn tham gia diễn đàn — bạn được +15 điểm khi họ đăng bài đầu tiên">
       <i class="ph-duotone ph-user-plus"></i>Mời bạn
@@ -615,6 +630,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <a class="fpc-follow" href="https://www.facebook.com/1244358728751633" target="_blank" rel="noopener">
     <i class="ph-duotone ph-thumbs-up"></i>Theo dõi Fanpage
   </a>
+  <button class="fpc-claim" id="fpcClaim" style="display:none" onclick="claimFollowPoints()">
+    <i class="ph-duotone ph-seal-check"></i><span id="fpcClaimText">Tôi đã follow, nhận +5 điểm</span>
+  </button>
   <button class="fpc-close" onclick="dismissFanpageCta()" aria-label="Đóng">✕</button>
 </div>
 <script>
@@ -798,6 +816,8 @@ const callSummarize = httpsCallable(fns, 'forumSummarize');
 const callToCamNang = httpsCallable(fns, 'forumToCamNang');
 const callToMarketingDraft = httpsCallable(fns, 'forumAnswerToMarketingDraft');
 const callChooseKts = httpsCallable(fns, 'forumChooseKts');
+const callMyPoints = httpsCallable(fns, 'forumMyPoints');
+const callFollowClaim = httpsCallable(fns, 'forumFollowFanpageClaim');
 
 /* ════ CẤU HÌNH CHUYÊN MỤC (đồng bộ với forum.js) ════ */
 const CATS = {
@@ -955,6 +975,8 @@ onAuthStateChanged(auth, async user => {
     $('p2Switch').style.display = 'inline-flex';
     $('lnkAdmin').style.display = 'inline-flex';
   }
+
+  loadMyPoints();   // điểm thưởng tăng trưởng — không chặn luồng nếu lỗi
 
   /* Cờ P2 realtime → dựng lại giao diện khi founder gạt công tắc */
   onSnapshot(doc(db, 'forumConfig', 'flags'), s => {
@@ -1149,8 +1171,11 @@ function visiblePosts(){
 function renderFeed(){
   let list = visiblePosts();
   if(FILTER !== 'all') list = list.filter(p => catOf(p) === FILTER);
-  /* Ghim lên đầu */
-  list = list.filter(p => p.pinned).concat(list.filter(p => !p.pinned));
+  /* Ghim lên đầu, rồi tới bài "ưu tiên hiển thị" (mốc 50đ điểm thưởng — cờ
+     priority chụp lúc đăng bài, xem forumPost), còn lại giữ nguyên thứ tự */
+  list = list.filter(p => p.pinned)
+    .concat(list.filter(p => !p.pinned && p.priority))
+    .concat(list.filter(p => !p.pinned && !p.priority));
   $('postCount').textContent = list.length + ' chủ đề';
   if(!list.length){
     $('feedList').innerHTML = '<div class="empty-state"><i class="ph-duotone ph-chats-circle"></i><p>Chưa có bài nào trong chuyên mục này.<br>Hãy là người mở chủ đề đầu tiên!</p></div>';
@@ -1711,6 +1736,49 @@ window.shareInviteLink = async function(){
     showToast(link);
   }
 };
+
+/* Điểm thưởng tăng trưởng: hiện điểm + huy hiệu cạnh tên user, đồng thời
+   đồng bộ trạng thái nút "Tôi đã follow" trong banner Fanpage. */
+async function loadMyPoints(){
+  if(!USER || !USER.uid) return;
+  try {
+    const r = await callMyPoints();
+    renderMyPoints(r.data || {});
+  } catch(e){ console.warn('[forum] forumMyPoints lỗi:', e); }
+}
+function renderMyPoints(data){
+  const points = data.points || 0;
+  const badges = data.badges || [];
+  const ptsEl = $('tbPoints');
+  if(ptsEl){
+    ptsEl.style.display = 'inline-flex';
+    ptsEl.innerHTML = '<i class="ph-duotone ph-medal"></i>' + points + 'đ';
+    const topBadge = badges.length ? badges[badges.length - 1].label : '';
+    const toGo = data.nextBadge ? ('Còn ' + data.nextBadge.pointsToGo + 'đ để đạt "' + data.nextBadge.label + '"') : '';
+    ptsEl.title = [topBadge ? ('Huy hiệu: ' + topBadge) : '', toGo].filter(Boolean).join(' — ');
+  }
+  const claimBtn = $('fpcClaim');
+  if(claimBtn){
+    claimBtn.style.display = 'inline-flex';
+    claimBtn.disabled = !!data.followClaimed;
+    $('fpcClaimText').textContent = data.followClaimed ? 'Đã nhận +5 điểm follow' : 'Tôi đã follow, nhận +5 điểm';
+  }
+}
+window.claimFollowPoints = async function(){
+  const btn = $('fpcClaim');
+  if(btn) btn.disabled = true;
+  try {
+    const r = await callFollowClaim();
+    showToast((r.data && r.data.already)
+      ? 'Bạn đã nhận điểm follow trước đó rồi'
+      : '✅ +5 điểm — cảm ơn bạn đã theo dõi Fanpage App Làm Nhà!');
+    loadMyPoints();
+  } catch(e){
+    showToast('Lỗi: ' + fnErr(e));
+    if(btn) btn.disabled = false;
+  }
+};
+
 /* Chống trùng: tìm câu hỏi tương tự khi soạn bài (debounce) */
 let _simTimer = null;
 window.checkSimilar = function(){
