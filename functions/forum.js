@@ -353,6 +353,59 @@ async function grantPostCreatedPoints(uid, postId) {
   }
 }
 
+const REFERRAL_DAILY_CAP = 5;
+
+/* Mời bạn (referral): +15đ cho referrerUid khi người được mời đăng bài ĐẦU
+   TIÊN trên diễn đàn (forumPost gọi hàm này, đã tự kiểm contribBefore===0
+   và referrerUid !== uid trước khi gọi).
+
+   RỦI RO ĐÃ BIẾT VÀ CHẤP NHẬN: hệ thống không xác minh danh tính thật, nên
+   KHÔNG THỂ chặn tuyệt đối việc tạo tài khoản ảo hàng loạt để tự mời chính
+   mình lấy điểm. REFERRAL_DAILY_CAP (5 lượt/ngày/referrerUid) CHỈ GIỚI HẠN
+   THIỆT HẠI nếu bị lạm dụng — không loại bỏ gian lận. */
+async function grantReferralPoints(referrerUid, newUid, postId) {
+  const referrerSnap = await fdb.collection("users").doc(referrerUid).get();
+  if (!referrerSnap.exists) return; // referrerUid client gửi lên không tồn tại thật — bỏ qua, không tin client mù quáng
+
+  const today = todayVN();
+  const newRef = fdb.collection(GROWTH_COL).doc(newUid);
+  const referrerRef = fdb.collection(GROWTH_COL).doc(referrerUid);
+
+  const result = await fdb.runTransaction(async (tx) => {
+    const newSnap = await tx.get(newRef);
+    if (newSnap.exists && newSnap.data().referredBy) return "duplicate"; // đã credit trước đó — chặn lặp
+
+    const refSnap = await tx.get(referrerRef);
+    const refData = refSnap.exists ? refSnap.data() : {};
+    const sameDay = refData.referralDate === today;
+    const countToday = sameDay ? (refData.referralToday || 0) : 0;
+    const capped = countToday >= REFERRAL_DAILY_CAP;
+
+    // Luôn đánh dấu referredBy (kể cả khi capped) để không xét lại — mỗi user
+    // chỉ có đúng 1 "bài đầu tiên" nên đây cũng là chặn double-fire duy nhất.
+    tx.set(newRef, { referredBy: referrerUid, updatedAt: ts() }, { merge: true });
+    if (capped) return "capped";
+
+    tx.set(referrerRef, {
+      points: inc(GROWTH_POINTS.referral),
+      ["counts.referral"]: inc(1),
+      referralToday: sameDay ? countToday + 1 : 1,
+      referralDate: today,
+      updatedAt: ts(),
+    }, { merge: true });
+    return "granted";
+  });
+
+  if (result === "granted") {
+    await referrerRef.collection("events").add({
+      type: "referral", delta: GROWTH_POINTS.referral,
+      refPath: COL.posts + "/" + postId, createdAt: ts(),
+    });
+  } else if (result === "capped") {
+    console.warn("[forumGrowthPoints] referral bị chặn do vượt trần " + REFERRAL_DAILY_CAP + "/ngày cho referrerUid=" + referrerUid + " — kiểm tra khả năng lạm dụng");
+  }
+}
+
 /* Chính sách 3 bước: Cảnh báo (1-2) → Đề nghị khóa 90 ngày (3-4) → Đề nghị khóa vĩnh viễn (≥5).
    Bản nháp CHỈ ghi cờ đề nghị + báo Founder — KHÔNG tự khóa tài khoản thật. */
 function modStageFromCount(n) {
@@ -555,14 +608,17 @@ exports.forumPost = onCall({ region: REGION }, async (request) => {
   }
 
   /* Tiền kiểm: 3 đóng góp đầu HOẶC người hay bị chặn lách sàn (≥2 lần) → chờ duyệt.
-     Người sạch, đã qua 3 bài → đăng thẳng (hậu kiểm). */
+     Người sạch, đã qua 3 bài → đăng thẳng (hậu kiểm).
+     contribBefore giữ lại (không chỉ dùng cục bộ) để referral bên dưới biết
+     đây có phải bài ĐẦU TIÊN của user hay không. */
   let pending = false;
+  let contribBefore = 0;
   if (profile.role !== "founder") {
     const stSnap = await fdb.collection(COL.userState).doc(uid).get();
     const st = stSnap.exists ? stSnap.data() : {};
-    const contrib = st.contribCount || 0;
+    contribBefore = st.contribCount || 0;
     const blocks = st.blockCount || 0;
-    pending = contrib < NEW_ACCOUNT_FREE_AFTER || blocks >= 2;
+    pending = contribBefore < NEW_ACCOUNT_FREE_AFTER || blocks >= 2;
   }
 
   const authorRank = await safeRank(uid, profile.role);   // hạng KTS (trust signal)
@@ -596,6 +652,15 @@ exports.forumPost = onCall({ region: REGION }, async (request) => {
   const postRef = await fdb.collection(COL.posts).add(post);
   await fdb.collection(COL.userState).doc(uid).set({ contribCount: inc(1), updatedAt: ts() }, { merge: true });
   await grantPostCreatedPoints(uid, postRef.id);
+
+  /* Mời bạn (referral): chỉ cộng khi đây là bài ĐẦU TIÊN của user (contribBefore
+     === 0) VÀ có referrerUid gửi lên VÀ khác chính uid hiện tại — verify thật
+     sự tồn tại + chặn credit lặp nằm trong grantReferralPoints. */
+  const referrerUidRaw = String(d.referrerUid || "").trim();
+  if (contribBefore === 0 && referrerUidRaw && referrerUidRaw !== uid) {
+    try { await grantReferralPoints(referrerUidRaw, uid, postRef.id); }
+    catch (e) { console.error("[forumPost] referral lỗi:", e); }
+  }
 
   /* Đồng bộ thread Tư vấn Dự án → lead (Speed-to-Lead Loop) */
   if (brief) {

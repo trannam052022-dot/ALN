@@ -33,6 +33,7 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
   try{
     var parts = location.search.substring(1).split('&');
     var utm = {}; var found = false;
+    var refUid = '';
     for (var i = 0; i < parts.length; i++) {
       var kv = parts[i].split('=');
       if (kv.length < 2 || !kv[1]) continue;
@@ -40,8 +41,12 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
       var v = decodeURIComponent(kv[1].replace(/\+/g, ' '));
       if (k.indexOf('utm_') === 0) { utm[k.substring(4)] = v.slice(0, 120); found = true; }
       if (k === 'fbclid') { utm.fbclid = v.slice(0, 200); found = true; }
+      if (k === 'ref') { refUid = v.slice(0, 64); }
     }
     if (found) { utm.ts = Date.now(); localStorage.setItem('aln_utm', JSON.stringify(utm)); }
+    /* Link mời bạn (?ref=UID) — giữ 7 ngày như UTM, dùng cộng điểm referral
+       cho referrerUid khi người được mời đăng bài đầu tiên (server verify lại). */
+    if (refUid) { localStorage.setItem('aln_ref', JSON.stringify({ uid: refUid, ts: Date.now() })); }
   }catch(e){}
   window.alnGetUtm = function(){
     try{
@@ -51,6 +56,15 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
       if (o.ts && Date.now() - o.ts > 7 * 864e5) return {};
       return o;
     }catch(e){ return {}; }
+  };
+  window.alnGetRef = function(){
+    try{
+      var s = localStorage.getItem('aln_ref');
+      if (!s) return '';
+      var o = JSON.parse(s);
+      if (o.ts && Date.now() - o.ts > 7 * 864e5) return '';
+      return o.uid || '';
+    }catch(e){ return ''; }
   };
   window.alnGetCookie = function(name){
     var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
@@ -571,6 +585,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="tb-user" id="tbUser" style="display:none">
       <div class="tb-avatar" id="tbAvatar"></div><span id="tbName"></span><span id="tbRole" style="display:none"></span>
     </div>
+    <button class="tb-link" id="btnInvite" style="display:none" onclick="shareInviteLink()" title="Mời bạn tham gia diễn đàn — bạn được +15 điểm khi họ đăng bài đầu tiên">
+      <i class="ph-duotone ph-user-plus"></i>Mời bạn
+    </button>
     <div class="tb-guest" id="tbGuest" style="display:none">
       <a class="g-login" onclick="requireLogin()">Đăng nhập</a>
       <a class="g-reg" href="register.html" onclick="return forumGoRegister()">Đăng ký miễn phí</a>
@@ -919,6 +936,7 @@ onAuthStateChanged(auth, async user => {
   USER = { uid: user.uid, role: profile.role, name: profile.name || '', avatar: profile.avatarUrl || '' };
   $('tbUser').style.display = 'flex';
   $('tbGuest').style.display = 'none';
+  $('btnInvite').style.display = 'inline-flex';
   $('tbName').textContent = USER.name;
   $('tbAvatar').innerHTML = USER.avatar ? '<img src="'+escH(USER.avatar)+'">' : escH((USER.name||'?')[0].toUpperCase());
   setTbRole(USER.role);
@@ -952,6 +970,7 @@ function bootGuest(){
   P2_ON = false;
   $('tbUser').style.display = 'none';
   $('tbGuest').style.display = 'inline-flex';
+  $('btnInvite').style.display = 'none';
   $('tbBack').style.display = 'none';   // khách chưa có dashboard để quay lại
   const av = $('authVeil'); if(av) av.remove();
   bootForRole();
@@ -1329,7 +1348,8 @@ window.submitPost = async function(){
       const url = await getDownloadURL(up.ref);
       media.push({ url, type: f.type.startsWith('video') ? 'video' : 'image' });
     }
-    const res = await callPost({ category: selectedCat, text, media, brief });
+    const referrerUid = window.alnGetRef ? window.alnGetRef() : '';
+    const res = await callPost({ category: selectedCat, text, media, brief, referrerUid });
     try{
       window.dataLayer = window.dataLayer || [];
       dataLayer.push({ event: 'aln_forum_thread_created', aln_forum_category: selectedCat });
@@ -1670,6 +1690,26 @@ window.toCamNang = async function(pid){
 window.toMarketingDraft = async function(pid){
   try { await callToMarketingDraft({ postId: pid }); showToast('✅ Đã tạo nháp Fanpage — vào tab Trợ lý Marketing để duyệt & đăng'); }
   catch(e){ showToast('Lỗi: ' + fnErr(e)); }
+};
+/* Mời bạn (referral): sinh link forum.html?ref=<uid của chính mình>, dùng Web
+   Share API nếu có (mobile), fallback copy clipboard. +15 điểm được cộng
+   phía server khi người được mời đăng bài đầu tiên (forumPost verify lại). */
+window.shareInviteLink = async function(){
+  if(!USER || !USER.uid) return;
+  const link = 'https://applamnha.vn/forum.html?ref=' + encodeURIComponent(USER.uid);
+  const text = 'Vào Diễn đàn ALN hỏi đáp Kiến trúc sư miễn phí — vật liệu, giá cả, kinh nghiệm xây nhà thực tế:';
+  try {
+    if(navigator.share){
+      await navigator.share({ title: 'Diễn đàn ALN', text, url: link });
+      return;
+    }
+  } catch(e){ /* user hủy share sheet — vẫn thử fallback copy bên dưới */ }
+  try {
+    await navigator.clipboard.writeText(link);
+    showToast('✅ Đã copy link mời bạn — gửi cho bạn bè để nhận +15 điểm khi họ đăng bài đầu tiên');
+  } catch(e){
+    showToast(link);
+  }
 };
 /* Chống trùng: tìm câu hỏi tương tự khi soạn bài (debounce) */
 let _simTimer = null;
