@@ -295,6 +295,64 @@ async function addRep(uid, type, sign, refPath) {
   await ref.collection("events").add({ type, delta: pts, refPath: refPath || null, createdAt: ts() });
 }
 
+/* Điểm thưởng TĂNG TRƯỞNG (follow Fanpage + tham gia diễn đàn) — collection
+   RIÊNG BIỆT với ktsReputation ở trên. ktsReputation CHỈ xếp hạng chuyên môn
+   KTS (Chuyên gia/Cố vấn/Tân binh, ưu tiên nhận dự án) — TUYỆT ĐỐI không
+   trộn điểm follow/mời bạn vào đó. forumGrowthPoints áp dụng MỌI vai trò
+   (CN/DN/KTS). CHỈ server ghi — client không ghi trực tiếp (giống addRep). */
+const GROWTH_COL = "forumGrowthPoints";
+const GROWTH_POINTS = { postCreated: 2, bestAnswer: 10, heart: 1, referral: 15, followSelf: 5 };
+const POST_CREATED_DAILY_CAP = 3;
+
+function todayVN() {
+  // yyyy-mm-dd theo giờ VN — dùng để reset bộ đếm điểm thưởng "đăng bài trong ngày"
+  return new Intl.DateTimeFormat("en-CA", { timeZone: VN_TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+}
+
+/* delta là SỐ ĐIỂM thực tế (đã có dấu +/-), KHÔNG tra bảng như addRep —
+   vì bestAnswer/heart cần cộng và trừ đối xứng (chọn lại/bỏ chọn), còn
+   postCreated có trần theo ngày nên tự tính delta ở nơi gọi. */
+async function addGrowthPoints(uid, type, delta, refPath) {
+  if (!delta) return;
+  const ref = fdb.collection(GROWTH_COL).doc(uid);
+  await ref.set({
+    points: inc(delta),
+    ["counts." + type]: inc(delta > 0 ? 1 : -1),
+    updatedAt: ts(),
+  }, { merge: true });
+  await ref.collection("events").add({ type, delta, refPath: refPath || null, createdAt: ts() });
+}
+
+/* postCreated: +2/bài, tối đa POST_CREATED_DAILY_CAP lần/ngày/uid (chống
+   spam đăng bài rác kiếm điểm) — đếm riêng bằng postCreatedToday/postCreatedDate
+   trên chính doc forumGrowthPoints/{uid}, transaction để tránh đếm hụt khi
+   trùng thời điểm. */
+async function grantPostCreatedPoints(uid, postId) {
+  const today = todayVN();
+  const ref = fdb.collection(GROWTH_COL).doc(uid);
+  const granted = await fdb.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const data = snap.exists ? snap.data() : {};
+    const sameDay = data.postCreatedDate === today;
+    const countToday = sameDay ? (data.postCreatedToday || 0) : 0;
+    if (countToday >= POST_CREATED_DAILY_CAP) return false;
+    tx.set(ref, {
+      points: inc(GROWTH_POINTS.postCreated),
+      ["counts.postCreated"]: inc(1),
+      postCreatedToday: sameDay ? countToday + 1 : 1,
+      postCreatedDate: today,
+      updatedAt: ts(),
+    }, { merge: true });
+    return true;
+  });
+  if (granted) {
+    await ref.collection("events").add({
+      type: "postCreated", delta: GROWTH_POINTS.postCreated,
+      refPath: COL.posts + "/" + postId, createdAt: ts(),
+    });
+  }
+}
+
 /* Chính sách 3 bước: Cảnh báo (1-2) → Đề nghị khóa 90 ngày (3-4) → Đề nghị khóa vĩnh viễn (≥5).
    Bản nháp CHỈ ghi cờ đề nghị + báo Founder — KHÔNG tự khóa tài khoản thật. */
 function modStageFromCount(n) {
@@ -537,6 +595,7 @@ exports.forumPost = onCall({ region: REGION }, async (request) => {
 
   const postRef = await fdb.collection(COL.posts).add(post);
   await fdb.collection(COL.userState).doc(uid).set({ contribCount: inc(1), updatedAt: ts() }, { merge: true });
+  await grantPostCreatedPoints(uid, postRef.id);
 
   /* Đồng bộ thread Tư vấn Dự án → lead (Speed-to-Lead Loop) */
   if (brief) {
@@ -729,6 +788,12 @@ exports.forumHeart = onCall({ region: REGION }, async (request) => {
   if (commentId && result.authorRole === "kts" && result.authorUid !== uid) {
     await addRep(result.authorUid, "heart", result.nowHearted ? 1 : -1, COL.posts + "/" + postId + "/comments/" + commentId);
   }
+  /* Điểm thưởng tăng trưởng — MỌI vai trò (khác ktsReputation ở trên chỉ tính KTS) */
+  if (commentId && result.authorUid !== uid) {
+    await addGrowthPoints(result.authorUid, "heart",
+      result.nowHearted ? GROWTH_POINTS.heart : -GROWTH_POINTS.heart,
+      COL.posts + "/" + postId + "/comments/" + commentId);
+  }
 
   return { hearted: result.nowHearted };
 });
@@ -783,6 +848,12 @@ exports.forumBestAnswer = onCall({ region: REGION }, async (request) => {
   if (info.authorRole === "kts") {
     await addRep(info.authorUid, "bestAnswer", 1, COL.posts + "/" + postId + "/comments/" + commentId);
   }
+  /* Điểm thưởng tăng trưởng — MỌI vai trò, đối xứng: gỡ Best Answer cũ thì trừ điểm lại */
+  if (info.prev) {
+    await addGrowthPoints(info.prev.authorUid, "bestAnswer", -GROWTH_POINTS.bestAnswer, COL.posts + "/" + postId);
+  }
+  await addGrowthPoints(info.authorUid, "bestAnswer", GROWTH_POINTS.bestAnswer,
+    COL.posts + "/" + postId + "/comments/" + commentId);
   await fdNotify(info.authorUid, "🏆 Câu trả lời của bạn được chọn Best Answer",
     "Chủ thớt đã đánh dấu câu trả lời hay nhất — +5 điểm uy tín",
     { type: "FORUM_BEST_ANSWER", postId, commentId });
