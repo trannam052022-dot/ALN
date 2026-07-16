@@ -2072,6 +2072,30 @@ exports.forumToCamNang = onCall({ region: REGION }, async (request) => {
   return { ok: true, id: ref.id };
 });
 
+/* 9.4b — Founder tự chọn 1 Best Answer bất kỳ để tạo nháp Fanpage (giống
+   forumToCamNang nhưng ra marketingDrafts thay vì camNangForum). Dùng lại
+   buildForumQnaDraftContent — cùng format với draft tự động của forumWeeklyDigest. */
+exports.forumAnswerToMarketingDraft = onCall({ region: REGION }, async (request) => {
+  const { profile } = await requireAuth(request);
+  if (profile.role !== "founder") throw new HttpsError("permission-denied", "Chỉ Founder tạo nháp Fanpage");
+  const postId = String((request.data || {}).postId || "");
+  const postRef = fdb.collection(COL.posts).doc(postId);
+  const snap = await postRef.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Bài không tồn tại");
+  const p = snap.data();
+  if (!p.bestAnswerId) throw new HttpsError("failed-precondition", "Chưa có Best Answer — chỉ tạo nháp từ nội dung đã kiểm chứng");
+  const baSnap = await postRef.collection("comments").doc(p.bestAnswerId).get();
+  const ba = baSnap.exists ? baSnap.data() : null;
+  if (!ba || !ba.text) throw new HttpsError("failed-precondition", "Best Answer không còn nội dung");
+  const ref = await fdb.collection("marketingDrafts").add({
+    kind: "forum_qna", label: "Hỏi đáp Diễn đàn",
+    content: buildForumQnaDraftContent(postId, p.text || "", ba.text || "", ba.authorName || ""),
+    status: "draft", createdAt: ts(), sourcePostId: postId,
+  });
+  await postRef.update({ marketingDraftId: ref.id });
+  return { ok: true, id: ref.id };
+});
+
 /* 9.5 — SLA: câu hỏi KTS quá 2 ngày chưa ai trả lời → nhắc top KTS + báo Founder */
 exports.forumUnansweredNudge = onSchedule(
   { schedule: "20 9 * * *", timeZone: VN_TZ, region: REGION },

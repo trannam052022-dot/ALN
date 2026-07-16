@@ -732,6 +732,7 @@ const callSimilar   = httpsCallable(fns, 'forumSimilar');
 const callAiDraft   = httpsCallable(fns, 'forumAiDraftAnswer');
 const callSummarize = httpsCallable(fns, 'forumSummarize');
 const callToCamNang = httpsCallable(fns, 'forumToCamNang');
+const callToMarketingDraft = httpsCallable(fns, 'forumAnswerToMarketingDraft');
 const callChooseKts = httpsCallable(fns, 'forumChooseKts');
 
 /* ════ CẤU HÌNH CHUYÊN MỤC (đồng bộ với forum.js) ════ */
@@ -1420,6 +1421,7 @@ function renderThread(){
       + ((mine || USER.role==='founder') ? '<button class="tc-stat" onclick="delPost(\''+p.id+'\')"><i class="ph-duotone ph-trash"></i> Xóa</button>' : '')
       + (USER.role==='founder' ? '<button class="tc-stat" onclick="pinPost(\''+p.id+'\')"><i class="ph-duotone ph-push-pin"></i> '+(p.pinned?'Bỏ ghim':'Ghim')+'</button>' : '')
       + (USER.role==='founder' && p.bestAnswerId ? '<button class="tc-stat" onclick="toCamNang(\''+p.id+'\')" style="color:var(--gold)"><i class="ph-duotone ph-book-bookmark"></i> '+(p.camNangId?'Đã vào Cẩm nang':'Đưa vào Cẩm nang')+'</button>' : '')
+      + (USER.role==='founder' && p.bestAnswerId ? '<button class="tc-stat" onclick="toMarketingDraft(\''+p.id+'\')" style="color:var(--gold)"><i class="ph-duotone ph-megaphone"></i> '+(p.marketingDraftId?'Đã có nháp Fanpage':'Tạo nháp Fanpage')+'</button>' : '')
     + '</div>'
     + '<div id="aiSummaryBox" class="ai-summary" style="display:'+(p.aiSummary?'block':'none')+'">'
       + (p.aiSummary ? '<div class="ai-tag"><i class="ph-duotone ph-sparkle"></i> Tóm tắt AI</div>'+escH(p.aiSummary).replace(/\n/g,'<br>') : '')
@@ -1614,6 +1616,12 @@ window.confirmChoose = async function(){
 /* Founder: đề cử Best Answer vào Cẩm nang (nội dung đã kiểm chứng) */
 window.toCamNang = async function(pid){
   try { await callToCamNang({ postId: pid }); showToast('✅ Đã đưa Best Answer vào Cẩm nang (nháp)'); }
+  catch(e){ showToast('Lỗi: ' + fnErr(e)); }
+};
+/* Founder: tạo nháp bài Fanpage từ 1 Best Answer bất kỳ — vào tab Trợ lý
+   Marketing (founder_panel.html) để duyệt, sửa & tự bấm đăng, KHÔNG tự đăng. */
+window.toMarketingDraft = async function(pid){
+  try { await callToMarketingDraft({ postId: pid }); showToast('✅ Đã tạo nháp Fanpage — vào tab Trợ lý Marketing để duyệt & đăng'); }
   catch(e){ showToast('Lỗi: ' + fnErr(e)); }
 };
 /* Chống trùng: tìm câu hỏi tương tự khi soạn bài (debounce) */
