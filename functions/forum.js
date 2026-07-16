@@ -417,6 +417,17 @@ async function grantReferralPoints(referrerUid, newUid, postId) {
     });
   } else if (result === "capped") {
     console.warn("[forumGrowthPoints] referral bị chặn do vượt trần " + REFERRAL_DAILY_CAP + "/ngày cho referrerUid=" + referrerUid + " — kiểm tra khả năng lạm dụng");
+    // Ghi vào modLogs (collection có sẵn, Founder đã đọc được qua rules hiện có)
+    // để hiện trong Founder Panel — console.warn một mình dễ bị bỏ sót vì phải
+    // vào tận Cloud Functions log mới thấy.
+    try {
+      await fdb.collection(COL.modLogs).add({
+        uid: referrerUid, name: "", role: "",
+        kind: "referral_cap", reason: "referral_daily_cap",
+        snippet: "Referral bị chặn do vượt trần " + REFERRAL_DAILY_CAP + "/ngày — kiểm tra khả năng lạm dụng (tài khoản ảo hoặc tự khai referrerUid).",
+        createdAt: ts(),
+      });
+    } catch (e) { console.error("[forumGrowthPoints] ghi modLogs referral_cap lỗi:", e); }
   }
 }
 
@@ -996,6 +1007,21 @@ exports.forumMyPoints = onCall({ region: REGION }, async (request) => {
     nextBadge: next ? { key: next.key, label: next.label, pointsToGo: next.min - points } : null,
     followClaimed: !!data.followClaimed,
   };
+});
+
+/* Top N điểm thưởng tăng trưởng — đọc qua function (không onSnapshot trực
+   tiếp) nên KHÔNG cần mở firestore.rules cho forumGrowthPoints, giống
+   forumMyPoints. Dùng chung cho widget công khai forum.html VÀ dashboard
+   Founder (không tách riêng 2 hàm để tránh lệch số liệu 2 nơi). */
+exports.forumGrowthLeaderboard = onCall({ region: REGION }, async (request) => {
+  await requireAuth(request);
+  const n = Math.min(Math.max(Number((request.data || {}).limit) || 10, 1), 20);
+  const snap = await fdb.collection(GROWTH_COL).orderBy("points", "desc").limit(n).get();
+  const rows = [];
+  snap.forEach((d) => { if ((d.data().points || 0) > 0) rows.push({ uid: d.id, points: d.data().points || 0 }); });
+  const names = await Promise.all(rows.map((r) => fdb.collection("users").doc(r.uid).get()));
+  names.forEach((s, i) => { rows[i].name = (s.exists && s.data().name) || "Thành viên ALN"; });
+  return { rows };
 });
 
 /* ════════════════════════════════════════════
@@ -2243,6 +2269,13 @@ exports.forumSummarize = onCall({ region: REGION, secrets: [ANTHROPIC_KEY] }, as
   return { summary, cached: false };
 });
 
+/* Ảnh mặc định đính kèm nháp Fanpage — bài có ảnh lên feed tốt hơn hẳn text
+   thuần. Dùng tạm 1 ảnh demo đã có sẵn (không có thư viện dựng ảnh thẻ theo
+   nội dung riêng từng câu hỏi — functions/package.json chưa có canvas/sharp,
+   không tự thêm dependency mới khi chưa hỏi). Founder có thể đổi ảnh trong
+   khung "Kết quả AI" trước khi đăng nếu muốn ảnh khác cho từng bài. */
+const FORUM_QNA_IMAGE_URL = "https://applamnha.vn/assets/demo/aln-demo-biet-thu-vuon.jpg";
+
 /* Dựng nội dung nháp Fanpage từ 1 câu hỏi + Best Answer đã kiểm chứng.
    Dùng chung cho forumWeeklyDigest (tự động, top tuần) và
    forumAnswerToMarketingDraft (Founder chọn tay) — tránh lệch format 2 nơi. */
@@ -2298,6 +2331,7 @@ exports.forumAnswerToMarketingDraft = onCall({ region: REGION }, async (request)
   const ref = await fdb.collection("marketingDrafts").add({
     kind: "forum_qna", label: "Hỏi đáp Diễn đàn",
     content: buildForumQnaDraftContent(postId, p.text || "", ba.text || "", ba.authorName || ""),
+    imageUrl: FORUM_QNA_IMAGE_URL,
     status: "draft", createdAt: ts(), sourcePostId: postId,
   });
   await postRef.update({ marketingDraftId: ref.id });
@@ -2371,6 +2405,7 @@ exports.forumWeeklyDigest = onSchedule(
           kind: "forum_qna",
           label: "Hỏi đáp Diễn đàn",
           content: buildForumQnaDraftContent(it.id, p.text || "", ba.text || "", ba.authorName || ""),
+          imageUrl: FORUM_QNA_IMAGE_URL,
           status: "draft",
           createdAt: ts(),
           sourcePostId: it.id,

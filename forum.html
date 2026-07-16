@@ -663,6 +663,11 @@ window.dismissFanpageCta = function () {
   <div class="lb-list" id="lbList"></div>
 </div>
 
+<div class="lb-widget" id="growthLbWidget" style="display:none">
+  <div class="lb-title"><i class="ph-duotone ph-medal"></i>Top thành viên tuần (điểm tăng trưởng)</div>
+  <div class="lb-list" id="growthLbList"></div>
+</div>
+
 <div class="feed-wrap">
   <div id="feedList">
     <div class="empty-state"><i class="ph-duotone ph-spinner-gap"></i><p>Đang tải diễn đàn...</p></div>
@@ -821,6 +826,7 @@ const callToMarketingDraft = httpsCallable(fns, 'forumAnswerToMarketingDraft');
 const callChooseKts = httpsCallable(fns, 'forumChooseKts');
 const callMyPoints = httpsCallable(fns, 'forumMyPoints');
 const callFollowClaim = httpsCallable(fns, 'forumFollowFanpageClaim');
+const callGrowthLeaderboard = httpsCallable(fns, 'forumGrowthLeaderboard');
 
 /* ════ CẤU HÌNH CHUYÊN MỤC (đồng bộ với forum.js) ════ */
 const CATS = {
@@ -1076,6 +1082,7 @@ function bootForRole(){
   subscribePosts();
   maybeOpenDeepLink();
   loadLeaderboard();
+  loadGrowthLeaderboard();
 }
 
 /* Bảng xếp hạng điểm uy tín top 10 (Hạng mục D4) — chỉ user đã đăng nhập xem được,
@@ -1095,6 +1102,23 @@ async function loadLeaderboard(){
     ).join('');
     $('lbWidget').style.display = 'block';
   } catch(e){ console.warn('[forum] leaderboard', e.message); }
+}
+
+/* Top thành viên theo điểm thưởng tăng trưởng (mọi vai trò) — qua callable
+   forumGrowthLeaderboard, KHÔNG đọc thẳng Firestore (forumGrowthPoints chưa
+   mở rules cho client, chỉ server ghi/đọc qua function). */
+async function loadGrowthLeaderboard(){
+  try {
+    const res = await callGrowthLeaderboard({ limit: 10 });
+    const rows = (res.data && res.data.rows) || [];
+    if(!rows.length) return;
+    $('growthLbList').innerHTML = rows.map((r, i) =>
+      '<div class="lb-row"><span class="lb-rank-num">'+(i+1)+'</span>'
+      + '<span class="lb-name">'+escH(r.name)+'</span>'
+      + '<span class="lb-points">'+r.points+'đ</span></div>'
+    ).join('');
+    $('growthLbWidget').style.display = 'block';
+  } catch(e){ console.warn('[forum] growth leaderboard', e.message); }
 }
 
 function renderGate(icon, title, msg){
