@@ -2269,12 +2269,31 @@ exports.forumSummarize = onCall({ region: REGION, secrets: [ANTHROPIC_KEY] }, as
   return { summary, cached: false };
 });
 
-/* Ảnh mặc định đính kèm nháp Fanpage — bài có ảnh lên feed tốt hơn hẳn text
-   thuần. Dùng tạm 1 ảnh demo đã có sẵn (không có thư viện dựng ảnh thẻ theo
-   nội dung riêng từng câu hỏi — functions/package.json chưa có canvas/sharp,
-   không tự thêm dependency mới khi chưa hỏi). Founder có thể đổi ảnh trong
-   khung "Kết quả AI" trước khi đăng nếu muốn ảnh khác cho từng bài. */
-const FORUM_QNA_IMAGE_URL = "https://applamnha.vn/assets/demo/aln-demo-biet-thu-vuon.jpg";
+/* Ảnh đính kèm nháp Fanpage — bài có ảnh lên feed tốt hơn hẳn text thuần.
+   Fallback tĩnh nếu Kho mẫu (mauNha) rỗng hoặc lỗi truy vấn. */
+const FORUM_QNA_IMAGE_FALLBACK = "https://applamnha.vn/assets/demo/aln-demo-biet-thu-vuon.jpg";
+
+/* Chọn ngẫu nhiên 1 ảnh (ảnh đầu — imgs[0], đã có watermark ALN từ lúc
+   Founder upload qua Kho mẫu) trong số mẫu nhà đang "visible" — ưu tiên
+   dùng ảnh THẬT quảng bá gói kinh tế thay vì 1 ảnh demo cố định, và mỗi
+   nháp ra ảnh khác nhau. Không tra bảng theo category câu hỏi (mauNha.cat
+   không khớp trực tiếp với category diễn đàn) — chọn ngẫu nhiên trong toàn
+   bộ mẫu đang hiển thị công khai là đủ cho mục đích minh hoạ bài đăng. */
+async function pickForumQnaImage() {
+  try {
+    const snap = await fdb.collection("mauNha").where("visible", "==", true).get();
+    const candidates = [];
+    snap.forEach((d) => {
+      const imgs = d.data().imgs;
+      if (Array.isArray(imgs) && imgs[0] && imgs[0].src) candidates.push(imgs[0].src);
+    });
+    if (!candidates.length) return FORUM_QNA_IMAGE_FALLBACK;
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  } catch (e) {
+    console.error("[forum] pickForumQnaImage lỗi, dùng ảnh fallback:", e);
+    return FORUM_QNA_IMAGE_FALLBACK;
+  }
+}
 
 /* Dựng nội dung nháp Fanpage từ 1 câu hỏi + Best Answer đã kiểm chứng.
    Dùng chung cho forumWeeklyDigest (tự động, top tuần) và
@@ -2331,7 +2350,7 @@ exports.forumAnswerToMarketingDraft = onCall({ region: REGION }, async (request)
   const ref = await fdb.collection("marketingDrafts").add({
     kind: "forum_qna", label: "Hỏi đáp Diễn đàn",
     content: buildForumQnaDraftContent(postId, p.text || "", ba.text || "", ba.authorName || ""),
-    imageUrl: FORUM_QNA_IMAGE_URL,
+    imageUrl: await pickForumQnaImage(),
     status: "draft", createdAt: ts(), sourcePostId: postId,
   });
   await postRef.update({ marketingDraftId: ref.id });
@@ -2405,7 +2424,7 @@ exports.forumWeeklyDigest = onSchedule(
           kind: "forum_qna",
           label: "Hỏi đáp Diễn đàn",
           content: buildForumQnaDraftContent(it.id, p.text || "", ba.text || "", ba.authorName || ""),
-          imageUrl: FORUM_QNA_IMAGE_URL,
+          imageUrl: await pickForumQnaImage(),
           status: "draft",
           createdAt: ts(),
           sourcePostId: it.id,
