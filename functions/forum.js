@@ -2035,6 +2035,21 @@ exports.forumSummarize = onCall({ region: REGION, secrets: [ANTHROPIC_KEY] }, as
   return { summary, cached: false };
 });
 
+/* Dựng nội dung nháp Fanpage từ 1 câu hỏi + Best Answer đã kiểm chứng.
+   Dùng chung cho forumWeeklyDigest (tự động, top tuần) và
+   forumAnswerToMarketingDraft (Founder chọn tay) — tránh lệch format 2 nơi. */
+function buildForumQnaDraftContent(postId, question, answer, answerBy) {
+  const q = (question || "").trim();
+  const a = (answer || "").trim();
+  const qShort = q.slice(0, 220) + (q.length > 220 ? "…" : "");
+  const aShort = a.slice(0, 280) + (a.length > 280 ? "…" : "");
+  const link = FORUM_URL + "?thread=" + postId + "&utm_source=facebook&utm_medium=social&utm_campaign=forum";
+  let body = "❓ " + qShort + "\n\n💡 " + aShort;
+  if (answerBy) body += "\n(KTS " + answerBy + " trả lời)";
+  body += "\n\n👉 Xem đầy đủ và đặt câu hỏi tại Diễn đàn ALN: " + link;
+  return body;
+}
+
 /* 9.4 — Đề cử Best Answer vào Cẩm nang (Founder; chỉ nội dung đã kiểm chứng) */
 exports.forumToCamNang = onCall({ region: REGION }, async (request) => {
   const { profile } = await requireAuth(request);
@@ -2096,16 +2111,41 @@ exports.forumWeeklyDigest = onSchedule(
       if (p.status === "visible" && ms >= weekAgo) {
         items.push({
           id: d.id, text: (p.text || "").slice(0, 80), category: p.category,
+          bestAnswerId: p.bestAnswerId || null,
           score: (p.heartCount || 0) * 2 + (p.commentCount || 0) + (p.bestAnswerId ? 3 : 0),
         });
       }
     });
     items.sort((a, b) => b.score - a.score);
-    const top = items.slice(0, 5);
+    const top = items.slice(0, 5).map(({ bestAnswerId, ...rest }) => rest); // bestAnswerId chỉ dùng nội bộ, không lưu vào digest
     const ref = await fdb.collection(COL.digest).add({ count: items.length, top, createdAt: ts() });
     if (top.length) {
       await fdNotify(FOUNDER_UID, "📰 Bản tin diễn đàn tuần (" + items.length + " bài)",
         top.map((t) => "• " + t.text).join("\n"), { type: "FORUM_WEEKLY", digestId: ref.id });
+    }
+
+    // Với mỗi bài top tuần đã có Best Answer (nội dung đã kiểm chứng) →
+    // tạo sẵn 1 nháp Fanpage cho Founder duyệt (KHÔNG tự đăng).
+    for (const it of items.slice(0, 5)) {
+      if (!it.bestAnswerId) continue;
+      try {
+        const postSnap = await fdb.collection(COL.posts).doc(it.id).get();
+        if (!postSnap.exists) continue;
+        const p = postSnap.data();
+        const baSnap = await postSnap.ref.collection("comments").doc(it.bestAnswerId).get();
+        const ba = baSnap.exists ? baSnap.data() : null;
+        if (!ba || !ba.text) continue;
+        await fdb.collection("marketingDrafts").add({
+          kind: "forum_qna",
+          label: "Hỏi đáp Diễn đàn",
+          content: buildForumQnaDraftContent(it.id, p.text || "", ba.text || "", ba.authorName || ""),
+          status: "draft",
+          createdAt: ts(),
+          sourcePostId: it.id,
+        });
+      } catch (e) {
+        console.error("[forumWeeklyDigest] draft cho bài", it.id, e);
+      }
     }
   }
 );
