@@ -2043,7 +2043,7 @@ function buildForumQnaDraftContent(postId, question, answer, answerBy) {
   const a = (answer || "").trim();
   const qShort = q.slice(0, 220) + (q.length > 220 ? "…" : "");
   const aShort = a.slice(0, 280) + (a.length > 280 ? "…" : "");
-  const link = FORUM_URL + "?thread=" + postId + "&utm_source=facebook&utm_medium=social&utm_campaign=forum";
+  const link = "https://applamnha.vn/forum.html?thread=" + postId + "&utm_source=facebook&utm_medium=social&utm_campaign=forum";
   let body = "❓ " + qShort + "\n\n💡 " + aShort;
   if (answerBy) body += "\n(KTS " + answerBy + " trả lời)";
   body += "\n\n👉 Xem đầy đủ và đặt câu hỏi tại Diễn đàn ALN: " + link;
