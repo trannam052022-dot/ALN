@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ký hợp đồng điện tử — ALN (bản nháp demo)</title>
+<link rel="stylesheet" href="aln-tokens.css">
+<style>
+:root{
+  --bg:#080c14;
+  --card:rgba(14,20,34,.88);
+  --border:rgba(255,255,255,.08);
+  --border-g:rgba(201,168,76,.2);
+  --text:#dce6f4;
+  --text2:#9aaac4;
+  --muted:#8090ae;
+  --gold:#c9a84c;
+  --gold2:#e8d07a;
+  --green:#10b981;
+  --red:#ef4444;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:1rem;line-height:1.6;min-height:100vh}
+.page{max-width:760px;margin:0 auto;padding:32px 20px 80px}
+.demo-banner{background:rgba(201,168,76,.1);border:1px solid var(--border-g);border-radius:var(--r);padding:10px 16px;font-size:.8rem;color:var(--gold2);margin-bottom:24px;text-align:center}
+.header{text-align:center;margin-bottom:24px}
+.header .brand{font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.header h1{font-size:1.5rem;font-weight:700;color:var(--text)}
+.status-badge{display:inline-block;padding:4px 12px;border-radius:99px;font-size:.75rem;font-weight:600;margin-bottom:16px}
+.st-draft,.st-sent,.st-viewed{background:rgba(154,170,196,.15);color:var(--text2)}
+.st-otp_pending{background:rgba(201,168,76,.15);color:var(--gold2)}
+.st-signed_partyB{background:rgba(74,143,255,.15);color:#4a8fff}
+.st-signed_all{background:rgba(16,185,129,.15);color:var(--green)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px}
+.party-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:560px){.party-grid{grid-template-columns:1fr}}
+.party-grid h3{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.party-grid p{font-size:.9rem;color:var(--text2);margin:2px 0}
+.contract-body{font-size:.92rem;color:var(--text2);line-height:1.85}
+.contract-body h2{font-size:1rem;color:var(--text);margin:20px 0 8px}
+.contract-body p{margin-bottom:8px}
+.agree-row{display:flex;align-items:flex-start;gap:10px;margin:20px 0}
+.agree-row input{margin-top:3px;width:16px;height:16px}
+.agree-row label{font-size:.88rem;color:var(--text2)}
+button{font:inherit;cursor:pointer;border:none;border-radius:10px;padding:12px 20px;font-weight:600;font-size:.9rem}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1406;width:100%}
+.btn-gold:disabled{opacity:.35;cursor:not-allowed}
+.btn-outline{background:transparent;border:1px solid var(--border-g);color:var(--gold2);width:100%;margin-top:10px}
+.otp-banner{background:rgba(201,168,76,.12);border:1px dashed var(--border-g);border-radius:10px;padding:12px 16px;font-size:.85rem;color:var(--gold2);margin-bottom:12px}
+.otp-banner b{font-size:1.1rem;letter-spacing:.15em}
+input#otpInput{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--text);font-size:1.1rem;letter-spacing:.3em;text-align:center;margin-bottom:10px}
+.err-text{color:var(--red);font-size:.82rem;margin-top:8px}
+.signed-box{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:var(--r);padding:20px;text-align:center;color:var(--green);font-weight:600}
+.signed-box .ts{display:block;color:var(--text2);font-weight:400;font-size:.82rem;margin-top:6px}
+#loadingBox,#errorBox{text-align:center;padding:60px 20px;color:var(--muted)}
+#errorBox{color:var(--red)}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="demo-banner">BẢN NHÁP DEMO — nội dung Điều khoản là khung mẫu, chưa phải văn bản pháp lý chính thức. OTP dùng cho luồng ký thật sẽ gửi SMS/email; ở bản demo này mã hiển thị ngay trên màn hình.</div>
+
+  <div id="loadingBox">Đang tải hợp đồng…</div>
+  <div id="errorBox" style="display:none"></div>
+
+  <div id="contractBox" style="display:none">
+    <div class="header">
+      <div class="brand">App Làm Nhà — Tổng thầu Thiết kế</div>
+      <h1 id="contractTitle">Hợp đồng</h1>
+      <span class="status-badge" id="statusBadge"></span>
+    </div>
+
+    <div class="card party-grid">
+      <div>
+        <h3>Bên A</h3>
+        <p id="partyAName"></p>
+        <p id="partyARep"></p>
+      </div>
+      <div>
+        <h3>Bên B</h3>
+        <p id="partyBName"></p>
+        <p id="partyBPhone"></p>
+      </div>
+    </div>
+
+    <div class="card contract-body" id="contractBody"></div>
+
+    <div class="card" id="agreeCard">
+      <div class="agree-row">
+        <input type="checkbox" id="agreeCheckbox" onchange="onAgreeChange()">
+        <label for="agreeCheckbox">Tôi đã đọc và đồng ý toàn bộ nội dung Hợp đồng</label>
+      </div>
+      <button class="btn-gold" id="signBtn" disabled onclick="onSignClick()">Ký hợp đồng</button>
+
+      <div id="otpBox" style="display:none;margin-top:16px">
+        <div class="otp-banner" id="otpDemoBanner"></div>
+        <input id="otpInput" maxlength="6" inputmode="numeric" placeholder="000000">
+        <button class="btn-gold" onclick="onVerifyClick()">Xác nhận OTP</button>
+        <button class="btn-outline" onclick="onResendOtp()">Gửi lại mã OTP</button>
+        <div class="err-text" id="otpError"></div>
+      </div>
+    </div>
+
+    <div class="signed-box" id="signedBox" style="display:none">
+      ✅ Bên B đã ký hợp đồng thành công
+      <span class="ts" id="signedAt"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+// Scope thường — KHÔNG dùng optional chaining (?.) hay object shorthand.
+
+var CONTRACT_TITLES = {
+  ktsCollaborator: 'Hợp đồng Cộng tác viên Kiến trúc sư',
+  businessClient: 'Hợp đồng Hợp tác Doanh nghiệp',
+  homeowner: 'Hợp đồng Thiết kế — Chủ nhà'
+};
+
+var STATUS_LABELS = {
+  draft: 'Bản nháp',
+  sent: 'Đã gửi — chờ Bên B xem',
+  viewed: 'Bên B đã xem',
+  otp_pending: 'Đang chờ nhập OTP',
+  signed_partyB: 'Bên B đã ký — chờ hoàn tất',
+  signed_all: 'Đã ký đầy đủ 2 bên',
+  liquidated: 'Đã thanh lý',
+  cancelled: 'Đã huỷ'
+};
+
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function fmtMoney(n) {
+  var num = Number(n);
+  if (!num) return '0 đ';
+  return num.toLocaleString('vi-VN') + ' đ';
+}
+
+function field(contractData, key, fallback) {
+  if (contractData && contractData[key] !== undefined && contractData[key] !== '') {
+    return contractData[key];
+  }
+  return fallback || '—';
+}
+
+function buildContractBody(contract) {
+  var d = contract.contractData || {};
+  var a = contract.partyA || {};
+  var b = contract.partyB || {};
+  var html = '';
+
+  html += '<p><b>Hôm nay</b>, tại App Làm Nhà, các Bên gồm:</p>';
+  html += '<p><b>BÊN A:</b> ' + escapeHtml(a.name) + ' — Đại diện: ' + escapeHtml(a.repName) + ' (' + escapeHtml(a.title) + ')</p>';
+  html += '<p><b>BÊN B:</b> ' + escapeHtml(b.name) + ' — CMND/CCCD/MST: ' + escapeHtml(b.idNumber) + ' — SĐT: ' + escapeHtml(b.phone) + '</p>';
+  html += '<p>Cùng thoả thuận ký kết hợp đồng với các điều khoản sau:</p>';
+
+  html += '<h2>Điều 1 — Đối tượng hợp đồng</h2>';
+
+  if (contract.type === 'ktsCollaborator') {
+    html += '<p>Bên A giao cho Bên B thực hiện vai trò Cộng tác viên Kiến trúc sư cho dự án <b>' + escapeHtml(field(d, 'projectName')) + '</b>, địa chỉ ' + escapeHtml(field(d, 'projectAddress')) + ', theo Quy trình 4 bước đảm bảo (C1–C4).</p>';
+    html += '<h2>Điều 2 — Phạm vi công việc</h2>';
+    html += '<p>' + escapeHtml(field(d, 'scopeOfWork', 'Tư vấn thiết kế, lập hồ sơ phương án qua từng chặng C1–C4 theo phân công của Bên A.')) + '</p>';
+    html += '<h2>Điều 3 — Thù lao &amp; thanh toán</h2>';
+    html += '<p>Bên B nhận thù lao bằng ' + escapeHtml(field(d, 'feePercent', '—')) + '% giá trị hợp đồng thiết kế của dự án, chi trả tương ứng theo tiến độ hoàn thành từng chặng C1–C4 (Quỹ bảo đảm 4 bước, đã có sẵn tại ALN chờ Bên B).</p>';
+    html += '<h2>Điều 4 — Thời gian thực hiện</h2>';
+    html += '<p>Bắt đầu từ ' + escapeHtml(field(d, 'startDate')) + ', thời gian dự kiến ' + escapeHtml(field(d, 'estimatedDurationDays')) + ' ngày.</p>';
+  } else if (contract.type === 'businessClient') {
+    html += '<p>Bên A và Bên B (<b>' + escapeHtml(field(d, 'businessRepTitle')) + '</b>, MST ' + escapeHtml(field(d, 'businessTaxId')) + ') hợp tác giới thiệu và triển khai dự án thiết kế cho khách hàng do hai bên cùng phục vụ.</p>';
+    html += '<h2>Điều 2 — Phạm vi hợp tác</h2>';
+    html += '<p>' + escapeHtml(field(d, 'cooperationScope', 'Bên B giới thiệu khách hàng, Bên A (ALN) là Tổng thầu Thiết kế ký hợp đồng trực tiếp với khách hàng, chịu trách nhiệm toàn bộ dự án.')) + '</p>';
+    html += '<h2>Điều 3 — Chính sách hoa hồng</h2>';
+    html += '<p>Bên B nhận hoa hồng ' + escapeHtml(field(d, 'commissionPercent', '—')) + '% trên giá trị hợp đồng mỗi dự án giới thiệu thành công, thanh toán theo Quy trình 4 bước đảm bảo.</p>';
+    html += '<h2>Điều 4 — Thời hạn hợp tác</h2>';
+    html += '<p>' + escapeHtml(field(d, 'cooperationDurationMonths', '—')) + ' tháng kể từ ngày ký, tự động gia hạn trừ khi một trong hai bên có văn bản chấm dứt.</p>';
+  } else {
+    html += '<p>Bên A (Tổng thầu Thiết kế) nhận thiết kế công trình <b>' + escapeHtml(field(d, 'designPackage')) + '</b> tại địa chỉ ' + escapeHtml(field(d, 'projectAddress')) + ' cho Bên B (Chủ nhà).</p>';
+    html += '<h2>Điều 2 — Giá trị hợp đồng &amp; thanh toán</h2>';
+    html += '<p>Tổng giá trị hợp đồng: <b>' + fmtMoney(field(d, 'totalFee', 0)) + '</b>. Đặt cọc/Quỹ bảo đảm chặng C1: <b>' + fmtMoney(field(d, 'escrowAmount', 0)) + '</b>. Thanh toán theo Quy trình 4 bước đảm bảo (C1–C4), giải ngân từng chặng khi Bên B duyệt phương án tương ứng.</p>';
+    html += '<h2>Điều 3 — Thời gian thực hiện</h2>';
+    html += '<p>Thời gian hoàn thành dự kiến ' + escapeHtml(field(d, 'estimatedDurationDays')) + ' ngày kể từ ngày Bên B duyệt phương án chặng C1.</p>';
+    html += '<h2>Điều 4 — Hồ sơ bàn giao</h2>';
+    html += '<p>Bên A bàn giao hồ sơ thiết kế đầy đủ theo từng chặng qua nền tảng App Làm Nhà, Bên B theo dõi tiến độ trực tuyến.</p>';
+  }
+
+  html += '<h2>Điều 5 — Bảo mật &amp; bản quyền hồ sơ</h2>';
+  html += '<p>Hồ sơ, bản vẽ hình thành trong quá trình thực hiện thuộc bản quyền Bên A cho đến khi hợp đồng được thanh lý đầy đủ; hai Bên cam kết bảo mật thông tin của nhau.</p>';
+  html += '<h2>Điều 6 — Chấm dứt &amp; thanh lý</h2>';
+  html += '<p>Hợp đồng có thể chấm dứt khi hoàn thành nghĩa vụ hai bên hoặc theo thoả thuận bằng văn bản; mọi tranh chấp ưu tiên thương lượng, nếu không thành sẽ giải quyết theo quy định pháp luật hiện hành.</p>';
+  html += '<h2>Điều 7 — Điều khoản chung</h2>';
+  html += '<p>Hợp đồng có hiệu lực kể từ thời điểm cả hai Bên hoàn tất ký xác thực (OTP đối với Bên B) trên nền tảng App Làm Nhà, lập thành bản điện tử duy nhất, có giá trị pháp lý như bản giấy có chữ ký hai bên.</p>';
+
+  return html;
+}
+
+function renderPage(contract) {
+  window.ALN_CONTRACT = contract;
+  document.getElementById('loadingBox').style.display = 'none';
+  document.getElementById('contractBox').style.display = 'block';
+
+  document.getElementById('contractTitle').textContent = CONTRACT_TITLES[contract.type] || 'Hợp đồng';
+  var badge = document.getElementById('statusBadge');
+  badge.textContent = STATUS_LABELS[contract.status] || contract.status;
+  badge.className = 'status-badge st-' + contract.status;
+
+  var a = contract.partyA || {};
+  var b = contract.partyB || {};
+  document.getElementById('partyAName').textContent = a.name || '';
+  document.getElementById('partyARep').textContent = 'Đại diện: ' + (a.repName || '') + ' — ' + (a.title || '');
+  document.getElementById('partyBName').textContent = b.name || '';
+  document.getElementById('partyBPhone').textContent = 'SĐT: ' + (b.phone || '');
+
+  document.getElementById('contractBody').innerHTML = buildContractBody(contract);
+
+  var sigB = (contract.signatures && contract.signatures.B) || {};
+  if (sigB.confirmed) {
+    showSignedState(sigB);
+  }
+}
+
+function showSignedState(sigB) {
+  document.getElementById('agreeCard').style.display = 'none';
+  var box = document.getElementById('signedBox');
+  box.style.display = 'block';
+  var ts = '';
+  if (sigB.otpVerifiedAt && sigB.otpVerifiedAt.seconds) {
+    ts = new Date(sigB.otpVerifiedAt.seconds * 1000).toLocaleString('vi-VN');
+  }
+  document.getElementById('signedAt').textContent = ts ? ('Lúc ' + ts) : '';
+}
+
+function onAgreeChange() {
+  var checked = document.getElementById('agreeCheckbox').checked;
+  document.getElementById('signBtn').disabled = !checked;
+}
+
+function onSignClick() {
+  document.getElementById('signBtn').disabled = true;
+  window.alnRequestOtp();
+}
+
+function onResendOtp() {
+  document.getElementById('otpError').textContent = '';
+  window.alnRequestOtp();
+}
+
+function onVerifyClick() {
+  var otp = document.getElementById('otpInput').value.trim();
+  document.getElementById('otpError').textContent = '';
+  if (otp.length !== 6) {
+    document.getElementById('otpError').textContent = 'Nhập đủ 6 số OTP.';
+    return;
+  }
+  window.alnVerifyOtp(otp);
+}
+
+function showOtpDemo(otp) {
+  document.getElementById('otpBox').style.display = 'block';
+  document.getElementById('otpDemoBanner').innerHTML = 'OTP demo (chỉ hiển thị ở bản nháp): <b>' + escapeHtml(otp) + '</b>';
+}
+</script>
+
+<script type="module">
+import { app } from './firebase-config.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+
+var fns = getFunctions(app, 'asia-southeast1');
+var params = new URLSearchParams(window.location.search);
+var contractId = params.get('id');
+
+function showError(msg) {
+  document.getElementById('loadingBox').style.display = 'none';
+  var box = document.getElementById('errorBox');
+  box.style.display = 'block';
+  box.textContent = msg;
+}
+
+async function loadContract() {
+  if (!contractId) { showError('Thiếu mã hợp đồng (?id=...) trên đường link.'); return; }
+  try {
+    var getContract = httpsCallable(fns, 'draftGetContract');
+    var res = await getContract({ contractId: contractId });
+    window.renderPage(res.data);
+  } catch (e) {
+    showError('Không tải được hợp đồng: ' + (e.message || e));
+  }
+}
+
+window.alnRequestOtp = async function () {
+  try {
+    var requestOtp = httpsCallable(fns, 'draftRequestOtp');
+    var res = await requestOtp({ contractId: contractId, party: 'B' });
+    window.showOtpDemo(res.data.otpDemo);
+    document.getElementById('signBtn').disabled = false;
+  } catch (e) {
+    document.getElementById('otpError').textContent = 'Không gửi được OTP: ' + (e.message || e);
+    document.getElementById('signBtn').disabled = false;
+  }
+};
+
+window.alnVerifyOtp = async function (otp) {
+  try {
+    var verifyOtp = httpsCallable(fns, 'draftVerifyOtp');
+    await verifyOtp({ contractId: contractId, party: 'B', otp: otp });
+    var getContract = httpsCallable(fns, 'draftGetContract');
+    var res = await getContract({ contractId: contractId });
+    window.renderPage(res.data);
+  } catch (e) {
+    document.getElementById('otpError').textContent = 'Xác thực thất bại: ' + (e.message || e);
+  }
+};
+
+loadContract();
+</script>
+</body>
+</html>

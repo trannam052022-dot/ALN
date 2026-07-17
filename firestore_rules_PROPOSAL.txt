@@ -1,0 +1,57 @@
+ĐỀ XUẤT RULES — Hợp đồng điện tử ALN (collection `contracts` PRODUCTION)
+════════════════════════════════════════════════════════════════════════
+File này CHỈ LÀ ĐỀ XUẤT — KHÔNG được dán thẳng và deploy. Chờ TRANNAM
+duyệt bằng văn bản rồi mới ghép thủ công vào firestore.rules (đặt cạnh
+block `match /projects/{pid}` hiện có) và chạy
+`firebase deploy --only firestore:rules --project aln-platform`.
+
+Áp dụng CHO GIAI ĐOẠN LÊN PRODUCTION (khi đổi tên contracts_draft →
+contracts, signatures_draft → signatures, auditLog_draft → auditLog).
+Ở giai đoạn draft hiện tại, collection contracts_draft KHÔNG có rule
+(mặc định deny) — mọi đọc/ghi đi qua Cloud Functions Admin SDK trong
+functions/contracts_draft.js, đúng chủ đích.
+
+Dựa trên isFounder()/signedIn() đã có sẵn ở đầu firestore.rules — không
+định nghĩa lại, chỉ tái sử dụng.
+
+--------------------------------------------------------------------
+    match /contracts/{contractId} {
+      // Chỉ Founder hoặc đúng 2 bên trong hợp đồng mới đọc được.
+      function isPartyOfContract(c) {
+        return signedIn() && (
+          request.auth.uid == c.partyA.uid ||
+          request.auth.uid == c.partyB.uid
+        );
+      }
+
+      allow read: if isFounder() || isPartyOfContract(resource.data);
+      allow create: if isFounder();
+      allow update: if false; // chỉ Cloud Function (Admin SDK) được ghi status/signatures
+      allow delete: if false; // hợp đồng không bị xoá — chỉ chuyển status 'cancelled'
+
+      match /signatures/{party} {
+        allow read: if isFounder() ||
+          isPartyOfContract(get(/databases/$(database)/documents/contracts/$(contractId)).data);
+        allow write: if false; // chỉ Cloud Function (Admin SDK)
+      }
+
+      match /auditLog/{logId} {
+        allow read: if isFounder();
+        allow create: if false; // chỉ Cloud Function (Admin SDK bypass rules)
+        allow update, delete: if false; // bất biến tuyệt đối — không sửa/xoá audit log
+      }
+    }
+--------------------------------------------------------------------
+
+Ghi chú:
+- `partyA.uid`/`partyB.uid` có thể null (Bên B chưa có tài khoản ALN,
+  ký qua OTP không cần đăng nhập) — khi đó chỉ Founder đọc được, đúng ý
+  vì bản thân request ký đi qua link + OTP, không qua Firestore client.
+- Nếu sau này cần Bên B đọc trực tiếp hợp đồng của mình qua tài khoản
+  đã đăng nhập (thay vì chỉ qua Cloud Function draftGetContract kiểu
+  bearer-link), rule trên đã đủ — chỉ cần đảm bảo partyB.uid được set
+  đúng khi tạo hợp đồng.
+- storage.rules cho `contracts/{contractId}/draft.pdf` và
+  `contracts/{contractId}/signed.pdf` CHƯA đề xuất ở đây vì Bước 1-3 của
+  LỆNH_CODE chưa render PDF thật (chỉ chuẩn bị dữ liệu) — sẽ bổ sung khi
+  làm tính năng xuất PDF.
