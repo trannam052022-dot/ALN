@@ -2337,3 +2337,12 @@ exports.seoDailyReport = functions
     }
     return null;
   });
+
+/* ════════════════════════════════════════════════════════════════
+   TẠM THỜI — CHỈ ĐỂ CHẠY `firebase emulators:start` TEST LOCAL cho
+   Hợp đồng điện tử (contracts_draft). TUYỆT ĐỐI KHÔNG deploy lên
+   production (aln-platform) khi còn đoạn này — xoá dòng dưới đây
+   bằng git trước khi tính chuyện merge/deploy chính thức.
+   Xem functions/contracts_draft.js + LỆNH_CODE_HopDongDienTu.md.
+   ════════════════════════════════════════════════════════════════ */
+Object.assign(exports, require("./contracts_draft.js"));
