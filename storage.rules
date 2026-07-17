@@ -85,5 +85,13 @@ service firebase.storage {
     match /reservations/{uid}/{file=**} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
+
+    // Gian hàng Nhà cung cấp (Vietbuild ALN) — ảnh sản phẩm + catalog PDF.
+    // Đọc CÔNG KHAI (trang gian hàng public); chỉ chính chủ upload, ≤20MB/file.
+    match /ncc-catalogs/{uid}/{allPaths=**} {
+      allow read:  if true;
+      allow write: if request.auth != null && request.auth.uid == uid
+                   && request.resource.size < 20 * 1024 * 1024;
+    }
   }
 }

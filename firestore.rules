@@ -186,10 +186,17 @@ service cloud.firestore {
 
     // Nhà cung cấp vật liệu (ncc-apply.html) — chỉ tham gia chuyên mục
     // "Vật liệu & Giá" trên Diễn đàn, cùng pattern các đơn đăng ký khác.
+    // Gian hàng (Vietbuild ALN): doc ĐÃ DUYỆT đọc công khai — trang
+    // ncc_profile.html + ncc-showcase.html (query where status=='approved').
     match /nccApplications/{uid} {
-      allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow read: if isFounder() || (signedIn() && request.auth.uid == uid)
+                  || resource.data.status == 'approved';
       allow create: if signedIn() && request.auth.uid == uid;
-      allow update: if isFounder() || (signedIn() && request.auth.uid == uid);
+      // Chính chủ tự cập nhật gian hàng (intro/gallery/catalog) nhưng KHÔNG
+      // được tự đổi status — chặn tự duyệt để lên gian hàng công khai.
+      allow update: if isFounder() ||
+        (signedIn() && request.auth.uid == uid &&
+         request.resource.data.status == resource.data.status);
       allow delete: if isFounder();
     }
 

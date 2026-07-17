@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MB7VRGR5');</script>
+<!-- End Google Tag Manager -->
+
+  <script src="error-monitor.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gian hàng Nhà cung cấp — App Làm Nhà</title>
+<meta name="description" content="Gian hàng vật liệu xây dựng trên App Làm Nhà — ảnh sản phẩm, catalog và liên hệ trực tiếp nhà cung cấp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="aln-tokens.css">
+<style>
+:root{
+  --cream:#f7f9fb;--white:#ffffff;--cream2:#eef2f6;
+  --border:#e1e7ee;--border2:#c9d3de;
+  --text:#1a2634;--text2:#3d4b5c;--sub:#5b6b7f;--muted:#93a1b3;
+  --gold:#98690a;--gold2:#b8860b;--gold-bg:rgba(152,105,10,.09);
+  --green:#16a34a;--blue:#4a8fff;
+  --r:14px;--r-sm:8px;--sh:0 1px 3px rgba(15,30,60,.06);
+  --mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;
+  --serif:'Cormorant Garamond',serif;--syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
+body{font-family:var(--sans);background:var(--cream);color:var(--text);min-height:100vh;font-size:1rem;line-height:1.6}
+a{color:var(--gold);text-decoration:none}
+.topbar{background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
+.tb-logo-box{background:linear-gradient(135deg,rgba(152,105,10,.14),rgba(184,134,11,.08));color:var(--gold);padding:4px 12px;border-radius:var(--r-sm);border:1.5px solid rgba(152,105,10,.3);font-family:var(--syne);font-size:11px;font-weight:800;letter-spacing:.07em}
+.tb-page{font-family:var(--serif);font-weight:600;font-style:italic;font-size:15px;color:var(--text)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-link{display:inline-flex;align-items:center;gap:5px;font-size:var(--text-xs);color:var(--sub);font-weight:600}
+.wrap{max-width:860px;margin:0 auto;padding:22px 16px 70px}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);padding:22px 24px;margin-bottom:16px}
+.shop-head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.shop-av{width:64px;height:64px;border-radius:14px;background:var(--gold-bg);border:1.5px solid rgba(152,105,10,.3);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--gold);flex-shrink:0}
+.shop-name{font-family:var(--syne);font-size:var(--text-xl);font-weight:800;color:var(--text);line-height:1.2}
+.shop-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:var(--text-xs);font-weight:700;padding:3px 11px;border-radius:99px;background:var(--gold-bg);border:1px solid rgba(152,105,10,.28);color:var(--gold)}
+.chip.blue{background:rgba(74,143,255,.08);border-color:rgba(74,143,255,.3);color:var(--blue)}
+.shop-bio{font-size:var(--text-sm);color:var(--text2);line-height:1.7;margin-top:14px;white-space:pre-wrap}
+.sec-title{font-family:var(--syne);font-size:var(--text-md);font-weight:800;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-title i{color:var(--gold)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.gallery a{display:block;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--cream2)}
+.gallery img{width:100%;height:130px;object-fit:cover;display:block;transition:transform .25s}
+.gallery a:hover img{transform:scale(1.04)}
+.gal-cap{font-size:var(--text-2xs);color:var(--sub);padding:5px 8px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pdf-row{display:flex;align-items:center;gap:12px;background:var(--cream2);border:1px solid var(--border);border-radius:10px;padding:12px 16px}
+.pdf-row i{font-size:26px;color:#dc2626;flex-shrink:0}
+.pdf-name{flex:1;font-size:var(--text-sm);font-weight:600;color:var(--text2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;font-family:var(--syne);font-size:var(--text-sm);font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:all .2s}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-gold:hover{background:var(--gold2)}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:hover{filter:brightness(1.08)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.contact-grid{grid-template-columns:1fr}}
+.contact-cell{background:var(--cream2);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.contact-label{font-size:var(--text-2xs);font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.contact-val{font-family:var(--mono);font-size:var(--text-md);font-weight:700;color:var(--text)}
+.disclaimer{font-size:var(--text-xs);color:var(--muted);background:var(--cream2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;line-height:1.6}
+.fanpage-box{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:rgba(74,143,255,.06);border:1px solid rgba(74,143,255,.25);border-radius:var(--r);padding:16px 20px}
+.fanpage-box i{font-size:26px;color:var(--blue);flex-shrink:0}
+.fanpage-box p{flex:1;font-size:var(--text-sm);color:var(--text2);min-width:200px}
+.empty{text-align:center;padding:56px 20px;color:var(--muted)}
+.empty i{font-size:44px;display:block;margin-bottom:12px}
+.lightbox{position:fixed;inset:0;background:rgba(8,12,20,.9);z-index:200;display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+.lightbox.open{display:flex}
+.lightbox img{max-width:100%;max-height:92vh;border-radius:10px}
+</style>
+<!-- Google Analytics 4 (ALN — G-5CSL1TF0RC, tách riêng khỏi property TK.HOUSE) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5CSL1TF0RC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5CSL1TF0RC');
+</script>
+<!-- End GA4 -->
+<script src="aln-tracking.js"></script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MB7VRGR5"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav class="topbar">
+  <div class="tb-logo-box">ALN</div>
+  <div class="tb-page">Gian hàng Nhà cung cấp</div>
+  <div class="tb-right">
+    <a class="tb-link" href="ncc-showcase.html"><i class="ph-duotone ph-storefront"></i>Tất cả gian hàng</a>
+    <a class="tb-link" href="forum.html"><i class="ph-duotone ph-chats-circle"></i>Diễn đàn</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div id="content">
+    <div class="empty"><i class="ph-duotone ph-spinner-gap"></i>Đang tải gian hàng…</div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('open')"><img id="lightboxImg" src="" alt=""></div>
+
+<script>
+function escH(s){
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function openLightbox(url){
+  document.getElementById('lightboxImg').src = url;
+  document.getElementById('lightbox').classList.add('open');
+}
+window.openLightbox = openLightbox;
+</script>
+
+<script type="module">
+import { db, doc, getDoc } from './firebase-config.js';
+
+var PROV_NAME = {HCM:'TP. Hồ Chí Minh',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'Bà Rịa – Vũng Tàu',LA:'Long An',TG:'Tiền Giang',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TH:'Thanh Hóa',OTHER:'Tỉnh khác'};
+var CAT_NAME = {sat_thep:'Sắt, thép',go_noithat:'Gỗ, xưởng nội thất',gach_vlxd:'Gạch, vật liệu xây dựng',son_hoanthien:'Sơn, hoàn thiện',dien_nuoc:'Thiết bị điện, nước',khac:'Vật liệu khác'};
+var CAT_ICON = {sat_thep:'ph-barbell',go_noithat:'ph-tree',gach_vlxd:'ph-wall',son_hoanthien:'ph-paint-roller',dien_nuoc:'ph-plug',khac:'ph-package'};
+
+function renderNotFound(msg){
+  document.getElementById('content').innerHTML =
+    '<div class="card"><div class="empty"><i class="ph-duotone ph-storefront"></i>' + escH(msg) + '<br><br><a class="btn btn-gold" href="ncc-showcase.html"><i class="ph-duotone ph-arrow-left"></i>Xem các gian hàng khác</a></div></div>';
+}
+
+async function load(){
+  var uid = '';
+  try { uid = new URL(location.href).searchParams.get('uid') || ''; } catch(e){}
+  if(!uid){ renderNotFound('Thiếu mã gian hàng.'); return; }
+  var snap;
+  try { snap = await getDoc(doc(db, 'nccApplications', uid)); }
+  catch(e){ renderNotFound('Gian hàng chưa mở hoặc không tồn tại.'); return; }
+  if(!snap.exists()){ renderNotFound('Gian hàng không tồn tại.'); return; }
+  var d = snap.data();
+  if(d.status !== 'approved'){ renderNotFound('Gian hàng chưa được duyệt.'); return; }
+
+  document.title = (d.name || 'Gian hàng') + ' — Gian hàng Nhà cung cấp ALN';
+
+  var gallery = Array.isArray(d.gallery) ? d.gallery.filter(function(g){ return g && g.url; }) : [];
+  var galHtml = gallery.length
+    ? '<div class="gallery">' + gallery.map(function(g){
+        return '<a href="javascript:void(0)" onclick="openLightbox(\'' + escH(g.url) + '\')">'
+          + '<img src="' + escH(g.url) + '" alt="' + escH(g.cap || d.name || '') + '" loading="lazy">'
+          + (g.cap ? '<div class="gal-cap">' + escH(g.cap) + '</div>' : '')
+          + '</a>';
+      }).join('') + '</div>'
+    : '<div style="font-size:var(--text-sm);color:var(--muted)">Nhà cung cấp chưa đăng ảnh sản phẩm.</div>';
+
+  var pdfHtml = d.catalogPdfUrl
+    ? '<div class="pdf-row"><i class="ph-duotone ph-file-pdf"></i>'
+      + '<span class="pdf-name">' + escH(d.catalogPdfName || 'Catalog sản phẩm.pdf') + '</span>'
+      + '<a class="btn btn-gold" href="' + escH(d.catalogPdfUrl) + '" target="_blank" rel="noopener"><i class="ph-duotone ph-download-simple"></i>Xem catalog</a></div>'
+    : '';
+
+  document.getElementById('content').innerHTML =
+    '<div class="card">'
+      + '<div class="shop-head">'
+        + '<div class="shop-av"><i class="ph-duotone ' + (CAT_ICON[d.category] || 'ph-package') + '"></i></div>'
+        + '<div style="flex:1;min-width:0">'
+          + '<div class="shop-name">' + escH(d.name || 'Gian hàng') + '</div>'
+          + '<div class="shop-meta">'
+            + '<span class="chip"><i class="ph-duotone ' + (CAT_ICON[d.category] || 'ph-package') + '"></i>' + escH(CAT_NAME[d.category] || d.category || '') + '</span>'
+            + '<span class="chip blue"><i class="ph-duotone ph-map-pin"></i>' + escH(PROV_NAME[d.province] || d.province || '') + '</span>'
+          + '</div>'
+        + '</div>'
+      + '</div>'
+      + ((d.intro || d.bio) ? '<div class="shop-bio">' + escH(d.intro || d.bio) + '</div>' : '')
+    + '</div>'
+
+    + '<div class="card">'
+      + '<div class="sec-title"><i class="ph-duotone ph-images"></i>Sản phẩm</div>'
+      + galHtml
+    + '</div>'
+
+    + (pdfHtml ? '<div class="card"><div class="sec-title"><i class="ph-duotone ph-book-open"></i>Catalog</div>' + pdfHtml + '</div>' : '')
+
+    + '<div class="card">'
+      + '<div class="sec-title"><i class="ph-duotone ph-phone"></i>Liên hệ</div>'
+      + '<div class="contact-grid">'
+        + '<div class="contact-cell"><div class="contact-label">Zalo / Điện thoại</div><div class="contact-val"><a href="tel:' + escH((d.phone||'').replace(/\D/g,'')) + '">' + escH(d.phone || '—') + '</a></div></div>'
+        + (d.email ? '<div class="contact-cell"><div class="contact-label">Email</div><div class="contact-val" style="font-size:var(--text-sm)">' + escH(d.email) + '</div></div>' : '')
+      + '</div>'
+    + '</div>'
+
+    + '<div class="fanpage-box">'
+      + '<i class="ph-duotone ph-facebook-logo"></i>'
+      + '<p><strong>Theo dõi Fanpage App Làm Nhà</strong> — cập nhật hỏi đáp vật liệu, giá cả và kinh nghiệm xây nhà mỗi tuần.</p>'
+      + '<a class="btn btn-blue" href="https://www.facebook.com/1244358728751633" target="_blank" rel="noopener"><i class="ph-duotone ph-thumbs-up"></i>Theo dõi Fanpage</a>'
+    + '</div>'
+
+    + '<div class="disclaimer" style="margin-top:16px"><b>ⓘ Lưu ý:</b> Thông tin, hình ảnh và catalog do nhà cung cấp tự đăng tải. ALN không thẩm định chất lượng sản phẩm — quý khách vui lòng kiểm tra kỹ trước khi giao dịch trực tiếp với nhà cung cấp.</div>';
+}
+load();
+</script>
+</body>
+</html>
