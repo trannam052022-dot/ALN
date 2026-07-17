@@ -2029,8 +2029,14 @@ exports.founderNormalizeUsers = onCall(
 
 /* ── Sao lưu Firestore tự động — chạy mỗi Chủ nhật 03:00 giờ VN ──
    Export toàn bộ database ra Cloud Storage, giữ 8 tuần gần nhất
-   (dọn bản cũ trong onSchedule kế tiếp để không phình dung lượng). */
-const BACKUP_BUCKET = "gs://aln-platform.firebasestorage.app/firestore-backups";
+   (dọn bản cũ trong onSchedule kế tiếp để không phình dung lượng).
+   LƯU Ý (17/07/2026): bucket mặc định "aln-platform.firebasestorage.app"
+   nằm ở vùng africa-south1, khác vùng Firestore (asia-southeast1) — Google
+   bắt buộc bucket đích export phải CÙNG vùng với database, nên export luôn
+   thất bại (INVALID_ARGUMENT) suốt từ lúc triển khai 07/07 tới giờ, dù hàm
+   không báo lỗi ở mức Cloud Functions (bắt lỗi nội bộ, chỉ thấy trong Logs).
+   Đổi sang bucket riêng "aln-platform-backups" tạo đúng vùng asia-southeast1. */
+const BACKUP_BUCKET = "gs://aln-platform-backups/firestore-backups";
 
 exports.scheduledFirestoreBackup = functions
   .region("asia-southeast1")
