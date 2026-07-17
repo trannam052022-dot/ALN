@@ -66,6 +66,10 @@ const LEGACY_DRAFT_COL = {
 const CATEGORIES = ["hoi_kts", "hoi_dap", "vat_lieu", "showcase", "nghe", "bang_tin", "tu_van_du_an"];
 const KTS_POST_CATEGORIES = ["hoi_kts", "hoi_dap", "vat_lieu", "showcase", "nghe"];
 const OPEN_CATEGORIES = ["hoi_kts", "tu_van_du_an", "showcase", "bang_tin"]; // CN/DN xem được (P2)
+/* Nhà cung cấp vật liệu (nsx-apply.html) — CHỈ tham gia đúng 1 chuyên mục
+   "Vật liệu & Giá", không có huy hiệu xếp hạng KTS, không có tính năng
+   "chọn làm dự án". Giữ hằng số riêng để không lẫn với KTS_POST_CATEGORIES. */
+const NCC_CATEGORIES = ["vat_lieu"];
 
 /* CHECKLIST_PHANQUYEN_DIENDAN_ALN.md PASS 1 — quyền ĐỌC theo category, denormalize
    vào field categoryVisibility của mỗi forumPosts để rules không phải get() chéo.
@@ -220,6 +224,7 @@ async function getP2Enabled() {
 
 function viewableCategories(role, p2) {
   if (role === "founder" || role === "kts") return CATEGORIES;
+  if (role === "ncc") return NCC_CATEGORIES;
   if ((role === "cn" || role === "dn") && p2) return OPEN_CATEGORIES;
   return [];
 }
@@ -227,6 +232,7 @@ function viewableCategories(role, p2) {
 function canPostCategory(role, cat, p2) {
   if (role === "founder") return true;
   if (role === "kts") return KTS_POST_CATEGORIES.includes(cat);
+  if (role === "ncc") return NCC_CATEGORIES.includes(cat);
   if ((role === "cn" || role === "dn") && p2) return cat === "tu_van_du_an" || cat === "hoi_kts";
   return false;
 }
@@ -771,6 +777,8 @@ exports.forumComment = onCall({ region: REGION }, async (request) => {
   const p2 = await getP2Enabled();
   if (profile.role === "founder" || profile.role === "kts") {
     // KTS/Founder bình luận mọi chuyên mục
+  } else if (profile.role === "ncc") {
+    if (!NCC_CATEGORIES.includes(post.category)) throw new HttpsError("permission-denied", "Nhà cung cấp chỉ bình luận được trong chuyên mục Vật liệu & Giá");
   } else if ((profile.role === "cn" || profile.role === "dn") && p2) {
     if (post.authorUid !== uid) throw new HttpsError("permission-denied", "Bạn chỉ bình luận được trong thread của mình");
   } else {

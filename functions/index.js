@@ -109,6 +109,25 @@ exports.onKsApply = functions
     );
   });
 
+/* ── Nhà cung cấp vật liệu đăng ký mới (chỉ tham gia chuyên mục Vật liệu & Giá) ── */
+exports.onNccApply = functions
+  .region("asia-southeast1")
+  .firestore.document("nccApplications/{uid}")
+  .onCreate(async (snap) => {
+    const d = snap.data() || {};
+    const CAT_LABEL = {
+      sat_thep: "Sắt, thép", go_noithat: "Gỗ, xưởng nội thất", gach_vlxd: "Gạch, VLXD",
+      son_hoanthien: "Sơn, hoàn thiện", dien_nuoc: "Điện, nước", khac: "Khác",
+    };
+    const detail = [d.province, CAT_LABEL[d.category] || d.category].filter(Boolean).join(" · ");
+
+    await notifyFounder(
+      "🧱 Nhà cung cấp đăng ký",
+      `${d.name || "NCC"} ${detail ? "— " + detail : ""} — chờ duyệt`,
+      { type: "NEW_NCC_APPLICATION", uid: snap.id, name: d.name || "" }
+    );
+  });
+
 /* ── KTV đăng ký mới ── */
 exports.onKtvApply = functions
   .region("asia-southeast1")

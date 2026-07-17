@@ -184,6 +184,15 @@ service cloud.firestore {
       allow delete: if isFounder();
     }
 
+    // Nhà cung cấp vật liệu (ncc-apply.html) — chỉ tham gia chuyên mục
+    // "Vật liệu & Giá" trên Diễn đàn, cùng pattern các đơn đăng ký khác.
+    match /nccApplications/{uid} {
+      allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow create: if signedIn() && request.auth.uid == uid;
+      allow update: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow delete: if isFounder();
+    }
+
     // Việc KTS giao KTV triển khai bản vẽ (kts_dashboard tab "Giao việc KTV" ↔ ktv_dashboard)
     match /ktvTasks/{tid} {
       function isKtv() {
@@ -366,6 +375,11 @@ service cloud.firestore {
       return signedIn() && fdProfile().role in ['cn', 'dn'] &&
         fdProfile().get('status', 'active') == 'active';
     }
+    // Nhà cung cấp vật liệu (ncc-apply.html) — CHỈ chuyên mục "Vật liệu & Giá"
+    function fdNccActive() {
+      return signedIn() && fdProfile().role == 'ncc' &&
+        fdProfile().get('status', 'active') == 'active';
+    }
     function fdP2On() {
       return get(/databases/$(database)/documents/forumConfig/flags)
         .data.FORUM_P2_ENABLED == true;
@@ -382,15 +396,18 @@ service cloud.firestore {
     match /forumPosts/{postId} {
       // CN/DN: chỉ đọc được doc thuộc chuyên mục mở VÀ khi cờ P2 bật —
       // query bắt buộc kèm where('category','in',[...]) mới qua được list.
+      // NCC: chỉ đọc được đúng chuyên mục "vat_lieu".
       allow read: if fdPublicVisiblePost(resource.data) || isFounder() || fdKtsActive() ||
-        (fdCnDnActive() && fdP2On() && fdOpenCategory(resource.data.category));
+        (fdCnDnActive() && fdP2On() && fdOpenCategory(resource.data.category)) ||
+        (fdNccActive() && resource.data.category == 'vat_lieu');
       allow write: if false;
 
       match /comments/{commentId} {
         allow read: if (resource.data.categoryVisibility == 'public' && resource.data.status == 'visible')
           || isFounder() || fdKtsActive() ||
           (fdCnDnActive() && fdP2On() && fdOpenCategory(
-            get(/databases/$(database)/documents/forumPosts/$(postId)).data.category));
+            get(/databases/$(database)/documents/forumPosts/$(postId)).data.category)) ||
+          (fdNccActive() && get(/databases/$(database)/documents/forumPosts/$(postId)).data.category == 'vat_lieu');
         allow write: if false;
       }
     }
