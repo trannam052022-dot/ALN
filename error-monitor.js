@@ -3,6 +3,10 @@
    App Check). Không thu thập tên/SĐT/uid — chỉ message/stack/url.
    Tối đa 10 lỗi/phiên để tránh spam khi 1 trang lỗi lặp liên tục. */
 (function () {
+  // Bỏ qua khi mở file cục bộ (file://) — đây là môi trường dev/xem trước lúc
+  // sửa code, không phải người dùng thật trên site, không cần báo lỗi.
+  if (location.protocol === "file:") return;
+
   var ENDPOINT = "https://asia-southeast1-aln-platform.cloudfunctions.net/logClientError";
   var MAX_PER_SESSION = 10;
   var sent = 0;
