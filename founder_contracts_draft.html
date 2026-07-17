@@ -92,6 +92,17 @@ th{color:var(--muted);font-weight:600;font-size:.75rem;text-transform:uppercase;
         <option value="homeowner">Chủ nhà</option>
       </select>
 
+      <label>Username Bên B (tuỳ chọn — tự điền nếu đã có tài khoản ALN)</label>
+      <div class="row2">
+        <div style="flex:2">
+          <input id="bUsername" placeholder="kts.tranlong / dn.tkhouse / cn.trannam...">
+        </div>
+        <div style="flex:0 0 auto">
+          <button class="btn-outline btn-sm" style="height:100%" onclick="onLookupUsername()">Tra cứu</button>
+        </div>
+      </div>
+      <div class="msg" id="bLookupMsg"></div>
+
       <div class="row2">
         <div>
           <label>Tên Bên B</label>
@@ -112,8 +123,16 @@ th{color:var(--muted);font-weight:600;font-size:.75rem;text-transform:uppercase;
           <input id="bEmail" type="email">
         </div>
       </div>
-      <label>Mã dự án liên kết (projects/{pid}, tuỳ chọn)</label>
-      <input id="cProjectId" placeholder="ALN-9921">
+      <label>Mã dự án liên kết (projects/{pid}, tuỳ chọn — tự điền thông tin dự án + Bên B tương ứng)</label>
+      <div class="row2">
+        <div style="flex:2">
+          <input id="cProjectId" placeholder="ALN-9921">
+        </div>
+        <div style="flex:0 0 auto">
+          <button class="btn-outline btn-sm" style="height:100%" onclick="onLookupProject()">Tra cứu dự án</button>
+        </div>
+      </div>
+      <div class="msg" id="projLookupMsg"></div>
 
       <div id="fieldsKts">
         <label>Tên dự án</label>
@@ -255,6 +274,74 @@ function collectContractData(type) {
   };
 }
 
+function renderUserLookup(found, data) {
+  var msg = document.getElementById('bLookupMsg');
+  if (!found) {
+    msg.className = 'msg msg-err';
+    msg.textContent = 'Không tìm thấy tài khoản ALN với username này.';
+    return;
+  }
+  msg.className = 'msg msg-ok';
+  msg.textContent = 'Đã điền theo tài khoản: ' + data.name + ' (' + data.role + ')' + (data.phone ? '' : ' — chưa có SĐT lưu sẵn, nhập tay giúp.');
+  document.getElementById('bName').value = data.name || '';
+  if (data.phone) document.getElementById('bPhone').value = data.phone;
+  if (data.email && data.email.indexOf('@aln.vn') === -1) document.getElementById('bEmail').value = data.email;
+}
+
+function renderProjectLookup(found, project) {
+  var msg = document.getElementById('projLookupMsg');
+  if (!found) {
+    msg.className = 'msg msg-err';
+    msg.textContent = 'Không tìm thấy dự án với mã này.';
+    return;
+  }
+  msg.className = 'msg msg-ok';
+  msg.textContent = 'Đã điền theo dự án: ' + project.name;
+  var type = document.getElementById('cType').value;
+  if (type === 'ktsCollaborator') {
+    document.getElementById('k_projectName').value = project.name || '';
+    document.getElementById('k_projectAddress').value = project.address || '';
+  } else if (type === 'homeowner') {
+    document.getElementById('h_projectAddress').value = project.address || '';
+    if (project.totalFee) document.getElementById('h_totalFee').value = project.totalFee;
+    if (project.escrow) document.getElementById('h_escrowAmount').value = project.escrow;
+  }
+}
+
+function renderPartyBFromProject(data) {
+  if (!data) return;
+  document.getElementById('bUsername').value = data.username || '';
+  document.getElementById('bName').value = data.name || '';
+  if (data.phone) document.getElementById('bPhone').value = data.phone;
+  if (data.email && data.email.indexOf('@aln.vn') === -1) document.getElementById('bEmail').value = data.email;
+}
+
+function onLookupUsername() {
+  var username = val('bUsername');
+  var msg = document.getElementById('bLookupMsg');
+  if (!username) {
+    msg.className = 'msg msg-err';
+    msg.textContent = 'Nhập username trước.';
+    return;
+  }
+  msg.className = 'msg';
+  msg.textContent = 'Đang tra cứu…';
+  window.alnLookupUsername(username);
+}
+
+function onLookupProject() {
+  var pid = val('cProjectId');
+  var msg = document.getElementById('projLookupMsg');
+  if (!pid) {
+    msg.className = 'msg msg-err';
+    msg.textContent = 'Nhập mã dự án trước.';
+    return;
+  }
+  msg.className = 'msg';
+  msg.textContent = 'Đang tra cứu…';
+  window.alnLookupProject(pid);
+}
+
 function onCreateClick() {
   var type = document.getElementById('cType').value;
   var partyB = {
@@ -336,7 +423,10 @@ function renderTimeline(contractId, items) {
 </script>
 
 <script type="module">
-import { app, auth, usernameToEmail, signInWithEmailAndPassword, onAuthStateChanged } from './firebase-config.js';
+import {
+  app, auth, db, usernameToEmail, signInWithEmailAndPassword, onAuthStateChanged,
+  doc, getDoc, collection, query, where, getDocs
+} from './firebase-config.js';
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
 
 var FOUNDER_UID = 'h4kEguPEyMcwJwl89stc0Q6j2si2';
@@ -351,6 +441,65 @@ window.alnDoLogin = async function (username, password) {
     await signInWithEmailAndPassword(auth, usernameToEmail(username), password);
   } catch (e) {
     document.getElementById('loginMsg').textContent = 'Đăng nhập thất bại: ' + (e.message || e);
+  }
+};
+
+/* users/{uid} không có SĐT cho role kts/dn/designer (SĐT nằm ở *Applications/{uid})
+   — chỉ role cn có sẵn users.phone (xem register.html). */
+async function fetchPartyInfo(uid, userData) {
+  var phone = userData.phone || '';
+  if (!phone) {
+    var appCol = userData.role === 'kts' ? 'ktsApplications'
+      : userData.role === 'dn' ? 'dnApplications'
+      : userData.role === 'designer' ? 'designerApplications'
+      : null;
+    if (appCol) {
+      try {
+        var appSnap = await getDoc(doc(db, appCol, uid));
+        if (appSnap.exists()) phone = appSnap.data().phone || '';
+      } catch (e) { /* Founder vẫn tạo hợp đồng được, chỉ là thiếu gợi ý SĐT */ }
+    }
+  }
+  return {
+    uid: uid, username: userData.username || '', name: userData.name || '',
+    role: userData.role || '', email: userData.email || '', phone: phone
+  };
+}
+
+window.alnLookupUsername = async function (username) {
+  try {
+    var q = query(collection(db, 'users'), where('username', '==', username));
+    var snap = await getDocs(q);
+    if (snap.empty) { window.renderUserLookup(false); return; }
+    var uDoc = snap.docs[0];
+    var data = await fetchPartyInfo(uDoc.id, uDoc.data());
+    window.renderUserLookup(true, data);
+  } catch (e) {
+    var msg = document.getElementById('bLookupMsg');
+    msg.className = 'msg msg-err';
+    msg.textContent = 'Lỗi tra cứu: ' + (e.message || e);
+  }
+};
+
+window.alnLookupProject = async function (pid) {
+  try {
+    var snap = await getDoc(doc(db, 'projects', pid));
+    if (!snap.exists()) { window.renderProjectLookup(false); return; }
+    var p = snap.data();
+    window.renderProjectLookup(true, p);
+
+    var type = document.getElementById('cType').value;
+    var party = type === 'ktsCollaborator' ? p.kts : type === 'businessClient' ? p.dn : type === 'homeowner' ? p.cn : null;
+    if (party && party.uid) {
+      var uSnap = await getDoc(doc(db, 'users', party.uid));
+      var userData = uSnap.exists() ? uSnap.data() : { name: party.name, username: party.username, role: '' };
+      var data = await fetchPartyInfo(party.uid, userData);
+      window.renderPartyBFromProject(data);
+    }
+  } catch (e) {
+    var pmsg = document.getElementById('projLookupMsg');
+    pmsg.className = 'msg msg-err';
+    pmsg.textContent = 'Lỗi tra cứu: ' + (e.message || e);
   }
 };
 
