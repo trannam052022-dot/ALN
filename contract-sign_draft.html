@@ -166,7 +166,7 @@ function buildContractBody(contract) {
   html += '<h2>Điều 1 — Đối tượng hợp đồng</h2>';
 
   if (contract.type === 'ktsCollaborator') {
-    html += '<p>Bên A giao cho Bên B thực hiện vai trò Cộng tác viên Kiến trúc sư cho dự án <b>' + escapeHtml(field(d, 'projectName')) + '</b>, địa chỉ ' + escapeHtml(field(d, 'projectAddress')) + ', theo Quy trình 4 bước đảm bảo (C1–C4).</p>';
+    html += '<p>Bên A giao cho Bên B thực hiện vai trò Cộng tác viên Kiến trúc sư cho dự án <b>' + escapeHtml(field(d, 'projectName')) + '</b> của chủ đầu tư <b>' + escapeHtml(field(d, 'investorName')) + '</b>, địa chỉ ' + escapeHtml(field(d, 'projectAddress')) + ', theo Quy trình 4 bước đảm bảo (C1–C4).</p>';
     html += '<h2>Điều 2 — Phạm vi công việc</h2>';
     html += '<p>' + escapeHtml(field(d, 'scopeOfWork', 'Tư vấn thiết kế, lập hồ sơ phương án qua từng chặng C1–C4 theo phân công của Bên A.')) + '</p>';
     html += '<h2>Điều 3 — Thù lao &amp; thanh toán</h2>';

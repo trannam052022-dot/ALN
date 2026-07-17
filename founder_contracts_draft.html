@@ -137,6 +137,8 @@ th{color:var(--muted);font-weight:600;font-size:.75rem;text-transform:uppercase;
       <div id="fieldsKts">
         <label>Tên dự án</label>
         <input id="k_projectName">
+        <label>Tên chủ đầu tư (khách hàng của dự án)</label>
+        <input id="k_investorName" placeholder="Chủ nhà hoặc Doanh nghiệp của dự án">
         <div class="row2">
           <div><label>Địa chỉ dự án</label><input id="k_projectAddress"></div>
           <div><label>Tỷ lệ thù lao (%)</label><input id="k_feePercent" type="number"></div>
@@ -249,6 +251,7 @@ function collectContractData(type) {
   if (type === 'ktsCollaborator') {
     return {
       projectName: val('k_projectName'),
+      investorName: val('k_investorName'),
       projectAddress: val('k_projectAddress'),
       feePercent: val('k_feePercent'),
       scopeOfWork: val('k_scopeOfWork'),
@@ -300,6 +303,8 @@ function renderProjectLookup(found, project) {
   var type = document.getElementById('cType').value;
   if (type === 'ktsCollaborator') {
     document.getElementById('k_projectName').value = project.name || '';
+    var investor = (project.cn && project.cn.name) || (project.dn && project.dn.name) || '';
+    document.getElementById('k_investorName').value = investor;
     document.getElementById('k_projectAddress').value = project.address || '';
   } else if (type === 'homeowner') {
     document.getElementById('h_projectAddress').value = project.address || '';
