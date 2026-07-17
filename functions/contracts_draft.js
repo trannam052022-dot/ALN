@@ -19,6 +19,10 @@
 ════════════════════════════════════════════════════════════════ */
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
+// Import trực tiếp thay vì FieldValue/.Timestamp — namespace
+// compat đó có lúc chưa gắn kịp khi module này được require() gián tiếp
+// (qua import tạm ở cuối index.js để chạy Emulator), gây TypeError undefined.
+const { FieldValue, Timestamp } = require("firebase-admin/firestore");
 const crypto = require("crypto");
 
 if (!admin.apps.length) admin.initializeApp();
@@ -51,7 +55,7 @@ async function writeAudit(contractId, action, opts) {
       party: opts.party || null,
       actorUid: opts.actorUid || null,
       actorRole: opts.actorRole || null,
-      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      timestamp: FieldValue.serverTimestamp(),
       ipAddress: opts.ipAddress || null,
       userAgent: opts.userAgent || null,
     });
@@ -72,7 +76,7 @@ async function maybeFinalize(contractId, request) {
 
   await ref.update({
     status: "signed_all",
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
   });
   await writeAudit(contractId, "signed", {
     actorUid: (request && request.auth && request.auth.uid) || null,
@@ -112,9 +116,9 @@ exports.draftCreateContract = onCall({ region: "asia-southeast1" }, async (reque
     pdfDraftURL: null,
     pdfSignedURL: null,
     createdBy: request.auth.uid,
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
     sentAt: null,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
   });
 
   await docRef.collection("signatures_draft").doc("A").set({
@@ -147,8 +151,8 @@ exports.draftSendContract = onCall({ region: "asia-southeast1" }, async (request
 
   await ref.update({
     status: "sent",
-    sentAt: admin.firestore.FieldValue.serverTimestamp(),
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    sentAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
   });
   await writeAudit(contractId, "sent", {
     actorUid: request.auth.uid, actorRole: "founder",
@@ -173,13 +177,13 @@ exports.draftConfirmPartyA = onCall({ region: "asia-southeast1" }, async (reques
     signerName: contract.partyA.repName,
     signerIdNumber: "",
     method: "manual",
-    otpVerifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+    otpVerifiedAt: FieldValue.serverTimestamp(),
     ipAddress: reqIp(request),
     userAgent: reqUserAgent(request),
     confirmed: true,
   }, { merge: true });
 
-  await ref.update({ updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+  await ref.update({ updatedAt: FieldValue.serverTimestamp() });
   await writeAudit(contractId, "signed", {
     party: "A", actorUid: request.auth.uid, actorRole: "founder",
     ipAddress: reqIp(request), userAgent: reqUserAgent(request),
@@ -200,7 +204,7 @@ exports.draftGetContract = onCall({ region: "asia-southeast1" }, async (request)
   const contract = snap.data();
 
   if (contract.status === "sent") {
-    await ref.update({ status: "viewed", updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+    await ref.update({ status: "viewed", updatedAt: FieldValue.serverTimestamp() });
     contract.status = "viewed";
   }
 
@@ -254,7 +258,7 @@ exports.draftRequestOtp = onCall({ region: "asia-southeast1" }, async (request) 
 
   const otp = String(crypto.randomInt(0, 1000000)).padStart(6, "0");
   const otpHash = crypto.createHash("sha256").update(contractId + ":" + party + ":" + otp).digest("hex");
-  const expiresAt = admin.firestore.Timestamp.fromMillis(Date.now() + OTP_TTL_MS);
+  const expiresAt = Timestamp.fromMillis(Date.now() + OTP_TTL_MS);
 
   await sigRef.set({
     otpHash: otpHash,
@@ -264,7 +268,7 @@ exports.draftRequestOtp = onCall({ region: "asia-southeast1" }, async (request) 
   }, { merge: true });
 
   if (party === "B") {
-    await ref.update({ status: "otp_pending", updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+    await ref.update({ status: "otp_pending", updatedAt: FieldValue.serverTimestamp() });
   }
 
   await writeAudit(contractId, "otp_requested", {
@@ -305,7 +309,7 @@ exports.draftVerifyOtp = onCall({ region: "asia-southeast1" }, async (request) =
 
   const otpHash = crypto.createHash("sha256").update(contractId + ":" + party + ":" + String(otp)).digest("hex");
   if (otpHash !== sig.otpHash) {
-    await sigRef.update({ otpAttempts: admin.firestore.FieldValue.increment(1) });
+    await sigRef.update({ otpAttempts: FieldValue.increment(1) });
     throw new HttpsError("permission-denied", "Mã OTP không đúng");
   }
 
@@ -318,13 +322,13 @@ exports.draftVerifyOtp = onCall({ region: "asia-southeast1" }, async (request) =
     confirmed: true,
     signerName: partyInfo.name || partyInfo.repName || "",
     signerIdNumber: partyInfo.idNumber || "",
-    otpVerifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+    otpVerifiedAt: FieldValue.serverTimestamp(),
     ipAddress: reqIp(request),
     userAgent: reqUserAgent(request),
   });
 
   const newStatus = party === "B" ? "signed_partyB" : contract.status;
-  await ref.update({ status: newStatus, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+  await ref.update({ status: newStatus, updatedAt: FieldValue.serverTimestamp() });
 
   await writeAudit(contractId, "otp_verified", {
     party: party, actorUid: (request.auth && request.auth.uid) || null,
