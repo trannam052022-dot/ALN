@@ -478,7 +478,7 @@ function render(b){
     var items = '';
     if (b.phone) items += '<div class="contact-item"><i class="ph-duotone ph-phone"></i><a href="tel:' + escH(b.phone) + '">' + escH(b.phone) + '</a></div>';
     if (b.zalo) items += '<div class="contact-item"><i class="ph-duotone ph-chat-circle-dots"></i><span>Zalo: ' + escH(b.zalo) + '</span></div>';
-    if (b.website) items += '<div class="contact-item"><i class="ph-duotone ph-globe"></i><a href="' + escH(b.website) + '" target="_blank" rel="noopener">' + escH(b.website.replace(/^https?:\/\//,'')) + '</a></div>';
+    if (b.website) items += '<div class="contact-item"><i class="ph-duotone ph-globe"></i><a href="' + escH(b.website) + '" target="_blank" rel="noopener nofollow">' + escH(b.website.replace(/^https?:\/\//,'')) + '</a></div>';
     if (b.address) items += '<div class="contact-item"><i class="ph-duotone ph-navigation-arrow"></i><a href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(b.address) + '" target="_blank" rel="noopener">Chỉ đường</a></div>';
     cg.innerHTML = items || '<div class="contact-item">Chưa cập nhật thông tin liên hệ.</div>';
     cg.querySelectorAll('a').forEach(function(a){

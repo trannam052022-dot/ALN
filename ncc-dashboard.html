@@ -54,11 +54,26 @@ textarea:focus,input:focus{border-color:rgba(201,168,76,.38)}
 .badge-unverified{background:rgba(255,255,255,.03);color:var(--muted);border:1px solid var(--border)}
 .gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
 .gal-item{position:relative;border-radius:9px;overflow:hidden;border:1px solid var(--border);background:var(--bg2)}
+.gal-item.is-cover{border-color:rgba(201,168,76,.5)}
 .gal-item img{width:100%;height:100px;object-fit:cover;display:block}
 .gal-del{position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;background:rgba(8,12,20,.85);border:1px solid rgba(240,96,96,.4);color:var(--red);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cover-badge{position:absolute;top:5px;left:5px;font-size:9px;font-weight:800;padding:2px 8px;border-radius:99px;background:rgba(201,168,76,.92);color:#0a0a10;display:flex;align-items:center;gap:3px}
+.btn-cover{position:absolute;bottom:5px;left:5px;right:5px;font-size:9px;font-weight:700;padding:4px 6px;border-radius:6px;background:rgba(8,12,20,.85);border:1px solid rgba(201,168,76,.35);color:var(--gold2);cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:3px}
+.btn-cover:hover{background:rgba(201,168,76,.15)}
 .gal-add{height:100px;border:1px dashed rgba(201,168,76,.35);border-radius:9px;background:rgba(201,168,76,.04);color:rgba(201,168,76,.7);font-size:12px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--sans)}
 .gal-add:hover{background:rgba(201,168,76,.09)}
 .gal-add i{font-size:20px}
+.vid-thumb{width:56px;height:42px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--bg2)}
+/* ── Thước đo hoàn thiện hồ sơ ── */
+.progress-wrap{margin-top:14px}
+.progress-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.progress-pct{font-family:var(--syne);font-size:13px;font-weight:800;color:var(--gold)}
+.progress-track{height:7px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#a07830,#e8d07a);transition:width .3s ease}
+.check-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.check-item{font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;display:inline-flex;align-items:center;gap:4px}
+.check-item.done{background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.28);color:var(--green)}
+.check-item.todo{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted)}
 .pdf-row{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:12px 14px}
 .pdf-row i{font-size:24px;color:var(--red);flex-shrink:0}
 .pdf-name{flex:1;font-size:12px;font-weight:600;color:var(--text2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -163,6 +178,13 @@ function isValidVideoUrl(u){
   } catch(e){ return false; }
 }
 
+/* Chỉ YouTube có URL thumbnail công khai không cần token/oEmbed call —
+   TikTok/Facebook giữ icon nền tảng như cũ (oEmbed cần gọi API ngoài,
+   Facebook còn cần access token, không làm được thuần client-side). */
+function ytThumbId(u){
+  const m = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{6,})/);
+  return m ? m[1] : null;
+}
 function videosHtml(){
   const videos = Array.isArray(DATA.videos) ? DATA.videos : [];
   let html = videos.map(function(u, i){
@@ -170,8 +192,12 @@ function videosHtml(){
     const isFb = /facebook\.com|fb\.watch/.test(u);
     const icon = isYt ? 'ph-youtube-logo' : isFb ? 'ph-facebook-logo' : 'ph-tiktok-logo';
     const color = isYt ? '#ff0000' : isFb ? '#1877f2' : 'var(--text)';
+    const ytId = isYt ? ytThumbId(u) : null;
+    const thumbOrIcon = ytId
+      ? '<img class="vid-thumb" src="https://img.youtube.com/vi/' + ytId + '/hqdefault.jpg" alt="">'
+      : '<i class="ph-duotone ' + icon + '" style="color:' + color + '"></i>';
     return '<div class="pdf-row" style="margin-bottom:8px">'
-      + '<i class="ph-duotone ' + icon + '" style="color:' + color + '"></i>'
+      + thumbOrIcon
       + '<span class="pdf-name">' + escH(u) + '</span>'
       + '<button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="removeVideo(' + i + ')">Gỡ</button>'
     + '</div>';
@@ -243,6 +269,22 @@ window.removePriceRow = function(i){
   render();
 };
 
+/* ── Thước đo hoàn thiện hồ sơ — nhắc NCC bổ sung nội dung để gian hàng
+   trông chuyên nghiệp hơn (đúng vai trò "website thay thế" cho NCC chưa
+   có trang riêng). Trọng số cộng dồn tối đa 100. ── */
+function calcCompletion(d){
+  const items = [
+    { label: 'Giới thiệu gian hàng', done: ((d.intro || d.bio || '').trim().length >= 50), weight: 20 },
+    { label: 'Có ảnh sản phẩm', done: Array.isArray(d.gallery) && d.gallery.length >= 1, weight: 25 },
+    { label: 'Có từ 3 ảnh trở lên', done: Array.isArray(d.gallery) && d.gallery.length >= 3, weight: 15 },
+    { label: 'Có catalog PDF', done: !!d.catalogPdfUrl, weight: 15 },
+    { label: 'Có video giới thiệu', done: Array.isArray(d.videos) && d.videos.length >= 1, weight: 10 },
+    { label: 'Có bảng giá tham khảo', done: Array.isArray(d.priceList) && d.priceList.some(function(p){ return p && (p.item || '').trim(); }), weight: 15 },
+  ];
+  const pct = items.reduce(function(sum, it){ return sum + (it.done ? it.weight : 0); }, 0);
+  return { pct: pct, items: items };
+}
+
 function render(){
   const d = DATA;
   const statusChip = d.status === 'approved'
@@ -259,9 +301,23 @@ function render(){
       : '<span class="badge badge-unverified">Chưa xác minh ĐKKD</span>';
   }
 
+  const comp = calcCompletion(d);
+  const checklistHtml = comp.items.map(function(it){
+    return '<span class="check-item ' + (it.done ? 'done' : 'todo') + '"><i class="ph-duotone ' + (it.done ? 'ph-check-circle' : 'ph-circle-dashed') + '"></i>' + escH(it.label) + '</span>';
+  }).join('');
+  const progressHtml =
+    '<div class="progress-wrap">'
+      + '<div class="progress-head"><span class="hint" style="margin:0">Mức độ hoàn thiện hồ sơ</span><span class="progress-pct">' + comp.pct + '%</span></div>'
+      + '<div class="progress-track"><div class="progress-fill" style="width:' + comp.pct + '%"></div></div>'
+      + '<div class="check-list">' + checklistHtml + '</div>'
+    + '</div>';
+
   const gallery = Array.isArray(d.gallery) ? d.gallery : [];
   let galHtml = gallery.map(function(g, i){
-    return '<div class="gal-item"><img src="' + escH(g.url) + '" alt="">'
+    return '<div class="gal-item' + (i === 0 ? ' is-cover' : '') + '"><img src="' + escH(g.url) + '" alt="">'
+      + (i === 0
+          ? '<span class="cover-badge"><i class="ph-duotone ph-star"></i>Ảnh bìa</span>'
+          : '<button class="btn-cover" onclick="setCover(' + i + ')"><i class="ph-duotone ph-star"></i>Đặt làm bìa</button>')
       + '<button class="gal-del" onclick="removeImage(' + i + ')" title="Xoá ảnh">✕</button></div>';
   }).join('');
   if(gallery.length < MAX_IMAGES){
@@ -284,6 +340,7 @@ function render(){
       + statusChip
       + '<div class="badge-row">' + badges + '</div>'
       + (d.status === 'approved' ? '<div class="hint" style="margin:10px 0 0">Hạng và trạng thái xác minh do Founder xét duyệt — không tự đổi được. Bạn tự quản lý nội dung bên dưới.</div>' : '')
+      + progressHtml
     + '</div>'
 
     + '<div class="card">'
@@ -295,10 +352,10 @@ function render(){
 
     + '<div class="card">'
       + '<div class="card-title"><i class="ph-duotone ph-address-book"></i>Liên hệ bổ sung</div>'
-      + '<div class="hint">Số điện thoại/địa chỉ đã lấy từ hồ sơ đăng ký. Bổ sung thêm Zalo (nếu khác SĐT) và website nếu có.</div>'
+      + '<div class="hint">Số điện thoại/địa chỉ đã lấy từ hồ sơ đăng ký. Bổ sung thêm Zalo (nếu khác SĐT). Chưa có website riêng cũng không sao — gian hàng này trên ALN đóng vai trò trang giới thiệu của bạn; nếu đã có website riêng, dán link vào ô bên dưới để khách xem thêm.</div>'
       + '<div class="field-row">'
         + '<div class="field"><label>Zalo</label><input type="text" id="fZalo" placeholder="0901 234 567" value="' + escH(d.zalo || '') + '"></div>'
-        + '<div class="field"><label>Website</label><input type="url" id="fWebsite" placeholder="https://..." value="' + escH(d.website || '') + '"></div>'
+        + '<div class="field"><label>Website riêng (nếu có)</label><input type="url" id="fWebsite" placeholder="https://tencuahang.vn" value="' + escH(d.website || '') + '"></div>'
       + '</div>'
       + '<div class="field" style="margin-top:14px"><label>Địa chỉ hiển thị công khai</label><input type="text" id="fAddress" placeholder="Số nhà, đường, quận/huyện…" value="' + escH(d.address || '') + '"></div>'
     + '</div>'
@@ -399,6 +456,15 @@ window.removeImage = function(i){
   DATA.gallery.splice(i, 1);
   markDirty();
   render();
+};
+
+window.setCover = function(i){
+  if(!Array.isArray(DATA.gallery) || i <= 0 || i >= DATA.gallery.length) return;
+  const img = DATA.gallery.splice(i, 1)[0];
+  DATA.gallery.unshift(img);
+  markDirty();
+  render();
+  showToast('Đã đặt làm ảnh bìa — bấm "Lưu thay đổi" để công bố');
 };
 
 window.removePdf = function(){
