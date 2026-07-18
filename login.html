@@ -81,16 +81,17 @@ input::placeholder{color:var(--muted)}
 .brand-title em{font-style:italic;font-weight:600;color:var(--gold2)}
 .brand-sub{font-size:11px;color:var(--sub);letter-spacing:.03em}
 
-/* ── ROLE TABS ── */
+/* ── ROLE TABS — lưới 4 cột x 2 hàng (8 vai trò), dễ bấm trên điện thoại
+   hơn nhồi 1 hàng ngang ── */
 .role-tabs{
-  display:flex;gap:5px;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:5px;
   background:rgba(255,255,255,.025);border:1px solid rgba(201,168,76,.14);
   border-radius:12px;padding:4px;
   width:100%;max-width:420px;
 }
 .role-tab{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
-  padding:10px 8px;border-radius:9px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:10px 6px;border-radius:9px;cursor:pointer;
   transition:all .18s;border:1px solid transparent;user-select:none;
   -webkit-tap-highlight-color:transparent;
 }
@@ -335,6 +336,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="role-tab" data-role="ke_toan" onclick="switchRole('ke_toan')">
       <div class="rt-icon"><i class="ph-duotone ph-calculator"></i></div>
       <div class="rt-label">Kế toán</div>
+      <div class="rt-dot"></div>
+    </div>
+    <div class="role-tab" data-role="ktv" onclick="switchRole('ktv')">
+      <div class="rt-icon"><i class="ph-duotone ph-ruler"></i></div>
+      <div class="rt-label">KTV</div>
+      <div class="rt-dot"></div>
+    </div>
+    <div class="role-tab" data-role="ncc" onclick="switchRole('ncc')">
+      <div class="rt-icon"><i class="ph-duotone ph-package"></i></div>
+      <div class="rt-label">Nhà cung cấp</div>
       <div class="rt-dot"></div>
     </div>
   </div>
@@ -642,9 +653,10 @@ async function doLogin(){
       resetLoginBtn(); return;
     }
     const effectiveRole = profile.role;
-    // founder + ke_toan + ktv + ncc: tài khoản không có tab riêng trên màn
-    // hình đăng nhập (nhập username thủ công) nên bỏ qua kiểm tra khớp tab.
-    const NO_TAB_ROLES = ['founder', 'ke_toan', 'ktv', 'ncc'];
+    // founder + ke_toan: tài khoản nội bộ, không có tab riêng trên màn hình
+    // đăng nhập (nhập username thủ công) nên bỏ qua kiểm tra khớp tab. Từ
+    // 18/07/2026 ktv/ncc đã có tab riêng nên không cần miễn trừ nữa.
+    const NO_TAB_ROLES = ['founder', 'ke_toan'];
     if(effectiveRole !== activeRole && NO_TAB_ROLES.indexOf(effectiveRole) === -1){
       await fb.signOut(fb.auth);
       const roleTitle = (ROLE_META[effectiveRole] && ROLE_META[effectiveRole].title) || effectiveRole;
