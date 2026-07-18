@@ -114,6 +114,7 @@ import {
 const MAX_IMAGES = 12;
 const MAX_IMG_MB = 8;
 const MAX_PDF_MB = 15;
+const MAX_VIDEOS = 5;
 
 let UID = null;
 let DATA = null;          // bản nháp đang chỉnh (gallery/intro/pdf)
@@ -125,6 +126,55 @@ window.nccLogout = async function(){
 };
 
 function markDirty(){ dirty = true; const b = document.getElementById('btnSave'); if(b) b.disabled = false; }
+
+/* Chỉ nhận link YouTube/TikTok https — tránh link rác/độc hại lên trang public */
+function isValidVideoUrl(u){
+  if(!/^https:\/\//.test(u)) return false;
+  try {
+    const host = new URL(u).hostname.replace(/^www\./, '');
+    return ['youtube.com', 'youtu.be', 'm.youtube.com', 'tiktok.com', 'vt.tiktok.com', 'vm.tiktok.com'].indexOf(host) !== -1;
+  } catch(e){ return false; }
+}
+
+function videosHtml(){
+  const videos = Array.isArray(DATA.videos) ? DATA.videos : [];
+  let html = videos.map(function(u, i){
+    const isYt = /youtu/.test(u);
+    return '<div class="pdf-row" style="margin-bottom:8px">'
+      + '<i class="ph-duotone ' + (isYt ? 'ph-youtube-logo' : 'ph-tiktok-logo') + '" style="color:' + (isYt ? '#ff0000' : 'var(--text)') + '"></i>'
+      + '<span class="pdf-name">' + escH(u) + '</span>'
+      + '<button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="removeVideo(' + i + ')">Gỡ</button>'
+    + '</div>';
+  }).join('');
+  if(videos.length < MAX_VIDEOS){
+    html += '<div style="display:flex;gap:8px;margin-top:4px">'
+      + '<input type="url" id="videoInput" placeholder="https://youtube.com/... hoặc https://tiktok.com/..." style="flex:1;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;background:rgba(255,255,255,.025);color:var(--text);font-size:12px;font-family:var(--mono);outline:none">'
+      + '<button class="btn btn-ghost btn-sm" onclick="addVideo()"><i class="ph-duotone ph-plus"></i>Thêm</button>'
+    + '</div>';
+  }
+  return html;
+}
+
+window.addVideo = function(){
+  const input = document.getElementById('videoInput');
+  const u = (input.value || '').trim();
+  if(!u) return;
+  if(!isValidVideoUrl(u)){ showToast('Chỉ nhận link YouTube hoặc TikTok (https)', true); return; }
+  if(!Array.isArray(DATA.videos)) DATA.videos = [];
+  if(DATA.videos.indexOf(u) !== -1){ showToast('Link này đã có trong danh sách', true); return; }
+  if(DATA.videos.length >= MAX_VIDEOS){ showToast('Tối đa ' + MAX_VIDEOS + ' video', true); return; }
+  DATA.videos.push(u.slice(0, 300));
+  markDirty();
+  render();
+  showToast('Đã thêm video — bấm "Lưu thay đổi" để công bố');
+};
+
+window.removeVideo = function(i){
+  if(!confirm('Gỡ video này khỏi gian hàng?')) return;
+  DATA.videos.splice(i, 1);
+  markDirty();
+  render();
+};
 
 function render(){
   const d = DATA;
@@ -173,6 +223,12 @@ function render(){
       + '<div class="card-title"><i class="ph-duotone ph-book-open"></i>Catalog PDF</div>'
       + pdfHtml
       + '<input type="file" id="pdfInput" accept="application/pdf" style="display:none">'
+    + '</div>'
+
+    + '<div class="card">'
+      + '<div class="card-title"><i class="ph-duotone ph-video"></i>Video giới thiệu</div>'
+      + '<div class="hint">Dán link video YouTube hoặc TikTok của bạn (tối đa ' + MAX_VIDEOS + ' video) — video phát ngay trên trang gian hàng, người xem cũng có thể ghé kênh của bạn.</div>'
+      + videosHtml()
     + '</div>'
 
     + '<div class="save-bar">'
@@ -263,6 +319,7 @@ window.saveAll = async function(){
       gallery: (DATA.gallery || []).slice(0, MAX_IMAGES),
       catalogPdfUrl: DATA.catalogPdfUrl || '',
       catalogPdfName: DATA.catalogPdfName || '',
+      videos: (DATA.videos || []).filter(isValidVideoUrl).slice(0, MAX_VIDEOS),
       galleryUpdatedAt: serverTimestamp(),
     });
     DATA.intro = intro;
