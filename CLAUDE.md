@@ -43,6 +43,10 @@ Nền tảng theo dõi công trình xây dựng. **Frontend tĩnh** (HTML/JS thu
 | `firebase-messaging-sw.js` | Service worker cho web push |
 | `functions/index.js` | Cloud Functions (Node 20, asia-southeast1) |
 | `index.html`, `manifest.json`, `icon-*.png` | PWA |
+| `ncc-apply.html` | Form đăng ký Gian hàng NCC (nhà cung cấp vật liệu/thiết bị) → ghi `nccApplications/{uid}`, role `ncc`, username prefix `ncc.` |
+| `ncc-showcase.html` | Trang công khai danh sách gian hàng NCC (3 tầng, tìm kiếm, filter tỉnh/danh mục) |
+| `ncc_profile.html` | Trang công khai chi tiết 1 gian hàng NCC (`?uid=`), có chế độ xem thử `?demo=1` |
+| `ncc-dashboard.html` | Trang NCC tự quản lý gian hàng sau khi được duyệt |
 
 ## firebase-config.js — exports
 
@@ -62,6 +66,7 @@ Quy ước: `username + "@aln.vn"` = email đăng nhập (email ảo).
 | `dn` | `client_DN.html` | — (xem projects + designProjects) | blue |
 | `cn` | `client_CN.html` | — (xem projects của mình) | green |
 | `ks` | `ks_dashboard.html` | — (xét duyệt KTS theo tỉnh) | gold |
+| `ncc` | `ncc-dashboard.html` | — (tự quản lý gian hàng, doc `nccApplications/{uid}`) | gold |
 
 **KS Vùng (Kỹ sư Vùng):** username prefix `ks.`, đăng ký qua `ks-apply.html` → `ksApplications/{uid}`, chờ founder duyệt. Sau khi active, login vào `ks_dashboard.html`, xem KTS pending trong tỉnh và gửi nhận xét (`ksNote`) lên `ktsApplications/{uid}`. Founder xem nhận xét này khi duyệt KTS.
 
@@ -201,6 +206,23 @@ body { font-size: 1rem; /* kế thừa từ html */ }
 - `designProjects/{pid}`: founder create, `designer.uid`/`cn.uid`/`dn.uid`/`memberUids` read, `memberUids` update.
 - **App Check**: đã chạy từ 02/07/2026. Bypass founder cứng ở đăng nhập thường (login.html chỗ A) đã gỡ 04/07/2026 → founder đọc role thật từ `users/{uid}`. Còn hardcode UID founder ở `doFounderLogin` (login.html) và `isFounder()` trong `firestore.rules` — có mật khẩu bảo vệ, dọn sau nếu cần quản lý founder bằng dữ liệu.
 
+## Gian hàng NCC (Nhà cung cấp vật liệu/thiết bị) — directory quảng cáo, KHÔNG phải sàn giao dịch
+
+Mục đích: NCC (sắt thép, gỗ nội thất, VLXD, sơn, điện nước, dịch vụ thi công, thiết bị vận chuyển...) có gian hàng công khai (ảnh, giá, liên hệ) để khách/KTS tìm — ALN không đứng ra giao dịch, không thẩm định chất lượng (disclaimer cố định trên `ncc_profile.html`).
+
+- **Luồng:** đăng ký `ncc-apply.html` → `nccApplications/{uid}` (`status:pending`) → Founder duyệt (`founder_panel.html`, gán `tier`: basic/featured/diamond + `verified`) → `status:'approved'` → hiện công khai trên `ncc-showcase.html` (danh sách) và `ncc_profile.html?uid={uid}` (chi tiết) → NCC tự cập nhật nội dung tại `ncc-dashboard.html` (không tự đổi được `status/tier/verified`).
+- **Field chính trên `nccApplications/{uid}`:** `name, category, province, tier, verified, phone, zalo, website, address, intro/bio, priceList[]` (dòng giá thuần item/unit/price), `products[]` (sản phẩm riêng: name/price/unit/**imageUrl** — thêm 18/07/2026, dùng khi NCC bán nhiều mặt hàng, VD cơ điện), `gallery[]` (ảnh chung, `gallery[0]` = ảnh bìa), `catalogPdfUrl/catalogPdfName`, `videos[]` (YouTube/TikTok/Facebook, tối đa 5), `leadCount` (**tĩnh, chưa có Cloud Function đếm thật** từ `nccLeads`), `alnProjects[]`.
+- **8 danh mục:** `sat_thep, go_noithat, gach_vlxd, son_hoanthien, dien_nuoc, dv_thicong, thietbi_vanchuyen, khac`. 2 danh mục dịch vụ (`dv_thicong`, `thietbi_vanchuyen`) hiện disclaimer riêng: *"ALN không phải bên cung cấp dịch vụ thi công/vận chuyển..."*.
+- **`nccLeads` collection:** ghi ẩn danh (`create: if true`), Founder-only đọc, immutable (`update/delete: if false`) — theo dõi `contact_view`/`quote_request` mà không thu thập PII người xem (tuân NĐ 13/2023/NĐ-CP).
+- **Storage:** `ncc-catalogs/{uid}/{allPaths=**}` — đọc công khai (`true`), chỉ chủ gian ghi. Wildcard đã bao luôn `ncc-catalogs/{uid}/products/...` (ảnh từng sản phẩm) — **không cần sửa storage.rules khi thêm loại ảnh mới trong path này**.
+- **Diễn đàn:** tab "Gian hàng Thiết bị" (`vat_lieu` — tên nội bộ giữ nguyên để tránh migrate dữ liệu) trên `forum.html` bấm vào là redirect thẳng sang `ncc-showcase.html` (không hiện feed bài viết nữa) — `CATEGORY_VISIBILITY.vat_lieu = 'public'`, khách vãng lai xem tự do không cần đăng nhập.
+- **Demo data:** `SHOW_DEMO_FALLBACK=true` trong `ncc-showcase.html` trộn 14 gian hàng mẫu (`MOCK_DATA`, `isDemo:true`, không SĐT/Zalo/website thật, không tên thương hiệu thật) sau data thật; mỗi thẻ có badge "Minh hoạ". `ncc_profile.html` có `MOCK_DATA` riêng (phải sửa đồng bộ cả 2 nơi) + chế độ xem thử toàn trang `?demo=1`. `demo-06` "Thiết Bị Điện Phú Hưng" có sẵn 6 `products[]` mẫu để xem trước khối "Sản phẩm nổi bật".
+- **Còn tồn đọng (chưa làm, chưa có xác nhận Founder):**
+  1. `home.html`/`index.html` chưa có link tới `ncc-showcase.html`.
+  2. `leadCount` là field tĩnh — chưa có Cloud Function tổng hợp thật từ `nccLeads`.
+  3. Quyền đăng bài diễn đàn của NCC (`NCC_CATEGORIES=['vat_lieu']` trong `functions/forum.js`) gần như vô nghĩa vì tab đã redirect thẳng ra ngoài — chưa quyết giữ hay bỏ.
+  4. Nhánh nháp `claude/ncc-showcase-demo-cithdq` (nhánh làm việc của các phiên NCC) — hỏi Founder có muốn xoá không, việc thật đã lên `main` trực tiếp.
+
 ## Các nút GHI đã được nối (Firestore/Storage)
 
 | Trang | Hàm | Đích |
@@ -217,6 +239,9 @@ body { font-size: 1rem; /* kế thừa từ html */ }
 | designer_dashboard | `desSubmitProposal()` | `designProjects/{pid}/stages/{s}/proposals` + Storage |
 | designer_dashboard | `window.desSubmitC3` (module) | `designProjects/{pid}/documents` + Storage |
 | designer_dashboard | `window.desUploadAvatar` (module) | Storage `designer-profiles/{uid}/` |
+| ncc-dashboard | `window.saveAll()` (module) | `nccApplications/{uid}` (intro/zalo/website/address/gallery/priceList/products/videos/catalog) |
+| ncc-dashboard | `onPickImages/onPickPdf/onPickProductImg` (module) | Storage `ncc-catalogs/{uid}/` (+ `/products/` cho ảnh từng SP) |
+| ncc_profile | `logLead()` (module) | `nccLeads` (create, ẩn danh — contact_view/quote_request) |
 
 ## QUYỀN TỰ ĐỘNG (dành cho phiên autonomous)
 
