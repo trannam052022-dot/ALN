@@ -81,6 +81,15 @@ service firebase.storage {
       allow write: if request.auth != null && request.auth.uid == uid;
     }
 
+    // Ảnh gallery + catalog PDF gian hàng NCC (ncc-dashboard.html) — đọc CÔNG
+    // KHAI để khách vãng lai xem trên ncc-showcase.html/ncc_profile.html khi
+    // gian đã duyệt (status=='approved' kiểm tra ở tầng Firestore); chỉ chủ
+    // gian tự ghi.
+    match /ncc-catalogs/{uid}/{allPaths=**} {
+      allow read:  if true;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+
     // Module Giữ chỗ — hồ sơ nộp (giấy phép, portfolio, ảnh công trình)
     match /reservations/{uid}/{file=**} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
