@@ -67,8 +67,9 @@ const CATEGORIES = ["hoi_kts", "hoi_dap", "vat_lieu", "showcase", "nghe", "bang_
 const KTS_POST_CATEGORIES = ["hoi_kts", "hoi_dap", "vat_lieu", "showcase", "nghe"];
 const OPEN_CATEGORIES = ["hoi_kts", "tu_van_du_an", "showcase", "bang_tin"]; // CN/DN xem được (P2)
 /* Nhà cung cấp vật liệu (nsx-apply.html) — CHỈ tham gia đúng 1 chuyên mục
-   "Vật liệu & Giá", không có huy hiệu xếp hạng KTS, không có tính năng
-   "chọn làm dự án". Giữ hằng số riêng để không lẫn với KTS_POST_CATEGORIES. */
+   "Gian hàng Thiết bị" (key nội bộ vat_lieu, không đổi), không có huy hiệu
+   xếp hạng KTS, không có tính năng "chọn làm dự án". Giữ hằng số riêng để
+   không lẫn với KTS_POST_CATEGORIES. */
 const NCC_CATEGORIES = ["vat_lieu"];
 
 /* CHECKLIST_PHANQUYEN_DIENDAN_ALN.md PASS 1 — quyền ĐỌC theo category, denormalize
@@ -778,7 +779,7 @@ exports.forumComment = onCall({ region: REGION }, async (request) => {
   if (profile.role === "founder" || profile.role === "kts") {
     // KTS/Founder bình luận mọi chuyên mục
   } else if (profile.role === "ncc") {
-    if (!NCC_CATEGORIES.includes(post.category)) throw new HttpsError("permission-denied", "Nhà cung cấp chỉ bình luận được trong chuyên mục Vật liệu & Giá");
+    if (!NCC_CATEGORIES.includes(post.category)) throw new HttpsError("permission-denied", "Nhà cung cấp chỉ bình luận được trong chuyên mục Gian hàng Thiết bị");
   } else if ((profile.role === "cn" || profile.role === "dn") && p2) {
     if (post.authorUid !== uid) throw new HttpsError("permission-denied", "Bạn chỉ bình luận được trong thread của mình");
   } else {
@@ -1596,7 +1597,7 @@ async function seedForumData() {
     heartCount: 2, heartedBy: [KTS_UID, DN_UID], createdAt: T(28),
   });
 
-  /* P1 — Vật liệu & Giá */
+  /* P1 — Gian hàng Thiết bị (key nội bộ vat_lieu) */
   batch1.set(posts.doc("draft_p03"), P(ktsAuthor, {
     category: "vat_lieu",
     text: "Cập nhật giá gạch không nung khu vực Bình Dương tháng 7/2026: gạch block 390x190x190 dao động 12.5k–13.8k/viên tại bãi, tăng nhẹ ~4% so với quý trước. Anh em khu vực khác cập nhật giúp để có mặt bằng chung.",
