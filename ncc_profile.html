@@ -288,6 +288,7 @@ document.getElementById('qCancel').addEventListener('click', function(){
   document.getElementById('quoteModal').classList.remove('open');
 });
 document.getElementById('btnQuote').addEventListener('click', function(){
+  if (window.NCC && window.NCC.isDemo) { window.showToast('Đây là gian hàng minh hoạ — chưa gửi yêu cầu báo giá được.'); return; }
   document.getElementById('quoteModal').classList.add('open');
 });
 </script>
@@ -360,68 +361,70 @@ function fmtDate(ts){
   return '';
 }
 
-/* ── DỮ LIỆU MẪU (chế độ xem thử ?demo=1) — mirror danh sách trong
-   ncc-showcase.html, KHÔNG ghi vào Firestore. Xem chú thích ở đó. ──── */
+/* ── DỮ LIỆU MẪU (chế độ xem thử ?demo=1) — mirror CHÍNH XÁC danh
+   sách trong ncc-showcase.html (đổi cả 2 nơi cùng lúc), KHÔNG ghi vào
+   Firestore. Tên/mô tả không dùng thương hiệu thật, không có SĐT/Zalo/
+   website (tránh khách gọi nhầm số thật), không có alnProjects (tránh
+   gắn dự án/KTS thật của hệ thống vào gian hàng giả). ──── */
 function img(seed){ return 'https://picsum.photos/seed/ncc-' + seed + '/480/360'; }
 var MOCK_DATA = {
-  'demo-01': { name:'Thép Hòa Phát — Đại lý cấp 1 Sài Gòn', category:'sat_thep', province:'HCM', tier:'diamond', verified:true,
-    phone:'0909111001', zalo:'0909111001', website:'https://thephoaphat-sg.example.vn', address:'Số 12 Quốc lộ 1A, Q.Bình Tân, TP.HCM',
-    intro:'Đại lý cấp 1 thép Hòa Phát — kho 5.000 tấn, giao công trình khu vực TP.HCM trong ngày.',
+  'demo-01': { name:'Thép Kim Long Sài Gòn', category:'sat_thep', province:'HCM', tier:'diamond', verified:true,
+    address:'Q.Bình Tân, TP.HCM',
+    intro:'Đại lý thép xây dựng các loại — kho 5.000 tấn, giao công trình khu vực TP.HCM trong ngày.',
     priceList:[{item:'Thép hộp 40x80',unit:'kg',price:19500},{item:'Thép phi 10 (D10)',unit:'kg',price:18200}],
-    gallery:[{url:img('01a')},{url:img('01b')},{url:img('01c')}],
-    alnProjects:[{projectName:'Biệt thự Vườn Tân Cổ Điển',ktsName:'KTS. Trần Đại Long',month:'06/2026'}] },
-  'demo-02': { name:'Gỗ Việt Nội Thất Đồng Nai', category:'go_noithat', province:'DNai', tier:'diamond', verified:true,
-    phone:'0909111002', zalo:'0909111002', website:'https://goviet-dnai.example.vn', address:'KCN Biên Hòa 2, TP.Biên Hòa, Đồng Nai',
-    intro:'Xưởng sản xuất tủ bếp, tủ áo theo thiết kế — gỗ công nghiệp An Cường, CNC theo bản vẽ KTS.',
+    gallery:[{url:img('01a')},{url:img('01b')},{url:img('01c')}] },
+  'demo-02': { name:'Nội Thất Gỗ An Khang', category:'go_noithat', province:'DNai', tier:'diamond', verified:true,
+    address:'TP.Biên Hòa, Đồng Nai',
+    intro:'Xưởng sản xuất tủ bếp, tủ áo theo thiết kế — gỗ công nghiệp phủ melamine, laminate, CNC theo bản vẽ KTS.',
     priceList:[{item:'Tủ bếp trên/dưới',unit:'md',price:3200000},{item:'Tủ áo cánh lùa',unit:'md',price:2800000}],
     gallery:[{url:img('02a')},{url:img('02b')}] },
   'demo-03': { name:'VLXD Đại Thành Bình Dương', category:'gach_vlxd', province:'BD', tier:'diamond', verified:true,
-    phone:'0909111003', zalo:'0909111003', website:'https://daithanh-vlxd.example.vn', address:'KCN Sóng Thần, TP.Dĩ An, Bình Dương',
-    intro:'Nhà phân phối cấp 1 gạch Đồng Tâm, Viglacera — showroom 1.200m², hỗ trợ tính khối lượng theo bản vẽ.',
+    address:'TP.Dĩ An, Bình Dương',
+    intro:'Nhà phân phối vật liệu xây dựng — gạch ốp lát, xi măng — showroom 1.200m², hỗ trợ tính khối lượng theo bản vẽ.',
     priceList:[{item:'Gạch ốp 60x60 bóng kiếng',unit:'m²',price:285000},{item:'Xi măng PCB40',unit:'bao',price:92000}],
     gallery:[{url:img('03a')},{url:img('03b')}] },
-  'demo-04': { name:'Sơn Galaxy VN', category:'son_hoanthien', province:'HCM', tier:'featured', verified:true,
-    phone:'0909111004', zalo:'0909111004', website:null, address:'156 Cộng Hòa, Q.Tân Bình, TP.HCM',
-    intro:'Phân phối sơn nước Dulux, Jotun — tư vấn phối màu, giao toàn quốc.',
+  'demo-04': { name:'Sơn Hoàng Long Sài Gòn', category:'son_hoanthien', province:'HCM', tier:'featured', verified:true,
+    address:'Q.Tân Bình, TP.HCM',
+    intro:'Phân phối sơn nước các dòng phổ thông đến cao cấp — tư vấn phối màu, giao toàn quốc.',
     priceList:[{item:'Sơn nội thất 18L',unit:'thùng',price:1650000}], gallery:[{url:img('04a')}] },
-  'demo-05': { name:'Gạch Đồng Tâm HN', category:'gach_vlxd', province:'HN', tier:'featured', verified:true,
-    phone:'0909111005', zalo:'0909111005', website:null, address:'88 Phạm Văn Đồng, Q.Bắc Từ Liêm, Hà Nội',
-    intro:'Đại lý gạch ốp lát Đồng Tâm khu vực miền Bắc — giao toàn quốc.',
+  'demo-05': { name:'Gạch Ốp Lát Bắc Việt', category:'gach_vlxd', province:'HN', tier:'featured', verified:true,
+    address:'Q.Bắc Từ Liêm, Hà Nội',
+    intro:'Đại lý gạch ốp lát khu vực miền Bắc — giao toàn quốc.',
     priceList:[{item:'Gạch nền 80x80',unit:'m²',price:245000}], gallery:[{url:img('05a')}] },
-  'demo-06': { name:'Thiết bị điện Phú Hưng Sài Gòn', category:'dien_nuoc', province:'HCM', tier:'featured', verified:true,
-    phone:'0909111006', zalo:'0909111006', website:null, address:'320 Điện Biên Phủ, Q.Bình Thạnh, TP.HCM',
-    intro:'Thiết bị điện Panasonic, Schneider — bóc tách khối lượng M&E miễn phí từ hồ sơ thiết kế.',
-    priceList:[{item:'Aptomat Panasonic 20A',unit:'cái',price:145000}], gallery:[{url:img('06a')}] },
-  'demo-07': { name:'Đội thi công Thành Phát', category:'dv_thicong', province:'HCM', tier:'featured', verified:false,
-    phone:'0909111007', zalo:'0909111007', website:null, address:'88 Tô Ký, Q.12, TP.HCM',
+  'demo-06': { name:'Thiết Bị Điện Phú Hưng', category:'dien_nuoc', province:'HCM', tier:'featured', verified:true,
+    address:'Q.Bình Thạnh, TP.HCM',
+    intro:'Thiết bị điện dân dụng và công nghiệp — bóc tách khối lượng M&E miễn phí từ hồ sơ thiết kế.',
+    priceList:[{item:'Aptomat 20A',unit:'cái',price:145000}], gallery:[{url:img('06a')}] },
+  'demo-07': { name:'Đội Thi Công Thành Phát', category:'dv_thicong', province:'HCM', tier:'featured', verified:false,
+    address:'Q.12, TP.HCM',
     intro:'Nhóm thợ xây dựng trọn gói phần thô, nhân công lâu năm, nhận thi công theo bản vẽ kiến trúc.',
     priceList:[{item:'Nhân công xây tô',unit:'m²',price:320000}], gallery:[{url:img('07a')}] },
-  'demo-08': { name:'Xi măng Hà Tiên — NPP Quận 7', category:'gach_vlxd', province:'HCM', tier:'basic', verified:false,
-    phone:'0909111008', zalo:'0909111008', website:null, address:'Đường Nguyễn Lương Bằng, Q.7, TP.HCM',
-    intro:'Nhà phân phối xi măng Hà Tiên — giao trong ngày khu vực Q.7, Nhà Bè.',
-    priceList:[{item:'Xi măng Hà Tiên PCB40',unit:'bao',price:89000}], gallery:[{url:img('08a')}] },
-  'demo-09': { name:'Cát đá Tân Cang — Đồng Nai', category:'gach_vlxd', province:'DNai', tier:'basic', verified:false,
-    phone:'0909111009', zalo:'0909111009', website:null, address:'Tân Cang, TP.Biên Hòa, Đồng Nai',
+  'demo-08': { name:'VLXD Phương Nam', category:'gach_vlxd', province:'HCM', tier:'basic', verified:false,
+    address:'Q.7, TP.HCM',
+    intro:'Nhà phân phối vật liệu xây dựng — giao trong ngày khu vực Q.7, Nhà Bè.',
+    priceList:[{item:'Xi măng PCB40',unit:'bao',price:89000}], gallery:[{url:img('08a')}] },
+  'demo-09': { name:'Cát Đá Sông Đồng Nai', category:'gach_vlxd', province:'DNai', tier:'basic', verified:false,
+    address:'TP.Biên Hòa, Đồng Nai',
     intro:'Cát, đá xây dựng khai thác trực tiếp — bán theo vùng Đông Nam Bộ.',
     priceList:[{item:'Cát xây tô',unit:'m³',price:320000}], gallery:[{url:img('09a')}] },
-  'demo-10': { name:'Nội thất mây tre Phú Vinh', category:'go_noithat', province:'HN', tier:'basic', verified:false,
-    phone:'0909111010', zalo:'0909111010', website:null, address:'Làng nghề Phú Vinh, Chương Mỹ, Hà Nội',
-    intro:'Đồ mây tre đan làng nghề — sofa, đèn, bình phong phong cách indochine.',
+  'demo-10': { name:'Nội Thất Mây Tre An Bình', category:'go_noithat', province:'HN', tier:'basic', verified:false,
+    address:'Chương Mỹ, Hà Nội',
+    intro:'Đồ mây tre đan thủ công — sofa, đèn, bình phong phong cách indochine.',
     priceList:[{item:'Ghế mây đan',unit:'cái',price:1450000}], gallery:[{url:img('10a')}] },
-  'demo-11': { name:'Vận tải vật liệu Phát Lộc', category:'thietbi_vanchuyen', province:'DNai', tier:'basic', verified:true,
-    phone:'0909111011', zalo:'0909111011', website:null, address:'KCN Amata, TP.Biên Hòa, Đồng Nai',
+  'demo-11': { name:'Vận Tải Vật Liệu Phát Lộc', category:'thietbi_vanchuyen', province:'DNai', tier:'basic', verified:true,
+    address:'TP.Biên Hòa, Đồng Nai',
     intro:'Đội xe tải 1.5–15 tấn chuyên chở vật liệu xây dựng, giao hàng công trình toàn Đông Nam Bộ.',
     priceList:[{item:'Xe tải 5 tấn nội thành',unit:'chuyến',price:850000}], gallery:[{url:img('11a')}] },
-  'demo-12': { name:'Kính cường lực Nam Việt', category:'khac', province:'DNai', tier:'basic', verified:true,
-    phone:'0909111012', zalo:'0909111012', website:null, address:'KCN Long Bình, TP.Biên Hòa, Đồng Nai',
+  'demo-12': { name:'Kính Cường Lực Nam Việt', category:'khac', province:'DNai', tier:'basic', verified:true,
+    address:'TP.Biên Hòa, Đồng Nai',
     intro:'Kính cường lực, kính hộp, lan can kính — đo đạc tại công trình.',
     priceList:[{item:'Kính cường lực 10ly',unit:'m²',price:680000}], gallery:[{url:img('12a')}] },
-  'demo-13': { name:'Ống nhựa Đồng Tiến Tiền Giang', category:'dien_nuoc', province:'TG', tier:'basic', verified:false,
-    phone:'0909111013', zalo:'0909111013', website:null, address:'QL1A, TP.Mỹ Tho, Tiền Giang',
-    intro:'Ống uPVC, HDPE, phụ kiện cấp thoát nước — giao sỉ lẻ khu vực miền Tây.',
+  'demo-13': { name:'Ống Nhựa Miền Tây', category:'dien_nuoc', province:'TG', tier:'basic', verified:false,
+    address:'TP.Mỹ Tho, Tiền Giang',
+    intro:'Ống nhựa, phụ kiện cấp thoát nước — giao sỉ lẻ khu vực miền Tây.',
     priceList:[{item:'Ống HDPE D50',unit:'cây',price:62000}], gallery:[{url:img('13a')}] },
-  'demo-14': { name:'Sơn Nhật Minh TP.HCM', category:'son_hoanthien', province:'HCM', tier:'basic', verified:false,
-    phone:'0909111014', zalo:'0909111014', website:null, address:'156 Cộng Hòa, Q.Tân Bình, TP.HCM',
+  'demo-14': { name:'Sơn Nhật Minh', category:'son_hoanthien', province:'HCM', tier:'basic', verified:false,
+    address:'Q.Tân Bình, TP.HCM',
     intro:'Phân phối sơn nước và sơn giả đá, có đội ngũ thi công riêng.',
     priceList:[{item:'Sơn giả đá hiệu ứng',unit:'m²',price:185000}], gallery:[{url:img('14a')}] },
 };
@@ -436,6 +439,7 @@ function showNotFound(){
 
 function render(b){
   NCC = b;
+  window.NCC = b;
   document.getElementById('loadingState').style.display = 'none';
   document.getElementById('profileState').style.display = 'block';
 
@@ -445,6 +449,7 @@ function render(b){
   }
 
   var badges = '';
+  if (b.isDemo) badges += '<span class="badge" style="background:#f3f0e8;color:#6b5a2e;border:1px dashed #ccbd8a"><i class="ph-duotone ph-info"></i>Minh hoạ — chưa phải gian hàng thật</span>';
   if (b.tier === 'diamond') badges += '<span class="badge badge-diamond"><i class="ph-duotone ph-crown-simple"></i>Kim cương</span>';
   if (b.tier === 'featured') badges += '<span class="badge badge-featured"><i class="ph-duotone ph-star"></i>Nổi bật</span>';
   if (b.verified) badges += '<span class="badge badge-verified"><i class="ph-duotone ph-seal-check"></i>Đã xác minh ĐKKD</span>';
@@ -467,15 +472,19 @@ function render(b){
 
   /* 2) Liên hệ */
   var cg = document.getElementById('contactGrid');
-  var items = '';
-  if (b.phone) items += '<div class="contact-item"><i class="ph-duotone ph-phone"></i><a href="tel:' + escH(b.phone) + '">' + escH(b.phone) + '</a></div>';
-  if (b.zalo) items += '<div class="contact-item"><i class="ph-duotone ph-chat-circle-dots"></i><span>Zalo: ' + escH(b.zalo) + '</span></div>';
-  if (b.website) items += '<div class="contact-item"><i class="ph-duotone ph-globe"></i><a href="' + escH(b.website) + '" target="_blank" rel="noopener">' + escH(b.website.replace(/^https?:\/\//,'')) + '</a></div>';
-  if (b.address) items += '<div class="contact-item"><i class="ph-duotone ph-navigation-arrow"></i><a href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(b.address) + '" target="_blank" rel="noopener">Chỉ đường</a></div>';
-  cg.innerHTML = items || '<div class="contact-item">Chưa cập nhật thông tin liên hệ.</div>';
-  cg.querySelectorAll('a').forEach(function(a){
-    a.addEventListener('click', function(){ logLead(NCC_UID, 'contact_view'); });
-  });
+  if (b.isDemo) {
+    cg.innerHTML = '<div class="contact-item">Đây là gian hàng minh hoạ — chưa có thông tin liên hệ thật. Ví dụ giao diện trong lúc ALN mời thêm nhà cung cấp đăng ký.</div>';
+  } else {
+    var items = '';
+    if (b.phone) items += '<div class="contact-item"><i class="ph-duotone ph-phone"></i><a href="tel:' + escH(b.phone) + '">' + escH(b.phone) + '</a></div>';
+    if (b.zalo) items += '<div class="contact-item"><i class="ph-duotone ph-chat-circle-dots"></i><span>Zalo: ' + escH(b.zalo) + '</span></div>';
+    if (b.website) items += '<div class="contact-item"><i class="ph-duotone ph-globe"></i><a href="' + escH(b.website) + '" target="_blank" rel="noopener">' + escH(b.website.replace(/^https?:\/\//,'')) + '</a></div>';
+    if (b.address) items += '<div class="contact-item"><i class="ph-duotone ph-navigation-arrow"></i><a href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(b.address) + '" target="_blank" rel="noopener">Chỉ đường</a></div>';
+    cg.innerHTML = items || '<div class="contact-item">Chưa cập nhật thông tin liên hệ.</div>';
+    cg.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){ logLead(NCC_UID, 'contact_view'); });
+    });
+  }
 
   /* 3) Bảng giá */
   if (Array.isArray(b.priceList) && b.priceList.length) {
@@ -528,7 +537,7 @@ async function load(){
     document.getElementById('devBanner').innerHTML =
       '<div style="background:#fff3d6;border-bottom:1px solid #e8c877;color:#7a5410;font-size:12px;font-weight:700;text-align:center;padding:8px 14px">'
       + '⚠ Đang xem DỮ LIỆU MẪU (demo) để duyệt giao diện — không phải gian hàng thật.</div>';
-    var v = Object.assign({}, mock, { uid: NCC_UID });
+    var v = Object.assign({}, mock, { uid: NCC_UID, isDemo: true });
     render(v);
     return;
   }

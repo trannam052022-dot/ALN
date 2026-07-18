@@ -85,6 +85,10 @@ h1.sr-h1{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:h
 .fcard-meta{display:flex;align-items:center;justify-content:space-between;gap:6px}
 .verified-badge{display:inline-flex;align-items:center;gap:3px;font-size:var(--text-2xs);font-weight:700;color:var(--green);background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.25);border-radius:99px;padding:2px 9px}
 .lead-count{font-size:var(--text-2xs);color:var(--muted)}
+.demo-badge{display:inline-flex;align-items:center;gap:3px;font-size:var(--text-2xs);font-weight:700;color:#6b5a2e;background:#f3f0e8;border:1px dashed #ccbd8a;border-radius:99px;padding:2px 9px}
+.diamond-slide.is-demo,.fcard.is-demo{opacity:.88}
+.row-item.is-demo{background:repeating-linear-gradient(135deg,var(--white),var(--white) 10px,#faf8f2 10px,#faf8f2 20px)}
+.contact-btn.disabled{opacity:.5;cursor:default;pointer-events:none}
 /* TẤT CẢ GIAN HÀNG — hàng ngang */
 .list-head{display:flex;align-items:baseline;justify-content:space-between;margin:20px 0 10px}
 .list-head h2{font-family:var(--syne);font-size:var(--text-sm);font-weight:800;color:var(--text)}
@@ -206,79 +210,92 @@ var SERVICE_DISCLAIMER = 'ALN không phải bên cung cấp dịch vụ thi côn
    KHÔNG dùng màu sáng bão hoà lệch tông vàng đồng chủ đạo của ALN. */
 var AVATAR_COLORS = ['#98690a','#1d4ed8','#3a7a3e','#9b6ec9','#b45309','#2b7a8f','#5a7a5c','#8a4a3d'];
 
-/* ── DỮ LIỆU MẪU (chế độ xem thử ?demo=1) ──────────────────────
-   KHÔNG ghi vào Firestore — chỉ để xem trước giao diện lúc chưa có
-   NCC thật đăng ký. Ảnh dùng picsum.photos (placeholder ổn định
-   theo seed, không phải ảnh sản phẩm thật). Bật bằng URL
-   ncc-showcase.html?demo=1 — mặc định KHÔNG bật, người dùng thật
-   luôn thấy dữ liệu Firestore thật. */
+/* ── DỮ LIỆU MẪU ──────────────────────────────────────────────
+   Dùng 2 nơi:
+   (a) ?demo=1 — Founder xem TOÀN BỘ trang là mẫu để duyệt giao diện.
+   (b) SHOW_DEMO_FALLBACK — chế độ mặc định (18/07/2026), TRỘN thêm
+       gian hàng mẫu vào sau danh sách thật để trang đỡ trống trong
+       lúc chờ NCC đăng ký, mỗi thẻ có nhãn "Minh hoạ" phân biệt rõ.
+       TẮT bằng cách đổi SHOW_DEMO_FALLBACK = false khi đã đủ NCC thật
+       (không cần xoá dữ liệu này, chỉ cần đổi 1 dòng + push).
+   Tên/mô tả KHÔNG dùng thương hiệu thật (tránh hiểu nhầm ALN đại diện
+   hãng đó); KHÔNG có SĐT/Zalo/website (tránh khách gọi trúng số người
+   lạ); KHÔNG có alnProjects (tránh gắn dự án/KTS thật của hệ thống vào
+   gian hàng giả). Ảnh dùng picsum.photos (placeholder, không phải ảnh
+   sản phẩm thật). */
 function img(seed){ return 'https://picsum.photos/seed/ncc-' + seed + '/480/360'; }
+var SHOW_DEMO_FALLBACK = true;
 var MOCK_DATA = [
-  { uid:'demo-01', name:'Thép Hòa Phát — Đại lý cấp 1 Sài Gòn', category:'sat_thep', province:'HCM', tier:'diamond', verified:true,
-    phone:'0909111001', zalo:'0909111001', website:'https://thephoaphat-sg.example.vn', address:'Số 12 Quốc lộ 1A, Q.Bình Tân, TP.HCM',
-    intro:'Đại lý cấp 1 thép Hòa Phát — kho 5.000 tấn, giao công trình khu vực TP.HCM trong ngày.',
+  { uid:'demo-01', name:'Thép Kim Long Sài Gòn', category:'sat_thep', province:'HCM', tier:'diamond', verified:true,
+    address:'Q.Bình Tân, TP.HCM',
+    intro:'Đại lý thép xây dựng các loại — kho 5.000 tấn, giao công trình khu vực TP.HCM trong ngày.',
     priceList:[{item:'Thép hộp 40x80',unit:'kg',price:19500},{item:'Thép phi 10 (D10)',unit:'kg',price:18200}],
     gallery:[{url:img('01a')},{url:img('01b')},{url:img('01c')}], leadCount:312 },
-  { uid:'demo-02', name:'Gỗ Việt Nội Thất Đồng Nai', category:'go_noithat', province:'DNai', tier:'diamond', verified:true,
-    phone:'0909111002', zalo:'0909111002', website:'https://goviet-dnai.example.vn', address:'KCN Biên Hòa 2, TP.Biên Hòa, Đồng Nai',
-    intro:'Xưởng sản xuất tủ bếp, tủ áo theo thiết kế — gỗ công nghiệp An Cường, CNC theo bản vẽ KTS.',
+  { uid:'demo-02', name:'Nội Thất Gỗ An Khang', category:'go_noithat', province:'DNai', tier:'diamond', verified:true,
+    address:'TP.Biên Hòa, Đồng Nai',
+    intro:'Xưởng sản xuất tủ bếp, tủ áo theo thiết kế — gỗ công nghiệp phủ melamine, laminate, CNC theo bản vẽ KTS.',
     priceList:[{item:'Tủ bếp trên/dưới',unit:'md',price:3200000},{item:'Tủ áo cánh lùa',unit:'md',price:2800000}],
     gallery:[{url:img('02a')},{url:img('02b')}], leadCount:401 },
   { uid:'demo-03', name:'VLXD Đại Thành Bình Dương', category:'gach_vlxd', province:'BD', tier:'diamond', verified:true,
-    phone:'0909111003', zalo:'0909111003', website:'https://daithanh-vlxd.example.vn', address:'KCN Sóng Thần, TP.Dĩ An, Bình Dương',
-    intro:'Nhà phân phối cấp 1 gạch Đồng Tâm, Viglacera — showroom 1.200m², hỗ trợ tính khối lượng theo bản vẽ.',
+    address:'TP.Dĩ An, Bình Dương',
+    intro:'Nhà phân phối vật liệu xây dựng — gạch ốp lát, xi măng — showroom 1.200m², hỗ trợ tính khối lượng theo bản vẽ.',
     priceList:[{item:'Gạch ốp 60x60 bóng kiếng',unit:'m²',price:285000},{item:'Xi măng PCB40',unit:'bao',price:92000}],
     gallery:[{url:img('03a')},{url:img('03b')}], leadCount:278 },
-  { uid:'demo-04', name:'Sơn Galaxy VN', category:'son_hoanthien', province:'HCM', tier:'featured', verified:true,
-    phone:'0909111004', zalo:'0909111004', website:null, address:'156 Cộng Hòa, Q.Tân Bình, TP.HCM',
-    intro:'Phân phối sơn nước Dulux, Jotun — tư vấn phối màu, giao toàn quốc.',
+  { uid:'demo-04', name:'Sơn Hoàng Long Sài Gòn', category:'son_hoanthien', province:'HCM', tier:'featured', verified:true,
+    address:'Q.Tân Bình, TP.HCM',
+    intro:'Phân phối sơn nước các dòng phổ thông đến cao cấp — tư vấn phối màu, giao toàn quốc.',
     priceList:[{item:'Sơn nội thất 18L',unit:'thùng',price:1650000}], gallery:[{url:img('04a')}], leadCount:128 },
-  { uid:'demo-05', name:'Gạch Đồng Tâm HN', category:'gach_vlxd', province:'HN', tier:'featured', verified:true,
-    phone:'0909111005', zalo:'0909111005', website:null, address:'88 Phạm Văn Đồng, Q.Bắc Từ Liêm, Hà Nội',
-    intro:'Đại lý gạch ốp lát Đồng Tâm khu vực miền Bắc — giao toàn quốc.',
+  { uid:'demo-05', name:'Gạch Ốp Lát Bắc Việt', category:'gach_vlxd', province:'HN', tier:'featured', verified:true,
+    address:'Q.Bắc Từ Liêm, Hà Nội',
+    intro:'Đại lý gạch ốp lát khu vực miền Bắc — giao toàn quốc.',
     priceList:[{item:'Gạch nền 80x80',unit:'m²',price:245000}], gallery:[{url:img('05a')}], leadCount:94 },
-  { uid:'demo-06', name:'Thiết bị điện Phú Hưng Sài Gòn', category:'dien_nuoc', province:'HCM', tier:'featured', verified:true,
-    phone:'0909111006', zalo:'0909111006', website:null, address:'320 Điện Biên Phủ, Q.Bình Thạnh, TP.HCM',
-    intro:'Thiết bị điện Panasonic, Schneider — bóc tách khối lượng M&E miễn phí từ hồ sơ thiết kế.',
-    priceList:[{item:'Aptomat Panasonic 20A',unit:'cái',price:145000}], gallery:[{url:img('06a')}], leadCount:76 },
-  { uid:'demo-07', name:'Đội thi công Thành Phát', category:'dv_thicong', province:'HCM', tier:'featured', verified:false,
-    phone:'0909111007', zalo:'0909111007', website:null, address:'88 Tô Ký, Q.12, TP.HCM',
+  { uid:'demo-06', name:'Thiết Bị Điện Phú Hưng', category:'dien_nuoc', province:'HCM', tier:'featured', verified:true,
+    address:'Q.Bình Thạnh, TP.HCM',
+    intro:'Thiết bị điện dân dụng và công nghiệp — bóc tách khối lượng M&E miễn phí từ hồ sơ thiết kế.',
+    priceList:[{item:'Aptomat 20A',unit:'cái',price:145000}], gallery:[{url:img('06a')}], leadCount:76 },
+  { uid:'demo-07', name:'Đội Thi Công Thành Phát', category:'dv_thicong', province:'HCM', tier:'featured', verified:false,
+    address:'Q.12, TP.HCM',
     intro:'Nhóm thợ xây dựng trọn gói phần thô, nhân công lâu năm, nhận thi công theo bản vẽ kiến trúc.',
     priceList:[{item:'Nhân công xây tô',unit:'m²',price:320000}], gallery:[{url:img('07a')}], leadCount:52 },
-  { uid:'demo-08', name:'Xi măng Hà Tiên — NPP Quận 7', category:'gach_vlxd', province:'HCM', tier:'basic', verified:false,
-    phone:'0909111008', zalo:'0909111008', website:null, address:'Đường Nguyễn Lương Bằng, Q.7, TP.HCM',
-    intro:'Nhà phân phối xi măng Hà Tiên — giao trong ngày khu vực Q.7, Nhà Bè.',
-    priceList:[{item:'Xi măng Hà Tiên PCB40',unit:'bao',price:89000}], gallery:[{url:img('08a')}] },
-  { uid:'demo-09', name:'Cát đá Tân Cang — Đồng Nai', category:'gach_vlxd', province:'DNai', tier:'basic', verified:false,
-    phone:'0909111009', zalo:'0909111009', website:null, address:'Tân Cang, TP.Biên Hòa, Đồng Nai',
+  { uid:'demo-08', name:'VLXD Phương Nam', category:'gach_vlxd', province:'HCM', tier:'basic', verified:false,
+    address:'Q.7, TP.HCM',
+    intro:'Nhà phân phối vật liệu xây dựng — giao trong ngày khu vực Q.7, Nhà Bè.',
+    priceList:[{item:'Xi măng PCB40',unit:'bao',price:89000}], gallery:[{url:img('08a')}] },
+  { uid:'demo-09', name:'Cát Đá Sông Đồng Nai', category:'gach_vlxd', province:'DNai', tier:'basic', verified:false,
+    address:'TP.Biên Hòa, Đồng Nai',
     intro:'Cát, đá xây dựng khai thác trực tiếp — bán theo vùng Đông Nam Bộ.',
     priceList:[{item:'Cát xây tô',unit:'m³',price:320000}], gallery:[{url:img('09a')}] },
-  { uid:'demo-10', name:'Nội thất mây tre Phú Vinh', category:'go_noithat', province:'HN', tier:'basic', verified:false,
-    phone:'0909111010', zalo:'0909111010', website:null, address:'Làng nghề Phú Vinh, Chương Mỹ, Hà Nội',
-    intro:'Đồ mây tre đan làng nghề — sofa, đèn, bình phong phong cách indochine.',
+  { uid:'demo-10', name:'Nội Thất Mây Tre An Bình', category:'go_noithat', province:'HN', tier:'basic', verified:false,
+    address:'Chương Mỹ, Hà Nội',
+    intro:'Đồ mây tre đan thủ công — sofa, đèn, bình phong phong cách indochine.',
     priceList:[{item:'Ghế mây đan',unit:'cái',price:1450000}], gallery:[{url:img('10a')}] },
-  { uid:'demo-11', name:'Vận tải vật liệu Phát Lộc', category:'thietbi_vanchuyen', province:'DNai', tier:'basic', verified:true,
-    phone:'0909111011', zalo:'0909111011', website:null, address:'KCN Amata, TP.Biên Hòa, Đồng Nai',
+  { uid:'demo-11', name:'Vận Tải Vật Liệu Phát Lộc', category:'thietbi_vanchuyen', province:'DNai', tier:'basic', verified:true,
+    address:'TP.Biên Hòa, Đồng Nai',
     intro:'Đội xe tải 1.5–15 tấn chuyên chở vật liệu xây dựng, giao hàng công trình toàn Đông Nam Bộ.',
     priceList:[{item:'Xe tải 5 tấn nội thành',unit:'chuyến',price:850000}], gallery:[{url:img('11a')}] },
-  { uid:'demo-12', name:'Kính cường lực Nam Việt', category:'khac', province:'DNai', tier:'basic', verified:true,
-    phone:'0909111012', zalo:'0909111012', website:null, address:'KCN Long Bình, TP.Biên Hòa, Đồng Nai',
+  { uid:'demo-12', name:'Kính Cường Lực Nam Việt', category:'khac', province:'DNai', tier:'basic', verified:true,
+    address:'TP.Biên Hòa, Đồng Nai',
     intro:'Kính cường lực, kính hộp, lan can kính — đo đạc tại công trình.',
     priceList:[{item:'Kính cường lực 10ly',unit:'m²',price:680000}], gallery:[{url:img('12a')}] },
-  { uid:'demo-13', name:'Ống nhựa Đồng Tiến Tiền Giang', category:'dien_nuoc', province:'TG', tier:'basic', verified:false,
-    phone:'0909111013', zalo:'0909111013', website:null, address:'QL1A, TP.Mỹ Tho, Tiền Giang',
-    intro:'Ống uPVC, HDPE, phụ kiện cấp thoát nước — giao sỉ lẻ khu vực miền Tây.',
+  { uid:'demo-13', name:'Ống Nhựa Miền Tây', category:'dien_nuoc', province:'TG', tier:'basic', verified:false,
+    address:'TP.Mỹ Tho, Tiền Giang',
+    intro:'Ống nhựa, phụ kiện cấp thoát nước — giao sỉ lẻ khu vực miền Tây.',
     priceList:[{item:'Ống HDPE D50',unit:'cây',price:62000}], gallery:[{url:img('13a')}] },
-  { uid:'demo-14', name:'Sơn Nhật Minh TP.HCM', category:'son_hoanthien', province:'HCM', tier:'basic', verified:false,
-    phone:'0909111014', zalo:'0909111014', website:null, address:'156 Cộng Hòa, Q.Tân Bình, TP.HCM',
+  { uid:'demo-14', name:'Sơn Nhật Minh', category:'son_hoanthien', province:'HCM', tier:'basic', verified:false,
+    address:'Q.Tân Bình, TP.HCM',
     intro:'Phân phối sơn nước và sơn giả đá, có đội ngũ thi công riêng.',
     priceList:[{item:'Sơn giả đá hiệu ứng',unit:'m²',price:185000}], gallery:[{url:img('14a')}] },
-];
+].map(function(m){ return Object.assign({}, m, { isDemo: true, phone: null, zalo: null, website: null }); });
+
 var IS_DEMO = new URLSearchParams(location.search).get('demo') === '1';
 if (IS_DEMO) {
   document.getElementById('demoBanner').innerHTML =
     '<div style="background:#fff3d6;border-bottom:1px solid #e8c877;color:#7a5410;font-size:12px;font-weight:700;text-align:center;padding:8px 14px">'
     + '⚠ Đang xem DỮ LIỆU MẪU (demo) để duyệt giao diện — không phải gian hàng thật, chưa ghi vào Firestore.</div>';
+} else if (SHOW_DEMO_FALLBACK) {
+  document.getElementById('demoBanner').innerHTML =
+    '<div style="background:#f3f0e8;border-bottom:1px solid #ddd2b0;color:#6b5a2e;font-size:11px;text-align:center;padding:6px 14px">'
+    + 'Một số gian hàng đánh dấu <b>"Minh hoạ"</b> là ví dụ giao diện, chưa phải nhà cung cấp thật — ALN đang mời thêm NCC đăng ký.</div>';
 }
 
 var FILTER = 'all';
@@ -338,8 +355,8 @@ function renderProvSelect(){
   sel.addEventListener('change', function(){ PROV = sel.value; renderAll(); });
 }
 
-function profileUrl(uid){
-  return 'ncc_profile.html?uid=' + escH(uid) + (IS_DEMO ? '&demo=1' : '');
+function profileUrl(b){
+  return 'ncc_profile.html?uid=' + escH(b.uid) + ((IS_DEMO || b.isDemo) ? '&demo=1' : '');
 }
 
 function matchesFilter(b){
@@ -362,7 +379,7 @@ function bindContactBtn(root){
       ev.preventDefault(); ev.stopPropagation();
       var uid = btn.getAttribute('data-uid');
       var b = ALL.filter(function(x){ return x.uid === uid; })[0];
-      if (!b) return;
+      if (!b || b.isDemo) return; // gian hàng minh hoạ — không có liên hệ thật, không ghi lead giả
       var row = btn.closest('.row-item');
       var existing = row.querySelector('.contact-reveal');
       if (existing) { existing.style.display = existing.style.display === 'none' ? 'flex' : 'none'; return; }
@@ -382,8 +399,9 @@ function renderDiamond(items){
   if (!items.length){ sec.style.display = 'none'; return; }
   sec.style.display = 'block';
   document.getElementById('diamondTrack').innerHTML = items.map(function(b, i){
-    return '<a class="diamond-slide' + (i===0?' active':'') + '" href="' + profileUrl(b.uid) + '" data-i="' + i + '">'
+    return '<a class="diamond-slide' + (i===0?' active':'') + (b.isDemo?' is-demo':'') + '" href="' + profileUrl(b) + '" data-i="' + i + '">'
       + '<span class="diamond-badge">Kim cương</span>'
+      + (b.isDemo ? '<span class="demo-badge" style="position:absolute;top:16px;left:16px">Minh hoạ</span>' : '')
       + '<div class="diamond-eyebrow">Gian hàng Kim cương · ' + escH((CATS[b.category]||{}).label || '') + '</div>'
       + '<div class="diamond-name">' + escH(b.name || '') + '</div>'
     + '</a>';
@@ -413,10 +431,10 @@ function renderFeatured(items){
   if (!items.length){ sec.style.display = 'none'; return; }
   sec.style.display = 'block';
   document.getElementById('featuredGrid').innerHTML = items.map(function(b){
-    return '<a class="fcard" href="' + profileUrl(b.uid) + '">'
+    return '<a class="fcard' + (b.isDemo?' is-demo':'') + '" href="' + profileUrl(b) + '">'
       + '<div class="fcard-top">' + avatarHtml(b) + '<div style="min-width:0"><div class="fcard-name">' + escH(b.name || 'Gian hàng') + '</div><div class="fcard-loc">' + escH(PROV_NAME[b.province] || b.province || '') + '</div></div></div>'
       + '<div class="fcard-meta">'
-        + (b.verified ? '<span class="verified-badge"><i class="ph-duotone ph-seal-check"></i>Đã xác minh</span>' : '<span></span>')
+        + (b.isDemo ? '<span class="demo-badge">Minh hoạ</span>' : (b.verified ? '<span class="verified-badge"><i class="ph-duotone ph-seal-check"></i>Đã xác minh</span>' : '<span></span>'))
         + (typeof b.leadCount === 'number' ? '<span class="lead-count">' + b.leadCount + ' lượt liên hệ</span>' : '')
       + '</div>'
     + '</a>';
@@ -431,12 +449,14 @@ function renderBasic(items){
   document.getElementById('listHeadCount').textContent = items.length + ' nhà cung cấp';
   var list = document.getElementById('basicList');
   list.innerHTML = items.map(function(b){
-    return '<div class="row-item">'
+    return '<div class="row-item' + (b.isDemo?' is-demo':'') + '">'
       + avatarHtml(b)
-      + '<div class="row-info"><div class="row-name">' + escH(b.name || 'Gian hàng') + '</div>'
+      + '<div class="row-info"><div class="row-name">' + escH(b.name || 'Gian hàng') + (b.isDemo ? ' <span class="demo-badge">Minh hoạ</span>' : '') + '</div>'
         + '<div class="row-sub">' + escH(PROV_NAME[b.province] || b.province || '') + (b.intro || b.bio ? ' · ' + escH(b.intro || b.bio) : '') + '</div></div>'
-      + '<a href="' + profileUrl(b.uid) + '" class="contact-btn" style="text-decoration:none"><i class="ph-duotone ph-storefront"></i>Xem gian hàng</a>'
-      + '<button class="contact-btn" data-uid="' + escH(b.uid) + '"><i class="ph-duotone ph-phone"></i>Xem liên hệ</button>'
+      + '<a href="' + profileUrl(b) + '" class="contact-btn" style="text-decoration:none"><i class="ph-duotone ph-storefront"></i>Xem gian hàng</a>'
+      + (b.isDemo
+          ? '<button class="contact-btn disabled" disabled title="Gian hàng minh hoạ — chưa có liên hệ thật"><i class="ph-duotone ph-phone"></i>Xem liên hệ</button>'
+          : '<button class="contact-btn" data-uid="' + escH(b.uid) + '"><i class="ph-duotone ph-phone"></i>Xem liên hệ</button>')
     + '</div>';
   }).join('');
   bindContactBtn(list);
@@ -471,6 +491,7 @@ async function loadAll(){
     console.warn('[ncc-showcase]', e && e.message);
     ALL = [];
   }
+  if (SHOW_DEMO_FALLBACK) ALL = ALL.concat(MOCK_DATA); // gian hàng thật luôn đứng trước, mẫu bổ sung phía sau
   document.getElementById('loadState').style.display = 'none';
   document.getElementById('sections').style.display = 'block';
   renderAll();
