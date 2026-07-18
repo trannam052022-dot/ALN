@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hợp đồng điện tử (bản nháp) — Founder ALN</title>
+<link rel="stylesheet" href="aln-tokens.css">
+<style>
+:root{
+  --bg:#080c14;
+  --card:rgba(14,20,34,.88);
+  --border:rgba(255,255,255,.08);
+  --border-g:rgba(201,168,76,.2);
+  --text:#dce6f4;
+  --text2:#9aaac4;
+  --muted:#8090ae;
+  --gold:#c9a84c;
+  --gold2:#e8d07a;
+  --green:#10b981;
+  --red:#ef4444;
+  --blue:#4a8fff;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:1rem;line-height:1.6;min-height:100vh}
+.page{max-width:980px;margin:0 auto;padding:32px 20px 80px}
+.demo-banner{background:rgba(201,168,76,.1);border:1px solid var(--border-g);border-radius:var(--r);padding:10px 16px;font-size:.8rem;color:var(--gold2);margin-bottom:24px;text-align:center}
+h1{font-size:1.4rem;margin-bottom:4px}
+.sub{color:var(--muted);font-size:.82rem;margin-bottom:24px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:20px}
+label{display:block;font-size:.78rem;color:var(--muted);margin:12px 0 4px}
+label:first-child{margin-top:0}
+input,select,textarea{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--text);font:inherit}
+textarea{resize:vertical;min-height:60px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:640px){.row2{grid-template-columns:1fr}}
+button{font:inherit;cursor:pointer;border:none;border-radius:8px;padding:10px 16px;font-weight:600;font-size:.85rem}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1406}
+.btn-outline{background:transparent;border:1px solid var(--border-g);color:var(--gold2)}
+.btn-outline:hover{background:rgba(201,168,76,.08)}
+.btn-sm{padding:6px 12px;font-size:.78rem}
+.msg{font-size:.82rem;margin-top:10px}
+.msg-ok{color:var(--green)}
+.msg-err{color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.72rem;font-weight:600}
+.st-draft,.st-sent,.st-viewed{background:rgba(154,170,196,.15);color:var(--text2)}
+.st-otp_pending{background:rgba(201,168,76,.15);color:var(--gold2)}
+.st-signed_partyB{background:rgba(74,143,255,.15);color:var(--blue)}
+.st-signed_all{background:rgba(16,185,129,.15);color:var(--green)}
+.actions-cell{display:flex;gap:6px;flex-wrap:wrap}
+.timeline{margin-top:10px;padding:12px;background:rgba(255,255,255,.02);border-radius:8px;font-size:.78rem;color:var(--text2);display:none}
+.timeline-row{padding:4px 0;border-bottom:1px dashed var(--border)}
+.timeline-row:last-child{border-bottom:none}
+#loginCard{max-width:360px;margin:80px auto}
+#loginCard input{margin-bottom:12px}
+#appRoot{display:none}
+.link-box{display:flex;gap:8px;margin-top:6px}
+.link-box input{flex:1;font-size:.78rem}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="demo-banner">BẢN NHÁP — quản lý contracts_draft. Không đụng dữ liệu production (projects/users...). Chỉ Founder truy cập được.</div>
+
+  <div id="loginCard" class="card">
+    <h1>Đăng nhập Founder</h1>
+    <p class="sub">Trang nháp Hợp đồng điện tử</p>
+    <label>Username</label>
+    <input id="loginUser" placeholder="founder.tranlong">
+    <label>Mật khẩu</label>
+    <input id="loginPass" type="password">
+    <button class="btn-gold" style="width:100%;margin-top:8px" onclick="onLoginClick()">Đăng nhập</button>
+    <div class="msg msg-err" id="loginMsg"></div>
+  </div>
+
+  <div id="appRoot">
+    <h1>Hợp đồng điện tử — Bản nháp</h1>
+    <p class="sub">Founder tạo hợp đồng → gửi Bên B ký OTP → theo dõi trạng thái + audit log.</p>
+
+    <div class="card">
+      <h2 style="font-size:1rem;margin-bottom:4px">Tạo hợp đồng mới</h2>
+      <label>Loại hợp đồng</label>
+      <select id="cType" onchange="onTypeChange()">
+        <option value="ktsCollaborator">Cộng tác viên Kiến trúc sư</option>
+        <option value="businessClient">Doanh nghiệp hợp tác</option>
+        <option value="homeowner">Chủ nhà</option>
+      </select>
+
+      <label>Username Bên B (tuỳ chọn — tự điền nếu đã có tài khoản ALN)</label>
+      <div class="row2">
+        <div style="flex:2">
+          <input id="bUsername" placeholder="kts.tranlong / dn.tkhouse / cn.trannam...">
+        </div>
+        <div style="flex:0 0 auto">
+          <button class="btn-outline btn-sm" style="height:100%" onclick="onLookupUsername()">Tra cứu</button>
+        </div>
+      </div>
+      <div class="msg" id="bLookupMsg"></div>
+
+      <div class="row2">
+        <div>
+          <label>Tên Bên B</label>
+          <input id="bName" placeholder="Nguyễn Văn A">
+        </div>
+        <div>
+          <label>CMND/CCCD/MST</label>
+          <input id="bIdNumber">
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label>SĐT Bên B</label>
+          <input id="bPhone" placeholder="09xxxxxxxx">
+        </div>
+        <div>
+          <label>Email Bên B (tuỳ chọn)</label>
+          <input id="bEmail" type="email">
+        </div>
+      </div>
+      <label>Mã dự án liên kết (projects/{pid}, tuỳ chọn — tự điền thông tin dự án + Bên B tương ứng)</label>
+      <div class="row2">
+        <div style="flex:2">
+          <input id="cProjectId" placeholder="ALN-9921">
+        </div>
+        <div style="flex:0 0 auto">
+          <button class="btn-outline btn-sm" style="height:100%" onclick="onLookupProject()">Tra cứu dự án</button>
+        </div>
+      </div>
+      <div class="msg" id="projLookupMsg"></div>
+
+      <div id="fieldsKts">
+        <label>Tên dự án</label>
+        <input id="k_projectName">
+        <label>Tên chủ đầu tư (khách hàng của dự án)</label>
+        <input id="k_investorName" placeholder="Chủ nhà hoặc Doanh nghiệp của dự án">
+        <div class="row2">
+          <div><label>Địa chỉ dự án</label><input id="k_projectAddress"></div>
+          <div><label>Tỷ lệ thù lao (%)</label><input id="k_feePercent" type="number"></div>
+        </div>
+        <label>Phạm vi công việc</label>
+        <textarea id="k_scopeOfWork"></textarea>
+        <div class="row2">
+          <div><label>Ngày bắt đầu</label><input id="k_startDate" type="date"></div>
+          <div><label>Thời gian dự kiến (ngày)</label><input id="k_estimatedDurationDays" type="number"></div>
+        </div>
+      </div>
+
+      <div id="fieldsBiz" style="display:none">
+        <div class="row2">
+          <div><label>Mã số thuế doanh nghiệp</label><input id="z_businessTaxId"></div>
+          <div><label>Chức danh người đại diện</label><input id="z_businessRepTitle"></div>
+        </div>
+        <label>Phạm vi hợp tác</label>
+        <textarea id="z_cooperationScope"></textarea>
+        <div class="row2">
+          <div><label>Hoa hồng (%)</label><input id="z_commissionPercent" type="number"></div>
+          <div><label>Thời hạn hợp tác (tháng)</label><input id="z_cooperationDurationMonths" type="number"></div>
+        </div>
+      </div>
+
+      <div id="fieldsHome" style="display:none">
+        <label>Địa chỉ dự án</label>
+        <input id="h_projectAddress">
+        <div class="row2">
+          <div><label>Gói thiết kế</label><input id="h_designPackage" placeholder="Biệt thự vườn tân cổ điển"></div>
+          <div><label>Thời gian dự kiến (ngày)</label><input id="h_estimatedDurationDays" type="number"></div>
+        </div>
+        <div class="row2">
+          <div><label>Tổng giá trị hợp đồng (đ)</label><input id="h_totalFee" type="number"></div>
+          <div><label>Quỹ bảo đảm chặng C1 (đ)</label><input id="h_escrowAmount" type="number"></div>
+        </div>
+      </div>
+
+      <button class="btn-gold" style="margin-top:16px" onclick="onCreateClick()">Tạo hợp đồng (bản nháp)</button>
+      <div class="msg" id="createMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:1rem;margin-bottom:12px">Danh sách hợp đồng</h2>
+      <button class="btn-outline btn-sm" onclick="reloadList()">↻ Tải lại</button>
+      <div style="overflow-x:auto;margin-top:12px">
+        <table>
+          <thead>
+            <tr><th>Loại</th><th>Bên B</th><th>Trạng thái</th><th>Cập nhật</th><th>Thao tác</th></tr>
+          </thead>
+          <tbody id="listBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Scope thường — KHÔNG dùng optional chaining (?.) hay object shorthand.
+
+var TYPE_LABELS = {
+  ktsCollaborator: 'CTV Kiến trúc sư',
+  businessClient: 'Doanh nghiệp',
+  homeowner: 'Chủ nhà'
+};
+
+var STATUS_LABELS = {
+  draft: 'Bản nháp',
+  sent: 'Đã gửi',
+  viewed: 'Đã xem',
+  otp_pending: 'Chờ OTP',
+  signed_partyB: 'B đã ký',
+  signed_all: 'Đã ký đủ',
+  liquidated: 'Đã thanh lý',
+  cancelled: 'Đã huỷ'
+};
+
+var ACTION_LABELS = {
+  created: 'Tạo hợp đồng',
+  sent: 'Gửi cho Bên B',
+  viewed: 'Bên B xem hợp đồng',
+  otp_requested: 'Yêu cầu mã OTP',
+  otp_verified: 'Xác thực OTP thành công',
+  signed: 'Đã ký',
+  liquidated: 'Thanh lý hợp đồng'
+};
+
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function onLoginClick() {
+  var user = document.getElementById('loginUser').value.trim();
+  var pass = document.getElementById('loginPass').value;
+  document.getElementById('loginMsg').textContent = '';
+  window.alnDoLogin(user, pass);
+}
+
+function onTypeChange() {
+  var type = document.getElementById('cType').value;
+  document.getElementById('fieldsKts').style.display = type === 'ktsCollaborator' ? 'block' : 'none';
+  document.getElementById('fieldsBiz').style.display = type === 'businessClient' ? 'block' : 'none';
+  document.getElementById('fieldsHome').style.display = type === 'homeowner' ? 'block' : 'none';
+}
+
+function val(id) { return document.getElementById(id).value.trim(); }
+
+function collectContractData(type) {
+  if (type === 'ktsCollaborator') {
+    return {
+      projectName: val('k_projectName'),
+      investorName: val('k_investorName'),
+      projectAddress: val('k_projectAddress'),
+      feePercent: val('k_feePercent'),
+      scopeOfWork: val('k_scopeOfWork'),
+      startDate: val('k_startDate'),
+      estimatedDurationDays: val('k_estimatedDurationDays')
+    };
+  }
+  if (type === 'businessClient') {
+    return {
+      businessTaxId: val('z_businessTaxId'),
+      businessRepTitle: val('z_businessRepTitle'),
+      cooperationScope: val('z_cooperationScope'),
+      commissionPercent: val('z_commissionPercent'),
+      cooperationDurationMonths: val('z_cooperationDurationMonths')
+    };
+  }
+  return {
+    projectAddress: val('h_projectAddress'),
+    designPackage: val('h_designPackage'),
+    estimatedDurationDays: val('h_estimatedDurationDays'),
+    totalFee: val('h_totalFee'),
+    escrowAmount: val('h_escrowAmount')
+  };
+}
+
+function renderUserLookup(found, data) {
+  var msg = document.getElementById('bLookupMsg');
+  if (!found) {
+    msg.className = 'msg msg-err';
+    msg.textContent = 'Không tìm thấy tài khoản ALN với username này.';
+    return;
+  }
+  msg.className = 'msg msg-ok';
+  msg.textContent = 'Đã điền theo tài khoản: ' + data.name + ' (' + data.role + ')' + (data.phone ? '' : ' — chưa có SĐT lưu sẵn, nhập tay giúp.');
+  document.getElementById('bName').value = data.name || '';
+  if (data.phone) document.getElementById('bPhone').value = data.phone;
+  if (data.email && data.email.indexOf('@aln.vn') === -1) document.getElementById('bEmail').value = data.email;
+}
+
+function renderProjectLookup(found, project) {
+  var msg = document.getElementById('projLookupMsg');
+  if (!found) {
+    msg.className = 'msg msg-err';
+    msg.textContent = 'Không tìm thấy dự án với mã này.';
+    return;
+  }
+  msg.className = 'msg msg-ok';
+  msg.textContent = 'Đã điền theo dự án: ' + project.name;
+  var type = document.getElementById('cType').value;
+  if (type === 'ktsCollaborator') {
+    document.getElementById('k_projectName').value = project.name || '';
+    var investor = (project.cn && project.cn.name) || (project.dn && project.dn.name) || '';
+    document.getElementById('k_investorName').value = investor;
+    document.getElementById('k_projectAddress').value = project.address || '';
+  } else if (type === 'homeowner') {
+    document.getElementById('h_projectAddress').value = project.address || '';
+    if (project.totalFee) document.getElementById('h_totalFee').value = project.totalFee;
+    if (project.escrow) document.getElementById('h_escrowAmount').value = project.escrow;
+  }
+}
+
+function renderPartyBFromProject(data) {
+  if (!data) return;
+  document.getElementById('bUsername').value = data.username || '';
+  document.getElementById('bName').value = data.name || '';
+  if (data.phone) document.getElementById('bPhone').value = data.phone;
+  if (data.email && data.email.indexOf('@aln.vn') === -1) document.getElementById('bEmail').value = data.email;
+}
+
+function onLookupUsername() {
+  var username = val('bUsername');
+  var msg = document.getElementById('bLookupMsg');
+  if (!username) {
+    msg.className = 'msg msg-err';
+    msg.textContent = 'Nhập username trước.';
+    return;
+  }
+  msg.className = 'msg';
+  msg.textContent = 'Đang tra cứu…';
+  window.alnLookupUsername(username);
+}
+
+function onLookupProject() {
+  var pid = val('cProjectId');
+  var msg = document.getElementById('projLookupMsg');
+  if (!pid) {
+    msg.className = 'msg msg-err';
+    msg.textContent = 'Nhập mã dự án trước.';
+    return;
+  }
+  msg.className = 'msg';
+  msg.textContent = 'Đang tra cứu…';
+  window.alnLookupProject(pid);
+}
+
+function onCreateClick() {
+  var type = document.getElementById('cType').value;
+  var partyB = {
+    name: val('bName'),
+    idNumber: val('bIdNumber'),
+    phone: val('bPhone'),
+    email: val('bEmail')
+  };
+  var msgBox = document.getElementById('createMsg');
+  if (!partyB.name || !partyB.phone) {
+    msgBox.className = 'msg msg-err';
+    msgBox.textContent = 'Nhập tên và SĐT Bên B.';
+    return;
+  }
+  msgBox.className = 'msg';
+  msgBox.textContent = 'Đang tạo…';
+  window.alnCreateContract({
+    type: type,
+    partyB: partyB,
+    projectId: val('cProjectId') || null,
+    contractData: collectContractData(type)
+  });
+}
+
+function reloadList() { window.alnListContracts(); }
+
+function renderList(items) {
+  var body = document.getElementById('listBody');
+  body.innerHTML = '';
+  for (var i = 0; i < items.length; i++) {
+    var c = items[i];
+    var tr = document.createElement('tr');
+    var updated = c.updatedAt && c.updatedAt.seconds ? new Date(c.updatedAt.seconds * 1000).toLocaleString('vi-VN') : '—';
+    var signLink = window.location.href.replace('founder_contracts_draft.html', 'contract-sign_draft.html') + '?id=' + c.contractId;
+
+    var actionsHtml = '';
+    if (c.status === 'draft') {
+      actionsHtml += '<button class="btn-outline btn-sm" onclick="window.alnSendContract(\'' + c.contractId + '\')">Gửi Bên B</button>';
+    }
+    actionsHtml += '<button class="btn-outline btn-sm" onclick="window.alnConfirmA(\'' + c.contractId + '\')">Xác nhận Bên A</button>';
+    actionsHtml += '<button class="btn-outline btn-sm" onclick="toggleTimeline(\'' + c.contractId + '\')">Timeline</button>';
+
+    tr.innerHTML =
+      '<td>' + (TYPE_LABELS[c.type] || c.type) + '</td>' +
+      '<td>' + escapeHtml(c.partyB && c.partyB.name) + '<br><span style="color:var(--muted);font-size:.75rem">' + escapeHtml(c.partyB && c.partyB.phone) + '</span></td>' +
+      '<td><span class="badge st-' + c.status + '">' + (STATUS_LABELS[c.status] || c.status) + '</span></td>' +
+      '<td>' + updated + '</td>' +
+      '<td><div class="actions-cell">' + actionsHtml + '</div>' +
+      '<div class="link-box"><input readonly value="' + escapeHtml(signLink) + '" onclick="this.select()"></div>' +
+      '<div class="timeline" id="tl-' + c.contractId + '"></div></td>';
+    body.appendChild(tr);
+  }
+  if (items.length === 0) {
+    body.innerHTML = '<tr><td colspan="5" style="color:var(--muted)">Chưa có hợp đồng nào.</td></tr>';
+  }
+}
+
+function toggleTimeline(contractId) {
+  var box = document.getElementById('tl-' + contractId);
+  if (box.style.display === 'block') { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  box.textContent = 'Đang tải…';
+  window.alnGetAuditLog(contractId);
+}
+
+function renderTimeline(contractId, items) {
+  var box = document.getElementById('tl-' + contractId);
+  if (!box) return;
+  var html = '';
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    var ts = it.timestamp && it.timestamp.seconds ? new Date(it.timestamp.seconds * 1000).toLocaleString('vi-VN') : '—';
+    var label = ACTION_LABELS[it.action] || it.action;
+    if (it.party) label += ' (Bên ' + it.party + ')';
+    html += '<div class="timeline-row">' + ts + ' — ' + escapeHtml(label) + '</div>';
+  }
+  box.innerHTML = html || 'Chưa có nhật ký.';
+}
+</script>
+
+<script type="module">
+import {
+  app, auth, db, usernameToEmail, signInWithEmailAndPassword, onAuthStateChanged,
+  doc, getDoc, collection, query, where, getDocs
+} from './firebase-config.js';
+import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+
+var FOUNDER_UID = 'h4kEguPEyMcwJwl89stc0Q6j2si2';
+var fns = getFunctions(app, 'asia-southeast1');
+// TẠM THỜI — test qua Firebase Emulator local. Xoá khối if này khi lên production.
+if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+  connectFunctionsEmulator(fns, location.hostname, 5001);
+}
+
+window.alnDoLogin = async function (username, password) {
+  try {
+    await signInWithEmailAndPassword(auth, usernameToEmail(username), password);
+  } catch (e) {
+    document.getElementById('loginMsg').textContent = 'Đăng nhập thất bại: ' + (e.message || e);
+  }
+};
+
+/* users/{uid} không có SĐT cho role kts/dn/designer (SĐT nằm ở *Applications/{uid})
+   — chỉ role cn có sẵn users.phone (xem register.html). */
+async function fetchPartyInfo(uid, userData) {
+  var phone = userData.phone || '';
+  if (!phone) {
+    var appCol = userData.role === 'kts' ? 'ktsApplications'
+      : userData.role === 'dn' ? 'dnApplications'
+      : userData.role === 'designer' ? 'designerApplications'
+      : null;
+    if (appCol) {
+      try {
+        var appSnap = await getDoc(doc(db, appCol, uid));
+        if (appSnap.exists()) phone = appSnap.data().phone || '';
+      } catch (e) { /* Founder vẫn tạo hợp đồng được, chỉ là thiếu gợi ý SĐT */ }
+    }
+  }
+  return {
+    uid: uid, username: userData.username || '', name: userData.name || '',
+    role: userData.role || '', email: userData.email || '', phone: phone
+  };
+}
+
+window.alnLookupUsername = async function (username) {
+  try {
+    var q = query(collection(db, 'users'), where('username', '==', username));
+    var snap = await getDocs(q);
+    if (snap.empty) { window.renderUserLookup(false); return; }
+    var uDoc = snap.docs[0];
+    var data = await fetchPartyInfo(uDoc.id, uDoc.data());
+    window.renderUserLookup(true, data);
+  } catch (e) {
+    var msg = document.getElementById('bLookupMsg');
+    msg.className = 'msg msg-err';
+    msg.textContent = 'Lỗi tra cứu: ' + (e.message || e);
+  }
+};
+
+window.alnLookupProject = async function (pid) {
+  try {
+    var snap = await getDoc(doc(db, 'projects', pid));
+    if (!snap.exists()) { window.renderProjectLookup(false); return; }
+    var p = snap.data();
+    window.renderProjectLookup(true, p);
+
+    var type = document.getElementById('cType').value;
+    var party = type === 'ktsCollaborator' ? p.kts : type === 'businessClient' ? p.dn : type === 'homeowner' ? p.cn : null;
+    if (party && party.uid) {
+      var uSnap = await getDoc(doc(db, 'users', party.uid));
+      var userData = uSnap.exists() ? uSnap.data() : { name: party.name, username: party.username, role: '' };
+      var data = await fetchPartyInfo(party.uid, userData);
+      window.renderPartyBFromProject(data);
+    }
+  } catch (e) {
+    var pmsg = document.getElementById('projLookupMsg');
+    pmsg.className = 'msg msg-err';
+    pmsg.textContent = 'Lỗi tra cứu: ' + (e.message || e);
+  }
+};
+
+onAuthStateChanged(auth, function (user) {
+  if (user && user.uid === FOUNDER_UID) {
+    document.getElementById('loginCard').style.display = 'none';
+    document.getElementById('appRoot').style.display = 'block';
+    window.alnListContracts();
+  } else {
+    document.getElementById('loginCard').style.display = 'block';
+    document.getElementById('appRoot').style.display = 'none';
+    if (user && user.uid !== FOUNDER_UID) {
+      document.getElementById('loginMsg').textContent = 'Tài khoản này không phải Founder.';
+    }
+  }
+});
+
+window.alnCreateContract = async function (payload) {
+  try {
+    var fn = httpsCallable(fns, 'draftCreateContract');
+    await fn(payload);
+    document.getElementById('createMsg').className = 'msg msg-ok';
+    document.getElementById('createMsg').textContent = 'Đã tạo hợp đồng.';
+    window.alnListContracts();
+  } catch (e) {
+    document.getElementById('createMsg').className = 'msg msg-err';
+    document.getElementById('createMsg').textContent = 'Lỗi: ' + (e.message || e);
+  }
+};
+
+window.alnSendContract = async function (contractId) {
+  try {
+    var fn = httpsCallable(fns, 'draftSendContract');
+    await fn({ contractId: contractId });
+    window.alnListContracts();
+  } catch (e) {
+    alert('Lỗi gửi hợp đồng: ' + (e.message || e));
+  }
+};
+
+window.alnConfirmA = async function (contractId) {
+  try {
+    var fn = httpsCallable(fns, 'draftConfirmPartyA');
+    await fn({ contractId: contractId });
+    window.alnListContracts();
+  } catch (e) {
+    alert('Lỗi xác nhận Bên A: ' + (e.message || e));
+  }
+};
+
+window.alnListContracts = async function () {
+  try {
+    var fn = httpsCallable(fns, 'draftListContracts');
+    var res = await fn();
+    window.renderList(res.data.items || []);
+  } catch (e) {
+    document.getElementById('listBody').innerHTML = '<tr><td colspan="5" style="color:var(--red)">Lỗi tải danh sách: ' + (e.message || e) + '</td></tr>';
+  }
+};
+
+window.alnGetAuditLog = async function (contractId) {
+  try {
+    var fn = httpsCallable(fns, 'draftGetAuditLog');
+    var res = await fn({ contractId: contractId });
+    window.renderTimeline(contractId, res.data.items || []);
+  } catch (e) {
+    window.renderTimeline(contractId, []);
+  }
+};
+</script>
+</body>
+</html>
