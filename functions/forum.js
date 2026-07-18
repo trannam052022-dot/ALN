@@ -79,7 +79,7 @@ const NCC_CATEGORIES = ["vat_lieu"];
 const CATEGORY_VISIBILITY = {
   hoi_kts:       "public",
   hoi_dap:       "kts",
-  vat_lieu:      "kts",
+  vat_lieu:      "public", // 18/07/2026: mở công khai — NCC cần khách vãng lai xem được giá/thảo luận (đúng tinh thần Gian hàng NCC, E1/E3)
   showcase:      "public",
   nghe:          "kts",
   bang_tin:      "public",
