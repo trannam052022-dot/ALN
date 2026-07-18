@@ -127,12 +127,13 @@ window.nccLogout = async function(){
 
 function markDirty(){ dirty = true; const b = document.getElementById('btnSave'); if(b) b.disabled = false; }
 
-/* Chỉ nhận link YouTube/TikTok https — tránh link rác/độc hại lên trang public */
+/* Chỉ nhận link YouTube/TikTok/Facebook https — tránh link rác/độc hại lên trang public */
 function isValidVideoUrl(u){
   if(!/^https:\/\//.test(u)) return false;
   try {
     const host = new URL(u).hostname.replace(/^www\./, '');
-    return ['youtube.com', 'youtu.be', 'm.youtube.com', 'tiktok.com', 'vt.tiktok.com', 'vm.tiktok.com'].indexOf(host) !== -1;
+    return ['youtube.com', 'youtu.be', 'm.youtube.com', 'tiktok.com', 'vt.tiktok.com', 'vm.tiktok.com',
+            'facebook.com', 'm.facebook.com', 'fb.watch'].indexOf(host) !== -1;
   } catch(e){ return false; }
 }
 
@@ -140,15 +141,18 @@ function videosHtml(){
   const videos = Array.isArray(DATA.videos) ? DATA.videos : [];
   let html = videos.map(function(u, i){
     const isYt = /youtu/.test(u);
+    const isFb = /facebook\.com|fb\.watch/.test(u);
+    const icon = isYt ? 'ph-youtube-logo' : isFb ? 'ph-facebook-logo' : 'ph-tiktok-logo';
+    const color = isYt ? '#ff0000' : isFb ? '#1877f2' : 'var(--text)';
     return '<div class="pdf-row" style="margin-bottom:8px">'
-      + '<i class="ph-duotone ' + (isYt ? 'ph-youtube-logo' : 'ph-tiktok-logo') + '" style="color:' + (isYt ? '#ff0000' : 'var(--text)') + '"></i>'
+      + '<i class="ph-duotone ' + icon + '" style="color:' + color + '"></i>'
       + '<span class="pdf-name">' + escH(u) + '</span>'
       + '<button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="removeVideo(' + i + ')">Gỡ</button>'
     + '</div>';
   }).join('');
   if(videos.length < MAX_VIDEOS){
     html += '<div style="display:flex;gap:8px;margin-top:4px">'
-      + '<input type="url" id="videoInput" placeholder="https://youtube.com/... hoặc https://tiktok.com/..." style="flex:1;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;background:rgba(255,255,255,.025);color:var(--text);font-size:12px;font-family:var(--mono);outline:none">'
+      + '<input type="url" id="videoInput" placeholder="https://youtube.com/... · tiktok.com/... · facebook.com/..." style="flex:1;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;background:rgba(255,255,255,.025);color:var(--text);font-size:12px;font-family:var(--mono);outline:none">'
       + '<button class="btn btn-ghost btn-sm" onclick="addVideo()"><i class="ph-duotone ph-plus"></i>Thêm</button>'
     + '</div>';
   }
@@ -227,7 +231,7 @@ function render(){
 
     + '<div class="card">'
       + '<div class="card-title"><i class="ph-duotone ph-video"></i>Video giới thiệu</div>'
-      + '<div class="hint">Dán link video YouTube hoặc TikTok của bạn (tối đa ' + MAX_VIDEOS + ' video) — video phát ngay trên trang gian hàng, người xem cũng có thể ghé kênh của bạn.</div>'
+      + '<div class="hint">Dán link video YouTube, TikTok hoặc Facebook của bạn (tối đa ' + MAX_VIDEOS + ' video) — video phát ngay trên trang gian hàng, người xem cũng có thể ghé kênh của bạn. Lưu ý: video Facebook phải để chế độ <b>Công khai</b> mới phát được.</div>'
       + videosHtml()
     + '</div>'
 

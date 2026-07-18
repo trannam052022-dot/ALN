@@ -173,8 +173,17 @@ async function load(){
     if(m) return '<div class="video-item yt"><iframe src="https://www.youtube.com/embed/' + m[1] + '" allowfullscreen loading="lazy" title="Video gian hàng"></iframe></div>';
     m = String(u).match(/tiktok\.com\/@[^\/]+\/video\/(\d{6,25})/);
     if(m) return '<div class="video-item tt"><iframe src="https://www.tiktok.com/embed/v2/' + m[1] + '" allowfullscreen loading="lazy" title="Video gian hàng"></iframe></div>';
-    if(/^https:\/\/(www\.)?(youtube\.com|youtu\.be|m\.youtube\.com|tiktok\.com|vt\.tiktok\.com|vm\.tiktok\.com)\//.test(u)){
-      return '<a class="video-link" href="' + escH(u) + '" target="_blank" rel="noopener"><i class="ph-duotone ph-play-circle" style="font-size:22px;color:var(--gold)"></i>Xem video trên ' + (/youtu/.test(u) ? 'YouTube' : 'TikTok') + '</a>';
+    /* Facebook: player nhúng chính thức plugins/video.php — URL gốc được
+       encodeURIComponent toàn bộ vào tham số href (an toàn injection).
+       CHỈ video để chế độ Công khai mới phát được. Reel dựng khung dọc. */
+    m = String(u).match(/^https:\/\/(?:www\.|m\.)?facebook\.com\/(?:watch\/?\?v=\d+|reel\/\d+|[\w.]+\/videos\/\d+)/);
+    if(m){
+      var isReel = /\/reel\//.test(u);
+      return '<div class="video-item ' + (isReel ? 'tt' : 'yt') + '"><iframe src="https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(m[0]) + '&show_text=false" allowfullscreen loading="lazy" title="Video gian hàng"></iframe></div>';
+    }
+    if(/^https:\/\/(www\.|m\.)?(youtube\.com|youtu\.be|tiktok\.com|vt\.tiktok\.com|vm\.tiktok\.com|facebook\.com|fb\.watch)\//.test(u)){
+      var srcName = /youtu/.test(u) ? 'YouTube' : /facebook\.com|fb\.watch/.test(u) ? 'Facebook' : 'TikTok';
+      return '<a class="video-link" href="' + escH(u) + '" target="_blank" rel="noopener"><i class="ph-duotone ph-play-circle" style="font-size:22px;color:var(--gold)"></i>Xem video trên ' + srcName + '</a>';
     }
     return '';
   }
