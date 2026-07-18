@@ -20,7 +20,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta property="og:description" content="Xem ảnh sản phẩm, catalog và liên hệ trực tiếp các nhà cung cấp vật liệu xây dựng trên App Làm Nhà.">
 <meta property="og:image" content="https://applamnha.vn/assets/demo/aln-demo-biet-thu-vuon.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
 <link rel="stylesheet" href="aln-tokens.css">
 <style>
@@ -29,10 +29,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   --border:#e1e7ee;--border2:#c9d3de;
   --text:#1a2634;--text2:#3d4b5c;--sub:#5b6b7f;--muted:#93a1b3;
   --gold:#98690a;--gold2:#b8860b;--gold-bg:rgba(152,105,10,.09);
-  --green:#16a34a;--blue:#4a8fff;
+  --green:#16a34a;--blue:#4a8fff;--blue-bg:#eef4ff;
   --r:14px;--r-sm:8px;--sh:0 1px 3px rgba(15,30,60,.06);
-  --mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;
-  --serif:'Cormorant Garamond',serif;--syne:'Syne',sans-serif;
+  --mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;--syne:'Syne',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:13px}
@@ -42,66 +41,64 @@ body{font-family:var(--sans);background:var(--cream);color:var(--text);min-heigh
 a{color:var(--gold);text-decoration:none}
 .topbar{background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
 .tb-logo-box{background:linear-gradient(135deg,rgba(152,105,10,.14),rgba(184,134,11,.08));color:var(--gold);padding:4px 12px;border-radius:var(--r-sm);border:1.5px solid rgba(152,105,10,.3);font-family:var(--syne);font-size:11px;font-weight:800;letter-spacing:.07em}
-.tb-page{font-family:var(--serif);font-weight:600;font-style:italic;font-size:15px;color:var(--text)}
+.tb-page{font-family:var(--syne);font-weight:700;font-size:13px;color:var(--text)}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 .tb-link{display:inline-flex;align-items:center;gap:5px;font-size:var(--text-xs);color:var(--sub);font-weight:600}
-.hero{text-align:center;padding:34px 16px 8px}
-.hero h1{font-family:var(--serif);font-weight:600;font-size:var(--text-2xl);color:var(--text)}
-.hero h1 em{font-style:italic;color:var(--gold2)}
-.hero p{font-size:var(--text-sm);color:var(--sub);max-width:560px;margin:8px auto 0}
-.wrap{max-width:1040px;margin:0 auto;padding:18px 16px 70px}
-.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-bottom:8px}
-.search-box{position:relative;min-width:220px;flex:1;max-width:320px}
-.search-box input{width:100%;padding:8px 14px 8px 32px;border-radius:99px;border:1px solid var(--border2);background:var(--white);color:var(--text);font-family:var(--sans);font-size:var(--text-xs);outline:none}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 70px}
+h1.sr-h1{font-size:var(--text-lg);font-family:var(--syne);font-weight:800;color:var(--text);margin-bottom:12px}
+/* TOOLBAR: search + khu vực */
+.toolbar{display:flex;gap:8px;margin-bottom:16px}
+.search-box{position:relative;flex:1}
+.search-box input{width:100%;padding:10px 14px 10px 36px;border-radius:12px;border:1px solid var(--border2);background:var(--white);color:var(--text);font-family:var(--sans);font-size:var(--text-sm);outline:none}
 .search-box input:focus{border-color:var(--gold)}
-.search-box i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px}
-.prov-select{padding:7px 14px;border-radius:99px;border:1px solid var(--border2);background:var(--white);color:var(--text2);font-family:var(--sans);font-size:var(--text-xs);font-weight:700;cursor:pointer}
-.filters{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 18px;justify-content:center}
-.ftab{padding:7px 16px;border-radius:99px;border:1px solid var(--border2);background:var(--white);color:var(--sub);font-family:var(--sans);font-size:var(--text-xs);font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
-.ftab.active{background:var(--text);border-color:var(--text);color:#fff}
-.svc-disclaimer{max-width:640px;margin:0 auto 18px;font-size:var(--text-xs);color:var(--gold2);background:var(--gold-bg);border:1px solid rgba(152,105,10,.25);border-radius:9px;padding:9px 14px;text-align:center;line-height:1.6}
-.sec-block{margin-bottom:26px}
-.sec-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.sec-head i{color:var(--gold);font-size:18px}
-.sec-head h2{font-family:var(--syne);font-size:var(--text-md);font-weight:800;color:var(--text)}
-.sec-head span{font-size:var(--text-2xs);color:var(--muted);font-weight:600}
-/* KIM CƯƠNG — carousel */
-.diamond-wrap{position:relative;border-radius:var(--r);overflow:hidden;box-shadow:0 8px 28px rgba(15,30,60,.12)}
-.diamond-track{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1)}
-.diamond-slide{min-width:100%;background:linear-gradient(120deg,#1a2634,#2d4058);color:#fff;display:grid;grid-template-columns:1fr 1fr;min-height:190px}
-.diamond-img{background:#0f1c2c;overflow:hidden}
-.diamond-img img{width:100%;height:100%;object-fit:cover;display:block}
-.diamond-body{padding:22px 24px;display:flex;flex-direction:column;justify-content:center}
-.diamond-badge{display:inline-flex;align-items:center;gap:5px;font-size:var(--text-2xs);font-weight:800;color:#ffd875;margin-bottom:8px}
-.diamond-name{font-family:var(--syne);font-size:var(--text-lg);font-weight:800;line-height:1.25;margin-bottom:6px}
-.diamond-intro{font-size:var(--text-xs);color:rgba(255,255,255,.72);line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.diamond-cta{display:inline-flex;align-items:center;gap:6px;font-size:var(--text-xs);font-weight:700;color:#0a0a10;background:#e8d07a;padding:8px 16px;border-radius:8px;width:fit-content}
-.diamond-dots{display:flex;gap:6px;justify-content:center;padding:10px 0;background:var(--white)}
+.search-box i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px}
+.prov-select{padding:10px 14px;border-radius:12px;border:1px solid var(--border2);background:var(--white);color:var(--text2);font-family:var(--sans);font-size:var(--text-sm);font-weight:600;cursor:pointer;max-width:150px}
+/* DIAMOND BANNER — 1 slide, dạng thẻ */
+.diamond-wrap{margin-bottom:20px}
+.diamond-track{position:relative;border-radius:var(--r);overflow:hidden}
+.diamond-slide{display:none;background:linear-gradient(120deg,var(--blue-bg),#e4ecfb);border:1px solid rgba(74,143,255,.2);border-radius:var(--r);padding:18px 20px;position:relative}
+.diamond-slide.active{display:block}
+.diamond-eyebrow{font-size:var(--text-2xs);font-weight:700;color:var(--sub)}
+.diamond-name{font-family:var(--syne);font-size:var(--text-md);font-weight:800;color:var(--text);margin-top:4px}
+.diamond-badge{position:absolute;top:16px;right:16px;font-size:var(--text-2xs);font-weight:700;background:var(--white);color:var(--blue);border:1px solid rgba(74,143,255,.3);border-radius:99px;padding:4px 11px}
+.diamond-dots{display:flex;gap:6px;justify-content:center;margin-top:10px}
 .diamond-dot{width:7px;height:7px;border-radius:50%;background:var(--border2);border:none;cursor:pointer;padding:0}
-.diamond-dot.active{background:var(--gold)}
-@media(max-width:640px){.diamond-slide{grid-template-columns:1fr}.diamond-img{height:140px}}
-/* NỔI BẬT — grid card viền vàng */
-.featured-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.fcard{background:var(--white);border:1.5px solid rgba(152,105,10,.3);border-radius:var(--r);box-shadow:0 2px 10px rgba(152,105,10,.08);overflow:hidden;display:block;color:inherit;position:relative}
-.fcard-img{height:130px;background:var(--cream2);overflow:hidden}
-.fcard-img img{width:100%;height:100%;object-fit:cover}
-/* CƠ BẢN — grid thường */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
-.booth{background:var(--white);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;transition:transform .2s,box-shadow .2s;display:block;color:inherit}
-.booth:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(15,30,60,.1)}
-.booth-img{height:130px;background:var(--cream2);display:flex;align-items:center;justify-content:center;overflow:hidden}
-.booth-img img{width:100%;height:100%;object-fit:cover}
-.booth-img i{font-size:36px;color:var(--muted)}
-.booth-body{padding:13px 15px}
-.booth-name{font-family:var(--syne);font-size:var(--text-sm);font-weight:800;color:var(--text);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.booth-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.chip{display:inline-flex;align-items:center;gap:4px;font-size:var(--text-2xs);font-weight:700;padding:2px 9px;border-radius:99px;background:var(--gold-bg);border:1px solid rgba(152,105,10,.28);color:var(--gold)}
-.chip.blue{background:rgba(74,143,255,.08);border-color:rgba(74,143,255,.3);color:var(--blue)}
-.chip.green{background:rgba(22,163,74,.08);border-color:rgba(22,163,74,.3);color:var(--green)}
-.booth-bio{font-size:var(--text-xs);color:var(--sub);line-height:1.5;margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.contact-btn{width:100%;margin-top:10px;padding:7px;border-radius:7px;border:1px dashed var(--border2);background:transparent;color:var(--gold);font-family:var(--sans);font-size:var(--text-2xs);font-weight:700;cursor:pointer}
-.contact-btn:hover{border-color:var(--gold);background:var(--gold-bg)}
-.contact-reveal{margin-top:8px;font-size:var(--text-xs);background:var(--cream2);border-radius:7px;padding:8px 10px;display:flex;flex-direction:column;gap:3px}
+.diamond-dot.active{background:var(--blue);width:16px;border-radius:4px;transition:width .2s}
+/* KHU NGÀNH HÀNG — icon row */
+.sec-title{font-family:var(--syne);font-size:var(--text-sm);font-weight:800;color:var(--text);margin:20px 0 12px}
+.zone-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:6px}
+@media(min-width:520px){.zone-row{grid-template-columns:repeat(8,1fr)}}
+.zone-btn{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;cursor:pointer;padding:4px 2px}
+.zone-icon{width:46px;height:46px;border-radius:13px;background:var(--white);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--sub);transition:all .15s}
+.zone-btn.active .zone-icon{background:var(--text);border-color:var(--text);color:#fff}
+.zone-label{font-size:var(--text-2xs);color:var(--sub);font-weight:600;text-align:center;line-height:1.3}
+.zone-btn.active .zone-label{color:var(--text);font-weight:800}
+.svc-disclaimer{font-size:var(--text-xs);color:var(--gold2);background:var(--gold-bg);border:1px solid rgba(152,105,10,.25);border-radius:9px;padding:9px 14px;line-height:1.6;margin-bottom:16px}
+/* NỔI BẬT — card avatar */
+.featured-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+@media(max-width:420px){.featured-grid{grid-template-columns:1fr}}
+.fcard{background:var(--white);border:1px solid var(--border2);border-radius:12px;padding:13px 14px;display:block;color:inherit}
+.fcard-top{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.avatar{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--syne);font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+.fcard-name{font-size:var(--text-sm);font-weight:800;color:var(--text);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fcard-loc{font-size:var(--text-2xs);color:var(--muted)}
+.fcard-meta{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.verified-badge{display:inline-flex;align-items:center;gap:3px;font-size:var(--text-2xs);font-weight:700;color:var(--green);background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.25);border-radius:99px;padding:2px 9px}
+.lead-count{font-size:var(--text-2xs);color:var(--muted)}
+/* TẤT CẢ GIAN HÀNG — hàng ngang */
+.list-head{display:flex;align-items:baseline;justify-content:space-between;margin:20px 0 10px}
+.list-head h2{font-family:var(--syne);font-size:var(--text-sm);font-weight:800;color:var(--text)}
+.list-head span{font-size:var(--text-2xs);color:var(--muted);font-weight:600}
+.row-list{display:flex;flex-direction:column;gap:8px}
+.row-item{display:flex;align-items:center;gap:11px;background:var(--white);border:1px solid var(--border);border-radius:11px;padding:11px 13px}
+.row-item .avatar{width:38px;height:38px;border-radius:9px;font-size:12px}
+.row-info{flex:1;min-width:0}
+.row-name{font-size:var(--text-sm);font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-sub{font-size:var(--text-2xs);color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.contact-btn{flex-shrink:0;padding:7px 13px;border-radius:8px;border:1px solid var(--border2);background:var(--cream2);color:var(--text2);font-family:var(--sans);font-size:var(--text-2xs);font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.contact-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-bg)}
+.contact-reveal{margin-top:8px;font-size:var(--text-xs);background:var(--cream2);border-radius:7px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;width:100%}
+.row-item.has-reveal{flex-wrap:wrap}
 .empty{text-align:center;padding:60px 20px;color:var(--muted)}
 .empty i{font-size:44px;display:block;margin-bottom:12px}
 .cta-ncc{margin-top:28px;text-align:center;background:var(--white);border:1px dashed var(--border2);border-radius:var(--r);padding:24px}
@@ -109,7 +106,7 @@ a{color:var(--gold);text-decoration:none}
 .btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:9px;font-family:var(--syne);font-size:var(--text-sm);font-weight:700;cursor:pointer;border:none;text-decoration:none;background:var(--gold);color:#fff;transition:all .2s}
 .btn:hover{background:var(--gold2)}
 .disclaimer{font-size:var(--text-xs);color:var(--muted);text-align:center;margin-top:20px;line-height:1.6}
-@media(prefers-reduced-motion:reduce){.diamond-track{transition:none}.booth,.contact-btn{transition:none}}
+@media(prefers-reduced-motion:reduce){.diamond-dot{transition:none}}
 </style>
 <!-- Google Analytics 4 (ALN — G-5CSL1TF0RC, tách riêng khỏi property TK.HOUSE) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-5CSL1TF0RC"></script>
@@ -137,38 +134,37 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </nav>
 
-<header class="hero">
-  <h1>Gian hàng <em>Vật liệu ALN</em></h1>
-  <p>Sắt thép · Gỗ &amp; nội thất · Gạch &amp; VLXD · Sơn hoàn thiện · Điện nước · Dịch vụ thi công · Thiết bị &amp; vận chuyển — xem sản phẩm, catalog và liên hệ trực tiếp nhà cung cấp</p>
-</header>
-
 <div class="wrap">
+  <h1 class="sr-h1">Gian hàng Vật liệu ALN — sắt thép, gỗ nội thất, gạch, sơn, điện nước, dịch vụ thi công</h1>
+
   <div class="toolbar">
-    <div class="search-box"><i class="ph-duotone ph-magnifying-glass"></i><input type="text" id="searchBox" placeholder="Tìm tên gian hàng…"></div>
+    <div class="search-box"><i class="ph-duotone ph-magnifying-glass"></i><input type="text" id="searchBox" placeholder="Tìm vật tư, nhà cung cấp…"></div>
     <select class="prov-select" id="provSelect"></select>
   </div>
-  <div class="filters" id="filters"></div>
+
+  <div class="diamond-wrap" id="diamondSec" style="display:none">
+    <div class="diamond-track" id="diamondTrack"></div>
+    <div class="diamond-dots" id="diamondDots"></div>
+  </div>
+
+  <div class="sec-title"><i class="ph-duotone ph-squares-four" style="color:var(--gold)"></i> Khu ngành hàng</div>
+  <div class="zone-row" id="zoneRow"></div>
   <div class="svc-disclaimer" id="svcDisclaimer" style="display:none"></div>
 
   <div id="loadState" class="empty"><i class="ph-duotone ph-spinner-gap"></i>Đang tải gian hàng…</div>
   <div id="sections" style="display:none">
 
-    <div class="sec-block" id="diamondSec" style="display:none">
-      <div class="sec-head"><i class="ph-duotone ph-crown-simple"></i><h2>Gian hàng Kim cương</h2><span>Đối tác nổi bật nhất</span></div>
-      <div class="diamond-wrap">
-        <div class="diamond-track" id="diamondTrack"></div>
-      </div>
-      <div class="diamond-dots" id="diamondDots"></div>
-    </div>
-
-    <div class="sec-block" id="featuredSec" style="display:none">
-      <div class="sec-head"><i class="ph-duotone ph-star"></i><h2>Gian hàng Nổi bật</h2></div>
+    <div id="featuredSec" style="display:none">
+      <div class="sec-title"><i class="ph-duotone ph-star" style="color:var(--gold)"></i> Gian hàng nổi bật</div>
       <div class="featured-grid" id="featuredGrid"></div>
     </div>
 
-    <div class="sec-block" id="basicSec" style="display:none">
-      <div class="sec-head"><i class="ph-duotone ph-squares-four"></i><h2>Gian hàng khác</h2></div>
-      <div class="grid" id="basicGrid"></div>
+    <div id="basicSec" style="display:none">
+      <div class="list-head">
+        <h2 id="listHeadTitle">Tất cả gian hàng</h2>
+        <span id="listHeadCount"></span>
+      </div>
+      <div class="row-list" id="basicList"></div>
     </div>
 
     <div class="empty" id="emptyState" style="display:none"><i class="ph-duotone ph-storefront"></i>Chưa có gian hàng nào phù hợp bộ lọc.<br>Bạn là nhà cung cấp? Đăng ký mở gian hàng ngay bên dưới!</div>
@@ -193,7 +189,6 @@ import { db, collection, query, where, getDocs, limit, addDoc, serverTimestamp }
 
 var PROV_NAME = {HCM:'TP.HCM',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'BR–Vũng Tàu',LA:'Long An',TG:'Tiền Giang',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TH:'Thanh Hóa',OTHER:'Tỉnh khác'};
 var CATS = {
-  all:               { label: 'Tất cả',                icon: 'ph-squares-four' },
   sat_thep:          { label: 'Sắt, thép',              icon: 'ph-barbell' },
   go_noithat:        { label: 'Gỗ, nội thất',           icon: 'ph-tree' },
   gach_vlxd:         { label: 'Gạch, VLXD',              icon: 'ph-wall' },
@@ -203,9 +198,9 @@ var CATS = {
   thietbi_vanchuyen: { label: 'Thiết bị & vận chuyển',   icon: 'ph-truck' },
   khac:              { label: 'Khác',                    icon: 'ph-package' },
 };
-var CAT_ICON = {sat_thep:'ph-barbell',go_noithat:'ph-tree',gach_vlxd:'ph-wall',son_hoanthien:'ph-paint-roller',dien_nuoc:'ph-plug',dv_thicong:'ph-hard-hat',thietbi_vanchuyen:'ph-truck',khac:'ph-package'};
 var SERVICE_CATS = ['dv_thicong', 'thietbi_vanchuyen'];
 var SERVICE_DISCLAIMER = 'ALN không phải bên cung cấp dịch vụ thi công/vận chuyển, không giám sát thực hiện và không chịu trách nhiệm về chất lượng, an toàn lao động và thiệt hại phát sinh. Quý khách giao kết trực tiếp với nhà cung cấp.';
+var AVATAR_COLORS = ['#4a8fff','#e0568c','#16a34a','#b8860b','#7c3aed','#dc6b19','#0891b2','#c2410c'];
 
 var FILTER = 'all';
 var PROV = 'all';
@@ -221,15 +216,31 @@ function logLead(nccUid, type, extra){
     if (window.gtag) window.gtag('event', 'ncc_contact_view', { ncc_uid: nccUid });
   } catch(e){ console.warn('[ncc-lead]', e && e.message); }
 }
-window.logLead = logLead;
 
-function renderFilters(){
-  document.getElementById('filters').innerHTML = Object.keys(CATS).map(function(k){
-    return '<button class="ftab' + (FILTER === k ? ' active' : '') + '" data-cat="' + k + '">'
-      + '<i class="ph-duotone ' + CATS[k].icon + '"></i>' + escH(CATS[k].label) + '</button>';
+function initials(name){
+  var parts = (name || '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '?';
+  if (parts.length === 1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+}
+function avatarColor(uid){
+  var h = 0;
+  for (var i=0;i<(uid||'').length;i++) h = (h*31 + uid.charCodeAt(i)) >>> 0;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+function avatarHtml(b, size){
+  return '<div class="avatar" style="background:' + avatarColor(b.uid) + (size?';width:'+size+'px;height:'+size+'px':'') + '">' + escH(initials(b.name)) + '</div>';
+}
+
+function renderZones(){
+  var allBtn = '<button class="zone-btn' + (FILTER==='all'?' active':'') + '" data-cat="all">'
+    + '<span class="zone-icon"><i class="ph-duotone ph-squares-four"></i></span><span class="zone-label">Tất cả</span></button>';
+  document.getElementById('zoneRow').innerHTML = allBtn + Object.keys(CATS).map(function(k){
+    return '<button class="zone-btn' + (FILTER===k?' active':'') + '" data-cat="' + k + '">'
+      + '<span class="zone-icon"><i class="ph-duotone ' + CATS[k].icon + '"></i></span><span class="zone-label">' + escH(CATS[k].label) + '</span></button>';
   }).join('');
-  document.querySelectorAll('.ftab').forEach(function(btn){
-    btn.addEventListener('click', function(){ FILTER = btn.getAttribute('data-cat'); renderFilters(); renderAll(); });
+  document.querySelectorAll('.zone-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ FILTER = btn.getAttribute('data-cat'); renderZones(); renderAll(); });
   });
   var svc = document.getElementById('svcDisclaimer');
   if (SERVICE_CATS.indexOf(FILTER) !== -1) {
@@ -242,7 +253,7 @@ function renderFilters(){
 
 function renderProvSelect(){
   var sel = document.getElementById('provSelect');
-  sel.innerHTML = '<option value="all">Tất cả tỉnh thành</option>' + Object.keys(PROV_NAME).map(function(k){
+  sel.innerHTML = '<option value="all">Toàn quốc</option>' + Object.keys(PROV_NAME).map(function(k){
     return '<option value="' + escH(k) + '">' + escH(PROV_NAME[k]) + '</option>';
   }).join('');
   sel.addEventListener('change', function(){ PROV = sel.value; renderAll(); });
@@ -253,12 +264,6 @@ function matchesFilter(b){
   if (PROV !== 'all' && b.province !== PROV) return false;
   if (SEARCH && (b.name || '').toLowerCase().indexOf(SEARCH) === -1) return false;
   return true;
-}
-
-function thumbHtml(b){
-  return (Array.isArray(b.gallery) && b.gallery[0] && b.gallery[0].url)
-    ? '<img src="' + escH(b.gallery[0].url) + '" alt="' + escH(b.name || '') + '" loading="lazy">'
-    : '<i class="ph-duotone ' + (CAT_ICON[b.category] || 'ph-package') + '"></i>';
 }
 
 function contactRevealHtml(b){
@@ -275,12 +280,14 @@ function bindContactBtn(root){
       var uid = btn.getAttribute('data-uid');
       var b = ALL.filter(function(x){ return x.uid === uid; })[0];
       if (!b) return;
-      var reveal = btn.nextElementSibling;
-      if (reveal && reveal.classList.contains('contact-reveal')) { reveal.style.display = reveal.style.display === 'none' ? 'flex' : 'none'; return; }
+      var row = btn.closest('.row-item');
+      var existing = row.querySelector('.contact-reveal');
+      if (existing) { existing.style.display = existing.style.display === 'none' ? 'flex' : 'none'; return; }
       var div = document.createElement('div');
       div.className = 'contact-reveal';
       div.innerHTML = contactRevealHtml(b);
-      btn.insertAdjacentElement('afterend', div);
+      row.classList.add('has-reveal');
+      row.appendChild(div);
       btn.style.display = 'none';
       logLead(uid, 'contact_view');
     });
@@ -291,16 +298,12 @@ function renderDiamond(items){
   var sec = document.getElementById('diamondSec');
   if (!items.length){ sec.style.display = 'none'; return; }
   sec.style.display = 'block';
-  document.getElementById('diamondTrack').innerHTML = items.map(function(b){
-    return '<div class="diamond-slide">'
-      + '<div class="diamond-img">' + thumbHtml(b) + '</div>'
-      + '<div class="diamond-body">'
-        + '<span class="diamond-badge"><i class="ph-duotone ph-crown-simple"></i>KIM CƯƠNG · ' + escH((CATS[b.category]||{}).label || '') + '</span>'
-        + '<div class="diamond-name">' + escH(b.name || '') + '</div>'
-        + '<div class="diamond-intro">' + escH(b.intro || b.bio || '') + '</div>'
-        + '<a class="diamond-cta" href="ncc_profile.html?uid=' + escH(b.uid) + '"><i class="ph-duotone ph-arrow-right"></i>Xem gian hàng</a>'
-      + '</div>'
-    + '</div>';
+  document.getElementById('diamondTrack').innerHTML = items.map(function(b, i){
+    return '<a class="diamond-slide' + (i===0?' active':'') + '" href="ncc_profile.html?uid=' + escH(b.uid) + '" data-i="' + i + '">'
+      + '<span class="diamond-badge">Kim cương</span>'
+      + '<div class="diamond-eyebrow">Gian hàng Kim cương · ' + escH((CATS[b.category]||{}).label || '') + '</div>'
+      + '<div class="diamond-name">' + escH(b.name || '') + '</div>'
+    + '</a>';
   }).join('');
   document.getElementById('diamondDots').innerHTML = items.map(function(b, i){
     return '<button class="diamond-dot' + (i===0?' active':'') + '" data-i="' + i + '"></button>';
@@ -317,8 +320,7 @@ function renderDiamond(items){
   }
 }
 function applyDiamondTransform(){
-  var track = document.getElementById('diamondTrack');
-  track.style.transform = 'translateX(-' + (diamondIdx * 100) + '%)';
+  document.querySelectorAll('.diamond-slide').forEach(function(s, i){ s.classList.toggle('active', i === diamondIdx); });
   document.querySelectorAll('.diamond-dot').forEach(function(d, i){ d.classList.toggle('active', i === diamondIdx); });
 }
 function goDiamond(i){ diamondIdx = i; applyDiamondTransform(); }
@@ -327,45 +329,34 @@ function renderFeatured(items){
   var sec = document.getElementById('featuredSec');
   if (!items.length){ sec.style.display = 'none'; return; }
   sec.style.display = 'block';
-  var grid = document.getElementById('featuredGrid');
-  grid.innerHTML = items.map(function(b){
+  document.getElementById('featuredGrid').innerHTML = items.map(function(b){
     return '<a class="fcard" href="ncc_profile.html?uid=' + escH(b.uid) + '">'
-      + '<div class="fcard-img">' + thumbHtml(b) + '</div>'
-      + '<div class="booth-body">'
-        + '<div class="booth-name">' + escH(b.name || 'Gian hàng') + '</div>'
-        + '<div class="booth-meta">'
-          + '<span class="chip"><i class="ph-duotone ph-star"></i>Nổi bật</span>'
-          + (b.verified ? '<span class="chip green"><i class="ph-duotone ph-seal-check"></i>Đã xác minh</span>' : '')
-          + '<span class="chip blue"><i class="ph-duotone ph-map-pin"></i>' + escH(PROV_NAME[b.province] || b.province || '') + '</span>'
-        + '</div>'
-        + ((b.intro || b.bio) ? '<div class="booth-bio">' + escH(b.intro || b.bio) + '</div>' : '')
-        + '<button class="contact-btn" data-uid="' + escH(b.uid) + '"><i class="ph-duotone ph-phone"></i> Xem liên hệ</button>'
+      + '<div class="fcard-top">' + avatarHtml(b) + '<div style="min-width:0"><div class="fcard-name">' + escH(b.name || 'Gian hàng') + '</div><div class="fcard-loc">' + escH(PROV_NAME[b.province] || b.province || '') + '</div></div></div>'
+      + '<div class="fcard-meta">'
+        + (b.verified ? '<span class="verified-badge"><i class="ph-duotone ph-seal-check"></i>Đã xác minh</span>' : '<span></span>')
+        + (typeof b.leadCount === 'number' ? '<span class="lead-count">' + b.leadCount + ' lượt liên hệ</span>' : '')
       + '</div>'
     + '</a>';
   }).join('');
-  bindContactBtn(grid);
 }
 
 function renderBasic(items){
   var sec = document.getElementById('basicSec');
   if (!items.length){ sec.style.display = 'none'; return; }
   sec.style.display = 'block';
-  var grid = document.getElementById('basicGrid');
-  grid.innerHTML = items.map(function(b){
-    return '<a class="booth" href="ncc_profile.html?uid=' + escH(b.uid) + '">'
-      + '<div class="booth-img">' + thumbHtml(b) + '</div>'
-      + '<div class="booth-body">'
-        + '<div class="booth-name">' + escH(b.name || 'Gian hàng') + '</div>'
-        + '<div class="booth-meta">'
-          + '<span class="chip"><i class="ph-duotone ' + (CAT_ICON[b.category] || 'ph-package') + '"></i>' + escH((CATS[b.category] || {}).label || b.category || '') + '</span>'
-          + '<span class="chip blue"><i class="ph-duotone ph-map-pin"></i>' + escH(PROV_NAME[b.province] || b.province || '') + '</span>'
-        + '</div>'
-        + ((b.intro || b.bio) ? '<div class="booth-bio">' + escH(b.intro || b.bio) + '</div>' : '')
-        + '<button class="contact-btn" data-uid="' + escH(b.uid) + '"><i class="ph-duotone ph-phone"></i> Xem liên hệ</button>'
-      + '</div>'
-    + '</a>';
+  document.getElementById('listHeadTitle').textContent = FILTER === 'all' ? 'Tất cả gian hàng' : ('Tất cả gian hàng — ' + ((CATS[FILTER]||{}).label || FILTER));
+  document.getElementById('listHeadCount').textContent = items.length + ' nhà cung cấp';
+  var list = document.getElementById('basicList');
+  list.innerHTML = items.map(function(b){
+    return '<div class="row-item">'
+      + avatarHtml(b)
+      + '<div class="row-info"><div class="row-name">' + escH(b.name || 'Gian hàng') + '</div>'
+        + '<div class="row-sub">' + escH(PROV_NAME[b.province] || b.province || '') + (b.intro || b.bio ? ' · ' + escH(b.intro || b.bio) : '') + '</div></div>'
+      + '<a href="ncc_profile.html?uid=' + escH(b.uid) + '" class="contact-btn" style="text-decoration:none"><i class="ph-duotone ph-storefront"></i>Xem gian hàng</a>'
+      + '<button class="contact-btn" data-uid="' + escH(b.uid) + '"><i class="ph-duotone ph-phone"></i>Xem liên hệ</button>'
+    + '</div>';
   }).join('');
-  bindContactBtn(grid);
+  bindContactBtn(list);
 }
 
 function renderAll(){
@@ -400,7 +391,7 @@ document.getElementById('searchBox').addEventListener('input', function(){
   renderAll();
 });
 
-renderFilters();
+renderZones();
 renderProvSelect();
 loadAll();
 </script>
