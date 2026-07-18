@@ -53,7 +53,7 @@ service cloud.firestore {
       // cho tới khi Founder duyệt. Founder (seed.html / admin) tạo tự do.
       allow create: if isFounder() || (
         signedIn() && request.auth.uid == uid &&
-        request.resource.data.role in ['cn','kts','dn','designer','ks','ktv'] &&
+        request.resource.data.role in ['cn','kts','dn','designer','ks','ktv','ncc'] &&
         (request.resource.data.role == 'cn'
           ? request.resource.data.status == 'active'
           : request.resource.data.status == 'pending')
