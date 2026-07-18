@@ -109,7 +109,7 @@ exports.onKsApply = functions
     );
   });
 
-/* ── Nhà cung cấp vật liệu đăng ký mới (chỉ tham gia chuyên mục Vật liệu & Giá) ── */
+/* ── Nhà cung cấp vật liệu đăng ký mới (chỉ tham gia chuyên mục "Gian hàng Thiết bị", key nội bộ vat_lieu) ── */
 exports.onNccApply = functions
   .region("asia-southeast1")
   .firestore.document("nccApplications/{uid}")

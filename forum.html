@@ -234,6 +234,19 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 }
 .tuvan-disclaimer b { color: var(--amber); }
 
+/* ── CTA GIAN HÀNG NCC (tab Gian hàng Thiết bị) ── */
+.gianhang-cta {
+  display: none; max-width: 760px; margin: 16px auto 0; padding: 12px 16px;
+  border: 1px solid rgba(152,105,10,.3); background: rgba(152,105,10,.06);
+  border-radius: var(--r-sm); font-size: var(--text-xs); color: var(--text2); line-height: 1.6;
+  align-items: center; gap: 10px; justify-content: space-between; flex-wrap: wrap;
+}
+.gianhang-cta b { color: #98690a; }
+.gianhang-cta a {
+  display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px;
+  background: #98690a; color: #fff; font-weight: 700; font-size: var(--text-xs); white-space: nowrap;
+}
+
 /* ── FANPAGE CTA (Forum → Fanpage, dismiss được, ghi nhớ localStorage) ── */
 .fanpage-cta {
   max-width: 760px; margin: 14px auto 0; padding: 10px 14px;
@@ -619,7 +632,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <section class="hero">
   <h1>Diễn đàn <em>ALN</em></h1>
-  <p class="hero-sub">Hỏi đáp kỹ thuật · Vật liệu & Giá · Showcase công trình · Nghề & Chứng chỉ — mọi trao đổi dự án qua kênh chat sàn ALN</p>
+  <p class="hero-sub">Hỏi đáp kỹ thuật · Gian hàng Thiết bị · Showcase công trình · Nghề & Chứng chỉ — mọi trao đổi dự án qua kênh chat sàn ALN</p>
 </section>
 
 <div class="toolbar" id="toolbar" style="display:none">
@@ -656,6 +669,11 @@ window.dismissFanpageCta = function () {
 
 <div class="tuvan-disclaimer" id="tuvanDisclaimer">
   <b>ⓘ Lưu ý pháp lý:</b> Nội dung tư vấn trên diễn đàn là ý kiến tham khảo của cá nhân KTS, không phải hồ sơ thiết kế có chữ ký chủ trì theo NĐ 175/2024 và không thay thế hợp đồng dịch vụ. Mọi giao dịch qua sàn ALN mới được bảo vệ bởi Quy trình 4 bước.
+</div>
+
+<div class="gianhang-cta" id="gianhangCta">
+  <span><b>🏪 Gian hàng Vật liệu ALN</b> — xem ảnh sản phẩm, bảng giá và liên hệ trực tiếp nhà cung cấp đã xác minh.</span>
+  <a href="ncc-showcase.html"><i class="ph-duotone ph-storefront"></i>Xem gian hàng</a>
 </div>
 
 <div class="lb-widget" id="lbWidget" style="display:none">
@@ -832,7 +850,7 @@ const callGrowthLeaderboard = httpsCallable(fns, 'forumGrowthLeaderboard');
 const CATS = {
   hoi_kts:      { label: 'Hỏi KTS Miễn Phí', icon: 'ph-hand-heart',  color: '#0f2c52' },
   hoi_dap:      { label: 'Hỏi đáp kỹ thuật', icon: 'ph-chats-circle', color: '#1d4ed8' },
-  vat_lieu:     { label: 'Vật liệu & Giá',   icon: 'ph-package',      color: '#15803d' },
+  vat_lieu:     { label: 'Gian hàng Thiết bị', icon: 'ph-package',    color: '#15803d' },
   showcase:     { label: 'Showcase',          icon: 'ph-image-square', color: '#b8860b' },
   nghe:         { label: 'Nghề & Chứng chỉ', icon: 'ph-certificate',  color: '#0e7490' },
   bang_tin:     { label: 'Bảng tin ALN',      icon: 'ph-megaphone',    color: '#dc2626' },
@@ -923,9 +941,10 @@ const PUBLIC_CATEGORIES = ['hoi_kts', 'tu_van_du_an', 'showcase', 'bang_tin', 'v
 /* 2 chuyên mục KTS-only vĩnh viễn — khách thấy tên nhưng khóa nội dung */
 const GUEST_LOCKED_CATEGORIES = ['hoi_dap', 'nghe'];
 
-/* Nhà cung cấp vật liệu — CHỈ chuyên mục "Vật liệu & Giá", không có huy hiệu
-   xếp hạng KTS, không có tính năng "chọn làm dự án" (xem NCC_CATEGORIES phía
-   server, functions/forum.js — giữ đồng bộ 2 nơi). */
+/* Nhà cung cấp vật liệu — CHỈ chuyên mục "Gian hàng Thiết bị" (key nội bộ
+   vẫn là vat_lieu, không đổi), không có huy hiệu xếp hạng KTS, không có
+   tính năng "chọn làm dự án" (xem NCC_CATEGORIES phía server,
+   functions/forum.js — giữ đồng bộ 2 nơi). */
 const NCC_CATEGORIES = ['vat_lieu'];
 
 /* Chuyên mục user hiện tại XEM được */
@@ -1160,6 +1179,7 @@ function renderTabs(){
   }
   $('catTabs').innerHTML = html;
   $('tuvanDisclaimer').style.display = FILTER === 'tu_van_du_an' ? 'block' : 'none';
+  $('gianhangCta').style.display = FILTER === 'vat_lieu' ? 'flex' : 'none';
 }
 window.setFilter = function(f){
   FILTER = f; renderTabs(); renderFeed();
