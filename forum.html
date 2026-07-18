@@ -234,19 +234,6 @@ body { font-family: var(--sans); background: var(--cream); color: var(--text); l
 }
 .tuvan-disclaimer b { color: var(--amber); }
 
-/* ── CTA GIAN HÀNG NCC (tab Gian hàng Thiết bị) ── */
-.gianhang-cta {
-  display: none; max-width: 760px; margin: 16px auto 0; padding: 12px 16px;
-  border: 1px solid rgba(152,105,10,.3); background: rgba(152,105,10,.06);
-  border-radius: var(--r-sm); font-size: var(--text-xs); color: var(--text2); line-height: 1.6;
-  align-items: center; gap: 10px; justify-content: space-between; flex-wrap: wrap;
-}
-.gianhang-cta b { color: #98690a; }
-.gianhang-cta a {
-  display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px;
-  background: #98690a; color: #fff; font-weight: 700; font-size: var(--text-xs); white-space: nowrap;
-}
-
 /* ── FANPAGE CTA (Forum → Fanpage, dismiss được, ghi nhớ localStorage) ── */
 .fanpage-cta {
   max-width: 760px; margin: 14px auto 0; padding: 10px 14px;
@@ -669,11 +656,6 @@ window.dismissFanpageCta = function () {
 
 <div class="tuvan-disclaimer" id="tuvanDisclaimer">
   <b>ⓘ Lưu ý pháp lý:</b> Nội dung tư vấn trên diễn đàn là ý kiến tham khảo của cá nhân KTS, không phải hồ sơ thiết kế có chữ ký chủ trì theo NĐ 175/2024 và không thay thế hợp đồng dịch vụ. Mọi giao dịch qua sàn ALN mới được bảo vệ bởi Quy trình 4 bước.
-</div>
-
-<div class="gianhang-cta" id="gianhangCta">
-  <span><b>🏪 Gian hàng Vật liệu ALN</b> — xem ảnh sản phẩm, bảng giá và liên hệ trực tiếp nhà cung cấp đã xác minh.</span>
-  <a href="ncc-showcase.html"><i class="ph-duotone ph-storefront"></i>Xem gian hàng</a>
 </div>
 
 <div class="lb-widget" id="lbWidget" style="display:none">
@@ -1179,9 +1161,12 @@ function renderTabs(){
   }
   $('catTabs').innerHTML = html;
   $('tuvanDisclaimer').style.display = FILTER === 'tu_van_du_an' ? 'block' : 'none';
-  $('gianhangCta').style.display = FILTER === 'vat_lieu' ? 'flex' : 'none';
 }
+/* Tab "Gian hàng Thiết bị" (key nội bộ vat_lieu) không hiện feed bài viết
+   nữa — bấm vào là sang thẳng ncc-showcase.html (Founder yêu cầu
+   18/07/2026: bấm vào phải thấy gian hàng ngay, không phải bài thảo luận). */
 window.setFilter = function(f){
+  if (f === 'vat_lieu') { window.location.href = 'ncc-showcase.html'; return; }
   FILTER = f; renderTabs(); renderFeed();
 };
 
