@@ -923,7 +923,8 @@ body {
     <button class="fsub" id="tabMgCn"   onclick="switchTab('mgCn')"  ><i class="ph-duotone ph-house-line"></i>Chủ nhà</button>
     <button class="fsub" id="tabMgKs"   onclick="switchTab('mgKs')"  ><i class="ph-duotone ph-map-pin-area"></i>KS Vùng</button>
     <button class="fsub" id="tabMgKtv"  onclick="switchTab('mgKtv')" ><i class="ph-duotone ph-ruler"></i>KTV</button>
-    <button class="fsub" id="tabPending" onclick="switchTab('pending')"><i class="ph-duotone ph-user-plus"></i>Duyệt đăng ký<span id="pendingBadge" style="display:none;background:var(--gold);color:#08090f;border-radius:99px;font-size:9px;padding:1px 5px;margin-left:2px;font-weight:800">0</span></button>
+    <button class="fsub" id="tabMgNcc"  onclick="switchTab('mgNcc')" ><i class="ph-duotone ph-package"></i>Gian hàng NCC</button>
+    <button class="fsub" id="tabPending" onclick="switchTab('pending')"<i class="ph-duotone ph-user-plus"></i>Duyệt đăng ký<span id="pendingBadge" style="display:none;background:var(--gold);color:#08090f;border-radius:99px;font-size:9px;padding:1px 5px;margin-left:2px;font-weight:800">0</span></button>
   </span>
 
   <!-- VẬN HÀNH -->
@@ -1498,6 +1499,51 @@ document.addEventListener('DOMContentLoaded', function() {
         <th>Đăng ký</th>
       </tr></thead>
       <tbody id="mgKtvBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ PANEL: GIAN HÀNG NCC ══ -->
+<div id="panelMgNcc" style="display:none;flex-direction:column;flex:1;overflow-y:auto;padding:20px;gap:16px">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px">
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-bottom:3px">QUẢN LÝ THÀNH VIÊN</div>
+      <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1)">Gian hàng Nhà cung cấp</div>
+    </div>
+    <a href="ncc-showcase.html" target="_blank" rel="noopener" style="font-size:11px;color:var(--sub);display:inline-flex;align-items:center;gap:5px"><i class="ph-duotone ph-eye"></i>Xem trang công khai</a>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px">
+    <div class="dn-kpi"><div class="dk-l">Tổng đăng ký</div><div class="dk-v" id="mgNccV0">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-circle" style="color:var(--green)"></i> Đã duyệt (công khai)</div><div class="dk-v" style="color:var(--green)" id="mgNccV1">0</div></div>
+    <div class="dn-kpi"><div class="dk-l">⏳ Chờ duyệt</div><div class="dk-v" style="color:var(--amber)" id="mgNccV2">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-crown-simple"></i> Kim cương / Nổi bật</div><div class="dk-v" style="color:var(--gold)" id="mgNccV3">0</div></div>
+  </div>
+  <div style="font-size:11px;color:var(--dim);line-height:1.6;background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">
+    Hạng và trạng thái xác minh ĐKKD chỉ Founder gán được (NCC không tự nâng hạng). Đổi hạng áp dụng ngay trên trang công khai <a href="ncc-showcase.html" target="_blank" style="color:var(--gold)">ncc-showcase.html</a>.
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px">
+    <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:200px;background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:6px 12px">
+      <i class="ph-duotone ph-magnifying-glass" style="color:var(--dim)"></i>
+      <input type="text" id="mgNccSearch" placeholder="Tên gian hàng, tỉnh..." oninput="renderMgNcc()" style="background:none;border:none;outline:none;font-family:var(--sans);font-size:12px;color:var(--text1);width:100%">
+    </div>
+    <select id="mgNccFilterStatus" onchange="renderMgNcc()" style="background:var(--raised);border:1px solid var(--border);color:var(--text2);font-family:var(--sans);font-size:11px;padding:6px 10px;border-radius:6px;outline:none">
+      <option value="">Tất cả trạng thái</option>
+      <option value="approved">Đã duyệt</option>
+      <option value="pending">Chờ duyệt</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr>
+        <th>Gian hàng</th>
+        <th>Danh mục</th>
+        <th>Tỉnh</th>
+        <th>Trạng thái</th>
+        <th>Hạng</th>
+        <th>Xác minh ĐKKD</th>
+        <th>Thao tác</th>
+      </tr></thead>
+      <tbody id="mgNccBody"></tbody>
     </table>
   </div>
 </div>
@@ -3310,7 +3356,7 @@ window.ALNRealtime = (() => {
 ══════════════════════════════════════════ */
 
 function switchTab(t){
-  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','mgKtv','pending','payments','report','leads','recruit','company','pricing','khomau','mkt','seo','hoikien','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes','liveKs','liveKtv','liveKeToan'];
+  var ALL = ['projects','stats','mgKts','mgDn','mgCn','mgKs','mgKtv','mgNcc','pending','payments','report','leads','recruit','company','pricing','khomau','mkt','seo','hoikien','waitRoom','matching','c2monitor','liveKts','liveDn','liveCn','liveDes','liveKs','liveKtv','liveKeToan'];
   var activeStyle  = 'padding:5px 13px;border:1px solid rgba(59,130,246,.25);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(59,130,246,.15);color:var(--blue);white-space:nowrap';
   var inactiveStyle= 'padding:5px 13px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:var(--raised);color:var(--sub);white-space:nowrap';
   var liveStyles = {
@@ -3353,6 +3399,7 @@ function switchTab(t){
   if(t==='mgCn')    renderMgCn();
   if(t==='mgKs')    renderMgKs();
   if(t==='mgKtv')   renderMgKtv();
+  if(t==='mgNcc')   renderMgNcc();
   if(t==='pending')  renderPending();
   if(t==='payments') { renderPayments(); if(typeof renderDesignApprovals==='function') renderDesignApprovals(); }
   if(t==='report')   { renderIncomeReport(); if(typeof _fillFeeConfigForm==='function') _fillFeeConfigForm(); }
@@ -3904,6 +3951,70 @@ function _loadKtvUsers() {
   else { if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:28px">Module chưa sẵn sàng, thử lại sau</td></tr>'; }
 }
 
+/* ── GIAN HÀNG NCC — hạng (tier) + xác minh ĐKKD chỉ Founder gán được ── */
+var _mgNccData = null;
+var CAT_LABEL_NCC_MG = {sat_thep:'Sắt, thép', go_noithat:'Gỗ, nội thất', gach_vlxd:'Gạch, VLXD', son_hoanthien:'Sơn, hoàn thiện', dien_nuoc:'Điện, nước', dv_thicong:'Dịch vụ thi công', thietbi_vanchuyen:'Thiết bị & vận chuyển', khac:'Khác'};
+var PROV_NAME_NCC_MG = {HCM:'TP. HCM',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'Vũng Tàu',LA:'Long An',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TH:'Thanh Hóa',TG:'Tiền Giang',OTHER:'Tỉnh khác'};
+function renderMgNcc() {
+  if(window._mgNccData) _mgNccData = window._mgNccData;
+  if(!_mgNccData) {
+    _loadNccUsers();
+    return;
+  }
+  var q  = (document.getElementById('mgNccSearch') ? document.getElementById('mgNccSearch').value : '').toLowerCase();
+  var fs = document.getElementById('mgNccFilterStatus') ? document.getElementById('mgNccFilterStatus').value : '';
+  var rows = _mgNccData.filter(function(k){
+    if(fs && k.status !== fs) return false;
+    if(q && !(k.name||'').toLowerCase().includes(q) && !(k.province||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  var total    = _mgNccData.length;
+  var approved = _mgNccData.filter(function(k){ return k.status==='approved'; }).length;
+  var pending  = _mgNccData.filter(function(k){ return k.status==='pending'; }).length;
+  var topTier  = _mgNccData.filter(function(k){ return k.tier==='diamond' || k.tier==='featured'; }).length;
+  document.getElementById('mgNccV0').textContent = total;
+  document.getElementById('mgNccV1').textContent = approved;
+  document.getElementById('mgNccV2').textContent = pending;
+  document.getElementById('mgNccV3').textContent = topTier;
+  var tbody = document.getElementById('mgNccBody');
+  if(!tbody) return;
+  if(!rows.length){ tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:28px">Không có dữ liệu</td></tr>'; return; }
+  tbody.innerHTML = rows.map(function(k){
+    var provName = PROV_NAME_NCC_MG[k.province] || k.province || '—';
+    var catName  = CAT_LABEL_NCC_MG[k.category] || k.category || '—';
+    var sColor = k.status==='approved' ? 'var(--green)' : k.status==='pending' ? 'var(--amber)' : 'var(--dim)';
+    var sLabel = k.status==='approved' ? '🟢 Đã duyệt' : k.status==='pending' ? '⏳ Chờ duyệt' : (k.status||'—');
+    var tier = k.tier || 'basic';
+    return '<tr>'
+      +'<td style="font-weight:700;color:var(--text1)">'+(k.name||'—')+'</td>'
+      +'<td style="font-size:11px;color:var(--sub)">'+catName+'</td>'
+      +'<td><span style="font-size:10px;font-weight:700;padding:2px 8px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.22);border-radius:5px;color:var(--gold)">'+provName+'</span></td>'
+      +'<td style="color:'+sColor+';font-size:11px;font-weight:700">'+sLabel+'</td>'
+      +'<td><select onchange="nccSetTier(\''+k.uid+'\',this.value)" style="background:var(--raised);border:1px solid var(--border);color:var(--text1);font-family:var(--sans);font-size:11px;padding:4px 8px;border-radius:6px;outline:none">'
+        +'<option value="basic"'+(tier==='basic'?' selected':'')+'>Cơ bản</option>'
+        +'<option value="featured"'+(tier==='featured'?' selected':'')+'>Nổi bật</option>'
+        +'<option value="diamond"'+(tier==='diamond'?' selected':'')+'>Kim cương</option>'
+      +'</select></td>'
+      +'<td style="text-align:center"><input type="checkbox" onchange="nccSetVerified(\''+k.uid+'\',this.checked)"'+(k.verified?' checked':'')+' style="width:16px;height:16px;cursor:pointer"></td>'
+      +'<td>'+(k.status==='approved' ? '<a href="ncc_profile.html?uid='+k.uid+'" target="_blank" style="font-size:11px;color:var(--gold);display:inline-flex;align-items:center;gap:4px"><i class="ph-duotone ph-eye"></i>Xem</a>' : '—')+'</td>'
+    +'</tr>';
+  }).join('');
+}
+
+function _loadNccUsers() {
+  var tbody = document.getElementById('mgNccBody');
+  if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:28px"><i class="ph-duotone ph-spinner ph-spin"></i> Đang tải…</td></tr>';
+  if(window._nccLoadFromModule) { window._nccLoadFromModule(); }
+  else { if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:28px">Module chưa sẵn sàng, thử lại sau</td></tr>'; }
+}
+
+window.nccSetTier = function(uid, tier){
+  if(window._nccSetField) window._nccSetField(uid, { tier: tier });
+};
+window.nccSetVerified = function(uid, checked){
+  if(window._nccSetField) window._nccSetField(uid, { verified: !!checked });
+};
+
 /* ── DUYỆT ĐĂNG KÝ ── */
 var PENDING_USERS = [];
 window.PENDING_USERS = PENDING_USERS;
@@ -4089,7 +4200,7 @@ function renderPending(){
     }
     if(u.role === 'ncc'){
       var PROV_NAME_NCC = {HCM:'TP. HCM',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'Vũng Tàu',LA:'Long An',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TH:'Thanh Hóa',TG:'Tiền Giang',OTHER:'Tỉnh khác'};
-      var CAT_LABEL_NCC = {sat_thep:'Sắt, thép', go_noithat:'Gỗ, xưởng nội thất', gach_vlxd:'Gạch, VLXD', son_hoanthien:'Sơn, hoàn thiện', dien_nuoc:'Điện, nước', khac:'Khác'};
+      var CAT_LABEL_NCC = {sat_thep:'Sắt, thép', go_noithat:'Gỗ, xưởng nội thất', gach_vlxd:'Gạch, VLXD', son_hoanthien:'Sơn, hoàn thiện', dien_nuoc:'Điện, nước', dv_thicong:'Dịch vụ thi công', thietbi_vanchuyen:'Thiết bị & vận chuyển', khac:'Khác'};
       details = '<div style="padding:14px 20px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--border)">'
         +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
           +'<div style="background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">'
@@ -6278,6 +6389,35 @@ window._ktvLoadFromModule = async function() {
     console.error('[mgKtv load]', e);
     var tbody = document.getElementById('mgKtvBody');
     if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--red);padding:28px">Lỗi tải dữ liệu: ' + (e.message||e.code) + '</td></tr>';
+  }
+};
+
+/* ── GIAN HÀNG NCC — đọc trực tiếp nccApplications (không phải users) vì
+   tier/verified/category/gallery nằm ở đó, không ở users/{uid} ── */
+window._nccLoadFromModule = async function() {
+  try {
+    const snap = await getDocs(collection(db, 'nccApplications'));
+    window._mgNccData = snap.docs.map(function(d){ return Object.assign({uid:d.id}, d.data()); });
+    if(typeof renderMgNcc === 'function') renderMgNcc();
+  } catch(e) {
+    console.error('[mgNcc load]', e);
+    var tbody = document.getElementById('mgNccBody');
+    if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--red);padding:28px">Lỗi tải dữ liệu: ' + (e.message||e.code) + '</td></tr>';
+  }
+};
+
+window._nccSetField = async function(uid, patch){
+  try {
+    await updateDoc(doc(db, 'nccApplications', uid), Object.assign({}, patch, { updatedAt: serverTimestamp() }));
+    if(window._mgNccData){
+      var row = window._mgNccData.filter(function(r){ return r.uid === uid; })[0];
+      if(row) Object.assign(row, patch);
+    }
+    if(window.showToastFounder) window.showToastFounder('Đã cập nhật gian hàng');
+  } catch(e) {
+    console.error('[nccSetField]', e);
+    alert('Lỗi cập nhật: ' + (e.message || e.code));
+    renderMgNcc();
   }
 };
 

@@ -53,7 +53,7 @@ service cloud.firestore {
       // cho tới khi Founder duyệt. Founder (seed.html / admin) tạo tự do.
       allow create: if isFounder() || (
         signedIn() && request.auth.uid == uid &&
-        request.resource.data.role in ['cn','kts','dn','designer','ks','ktv'] &&
+        request.resource.data.role in ['cn','kts','dn','designer','ks','ktv','ncc'] &&
         (request.resource.data.role == 'cn'
           ? request.resource.data.status == 'active'
           : request.resource.data.status == 'pending')
@@ -184,13 +184,30 @@ service cloud.firestore {
       allow delete: if isFounder();
     }
 
-    // Nhà cung cấp vật liệu (ncc-apply.html) — chỉ tham gia chuyên mục
-    // "Vật liệu & Giá" trên Diễn đàn, cùng pattern các đơn đăng ký khác.
+    // Nhà cung cấp vật liệu (ncc-apply.html) — tham gia chuyên mục "Vật liệu
+    // & Giá" trên Diễn đàn VÀ có gian hàng công khai (ncc-showcase.html/
+    // ncc_profile.html) khi status=='approved'. Chủ gian tự sửa nội dung
+    // (ncc-dashboard.html) nhưng KHÔNG tự đổi được status/tier/verified —
+    // 3 field này chỉ Founder gán (founder_panel.html), chặn tự duyệt/tự
+    // nâng hạng gian hàng của chính mình.
     match /nccApplications/{uid} {
-      allow read: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow read: if resource.data.status == 'approved' || isFounder() || (signedIn() && request.auth.uid == uid);
       allow create: if signedIn() && request.auth.uid == uid;
-      allow update: if isFounder() || (signedIn() && request.auth.uid == uid);
+      allow update: if isFounder()
+        || (signedIn() && request.auth.uid == uid
+            && request.resource.data.status == resource.data.status
+            && request.resource.data.tier == resource.data.tier
+            && request.resource.data.verified == resource.data.verified);
       allow delete: if isFounder();
+    }
+
+    // Lead "Xem liên hệ"/"Yêu cầu báo giá" từ ncc-showcase.html/ncc_profile.html
+    // — ghi ẩn danh (không thu thập định danh người xem, NĐ 13/2023), chỉ
+    // Founder đọc để phân tích/định giá gói quảng cáo sau này (mục E3).
+    match /nccLeads/{leadId} {
+      allow read: if isFounder();
+      allow create: if true;
+      allow update, delete: if false;
     }
 
     // Việc KTS giao KTV triển khai bản vẽ (kts_dashboard tab "Giao việc KTV" ↔ ktv_dashboard)

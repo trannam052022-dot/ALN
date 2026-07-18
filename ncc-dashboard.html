@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <script src="error-monitor.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gian hàng của tôi — App Làm Nhà</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="aln-tokens.css">
+<style>
+:root{
+  --bg:#080c14;--bg2:#0e1422;--card:rgba(14,20,34,.88);
+  --border:rgba(255,255,255,.07);--border-g:rgba(201,168,76,.18);
+  --muted:rgba(228,212,176,.38);--text:#f0e6cc;--text2:rgba(240,230,204,.62);
+  --gold:#C9A84C;--gold2:#e8d07a;--green:#3dd68c;--red:#f06060;--blue:#4a8fff;
+  --r:14px;--mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;
+  --serif:'Cormorant Garamond',serif;--syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:1rem;line-height:1.6;
+  background-image:linear-gradient(rgba(201,168,76,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.022) 1px,transparent 1px);
+  background-size:56px 56px;}
+a{color:var(--gold);text-decoration:none}
+textarea::placeholder,input::placeholder{color:rgba(228,212,176,.22)}
+.topbar{background:rgba(8,12,20,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(201,168,76,.14);padding:0 20px;height:50px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
+.tb-logo{font-family:var(--syne);font-size:12px;font-weight:800;color:var(--gold2);letter-spacing:.06em}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-link{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);font-weight:600;cursor:pointer;background:none;border:none;font-family:var(--sans)}
+.tb-link:hover{color:var(--gold)}
+.page{max-width:680px;margin:0 auto;padding:24px 16px 80px}
+.card{background:var(--card);backdrop-filter:blur(28px);border:1px solid var(--border-g);border-radius:var(--r);padding:22px 22px;margin-bottom:16px}
+.card-title{font-family:var(--syne);font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.card-title i{color:var(--gold)}
+.hint{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+textarea,input[type=text],input[type=url],input[type=number]{width:100%;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 13px;background:rgba(255,255,255,.025);color:var(--text);font-size:13px;font-family:var(--sans);outline:none}
+textarea{resize:vertical;min-height:110px}
+textarea:focus,input:focus{border-color:rgba(201,168,76,.38)}
+.char-count{font-size:10px;color:var(--muted);text-align:right;margin-top:4px;font-family:var(--mono)}
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-family:var(--syne);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.badge{font-size:10px;font-weight:800;padding:3px 11px;border-radius:99px;display:inline-flex;align-items:center;gap:4px}
+.badge-diamond{background:linear-gradient(120deg,#1a2634,#3d5470);color:#fff;border:1px solid rgba(255,255,255,.15)}
+.badge-featured{background:rgba(201,168,76,.15);color:var(--gold);border:1px solid rgba(201,168,76,.35)}
+.badge-basic{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border)}
+.badge-verified{background:rgba(61,214,140,.1);color:var(--green);border:1px solid rgba(61,214,140,.3)}
+.badge-unverified{background:rgba(255,255,255,.03);color:var(--muted);border:1px solid var(--border)}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.gal-item{position:relative;border-radius:9px;overflow:hidden;border:1px solid var(--border);background:var(--bg2)}
+.gal-item img{width:100%;height:100px;object-fit:cover;display:block}
+.gal-del{position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;background:rgba(8,12,20,.85);border:1px solid rgba(240,96,96,.4);color:var(--red);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.gal-add{height:100px;border:1px dashed rgba(201,168,76,.35);border-radius:9px;background:rgba(201,168,76,.04);color:rgba(201,168,76,.7);font-size:12px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--sans)}
+.gal-add:hover{background:rgba(201,168,76,.09)}
+.gal-add i{font-size:20px}
+.pdf-row{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:12px 14px}
+.pdf-row i{font-size:24px;color:var(--red);flex-shrink:0}
+.pdf-name{flex:1;font-size:12px;font-weight:600;color:var(--text2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.price-row{display:grid;grid-template-columns:1fr 90px 130px 34px;gap:8px;margin-bottom:8px;align-items:center}
+.price-row input{padding:8px 10px;font-size:12px}
+.price-del{width:30px;height:30px;border-radius:8px;background:rgba(240,96,96,.08);border:1px solid rgba(240,96,96,.25);color:var(--red);cursor:pointer;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border-radius:9px;font-family:var(--syne);font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .2s}
+.btn-gold{background:linear-gradient(100deg,#a07830 0%,#e8d07a 45%,#C9A84C 100%);background-size:200% 100%;color:#0a0a10}
+.btn-gold:hover:not(:disabled){background-position:100%}
+.btn-gold:disabled{opacity:.4;cursor:not-allowed}
+.btn-ghost{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);color:var(--text2)}
+.btn-ghost:hover{border-color:rgba(201,168,76,.3);color:rgba(201,168,76,.8)}
+.btn-sm{padding:7px 13px;font-size:11px}
+.save-bar{position:sticky;bottom:0;background:rgba(8,12,20,.94);backdrop-filter:blur(16px);border-top:1px solid rgba(201,168,76,.14);padding:12px 16px;display:flex;justify-content:center;gap:10px;margin:0 -16px}
+.status-chip{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;padding:3px 11px;border-radius:99px}
+.status-approved{background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.3);color:var(--green)}
+.status-pending{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.3);color:var(--gold)}
+.gate{text-align:center;padding:70px 20px;color:var(--muted)}
+.gate i{font-size:44px;display:block;margin-bottom:12px;color:var(--gold)}
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:rgba(14,20,34,.97);border:1px solid rgba(255,255,255,.1);color:var(--text);font-size:12px;font-weight:500;padding:10px 22px;border-radius:99px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.7);opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+.toast.err{border-color:rgba(240,96,96,.35);color:#f09898}
+.ph-spin{animation:phspin 1s linear infinite;display:inline-block}
+@keyframes phspin{to{transform:rotate(360deg)}}
+@media(max-width:480px){.field-row{grid-template-columns:1fr}.price-row{grid-template-columns:1fr 70px 34px;grid-template-areas:"item unit del" "price price price"}}
+</style>
+<!-- Google Analytics 4 (ALN — G-5CSL1TF0RC, tách riêng khỏi property TK.HOUSE) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5CSL1TF0RC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5CSL1TF0RC');
+</script>
+<!-- End GA4 -->
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="tb-logo">GIAN HÀNG CỦA TÔI · ALN</div>
+  <div class="tb-right">
+    <a class="tb-link" id="lnkView" href="#" target="_blank" rel="noopener" style="display:none"><i class="ph-duotone ph-eye"></i>Xem trang công khai</a>
+    <a class="tb-link" href="forum.html"><i class="ph-duotone ph-chats-circle"></i>Diễn đàn</a>
+    <button class="tb-link" onclick="if(confirm('Đăng xuất?')) nccLogout()"><i class="ph-duotone ph-sign-out"></i>Đăng xuất</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div id="content">
+    <div class="gate"><i class="ph-duotone ph-spinner-gap ph-spin"></i>Đang tải…</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var _tt = null;
+function showToast(msg, isErr) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isErr ? ' err' : '');
+  clearTimeout(_tt);
+  _tt = setTimeout(function() { el.className = 'toast'; }, 3000);
+}
+window.showToast = showToast;
+function escH(s){
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+window.escH = escH;
+</script>
+
+<script type="module">
+import {
+  auth, db, onAuthStateChanged, signOut, doc, getDoc, updateDoc, serverTimestamp,
+  storage, storageRef, uploadBytes, getDownloadURL
+} from './firebase-config.js';
+
+const MAX_IMAGES = 12;
+const MAX_IMG_MB = 8;
+const MAX_PDF_MB = 15;
+const MAX_VIDEOS = 5;
+const MAX_PRICE_ROWS = 30;
+
+let UID = null;
+let DATA = null;          // bản nháp đang chỉnh (gallery/intro/pdf/priceList...)
+let dirty = false;
+
+window.nccLogout = async function(){
+  try { await signOut(auth); } catch(e){}
+  window.location.replace('login.html');
+};
+
+function markDirty(){ dirty = true; const b = document.getElementById('btnSave'); if(b) b.disabled = false; }
+
+/* Chỉ nhận link YouTube/TikTok/Facebook https — tránh link rác/độc hại lên trang public */
+function isValidVideoUrl(u){
+  if(!/^https:\/\//.test(u)) return false;
+  try {
+    const host = new URL(u).hostname.replace(/^www\./, '');
+    return ['youtube.com', 'youtu.be', 'm.youtube.com', 'tiktok.com', 'vt.tiktok.com', 'vm.tiktok.com',
+            'facebook.com', 'm.facebook.com', 'fb.watch'].indexOf(host) !== -1;
+  } catch(e){ return false; }
+}
+
+function videosHtml(){
+  const videos = Array.isArray(DATA.videos) ? DATA.videos : [];
+  let html = videos.map(function(u, i){
+    const isYt = /youtu/.test(u);
+    const isFb = /facebook\.com|fb\.watch/.test(u);
+    const icon = isYt ? 'ph-youtube-logo' : isFb ? 'ph-facebook-logo' : 'ph-tiktok-logo';
+    const color = isYt ? '#ff0000' : isFb ? '#1877f2' : 'var(--text)';
+    return '<div class="pdf-row" style="margin-bottom:8px">'
+      + '<i class="ph-duotone ' + icon + '" style="color:' + color + '"></i>'
+      + '<span class="pdf-name">' + escH(u) + '</span>'
+      + '<button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="removeVideo(' + i + ')">Gỡ</button>'
+    + '</div>';
+  }).join('');
+  if(videos.length < MAX_VIDEOS){
+    html += '<div style="display:flex;gap:8px;margin-top:4px">'
+      + '<input type="url" id="videoInput" placeholder="https://youtube.com/... · tiktok.com/... · facebook.com/..." style="flex:1;font-family:var(--mono);font-size:12px">'
+      + '<button class="btn btn-ghost btn-sm" onclick="addVideo()"><i class="ph-duotone ph-plus"></i>Thêm</button>'
+    + '</div>';
+  }
+  return html;
+}
+
+window.addVideo = function(){
+  const input = document.getElementById('videoInput');
+  const u = (input.value || '').trim();
+  if(!u) return;
+  if(!isValidVideoUrl(u)){ showToast('Chỉ nhận link YouTube, TikTok hoặc Facebook (https)', true); return; }
+  if(!Array.isArray(DATA.videos)) DATA.videos = [];
+  if(DATA.videos.indexOf(u) !== -1){ showToast('Link này đã có trong danh sách', true); return; }
+  if(DATA.videos.length >= MAX_VIDEOS){ showToast('Tối đa ' + MAX_VIDEOS + ' video', true); return; }
+  DATA.videos.push(u.slice(0, 300));
+  markDirty();
+  render();
+  showToast('Đã thêm video — bấm "Lưu thay đổi" để công bố');
+};
+
+window.removeVideo = function(i){
+  if(!confirm('Gỡ video này khỏi gian hàng?')) return;
+  DATA.videos.splice(i, 1);
+  markDirty();
+  render();
+};
+
+/* ── Bảng giá tham khảo (NCC tự nhập, ALN không thẩm định) ── */
+function priceRowsHtml(){
+  const rows = Array.isArray(DATA.priceList) ? DATA.priceList : [];
+  let html = rows.map(function(p, i){
+    return '<div class="price-row">'
+      + '<input type="text" placeholder="Hạng mục — VD: Thép hộp 40x80" value="' + escH(p.item || '') + '" oninput="setPriceField(' + i + ',\'item\',this.value)">'
+      + '<input type="text" placeholder="ĐVT" value="' + escH(p.unit || '') + '" oninput="setPriceField(' + i + ',\'unit\',this.value)">'
+      + '<input type="number" min="0" placeholder="Giá (đ)" value="' + (p.price != null ? p.price : '') + '" oninput="setPriceField(' + i + ',\'price\',this.value)">'
+      + '<button class="price-del" onclick="removePriceRow(' + i + ')" title="Xoá dòng"><i class="ph-duotone ph-trash"></i></button>'
+    + '</div>';
+  }).join('');
+  return html;
+}
+
+window.setPriceField = function(i, key, val){
+  if(!Array.isArray(DATA.priceList)) DATA.priceList = [];
+  if(!DATA.priceList[i]) DATA.priceList[i] = {};
+  DATA.priceList[i][key] = key === 'price' ? (val === '' ? null : Number(val)) : val;
+  markDirty();
+};
+
+window.addPriceRow = function(){
+  if(!Array.isArray(DATA.priceList)) DATA.priceList = [];
+  if(DATA.priceList.length >= MAX_PRICE_ROWS){ showToast('Tối đa ' + MAX_PRICE_ROWS + ' dòng giá', true); return; }
+  DATA.priceList.push({ item: '', unit: '', price: null });
+  markDirty();
+  render();
+  const rows = document.querySelectorAll('#priceRows .price-row input');
+  if(rows.length) rows[rows.length - 3].focus();
+};
+
+window.removePriceRow = function(i){
+  DATA.priceList.splice(i, 1);
+  markDirty();
+  render();
+};
+
+function render(){
+  const d = DATA;
+  const statusChip = d.status === 'approved'
+    ? '<span class="status-chip status-approved"><i class="ph-duotone ph-seal-check"></i>Đã duyệt — gian hàng đang công khai</span>'
+    : '<span class="status-chip status-pending"><i class="ph-duotone ph-clock"></i>Chờ Founder duyệt — gian hàng chưa hiển thị công khai</span>';
+
+  let badges = '';
+  if(d.status === 'approved'){
+    if(d.tier === 'diamond') badges += '<span class="badge badge-diamond"><i class="ph-duotone ph-crown-simple"></i>Kim cương</span>';
+    else if(d.tier === 'featured') badges += '<span class="badge badge-featured"><i class="ph-duotone ph-star"></i>Nổi bật</span>';
+    else badges += '<span class="badge badge-basic">Hạng cơ bản</span>';
+    badges += d.verified
+      ? '<span class="badge badge-verified"><i class="ph-duotone ph-seal-check"></i>Đã xác minh ĐKKD</span>'
+      : '<span class="badge badge-unverified">Chưa xác minh ĐKKD</span>';
+  }
+
+  const gallery = Array.isArray(d.gallery) ? d.gallery : [];
+  let galHtml = gallery.map(function(g, i){
+    return '<div class="gal-item"><img src="' + escH(g.url) + '" alt="">'
+      + '<button class="gal-del" onclick="removeImage(' + i + ')" title="Xoá ảnh">✕</button></div>';
+  }).join('');
+  if(gallery.length < MAX_IMAGES){
+    galHtml += '<button class="gal-add" onclick="document.getElementById(\'imgInput\').click()">'
+      + '<i class="ph-duotone ph-plus-circle"></i>Thêm ảnh<span style="font-size:9px;font-weight:400">(' + gallery.length + '/' + MAX_IMAGES + ')</span></button>';
+  }
+
+  const pdfHtml = d.catalogPdfUrl
+    ? '<div class="pdf-row"><i class="ph-duotone ph-file-pdf"></i>'
+      + '<span class="pdf-name">' + escH(d.catalogPdfName || 'catalog.pdf') + '</span>'
+      + '<a class="btn btn-ghost btn-sm" href="' + escH(d.catalogPdfUrl) + '" target="_blank" rel="noopener">Xem</a>'
+      + '<button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="removePdf()">Gỡ</button></div>'
+    : '<button class="btn btn-ghost" onclick="document.getElementById(\'pdfInput\').click()"><i class="ph-duotone ph-upload-simple"></i>Tải catalog PDF (tối đa ' + MAX_PDF_MB + 'MB)</button>';
+
+  const priceRows = Array.isArray(d.priceList) ? d.priceList : [];
+
+  document.getElementById('content').innerHTML =
+    '<div class="card">'
+      + '<div class="card-title"><i class="ph-duotone ph-storefront"></i>' + escH(d.name || 'Gian hàng') + '</div>'
+      + statusChip
+      + '<div class="badge-row">' + badges + '</div>'
+      + (d.status === 'approved' ? '<div class="hint" style="margin:10px 0 0">Hạng và trạng thái xác minh do Founder xét duyệt — không tự đổi được. Bạn tự quản lý nội dung bên dưới.</div>' : '')
+    + '</div>'
+
+    + '<div class="card">'
+      + '<div class="card-title"><i class="ph-duotone ph-text-align-left"></i>Giới thiệu gian hàng</div>'
+      + '<div class="hint">Mô tả mặt hàng chủ lực, thế mạnh, khu vực giao hàng… Nội dung này hiện công khai trên trang gian hàng của bạn.</div>'
+      + '<textarea id="fIntro" maxlength="1000" placeholder="VD: Chuyên sắt thép xây dựng chính hãng Hòa Phát, Pomina — giao tận công trình khu vực Bình Dương, Đồng Nai trong 24h…">' + escH(d.intro || d.bio || '') + '</textarea>'
+      + '<div class="char-count"><span id="introCount">' + String((d.intro || d.bio || '').length) + '</span> / 1000</div>'
+    + '</div>'
+
+    + '<div class="card">'
+      + '<div class="card-title"><i class="ph-duotone ph-address-book"></i>Liên hệ bổ sung</div>'
+      + '<div class="hint">Số điện thoại/địa chỉ đã lấy từ hồ sơ đăng ký. Bổ sung thêm Zalo (nếu khác SĐT) và website nếu có.</div>'
+      + '<div class="field-row">'
+        + '<div class="field"><label>Zalo</label><input type="text" id="fZalo" placeholder="0901 234 567" value="' + escH(d.zalo || '') + '"></div>'
+        + '<div class="field"><label>Website</label><input type="url" id="fWebsite" placeholder="https://..." value="' + escH(d.website || '') + '"></div>'
+      + '</div>'
+      + '<div class="field" style="margin-top:14px"><label>Địa chỉ hiển thị công khai</label><input type="text" id="fAddress" placeholder="Số nhà, đường, quận/huyện…" value="' + escH(d.address || '') + '"></div>'
+    + '</div>'
+
+    + '<div class="card">'
+      + '<div class="card-title"><i class="ph-duotone ph-tag"></i>Bảng giá tham khảo</div>'
+      + '<div class="hint">Giá do bạn tự nhập, hiển thị công khai kèm dòng "giá tham khảo, có thể thay đổi". Bỏ trống nếu chưa muốn công bố giá.</div>'
+      + '<div id="priceRows">' + priceRowsHtml() + '</div>'
+      + '<button class="btn btn-ghost btn-sm" onclick="addPriceRow()"><i class="ph-duotone ph-plus"></i>Thêm dòng giá</button>'
+    + '</div>'
+
+    + '<div class="card">'
+      + '<div class="card-title"><i class="ph-duotone ph-images"></i>Ảnh sản phẩm</div>'
+      + '<div class="hint">Tối đa ' + MAX_IMAGES + ' ảnh, mỗi ảnh ≤ ' + MAX_IMG_MB + 'MB. Ảnh đầu tiên dùng làm ảnh đại diện gian hàng.</div>'
+      + '<div class="gal-grid" id="galGrid">' + galHtml + '</div>'
+      + '<input type="file" id="imgInput" accept="image/*" multiple style="display:none">'
+    + '</div>'
+
+    + '<div class="card">'
+      + '<div class="card-title"><i class="ph-duotone ph-book-open"></i>Catalog PDF</div>'
+      + pdfHtml
+      + '<input type="file" id="pdfInput" accept="application/pdf" style="display:none">'
+    + '</div>'
+
+    + '<div class="card">'
+      + '<div class="card-title"><i class="ph-duotone ph-video"></i>Video giới thiệu</div>'
+      + '<div class="hint">Dán link video YouTube, TikTok hoặc Facebook của bạn (tối đa ' + MAX_VIDEOS + ' video). Lưu ý: video Facebook phải để chế độ <b>Công khai</b> mới phát được.</div>'
+      + videosHtml()
+    + '</div>'
+
+    + '<div class="save-bar">'
+      + '<button class="btn btn-gold" id="btnSave" onclick="saveAll()" ' + (dirty ? '' : 'disabled') + '><i class="ph-duotone ph-floppy-disk"></i>Lưu thay đổi</button>'
+    + '</div>';
+
+  const lnk = document.getElementById('lnkView');
+  if(d.status === 'approved'){ lnk.style.display = 'inline-flex'; lnk.href = 'ncc_profile.html?uid=' + UID; }
+
+  document.getElementById('fIntro').addEventListener('input', function(){
+    document.getElementById('introCount').textContent = this.value.length;
+    markDirty();
+  });
+  document.getElementById('fZalo').addEventListener('input', markDirty);
+  document.getElementById('fWebsite').addEventListener('input', markDirty);
+  document.getElementById('fAddress').addEventListener('input', markDirty);
+  document.getElementById('imgInput').addEventListener('change', onPickImages);
+  const pdfIn = document.getElementById('pdfInput');
+  if(pdfIn) pdfIn.addEventListener('change', onPickPdf);
+}
+
+async function onPickImages(ev){
+  const files = Array.from(ev.target.files || []);
+  ev.target.value = '';
+  if(!files.length) return;
+  const gallery = Array.isArray(DATA.gallery) ? DATA.gallery : (DATA.gallery = []);
+  for(const f of files){
+    if(gallery.length >= MAX_IMAGES){ showToast('Đã đạt tối đa ' + MAX_IMAGES + ' ảnh', true); break; }
+    if(!f.type.startsWith('image/')){ showToast('Chỉ nhận file ảnh', true); continue; }
+    if(f.size > MAX_IMG_MB * 1024 * 1024){ showToast('Ảnh "' + f.name + '" vượt ' + MAX_IMG_MB + 'MB', true); continue; }
+    showToast('Đang tải ảnh lên… (' + f.name + ')');
+    try {
+      const ref = storageRef(storage, 'ncc-catalogs/' + UID + '/' + Date.now() + '-' + f.name);
+      await uploadBytes(ref, f, { contentType: f.type });
+      const url = await getDownloadURL(ref);
+      gallery.push({ url: url, cap: '' });
+      markDirty();
+      render();
+    } catch(e){
+      console.error(e);
+      showToast('Lỗi tải ảnh: ' + (e.message || e.code || e), true);
+    }
+  }
+  showToast('Ảnh đã thêm — bấm "Lưu thay đổi" để công bố');
+}
+
+async function onPickPdf(ev){
+  const f = (ev.target.files || [])[0];
+  ev.target.value = '';
+  if(!f) return;
+  if(f.type !== 'application/pdf'){ showToast('Chỉ nhận file PDF', true); return; }
+  if(f.size > MAX_PDF_MB * 1024 * 1024){ showToast('File vượt ' + MAX_PDF_MB + 'MB', true); return; }
+  showToast('Đang tải catalog lên…');
+  try {
+    const ref = storageRef(storage, 'ncc-catalogs/' + UID + '/catalog-' + Date.now() + '.pdf');
+    await uploadBytes(ref, f, { contentType: 'application/pdf' });
+    DATA.catalogPdfUrl = await getDownloadURL(ref);
+    DATA.catalogPdfName = f.name;
+    markDirty();
+    render();
+    showToast('Catalog đã thêm — bấm "Lưu thay đổi" để công bố');
+  } catch(e){
+    console.error(e);
+    showToast('Lỗi tải catalog: ' + (e.message || e.code || e), true);
+  }
+}
+
+window.removeImage = function(i){
+  if(!confirm('Xoá ảnh này khỏi gian hàng?')) return;
+  DATA.gallery.splice(i, 1);
+  markDirty();
+  render();
+};
+
+window.removePdf = function(){
+  if(!confirm('Gỡ catalog PDF khỏi gian hàng?')) return;
+  DATA.catalogPdfUrl = '';
+  DATA.catalogPdfName = '';
+  markDirty();
+  render();
+};
+
+window.saveAll = async function(){
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph-duotone ph-spinner ph-spin"></i>Đang lưu…';
+  try {
+    const intro = (document.getElementById('fIntro').value || '').trim().slice(0, 1000);
+    const zalo = (document.getElementById('fZalo').value || '').trim().slice(0, 30);
+    const website = (document.getElementById('fWebsite').value || '').trim().slice(0, 200);
+    const address = (document.getElementById('fAddress').value || '').trim().slice(0, 200);
+    const priceList = (DATA.priceList || [])
+      .filter(function(p){ return p && (p.item || '').trim(); })
+      .slice(0, MAX_PRICE_ROWS)
+      .map(function(p){ return { item: (p.item||'').trim().slice(0,120), unit: (p.unit||'').trim().slice(0,20), price: (p.price != null && !isNaN(p.price)) ? Number(p.price) : null }; });
+
+    await updateDoc(doc(db, 'nccApplications', UID), {
+      intro: intro,
+      zalo: zalo,
+      website: website,
+      address: address,
+      gallery: (DATA.gallery || []).slice(0, MAX_IMAGES),
+      catalogPdfUrl: DATA.catalogPdfUrl || '',
+      catalogPdfName: DATA.catalogPdfName || '',
+      videos: (DATA.videos || []).filter(isValidVideoUrl).slice(0, MAX_VIDEOS),
+      priceList: priceList,
+      priceUpdatedAt: serverTimestamp(),
+      galleryUpdatedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+    DATA.intro = intro; DATA.zalo = zalo; DATA.website = website; DATA.address = address; DATA.priceList = priceList;
+    dirty = false;
+    showToast('✅ Đã lưu gian hàng');
+    render();
+  } catch(e){
+    console.error(e);
+    showToast('Lỗi lưu: ' + (e.message || e.code || e), true);
+    btn.disabled = false;
+  }
+  btn.innerHTML = '<i class="ph-duotone ph-floppy-disk"></i>Lưu thay đổi';
+};
+
+onAuthStateChanged(auth, async function(user){
+  if(!user){
+    document.getElementById('content').innerHTML =
+      '<div class="gate"><i class="ph-duotone ph-lock-key"></i>Vui lòng đăng nhập bằng tài khoản Nhà cung cấp.<br><br><a class="btn btn-gold" href="login.html">Đăng nhập</a></div>';
+    return;
+  }
+  UID = user.uid;
+  try {
+    const [uSnap, aSnap] = await Promise.all([
+      getDoc(doc(db, 'users', UID)),
+      getDoc(doc(db, 'nccApplications', UID)),
+    ]);
+    const role = uSnap.exists() ? uSnap.data().role : '';
+    if(role !== 'ncc'){
+      document.getElementById('content').innerHTML =
+        '<div class="gate"><i class="ph-duotone ph-prohibit"></i>Trang này dành riêng cho tài khoản Nhà cung cấp (ncc.*).</div>';
+      return;
+    }
+    if(!aSnap.exists()){
+      document.getElementById('content').innerHTML =
+        '<div class="gate"><i class="ph-duotone ph-file-x"></i>Không tìm thấy hồ sơ đăng ký gian hàng.</div>';
+      return;
+    }
+    DATA = aSnap.data();
+    render();
+  } catch(e){
+    console.error(e);
+    document.getElementById('content').innerHTML =
+      '<div class="gate"><i class="ph-duotone ph-warning"></i>Lỗi tải dữ liệu: ' + escH(e.message || e.code || e) + '</div>';
+  }
+});
+</script>
+</body>
+</html>

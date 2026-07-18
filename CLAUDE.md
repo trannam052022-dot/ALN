@@ -177,6 +177,7 @@ body { font-size: 1rem; /* kế thừa từ html */ }
    - Để module gọi hàm UI, phải đưa ra `window.*`. Khai báo sớm các biến `window.PROJECTS_CLIENT/activeProj/...` trong `<head>`. Guard mảng rỗng lúc init (`PROJECTS_CLIENT[0]?.id`).
 4. Sau mỗi sửa: `node --check` phần module + kiểm tra còn đủ `</head></body></html>`.
 5. **MỌI TRANG CÔNG KHAI MỚI PHẢI CÓ THẺ GA4** (`G-5CSL1TF0RC`) trong `<head>` — copy snippet từ `index.html` (dòng có comment "Google Analytics 4"). Đã tự động ở: 3 template `tools/template-*.html` (gen-tinh/mau/dutoan) và `scripts/lib/templates.js` (build-cam-nang). CI `code-check.yml` sẽ FAIL nếu trang công khai thiếu hoặc trùng thẻ. Ngoại lệ (không gắn): dashboard nội bộ (client_CN/DN, kts/designer/ks_dashboard, founder_*), draft, `seed.html`, `board-editor.html`, `home.html` (redirect).
+6. **LÀM XONG VIỆC → LUÔN ĐỀ XUẤT DỌN DẸP KÈM THEO** (không tự xoá): sau khi hoàn thành một nhánh/tính năng, chủ động rà xem có nhánh nháp/file trùng lặp/bị thay thế nào còn sót lại không (VD: nhánh nháp bị một phiên/nhánh khác merge thẳng lên `main` khiến nội dung trùng, file `_draft`/`_v2` không còn dùng tới...). Nêu rõ trong báo cáo cuối và hỏi Founder có muốn dọn (xoá nhánh, gộp tài liệu...) hay không — không tự ý xoá nếu chưa được xác nhận.
 
 ## Query theo trang
 

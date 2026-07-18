@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MB7VRGR5');</script>
+<!-- End Google Tag Manager -->
+
+  <script src="error-monitor.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gian hàng nhà cung cấp — Vietbuild ALN | App Làm Nhà</title>
+<meta name="description" content="Hồ sơ gian hàng nhà cung cấp vật liệu xây dựng trên App Làm Nhà — ảnh sản phẩm, bảng giá tham khảo, liên hệ trực tiếp.">
+<meta property="og:title" content="Gian hàng nhà cung cấp — Vietbuild ALN">
+<meta property="og:description" content="Ảnh sản phẩm, bảng giá tham khảo và liên hệ trực tiếp nhà cung cấp vật liệu xây dựng trên App Làm Nhà.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="aln-tokens.css">
+<style>
+:root{
+  --cream:#f7f9fb;--white:#ffffff;--cream2:#eef2f6;
+  --border:#e1e7ee;--border2:#c9d3de;
+  --text:#1a2634;--text2:#3d4b5c;--sub:#5b6b7f;--muted:#93a1b3;
+  --gold:#98690a;--gold2:#b8860b;--gold-bg:rgba(152,105,10,.09);
+  --green:#16a34a;--blue:#4a8fff;
+  --r:14px;--r-sm:8px;--sh:0 1px 3px rgba(15,30,60,.06);
+  --mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;
+  --serif:'Cormorant Garamond',serif;--syne:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
+body{font-family:var(--sans);background:var(--cream);color:var(--text);min-height:100vh;font-size:1rem;line-height:1.6}
+a{color:var(--gold);text-decoration:none}
+.topbar{background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
+.tb-logo-box{background:linear-gradient(135deg,rgba(152,105,10,.14),rgba(184,134,11,.08));color:var(--gold);padding:4px 12px;border-radius:var(--r-sm);border:1.5px solid rgba(152,105,10,.3);font-family:var(--syne);font-size:11px;font-weight:800;letter-spacing:.07em}
+.tb-back{display:inline-flex;align-items:center;gap:5px;font-size:var(--text-xs);color:var(--sub);font-weight:600}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 70px}
+
+/* ── NOT FOUND ── */
+.notfound{text-align:center;padding:100px 20px}
+.notfound i{font-size:52px;color:var(--muted);display:block;margin-bottom:16px}
+.notfound h1{font-family:var(--serif);font-size:var(--text-xl);color:var(--text);margin-bottom:8px}
+.notfound p{font-size:var(--text-sm);color:var(--sub);margin-bottom:20px}
+
+/* ── COVER + HEADER ── */
+.cover{height:200px;background:var(--cream2);position:relative;overflow:hidden;border-radius:0 0 var(--r) var(--r)}
+.cover img{width:100%;height:100%;object-fit:cover}
+.cover i{font-size:56px;color:var(--muted);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.pro-header{padding:16px 4px 20px;position:relative}
+.badge-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.badge{font-size:var(--text-2xs);font-weight:800;padding:3px 10px;border-radius:99px;display:inline-flex;align-items:center;gap:4px}
+.badge-diamond{background:linear-gradient(120deg,#1a2634,#3d5470);color:#fff}
+.badge-featured{background:var(--gold);color:#fff}
+.badge-verified{background:var(--green);color:#fff}
+.badge-projects{background:var(--gold-bg);border:1px solid rgba(152,105,10,.28);color:var(--gold)}
+.pro-name{font-family:var(--syne);font-size:var(--text-xl);font-weight:800;color:var(--text);line-height:1.25}
+.pro-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:var(--text-sm);color:var(--sub)}
+.pro-meta span{display:inline-flex;align-items:center;gap:5px}
+.pro-bio{font-size:var(--text-sm);color:var(--text2);margin-top:12px;line-height:1.65}
+
+/* ── SECTION SHELL ── */
+.sec{background:var(--white);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);padding:18px 18px 20px;margin-top:14px}
+.sec-title{font-family:var(--syne);font-size:var(--text-sm);font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px;margin-bottom:14px}
+.sec-title i{color:var(--gold)}
+
+/* ── CONTACT BLOCK ── */
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.contact-item{display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:10px;background:var(--cream2);font-size:var(--text-sm);color:var(--text2);font-weight:600}
+.contact-item i{font-size:18px;color:var(--gold);flex-shrink:0}
+.contact-item a{color:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── PRICE LIST ── */
+.price-updated{font-size:var(--text-xs);color:var(--muted);margin-bottom:10px}
+.price-table{width:100%;border-collapse:collapse;font-size:var(--text-sm)}
+.price-table th{text-align:left;font-family:var(--syne);font-size:var(--text-2xs);text-transform:uppercase;letter-spacing:.06em;color:var(--sub);padding:6px 8px;border-bottom:1.5px solid var(--border2)}
+.price-table td{padding:8px;border-bottom:1px solid var(--border)}
+.price-table tr:last-child td{border-bottom:none}
+.price-table td.num{text-align:right;font-family:var(--mono);color:var(--text)}
+.price-note{font-size:var(--text-xs);color:var(--sub);margin-top:4px}
+
+/* ── GALLERY ── */
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.gallery-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;cursor:pointer;transition:opacity .15s}
+.gallery-grid img:hover{opacity:.85}
+
+/* ── VIDEO ── */
+.video-list{display:flex;flex-direction:column;gap:14px}
+.video-embed{position:relative;width:100%;padding-top:56.25%;border-radius:10px;overflow:hidden;background:#000}
+.video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video-link{display:inline-flex;align-items:center;gap:8px;padding:11px 13px;border-radius:10px;background:var(--cream2);font-size:var(--text-sm);color:var(--text2);font-weight:600}
+.video-link i{font-size:18px;flex-shrink:0}
+
+/* ── ALN PROJECTS ── */
+.aln-projects{display:flex;flex-direction:column;gap:8px}
+.aln-project-row{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:8px;background:var(--cream2);font-size:var(--text-sm)}
+.aln-project-name{font-weight:700;color:var(--text)}
+.aln-project-meta{color:var(--sub);font-size:var(--text-xs)}
+
+/* ── QUOTE CTA ── */
+.btn-quote{width:100%;padding:13px;border-radius:10px;border:1.5px dashed var(--border2);background:var(--white);color:var(--gold);font-family:var(--syne);font-size:var(--text-sm);font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
+.btn-quote:hover{border-color:var(--gold);background:var(--gold-bg)}
+
+.disclaimer{font-size:var(--text-xs);color:var(--muted);text-align:center;margin-top:20px;line-height:1.6}
+
+/* ── LIGHTBOX ── */
+.lightbox{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.9);align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox img{max-width:92vw;max-height:88vh;border-radius:8px;object-fit:contain}
+.lightbox-close{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.15);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer}
+
+/* ── QUOTE MODAL ── */
+.modal-backdrop{display:none;position:fixed;inset:0;z-index:200;background:rgba(15,25,40,.55);align-items:center;justify-content:center;padding:16px}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--white);border-radius:var(--r);padding:22px;max-width:420px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.modal h3{font-family:var(--syne);font-size:var(--text-md);font-weight:800;color:var(--text);margin-bottom:4px}
+.modal p.hint{font-size:var(--text-xs);color:var(--sub);margin-bottom:16px}
+.modal label{display:block;font-size:var(--text-xs);font-weight:700;color:var(--text2);margin-bottom:6px;margin-top:14px}
+.modal textarea,.modal input[type=tel]{width:100%;border:1px solid var(--border2);border-radius:8px;padding:9px 11px;font-family:var(--sans);font-size:var(--text-sm);color:var(--text);outline:none;resize:vertical}
+.modal textarea{min-height:80px}
+.modal textarea:focus,.modal input:focus{border-color:var(--gold)}
+.modal-consent{display:flex;align-items:flex-start;gap:8px;margin-top:14px;font-size:var(--text-2xs);color:var(--sub);line-height:1.55}
+.modal-consent input{margin-top:2px}
+.modal-btns{display:flex;gap:10px;margin-top:18px}
+.modal-btns button{flex:1;padding:11px;border-radius:9px;font-family:var(--syne);font-size:var(--text-sm);font-weight:700;cursor:pointer;border:none}
+.modal-cancel{background:var(--cream2);color:var(--text2)}
+.modal-submit{background:var(--gold);color:#fff}
+.modal-submit:hover{background:var(--gold2)}
+.modal-submit:disabled{opacity:.5;cursor:not-allowed}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(20,30,45,.97);color:#fff;font-size:var(--text-sm);font-weight:500;padding:10px 22px;border-radius:99px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .25s;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+@media(prefers-reduced-motion:reduce){.gallery-grid img,.btn-quote{transition:none}}
+</style>
+<!-- Google Analytics 4 (ALN — G-5CSL1TF0RC, tách riêng khỏi property TK.HOUSE) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5CSL1TF0RC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5CSL1TF0RC');
+</script>
+<!-- End GA4 -->
+<script src="aln-tracking.js"></script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MB7VRGR5"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav class="topbar">
+  <div class="tb-logo-box">ALN</div>
+  <a class="tb-back" href="ncc-showcase.html"><i class="ph-duotone ph-arrow-left"></i>Gian hàng Vật liệu</a>
+</nav>
+
+<div id="devBanner"></div>
+
+<div id="notFoundState" class="notfound" style="display:none">
+  <i class="ph-duotone ph-storefront"></i>
+  <h1>Gian hàng không tồn tại</h1>
+  <p>Gian hàng này có thể đã bị gỡ hoặc đường dẫn không đúng.</p>
+  <a class="tb-back" href="ncc-showcase.html" style="display:inline-flex"><i class="ph-duotone ph-arrow-left"></i>Về trang Gian hàng Vật liệu</a>
+</div>
+
+<div id="loadingState" class="notfound">
+  <i class="ph-duotone ph-spinner-gap"></i>
+  <p>Đang tải gian hàng…</p>
+</div>
+
+<div id="profileState" class="wrap" style="display:none">
+
+  <!-- 1) Ảnh bìa + tên + địa chỉ + badges -->
+  <div class="cover" id="cover"><i class="ph-duotone ph-storefront"></i></div>
+  <div class="pro-header">
+    <div class="badge-row" id="badgeRow"></div>
+    <div class="pro-name" id="proName"></div>
+    <div class="pro-meta">
+      <span id="proAddress"><i class="ph-duotone ph-map-pin"></i></span>
+      <span id="proCategory"><i class="ph-duotone ph-tag"></i></span>
+    </div>
+    <div class="pro-bio" id="proBio"></div>
+  </div>
+
+  <!-- 2) Khối liên hệ -->
+  <div class="sec">
+    <div class="sec-title"><i class="ph-duotone ph-address-book"></i>Liên hệ nhà cung cấp</div>
+    <div class="contact-grid" id="contactGrid"></div>
+  </div>
+
+  <!-- 3) Bảng giá tham khảo -->
+  <div class="sec" id="priceSec" style="display:none">
+    <div class="sec-title"><i class="ph-duotone ph-tag"></i>Bảng giá tham khảo</div>
+    <div class="price-updated" id="priceUpdated"></div>
+    <div style="overflow-x:auto">
+      <table class="price-table" id="priceTable"><thead><tr><th>Hạng mục</th><th>ĐVT</th><th style="text-align:right">Giá</th></tr></thead><tbody id="priceBody"></tbody></table>
+    </div>
+    <div class="price-note">Giá tham khảo, có thể thay đổi theo thời điểm — liên hệ trực tiếp để chốt giá.</div>
+  </div>
+
+  <!-- 4) Gallery sản phẩm -->
+  <div class="sec" id="gallerySec" style="display:none">
+    <div class="sec-title"><i class="ph-duotone ph-images-square"></i>Ảnh sản phẩm</div>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+
+  <!-- 5) Catalog PDF -->
+  <div class="sec" id="catalogSec" style="display:none">
+    <div class="sec-title"><i class="ph-duotone ph-file-pdf"></i>Catalog</div>
+    <a class="video-link" id="catalogLink" href="#" target="_blank" rel="noopener"><i class="ph-duotone ph-file-pdf" style="color:#e05252"></i><span id="catalogName"></span></a>
+  </div>
+
+  <!-- 6) Video giới thiệu -->
+  <div class="sec" id="videoSec" style="display:none">
+    <div class="sec-title"><i class="ph-duotone ph-video"></i>Video giới thiệu</div>
+    <div class="video-list" id="videoList"></div>
+  </div>
+
+  <!-- 7) Đã cung cấp cho dự án ALN -->
+  <div class="sec" id="alnProjectsSec" style="display:none">
+    <div class="sec-title"><i class="ph-duotone ph-medal"></i>Đã cung cấp cho dự án ALN</div>
+    <div class="aln-projects" id="alnProjectsList"></div>
+  </div>
+
+  <!-- 8) Yêu cầu báo giá -->
+  <div class="sec">
+    <button type="button" class="btn-quote" id="btnQuote"><i class="ph-duotone ph-calculator"></i>Yêu cầu báo giá theo dự toán</button>
+  </div>
+
+  <!-- 9) Disclaimer -->
+  <div class="disclaimer"><b>ⓘ</b> Thông tin gian hàng do nhà cung cấp tự đăng tải — ALN không thẩm định chất lượng sản phẩm. Quý khách kiểm tra kỹ trước khi giao dịch.</div>
+  <div class="disclaimer" id="serviceDisclaimer" style="display:none"></div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<!-- QUOTE MODAL -->
+<div class="modal-backdrop" id="quoteModal">
+  <div class="modal">
+    <h3>Yêu cầu báo giá theo dự toán</h3>
+    <p class="hint">Mô tả ngắn nhu cầu — nhà cung cấp sẽ liên hệ lại báo giá.</p>
+    <label for="qDesc">Mô tả nhu cầu <span style="color:var(--gold)">*</span></label>
+    <textarea id="qDesc" placeholder="VD: cần báo giá thép hộp cho nhà 2 tầng, diện tích 80m²…" maxlength="500"></textarea>
+    <label for="qPhone">Số điện thoại của bạn <span style="color:var(--gold)">*</span></label>
+    <input type="tel" id="qPhone" placeholder="0901 234 567">
+    <label class="modal-consent">
+      <input type="checkbox" id="qConsent">
+      <span>Tôi đồng ý để ALN và nhà cung cấp này xử lý thông tin trên nhằm mục đích liên hệ báo giá, theo Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân.</span>
+    </label>
+    <div class="modal-btns">
+      <button class="modal-cancel" id="qCancel">Huỷ</button>
+      <button class="modal-submit" id="qSubmit"><i class="ph-duotone ph-paper-plane-tilt"></i> Gửi yêu cầu</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function escH(s){
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function openLightbox(url){ document.getElementById('lightboxImg').src = url; document.getElementById('lightbox').classList.add('open'); }
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); document.getElementById('lightboxImg').src=''; }
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;
+
+var _tt = null;
+function showToast(msg){
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show';
+  clearTimeout(_tt);
+  _tt = setTimeout(function(){ el.className = 'toast'; }, 3200);
+}
+window.showToast = showToast;
+
+document.getElementById('qCancel').addEventListener('click', function(){
+  document.getElementById('quoteModal').classList.remove('open');
+});
+document.getElementById('btnQuote').addEventListener('click', function(){
+  document.getElementById('quoteModal').classList.add('open');
+});
+</script>
+
+<script type="module">
+import { db, doc, getDoc, collection, addDoc, serverTimestamp } from './firebase-config.js';
+
+var PROV_NAME = {HCM:'TP.HCM',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'BR–Vũng Tàu',LA:'Long An',TG:'Tiền Giang',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TH:'Thanh Hóa',OTHER:'Tỉnh khác'};
+var CATS = {
+  sat_thep:          'Sắt, thép',
+  go_noithat:        'Gỗ, nội thất',
+  gach_vlxd:         'Gạch, VLXD',
+  son_hoanthien:     'Sơn, hoàn thiện',
+  dien_nuoc:         'Điện, nước',
+  dv_thicong:        'Dịch vụ thi công',
+  thietbi_vanchuyen: 'Thiết bị & vận chuyển',
+  khac:              'Khác'
+};
+var SERVICE_CATS = ['dv_thicong', 'thietbi_vanchuyen'];
+var SERVICE_DISCLAIMER = 'ALN không phải bên cung cấp dịch vụ thi công/vận chuyển, không giám sát thực hiện và không chịu trách nhiệm về chất lượng, an toàn lao động và thiệt hại phát sinh. Quý khách giao kết trực tiếp với nhà cung cấp.';
+
+/* Chỉ nhúng YouTube/TikTok; Facebook dùng plugin video qua href (không nhúng iframe trực tiếp
+   vì cần App ID) — trích ID/URL bằng regex chặt để chống injection, không dùng innerHTML thô. */
+function videoEmbedHtml(u){
+  try {
+    var url = new URL(u);
+    var host = url.hostname.replace(/^www\./, '');
+    if (host === 'youtube.com' || host === 'm.youtube.com') {
+      var vid = url.searchParams.get('v');
+      if (vid && /^[\w-]{6,20}$/.test(vid)) {
+        return '<div class="video-embed"><iframe src="https://www.youtube.com/embed/' + vid + '" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>';
+      }
+      return '';
+    }
+    if (host === 'youtu.be') {
+      var vid2 = url.pathname.replace(/^\//, '');
+      if (vid2 && /^[\w-]{6,20}$/.test(vid2)) {
+        return '<div class="video-embed"><iframe src="https://www.youtube.com/embed/' + vid2 + '" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>';
+      }
+      return '';
+    }
+    if (host === 'tiktok.com') {
+      return '<a class="video-link" href="' + escH(u) + '" target="_blank" rel="noopener"><i class="ph-duotone ph-tiktok-logo"></i>Xem video trên TikTok</a>';
+    }
+    if (host === 'facebook.com' || host === 'm.facebook.com' || host === 'fb.watch') {
+      return '<div class="video-embed"><iframe src="https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(u) + '&show_text=false" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>';
+    }
+  } catch(e){}
+  return '<a class="video-link" href="' + escH(u) + '" target="_blank" rel="noopener"><i class="ph-duotone ph-play-circle"></i>Xem video</a>';
+}
+
+function logLead(nccUid, type, extra){
+  try {
+    var payload = Object.assign({ nccUid: nccUid, type: type, page: 'profile', ts: serverTimestamp() }, extra || {});
+    addDoc(collection(db, 'nccLeads'), payload).catch(function(e){ console.warn('[ncc-lead]', e && e.message); });
+    if (window.gtag) window.gtag('event', type === 'quote_request' ? 'ncc_quote_request' : 'ncc_contact_view', { ncc_uid: nccUid });
+  } catch(e){ console.warn('[ncc-lead]', e && e.message); }
+}
+
+function fmtVnd(n){
+  n = Number(n);
+  if (isNaN(n)) return '';
+  return n.toLocaleString('vi-VN') + ' đ';
+}
+
+function fmtDate(ts){
+  try {
+    if (ts && typeof ts.toDate === 'function') return ts.toDate().toLocaleDateString('vi-VN');
+  } catch(e){}
+  return '';
+}
+
+/* ── DỮ LIỆU MẪU (chế độ xem thử ?demo=1) — mirror danh sách trong
+   ncc-showcase.html, KHÔNG ghi vào Firestore. Xem chú thích ở đó. ──── */
+function img(seed){ return 'https://picsum.photos/seed/ncc-' + seed + '/480/360'; }
+var MOCK_DATA = {
+  'demo-01': { name:'Thép Hòa Phát — Đại lý cấp 1 Sài Gòn', category:'sat_thep', province:'HCM', tier:'diamond', verified:true,
+    phone:'0909111001', zalo:'0909111001', website:'https://thephoaphat-sg.example.vn', address:'Số 12 Quốc lộ 1A, Q.Bình Tân, TP.HCM',
+    intro:'Đại lý cấp 1 thép Hòa Phát — kho 5.000 tấn, giao công trình khu vực TP.HCM trong ngày.',
+    priceList:[{item:'Thép hộp 40x80',unit:'kg',price:19500},{item:'Thép phi 10 (D10)',unit:'kg',price:18200}],
+    gallery:[{url:img('01a')},{url:img('01b')},{url:img('01c')}],
+    alnProjects:[{projectName:'Biệt thự Vườn Tân Cổ Điển',ktsName:'KTS. Trần Đại Long',month:'06/2026'}] },
+  'demo-02': { name:'Gỗ Việt Nội Thất Đồng Nai', category:'go_noithat', province:'DNai', tier:'diamond', verified:true,
+    phone:'0909111002', zalo:'0909111002', website:'https://goviet-dnai.example.vn', address:'KCN Biên Hòa 2, TP.Biên Hòa, Đồng Nai',
+    intro:'Xưởng sản xuất tủ bếp, tủ áo theo thiết kế — gỗ công nghiệp An Cường, CNC theo bản vẽ KTS.',
+    priceList:[{item:'Tủ bếp trên/dưới',unit:'md',price:3200000},{item:'Tủ áo cánh lùa',unit:'md',price:2800000}],
+    gallery:[{url:img('02a')},{url:img('02b')}] },
+  'demo-03': { name:'VLXD Đại Thành Bình Dương', category:'gach_vlxd', province:'BD', tier:'diamond', verified:true,
+    phone:'0909111003', zalo:'0909111003', website:'https://daithanh-vlxd.example.vn', address:'KCN Sóng Thần, TP.Dĩ An, Bình Dương',
+    intro:'Nhà phân phối cấp 1 gạch Đồng Tâm, Viglacera — showroom 1.200m², hỗ trợ tính khối lượng theo bản vẽ.',
+    priceList:[{item:'Gạch ốp 60x60 bóng kiếng',unit:'m²',price:285000},{item:'Xi măng PCB40',unit:'bao',price:92000}],
+    gallery:[{url:img('03a')},{url:img('03b')}] },
+  'demo-04': { name:'Sơn Galaxy VN', category:'son_hoanthien', province:'HCM', tier:'featured', verified:true,
+    phone:'0909111004', zalo:'0909111004', website:null, address:'156 Cộng Hòa, Q.Tân Bình, TP.HCM',
+    intro:'Phân phối sơn nước Dulux, Jotun — tư vấn phối màu, giao toàn quốc.',
+    priceList:[{item:'Sơn nội thất 18L',unit:'thùng',price:1650000}], gallery:[{url:img('04a')}] },
+  'demo-05': { name:'Gạch Đồng Tâm HN', category:'gach_vlxd', province:'HN', tier:'featured', verified:true,
+    phone:'0909111005', zalo:'0909111005', website:null, address:'88 Phạm Văn Đồng, Q.Bắc Từ Liêm, Hà Nội',
+    intro:'Đại lý gạch ốp lát Đồng Tâm khu vực miền Bắc — giao toàn quốc.',
+    priceList:[{item:'Gạch nền 80x80',unit:'m²',price:245000}], gallery:[{url:img('05a')}] },
+  'demo-06': { name:'Thiết bị điện Phú Hưng Sài Gòn', category:'dien_nuoc', province:'HCM', tier:'featured', verified:true,
+    phone:'0909111006', zalo:'0909111006', website:null, address:'320 Điện Biên Phủ, Q.Bình Thạnh, TP.HCM',
+    intro:'Thiết bị điện Panasonic, Schneider — bóc tách khối lượng M&E miễn phí từ hồ sơ thiết kế.',
+    priceList:[{item:'Aptomat Panasonic 20A',unit:'cái',price:145000}], gallery:[{url:img('06a')}] },
+  'demo-07': { name:'Đội thi công Thành Phát', category:'dv_thicong', province:'HCM', tier:'featured', verified:false,
+    phone:'0909111007', zalo:'0909111007', website:null, address:'88 Tô Ký, Q.12, TP.HCM',
+    intro:'Nhóm thợ xây dựng trọn gói phần thô, nhân công lâu năm, nhận thi công theo bản vẽ kiến trúc.',
+    priceList:[{item:'Nhân công xây tô',unit:'m²',price:320000}], gallery:[{url:img('07a')}] },
+  'demo-08': { name:'Xi măng Hà Tiên — NPP Quận 7', category:'gach_vlxd', province:'HCM', tier:'basic', verified:false,
+    phone:'0909111008', zalo:'0909111008', website:null, address:'Đường Nguyễn Lương Bằng, Q.7, TP.HCM',
+    intro:'Nhà phân phối xi măng Hà Tiên — giao trong ngày khu vực Q.7, Nhà Bè.',
+    priceList:[{item:'Xi măng Hà Tiên PCB40',unit:'bao',price:89000}], gallery:[{url:img('08a')}] },
+  'demo-09': { name:'Cát đá Tân Cang — Đồng Nai', category:'gach_vlxd', province:'DNai', tier:'basic', verified:false,
+    phone:'0909111009', zalo:'0909111009', website:null, address:'Tân Cang, TP.Biên Hòa, Đồng Nai',
+    intro:'Cát, đá xây dựng khai thác trực tiếp — bán theo vùng Đông Nam Bộ.',
+    priceList:[{item:'Cát xây tô',unit:'m³',price:320000}], gallery:[{url:img('09a')}] },
+  'demo-10': { name:'Nội thất mây tre Phú Vinh', category:'go_noithat', province:'HN', tier:'basic', verified:false,
+    phone:'0909111010', zalo:'0909111010', website:null, address:'Làng nghề Phú Vinh, Chương Mỹ, Hà Nội',
+    intro:'Đồ mây tre đan làng nghề — sofa, đèn, bình phong phong cách indochine.',
+    priceList:[{item:'Ghế mây đan',unit:'cái',price:1450000}], gallery:[{url:img('10a')}] },
+  'demo-11': { name:'Vận tải vật liệu Phát Lộc', category:'thietbi_vanchuyen', province:'DNai', tier:'basic', verified:true,
+    phone:'0909111011', zalo:'0909111011', website:null, address:'KCN Amata, TP.Biên Hòa, Đồng Nai',
+    intro:'Đội xe tải 1.5–15 tấn chuyên chở vật liệu xây dựng, giao hàng công trình toàn Đông Nam Bộ.',
+    priceList:[{item:'Xe tải 5 tấn nội thành',unit:'chuyến',price:850000}], gallery:[{url:img('11a')}] },
+  'demo-12': { name:'Kính cường lực Nam Việt', category:'khac', province:'DNai', tier:'basic', verified:true,
+    phone:'0909111012', zalo:'0909111012', website:null, address:'KCN Long Bình, TP.Biên Hòa, Đồng Nai',
+    intro:'Kính cường lực, kính hộp, lan can kính — đo đạc tại công trình.',
+    priceList:[{item:'Kính cường lực 10ly',unit:'m²',price:680000}], gallery:[{url:img('12a')}] },
+  'demo-13': { name:'Ống nhựa Đồng Tiến Tiền Giang', category:'dien_nuoc', province:'TG', tier:'basic', verified:false,
+    phone:'0909111013', zalo:'0909111013', website:null, address:'QL1A, TP.Mỹ Tho, Tiền Giang',
+    intro:'Ống uPVC, HDPE, phụ kiện cấp thoát nước — giao sỉ lẻ khu vực miền Tây.',
+    priceList:[{item:'Ống HDPE D50',unit:'cây',price:62000}], gallery:[{url:img('13a')}] },
+  'demo-14': { name:'Sơn Nhật Minh TP.HCM', category:'son_hoanthien', province:'HCM', tier:'basic', verified:false,
+    phone:'0909111014', zalo:'0909111014', website:null, address:'156 Cộng Hòa, Q.Tân Bình, TP.HCM',
+    intro:'Phân phối sơn nước và sơn giả đá, có đội ngũ thi công riêng.',
+    priceList:[{item:'Sơn giả đá hiệu ứng',unit:'m²',price:185000}], gallery:[{url:img('14a')}] },
+};
+
+var NCC_UID = null;
+var NCC = null;
+
+function showNotFound(){
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('notFoundState').style.display = 'block';
+}
+
+function render(b){
+  NCC = b;
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('profileState').style.display = 'block';
+
+  var cover = document.getElementById('cover');
+  if (Array.isArray(b.gallery) && b.gallery[0] && b.gallery[0].url) {
+    cover.innerHTML = '<img src="' + escH(b.gallery[0].url) + '" alt="' + escH(b.name || '') + '">';
+  }
+
+  var badges = '';
+  if (b.tier === 'diamond') badges += '<span class="badge badge-diamond"><i class="ph-duotone ph-crown-simple"></i>Kim cương</span>';
+  if (b.tier === 'featured') badges += '<span class="badge badge-featured"><i class="ph-duotone ph-star"></i>Nổi bật</span>';
+  if (b.verified) badges += '<span class="badge badge-verified"><i class="ph-duotone ph-seal-check"></i>Đã xác minh ĐKKD</span>';
+  if (Array.isArray(b.alnProjects) && b.alnProjects.length) badges += '<span class="badge badge-projects"><i class="ph-duotone ph-medal"></i>Đã cung cấp ' + b.alnProjects.length + ' dự án qua ALN</span>';
+  document.getElementById('badgeRow').innerHTML = badges;
+
+  document.title = (b.name || 'Gian hàng') + ' — Vietbuild ALN | App Làm Nhà';
+  document.getElementById('proName').textContent = b.name || 'Gian hàng';
+  document.getElementById('proAddress').innerHTML = '<i class="ph-duotone ph-map-pin"></i> ' + escH(b.address || PROV_NAME[b.province] || b.province || '');
+  document.getElementById('proCategory').innerHTML = '<i class="ph-duotone ph-tag"></i> ' + escH(CATS[b.category] || b.category || '');
+  document.getElementById('proBio').textContent = b.intro || b.bio || '';
+
+  var svcEl = document.getElementById('serviceDisclaimer');
+  if (SERVICE_CATS.indexOf(b.category) !== -1) {
+    svcEl.style.display = 'block';
+    svcEl.innerHTML = '<b>ⓘ</b> ' + escH(SERVICE_DISCLAIMER);
+  } else {
+    svcEl.style.display = 'none';
+  }
+
+  /* 2) Liên hệ */
+  var cg = document.getElementById('contactGrid');
+  var items = '';
+  if (b.phone) items += '<div class="contact-item"><i class="ph-duotone ph-phone"></i><a href="tel:' + escH(b.phone) + '">' + escH(b.phone) + '</a></div>';
+  if (b.zalo) items += '<div class="contact-item"><i class="ph-duotone ph-chat-circle-dots"></i><span>Zalo: ' + escH(b.zalo) + '</span></div>';
+  if (b.website) items += '<div class="contact-item"><i class="ph-duotone ph-globe"></i><a href="' + escH(b.website) + '" target="_blank" rel="noopener">' + escH(b.website.replace(/^https?:\/\//,'')) + '</a></div>';
+  if (b.address) items += '<div class="contact-item"><i class="ph-duotone ph-navigation-arrow"></i><a href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(b.address) + '" target="_blank" rel="noopener">Chỉ đường</a></div>';
+  cg.innerHTML = items || '<div class="contact-item">Chưa cập nhật thông tin liên hệ.</div>';
+  cg.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ logLead(NCC_UID, 'contact_view'); });
+  });
+
+  /* 3) Bảng giá */
+  if (Array.isArray(b.priceList) && b.priceList.length) {
+    document.getElementById('priceSec').style.display = 'block';
+    document.getElementById('priceUpdated').textContent = b.priceUpdatedAt ? ('Cập nhật: ' + fmtDate(b.priceUpdatedAt)) : '';
+    document.getElementById('priceBody').innerHTML = b.priceList.map(function(p){
+      return '<tr><td>' + escH(p.item || '') + '</td><td>' + escH(p.unit || '') + '</td><td class="num">' + (p.price != null ? escH(fmtVnd(p.price)) : '—') + '</td></tr>';
+    }).join('');
+  }
+
+  /* 4) Gallery */
+  if (Array.isArray(b.gallery) && b.gallery.length) {
+    document.getElementById('gallerySec').style.display = 'block';
+    document.getElementById('galleryGrid').innerHTML = b.gallery.map(function(g){
+      return '<img src="' + escH(g.url) + '" alt="' + escH(g.caption || b.name || '') + '" loading="lazy" onclick="openLightbox(\'' + escH(g.url).replace(/'/g, "\\'") + '\')">';
+    }).join('');
+  }
+
+  /* 5) Catalog PDF */
+  if (b.catalogPdfUrl) {
+    document.getElementById('catalogSec').style.display = 'block';
+    var cl = document.getElementById('catalogLink');
+    cl.href = b.catalogPdfUrl;
+    cl.addEventListener('click', function(){ logLead(NCC_UID, 'catalog_view'); });
+    document.getElementById('catalogName').textContent = b.catalogPdfName || 'Xem catalog PDF';
+  }
+
+  /* 6) Video */
+  if (Array.isArray(b.videos) && b.videos.length) {
+    document.getElementById('videoSec').style.display = 'block';
+    document.getElementById('videoList').innerHTML = b.videos.map(videoEmbedHtml).join('');
+  }
+
+  /* 7) Dự án ALN */
+  if (Array.isArray(b.alnProjects) && b.alnProjects.length) {
+    document.getElementById('alnProjectsSec').style.display = 'block';
+    document.getElementById('alnProjectsList').innerHTML = b.alnProjects.map(function(p){
+      return '<div class="aln-project-row"><span class="aln-project-name">' + escH(p.projectName || '') + '</span><span class="aln-project-meta">' + escH(p.ktsName || '') + (p.month ? ' · ' + escH(p.month) : '') + '</span></div>';
+    }).join('');
+  }
+}
+
+async function load(){
+  var params = new URLSearchParams(window.location.search);
+  NCC_UID = params.get('uid');
+  if (!NCC_UID) { showNotFound(); return; }
+  if (params.get('demo') === '1') {
+    var mock = MOCK_DATA[NCC_UID];
+    if (!mock) { showNotFound(); return; }
+    document.getElementById('devBanner').innerHTML =
+      '<div style="background:#fff3d6;border-bottom:1px solid #e8c877;color:#7a5410;font-size:12px;font-weight:700;text-align:center;padding:8px 14px">'
+      + '⚠ Đang xem DỮ LIỆU MẪU (demo) để duyệt giao diện — không phải gian hàng thật.</div>';
+    var v = Object.assign({}, mock, { uid: NCC_UID });
+    render(v);
+    return;
+  }
+  try {
+    var snap = await getDoc(doc(db, 'nccApplications', NCC_UID));
+    if (!snap.exists() || snap.data().status !== 'approved') { showNotFound(); return; }
+    var v2 = snap.data();
+    v2.uid = NCC_UID;
+    render(v2);
+  } catch(e) {
+    console.warn('[ncc-profile]', e && e.message);
+    showNotFound();
+  }
+}
+load();
+
+/* 8) Modal yêu cầu báo giá */
+document.getElementById('qSubmit').addEventListener('click', async function(){
+  var descEl = document.getElementById('qDesc');
+  var phoneEl = document.getElementById('qPhone');
+  var consentEl = document.getElementById('qConsent');
+  var desc = descEl.value.trim();
+  var phone = phoneEl.value.trim();
+  if (!desc) { window.showToast('Vui lòng mô tả nhu cầu'); return; }
+  if (!phone || phone.replace(/\D/g,'').length < 9) { window.showToast('Số điện thoại chưa hợp lệ'); return; }
+  if (!consentEl.checked) { window.showToast('Cần đồng ý xử lý dữ liệu cá nhân (NĐ 13/2023)'); return; }
+  var btn = document.getElementById('qSubmit');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph-duotone ph-spinner-gap"></i> Đang gửi…';
+  try {
+    logLead(NCC_UID, 'quote_request', { content: desc, buyerPhone: phone, consent: true });
+    document.getElementById('quoteModal').classList.remove('open');
+    descEl.value = ''; phoneEl.value = ''; consentEl.checked = false;
+    window.showToast('Đã gửi yêu cầu — ' + (NCC && NCC.name ? NCC.name : 'nhà cung cấp') + ' sẽ liên hệ lại.');
+  } catch(e) {
+    console.warn('[ncc-quote]', e && e.message);
+    window.showToast('Có lỗi xảy ra, vui lòng thử lại');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi yêu cầu';
+});
+</script>
+</body>
+</html>
