@@ -514,6 +514,8 @@ const ROLE_META = {
   ks:       { icon:'<i class="ph-duotone ph-map-pin-area"></i>', title:'KS Vùng', desc:'Xét duyệt KTS & quản lý mạng lưới địa phương', color:'var(--gold)', bg:'rgba(201,168,76,.08)' },
   founder:  { icon:'<i class="ph-duotone ph-crown"></i>', title:'Hội đồng Sáng lập', desc:'Toàn quyền quản trị hệ thống ALN', color:'var(--gold)', bg:'rgba(201,168,76,.12)' },
   ke_toan:  { icon:'<i class="ph-duotone ph-calculator"></i>', title:'Kế toán trưởng', desc:'Đối chiếu khoản chi KTS/Designer chờ Founder chuyển', color:'var(--gold)', bg:'rgba(201,168,76,.08)' },
+  ktv:      { icon:'<i class="ph-duotone ph-ruler"></i>', title:'Kỹ thuật viên', desc:'Triển khai bản vẽ được KTS giao', color:'#22d3ee', bg:'rgba(34,211,238,.1)' },
+  ncc:      { icon:'<i class="ph-duotone ph-package"></i>', title:'Nhà cung cấp', desc:'Quản lý gian hàng vật liệu trên ALN', color:'var(--green)', bg:'rgba(61,214,140,.1)' },
 };
 
 let activeRole = 'kts';
@@ -640,15 +642,16 @@ async function doLogin(){
       resetLoginBtn(); return;
     }
     const effectiveRole = profile.role;
-    // founder + ke_toan: tài khoản nội bộ, không có tab riêng trên màn hình đăng
-    // nhập nên bỏ qua kiểm tra khớp tab (giống founder từ trước).
-    if(effectiveRole !== activeRole && effectiveRole !== 'founder' && effectiveRole !== 'ke_toan'){
+    // founder + ke_toan + ktv + ncc: tài khoản không có tab riêng trên màn
+    // hình đăng nhập (nhập username thủ công) nên bỏ qua kiểm tra khớp tab.
+    const NO_TAB_ROLES = ['founder', 'ke_toan', 'ktv', 'ncc'];
+    if(effectiveRole !== activeRole && NO_TAB_ROLES.indexOf(effectiveRole) === -1){
       await fb.signOut(fb.auth);
       const roleTitle = (ROLE_META[effectiveRole] && ROLE_META[effectiveRole].title) || effectiveRole;
       showError(`Tài khoản này thuộc vai trò "${roleTitle}". Vui lòng chọn đúng loại tài khoản.`);
       resetLoginBtn(); return;
     }
-    const redirectRole = (effectiveRole === 'founder' || effectiveRole === 'ke_toan') ? effectiveRole : activeRole;
+    const redirectRole = NO_TAB_ROLES.indexOf(effectiveRole) !== -1 ? effectiveRole : activeRole;
     const username = profile.username || user;
     var userData = JSON.stringify({ name:profile.name||username, userId:username, role:profile.role, badge:profile.badge||'', uid:cred.user.uid });
     try { localStorage.setItem('aln_user', userData); } catch(e){}
