@@ -292,11 +292,10 @@ if (IS_DEMO) {
   document.getElementById('demoBanner').innerHTML =
     '<div style="background:#fff3d6;border-bottom:1px solid #e8c877;color:#7a5410;font-size:12px;font-weight:700;text-align:center;padding:8px 14px">'
     + '⚠ Đang xem DỮ LIỆU MẪU (demo) để duyệt giao diện — không phải gian hàng thật, chưa ghi vào Firestore.</div>';
-} else if (SHOW_DEMO_FALLBACK) {
-  document.getElementById('demoBanner').innerHTML =
-    '<div style="background:#f3f0e8;border-bottom:1px solid #ddd2b0;color:#6b5a2e;font-size:11px;text-align:center;padding:6px 14px">'
-    + 'Một số gian hàng đánh dấu <b>"Minh hoạ"</b> là ví dụ giao diện, chưa phải nhà cung cấp thật — ALN đang mời thêm NCC đăng ký.</div>';
 }
+/* Founder yêu cầu bỏ banner giải thích "Minh hoạ" đầu trang (18/07/2026)
+   — badge "Minh hoạ" trên từng thẻ gian hàng mẫu vẫn giữ nguyên, chỉ bỏ
+   dòng ghi chú lặp lại ở đầu trang. */
 
 var FILTER = 'all';
 var PROV = 'all';
