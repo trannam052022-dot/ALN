@@ -80,6 +80,21 @@ textarea:focus,input:focus{border-color:rgba(201,168,76,.38)}
 .price-row{display:grid;grid-template-columns:1fr 90px 130px 34px;gap:8px;margin-bottom:8px;align-items:center}
 .price-row input{padding:8px 10px;font-size:12px}
 .price-del{width:30px;height:30px;border-radius:8px;background:rgba(240,96,96,.08);border:1px solid rgba(240,96,96,.25);color:var(--red);cursor:pointer;flex-shrink:0}
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.prod-card{border-radius:9px;overflow:hidden;border:1px solid var(--border);background:var(--bg2)}
+.prod-img-wrap{position:relative}
+.prod-img{width:100%;height:90px;object-fit:cover;display:block}
+.prod-img-add{width:100%;height:90px;border:none;background:rgba(201,168,76,.04);color:rgba(201,168,76,.7);font-size:11px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-family:var(--sans)}
+.prod-img-add:hover{background:rgba(201,168,76,.09)}
+.prod-img-add i{font-size:20px}
+.prod-img-del{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(8,12,20,.85);border:1px solid rgba(240,96,96,.4);color:var(--red);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.prod-body{padding:8px}
+.prod-body input{padding:6px 8px;font-size:11px;margin-bottom:6px}
+.prod-row2{display:grid;grid-template-columns:1fr 60px;gap:6px}
+.prod-del{width:100%;margin-top:2px;font-size:10px;font-weight:700;padding:5px;border-radius:6px;background:rgba(240,96,96,.08);border:1px solid rgba(240,96,96,.25);color:var(--red);cursor:pointer;font-family:var(--sans)}
+.prod-add-card{min-height:170px;border:1px dashed rgba(201,168,76,.35);border-radius:9px;background:rgba(201,168,76,.04);color:rgba(201,168,76,.7);font-size:12px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--sans)}
+.prod-add-card:hover{background:rgba(201,168,76,.09)}
+.prod-add-card i{font-size:22px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border-radius:9px;font-family:var(--syne);font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .2s}
 .btn-gold{background:linear-gradient(100deg,#a07830 0%,#e8d07a 45%,#C9A84C 100%);background-size:200% 100%;color:#0a0a10}
 .btn-gold:hover:not(:disabled){background-position:100%}
@@ -156,10 +171,12 @@ const MAX_IMG_MB = 8;
 const MAX_PDF_MB = 15;
 const MAX_VIDEOS = 5;
 const MAX_PRICE_ROWS = 30;
+const MAX_PRODUCTS = 60;
 
 let UID = null;
 let DATA = null;          // bản nháp đang chỉnh (gallery/intro/pdf/priceList...)
 let dirty = false;
+let pendingProductIdx = null;
 
 window.nccLogout = async function(){
   try { await signOut(auth); } catch(e){}
@@ -269,17 +286,102 @@ window.removePriceRow = function(i){
   render();
 };
 
+/* ── Sản phẩm nổi bật — mỗi sản phẩm có ảnh + tên + giá + ĐVT riêng, phù hợp
+   NCC bán nhiều mặt hàng (VD: cơ điện có hàng chục thiết bị khác nhau). ── */
+function productsHtml(){
+  const products = Array.isArray(DATA.products) ? DATA.products : [];
+  let html = products.map(function(p, i){
+    const imgBlock = p.imageUrl
+      ? '<div class="prod-img-wrap"><img class="prod-img" src="' + escH(p.imageUrl) + '" alt="">'
+        + '<button class="prod-img-del" onclick="removeProductImg(' + i + ')" title="Gỡ ảnh">✕</button></div>'
+      : '<button class="prod-img-add" onclick="pickProductImg(' + i + ')"><i class="ph-duotone ph-image"></i>Thêm ảnh</button>';
+    return '<div class="prod-card">'
+      + imgBlock
+      + '<div class="prod-body">'
+        + '<input type="text" placeholder="Tên sản phẩm" value="' + escH(p.name || '') + '" oninput="setProductField(' + i + ',\'name\',this.value)">'
+        + '<div class="prod-row2">'
+          + '<input type="number" min="0" placeholder="Giá (đ)" value="' + (p.price != null ? p.price : '') + '" oninput="setProductField(' + i + ',\'price\',this.value)">'
+          + '<input type="text" placeholder="ĐVT" value="' + escH(p.unit || '') + '" oninput="setProductField(' + i + ',\'unit\',this.value)">'
+        + '</div>'
+        + '<button class="prod-del" onclick="removeProduct(' + i + ')"><i class="ph-duotone ph-trash"></i> Xoá</button>'
+      + '</div>'
+    + '</div>';
+  }).join('');
+  if(products.length < MAX_PRODUCTS){
+    html += '<button class="prod-add-card" onclick="addProduct()"><i class="ph-duotone ph-plus-circle"></i>Thêm sản phẩm<span style="font-size:9px;font-weight:400">(' + products.length + '/' + MAX_PRODUCTS + ')</span></button>';
+  }
+  return html;
+}
+
+window.addProduct = function(){
+  if(!Array.isArray(DATA.products)) DATA.products = [];
+  if(DATA.products.length >= MAX_PRODUCTS){ showToast('Tối đa ' + MAX_PRODUCTS + ' sản phẩm', true); return; }
+  DATA.products.push({ name: '', price: null, unit: '', imageUrl: '' });
+  markDirty();
+  render();
+};
+
+window.setProductField = function(i, key, val){
+  if(!Array.isArray(DATA.products)) DATA.products = [];
+  if(!DATA.products[i]) DATA.products[i] = {};
+  DATA.products[i][key] = key === 'price' ? (val === '' ? null : Number(val)) : val;
+  markDirty();
+};
+
+window.removeProduct = function(i){
+  if(!confirm('Xoá sản phẩm này khỏi gian hàng?')) return;
+  DATA.products.splice(i, 1);
+  markDirty();
+  render();
+};
+
+window.pickProductImg = function(i){
+  pendingProductIdx = i;
+  document.getElementById('prodImgInput').click();
+};
+
+window.removeProductImg = function(i){
+  if(!DATA.products[i]) return;
+  DATA.products[i].imageUrl = '';
+  markDirty();
+  render();
+};
+
+async function onPickProductImg(ev){
+  const f = (ev.target.files || [])[0];
+  ev.target.value = '';
+  const i = pendingProductIdx;
+  pendingProductIdx = null;
+  if(!f || i == null || !DATA.products[i]) return;
+  if(!f.type.startsWith('image/')){ showToast('Chỉ nhận file ảnh', true); return; }
+  if(f.size > MAX_IMG_MB * 1024 * 1024){ showToast('Ảnh vượt ' + MAX_IMG_MB + 'MB', true); return; }
+  showToast('Đang tải ảnh sản phẩm lên…');
+  try {
+    const ref = storageRef(storage, 'ncc-catalogs/' + UID + '/products/' + Date.now() + '-' + f.name);
+    await uploadBytes(ref, f, { contentType: f.type });
+    const url = await getDownloadURL(ref);
+    DATA.products[i].imageUrl = url;
+    markDirty();
+    render();
+    showToast('Đã thêm ảnh — bấm "Lưu thay đổi" để công bố');
+  } catch(e){
+    console.error(e);
+    showToast('Lỗi tải ảnh: ' + (e.message || e.code || e), true);
+  }
+}
+
 /* ── Thước đo hoàn thiện hồ sơ — nhắc NCC bổ sung nội dung để gian hàng
    trông chuyên nghiệp hơn (đúng vai trò "website thay thế" cho NCC chưa
    có trang riêng). Trọng số cộng dồn tối đa 100. ── */
 function calcCompletion(d){
   const items = [
-    { label: 'Giới thiệu gian hàng', done: ((d.intro || d.bio || '').trim().length >= 50), weight: 20 },
-    { label: 'Có ảnh sản phẩm', done: Array.isArray(d.gallery) && d.gallery.length >= 1, weight: 25 },
-    { label: 'Có từ 3 ảnh trở lên', done: Array.isArray(d.gallery) && d.gallery.length >= 3, weight: 15 },
-    { label: 'Có catalog PDF', done: !!d.catalogPdfUrl, weight: 15 },
+    { label: 'Giới thiệu gian hàng', done: ((d.intro || d.bio || '').trim().length >= 50), weight: 15 },
+    { label: 'Có ảnh sản phẩm', done: Array.isArray(d.gallery) && d.gallery.length >= 1, weight: 15 },
+    { label: 'Có từ 3 ảnh trở lên', done: Array.isArray(d.gallery) && d.gallery.length >= 3, weight: 10 },
+    { label: 'Có catalog PDF', done: !!d.catalogPdfUrl, weight: 10 },
     { label: 'Có video giới thiệu', done: Array.isArray(d.videos) && d.videos.length >= 1, weight: 10 },
     { label: 'Có bảng giá tham khảo', done: Array.isArray(d.priceList) && d.priceList.some(function(p){ return p && (p.item || '').trim(); }), weight: 15 },
+    { label: 'Có sản phẩm nổi bật', done: Array.isArray(d.products) && d.products.some(function(p){ return p && (p.name || '').trim(); }), weight: 25 },
   ];
   const pct = items.reduce(function(sum, it){ return sum + (it.done ? it.weight : 0); }, 0);
   return { pct: pct, items: items };
@@ -368,8 +470,15 @@ function render(){
     + '</div>'
 
     + '<div class="card">'
-      + '<div class="card-title"><i class="ph-duotone ph-images"></i>Ảnh sản phẩm</div>'
-      + '<div class="hint">Tối đa ' + MAX_IMAGES + ' ảnh, mỗi ảnh ≤ ' + MAX_IMG_MB + 'MB. Ảnh đầu tiên dùng làm ảnh đại diện gian hàng.</div>'
+      + '<div class="card-title"><i class="ph-duotone ph-package"></i>Sản phẩm nổi bật</div>'
+      + '<div class="hint">Đăng từng sản phẩm/thiết bị riêng biệt kèm ảnh, tên, giá — phù hợp khi bạn có nhiều mặt hàng khác nhau (VD: cơ điện, thiết bị công trình). Tối đa ' + MAX_PRODUCTS + ' sản phẩm.</div>'
+      + '<div class="prod-grid" id="prodGrid">' + productsHtml() + '</div>'
+      + '<input type="file" id="prodImgInput" accept="image/*" style="display:none">'
+    + '</div>'
+
+    + '<div class="card">'
+      + '<div class="card-title"><i class="ph-duotone ph-images"></i>Ảnh sản phẩm (bộ sưu tập chung)</div>'
+      + '<div class="hint">Ảnh tổng quan xưởng/kho/công trình — khác với ảnh riêng của từng sản phẩm ở trên. Tối đa ' + MAX_IMAGES + ' ảnh, mỗi ảnh ≤ ' + MAX_IMG_MB + 'MB. Ảnh đầu tiên dùng làm ảnh đại diện gian hàng.</div>'
       + '<div class="gal-grid" id="galGrid">' + galHtml + '</div>'
       + '<input type="file" id="imgInput" accept="image/*" multiple style="display:none">'
     + '</div>'
@@ -401,6 +510,7 @@ function render(){
   document.getElementById('fWebsite').addEventListener('input', markDirty);
   document.getElementById('fAddress').addEventListener('input', markDirty);
   document.getElementById('imgInput').addEventListener('change', onPickImages);
+  document.getElementById('prodImgInput').addEventListener('change', onPickProductImg);
   const pdfIn = document.getElementById('pdfInput');
   if(pdfIn) pdfIn.addEventListener('change', onPickPdf);
 }
@@ -488,6 +598,10 @@ window.saveAll = async function(){
       .filter(function(p){ return p && (p.item || '').trim(); })
       .slice(0, MAX_PRICE_ROWS)
       .map(function(p){ return { item: (p.item||'').trim().slice(0,120), unit: (p.unit||'').trim().slice(0,20), price: (p.price != null && !isNaN(p.price)) ? Number(p.price) : null }; });
+    const products = (DATA.products || [])
+      .filter(function(p){ return p && (p.name || '').trim(); })
+      .slice(0, MAX_PRODUCTS)
+      .map(function(p){ return { name: (p.name||'').trim().slice(0,120), price: (p.price != null && !isNaN(p.price)) ? Number(p.price) : null, unit: (p.unit||'').trim().slice(0,20), imageUrl: p.imageUrl || '' }; });
 
     await updateDoc(doc(db, 'nccApplications', UID), {
       intro: intro,
@@ -499,11 +613,12 @@ window.saveAll = async function(){
       catalogPdfName: DATA.catalogPdfName || '',
       videos: (DATA.videos || []).filter(isValidVideoUrl).slice(0, MAX_VIDEOS),
       priceList: priceList,
+      products: products,
       priceUpdatedAt: serverTimestamp(),
       galleryUpdatedAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
-    DATA.intro = intro; DATA.zalo = zalo; DATA.website = website; DATA.address = address; DATA.priceList = priceList;
+    DATA.intro = intro; DATA.zalo = zalo; DATA.website = website; DATA.address = address; DATA.priceList = priceList; DATA.products = products;
     dirty = false;
     showToast('✅ Đã lưu gian hàng');
     render();
