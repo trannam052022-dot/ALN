@@ -213,8 +213,9 @@ window.renderLeads = function(){
   }).join('');
 
   // B2 — đếm hiệu quả theo KTS (KHÔNG tự cộng điểm — chỉ hiển thị cho Founder trả điểm minh bạch)
+  // Bỏ qua lead thiếu kts_ref (lead test/nhập tay không qua landing) — tránh hiện ô "undefined".
   const byKts = {};
-  filtered.forEach(l => { byKts[l.kts_ref] = (byKts[l.kts_ref]||0) + 1; });
+  filtered.forEach(l => { if(l.kts_ref) byKts[l.kts_ref] = (byKts[l.kts_ref]||0) + 1; });
   const rows = Object.keys(byKts).sort((a,b) => byKts[b]-byKts[a]);
   $('leadStats').innerHTML =
     '<div class="stat-card"><div class="stat-num">'+filtered.length+'</div><div class="stat-label">TỔNG LEAD (lọc)</div></div>'
