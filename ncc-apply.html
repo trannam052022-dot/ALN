@@ -353,14 +353,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="success-wrap">
       <div class="success-icon"><i class="ph-duotone ph-check-circle"></i></div>
       <h2 class="success-title">Đăng ký thành công!</h2>
-      <p class="success-sub">Founder sẽ liên hệ qua Zalo để xác minh và hướng dẫn bước tiếp theo trong vòng 1–2 ngày làm việc.</p>
+      <p class="success-sub">Gian hàng của bạn đã lên công khai NGAY trên ALN — không cần chờ Founder duyệt. Ghi nhớ tên đăng nhập bên dưới để lần sau quay lại:</p>
       <div class="success-uname" id="successUname">ncc.an0000</div>
       <ul class="next-steps">
-        <li><i class="ph-duotone ph-clock"></i> Hồ sơ đang chờ Founder xét duyệt</li>
-        <li><i class="ph-duotone ph-phone"></i> Founder gọi Zalo xác minh trực tiếp</li>
-        <li><i class="ph-duotone ph-chats-circle"></i> Sau duyệt: tham gia chuyên mục "Vật liệu &amp; Giá"</li>
-        <li><i class="ph-duotone ph-sign-in"></i> Đăng nhập tại <a href="login.html">login.html</a></li>
+        <li><i class="ph-duotone ph-storefront"></i> Gian hàng đã hiển thị công khai trên "Gian hàng Thiết bị"</li>
+        <li><i class="ph-duotone ph-pencil-simple"></i> Bổ sung ảnh/bảng giá/sản phẩm tại "Gian hàng của tôi"</li>
+        <li><i class="ph-duotone ph-phone"></i> Founder rà soát hồ sơ sau, có thể liên hệ Zalo nếu cần</li>
+        <li><i class="ph-duotone ph-sign-in"></i> Lần sau đăng nhập lại tại <a href="login.html">login.html</a> bằng tên đăng nhập trên</li>
       </ul>
+      <button class="btn btn-primary" id="btnGoShowcase" onclick="window.location.href='ncc-showcase.html'" style="margin-top:18px;width:100%">
+        <i class="ph-duotone ph-arrow-right"></i> Vào Gian hàng Thiết bị ngay
+      </button>
+      <div id="autoRedirectNote" style="font-size:11px;color:var(--text2);margin-top:10px"></div>
     </div>
   </div>
 
@@ -519,8 +523,23 @@ window._doSubmit = async function() {
       });
     } catch (e) { console.warn('upsertContact:', e.message); }
 
-    window.showToast('🎉 Đăng ký thành công! Gian hàng của bạn đã lên ngay — đang chuyển trang...', false);
-    setTimeout(function(){ window.location.href = 'ncc-showcase.html'; }, 1600);
+    // Hiện màn hình thành công VỚI username rõ ràng — username tự sinh (vd
+    // ncc.qc5833) không phải thứ khách nhớ được, cần thời gian đọc/ghi lại
+    // trước khi rời trang, KHÔNG auto-redirect ngay (từng làm mất luôn cơ
+    // hội xem username, khách không biết đăng nhập lại bằng gì).
+    document.getElementById('successUname').textContent = uname;
+    window.setStep(3);
+    var secondsLeft = 8;
+    var noteEl = document.getElementById('autoRedirectNote');
+    var countdownTimer = setInterval(function(){
+      secondsLeft -= 1;
+      if (noteEl) noteEl.textContent = 'Tự động chuyển trang sau ' + secondsLeft + ' giây...';
+      if (secondsLeft <= 0) {
+        clearInterval(countdownTimer);
+        window.location.href = 'ncc-showcase.html';
+      }
+    }, 1000);
+    if (noteEl) noteEl.textContent = 'Tự động chuyển trang sau ' + secondsLeft + ' giây...';
   } catch(err) {
     console.error(err);
     var msg = 'Có lỗi xảy ra, vui lòng thử lại';
