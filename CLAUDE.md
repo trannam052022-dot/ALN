@@ -44,7 +44,7 @@ Nền tảng theo dõi công trình xây dựng. **Frontend tĩnh** (HTML/JS thu
 | `functions/index.js` | Cloud Functions (Node 20, asia-southeast1) |
 | `index.html`, `manifest.json`, `icon-*.png` | PWA |
 | `ncc-apply.html` | Form đăng ký Gian hàng NCC (nhà cung cấp vật liệu/thiết bị) → ghi `nccApplications/{uid}`, role `ncc`, username prefix `ncc.` |
-| `ncc-showcase.html` | Trang công khai danh sách gian hàng NCC (3 tầng, tìm kiếm, filter tỉnh/danh mục) |
+| `ncc-showcase.html` | Trang công khai "Mạng lưới Thiết bị - Vật tư ALN" — danh sách gian hàng NCC (3 tầng, tìm kiếm, filter tỉnh/danh mục), đổi tên từ "Gian hàng Vật liệu"/"Vietbuild ALN" → "Mạng lưới Vật liệu ALN" → "Mạng lưới Thiết bị - Vật tư ALN" ngày 19/07/2026 |
 | `ncc_profile.html` | Trang công khai chi tiết 1 gian hàng NCC (`?uid=`), có chế độ xem thử `?demo=1` |
 | `ncc-dashboard.html` | Trang NCC tự quản lý gian hàng sau khi được duyệt |
 
@@ -215,12 +215,14 @@ Mục đích: NCC (sắt thép, gỗ nội thất, VLXD, sơn, điện nước, 
 - **8 danh mục:** `sat_thep, go_noithat, gach_vlxd, son_hoanthien, dien_nuoc, dv_thicong, thietbi_vanchuyen, khac`. 2 danh mục dịch vụ (`dv_thicong`, `thietbi_vanchuyen`) hiện disclaimer riêng: *"ALN không phải bên cung cấp dịch vụ thi công/vận chuyển..."*.
 - **`nccLeads` collection:** ghi ẩn danh (`create: if true`), Founder-only đọc, immutable (`update/delete: if false`) — theo dõi `contact_view`/`quote_request` mà không thu thập PII người xem (tuân NĐ 13/2023/NĐ-CP).
 - **Storage:** `ncc-catalogs/{uid}/{allPaths=**}` — đọc công khai (`true`), chỉ chủ gian ghi. Wildcard đã bao luôn `ncc-catalogs/{uid}/products/...` (ảnh từng sản phẩm) — **không cần sửa storage.rules khi thêm loại ảnh mới trong path này**.
-- **Diễn đàn:** tab "Gian hàng Thiết bị" (`vat_lieu` — tên nội bộ giữ nguyên để tránh migrate dữ liệu) trên `forum.html` bấm vào là redirect thẳng sang `ncc-showcase.html` (không hiện feed bài viết nữa) — `CATEGORY_VISIBILITY.vat_lieu = 'public'`, khách vãng lai xem tự do không cần đăng nhập.
+- **Diễn đàn:** tab "Vật liệu & Giá" (`vat_lieu` — tên nội bộ giữ nguyên để tránh migrate dữ liệu, đổi tên hiển thị từ "Gian hàng Thiết bị" ngày 19/07/2026 cho khớp `ncc-apply.html`) trên `forum.html` bấm vào là redirect thẳng sang `ncc-showcase.html` (không hiện feed bài viết nữa, nay mang tên **"Mạng lưới Thiết bị - Vật tư ALN"**) — `CATEGORY_VISIBILITY.vat_lieu = 'public'`, khách vãng lai xem tự do không cần đăng nhập.
 - **Demo data:** `SHOW_DEMO_FALLBACK=true` trong `ncc-showcase.html` trộn 14 gian hàng mẫu (`MOCK_DATA`, `isDemo:true`, không SĐT/Zalo/website thật, không tên thương hiệu thật) sau data thật; mỗi thẻ có badge "Minh hoạ". `ncc_profile.html` có `MOCK_DATA` riêng (phải sửa đồng bộ cả 2 nơi) + chế độ xem thử toàn trang `?demo=1`. `demo-06` "Thiết Bị Điện Phú Hưng" có sẵn 6 `products[]` mẫu để xem trước khối "Sản phẩm nổi bật".
 - **Còn tồn đọng (chưa làm, chưa có xác nhận Founder):**
-  1. `home.html`/`index.html` chưa có link tới `ncc-showcase.html`.
+  1. ~~`home.html`/`index.html` chưa có link tới `ncc-showcase.html`~~ — đã thêm chip nhấp nháy nền xanh đen "Mạng lưới Thiết bị - Vật tư ALN" (kèm tagline nhỏ) trong dải `.recruit-strip` "Hợp tác cùng ALN:" trên `index.html` ngày 19/07/2026 (không dùng mục nav riêng, đã thử rồi bỏ vì trùng lặp). Floating badge dùng chung `ncc-network-badge.js` vẫn còn trên `forum.html`/`ncc_profile.html`/`aln_community.html` (đã gỡ khỏi `index.html` vì trùng với chip trên).
   2. `leadCount` là field tĩnh — chưa có Cloud Function tổng hợp thật từ `nccLeads`.
   3. Quyền đăng bài diễn đàn của NCC (`NCC_CATEGORIES=['vat_lieu']` trong `functions/forum.js`) gần như vô nghĩa vì tab đã redirect thẳng ra ngoài — chưa quyết giữ hay bỏ.
+  4. Chính sách phí gói gian hàng cơ bản sau năm miễn phí đầu tiên (ưu đãi 50 doanh nghiệp đầu tiên trên `ncc-showcase.html`) — chưa quyết, cần chốt trước khi hết hạn miễn phí năm đầu.
+  5. Nhánh nháp `claude/ncc-showcase-demo-cithdq` (nhánh làm việc của các phiên NCC, còn trên remote) — hỏi Founder có muốn xoá không, việc thật đã lên `main` trực tiếp.
   4. Nhánh nháp `claude/ncc-showcase-demo-cithdq` (nhánh làm việc của các phiên NCC) — hỏi Founder có muốn xoá không, việc thật đã lên `main` trực tiếp.
 
 ## Các nút GHI đã được nối (Firestore/Storage)

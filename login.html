@@ -593,7 +593,7 @@ function showError(msg){
   setTimeout(()=>{ card.style.animation='shake .35s ease'; },10);
 }
 
-// ncc trỏ thẳng ncc-showcase.html ("Gian hàng Thiết bị") thay vì
+// ncc trỏ thẳng ncc-showcase.html ("Mạng lưới Thiết bị - Vật tư ALN") thay vì
 // ncc-dashboard.html — NCC xem gian hàng chung trước, tự bấm "Gian hàng của
 // tôi" (link trên ncc-showcase.html) khi muốn vào trang quản lý riêng.
 const FILE_BY_ROLE = { kts:'kts_dashboard.html', dn:'client_DN.html', cn:'client_CN.html', designer:'designer_dashboard.html', founder:'founder_panel.html', ks:'ks_dashboard.html', ktv:'ktv_dashboard.html', ke_toan:'ketoan_dashboard.html', ncc:'ncc-showcase.html' };
@@ -677,7 +677,7 @@ async function doLogin(){
     document.getElementById('redirectSub').textContent = 'Đang vào trang ' + m.title + '...';
     overlay.style.display = 'flex';
     setTimeout(function(){
-      // NCC luôn vào thẳng Gian hàng Thiết bị, kể cả khi có forumReturn —
+      // NCC luôn vào thẳng Mạng lưới Thiết bị - Vật tư ALN, kể cả khi có forumReturn —
       // bỏ qua luồng "quay lại diễn đàn" cho gọn, vì vai NCC không thật sự
       // tham gia diễn đàn (chỉ redirect ra ncc-showcase.html).
       var dest = redirectRole === 'ncc'
