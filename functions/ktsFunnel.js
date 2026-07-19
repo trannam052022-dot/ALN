@@ -209,6 +209,7 @@ exports.submitKtsApplication = onCall(
       province_home: provinceHome, provinces_work: provincesWork,
       avatarUrl, cvUrl, certUrls, driveUrl,
       username, status: "pending",
+      followedFanpage: !!d.followedFanpage,
       utm, source: utm.source || "direct",
       submittedAt: now,
     });

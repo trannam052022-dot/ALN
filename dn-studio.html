@@ -440,6 +440,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <input type="checkbox" id="f_agree">
       <span>Tôi đồng ý với <a href="#">Điều khoản sử dụng</a> và <a href="privacy.html">Chính sách bảo mật</a> của App Làm Nhà Corp.</span>
     </div>
+    <div class="agree-row">
+      <input type="checkbox" id="f_fanpage">
+      <span>Tôi sẽ theo dõi <a href="https://www.facebook.com/applamnha" target="_blank" rel="noopener">Fanpage Facebook ALN</a> để cập nhật tin tức và cơ hội hợp tác.</span>
+    </div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="goStep(2)"><i class="ph-duotone ph-arrow-left"></i> Quay lại</button>
       <button class="btn btn-primary" id="submitBtn" onclick="submitApply()">
@@ -642,6 +646,7 @@ window._doSubmit = async function() {
       email:          email || '',
       username:       uname,
       status:         'pending',
+      followedFanpage: document.getElementById('f_fanpage').checked,
       submittedAt:    serverTimestamp()
     });
 
