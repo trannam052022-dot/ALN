@@ -12,9 +12,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <script src="error-monitor.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gian hàng nhà cung cấp — Vietbuild ALN | App Làm Nhà</title>
-<meta name="description" content="Hồ sơ gian hàng nhà cung cấp vật liệu xây dựng trên App Làm Nhà — ảnh sản phẩm, bảng giá tham khảo, liên hệ trực tiếp.">
-<meta property="og:title" content="Gian hàng nhà cung cấp — Vietbuild ALN">
+<title>Gian hàng nhà cung cấp — Mạng lưới Thiết bị - Vật tư ALN | App Làm Nhà</title>
+<meta name="description" content="Hồ sơ gian hàng nhà cung cấp thiết bị, vật tư xây dựng trên Mạng lưới Thiết bị - Vật tư ALN — ảnh sản phẩm, bảng giá tham khảo, liên hệ trực tiếp.">
+<meta property="og:title" content="Gian hàng nhà cung cấp — Mạng lưới Thiết bị - Vật tư ALN">
 <meta property="og:description" content="Ảnh sản phẩm, bảng giá tham khảo và liên hệ trực tiếp nhà cung cấp vật liệu xây dựng trên App Làm Nhà.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -481,7 +481,7 @@ function render(b){
   if (Array.isArray(b.alnProjects) && b.alnProjects.length) badges += '<span class="badge badge-projects"><i class="ph-duotone ph-medal"></i>Đã cung cấp ' + b.alnProjects.length + ' dự án qua ALN</span>';
   document.getElementById('badgeRow').innerHTML = badges;
 
-  document.title = (b.name || 'Gian hàng') + ' — Vietbuild ALN | App Làm Nhà';
+  document.title = (b.name || 'Gian hàng') + ' — Mạng lưới Thiết bị - Vật tư ALN | App Làm Nhà';
   document.getElementById('proName').textContent = b.name || 'Gian hàng';
   document.getElementById('proAddress').innerHTML = '<i class="ph-duotone ph-map-pin"></i> ' + escH(b.address || PROV_NAME[b.province] || b.province || '');
   document.getElementById('proCategory').innerHTML = '<i class="ph-duotone ph-tag"></i> ' + escH(CATS[b.category] || b.category || '');
@@ -622,5 +622,6 @@ document.getElementById('qSubmit').addEventListener('click', async function(){
   btn.innerHTML = '<i class="ph-duotone ph-paper-plane-tilt"></i> Gửi yêu cầu';
 });
 </script>
+<script src="ncc-network-badge.js" defer></script>
 </body>
 </html>
