@@ -495,15 +495,20 @@ window._doSubmit = async function() {
     var cred = await createUserWithEmailAndPassword(auth, uname + '@aln.vn', pw);
     var uid  = cred.user.uid;
 
+    // Gian hàng NCC là directory quảng cáo tự đăng — lên công khai NGAY
+    // (status:'active'/'approved'), KHÔNG chờ Founder duyệt trước như KTS/DN/
+    // Designer/KS. Founder vẫn nhận thông báo qua onNccApply để hậu kiểm,
+    // xoá sau nếu gian hàng không đạt (Founder xác nhận 19/07/2026).
     await setDoc(doc(db, 'users', uid), {
       username: uname, name: name, role: 'ncc',
       email: email || (uname + '@aln.vn'),
-      province: province, status: 'pending', plan: 'free', credits: {}, createdAt: serverTimestamp()
+      province: province, status: 'active', plan: 'free', credits: {}, createdAt: serverTimestamp()
     });
     await setDoc(doc(db, 'nccApplications', uid), {
       uid: uid, name: name, phone: phone, email: email || '',
       province: province, category: category, bio: bio,
-      username: uname, status: 'pending', submittedAt: serverTimestamp()
+      username: uname, status: 'approved', tier: 'basic', verified: false,
+      submittedAt: serverTimestamp()
     });
 
     try {
@@ -514,8 +519,8 @@ window._doSubmit = async function() {
       });
     } catch (e) { console.warn('upsertContact:', e.message); }
 
-    document.getElementById('successUname').textContent = uname;
-    window.setStep(3);
+    window.showToast('🎉 Đăng ký thành công! Gian hàng của bạn đã lên ngay — đang chuyển trang...', false);
+    setTimeout(function(){ window.location.href = 'ncc-showcase.html'; }, 1600);
   } catch(err) {
     console.error(err);
     var msg = 'Có lỗi xảy ra, vui lòng thử lại';
