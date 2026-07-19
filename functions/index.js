@@ -109,15 +109,17 @@ exports.onKsApply = functions
     );
   });
 
-/* ── Nhà cung cấp vật liệu đăng ký mới (chỉ tham gia chuyên mục "Gian hàng Thiết bị", key nội bộ vat_lieu) ── */
+/* ── Nhà cung cấp vật liệu đăng ký mới (chỉ tham gia chuyên mục "Vật liệu & Giá", key nội bộ vat_lieu) ── */
 exports.onNccApply = functions
   .region("asia-southeast1")
   .firestore.document("nccApplications/{uid}")
   .onCreate(async (snap) => {
     const d = snap.data() || {};
     const CAT_LABEL = {
-      sat_thep: "Sắt, thép", go_noithat: "Gỗ, xưởng nội thất", gach_vlxd: "Gạch, VLXD",
-      son_hoanthien: "Sơn, hoàn thiện", dien_nuoc: "Điện, nước", khac: "Khác",
+      sat_thep_vlxd: "Sắt thép, Gạch, VLXD", go_noithat: "Gỗ, xưởng nội thất",
+      son_hoanthien: "Sơn, hoàn thiện", dien_nuoc: "Điện, nước",
+      dv_thicong: "Thợ - Đội thi công", thietbi_vanchuyen: "Thiết bị & vận chuyển",
+      thang_may: "Thang máy", khac: "Khác",
     };
     const detail = [d.province, CAT_LABEL[d.category] || d.category].filter(Boolean).join(" · ");
 
