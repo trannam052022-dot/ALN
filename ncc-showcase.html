@@ -133,6 +133,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="tb-logo-box">ALN</div>
   <div class="tb-page">Gian hàng Vật liệu</div>
   <div class="tb-right">
+    <a class="tb-link" href="ncc-dashboard.html" id="tbMyShopLink" style="display:none;color:var(--gold)"><i class="ph-duotone ph-storefront"></i>Gian hàng của tôi</a>
     <a class="tb-link" href="forum.html"><i class="ph-duotone ph-chats-circle"></i>Diễn đàn</a>
     <a class="tb-link" href="home.html"><i class="ph-duotone ph-house-line"></i>Trang chủ</a>
   </div>
@@ -191,7 +192,22 @@ function escH(s){
 </script>
 
 <script type="module">
-import { db, collection, query, where, getDocs, limit, addDoc, serverTimestamp } from './firebase-config.js';
+import { db, auth, onAuthStateChanged, doc, getDoc, collection, query, where, getDocs, limit, addDoc, serverTimestamp } from './firebase-config.js';
+
+/* Hiện link "Gian hàng của tôi" nếu người đang xem đã đăng nhập VÀ là NCC —
+   chủ yếu phục vụ NCC vừa đăng ký xong (ncc-apply.html redirect thẳng về
+   đây), cần đường quay lại ncc-dashboard.html để hoàn thiện nội dung gian
+   hàng (ảnh/bảng giá/sản phẩm) mà trang này trước đó không có lối vào. */
+onAuthStateChanged(auth, async function(user){
+  if(!user) return;
+  try {
+    var snap = await getDoc(doc(db, 'users', user.uid));
+    if(snap.exists() && snap.data().role === 'ncc'){
+      var el = document.getElementById('tbMyShopLink');
+      if(el) el.style.display = 'inline-flex';
+    }
+  } catch(e){ console.warn('check NCC role:', e.message); }
+});
 
 var PROV_NAME = {HCM:'TP.HCM',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'BR–Vũng Tàu',LA:'Long An',TG:'Tiền Giang',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TH:'Thanh Hóa',OTHER:'Tỉnh khác'};
 var CATS = {
