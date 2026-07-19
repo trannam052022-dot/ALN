@@ -340,6 +340,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <input type="checkbox" id="f_agree">
       <span>Tôi đã đọc và đồng ý với tất cả điều khoản Nhà cung cấp ALN nêu trên.</span>
     </div>
+    <div class="agree-row">
+      <input type="checkbox" id="f_fanpage">
+      <span>Tôi sẽ theo dõi <a href="https://www.facebook.com/applamnha" target="_blank" rel="noopener">Fanpage Facebook ALN</a> để cập nhật tin tức và cơ hội hợp tác.</span>
+    </div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="goStep(1)"><i class="ph-duotone ph-arrow-left"></i> Quay lại</button>
       <button class="btn btn-primary" id="submitBtn" onclick="submitApply()">
@@ -512,6 +516,7 @@ window._doSubmit = async function() {
       uid: uid, name: name, phone: phone, email: email || '',
       province: province, category: category, bio: bio,
       username: uname, status: 'approved', tier: 'basic', verified: false,
+      followedFanpage: document.getElementById('f_fanpage').checked,
       submittedAt: serverTimestamp()
     });
 
