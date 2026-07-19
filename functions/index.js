@@ -2330,6 +2330,13 @@ exports.submitLocalLead = require("./localLeads").submitLocalLead;
 const seoAnalytics = require("./seoAnalytics");
 exports.seoReportNow = seoAnalytics.seoReportNow;
 
+/* ── MyMy Marketing: agent RIÊNG cho Founder (đăng bài Buffer + đọc báo cáo
+   GA4 theo campaign), TÁCH KHỎI runMyMyTurn/runMyMyTurnCN vì 2 agent đó chạy
+   theo uid của chính khách DN/CN, không có role check — xem functions/mymyMarketing.js.
+   Cần set secret BUFFER_ACCESS_TOKEN + điền settings/marketing.bufferProfiles
+   trước khi dùng thật. ── */
+exports.runMyMyMarketingTurn = require("./mymyMarketing").runMyMyMarketingTurn;
+
 /* Cron 08:30 giờ VN (sau dailyDigest 08:00 để không dồn 2 push cùng lúc):
    lưu seoReports/{date} làm lịch sử xu hướng + đẩy tóm tắt cho Founder.
    Chưa cấu hình settings/seoReport thì im lặng bỏ qua. */
