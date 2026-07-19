@@ -34,6 +34,7 @@ const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const { upsertContactCore } = require("./contacts");
 
 if (!admin.apps.length) admin.initializeApp();
 
@@ -212,6 +213,19 @@ exports.submitKtsApplication = onCall(
       submittedAt: now,
     });
     await batch.commit();
+
+    /* Bảng liên hệ hợp nhất (contacts/) — song song, không chặn luồng đăng ký chính */
+    try {
+      await upsertContactCore({
+        phone, name,
+        loai_lien_he: "kts_ung_tuyen",
+        nguon: utm.source || "direct",
+        campaign_tag: utm.campaign || null,
+        chi_tiet_nguon: "Đăng ký KTS qua kts-apply.html",
+      });
+    } catch (e) {
+      console.error("[submitKtsApplication] upsertContact:", e.message);
+    }
 
     /* KTS đi từ Phòng chờ → đánh dấu đã nộp hồ sơ (reservationLifecycle ngừng nhắc) */
     try {
@@ -404,6 +418,20 @@ exports.submitHomeLead = onCall(
       ua: String(headers["user-agent"] || "").slice(0, 400),
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
+
+    /* Bảng liên hệ hợp nhất (contacts/) — song song, không chặn luồng lead chính */
+    try {
+      await upsertContactCore({
+        phone, name,
+        loai_lien_he: "khach_hang",
+        nguon: utm.source || "direct",
+        campaign_tag: utm.campaign || null,
+        chi_tiet_nguon: "Form Nhận báo giá trang chủ (home.html)",
+      });
+    } catch (e) {
+      console.warn("[submitHomeLead] upsertContact:", e.message);
+    }
+
     return { ok: true, id: ref.id };
   }
 );

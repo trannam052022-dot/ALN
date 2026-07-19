@@ -1548,6 +1548,7 @@ function mymySendClick(){
     mymyAddBot('Dạ em ghi nhận SĐT ' + text + ' rồi ạ. Đội ngũ ALN sẽ liên hệ lại trong giờ hành chính nha!');
     try { if(window.fbq) fbq('track', 'Lead', { content_name: 'MyMy - Để lại SĐT' }); } catch(e){}
     try { if(window.gtag) gtag('event', 'generate_lead', { method: 'MyMy chat' }); } catch(e){}
+    if(window.mymyUpsertContact){ window.mymyUpsertContact(text); }
     return;
   }
 
@@ -1896,6 +1897,20 @@ const auth = getAuth(app);
 const functions = getFunctions(app, 'asia-southeast1');
 const callAlnChat = httpsCallable(functions, 'alnChat');
 const callSubmitHomeLead = httpsCallable(functions, 'submitHomeLead', { timeout: 20000 });
+const callUpsertContact = httpsCallable(functions, 'upsertContact');
+
+/* MyMy bắt được SĐT gõ trong chat công khai — trước đây chỉ bắn Pixel/GA,
+   KHÔNG lưu ở đâu cả (rò rỉ lead). Ghi vào Bảng liên hệ hợp nhất (contacts/),
+   xem functions/contacts.js. Không chặn luồng chat nếu lỗi. */
+window.mymyUpsertContact = async function(phone) {
+  try {
+    await callUpsertContact({
+      phone: phone, name: null,
+      loai_lien_he: 'khach_hang', nguon: 'mymy_chat',
+      chi_tiet_nguon: 'MyMy chat trang chủ',
+    });
+  } catch (e) { console.warn('upsertContact:', e.message); }
+};
 
 let authReady = false;
 signInAnonymously(auth).catch((e) => console.error('MyMy anon-auth lỗi:', e));

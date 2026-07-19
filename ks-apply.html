@@ -482,8 +482,12 @@ function submitApply() {
 
 <script type="module">
 import {
-  auth, db, createUserWithEmailAndPassword, setDoc, doc, serverTimestamp
+  app, auth, db, createUserWithEmailAndPassword, setDoc, doc, serverTimestamp
 } from './firebase-config.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+
+const fns = getFunctions(app, 'asia-southeast1');
+const callUpsertContact = httpsCallable(fns, 'upsertContact');
 
 window._doSubmit = async function() {
   var btn = document.getElementById('submitBtn');
@@ -513,6 +517,14 @@ window._doSubmit = async function() {
       province: province, industry: industry, numKts: numkts, bio: bio,
       username: uname, status: 'pending', submittedAt: serverTimestamp()
     });
+
+    try {
+      await callUpsertContact({
+        phone: phone, name: name,
+        loai_lien_he: 'ks_ung_tuyen', nguon: 'website',
+        chi_tiet_nguon: 'Đăng ký KS Vùng qua ks-apply.html',
+      });
+    } catch (e) { console.warn('upsertContact:', e.message); }
 
     document.getElementById('successUname').textContent = uname;
     window.setStep(3);

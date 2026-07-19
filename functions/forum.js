@@ -15,6 +15,7 @@ const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
+const { upsertContactCore } = require("./contacts");
 
 const ANTHROPIC_KEY = defineSecret("ANTHROPIC_API_KEY");
 const VN_TZ = "Asia/Ho_Chi_Minh";
@@ -724,6 +725,22 @@ exports.forumPost = onCall({ region: REGION }, async (request) => {
       createdAt: ts(),
     });
     await postRef.update({ leadId: leadRef.id });
+
+    /* Bảng liên hệ hợp nhất (contacts/) — song song, không chặn luồng tạo lead chính */
+    if (profile.phone) {
+      try {
+        await upsertContactCore({
+          phone: profile.phone,
+          name: profile.name || "",
+          loai_lien_he: "dien_dan",
+          nguon: "forum",
+          chi_tiet_nguon: "Bài tư vấn dự án diễn đàn #" + postRef.id,
+        });
+      } catch (e) {
+        console.warn("[forumPost] upsertContact:", e.message);
+      }
+    }
+
     await fdNotify(FOUNDER_UID, "🔥 Lead mới từ diễn đàn (" + tier + ")",
       `${profile.name || "Khách"} — ${brief.projectType}, ${brief.area}m², ${brief.region}`,
       { type: "FORUM_LEAD", postId: postRef.id });

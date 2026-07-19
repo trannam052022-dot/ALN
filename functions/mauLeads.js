@@ -16,6 +16,7 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const { scoreLead } = require("./forum");
+const { upsertContactCore } = require("./contacts");
 
 if (!admin.apps.length) admin.initializeApp();
 
@@ -78,6 +79,7 @@ exports.submitMauLead = onCall(
     const headers = raw.headers || {};
     const ip = String(headers["x-forwarded-for"] || "").split(",")[0].trim() || raw.ip || "";
 
+    const utm = cleanUtm(d.utm);
     const ref = db.collection("leads").doc();
     await ref.set({
       name, phone,
@@ -93,7 +95,7 @@ exports.submitMauLead = onCall(
       mauId,
       mauTen: String(d.mauTen || "").trim().slice(0, 160),
       cta: d.cta === "tuvan" ? "tuvan" : "mua",
-      utm: cleanUtm(d.utm),
+      utm,
       sourceUrl: typeof d.sourceUrl === "string" ? d.sourceUrl.slice(0, 300) : "",
       fbp: typeof d.fbp === "string" ? d.fbp.slice(0, 200) : "",
       fbc: typeof d.fbc === "string" ? d.fbc.slice(0, 200) : "",
@@ -101,6 +103,20 @@ exports.submitMauLead = onCall(
       ua: String(headers["user-agent"] || "").slice(0, 400),
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
+
+    /* Bảng liên hệ hợp nhất (contacts/) — song song, không chặn luồng lead chính */
+    try {
+      await upsertContactCore({
+        phone, name,
+        loai_lien_he: "khach_hang",
+        nguon: utm.source || "direct",
+        campaign_tag: utm.campaign || null,
+        chi_tiet_nguon: "Form lead Kho mẫu (" + mauId + ")",
+      });
+    } catch (e) {
+      console.warn("[submitMauLead] upsertContact:", e.message);
+    }
+
     return { ok: true, id: ref.id };
   }
 );
