@@ -1534,6 +1534,22 @@ function mymyQuick(text){
   mymySendClick();
 }
 
+/* Dò SĐT ở BẤT KỲ đâu trong câu (không chỉ khi cả tin nhắn là 1 số trần) —
+   trước đây chỉ bắt được khi text khớp NGUYÊN cả chuỗi là số, nên nếu khách
+   gõ SĐT lồng trong câu tự nhiên (vd "Số của em là 0900000000 anh nhé") thì
+   lọt qua AI (alnChat) mà không ai lưu lại — AI chỉ "xác nhận" bằng lời nói,
+   không có code nào ghi contacts/. Trả về SĐT dạng 0xxxxxxxxx hoặc null. */
+function mymyExtractPhone(text){
+  var candidates = text.match(/(?:\+?84|0)[\d\s.\-]{7,13}/g);
+  if(!candidates) return null;
+  for(var i = 0; i < candidates.length; i++){
+    var raw = candidates[i].replace(/[\s.\-]/g, '').replace(/^\+/, '');
+    if(raw.indexOf('84') === 0 && raw.length > 9){ raw = '0' + raw.slice(2); }
+    if(/^0\d{8,10}$/.test(raw)) return raw;
+  }
+  return null;
+}
+
 function mymySendClick(){
   var input = document.getElementById('mymy-input');
   var text = input.value.trim();
@@ -1543,12 +1559,16 @@ function mymySendClick(){
   window.MYMY_HISTORY.push({ role: 'user', content: text });
   window.MYMY_USER_TURNS = window.MYMY_USER_TURNS + 1;
 
+  // Ghi nhận SĐT ngay khi phát hiện trong tin nhắn — bất kể đây là số trần
+  // hay lồng trong câu, bất kể đã hỏi xin SĐT hay chưa (khách tự nguyện cho).
+  var _foundPhone = mymyExtractPhone(text);
+  if(_foundPhone && window.mymyUpsertContact){ window.mymyUpsertContact(_foundPhone); }
+
   // Chế độ công khai: chỉ tư vấn sơ bộ + xin SĐT, không chốt giá, không ghi DB trực tiếp
   if(text.match(/^[0-9 .+-]{8,14}$/) && window.MYMY_ASKED_PHONE){
     mymyAddBot('Dạ em ghi nhận SĐT ' + text + ' rồi ạ. Đội ngũ ALN sẽ liên hệ lại trong giờ hành chính nha!');
     try { if(window.fbq) fbq('track', 'Lead', { content_name: 'MyMy - Để lại SĐT' }); } catch(e){}
     try { if(window.gtag) gtag('event', 'generate_lead', { method: 'MyMy chat' }); } catch(e){}
-    if(window.mymyUpsertContact){ window.mymyUpsertContact(text); }
     return;
   }
 
