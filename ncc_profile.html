@@ -315,13 +315,13 @@ import { db, doc, getDoc, collection, addDoc, serverTimestamp } from './firebase
 
 var PROV_NAME = {HCM:'TP.HCM',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'BR–Vũng Tàu',LA:'Long An',TG:'Tiền Giang',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TH:'Thanh Hóa',OTHER:'Tỉnh khác'};
 var CATS = {
-  sat_thep:          'Sắt, thép',
+  sat_thep_vlxd:     'Sắt thép, Gạch, VLXD',
   go_noithat:        'Gỗ, nội thất',
-  gach_vlxd:         'Gạch, VLXD',
   son_hoanthien:     'Sơn, hoàn thiện',
   dien_nuoc:         'Điện, nước',
-  dv_thicong:        'Dịch vụ thi công',
+  dv_thicong:        'Thợ - Đội thi công',
   thietbi_vanchuyen: 'Thiết bị & vận chuyển',
+  thang_may:         'Thang máy',
   khac:              'Khác'
 };
 var SERVICE_CATS = ['dv_thicong', 'thietbi_vanchuyen'];
@@ -385,7 +385,7 @@ function fmtDate(ts){
    gắn dự án/KTS thật của hệ thống vào gian hàng giả). ──── */
 function img(seed){ return 'https://picsum.photos/seed/ncc-' + seed + '/480/360'; }
 var MOCK_DATA = {
-  'demo-01': { name:'Thép Kim Long Sài Gòn', category:'sat_thep', province:'HCM', tier:'diamond', verified:true,
+  'demo-01': { name:'Thép Kim Long Sài Gòn', category:'sat_thep_vlxd', province:'HCM', tier:'diamond', verified:true,
     address:'Q.Bình Tân, TP.HCM',
     intro:'Đại lý thép xây dựng các loại — kho 5.000 tấn, giao công trình khu vực TP.HCM trong ngày.',
     priceList:[{item:'Thép hộp 40x80',unit:'kg',price:19500},{item:'Thép phi 10 (D10)',unit:'kg',price:18200}],
@@ -395,7 +395,7 @@ var MOCK_DATA = {
     intro:'Xưởng sản xuất tủ bếp, tủ áo theo thiết kế — gỗ công nghiệp phủ melamine, laminate, CNC theo bản vẽ KTS.',
     priceList:[{item:'Tủ bếp trên/dưới',unit:'md',price:3200000},{item:'Tủ áo cánh lùa',unit:'md',price:2800000}],
     gallery:[{url:img('02a')},{url:img('02b')}] },
-  'demo-03': { name:'VLXD Đại Thành Bình Dương', category:'gach_vlxd', province:'BD', tier:'diamond', verified:true,
+  'demo-03': { name:'VLXD Đại Thành Bình Dương', category:'sat_thep_vlxd', province:'BD', tier:'diamond', verified:true,
     address:'TP.Dĩ An, Bình Dương',
     intro:'Nhà phân phối vật liệu xây dựng — gạch ốp lát, xi măng — showroom 1.200m², hỗ trợ tính khối lượng theo bản vẽ.',
     priceList:[{item:'Gạch ốp 60x60 bóng kiếng',unit:'m²',price:285000},{item:'Xi măng PCB40',unit:'bao',price:92000}],
@@ -404,7 +404,7 @@ var MOCK_DATA = {
     address:'Q.Tân Bình, TP.HCM',
     intro:'Phân phối sơn nước các dòng phổ thông đến cao cấp — tư vấn phối màu, giao toàn quốc.',
     priceList:[{item:'Sơn nội thất 18L',unit:'thùng',price:1650000}], gallery:[{url:img('04a')}] },
-  'demo-05': { name:'Gạch Ốp Lát Bắc Việt', category:'gach_vlxd', province:'HN', tier:'featured', verified:true,
+  'demo-05': { name:'Gạch Ốp Lát Bắc Việt', category:'sat_thep_vlxd', province:'HN', tier:'featured', verified:true,
     address:'Q.Bắc Từ Liêm, Hà Nội',
     intro:'Đại lý gạch ốp lát khu vực miền Bắc — giao toàn quốc.',
     priceList:[{item:'Gạch nền 80x80',unit:'m²',price:245000}], gallery:[{url:img('05a')}] },
@@ -424,11 +424,11 @@ var MOCK_DATA = {
     address:'Q.12, TP.HCM',
     intro:'Nhóm thợ xây dựng trọn gói phần thô, nhân công lâu năm, nhận thi công theo bản vẽ kiến trúc.',
     priceList:[{item:'Nhân công xây tô',unit:'m²',price:320000}], gallery:[{url:img('07a')}] },
-  'demo-08': { name:'VLXD Phương Nam', category:'gach_vlxd', province:'HCM', tier:'basic', verified:false,
+  'demo-08': { name:'VLXD Phương Nam', category:'sat_thep_vlxd', province:'HCM', tier:'basic', verified:false,
     address:'Q.7, TP.HCM',
     intro:'Nhà phân phối vật liệu xây dựng — giao trong ngày khu vực Q.7, Nhà Bè.',
     priceList:[{item:'Xi măng PCB40',unit:'bao',price:89000}], gallery:[{url:img('08a')}] },
-  'demo-09': { name:'Cát Đá Sông Đồng Nai', category:'gach_vlxd', province:'DNai', tier:'basic', verified:false,
+  'demo-09': { name:'Cát Đá Sông Đồng Nai', category:'sat_thep_vlxd', province:'DNai', tier:'basic', verified:false,
     address:'TP.Biên Hòa, Đồng Nai',
     intro:'Cát, đá xây dựng khai thác trực tiếp — bán theo vùng Đông Nam Bộ.',
     priceList:[{item:'Cát xây tô',unit:'m³',price:320000}], gallery:[{url:img('09a')}] },
