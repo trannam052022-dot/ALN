@@ -1542,6 +1542,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <th>Trạng thái</th>
         <th>Hạng</th>
         <th>Xác minh ĐKKD</th>
+        <th>Lượt liên hệ</th>
         <th>Thao tác</th>
       </tr></thead>
       <tbody id="mgNccBody"></tbody>
@@ -4115,7 +4116,7 @@ function renderMgNcc() {
   document.getElementById('mgNccV3').textContent = topTier;
   var tbody = document.getElementById('mgNccBody');
   if(!tbody) return;
-  if(!rows.length){ tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:28px">Không có dữ liệu</td></tr>'; return; }
+  if(!rows.length){ tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--dim);padding:28px">Không có dữ liệu</td></tr>'; return; }
   tbody.innerHTML = rows.map(function(k){
     var provName = PROV_NAME_NCC_MG[k.province] || k.province || '—';
     var catName  = CAT_LABEL_NCC_MG[k.category] || k.category || '—';
@@ -4133,6 +4134,7 @@ function renderMgNcc() {
         +'<option value="diamond"'+(tier==='diamond'?' selected':'')+'>Kim cương</option>'
       +'</select></td>'
       +'<td style="text-align:center"><input type="checkbox" onchange="nccSetVerified(\''+k.uid+'\',this.checked)"'+(k.verified?' checked':'')+' style="width:16px;height:16px;cursor:pointer"></td>'
+      +'<td style="text-align:center;font-weight:700;color:var(--text1)">'+(k.leadCount||0)+'</td>'
       +'<td style="display:flex;gap:10px;align-items:center">'
         +(k.status==='approved' ? '<a href="ncc_profile.html?uid='+k.uid+'" target="_blank" style="font-size:11px;color:var(--gold);display:inline-flex;align-items:center;gap:4px"><i class="ph-duotone ph-eye"></i>Xem</a>' : '—')
         +'<button onclick="nccDeleteShop(\''+k.uid+'\',\''+(k.name||'').replace(/'/g,"\\'")+'\')" style="font-size:11px;color:#ef4444;background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:var(--sans)"><i class="ph-duotone ph-trash"></i>Xoá</button>'
@@ -4143,9 +4145,9 @@ function renderMgNcc() {
 
 function _loadNccUsers() {
   var tbody = document.getElementById('mgNccBody');
-  if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:28px"><i class="ph-duotone ph-spinner ph-spin"></i> Đang tải…</td></tr>';
+  if(tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--dim);padding:28px"><i class="ph-duotone ph-spinner ph-spin"></i> Đang tải…</td></tr>';
   if(window._nccLoadFromModule) { window._nccLoadFromModule(); }
-  else { if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:28px">Module chưa sẵn sàng, thử lại sau</td></tr>'; }
+  else { if(tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--dim);padding:28px">Module chưa sẵn sàng, thử lại sau</td></tr>'; }
 }
 
 window.nccSetTier = function(uid, tier){

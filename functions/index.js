@@ -130,6 +130,33 @@ exports.onNccApply = functions
     );
   });
 
+/* ── NCC lead — đếm leadCount thật trên nccApplications từ nccLeads ──
+   nccLeads ghi ẩn danh từ client (ncc-showcase.html/ncc_profile.html) không
+   qua Auth, leadCount trên nccApplications trước giờ là field tĩnh không ai
+   cập nhật (xem CLAUDE.md). Dùng FieldValue.increment thay vì đọc-rồi-ghi để
+   tránh lost update khi nhiều lead ghi cùng lúc. Chỉ tăng leadCountByType
+   theo whitelist để field path không bị d.type (client tự đặt) chi phối tuỳ
+   ý — dù vẫn luôn nằm dưới nhánh leadCountByType, không đụng field top-level
+   khác (tier/verified/gallery...). */
+var NCC_LEAD_TYPES = ["contact_view", "catalog_view", "quote_request"];
+exports.onNccLeadCreated = functions
+  .region("asia-southeast1")
+  .firestore.document("nccLeads/{leadId}")
+  .onCreate(async (snap) => {
+    const d = snap.data() || {};
+    const uid = d.nccUid;
+    if (!uid || typeof uid !== "string") return;
+    const patch = { leadCount: admin.firestore.FieldValue.increment(1) };
+    if (NCC_LEAD_TYPES.indexOf(d.type) !== -1) {
+      patch["leadCountByType." + d.type] = admin.firestore.FieldValue.increment(1);
+    }
+    try {
+      await db.collection("nccApplications").doc(uid).update(patch);
+    } catch (e) {
+      console.error("[onNccLeadCreated]", e);
+    }
+  });
+
 /* ── KTV đăng ký mới ── */
 exports.onKtvApply = functions
   .region("asia-southeast1")
