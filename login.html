@@ -593,7 +593,10 @@ function showError(msg){
   setTimeout(()=>{ card.style.animation='shake .35s ease'; },10);
 }
 
-const FILE_BY_ROLE = { kts:'kts_dashboard.html', dn:'client_DN.html', cn:'client_CN.html', designer:'designer_dashboard.html', founder:'founder_panel.html', ks:'ks_dashboard.html', ktv:'ktv_dashboard.html', ke_toan:'ketoan_dashboard.html', ncc:'ncc-dashboard.html' };
+// ncc trỏ thẳng ncc-showcase.html ("Gian hàng Thiết bị") thay vì
+// ncc-dashboard.html — NCC xem gian hàng chung trước, tự bấm "Gian hàng của
+// tôi" (link trên ncc-showcase.html) khi muốn vào trang quản lý riêng.
+const FILE_BY_ROLE = { kts:'kts_dashboard.html', dn:'client_DN.html', cn:'client_CN.html', designer:'designer_dashboard.html', founder:'founder_panel.html', ks:'ks_dashboard.html', ktv:'ktv_dashboard.html', ke_toan:'ketoan_dashboard.html', ncc:'ncc-showcase.html' };
 /* Nếu người dùng bấm đăng nhập TỪ diễn đàn (forum.html lưu sessionStorage.forumReturn),
    sau khi login xong đưa họ QUAY LẠI forum (đúng thread) thay vì dashboard mặc định. */
 function alnReturnDest(){
@@ -674,7 +677,12 @@ async function doLogin(){
     document.getElementById('redirectSub').textContent = 'Đang vào trang ' + m.title + '...';
     overlay.style.display = 'flex';
     setTimeout(function(){
-      var dest = alnReturnDest() || (FILE_BY_ROLE[redirectRole] + '?u=' + encodeURIComponent(username) + '&r=' + redirectRole);
+      // NCC luôn vào thẳng Gian hàng Thiết bị, kể cả khi có forumReturn —
+      // bỏ qua luồng "quay lại diễn đàn" cho gọn, vì vai NCC không thật sự
+      // tham gia diễn đàn (chỉ redirect ra ncc-showcase.html).
+      var dest = redirectRole === 'ncc'
+        ? (FILE_BY_ROLE.ncc + '?u=' + encodeURIComponent(username) + '&r=ncc')
+        : (alnReturnDest() || (FILE_BY_ROLE[redirectRole] + '?u=' + encodeURIComponent(username) + '&r=' + redirectRole));
       window.location.replace(dest);
     }, 800);
   } catch(err) {
