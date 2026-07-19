@@ -2325,6 +2325,18 @@ exports.submitDuToanLead = require("./duToanLeads").submitDuToanLead;
    Phase 3): CTA form ghi lead server-side, xem functions/localLeads.js. ── */
 exports.submitLocalLead = require("./localLeads").submitLocalLead;
 
+/* ── Bảng liên hệ hợp nhất (contacts/, ALN_SPEC_BANG_LIEN_HE_HOP_NHAT.md):
+   gộp SĐT từ nhập tay + KTS ứng tuyển + diễn đàn, lọc trùng xuyên nguồn.
+   upsertContact public onCall (không đòi auth) vì MyMy trên index.html gọi
+   lúc khách chưa đăng nhập. 4 hàm còn lại Founder-only (đọc/cập nhật/thống kê/
+   segment+xuất — không mở firestore.rules) — xem functions/contacts.js. ── */
+const contacts = require("./contacts");
+exports.upsertContact = contacts.upsertContact;
+exports.updateContact = contacts.updateContact;
+exports.getContactStats = contacts.getContactStats;
+exports.segmentContacts = contacts.segmentContacts;
+exports.tagCampaignBulk = contacts.tagCampaignBulk;
+
 /* ── SEO & Analytics: kéo Search Console + GA4 cho Founder, xem functions/seoAnalytics.js.
    Cần cấp quyền service account trước khi có số liệu — docs/SEO_VIEC_TAY.md. ── */
 const seoAnalytics = require("./seoAnalytics");
