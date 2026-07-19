@@ -48,13 +48,16 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if signedIn();
       // create: user tự tạo doc của mình KHÔNG được tự phong role đặc quyền. role phải
-      // thuộc tập hợp lệ (chặn 'founder'); và status buộc 'pending' cho mọi role trừ 'cn'
-      // (CN active ngay) → kẻ tự tạo role:'kts' vẫn kẹt 'pending', isKts() không cấp quyền
-      // cho tới khi Founder duyệt. Founder (seed.html / admin) tạo tự do.
+      // thuộc tập hợp lệ (chặn 'founder'); và status buộc 'pending' cho mọi role trừ
+      // 'cn'/'ncc' (active ngay) → kẻ tự tạo role:'kts' vẫn kẹt 'pending', isKts() không
+      // cấp quyền cho tới khi Founder duyệt. 'ncc' active ngay vì mô hình gian hàng NCC
+      // là directory quảng cáo tự đăng — hiện công khai ngay, Founder hậu kiểm (post-
+      // moderate) thay vì duyệt trước, xoá sau nếu không đạt (Founder xác nhận
+      // 19/07/2026). Founder (seed.html / admin) tạo tự do.
       allow create: if isFounder() || (
         signedIn() && request.auth.uid == uid &&
         request.resource.data.role in ['cn','kts','dn','designer','ks','ktv','ncc'] &&
-        (request.resource.data.role == 'cn'
+        (request.resource.data.role in ['cn','ncc']
           ? request.resource.data.status == 'active'
           : request.resource.data.status == 'pending')
       );
@@ -186,10 +189,13 @@ service cloud.firestore {
 
     // Nhà cung cấp vật liệu (ncc-apply.html) — tham gia chuyên mục "Vật liệu
     // & Giá" trên Diễn đàn VÀ có gian hàng công khai (ncc-showcase.html/
-    // ncc_profile.html) khi status=='approved'. Chủ gian tự sửa nội dung
-    // (ncc-dashboard.html) nhưng KHÔNG tự đổi được status/tier/verified —
-    // 3 field này chỉ Founder gán (founder_panel.html), chặn tự duyệt/tự
-    // nâng hạng gian hàng của chính mình.
+    // ncc_profile.html) khi status=='approved'. Từ 19/07/2026: ncc-apply.html
+    // tự tạo doc với status:'approved' NGAY (auto-publish, hậu kiểm — không
+    // qua Founder duyệt trước như KTS/DN/Designer/KS) — allow create không
+    // chặn giá trị status vì lý do này. Chủ gian tự sửa NỘI DUNG sau đó
+    // (ncc-dashboard.html) nhưng KHÔNG tự ĐỔI được status/tier/verified khi
+    // update — 3 field này chỉ Founder gán (founder_panel.html), chặn tự hạ/
+    // tự nâng hạng gian hàng của chính mình sau khi đã lên công khai.
     match /nccApplications/{uid} {
       allow read: if resource.data.status == 'approved' || isFounder() || (signedIn() && request.auth.uid == uid);
       allow create: if signedIn() && request.auth.uid == uid;

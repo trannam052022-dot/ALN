@@ -4133,7 +4133,10 @@ function renderMgNcc() {
         +'<option value="diamond"'+(tier==='diamond'?' selected':'')+'>Kim cương</option>'
       +'</select></td>'
       +'<td style="text-align:center"><input type="checkbox" onchange="nccSetVerified(\''+k.uid+'\',this.checked)"'+(k.verified?' checked':'')+' style="width:16px;height:16px;cursor:pointer"></td>'
-      +'<td>'+(k.status==='approved' ? '<a href="ncc_profile.html?uid='+k.uid+'" target="_blank" style="font-size:11px;color:var(--gold);display:inline-flex;align-items:center;gap:4px"><i class="ph-duotone ph-eye"></i>Xem</a>' : '—')+'</td>'
+      +'<td style="display:flex;gap:10px;align-items:center">'
+        +(k.status==='approved' ? '<a href="ncc_profile.html?uid='+k.uid+'" target="_blank" style="font-size:11px;color:var(--gold);display:inline-flex;align-items:center;gap:4px"><i class="ph-duotone ph-eye"></i>Xem</a>' : '—')
+        +'<button onclick="nccDeleteShop(\''+k.uid+'\',\''+(k.name||'').replace(/'/g,"\\'")+'\')" style="font-size:11px;color:#ef4444;background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:var(--sans)"><i class="ph-duotone ph-trash"></i>Xoá</button>'
+      +'</td>'
     +'</tr>';
   }).join('');
 }
@@ -4150,6 +4153,13 @@ window.nccSetTier = function(uid, tier){
 };
 window.nccSetVerified = function(uid, checked){
   if(window._nccSetField) window._nccSetField(uid, { verified: !!checked });
+};
+// Gian hàng NCC auto-publish ngay khi đăng ký (không qua Founder duyệt trước,
+// xem firestore.rules 19/07/2026) — đây là công cụ hậu kiểm: xoá VĨNH VIỄN
+// (users/{uid} + nccApplications/{uid}) nếu gian hàng không đạt. Cảnh báo 2
+// lớp (confirm + gõ lại tên) vì không thể hoàn tác.
+window.nccDeleteShop = function(uid, name){
+  if(window._nccDeleteShop) window._nccDeleteShop(uid, name);
 };
 
 /* ── DUYỆT ĐĂNG KÝ ── */
@@ -6555,6 +6565,29 @@ window._nccSetField = async function(uid, patch){
     console.error('[nccSetField]', e);
     alert('Lỗi cập nhật: ' + (e.message || e.code));
     renderMgNcc();
+  }
+};
+
+/* Xoá vĩnh viễn 1 gian hàng NCC (users/{uid} + nccApplications/{uid}) — dùng
+   khi Founder hậu kiểm phát hiện gian hàng không đạt (gian hàng đã auto-
+   publish ngay lúc đăng ký, không qua duyệt trước). Cảnh báo 2 lớp vì không
+   thể hoàn tác: confirm() rồi bắt gõ lại đúng tên gian hàng. */
+window._nccDeleteShop = async function(uid, name){
+  if(!confirm('XOÁ VĨNH VIỄN gian hàng "' + name + '"?\n\nGian hàng sẽ biến mất khỏi ncc-showcase.html ngay lập tức và KHÔNG THỂ HOÀN TÁC.')) return;
+  var typed = prompt('Để xác nhận, gõ lại đúng tên gian hàng: "' + name + '"');
+  if(typed !== name){
+    alert('Tên gõ không khớp — đã huỷ thao tác xoá.');
+    return;
+  }
+  try {
+    await deleteDoc(doc(db, 'nccApplications', uid));
+    await deleteDoc(doc(db, 'users', uid));
+    if(window._mgNccData){ window._mgNccData = window._mgNccData.filter(function(r){ return r.uid !== uid; }); }
+    renderMgNcc();
+    if(window.showToastFounder) window.showToastFounder('Đã xoá gian hàng "' + name + '"');
+  } catch(e) {
+    console.error('[nccDeleteShop]', e);
+    alert('Lỗi xoá: ' + (e.message || e.code));
   }
 };
 
