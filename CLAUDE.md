@@ -224,6 +224,25 @@ Mục đích: NCC (sắt thép, gỗ nội thất, VLXD, sơn, điện nước, 
   3. Chính sách phí gói gian hàng cơ bản sau năm miễn phí đầu tiên (ưu đãi 50 doanh nghiệp đầu tiên trên `ncc-showcase.html`) — chưa quyết, cần chốt trước khi hết hạn miễn phí năm đầu.
   4. Nhánh nháp `claude/ncc-showcase-demo-cithdq` (nhánh làm việc của các phiên NCC, còn trên remote) — hỏi Founder có muốn xoá không, việc thật đã lên `main` trực tiếp.
 
+## MyMy Marketing (module Founder-only: đăng Buffer + báo cáo GA4) — thêm 20/07/2026
+
+Agent RIÊNG, KHÔNG dùng chung allowlist/session với `runMyMyTurn`/`runMyMyTurnCN` (2 cái đó chạy theo uid khách DN/CN, không có role check — không an toàn nếu gắn tool chi tiền/đăng công khai vào chung).
+
+- **Function:** `runMyMyMarketingTurn` (`functions/mymyMarketing.js`), gate `request.auth.uid === FOUNDER_UID`. Session: `mymy_marketing_sessions/{founderUid}`. UI: nút "Chat với MyMy Marketing" trong `founder_panel.html` tab Trợ lý Marketing.
+- **Tool:** `scheduleMarketingPost` (đăng Buffer, UTM, khung giờ vàng 11:30-13:00/19:30-21:00 giờ VN, idempotency, luôn qua `request_confirmation` kể cả bài organic), `getMarketingReport` (đọc GA4 theo `campaign_tag`, tái dùng `settings/seoReport.ga4PropertyId` có sẵn — KHÔNG tạo config GA4 riêng), `cancelMarketingPost`.
+- **Buffer API:** GraphQL (`api.buffer.com`, header `Authorization: Bearer`) — API REST cũ (`api.bufferapp.com/1/...`) đã bị Buffer khai tử, đã xác nhận schema thật qua `developers.buffer.com/reference.html` (không phải đoán). Secret `BUFFER_ACCESS_TOKEN`. Config kênh: `settings/marketing.bufferChannels = {facebook: "<channel id>"}` — Channel ID lấy qua GraphQL `channels(input:{organizationId})`, KHÔNG phải "profile_id" kiểu cũ.
+- **Đã deploy & set secret xong**, Facebook "App Làm Nhà" đã kết nối Buffer + đã lấy Channel ID thật (`6a5debc8e2638b94d79e8f3f`) + đã ghi vào `settings/marketing.bufferChannels.facebook`.
+- **Còn tồn đọng (chưa làm/chưa test):**
+  1. **`scheduleMarketingPost`/`cancelMarketingPost` CHƯA từng chạy thật lần nào** — rủi ro cao nhất, cần test với 1 bài organic thật trước khi tin tưởng dùng rộng.
+  2. **`getMarketingReport` chưa test** — chưa xác nhận `settings/seoReport.ga4PropertyId` có sẵn chưa, chưa xác nhận key event lead đã bật trong GA4 (nếu chưa, tool sẽ luôn báo 0 lead).
+  3. Instagram + TikTok chưa có tài khoản — chưa kết nối Buffer, `settings/marketing.bufferChannels` mới có `facebook`.
+  4. Không có UI trong `founder_panel.html` để sửa `bufferChannels` — phải vào thẳng Firestore Console.
+  5. Không có dashboard xem lại lịch sử `marketing_posts` — chỉ hỏi qua chat MyMy.
+  6. Quy tắc đặt tên `campaign_tag` theo mục đích (KTS recruit/BD partner/content thường kỳ...) — code chỉ validate định dạng, chưa có quy ước thống nhất.
+  7. Đổi model AI (`claude-sonnet-4-6` → mới hơn) cho cả 3 agent MyMy — xem mục P2 bên dưới.
+  8. Nhánh `claude/review-optimization-r49lr4` (đã merge vào main) còn sót trên GitHub remote — Founder tự xoá tay (`github.com/trannam052022-dot/ALN/branches`), tôi không đủ quyền xoá qua token phiên.
+- **Tiện thể sửa luôn (20/07/2026):** `runMyMyTurn` (MyMy DN) trước đó thiếu xưng hô anh/chị theo giới tính dù đã có field `users/{uid}.gender` sẵn (client_CN.html đã làm đúng từ lâu, DN bị bỏ sót) — đã sửa, đọc thẳng `gender` server-side, không cần sửa `client_DN.html`. MyMy Marketing xưng "anh Long" (lấy tên thật Founder). Cả 2 đã deploy nhưng CHƯA được Founder xác nhận lại đã đúng trong chat thật.
+
 ## Các nút GHI đã được nối (Firestore/Storage)
 
 | Trang | Hàm | Đích |
