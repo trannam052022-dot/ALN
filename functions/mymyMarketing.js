@@ -14,9 +14,12 @@
  * config settings/seoReport.ga4PropertyId đã có sẵn ở seoAnalytics.js — không
  * tạo config GA4 riêng.
  *
- * Buffer API: endpoint/payload trong bufferCreateUpdate/bufferDestroyUpdate
- * là best-effort theo API Buffer v1 đã biết — PHẢI đối chiếu lại doc Buffer
- * hiện hành trước khi bật thật (spec mục 4.2).
+ * Buffer API: GraphQL (api.buffer.com), xác nhận trực tiếp từ
+ * developers.buffer.com/reference.html ngày 20/07/2026 (API REST v1 cũ đã bị
+ * Buffer khai tử — không dùng api.bufferapp.com/1/... nữa). Channel ID lấy
+ * qua query `channels`, không phải "profile_id" của API cũ. Chưa test bằng
+ * request thật (chưa có API key) — verify bằng 1 bài organic thật trước khi
+ * dùng rộng.
  */
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
@@ -171,8 +174,10 @@ function mymyMktNextGoldenHour(now) {
   return candidates.find((slot) => slot >= earliest) || candidates[candidates.length - 1];
 }
 
-/* Guard mềm — chủ động chặn trước khi chạm giới hạn 100 request/24h của
-   Buffer Free, thay vì để Buffer trả 429 khó hiểu giữa chừng 1 lô nhiều kênh. */
+/* Guard mềm — chặn trước khi gửi quá nhiều request/ngày sang Buffer. Buffer đã
+   khai tử API REST cũ (cùng hạn mức 100/24h đã biết) và chuyển sang GraphQL
+   (api.buffer.com) — hạn mức thật của API mới chưa được xác nhận, ngưỡng 90
+   dưới đây chỉ là biên an toàn tạm, cần điều chỉnh nếu Buffer công bố số khác. */
 async function mymyMktCheckRateLimit(incrementBy) {
   const today = new Date().toISOString().slice(0, 10);
   const ref = db.collection("settings").doc("marketingRateLimit");
@@ -181,42 +186,92 @@ async function mymyMktCheckRateLimit(incrementBy) {
     const d = snap.exists ? snap.data() : {};
     const count = d.date === today ? (d.count || 0) : 0;
     if (count + incrementBy > 90) {
-      throw new Error("Đã gần chạm giới hạn 100 request/24h của Buffer Free — thử lại sau vài giờ hoặc giảm số kênh.");
+      throw new Error("Đã gần chạm ngưỡng an toàn số request/ngày sang Buffer — thử lại sau vài giờ hoặc giảm số kênh.");
     }
     tx.set(ref, { date: today, count: count + incrementBy }, { merge: true });
   });
 }
 
-/* ── Buffer API — best-effort theo API v1 đã biết, xem ghi chú đầu file ── */
+/* ── Buffer API (GraphQL, api.buffer.com) — schema xác nhận trực tiếp từ
+   developers.buffer.com/reference.html ngày 20/07/2026 (API REST v1 cũ đã bị
+   khai tử). Endpoint duy nhất, auth "Authorization: Bearer <token>". ── */
 
-async function bufferCreateUpdate(token, { profileId, text, mediaUrl, scheduledAt }) {
-  const body = new URLSearchParams();
-  body.append("profile_ids[]", profileId);
-  body.append("text", text || "");
-  body.append("scheduled_at", String(Math.floor(scheduledAt.getTime() / 1000)));
-  if (mediaUrl) body.append("media[photo]", mediaUrl);
-  const resp = await fetch("https://api.bufferapp.com/1/updates/create.json", {
+const BUFFER_GRAPHQL_ENDPOINT = "https://api.buffer.com";
+
+async function bufferGraphQL(token, query, variables) {
+  const resp = await fetch(BUFFER_GRAPHQL_ENDPOINT, {
     method: "POST",
-    headers: { Authorization: "Bearer " + token, "Content-Type": "application/x-www-form-urlencoded" },
-    body: body.toString(),
+    headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+    body: JSON.stringify({ query, variables }),
   });
-  const data = await resp.json().catch(() => ({}));
-  if (!resp.ok || data.success === false) {
-    throw new Error((data && data.message) || ("Buffer HTTP " + resp.status));
+  const json = await resp.json().catch(() => ({}));
+  if (!resp.ok || (json.errors && json.errors.length)) {
+    const msg = (json.errors && json.errors[0] && json.errors[0].message) || ("Buffer HTTP " + resp.status);
+    throw new Error(msg);
   }
-  return data;
+  return json.data;
 }
 
-async function bufferDestroyUpdate(token, updateId) {
-  const resp = await fetch("https://api.bufferapp.com/1/updates/" + encodeURIComponent(updateId) + "/destroy.json", {
-    method: "POST",
-    headers: { Authorization: "Bearer " + token },
-  });
-  const data = await resp.json().catch(() => ({}));
-  if (!resp.ok || data.success === false) {
-    throw new Error((data && data.message) || ("Buffer HTTP " + resp.status));
+const VIDEO_EXT_RE = /\.(mp4|mov|webm|m4v)(\?|$)/i;
+
+/* AssetInput: kiểu "chọn đúng 1 trong 4" (image/video/document/link) — chỉ
+   phân biệt ảnh/video theo đuôi file URL vì content_url luôn là ảnh hoặc
+   video đã dựng xong (theo phạm vi spec). */
+function mymyMktAssetInput(url) {
+  return VIDEO_EXT_RE.test(url) ? { video: { url } } : { image: { url } };
+}
+
+const CREATE_POST_MUTATION = `
+  mutation MyMyCreatePost($input: CreatePostInput!) {
+    createPost(input: $input) {
+      __typename
+      ... on PostActionSuccess { post { id } }
+      ... on InvalidInputError { message }
+      ... on LimitReachedError { message }
+      ... on UnauthorizedError { message }
+      ... on NotFoundError { message }
+      ... on UnexpectedError { message }
+      ... on RestProxyError { message }
+    }
   }
-  return data;
+`;
+
+const DELETE_POST_MUTATION = `
+  mutation MyMyDeletePost($input: DeletePostInput!) {
+    deletePost(input: $input) {
+      __typename
+      ... on DeletePostSuccess { id }
+      ... on VoidMutationError { message }
+    }
+  }
+`;
+
+async function bufferCreatePost(token, { channelId, text, mediaUrl, scheduledAt }) {
+  const data = await bufferGraphQL(token, CREATE_POST_MUTATION, {
+    input: {
+      channelId,
+      text: text || "",
+      assets: [mymyMktAssetInput(mediaUrl)],
+      schedulingType: "automatic",
+      mode: "customScheduled",
+      dueAt: scheduledAt.toISOString(),
+      source: "aln-mymy-marketing",
+    },
+  });
+  const result = data.createPost;
+  if (result.__typename !== "PostActionSuccess") {
+    throw new Error(result.message || ("Buffer trả lỗi " + result.__typename));
+  }
+  return result.post.id;
+}
+
+async function bufferDeletePost(token, postId) {
+  const data = await bufferGraphQL(token, DELETE_POST_MUTATION, { input: { id: postId } });
+  const result = data.deletePost;
+  if (result.__typename !== "DeletePostSuccess") {
+    throw new Error(result.message || ("Buffer trả lỗi " + result.__typename));
+  }
+  return result.id;
 }
 
 /* ── GA4 Data API — tái dùng access token pattern của seoAnalytics.js ── */
@@ -281,10 +336,10 @@ async function mymyMktExecSchedulePost(founderUid, bufferToken, input) {
 
     const cfgSnap = await db.collection("settings").doc("marketing").get();
     const cfg = cfgSnap.exists ? cfgSnap.data() : {};
-    const bufferProfiles = cfg.bufferProfiles || {};
-    const missingProfiles = channels.filter((c) => !bufferProfiles[c]);
-    if (missingProfiles.length) {
-      return { ok: false, error: { code: "failed-precondition", message: "Chưa cấu hình Buffer profile cho kênh: " + missingProfiles.join(", ") + " (settings/marketing.bufferProfiles)" } };
+    const bufferChannels = cfg.bufferChannels || {};
+    const missingChannels = channels.filter((c) => !bufferChannels[c]);
+    if (missingChannels.length) {
+      return { ok: false, error: { code: "failed-precondition", message: "Chưa cấu hình Buffer channel ID cho kênh: " + missingChannels.join(", ") + " (settings/marketing.bufferChannels — lấy qua GraphQL query channels)" } };
     }
 
     await mymyMktCheckRateLimit(channels.length);
@@ -293,14 +348,13 @@ async function mymyMktExecSchedulePost(founderUid, bufferToken, input) {
     for (const ch of channels) {
       const utm = { utm_source: ch, utm_medium: isPaid ? "paid" : "organic", utm_campaign: input.campaign_tag };
       try {
-        const res = await bufferCreateUpdate(bufferToken, {
-          profileId: bufferProfiles[ch],
+        const bufferPostId = await bufferCreatePost(bufferToken, {
+          channelId: bufferChannels[ch],
           text: input.caption,
           mediaUrl: input.content_url,
           scheduledAt,
         });
-        const bufferId = res.updates && res.updates[0] && res.updates[0].id;
-        perChannel[ch] = { status: "scheduled", buffer_post_id: bufferId || null, utm_params: utm };
+        perChannel[ch] = { status: "scheduled", buffer_post_id: bufferPostId || null, utm_params: utm };
       } catch (e) {
         console.error("[mymyMktExecSchedulePost] Buffer error channel=" + ch, e);
         perChannel[ch] = { status: "failed", error: e.message, utm_params: utm };
@@ -348,7 +402,7 @@ async function mymyMktExecCancelPost(bufferToken, payload) {
     for (const [ch, info] of Object.entries(channels)) {
       if (info.status !== "scheduled" || !info.buffer_post_id) { updated[ch] = info; continue; }
       try {
-        await bufferDestroyUpdate(bufferToken, info.buffer_post_id);
+        await bufferDeletePost(bufferToken, info.buffer_post_id);
         updated[ch] = { ...info, status: "cancelled" };
       } catch (e) {
         updated[ch] = { ...info, cancel_error: e.message };

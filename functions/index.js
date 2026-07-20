@@ -2333,7 +2333,7 @@ exports.seoReportNow = seoAnalytics.seoReportNow;
 /* ── MyMy Marketing: agent RIÊNG cho Founder (đăng bài Buffer + đọc báo cáo
    GA4 theo campaign), TÁCH KHỎI runMyMyTurn/runMyMyTurnCN vì 2 agent đó chạy
    theo uid của chính khách DN/CN, không có role check — xem functions/mymyMarketing.js.
-   Cần set secret BUFFER_ACCESS_TOKEN + điền settings/marketing.bufferProfiles
+   Cần set secret BUFFER_ACCESS_TOKEN + điền settings/marketing.bufferChannels
    trước khi dùng thật. ── */
 exports.runMyMyMarketingTurn = require("./mymyMarketing").runMyMyMarketingTurn;
 
