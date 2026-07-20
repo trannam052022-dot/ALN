@@ -3299,7 +3299,7 @@ function nccSuggestBlockHtmlKts(p){
   if (!picks.length) return '';
   var cards = picks.map(function(b){
     var initials = String(b.name||'?').trim().split(/\s+/).filter(Boolean).slice(0,2).map(function(w){ return w[0]; }).join('').toUpperCase();
-    return '<a href="ncc_profile.html?uid=' + encodeURIComponent(b.uid) + '" target="_blank" style="flex:1;min-width:130px;background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:9px 10px;display:block;color:inherit;text-decoration:none">'
+    return '<a href="ncc_profile.html?uid=' + encodeURIComponent(b.uid) + '" target="_blank" style="flex:1;min-width:130px;background:var(--ink2);border:1px solid var(--border);border-radius:8px;padding:9px 10px;display:block;color:inherit;text-decoration:none">'
       + '<div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">'
         + '<div style="width:24px;height:24px;border-radius:6px;background:rgba(201,168,76,.14);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">' + _nccEscH(initials) + '</div>'
         + '<div style="font-size:11px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + _nccEscH(b.name || 'Gian hàng') + '</div>'
@@ -3307,9 +3307,9 @@ function nccSuggestBlockHtmlKts(p){
       + '<div style="font-size:9px;color:var(--muted)">' + _nccEscH(NCC_CAT_LABEL_KTS[b.category] || '') + '</div>'
     + '</a>';
   }).join('');
-  return '<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">'
-    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
-      + '<div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em"><i class="ph-duotone ph-storefront"></i> Gợi ý NCC vật tư</div>'
+  return '<div style="margin-top:14px;padding:12px;border-radius:9px;border:1.5px solid var(--gold);background:linear-gradient(135deg,rgba(152,105,10,.06),rgba(184,134,11,.10))">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">'
+      + '<div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em"><i class="ph-duotone ph-storefront"></i> Gợi ý NCC vật tư <span style="display:inline-block;background:var(--gold);color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:99px;margin-left:4px;text-transform:none;letter-spacing:normal">MỚI</span></div>'
       + '<a href="ncc-showcase.html" target="_blank" style="font-size:10px;color:var(--gold);font-weight:700">Xem tất cả →</a>'
     + '</div>'
     + '<div style="display:flex;gap:7px;flex-wrap:wrap">' + cards + '</div>'

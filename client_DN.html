@@ -2160,9 +2160,9 @@ function nccSuggestBlockHtmlDn(p){
     </a>`;
   }).join('');
   return `
-    <div class="card" style="padding:14px 18px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div class="ct" style="margin:0;border:none;padding:0"><i class="ph-duotone ph-storefront" style="color:var(--gold)"></i> Gợi ý nhà cung cấp vật tư</div>
+    <div class="card" style="padding:14px 18px;border:1.5px solid var(--gold);background:linear-gradient(135deg,rgba(152,105,10,.05),rgba(184,134,11,.09))">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">
+        <div class="ct" style="margin:0;border:none;padding:0"><i class="ph-duotone ph-storefront" style="color:var(--gold)"></i> Gợi ý nhà cung cấp vật tư <span class="pill" style="background:var(--gold);color:#fff;font-size:8px;margin-left:4px">MỚI</span></div>
         <a href="ncc-showcase.html" target="_blank" style="font-size:10px;color:var(--gold);font-weight:700">Xem tất cả →</a>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">${cards}</div>
