@@ -2128,7 +2128,7 @@ var REVIEW_DATA = {};
 /* Active review state */
 const _reviewState = {};
 
-/* ── Gợi ý NCC (Mạng lưới Thiết bị - Vật tư ALN) ở giai đoạn C3 — ưu tiên
+/* ── Gợi ý NCC (Mạng lưới Thiết bị - Vật tư ALN) từ chặng C2 trở đi — ưu tiên
    tier cao + cùng tỉnh dự án (meetingProvince trong p._raw), dự phòng NCC
    toàn quốc nếu tỉnh đó chưa đủ. Tên NCC do người dùng tự nhập (auto-
    publish, không qua Founder duyệt trước) nên PHẢI escape. */
@@ -2146,7 +2146,7 @@ function nccPickSuggestionsDn(provinceCode, count){
   return inProv.concat(rest).slice(0, count);
 }
 function nccSuggestBlockHtmlDn(p){
-  if ((p.stage||'') !== 'C3') return '';
+  if ((p.stage||'C1') === 'C1') return '';
   var picks = nccPickSuggestionsDn((p._raw && p._raw.meetingProvince) || '', 4);
   if (!picks.length) return '';
   var cards = picks.map(b=>{
@@ -2162,7 +2162,7 @@ function nccSuggestBlockHtmlDn(p){
   return `
     <div class="card" style="padding:14px 18px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div class="ct" style="margin:0;border:none;padding:0"><i class="ph-duotone ph-storefront" style="color:var(--gold)"></i> Gợi ý nhà cung cấp vật tư — giai đoạn hoàn thiện</div>
+        <div class="ct" style="margin:0;border:none;padding:0"><i class="ph-duotone ph-storefront" style="color:var(--gold)"></i> Gợi ý nhà cung cấp vật tư</div>
         <a href="ncc-showcase.html" target="_blank" style="font-size:10px;color:var(--gold);font-weight:700">Xem tất cả →</a>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">${cards}</div>
@@ -3625,7 +3625,7 @@ import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, 
 
 const REQUIRED_ROLE = "dn";
 
-/* ── Gợi ý NCC ở giai đoạn C3 — tải 1 lần lúc vào trang, ưu tiên NCC cùng
+/* ── Gợi ý NCC từ chặng C2 trở đi — tải 1 lần lúc vào trang, ưu tiên NCC cùng
    tỉnh dự án. renderMain là hàm global (plain script) nên gọi lại được
    trực tiếp khi data về. */
 window.NCC_SUGGEST_LIST = [];

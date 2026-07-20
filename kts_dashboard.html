@@ -3031,7 +3031,7 @@ import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, 
 
 const REQUIRED_ROLE = "kts";
 
-/* ── Gợi ý NCC ở giai đoạn C3 — tải 1 lần lúc vào trang, ưu tiên NCC cùng
+/* ── Gợi ý NCC từ chặng C2 trở đi — tải 1 lần lúc vào trang, ưu tiên NCC cùng
    tỉnh dự án. Nếu panel chi tiết dự án đang mở khi data về, render lại
    qua window.mplSelect (hàm công khai duy nhất trigger mplRenderDetail). */
 window.NCC_SUGGEST_LIST = [];
@@ -3277,7 +3277,7 @@ function renderProjCards(projs) {
 }
 
 /* ── Gợi ý NCC (Mạng lưới Thiết bị - Vật tư ALN) cho panel chi tiết dự án
-   ở giai đoạn C3 — ưu tiên tier cao + cùng tỉnh dự án (meetingProvince),
+   từ chặng C2 trở đi — ưu tiên tier cao + cùng tỉnh dự án (meetingProvince),
    dự phòng NCC toàn quốc nếu tỉnh đó chưa đủ. Tên NCC do người dùng tự
    nhập (auto-publish, không qua Founder duyệt trước) nên PHẢI escape. */
 function _nccEscH(s){
@@ -3294,7 +3294,7 @@ function nccPickSuggestionsKts(provinceCode, count){
   return inProv.concat(rest).slice(0, count);
 }
 function nccSuggestBlockHtmlKts(p){
-  if ((p.stage||'') !== 'C3') return '';
+  if ((p.stage||'C1') === 'C1') return '';
   var picks = nccPickSuggestionsKts(p.meetingProvince || '', 4);
   if (!picks.length) return '';
   var cards = picks.map(function(b){
@@ -3309,7 +3309,7 @@ function nccSuggestBlockHtmlKts(p){
   }).join('');
   return '<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">'
     + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
-      + '<div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em"><i class="ph-duotone ph-storefront"></i> Gợi ý NCC vật tư — giai đoạn hoàn thiện</div>'
+      + '<div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em"><i class="ph-duotone ph-storefront"></i> Gợi ý NCC vật tư</div>'
       + '<a href="ncc-showcase.html" target="_blank" style="font-size:10px;color:var(--gold);font-weight:700">Xem tất cả →</a>'
     + '</div>'
     + '<div style="display:flex;gap:7px;flex-wrap:wrap">' + cards + '</div>'
