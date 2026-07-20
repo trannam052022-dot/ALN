@@ -3027,9 +3027,21 @@ window.renderKtsKtvTasks = renderKtsKtvTasks;
 </script>
 
 <script type="module">
-import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, query, where, orderBy, limitToLast, onSnapshot, serverTimestamp, storage, storageRef, uploadBytes, getDownloadURL, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "./firebase-config.js";
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, query, where, orderBy, limit, limitToLast, onSnapshot, serverTimestamp, storage, storageRef, uploadBytes, getDownloadURL, getMessaging, getToken, onFcmMessage, fcmSupported, ALN_VAPID_KEY, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "./firebase-config.js";
 
 const REQUIRED_ROLE = "kts";
+
+/* ── Gợi ý NCC ở giai đoạn C3 — tải 1 lần lúc vào trang, ưu tiên NCC cùng
+   tỉnh dự án. Nếu panel chi tiết dự án đang mở khi data về, render lại
+   qua window.mplSelect (hàm công khai duy nhất trigger mplRenderDetail). */
+window.NCC_SUGGEST_LIST = [];
+(async function _loadNccSuggestKts(){
+  try {
+    const snap = await getDocs(query(collection(db, 'nccApplications'), where('status', '==', 'approved'), limit(60)));
+    window.NCC_SUGGEST_LIST = snap.docs.map(d => Object.assign({ uid: d.id }, d.data()));
+    if (window._mplDetailOpen && window._mplActiveId && typeof window.mplSelect === 'function') window.mplSelect(window._mplActiveId);
+  } catch(e) { console.warn('[KTS] load NCC suggest:', e.message); }
+})();
 
 
 /* ══ KTS PROJECT: Firestore realtime ══ */
@@ -3264,6 +3276,46 @@ function renderProjCards(projs) {
   if (mEl) mEl.textContent = new Date().getMonth() + 1;
 }
 
+/* ── Gợi ý NCC (Mạng lưới Thiết bị - Vật tư ALN) cho panel chi tiết dự án
+   ở giai đoạn C3 — ưu tiên tier cao + cùng tỉnh dự án (meetingProvince),
+   dự phòng NCC toàn quốc nếu tỉnh đó chưa đủ. Tên NCC do người dùng tự
+   nhập (auto-publish, không qua Founder duyệt trước) nên PHẢI escape. */
+function _nccEscH(s){
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+var NCC_CAT_LABEL_KTS = {sat_thep_vlxd:'Sắt thép, Gạch, VLXD', go_noithat:'Gỗ, nội thất', son_hoanthien:'Sơn, hoàn thiện', dien_nuoc:'Điện, nước', dv_thicong:'Thợ - Đội thi công', thietbi_vanchuyen:'Thiết bị & vận chuyển', thang_may:'Thang máy', khac:'Khác'};
+var NCC_TIER_RANK_KTS = {diamond:3, featured:2, basic:1};
+function nccPickSuggestionsKts(provinceCode, count){
+  var all = (window.NCC_SUGGEST_LIST || []).slice();
+  if (!all.length) return [];
+  all.sort(function(a,b){ return (NCC_TIER_RANK_KTS[b.tier]||0) - (NCC_TIER_RANK_KTS[a.tier]||0) || (b.leadCount||0) - (a.leadCount||0); });
+  var inProv = provinceCode ? all.filter(function(b){ return b.province === provinceCode; }) : [];
+  var rest = all.filter(function(b){ return inProv.indexOf(b) === -1; });
+  return inProv.concat(rest).slice(0, count);
+}
+function nccSuggestBlockHtmlKts(p){
+  if ((p.stage||'') !== 'C3') return '';
+  var picks = nccPickSuggestionsKts(p.meetingProvince || '', 4);
+  if (!picks.length) return '';
+  var cards = picks.map(function(b){
+    var initials = String(b.name||'?').trim().split(/\s+/).filter(Boolean).slice(0,2).map(function(w){ return w[0]; }).join('').toUpperCase();
+    return '<a href="ncc_profile.html?uid=' + encodeURIComponent(b.uid) + '" target="_blank" style="flex:1;min-width:130px;background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:9px 10px;display:block;color:inherit;text-decoration:none">'
+      + '<div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">'
+        + '<div style="width:24px;height:24px;border-radius:6px;background:rgba(201,168,76,.14);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">' + _nccEscH(initials) + '</div>'
+        + '<div style="font-size:11px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + _nccEscH(b.name || 'Gian hàng') + '</div>'
+      + '</div>'
+      + '<div style="font-size:9px;color:var(--muted)">' + _nccEscH(NCC_CAT_LABEL_KTS[b.category] || '') + '</div>'
+    + '</a>';
+  }).join('');
+  return '<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+      + '<div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em"><i class="ph-duotone ph-storefront"></i> Gợi ý NCC vật tư — giai đoạn hoàn thiện</div>'
+      + '<a href="ncc-showcase.html" target="_blank" style="font-size:10px;color:var(--gold);font-weight:700">Xem tất cả →</a>'
+    + '</div>'
+    + '<div style="display:flex;gap:7px;flex-wrap:wrap">' + cards + '</div>'
+  + '</div>';
+}
+
 function renderMyProjects(projects) {
   const wrap = document.getElementById('myProjList');
   const badge = document.getElementById('myProjBadge');
@@ -3378,6 +3430,7 @@ function renderMyProjects(projects) {
         <div class="proj-detail-item"><div class="proj-detail-label">Chặng</div><div class="proj-detail-val">${p.stage||'C1'}</div></div>
         <div class="proj-detail-item"><div class="proj-detail-label">Loại</div><div class="proj-detail-val" style="font-size:11px;color:${isDN?'var(--gold)':'var(--green)'}">${isDN?'Doanh nghiệp':'Chủ nhà'}</div></div>
       </div>
+      ${nccSuggestBlockHtmlKts(p)}
       <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Làm việc trên dự án này</div>
       <div class="kts-work-grid">
         <div class="kts-work-card" onclick="window.switchKtsProject&&window.switchKtsProject('${pid}');window.ktsShowTab('proposal')">
