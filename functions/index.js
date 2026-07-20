@@ -1029,15 +1029,23 @@ const MYMY_TOOLS = [
   },
 ];
 
-function mymyBuildSystemPrompt(dnName, state) {
+function mymyBuildSystemPrompt(dnName, honorific, state) {
   const phase = state.onboarding_complete ? "per-project" : "onboarding";
+  const lastName = dnName ? dnName.trim().split(/\s+/).pop() : "";
+  const addr = honorific && lastName ? honorific + " " + lastName
+             : honorific ? honorific
+             : lastName || "bạn";
+  const genderInstruction = honorific
+    ? `Đã biết cách gọi — dùng "${addr}" xuyên suốt, KHÔNG hỏi lại.`
+    : `Chưa biết cách gọi (hồ sơ DN chưa có giới tính) — câu ĐẦU TIÊN phải hỏi: "Em gọi là anh hay chị ạ?" rồi dùng xuyên suốt. KHÔNG dùng "anh/chị" kết hợp, KHÔNG dùng "bạn".`;
   return `Bạn là MyMy, nhân viên chăm sóc khách hàng của ALN (App Làm Nhà) — nền tảng quản lý công trình xây dựng cao cấp.
-Bạn đang hỗ trợ Doanh nghiệp tên: ${dnName}.
+Bạn đang hỗ trợ Doanh nghiệp tên: ${dnName || "(chưa rõ)"}.
 Pha hiện tại: ${phase}.
 
 THÔNG TIN VỀ BẠN:
 - Tên: MyMy, nữ, khoảng 22 tuổi, nhẹ nhàng, ấm áp, tận tâm
-- XƯNG: "em" — gọi khách: "bạn" (hoặc "anh/chị" nếu khách dùng trước)
+- XƯNG: "em" — gọi khách: "${addr}"
+- ${genderInstruction}
 - Ngôn ngữ: "dạ", "ạ", "nha", "á", "vậy hả" — như người thật nhắn tin
 - KHÔNG dùng dấu **, gạch đầu dòng, tiêu đề, đoạn văn dài
 - TUYỆT ĐỐI không nhận là AI hay chatbot
@@ -1259,8 +1267,10 @@ exports.runMyMyTurn = onCall(
     }).filter(m => m.role==="user"||m.role==="assistant");
 
     const userSnap = await db.collection("users").doc(dnUid).get();
-    const dnName = (userSnap.exists ? userSnap.data().name : "") || "bạn";
-    const systemPrompt = mymyBuildSystemPrompt(dnName, state);
+    const dnUser = userSnap.exists ? userSnap.data() : {};
+    const dnName = dnUser.name || "";
+    const dnHonorific = dnUser.gender === "female" ? "chị" : dnUser.gender === "male" ? "anh" : "";
+    const systemPrompt = mymyBuildSystemPrompt(dnName, dnHonorific, state);
     const apiKey = ANTHROPIC_KEY.value();
 
     let finalReply = null;
