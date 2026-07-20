@@ -297,7 +297,11 @@ var AVATAR_COLORS = ['#98690a','#1d4ed8','#3a7a3e','#9b6ec9','#b45309','#2b7a8f'
    (b) SHOW_DEMO_FALLBACK — chế độ mặc định (18/07/2026), TRỘN thêm
        gian hàng mẫu vào sau danh sách thật để trang đỡ trống trong
        lúc chờ NCC đăng ký, mỗi thẻ có nhãn "Minh hoạ" phân biệt rõ.
-       TẮT bằng cách đổi SHOW_DEMO_FALLBACK = false khi đã đủ NCC thật
+       Từ 20/07/2026: tự ẩn theo TỪNG DANH MỤC — danh mục nào đã có
+       ≥MOCK_HIDE_THRESHOLD NCC thật thì mock của đúng danh mục đó
+       biến mất khỏi trang (không cần Founder sửa tay), danh mục còn
+       trống vẫn giữ mock để đỡ trống. TẮT toàn bộ bằng cách đổi
+       SHOW_DEMO_FALLBACK = false khi đã đủ NCC thật ở mọi danh mục
        (không cần xoá dữ liệu này, chỉ cần đổi 1 dòng + push).
    Tên/mô tả KHÔNG dùng thương hiệu thật (tránh hiểu nhầm ALN đại diện
    hãng đó); KHÔNG có SĐT/Zalo/website (tránh khách gọi trúng số người
@@ -306,6 +310,7 @@ var AVATAR_COLORS = ['#98690a','#1d4ed8','#3a7a3e','#9b6ec9','#b45309','#2b7a8f'
    sản phẩm thật). */
 function img(seed){ return 'https://picsum.photos/seed/ncc-' + seed + '/480/360'; }
 var SHOW_DEMO_FALLBACK = true;
+var MOCK_HIDE_THRESHOLD = 3; // số NCC thật trong 1 danh mục để tự ẩn mock của danh mục đó
 var EARLY_BIRD_TARGET = 50; // Ưu đãi 50 doanh nghiệp đầu tiên — ẩn section mời gọi khi số NCC thật (Firestore) đạt mốc này
 /* Founder đã có quan hệ cá nhân với 23 doanh nghiệp CAM KẾT tham gia khi ALN đi vào hoạt động
    (19/07/2026) — CHƯA đăng ký chính thức qua ncc-apply.html nên KHÔNG có trong Firestore, phải
@@ -599,7 +604,12 @@ async function loadAll(){
     console.warn('[ncc-showcase]', e && e.message);
   }
   ALL = realList.slice();
-  if (SHOW_DEMO_FALLBACK) ALL = ALL.concat(MOCK_DATA); // gian hàng thật luôn đứng trước, mẫu bổ sung phía sau
+  if (SHOW_DEMO_FALLBACK) {
+    var realCountByCat = {};
+    realList.forEach(function(b){ realCountByCat[b.category] = (realCountByCat[b.category] || 0) + 1; });
+    var mockToShow = MOCK_DATA.filter(function(m){ return (realCountByCat[m.category] || 0) < MOCK_HIDE_THRESHOLD; });
+    ALL = ALL.concat(mockToShow); // gian hàng thật luôn đứng trước, mẫu bổ sung phía sau — trừ danh mục đã đủ NCC thật
+  }
   document.getElementById('loadState').style.display = 'none';
   document.getElementById('sections').style.display = 'block';
   renderAll();
