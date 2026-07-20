@@ -101,7 +101,8 @@ const MYMY_MKT_TOOLS = [
   },
 ];
 
-function mymyMktBuildSystemPrompt() {
+function mymyMktBuildSystemPrompt(founderCallName) {
+  const addressAs = founderCallName ? `anh ${founderCallName}` : "Founder";
   return `Bạn là MyMy, trợ lý marketing NỘI BỘ của ALN (App Làm Nhà) — CHỈ phục vụ Founder, không phải khách hàng.
 
 VAI TRÒ: hỗ trợ Founder phân phối nội dung marketing đã dựng xong (ảnh/video) lên Facebook/Instagram/TikTok qua Buffer, gắn UTM để theo dõi, và đọc báo cáo hiệu quả từ Google Analytics.
@@ -115,7 +116,7 @@ QUY TẮC BẮT BUỘC:
 6. getMarketingReport là tool chỉ đọc — dùng thoải mái để trả lời câu hỏi hiệu quả chiến dịch, không cần xác nhận.
 7. Diễn giải báo cáo bằng tiếng Việt tự nhiên, có đề xuất cụ thể cho chiến dịch tiếp theo (kênh nào/giờ nào hiệu quả hơn). Nếu conversions = 0 nhưng có traffic, nhắc khả năng key event GA4 chưa cấu hình thay vì kết luận ngay là chiến dịch kém.
 
-XƯNG HÔ: "em" — gọi Founder: "bạn" hoặc theo cách Founder xưng hô trước đó. Ngôn ngữ tự nhiên như người thật nhắn tin, không dùng dấu **, gạch đầu dòng, tiêu đề.
+XƯNG HÔ: "em" — gọi Founder: "${addressAs}" (đây luôn là đúng 1 người cố định, không cần né tránh như bot chưa biết đối tượng), trừ khi Founder chủ động xưng hô khác thì theo Founder. Ngôn ngữ tự nhiên như người thật nhắn tin, không dùng dấu **, gạch đầu dòng, tiêu đề.
 TUYỆT ĐỐI KHÔNG: tự động chạy quảng cáo trả phí khi chưa được xác nhận rõ ngân sách; tự nhận là AI/chatbot.`;
 }
 
@@ -564,7 +565,10 @@ const runMyMyMarketingTurn = onCall(
       return { role: m.role, content: m.text || "" };
     }).filter((m) => m.role === "user" || m.role === "assistant");
 
-    const systemPrompt = mymyMktBuildSystemPrompt();
+    const userSnap = await db.collection("users").doc(founderUid).get();
+    const founderName = (userSnap.exists ? userSnap.data().name : "") || "";
+    const founderCallName = founderName.trim().split(/\s+/).pop() || "";
+    const systemPrompt = mymyMktBuildSystemPrompt(founderCallName);
     const apiKey = ANTHROPIC_KEY.value();
 
     let finalReply = null;
