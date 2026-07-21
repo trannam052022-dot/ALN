@@ -222,7 +222,7 @@ Mục đích: NCC (sắt thép, gỗ nội thất, VLXD, sơn, điện nước, 
   1. ~~`home.html`/`index.html` chưa có link tới `ncc-showcase.html`~~ — đã thêm chip nhấp nháy nền xanh đen "Mạng lưới Thiết bị - Vật tư ALN" (kèm tagline nhỏ) trong dải `.recruit-strip` "Hợp tác cùng ALN:" trên `index.html` ngày 19/07/2026 (không dùng mục nav riêng, đã thử rồi bỏ vì trùng lặp). Floating badge dùng chung `ncc-network-badge.js` vẫn còn trên `forum.html`/`ncc_profile.html`/`aln_community.html` (đã gỡ khỏi `index.html` vì trùng với chip trên).
   2. Quyền đăng bài diễn đàn của NCC (`NCC_CATEGORIES=['vat_lieu']` trong `functions/forum.js`) gần như vô nghĩa vì tab đã redirect thẳng ra ngoài — chưa quyết giữ hay bỏ.
   3. Chính sách phí gói gian hàng cơ bản sau năm miễn phí đầu tiên (ưu đãi 50 doanh nghiệp đầu tiên trên `ncc-showcase.html`) — chưa quyết, cần chốt trước khi hết hạn miễn phí năm đầu.
-  4. Nhánh nháp `claude/ncc-showcase-demo-cithdq` (nhánh làm việc của các phiên NCC, còn trên remote) — hỏi Founder có muốn xoá không, việc thật đã lên `main` trực tiếp.
+  4. ~~Nhánh nháp `claude/ncc-showcase-demo-cithdq`~~ — Founder đã xoá 21/07/2026.
 
 ## MyMy Marketing (module Founder-only: đăng Buffer + báo cáo GA4) — thêm 20/07/2026
 
@@ -240,7 +240,7 @@ Agent RIÊNG, KHÔNG dùng chung allowlist/session với `runMyMyTurn`/`runMyMyT
   5. Không có dashboard xem lại lịch sử `marketing_posts` — chỉ hỏi qua chat MyMy.
   6. Quy tắc đặt tên `campaign_tag` theo mục đích (KTS recruit/BD partner/content thường kỳ...) — code chỉ validate định dạng, chưa có quy ước thống nhất.
   7. Đổi model AI (`claude-sonnet-4-6` → mới hơn) cho cả 3 agent MyMy — xem mục P2 bên dưới.
-  8. Nhánh `claude/review-optimization-r49lr4` (đã merge vào main) còn sót trên GitHub remote — Founder tự xoá tay (`github.com/trannam052022-dot/ALN/branches`), tôi không đủ quyền xoá qua token phiên.
+  8. ~~Nhánh `claude/review-optimization-r49lr4`~~ — Founder đã xoá 21/07/2026.
 - **Tiện thể sửa luôn (20/07/2026):** `runMyMyTurn` (MyMy DN) trước đó thiếu xưng hô anh/chị theo giới tính dù đã có field `users/{uid}.gender` sẵn (client_CN.html đã làm đúng từ lâu, DN bị bỏ sót) — đã sửa, đọc thẳng `gender` server-side, không cần sửa `client_DN.html`. MyMy Marketing xưng "anh Long" (lấy tên thật Founder). Cả 2 đã deploy nhưng CHƯA được Founder xác nhận lại đã đúng trong chat thật.
 
 ## Các nút GHI đã được nối (Firestore/Storage)

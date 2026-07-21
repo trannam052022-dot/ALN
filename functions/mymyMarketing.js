@@ -315,9 +315,15 @@ async function mymyMktExecSchedulePost(founderUid, bufferToken, input) {
 
     const idemKey = mymyMktIdemKey({ ...input, channels });
     const existingSnap = await db.collection("marketing_posts").where("idemKey", "==", idemKey).limit(1).get();
+    let retryDocRef = null;
     if (!existingSnap.empty) {
-      const d = existingSnap.docs[0].data();
-      return { ok: true, post_id: existingSnap.docs[0].id, status: d.status, channels: d.channels, deduped: true };
+      const existingDoc = existingSnap.docs[0];
+      const d = existingDoc.data();
+      if (d.status === "scheduled") {
+        return { ok: true, post_id: existingDoc.id, status: d.status, channels: d.channels, deduped: true };
+      }
+      // Lần trước thất bại/dở dang (failed/partial) — không coi là trùng, cho thử lại và ghi đè lên đúng doc cũ.
+      retryDocRef = existingDoc.ref;
     }
 
     let scheduledAt;
@@ -366,7 +372,7 @@ async function mymyMktExecSchedulePost(founderUid, bufferToken, input) {
     const aggStatus = statuses.every((s) => s === "scheduled") ? "scheduled"
       : statuses.some((s) => s === "scheduled") ? "partial" : "failed";
 
-    const docRef = await db.collection("marketing_posts").add({
+    const postData = {
       idemKey,
       channels: perChannel,
       campaign_tag: input.campaign_tag,
@@ -378,8 +384,14 @@ async function mymyMktExecSchedulePost(founderUid, bufferToken, input) {
       scheduled_time: admin.firestore.Timestamp.fromDate(scheduledAt),
       status: aggStatus,
       created_by: founderUid,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    };
+    let docRef;
+    if (retryDocRef) {
+      docRef = retryDocRef;
+      await docRef.set({ ...postData, createdAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    } else {
+      docRef = await db.collection("marketing_posts").add({ ...postData, createdAt: admin.firestore.FieldValue.serverTimestamp() });
+    }
 
     return { ok: true, post_id: docRef.id, status: aggStatus, channels: perChannel, scheduled_time: scheduledAt.toISOString() };
   } catch (e) {
