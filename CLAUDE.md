@@ -263,7 +263,11 @@ Diễn đàn không chỉ là nơi hỏi đáp — đúng vai trò là **trang m
 3. **Chuyên mục diễn đàn "Tổ ấm & Nhà đẹp"** + thử thách tuần + chương trình "Đại sứ ALN khu phố" — mới là ý tưởng, chưa có category/cơ chế thật.
 4. **Thể lệ chi trả Kim Cương ra tiền thật** — mức quy đổi, ngưỡng rút, form nhập tài khoản ngân hàng, khấu trừ thuế TNCN, màn duyệt chi cho Founder — hoàn toàn CHƯA làm, mới dừng ở trao Kim Cương + thông báo.
 5. Nhiệm vụ "đi chợ giùm" (chụp giá vật liệu) và "nhật ký xây nhà" — chưa có form nộp + hàng chờ duyệt trong `founder_panel.html`/`founder_forum.html`.
-6. Chưa deploy — cần `firebase deploy --only functions:bricksOnUserCreated,functions:bricksOnStageAdvanced,functions:bricksOnFirstPayment,functions:founderAwardBricks`.
+6. ~~Chưa deploy~~ — đã deploy thành công 21/07/2026 (`functions:bricksOnUserCreated,functions:bricksOnStageAdvanced,functions:bricksOnFirstPayment,functions:founderAwardBricks`). Backend đang chạy thật, chỉ chưa có UI hiển thị (mục 1).
+
+**Câu hỏi đang chờ Founder trả lời (hỏi cuối phiên 21/07/2026, chưa có câu trả lời) — hỏi lại đầu phiên sau:**
+- Hiển thị "Gạch của tôi" ở dashboard nào trước: `client_CN.html`, `kts_dashboard.html`, hay cả 2 cùng lúc?
+- Ngưỡng Gạch cho mỗi cấp bậc Nền Móng → Khung Nhà → Mái Ấm → Biệt Thự → Dinh Thự là bao nhiêu (chưa có con số, cần Founder chốt hoặc để Claude đề xuất thang điểm mẫu)?
 
 ## MyMy Marketing (module Founder-only: đăng Buffer + báo cáo GA4) — thêm 20/07/2026
 
