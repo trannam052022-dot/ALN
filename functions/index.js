@@ -2407,6 +2407,15 @@ exports.seoReportNow = seoAnalytics.seoReportNow;
    trước khi dùng thật. ── */
 exports.runMyMyMarketingTurn = require("./mymyMarketing").runMyMyMarketingTurn;
 
+/* ── Gạch & Kim Cương ALN (P1: tích lũy) — xem functions/bricks.js.
+   Gạch = điểm thưởng hoạt động (không đổi ra tiền); Kim Cương = thưởng giới
+   thiệu gắn doanh thu thật (C1 đã thu). Sổ cái bricksLedger chỉ server ghi. ── */
+const bricks = require("./bricks");
+exports.bricksOnUserCreated = bricks.bricksOnUserCreated;
+exports.bricksOnStageAdvanced = bricks.bricksOnStageAdvanced;
+exports.bricksOnFirstPayment = bricks.bricksOnFirstPayment;
+exports.founderAwardBricks = bricks.founderAwardBricks;
+
 /* Cron 08:30 giờ VN (sau dailyDigest 08:00 để không dồn 2 push cùng lúc):
    lưu seoReports/{date} làm lịch sử xu hướng + đẩy tóm tắt cho Founder.
    Chưa cấu hình settings/seoReport thì im lặng bỏ qua. */
