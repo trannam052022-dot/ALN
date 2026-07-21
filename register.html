@@ -53,6 +53,14 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
     }
     if (found) { utm.ts = Date.now(); localStorage.setItem('aln_utm', JSON.stringify(utm)); }
   }catch(e){}
+  /* Link giới thiệu của NCC: register.html?ref={ncc_uid} — công NCC giới
+     thiệu khách xây nhà, đếm referralCount qua onCnRegisteredViaNcc. */
+  try {
+    var _refUid = new URLSearchParams(location.search).get('ref');
+    if (_refUid && /^[A-Za-z0-9]{20,36}$/.test(_refUid)) {
+      localStorage.setItem('aln_ncc_ref', JSON.stringify({ uid: _refUid, ts: Date.now() }));
+    }
+  } catch(e){}
   window.alnGetUtm = function(){
     try{
       var s = localStorage.getItem('aln_utm');
@@ -550,6 +558,13 @@ async function doRegister(){
       if(_r && typeof _r.code === 'string' && /^KTS-\d+$/.test(_r.code)) ktsRef = _r.code;
     } catch(e){}
 
+    /* Công người giới thiệu (NCC) — register.html?ref={ncc_uid} lưu ở localStorage */
+    var nccRef = null;
+    try {
+      var _rn = JSON.parse(localStorage.getItem('aln_ncc_ref') || 'null');
+      if(_rn && typeof _rn.uid === 'string' && /^[A-Za-z0-9]{20,36}$/.test(_rn.uid)) nccRef = _rn.uid;
+    } catch(e){}
+
     /* Ghi users nếu chưa có (tránh ghi đè tài khoản cũ) */
     var uref = fb.doc(fb.db, 'users', uid);
     var usnap = await fb.getDoc(uref);
@@ -562,7 +577,7 @@ async function doRegister(){
       var fbc = window.alnGetFbc ? window.alnGetFbc() : '';
       await fb.setDoc(uref, {
         username: phone, name: name, phone: phone, role: 'cn', email: email,
-        status: 'active', plan: 'free', credits: {}, kts_ref: ktsRef,
+        status: 'active', plan: 'free', credits: {}, kts_ref: ktsRef, referredByNcc: nccRef,
         utm: utm, fbp: fbp, fbc: fbc, sourceUrl: location.origin + location.pathname,
         createdAt: fb.serverTimestamp(),
       });
@@ -580,10 +595,14 @@ async function doRegister(){
           aln_ad_type_hint: window.alnAdTypeHint ? window.alnAdTypeHint() : 'unknown'
         });
       } catch(e){}
-    } else if(ktsRef){
-      await fb.setDoc(uref, { kts_ref: ktsRef }, { merge: true });
+    } else if(ktsRef || nccRef){
+      var _refPatch = {};
+      if(ktsRef) _refPatch.kts_ref = ktsRef;
+      if(nccRef) _refPatch.referredByNcc = nccRef;
+      await fb.setDoc(uref, _refPatch, { merge: true });
     }
     if(ktsRef){ try { localStorage.removeItem('aln_kts_ref'); } catch(e){} }
+    if(nccRef){ try { localStorage.removeItem('aln_ncc_ref'); } catch(e){} }
 
     var ud = JSON.stringify({ name: name, userId: phone, role: 'cn', badge: 'Chủ nhà', uid: uid });
     try { localStorage.setItem('aln_user', ud); } catch(e){}

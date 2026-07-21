@@ -157,6 +157,25 @@ exports.onNccLeadCreated = functions
     }
   });
 
+/* ── CN đăng ký qua link giới thiệu của NCC (register.html?ref={ncc_uid}) →
+   đếm referralCount thật trên nccApplications, dùng cho chương trình "NCC
+   giới thiệu — thưởng bằng hiển thị" (xem CLAUDE.md mục NCC). ── */
+exports.onCnRegisteredViaNcc = functions
+  .region("asia-southeast1")
+  .firestore.document("users/{uid}")
+  .onCreate(async (snap) => {
+    const d = snap.data() || {};
+    const nccUid = d.referredByNcc;
+    if (d.role !== "cn" || !nccUid || typeof nccUid !== "string") return;
+    try {
+      await db.collection("nccApplications").doc(nccUid).update({
+        referralCount: admin.firestore.FieldValue.increment(1),
+      });
+    } catch (e) {
+      console.error("[onCnRegisteredViaNcc]", e);
+    }
+  });
+
 /* ── KTV đăng ký mới ── */
 exports.onKtvApply = functions
   .region("asia-southeast1")

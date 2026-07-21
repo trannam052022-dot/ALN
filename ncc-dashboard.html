@@ -158,6 +158,19 @@ function escH(s){
   return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 window.escH = escH;
+function copyRefLink(){
+  var el = document.getElementById('fRefLink');
+  if(!el) return;
+  var done = function(){ showToast('✅ Đã copy link giới thiệu'); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(el.value).then(done).catch(function(){
+      el.select(); try { document.execCommand('copy'); done(); } catch(e){ showToast('Không copy được — bôi đen rồi Ctrl+C thủ công', true); }
+    });
+  } else {
+    el.select(); try { document.execCommand('copy'); done(); } catch(e){ showToast('Không copy được — bôi đen rồi Ctrl+C thủ công', true); }
+  }
+}
+window.copyRefLink = copyRefLink;
 </script>
 
 <script type="module">
@@ -443,6 +456,16 @@ function render(){
       + '<div class="badge-row">' + badges + '</div>'
       + (d.status === 'approved' ? '<div class="hint" style="margin:10px 0 0">Hạng và trạng thái xác minh do Founder xét duyệt — không tự đổi được. Bạn tự quản lý nội dung bên dưới.</div>' : '')
       + progressHtml
+    + '</div>'
+
+    + '<div class="card">'
+      + '<div class="card-title"><i class="ph-duotone ph-users-three"></i>Giới thiệu khách hàng</div>'
+      + '<div class="hint">Gặp khách đang xây nhà chưa có bản vẽ thiết kế? Gửi link này — mỗi khách đăng ký qua link của bạn được tính vào chương trình ưu tiên hiển thị gian hàng (chi tiết Founder sẽ thông báo riêng).</div>'
+      + '<div class="field-row">'
+        + '<div class="field" style="flex:1"><label>Link giới thiệu của bạn</label><input type="text" id="fRefLink" readonly value="' + escH(location.origin + '/register.html?ref=' + UID) + '"></div>'
+        + '<button class="btn btn-ghost" onclick="copyRefLink()" style="align-self:flex-end"><i class="ph-duotone ph-copy"></i>Copy link</button>'
+      + '</div>'
+      + '<div class="hint" style="margin-top:10px">Đã giới thiệu: <b style="color:var(--gold)">' + (d.referralCount || 0) + '</b> khách đăng ký</div>'
     + '</div>'
 
     + '<div class="card">'
