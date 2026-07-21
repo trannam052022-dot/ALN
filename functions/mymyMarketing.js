@@ -247,7 +247,20 @@ const DELETE_POST_MUTATION = `
   }
 `;
 
-async function bufferCreatePost(token, { channelId, text, mediaUrl, scheduledAt }) {
+/* Facebook/Instagram bắt buộc metadata.<network>.type = POST/STORY/REEL — xác
+   nhận qua lỗi thật "Facebook posts require a type (post, story, or reel)"
+   ngày 21/07/2026 + docs Buffer (PostInputMetaData, "chỉ cần metadata cho đúng
+   network của channel"). TikTok chưa test, chưa rõ có bắt buộc không nên chưa
+   thêm — tránh đoán sai field. */
+const NETWORKS_REQUIRING_POST_TYPE = ["facebook", "instagram"];
+
+function mymyMktPostMetadata(channel) {
+  if (!NETWORKS_REQUIRING_POST_TYPE.includes(channel)) return undefined;
+  return { [channel]: { type: "POST" } };
+}
+
+async function bufferCreatePost(token, { channelId, channel, text, mediaUrl, scheduledAt }) {
+  const metadata = mymyMktPostMetadata(channel);
   const data = await bufferGraphQL(token, CREATE_POST_MUTATION, {
     input: {
       channelId,
@@ -257,6 +270,7 @@ async function bufferCreatePost(token, { channelId, text, mediaUrl, scheduledAt 
       mode: "customScheduled",
       dueAt: scheduledAt.toISOString(),
       source: "aln-mymy-marketing",
+      ...(metadata ? { metadata } : {}),
     },
   });
   const result = data.createPost;
@@ -357,6 +371,7 @@ async function mymyMktExecSchedulePost(founderUid, bufferToken, input) {
       try {
         const bufferPostId = await bufferCreatePost(bufferToken, {
           channelId: bufferChannels[ch],
+          channel: ch,
           text: input.caption,
           mediaUrl: input.content_url,
           scheduledAt,
