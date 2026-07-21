@@ -123,6 +123,18 @@ jobs:
             exit 1
           fi
 
+      - name: Kiểm tra cụm từ định vị bị cấm (CLAUDE.md)
+        run: |
+          echo "=== Tìm 'xây nhà trọn gói' / 'ALN là nhà thầu/tổng thầu thi công' / 'giữ tiền trung gian' ==="
+          FOUND=$(grep -rniE "xây nhà trọn gói|ALN (là|la) (nhà thầu|tổng thầu) thi công|giữ tiền trung gian|bên trung gian|giữ hộ tiền" --include="*.html" . 2>/dev/null | grep -v "_archive/\|/test/\|node_modules/" || true)
+          if [ -n "$FOUND" ]; then
+            echo "$FOUND"
+            echo "::error::Phát hiện cụm từ ĐỊNH VỊ BỊ CẤM theo CLAUDE.md — ALN là Tổng thầu Thiết kế (ký HĐ trực tiếp), mảng thi công chưa được phép triển khai. Xem mục 'NGUYÊN TẮC ĐỊNH VỊ ALN' trong CLAUDE.md để biết câu thay thế."
+            exit 1
+          else
+            echo "✓ Không tìm thấy cụm từ bị cấm"
+          fi
+
       - name: Kích thước file
         run: |
           echo "=== File sizes ==="
