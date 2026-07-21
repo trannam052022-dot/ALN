@@ -543,9 +543,17 @@ const runMyMyMarketingTurn = onCall(
       let replyText;
       if (result.ok) {
         if (pc.action === "scheduleMarketingPost") {
-          replyText = result.deduped
-            ? `Bài này đã được lên lịch trước đó rồi (post_id ${result.post_id}), em không đăng trùng nha!`
-            : `Đã lên lịch xong! Trạng thái: ${result.status}. post_id: ${result.post_id}, giờ đăng: ${result.scheduled_time}.`;
+          if (result.deduped) {
+            replyText = `Bài này đã được lên lịch trước đó rồi (post_id ${result.post_id}), em không đăng trùng nha!`;
+          } else if (result.status === "scheduled") {
+            replyText = `Đã lên lịch xong! Trạng thái: ${result.status}. post_id: ${result.post_id}, giờ đăng: ${result.scheduled_time}.`;
+          } else {
+            const channelErrors = Object.entries(result.channels || {})
+              .filter(([, info]) => info.status === "failed")
+              .map(([ch, info]) => `${ch}: ${info.error || "lỗi không rõ"}`)
+              .join("; ");
+            replyText = `Trạng thái: ${result.status}. post_id: ${result.post_id}. Chi tiết lỗi — ${channelErrors || "không rõ nguyên nhân"}.`;
+          }
         } else {
           replyText = `Đã huỷ bài ${result.post_id} rồi ạ.`;
         }
