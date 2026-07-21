@@ -527,9 +527,13 @@ async function mymyMktExecGetReport(input) {
 }
 
 /* ── Main agent loop — chỉ Founder gọi được ── */
-
+/* serviceAccount ghim cứng: hàm v2 mặc định chạy bằng SA compute
+   (…-compute@developer.gserviceaccount.com) — KHÁC email appspot mà Founder
+   đã cấp quyền Viewer trong GA4, gây 403 ở getMarketingReport dù cấp đúng
+   quyền. Cùng nguyên nhân + cách sửa đã áp dụng cho seoReportNow (xem
+   seoAnalytics.js) — ghim về appspot cho khớp. */
 const runMyMyMarketingTurn = onCall(
-  { region: "asia-southeast1", secrets: [ANTHROPIC_KEY, BUFFER_ACCESS_TOKEN] },
+  { region: "asia-southeast1", serviceAccount: "aln-platform@appspot.gserviceaccount.com", secrets: [ANTHROPIC_KEY, BUFFER_ACCESS_TOKEN] },
   async (request) => {
     if (!request.auth || request.auth.uid !== FOUNDER_UID) {
       throw new HttpsError("permission-denied", "Chỉ Founder được dùng MyMy Marketing");
