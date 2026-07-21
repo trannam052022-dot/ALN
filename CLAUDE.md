@@ -229,6 +229,19 @@ Mục đích: NCC (sắt thép, gỗ nội thất, VLXD, sơn, điện nước, 
   4. ~~Nhánh nháp `claude/ncc-showcase-demo-cithdq`~~ — Founder đã xoá 21/07/2026.
   5. Logic thưởng theo `referralCount` (ưu tiên hiển thị / nâng tier tạm thời / trừ phí năm 2) — mới có đếm số, CHƯA có hành động tự động khi đạt mốc.
 
+## Diễn đàn (forum.html) — cơ chế "mồi" giữ diễn đàn trông sống động
+
+Diễn đàn không chỉ là nơi hỏi đáp — đúng vai trò là **trang mồi** để đón traffic từ ads/tìm kiếm, cần trông luôn hoạt động (không "eo sèo") để không mất uy tín với khách mới vào.
+
+- **`founder_forum.html` → tab "Công cụ"** có sẵn bộ 3 nút cho mục "🕒 RẢI BÀI THEO NGÀY (drip)":
+  1. **"Nạp kho drip"** — nạp các câu hỏi hardcode trong `hoiKtsBank()` (`functions/forum.js`) vào collection `hoiKtsQueue` (status `queued`), bỏ qua item đã `published/done` (idempotent).
+  2. **"Bật / Tắt drip"** — toggle cờ `FORUM_HOIKTS_DRIP_ENABLED` (`forumConfig/flags`). Cron `exports.forumHoiKtsDrip` (`0 8,11,14,17,20 * * *` giờ VN) chỉ chạy thật khi cờ này bật — mỗi lần chạy random đăng 0-2 câu mới + tự "trổ" dần câu trả lời của các câu đã đăng trước theo mốc giờ định sẵn trong `D` (2h/6h/18h/30h/48h/66h sau khi đăng), tự nhiên như người thật đang thảo luận.
+  3. **"Đăng ngay 1 câu (test)"** — chạy thử ngay 1 vòng để xem kết quả tức thì, không cần đợi cron.
+- **21/07/2026 phát hiện:** cờ drip **đã BẬT sẵn** nhưng forum vẫn "eo sèo" (bài mới nhất dừng ở 9/7) — nguyên nhân thật là **kho `hoiKtsBank()` đã cạn** (toàn bộ ~16 câu gốc đã `published`, "Nạp kho drip" không tạo thêm được gì vì code idempotent bỏ qua item đã đăng). Đã viết bổ sung tổng cộng **30 câu mới** (2 đợt: 10 + 20) — kho hiện có 46 câu, ước chạy được ~2 tuần ở tốc độ 2-4 câu/ngày.
+- **Cần lặp lại định kỳ (~10-12 ngày/lần):** viết thêm câu hỏi mới vào cuối mảng `hoiKtsBank()` (kiểm tra tránh trùng chủ đề các câu đã có), giữ đúng văn phong (chủ nhà hỏi thực tế + nhiều KTS persona trả lời, 1 câu đánh dấu `best:true`), tránh cụm từ cấm ("xây nhà trọn gói"...). Sau khi thêm, deploy `functions:forumAdmin,functions:forumHoiKtsDrip`, nhắc Founder bấm lại "Nạp kho drip". Đã tự đặt lịch nhắc (`send_later`) cho đợt tiếp theo ~02/08/2026 — không cần Founder tự nhớ.
+- **Lưu ý key persona:** mọi item trong `hoiKtsBank()` dùng `k: KP.<key>` — `<key>` phải khớp đúng tên biến trong object `KP` (vd `khanh` không phải `baokhanh`, dù `uid`/`name` bên trong là "baokhanh"/"Bảo Khánh") — sai key gây lỗi runtime khi drip chạy tới item đó. Luôn `node --check` sau khi sửa `functions/forum.js`.
+- **Ngoài cơ chế Hỏi KTS**, còn có `seedForumData()` (11 bài đủ chuyên mục, chạy 1 lần qua nút "Nạp dữ liệu mẫu") và `seedHoiKtsData()` (20 câu bản gốc, khác với `hoiKtsQueue`/drip) — đã rà và sửa 1 chỗ dùng cụm "xây nhà trọn gói" trong tiêu đề bài seed của `seedForumData()` ngày 21/07/2026.
+
 ## MyMy Marketing (module Founder-only: đăng Buffer + báo cáo GA4) — thêm 20/07/2026
 
 Agent RIÊNG, KHÔNG dùng chung allowlist/session với `runMyMyTurn`/`runMyMyTurnCN` (2 cái đó chạy theo uid khách DN/CN, không có role check — không an toàn nếu gắn tool chi tiền/đăng công khai vào chung).
