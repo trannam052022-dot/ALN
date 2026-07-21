@@ -256,7 +256,7 @@ const NETWORKS_REQUIRING_POST_TYPE = ["facebook", "instagram"];
 
 function mymyMktPostMetadata(channel) {
   if (!NETWORKS_REQUIRING_POST_TYPE.includes(channel)) return undefined;
-  return { [channel]: { type: "POST" } };
+  return { [channel]: { type: "post" } };
 }
 
 async function bufferCreatePost(token, { channelId, channel, text, mediaUrl, scheduledAt }) {
