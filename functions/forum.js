@@ -1821,7 +1821,7 @@ async function seedHoiKtsData() {
       q: "Em có lô đất 4x18m ở Biên Hòa, định xây 3 tầng để ở, chưa biết nên chuẩn bị ngân sách bao nhiêu. Nhờ các anh KTS tư vấn giúp.",
       a: "Chào anh. Với lô 4x18m xây 3 tầng, nếu xây hết đất thì tổng diện tích sàn khoảng 200–216m². Chi phí xây thô + hoàn thiện cơ bản hiện dao động 5,5–7 triệu/m² tùy vật liệu và nhà thầu, tức phần xây dựng rơi vào khoảng 1,2–1,5 tỷ. Anh nên dự phòng thêm 10–15% cho phát sinh.\n\nRiêng phần thiết kế, nhiều chủ nhà hay bỏ qua nhưng đây là khoản rẻ nhất mà tiết kiệm nhiều nhất: một bộ hồ sơ đầy đủ (kiến trúc, kết cấu, điện nước) giúp anh khóa được khối lượng với nhà thầu, tránh phát sinh mơ hồ.\n\nCon số trên là ước tính chung. Nếu anh cho biết thêm nhu cầu (mấy phòng ngủ, có thang máy không, phong cách mong muốn), tôi tư vấn sát hơn. Khi cần bóc tách chi tiết cho đúng lô đất, anh có thể tạo dự án trên ALN để KTS làm việc trực tiếp." },
     { asker: "Anh Dũng · Long Thành", by: P.loc, best: false, hearts: 5, h: 300,
-      title: "Nên xây nhà trọn gói hay tách riêng thiết kế và thi công?",
+      title: "Nên thuê KTS riêng hay để nhà thầu lo luôn từ thiết kế đến thi công?",
       q: "Nhà thầu gần nhà báo em giá trọn gói 'miễn phí thiết kế'. Vậy có nên thuê KTS riêng nữa không, hay để nhà thầu lo hết cho tiện?",
       a: "Câu hỏi này gần như chủ nhà nào cũng gặp. 'Miễn phí thiết kế' nghe hấp dẫn, nhưng bản chất: không có gì miễn phí — chi phí thiết kế đã nằm trong giá thi công, và quan trọng hơn, bản vẽ khi đó phục vụ lợi ích của nhà thầu trước tiên. Bản vẽ sơ sài đồng nghĩa khối lượng mơ hồ, phát sinh sẽ xuất hiện ở giai đoạn anh chị khó dừng lại.\n\nThuê KTS độc lập nghĩa là có một người đứng về phía chủ nhà: hồ sơ chi tiết để so sánh báo giá nhiều nhà thầu, có căn cứ nghiệm thu, có người giám sát quyền tác giả.\n\nKinh nghiệm của tôi: với nhà từ 1,5 tỷ trở lên, tách riêng thiết kế luôn có lợi. Với nhà nhỏ ngân sách rất sát, trọn gói có thể chấp nhận nhưng nên yêu cầu xem đủ hồ sơ kết cấu và điện nước trước khi ký." },
     { asker: "Chị Lan · Vũng Tàu", by: P.loc, best: false, hearts: 4, h: 280,
@@ -2094,6 +2094,66 @@ function hoiKtsBank() {
       ans:[
         {k:KP.nson, d:D[0], h:4, t:"Miền Nam nắng gắt mưa nhiều thì chị ưu tiên sơn ngoại thất có khả năng chống kiềm + chống thấm + kháng tia UV, và QUAN TRỌNG là làm đủ hệ: bột trét ngoại thất + sơn lót kháng kiềm + 2 lớp phủ. Nhiều nhà bỏ lớp lót kháng kiềm nên mới phấn hóa, ố sớm."},
         {k:KP.ngoc, d:D[2], h:3, t:"Đúng rồi ạ. Và nên sơn khi tường đã khô đủ ngày (tường mới cần thời gian ổn định độ ẩm), sơn lúc tường còn ẩm là dễ bong, kiềm hóa. Màu sáng cũng ít hấp nhiệt và lâu xuống màu hơn."},
+      ] },
+    { asker:"Anh Huy · Thuận An", qh:3, title:"Xem tuổi làm nhà, nếu tuổi xấu thì phải chờ mấy năm?",
+      q:"Em tính năm nay khởi công nhưng nghe nói tuổi em không hợp làm nhà năm nay. Có nhất thiết phải đợi không hay có cách nào khác ạ?",
+      ans:[
+        {k:KP.bcv, d:D[0], h:6, best:true, t:"Đây là băn khoăn rất nhiều gia đình gặp anh ạ. Thực tế có 2 hướng người ta hay làm: (1) đợi năm hợp tuổi; (2) 'mượn tuổi' người hợp làm chủ đứng tên xin phép/động thổ (có làm giấy tờ mượn tuổi rõ ràng). Việc này thuộc phạm trù tín ngưỡng cá nhân, ALN tôn trọng lựa chọn của anh chị — bên thiết kế vẫn triển khai hồ sơ bình thường song song trong lúc anh cân nhắc, không ảnh hưởng tiến độ bản vẽ."},
+        {k:KP.tri, d:D[2], h:3, t:"Về mặt kỹ thuật thì tuổi không ảnh hưởng gì đến chất lượng công trình cả anh, quan trọng là lúc thi công thật (đổ móng, đổ sàn...) né được ngày mưa lớn là được."},
+      ] },
+    { asker:"Chị Thu Hằng · Q.Thủ Đức", qh:4, title:"Chi phí thiết kế chiếm khoảng bao nhiêu % tổng ngân sách xây nhà?",
+      q:"Em thấy nhiều người bỏ qua thiết kế cho đỡ tốn, xây theo mẫu có sẵn ngoài mạng. Thiết kế riêng có đáng bỏ tiền không và tốn bao nhiêu % ạ?",
+      ans:[
+        {k:KP.phat, d:D[0], h:9, best:true, t:"Chi phí thiết kế thường chỉ chiếm khoảng vài % tổng giá trị công trình thôi chị — nhưng nó quyết định gần hết chất lượng và chi phí thi công sau này (bố trí công năng, kết cấu, vật tư). Xây theo mẫu có sẵn dễ bị lệch với đất thật (hướng, kích thước, hiện trạng hàng xóm) dẫn tới sửa đổi giữa chừng — mà sửa lúc đang xây luôn đắt hơn sửa trên bản vẽ rất nhiều lần."},
+        {k:KP.khanh, d:D[2], h:4, t:"Đúng vậy chị. Bỏ vài % để có bản vẽ khớp đất thật + dự toán khối lượng rõ ràng, đổi lại tránh được phần lớn phát sinh khi thi công — tính ra lợi hơn."},
+      ] },
+    { asker:"Anh Khoa · Biên Hòa", qh:3, title:"Nhà phố liền kề sát vách, làm móng sao để không ảnh hưởng nhà bên cạnh?",
+      q:"Đất em 2 bên đều đã có nhà xây trước, sát vách luôn. Em sợ đào móng làm nứt/nghiêng nhà hàng xóm. Cần lưu ý gì ạ?",
+      ans:[
+        {k:KP.quan, d:D[0], h:7, best:true, t:"Đây là tình huống phải cẩn thận thật anh ạ. Trước khi thi công nên: (1) chụp ảnh/quay video hiện trạng nhà 2 bên (biên bản có chữ ký) để tránh tranh chấp sau này; (2) phương án móng/ép cọc cần tính đến ảnh hưởng rung chấn với nhà liền kề, ưu tiên biện pháp ép êm thay vì đóng cọc; (3) đào móng theo từng đoạn ngắn, có văng chống, không đào ồ ạt cả tuyến sát vách."},
+        {k:KP.nhan, d:D[3], h:2, t:"Bổ sung: nên báo trước cho hàng xóm biết lịch thi công, giữ quan hệ tốt — nhiều tranh chấp nhà liền kề bắt nguồn từ việc không thông báo trước thôi."},
+      ] },
+    { asker:"Chị Bảo Trâm · Q.Bình Thạnh", qh:2, title:"Kính hộp, kính cường lực khác nhau sao, nên chọn loại nào chống nóng?",
+      q:"Nhà em nhiều cửa sổ kính, sợ nóng và ồn. Nhân viên bán hàng tư vấn kính hộp nhưng em không hiểu khác gì kính cường lực thường ạ.",
+      ans:[
+        {k:KP.linh, d:D[0], h:5, best:true, t:"2 khái niệm khác nhau chị nhé: 'cường lực' là nói về ĐỘ BỀN (kính được xử lý nhiệt để khó vỡ, vỡ thì thành hạt nhỏ không gây sát thương). 'Kính hộp' là CẤU TẠO 2-3 lớp kính cách nhau 1 lớp không khí/khí trơ — chính lớp đệm này mới là thứ cách nhiệt, cách âm tốt. Muốn vừa an toàn vừa chống nóng/ồn thì chọn kính hộp làm từ kính cường lực — kết hợp cả 2."},
+        {k:KP.duy, d:D[2], h:2, t:"Thêm tí: có thể chọn kính hộp low-E (phủ lớp phản xạ nhiệt) cho hướng nắng gắt, hiệu quả chống nóng rõ rệt hơn kính hộp thường."},
+      ] },
+    { asker:"Anh Tài · Nhà Bè", qh:4, title:"Giếng trời làm sao để không bị mưa tạt vào nhà?",
+      q:"Em rất thích giếng trời cho sáng nhưng sợ nhà miền Nam mưa nhiều, tạt nước vào trong. Có cách nào khắc phục không ạ?",
+      ans:[
+        {k:KP.nam, d:D[0], h:6, best:true, t:"Có anh, xử lý được hết. Vài cách hay dùng: (1) mái che giếng trời bằng kính/tôn sáng có độ dốc, chừa khe thoáng 2 bên thay vì để hở hoàn toàn; (2) bố trí sàn quanh giếng trời thấp hơn hoặc có rãnh thu nước + độ dốc về phễu thoát; (3) trồng cây/đặt sỏi ở đáy giếng trời để thấm hút bớt nước mưa nếu để giếng trời có cây xanh."},
+        {k:KP.huy, d:D[2], h:2, t:"Nhà em làm mái che di động (dạng bạt kéo) cho giếng trời, trời nắng kéo ra lấy sáng tối đa, trời mưa gió lớn đóng lại — cũng là 1 lựa chọn nếu ngân sách cho phép."},
+      ] },
+    { asker:"Chị Minh Anh · Q.Tân Phú", qh:3, title:"Đi dây điện âm tường sao cho sau này sửa không phải đục phá nhiều?",
+      q:"Em nghe nhiều người kể sau này muốn thêm ổ cắm hay dây bị chuột cắn phải đục cả bức tường. Có cách đi dây khôn hơn không ạ?",
+      ans:[
+        {k:KP.klong, d:D[0], h:6, best:true, t:"Có chị, đây là kinh nghiệm hay bị bỏ qua lúc thiết kế: nên đi ống gen điện (ống nhựa luồn dây) thay vì chôn dây trực tiếp vào tường — sau này dây hỏng chỉ cần rút dây cũ luồn dây mới qua ống, không phải đục tường. Ống gen cũng nên đi theo phương đứng/ngang rõ ràng (không chéo góc) và LƯU LẠI bản vẽ hoàn công điện nước — nhà nào giữ được bản vẽ này thì sửa chữa sau cực nhàn."},
+        {k:KP.gbao, d:D[2], h:2, t:"Đúng rồi ạ, nhà em không giữ bản vẽ hoàn công, giờ khoan trúng dây điện hoài, cũng đang khổ vì cái này 😅"},
+      ] },
+    { asker:"Anh Duy · Q.Gò Vấp", qh:2, title:"Lát sân thượng bằng gạch gì để vừa chống nóng vừa không trơn trượt?",
+      q:"Sân thượng nhà em hay phơi đồ, nắng gắt cả ngày. Lát gạch bình thường thì nóng chân, mà trời mưa lại trơn. Nên chọn loại nào ạ?",
+      ans:[
+        {k:KP.cuong, d:D[0], h:5, best:true, t:"Anh ưu tiên gạch chống nóng chuyên dụng cho sân thượng (gạch có lỗ thoát nhiệt hoặc gạch granite bề mặt nhám/mài xước tạo độ nhám) — vừa giảm hấp nhiệt vừa chống trơn trượt tốt hơn gạch bóng láng nhiều. Tránh tuyệt đối gạch mặt bóng cho khu vực ngoài trời."},
+        {k:KP.ngoc, d:D[2], h:2, t:"Nhà em lát gạch terrazzo nhám ngoài trời, mát chân hơn hẳn gạch men thường, mưa cũng không trơn ạ."},
+      ] },
+    { asker:"Chị Ngọc Trinh · Long Thành", qh:4, title:"Xây nhà vào mùa mưa có ảnh hưởng chất lượng công trình không?",
+      q:"Kế hoạch của em rơi đúng mùa mưa, đợi mùa khô thì trễ cả năm. Xây mùa mưa có sao không, cần lưu ý gì ạ?",
+      ans:[
+        {k:KP.thinh, d:D[0], h:7, best:true, t:"Xây được chị ạ, không nhất thiết phải đợi mùa khô — quan trọng là quản lý đúng kỹ thuật theo mùa: (1) đổ bê tông móng/sàn cần che chắn, tránh đổ đúng lúc mưa lớn làm loãng nước bê tông; (2) tập kết vật tư (xi măng, thép) có mái che, kê cao tránh ẩm ướt hư hỏng; (3) tiến độ đào đất/móng cần tính dự phòng ngày mưa để tránh sụt lún hố móng. Đội thi công có kinh nghiệm mùa mưa sẽ chủ động được mấy điểm này."},
+        {k:KP.son, d:D[2], h:2, t:"Thêm: nên có bạt che công trình sẵn quanh năm chứ không đợi trời mưa mới lo, giúp cả bảo vệ vật tư lẫn an toàn thi công."},
+      ] },
+    { asker:"Anh Phong · Dĩ An", qh:3, title:"Đất thấp trũng, nhà hay bị ngập khi mưa lớn, cách xử lý khi thiết kế thế nào?",
+      q:"Khu em ở trũng, mưa to là nước dồn vào sân trước. Lúc thiết kế nhà mới em cần yêu cầu KTS lưu ý gì để đỡ ngập ạ?",
+      ans:[
+        {k:KP.hphuc, d:D[0], h:6, best:true, t:"Vài giải pháp hay áp dụng cho đất trũng anh nhé: (1) tôn nền cao hơn cao độ đường/vỉa hè hiện hữu một khoảng an toàn (KTS sẽ khảo sát cao độ thực tế để tính); (2) làm rãnh thu nước + hố ga quanh nhà, có nắp đậy dễ vệ sinh; (3) nếu có tầng hầm/gara âm thì bắt buộc có máy bơm nước thải dự phòng. Cái này cần khảo sát cao độ thực tế của khu đất, không nên áp dụng chung chung — anh nói rõ hiện trạng ngập cho KTS khi khảo sát nhé."},
+        {k:KP.truong, d:D[2], h:2, t:"Đồng ý, nhà khu trũng mà bỏ qua bước tôn nền + hố ga là gần như chắc chắn dính ngập mùa mưa sau này."},
+      ] },
+    { asker:"Chị Kim Oanh · Q.12", qh:2, title:"Nhà ống hẹp ngang (4m) làm sao lấy đủ ánh sáng tự nhiên?",
+      q:"Đất nhà em chỉ 4m ngang, sâu 18m, ở giữa dãy nhà san sát. Sợ nhà tối, phải bật đèn suốt ngày. Có cách nào khắc phục ạ?",
+      ans:[
+        {k:KP.tuan, d:D[0], h:8, best:true, t:"Nhà ống hẹp ngang là bài toán quen thuộc chị ạ, vài hướng xử lý: (1) giếng trời/thông tầng ở giữa hoặc cuối nhà — quan trọng nhất với nhà sâu; (2) cửa sổ lớn/vách kính lấy sáng ở mặt tiền và mặt hậu (2 đầu duy nhất tiếp xúc trời); (3) dùng vách ngăn phòng bằng kính hoặc lam gỗ thay vì tường đặc để ánh sáng xuyên được qua các phòng; (4) sơn tường màu sáng, sàn tone sáng để phản xạ ánh sáng tốt hơn. Kết hợp 2-3 cái đầu là đủ sáng cả ngày không cần bật đèn."},
+        {k:KP.nhat, d:D[2], h:3, t:"Bổ sung: cầu thang cũng nên đặt cạnh giếng trời, vừa lấy sáng cho cầu thang vừa dẫn sáng xuống các tầng dưới qua khoảng thông tầng."},
       ] },
   ];
 }
