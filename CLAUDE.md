@@ -10,6 +10,7 @@
 - **Câu chuẩn thay thế:** *"ALN là Tổng thầu Thiết kế — ký hợp đồng trực tiếp với khách hàng, trực tiếp chịu trách nhiệm toàn bộ dự án. Thanh toán theo Quy trình 4 bước đảm bảo (C1–C4)."* Bản rút gọn: *"Tổng thầu Thiết kế — hợp đồng trực tiếp, thanh toán theo Quy trình 4 bước đảm bảo."*
 - **Ngữ cảnh thuật ngữ** (không lẫn nhau): khách hàng → **"Quy trình 4 bước đảm bảo"**; KTS → **"Làm bước nào thanh toán bước đó"** (cập nhật 15/07/2026, thay cho "Tiền đã có sẵn tại ALN chờ bạn"); nội bộ → **"Quỹ bảo đảm 4 bước"**.
 - Trước khi publish nội dung mới (Cẩm nang, trang mẫu, trang tỉnh...), đối chiếu với lint content (đã thêm ở Phase 3) để chặn tái phạm.
+- **21/07/2026:** phát hiện 25 trang `cam-nang/xay-nha-tron-goi-{tỉnh}/` (24 tỉnh) + `cam-nang/index.html` dùng đúng cụm bị cấm "xây nhà trọn gói" (title/H1/meta/nội dung) — bản thân "Phase 3 lint" nhắc ở trên **chưa từng tồn tại thật trong `.github/workflows/code-check.yml`**. Đã sửa toàn bộ 25 trang sang **"xây nhà hoàn thiện"** (giữ nguyên URL slug `xay-nha-tron-goi-*` để không ảnh hưởng SEO/backlink), sửa luôn 1 dropdown ẩn trong `founder_panel.html` (mục tạo nội dung quảng cáo MyMy), và **đã thêm thật** bước lint chặn cụm cấm vào `code-check.yml` (step "Kiểm tra cụm từ định vị bị cấm").
 
 ## Tài liệu chiến lược → repo private
 
