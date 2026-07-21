@@ -238,10 +238,29 @@ Agent RIÊNG, KHÔNG dùng chung allowlist/session với `runMyMyTurn`/`runMyMyT
   3. Instagram + TikTok chưa có tài khoản — chưa kết nối Buffer, `settings/marketing.bufferChannels` mới có `facebook`.
   4. Không có UI trong `founder_panel.html` để sửa `bufferChannels` — phải vào thẳng Firestore Console.
   5. Không có dashboard xem lại lịch sử `marketing_posts` — chỉ hỏi qua chat MyMy.
-  6. Quy tắc đặt tên `campaign_tag` theo mục đích (KTS recruit/BD partner/content thường kỳ...) — code chỉ validate định dạng, chưa có quy ước thống nhất.
+  6. ~~Quy tắc đặt tên `campaign_tag`~~ — đã chốt 21/07/2026, xem bảng quy ước ngay dưới đây.
   7. Đổi model AI (`claude-sonnet-4-6` → mới hơn) cho cả 3 agent MyMy — xem mục P2 bên dưới.
   8. ~~Nhánh `claude/review-optimization-r49lr4`~~ — Founder đã xoá 21/07/2026.
 - **Tiện thể sửa luôn (20/07/2026):** `runMyMyTurn` (MyMy DN) trước đó thiếu xưng hô anh/chị theo giới tính dù đã có field `users/{uid}.gender` sẵn (client_CN.html đã làm đúng từ lâu, DN bị bỏ sót) — đã sửa, đọc thẳng `gender` server-side, không cần sửa `client_DN.html`. MyMy Marketing xưng "anh Long" (lấy tên thật Founder). Cả 2 đã deploy nhưng CHƯA được Founder xác nhận lại đã đúng trong chat thật.
+
+### Quy ước đặt tên `campaign_tag` (chốt 21/07/2026)
+
+Format: `{mục-đích}-{mô-tả-ngắn tuỳ chọn}-{tháng}{năm 2 số}` — chỉ chữ thường/số, nối bằng gạch ngang, ≤60 ký tự (khớp regex validate trong `mymyMktValidCampaignTag`).
+
+| Mục đích | Prefix | Ví dụ |
+|---|---|---|
+| Tuyển KTS | `kts-recruit` | `kts-recruit-jul26` |
+| Tuyển DN (chủ đầu tư/doanh nghiệp) | `dn-recruit` | `dn-recruit-jul26` |
+| Tuyển Designer nội thất | `designer-recruit` | `designer-recruit-jul26` |
+| Tuyển gian hàng NCC | `ncc-recruit` | `ncc-recruit-jul26` |
+| Quảng bá Mạng lưới NCC | `ncc-showcase` | `ncc-showcase-jul26` |
+| Hợp tác đối tác (BD, agency, sàn BĐS...) | `bd-partner` | `bd-partner-jul26` |
+| Nội dung thường kỳ (Cẩm nang, kiến thức) | `content-weekly` | `content-weekly-jul26` |
+| Quảng bá thương hiệu chung | `brand-awareness` | `brand-awareness-jul26` |
+| Sự kiện/khuyến mãi theo mùa | `event-promo` | `event-promo-jul26` |
+| Test/nội bộ (không tính vào báo cáo thật) | `test-mymy` | `test-mymy-jul21` |
+
+Cần mô tả chi tiết hơn (theo tỉnh/chiến dịch riêng) thì chèn giữa: `bd-partner-hcm-jul26`. MyMy Marketing nên gợi ý chuẩn hoá theo bảng này khi Founder đặt tên khác định dạng (đã có sẵn ở QUY TẮC BẮT BUỘC mục 4 trong system prompt).
 
 ## Các nút GHI đã được nối (Firestore/Storage)
 
