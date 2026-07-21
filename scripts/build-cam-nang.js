@@ -29,7 +29,10 @@
 // tới publishDate và lên web, hệ thống TỰ ĐỘNG đăng luôn lên Fanpage "App Làm
 // Nhà" (không cần duyệt lại — nội dung Cẩm nang đã duyệt lúc soạn). Không có
 // trường này hoặc "facebook: false" = mặc định an toàn, chỉ lên web, không
-// đăng FB. Chống đăng trùng bằng content/cam-nang/.fb-posted.json (mỗi slug
+// đăng FB. MẶC ĐỊNH cho bài Cẩm nang MỚI (từ 15/07/2026, xem CLAUDE.md): luôn
+// thêm "facebook: true" — không áp cho bài cũ đã publish trước ngày đó (bật
+// hàng loạt sẽ khiến cron đăng dồn nhiều bài cùng lúc, dễ bị FB đánh spam).
+// Chống đăng trùng bằng content/cam-nang/.fb-posted.json (mỗi slug
 // chỉ đăng đúng 1 lần — xem postDueArticlesToFacebook bên dưới). Cần thiết
 // lập secret CAM_NANG_FB_SECRET (GitHub Actions + Firebase) trước khi dùng —
 // xem CHANGES.md.

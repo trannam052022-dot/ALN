@@ -7,6 +7,7 @@ image: /images/cam-nang/thu-tuc-hoan-cong.jpg
 date: 2026-07-17
 updated: 2026-07-17
 publishDate: 2026-07-17
+facebook: true
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
   - thủ tục hoàn công nhà ở
