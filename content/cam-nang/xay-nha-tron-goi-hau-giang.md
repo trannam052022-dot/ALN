@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói Hậu Giang 2026: giá 5–7 triệu/m², nền yếu"
+title: "Xây nhà hoàn thiện Hậu Giang 2026: giá 5–7 triệu/m², nền yếu"
 slug: xay-nha-tron-goi-hau-giang
 category: khu-vuc
-description: "Giá xây nhà trọn gói Hậu Giang 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý nền phù sa phèn yếu, kênh rạch, ép cọc. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện Hậu Giang 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý nền phù sa phèn yếu, kênh rạch, ép cọc. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Hậu Giang"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói hậu giang
+  - xây nhà hoàn thiện hậu giang
   - giá xây nhà vị thanh ngã bảy 2026
   - xây nhà nền phèn yếu
   - thiết kế nhà hậu giang

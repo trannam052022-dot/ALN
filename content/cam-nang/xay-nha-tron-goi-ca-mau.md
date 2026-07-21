@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói Cà Mau 2026: giá 5–7 triệu/m², nền đất yếu"
+title: "Xây nhà hoàn thiện Cà Mau 2026: giá 5–7 triệu/m², nền đất yếu"
 slug: xay-nha-tron-goi-ca-mau
 category: khu-vuc
-description: "Giá xây nhà trọn gói Cà Mau 2026: thô ~4,3 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý nền yếu nhất nước, sụt lún, ép cọc sâu. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện Cà Mau 2026: thô ~4,3 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý nền yếu nhất nước, sụt lún, ép cọc sâu. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Cà Mau"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói cà mau
+  - xây nhà hoàn thiện cà mau
   - giá xây nhà cà mau 2026
   - xây nhà nền đất yếu sụt lún
   - thiết kế nhà cà mau

@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói Đà Lạt – Lâm Đồng 2026: giá m², đất dốc"
+title: "Xây nhà hoàn thiện Đà Lạt – Lâm Đồng 2026: giá m², đất dốc"
 slug: xay-nha-tron-goi-lam-dong
 category: khu-vuc
-description: "Giá xây nhà trọn gói Đà Lạt – Lâm Đồng 2026: thô ~4,5 triệu/m², hoàn thiện 5,5–8 triệu/m². Lưu ý đất dốc, khí hậu lạnh ẩm. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện Đà Lạt – Lâm Đồng 2026: thô ~4,5 triệu/m², hoàn thiện 5,5–8 triệu/m². Lưu ý đất dốc, khí hậu lạnh ẩm. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Lâm Đồng Đà Lạt"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói lâm đồng
+  - xây nhà hoàn thiện lâm đồng
   - giá xây nhà đà lạt 2026
   - xây nhà đất dốc đà lạt
   - thiết kế nhà đà lạt bảo lộc

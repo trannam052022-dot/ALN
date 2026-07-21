@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói Cần Thơ 2026: giá 5–7,5 triệu/m², nền yếu"
+title: "Xây nhà hoàn thiện Cần Thơ 2026: giá 5–7,5 triệu/m², nền yếu"
 slug: xay-nha-tron-goi-can-tho
 category: khu-vuc
-description: "Giá xây nhà trọn gói Cần Thơ 2026: thô ~4,4 triệu/m², hoàn thiện 5–7,5 triệu/m². Lưu ý nền phù sa yếu, triều cường đô thị. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện Cần Thơ 2026: thô ~4,4 triệu/m², hoàn thiện 5–7,5 triệu/m². Lưu ý nền phù sa yếu, triều cường đô thị. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Cần Thơ"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói cần thơ
+  - xây nhà hoàn thiện cần thơ
   - giá xây nhà cần thơ 2026
   - xây nhà ninh kiều
   - thiết kế nhà cần thơ

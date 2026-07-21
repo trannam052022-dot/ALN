@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói Vũng Tàu 2026: giá 5,5–8 triệu/m², ven biển"
+title: "Xây nhà hoàn thiện Vũng Tàu 2026: giá 5,5–8 triệu/m², ven biển"
 slug: xay-nha-tron-goi-vung-tau
 category: khu-vuc
-description: "Giá xây nhà trọn gói Vũng Tàu 2026: thô ~4,5 triệu/m², hoàn thiện 5,5–8 triệu/m². Lưu ý chống ăn mòn mặn ven biển, nền cát. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện Vũng Tàu 2026: thô ~4,5 triệu/m², hoàn thiện 5,5–8 triệu/m². Lưu ý chống ăn mòn mặn ven biển, nền cát. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Vũng Tàu"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói vũng tàu
+  - xây nhà hoàn thiện vũng tàu
   - giá xây nhà vũng tàu 2026
   - xây nhà ven biển chống mặn
   - thiết kế nhà bà rịa vũng tàu

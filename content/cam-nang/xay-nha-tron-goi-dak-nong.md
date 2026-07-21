@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói Đắk Nông 2026: giá 5–7 triệu/m², đồi dốc"
+title: "Xây nhà hoàn thiện Đắk Nông 2026: giá 5–7 triệu/m², đồi dốc"
 slug: xay-nha-tron-goi-dak-nong
 category: khu-vuc
-description: "Giá xây nhà trọn gói Đắk Nông 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý đất bazan đồi dốc quanh Gia Nghĩa, san nền. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện Đắk Nông 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý đất bazan đồi dốc quanh Gia Nghĩa, san nền. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Đắk Nông"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói đắk nông
+  - xây nhà hoàn thiện đắk nông
   - giá xây nhà gia nghĩa 2026
   - xây nhà đất dốc bazan
   - thiết kế nhà đắk nông

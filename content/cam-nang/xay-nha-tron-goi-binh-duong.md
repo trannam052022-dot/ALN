@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói Bình Dương 2026: giá 5–7,5 triệu/m², giấy phép"
+title: "Xây nhà hoàn thiện Bình Dương 2026: giá 5–7,5 triệu/m², giấy phép"
 slug: xay-nha-tron-goi-binh-duong
 category: khu-vuc
-description: "Giá xây nhà trọn gói Bình Dương 2026: thô ~4,3 triệu/m², hoàn thiện 5–7,5 triệu/m². Lưu ý chi phí ở Thuận An, Dĩ An, Thủ Dầu Một. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện Bình Dương 2026: thô ~4,3 triệu/m², hoàn thiện 5–7,5 triệu/m². Lưu ý chi phí ở Thuận An, Dĩ An, Thủ Dầu Một. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Bình Dương"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói bình dương
+  - xây nhà hoàn thiện bình dương
   - giá xây nhà bình dương 2026
   - xây nhà thuận an dĩ an thủ dầu một
   - thiết kế nhà bình dương

@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói Bến Tre 2026: giá 5–7,5 triệu/m², đất cù lao"
+title: "Xây nhà hoàn thiện Bến Tre 2026: giá 5–7,5 triệu/m², đất cù lao"
 slug: xay-nha-tron-goi-ben-tre
 category: khu-vuc
-description: "Giá xây nhà trọn gói Bến Tre 2026: thô ~4,3 triệu/m², hoàn thiện 5–7,5 triệu/m². Lưu ý nền cù lao yếu, xâm nhập mặn, ép cọc. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện Bến Tre 2026: thô ~4,3 triệu/m², hoàn thiện 5–7,5 triệu/m². Lưu ý nền cù lao yếu, xâm nhập mặn, ép cọc. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Bến Tre"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói bến tre
+  - xây nhà hoàn thiện bến tre
   - giá xây nhà bến tre 2026
   - xây nhà cù lao chống mặn
   - thiết kế nhà bến tre

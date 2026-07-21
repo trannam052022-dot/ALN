@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói Long An 2026: giá 5–7,5 triệu/m², nền phèn"
+title: "Xây nhà hoàn thiện Long An 2026: giá 5–7,5 triệu/m², nền phèn"
 slug: xay-nha-tron-goi-long-an
 category: khu-vuc
-description: "Giá xây nhà trọn gói Long An 2026: thô ~4,3 triệu/m², hoàn thiện 5–7,5 triệu/m². Lưu ý nền phèn yếu Đức Hòa, Bến Lức, Cần Giuộc. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện Long An 2026: thô ~4,3 triệu/m², hoàn thiện 5–7,5 triệu/m². Lưu ý nền phèn yếu Đức Hòa, Bến Lức, Cần Giuộc. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Long An"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói long an
+  - xây nhà hoàn thiện long an
   - giá xây nhà long an 2026
   - xây nhà đức hòa bến lức cần giuộc
   - thiết kế nhà long an

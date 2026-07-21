@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói Gia Lai 2026: giá 5–7 triệu/m², đất bazan"
+title: "Xây nhà hoàn thiện Gia Lai 2026: giá 5–7 triệu/m², đất bazan"
 slug: xay-nha-tron-goi-gia-lai
 category: khu-vuc
-description: "Giá xây nhà trọn gói Gia Lai 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý cao nguyên Pleiku nền tốt, đồi dốc. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện Gia Lai 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý cao nguyên Pleiku nền tốt, đồi dốc. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Gia Lai"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói gia lai
+  - xây nhà hoàn thiện gia lai
   - giá xây nhà pleiku 2026
   - xây nhà cao nguyên đất đỏ
   - thiết kế nhà gia lai

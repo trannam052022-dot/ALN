@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói TP.HCM 2026: giá 5,5–8 triệu/m², giấy phép"
+title: "Xây nhà hoàn thiện TP.HCM 2026: giá 5,5–8 triệu/m², giấy phép"
 slug: xay-nha-tron-goi-tphcm
 category: khu-vuc
-description: "Giá xây nhà trọn gói TP.HCM 2026: thô ~4,5 triệu/m², hoàn thiện 5,5–8 triệu/m². Lưu ý bóc tách theo quận, nền đất yếu. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện TP.HCM 2026: thô ~4,5 triệu/m², hoàn thiện 5,5–8 triệu/m². Lưu ý bóc tách theo quận, nền đất yếu. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại TP.HCM"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói tphcm
+  - xây nhà hoàn thiện tphcm
   - giá xây nhà tphcm 2026
   - chi phí xây nhà phần thô
   - thiết kế nhà tphcm

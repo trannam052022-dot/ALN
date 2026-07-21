@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói Kon Tum 2026: giá 5–7 triệu/m², đồi núi"
+title: "Xây nhà hoàn thiện Kon Tum 2026: giá 5–7 triệu/m², đồi núi"
 slug: xay-nha-tron-goi-kon-tum
 category: khu-vuc
-description: "Giá xây nhà trọn gói Kon Tum 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý đất bazan xen đồi núi, địa hình dốc. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện Kon Tum 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý đất bazan xen đồi núi, địa hình dốc. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Kon Tum"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói kon tum
+  - xây nhà hoàn thiện kon tum
   - giá xây nhà kon tum 2026
   - xây nhà đồi núi tây nguyên
   - thiết kế nhà kon tum

@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói Đắk Lắk 2026: giá 5–7 triệu/m², đất bazan"
+title: "Xây nhà hoàn thiện Đắk Lắk 2026: giá 5–7 triệu/m², đất bazan"
 slug: xay-nha-tron-goi-dak-lak
 category: khu-vuc
-description: "Giá xây nhà trọn gói Đắk Lắk 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý đất bazan nền tốt quanh Buôn Ma Thuột. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện Đắk Lắk 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý đất bazan nền tốt quanh Buôn Ma Thuột. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Đắk Lắk"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói đắk lắk
+  - xây nhà hoàn thiện đắk lắk
   - giá xây nhà buôn ma thuột 2026
   - xây nhà vườn cà phê đất đỏ bazan
   - thiết kế nhà đắk lắk

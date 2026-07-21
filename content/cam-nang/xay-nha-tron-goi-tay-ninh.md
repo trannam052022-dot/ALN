@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói Tây Ninh 2026: giá 5–7 triệu/m², đất cứng"
+title: "Xây nhà hoàn thiện Tây Ninh 2026: giá 5–7 triệu/m², đất cứng"
 slug: xay-nha-tron-goi-tay-ninh
 category: khu-vuc
-description: "Giá xây nhà trọn gói Tây Ninh 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý đất cao ráo nền cứng, nhà vườn đất rộng. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện Tây Ninh 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý đất cao ráo nền cứng, nhà vườn đất rộng. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Tây Ninh"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói tây ninh
+  - xây nhà hoàn thiện tây ninh
   - giá xây nhà tây ninh 2026
   - xây nhà vườn tây ninh
   - thiết kế nhà tây ninh

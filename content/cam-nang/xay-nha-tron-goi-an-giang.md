@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói An Giang 2026: giá 5–7 triệu/m², vùng lũ"
+title: "Xây nhà hoàn thiện An Giang 2026: giá 5–7 triệu/m², vùng lũ"
 slug: xay-nha-tron-goi-an-giang
 category: khu-vuc
-description: "Giá xây nhà trọn gói An Giang 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý vùng đầu nguồn lũ, tôn nền, ép cọc. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện An Giang 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý vùng đầu nguồn lũ, tôn nền, ép cọc. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại An Giang"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói an giang
+  - xây nhà hoàn thiện an giang
   - giá xây nhà long xuyên châu đốc 2026
   - xây nhà chống lũ an giang
   - thiết kế nhà an giang

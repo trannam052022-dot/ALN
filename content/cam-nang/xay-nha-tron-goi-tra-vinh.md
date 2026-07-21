@@ -1,15 +1,15 @@
 ---
-title: "Xây nhà trọn gói Trà Vinh 2026: giá 5–7 triệu/m², chống mặn"
+title: "Xây nhà hoàn thiện Trà Vinh 2026: giá 5–7 triệu/m², chống mặn"
 slug: xay-nha-tron-goi-tra-vinh
 category: khu-vuc
-description: "Giá xây nhà trọn gói Trà Vinh 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý nền yếu, xâm nhập mặn ven biển, ép cọc. Hỏi KTS miễn phí tại ALN."
+description: "Giá xây nhà hoàn thiện Trà Vinh 2026: thô ~4,2 triệu/m², hoàn thiện 5–7 triệu/m². Lưu ý nền yếu, xâm nhập mặn ven biển, ép cọc. Hỏi KTS miễn phí tại ALN."
 image: /images/cam-nang/xay-nha-het-bao-nhieu-tien.jpg
 imageAlt: "Xây nhà tại Trà Vinh"
 date: 2026-07-04
 updated: 2026-07-12
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
-  - xây nhà trọn gói trà vinh
+  - xây nhà hoàn thiện trà vinh
   - giá xây nhà trà vinh 2026
   - xây nhà ven biển chống mặn trà vinh
   - thiết kế nhà trà vinh
