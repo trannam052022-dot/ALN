@@ -242,6 +242,29 @@ Diễn đàn không chỉ là nơi hỏi đáp — đúng vai trò là **trang m
 - **Lưu ý key persona:** mọi item trong `hoiKtsBank()` dùng `k: KP.<key>` — `<key>` phải khớp đúng tên biến trong object `KP` (vd `khanh` không phải `baokhanh`, dù `uid`/`name` bên trong là "baokhanh"/"Bảo Khánh") — sai key gây lỗi runtime khi drip chạy tới item đó. Luôn `node --check` sau khi sửa `functions/forum.js`.
 - **Ngoài cơ chế Hỏi KTS**, còn có `seedForumData()` (11 bài đủ chuyên mục, chạy 1 lần qua nút "Nạp dữ liệu mẫu") và `seedHoiKtsData()` (20 câu bản gốc, khác với `hoiKtsQueue`/drip) — đã rà và sửa 1 chỗ dùng cụm "xây nhà trọn gói" trong tiêu đề bài seed của `seedForumData()` ngày 21/07/2026.
 
+## Gạch & Kim Cương ALN — hệ thống điểm thưởng gamification (P1, thêm 21/07/2026)
+
+Ý tưởng Founder: "game hoá" đóng góp của mọi vai (đặc biệt nhắm nhóm rảnh rỗi/chị em nội trợ — nguồn khách CN tiềm năng qua mối quan hệ cá nhân, không tốn quảng cáo). Đã chốt **định vị pháp lý 2 tầng** sau khi thảo luận kỹ (tránh cả 2 bẫy: tiền ảo bất hợp pháp VÀ mô hình đa cấp hình sự):
+
+- **Gạch** (`alnBricks`) — điểm thưởng khuyến mãi thuần: KHÔNG mua bằng tiền, KHÔNG đổi ra tiền, KHÔNG chuyển nhượng giữa người dùng. Chỉ đổi ưu đãi dịch vụ trong ALN (giảm phí thiết kế, nâng hạng NCC, quà...). Sinh ra từ: đăng ký tài khoản (welcome), chặng dự án được duyệt (CN + KTS), NCC có CN đăng ký qua link ref. Founder trao tay được qua `founderAwardBricks` (nhiệm vụ chưa tự động hoá: chia sẻ bài, "đi chợ giùm" chụp giá vật liệu, viết nhật ký xây nhà, thử thách tuần...).
+- **Kim Cương** (`alnDiamonds`) — thưởng giới thiệu, CHỈ trao khi có **kết quả doanh thu thật đã xác nhận** (CN được giới thiệu ký hợp đồng + tiền C1 đã thực nhận vào tài khoản ALN — không trao khi mới đăng ký). Bản chất là hoa hồng giới thiệu (hợp pháp, khác tiền ảo) — về sau quy đổi được ra tiền chuyển khoản theo thể lệ riêng (mức tiền/1 Kim Cương, ngưỡng rút, khấu trừ thuế TNCN, Founder duyệt tay từng lệnh chi) — **CHƯA làm** phần chi trả này, mới dừng ở trao Kim Cương + push báo Founder.
+- **KHÔNG có thưởng đa tầng** (ăn theo hoạt động tuyến dưới của người mình giới thiệu) — tránh cấu trúc đa cấp cần giấy phép (Điều 217a BLHS nếu làm chui).
+- Tên gọi công khai: luôn dùng **"Gạch"/"Kim Cương"**, KHÔNG dùng "xu/coin/tiền ALN" — tránh liên tưởng tiền ảo.
+
+**Kiến trúc (`functions/bricks.js`):**
+- `bricksLedger/{ledgerId}` — sổ cái bất biến, `ledgerId` đặt cố định theo sự kiện (vd `welcome_{uid}`, `stage_approved_cn_{pid}_{stage}`, `c1paid_{pid}` cho Kim Cương) → tự idempotent, trigger chạy lại không cộng đúp. CHỈ Cloud Functions ghi (Admin SDK bypass rules) — **không cần sửa `firestore.rules`** cho P1 vì client không đọc/ghi trực tiếp collection này.
+- Số dư cache `users/{uid}.alnBricks` / `.alnDiamonds` — đọc được ngay vì rule `users/{uid}` đã có `allow read: if signedIn()` từ trước, không cần mở rule mới.
+- Trigger tự động: `bricksOnUserCreated` (welcome + NCC ref), `bricksOnStageAdvanced` (chặng C1-C4 duyệt xong), `bricksOnFirstPayment` (Kim Cương khi C1 chuyển `status:'paid'` lần đầu, tra `referredByNcc` trên user CN).
+- `founderAwardBricks` (onCall, chỉ FOUNDER_UID) — trao/thu tay, trần ±1000 Gạch/lần, bắt buộc `reason`.
+
+**Còn tồn đọng (chưa làm):**
+1. **UI hiển thị** — chưa có màn "Gạch của tôi" / bảng xếp hạng ở bất kỳ dashboard nào (client_CN, kts_dashboard, founder_panel...). Mới có backend tích lũy âm thầm.
+2. **Cấp bậc "Nền Móng → Khung Nhà → Mái Ấm → Biệt Thự → Dinh Thự"** theo tổng Gạch — chưa định nghĩa ngưỡng, chưa hiển thị.
+3. **Chuyên mục diễn đàn "Tổ ấm & Nhà đẹp"** + thử thách tuần + chương trình "Đại sứ ALN khu phố" — mới là ý tưởng, chưa có category/cơ chế thật.
+4. **Thể lệ chi trả Kim Cương ra tiền thật** — mức quy đổi, ngưỡng rút, form nhập tài khoản ngân hàng, khấu trừ thuế TNCN, màn duyệt chi cho Founder — hoàn toàn CHƯA làm, mới dừng ở trao Kim Cương + thông báo.
+5. Nhiệm vụ "đi chợ giùm" (chụp giá vật liệu) và "nhật ký xây nhà" — chưa có form nộp + hàng chờ duyệt trong `founder_panel.html`/`founder_forum.html`.
+6. Chưa deploy — cần `firebase deploy --only functions:bricksOnUserCreated,functions:bricksOnStageAdvanced,functions:bricksOnFirstPayment,functions:founderAwardBricks`.
+
 ## MyMy Marketing (module Founder-only: đăng Buffer + báo cáo GA4) — thêm 20/07/2026
 
 Agent RIÊNG, KHÔNG dùng chung allowlist/session với `runMyMyTurn`/`runMyMyTurnCN` (2 cái đó chạy theo uid khách DN/CN, không có role check — không an toàn nếu gắn tool chi tiền/đăng công khai vào chung).
