@@ -35,7 +35,7 @@ const WEEKLY_TASK_BANK = [
   { key: "comment_new", label: "Bình luận 1 bài viết MỚI trên Fanpage tuần này", desc: "Vào Fanpage ALN, chọn bài mới nhất và để lại bình luận thật.", url: "https://www.facebook.com/applamnha", pts: 20 },
   { key: "share_post", label: "Chia sẻ 1 bài viết của Fanpage ALN lên trang cá nhân", desc: "Chọn bất kỳ bài viết nào trên Fanpage và bấm Chia sẻ công khai.", url: "https://www.facebook.com/applamnha", pts: 20 },
   { key: "tag_friend", label: "Gắn thẻ 1 người bạn sắp xây nhà vào bình luận Fanpage", desc: "Bình luận dưới 1 bài viết và tag tên người bạn đang có ý định xây/sửa nhà.", url: "https://www.facebook.com/applamnha", pts: 20 },
-  { key: "forum_comment", label: "Bình luận 1 câu hỏi trên Diễn đàn ALN", desc: "Vào mục Hỏi KTS trên Diễn đàn, để lại vài dòng góp ý thật.", url: "forum.html", pts: 20 },
+  { key: "share_group", label: "Chia sẻ bài viết ALN vào 1 nhóm Facebook xây nhà/nội thất", desc: "Đăng lại 1 bài viết Fanpage ALN vào nhóm Facebook về xây nhà, nội thất mà bạn đang tham gia.", url: "https://www.facebook.com/applamnha", pts: 20 },
   { key: "review_fanpage", label: "Để lại đánh giá cho Fanpage ALN", desc: "Vào mục Đánh giá trên Fanpage và chia sẻ cảm nhận của bạn.", url: "https://www.facebook.com/applamnha", pts: 20 },
 ];
 
