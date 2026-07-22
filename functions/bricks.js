@@ -143,10 +143,16 @@ exports.bricksOnUserCreated = functions
   .firestore.document("users/{uid}")
   .onCreate(async (snap, context) => {
     const uid = context.params.uid;
+    const d = snap.data() || {};
+    /* CTV ẩn danh (users/{sđt}, role ctv_lead — xem functions/ctvGame.js) tự có
+       thưởng riêng qua nhiệm vụ, KHÔNG dùng đường "welcome" chung của thành
+       viên đăng ký thật (cn/kts/dn/designer/ncc/ks) — trigger này lắng nghe
+       MỌI doc mới trong users/ nên phải tự loại trừ, tránh cộng đúp ngoài ý
+       muốn (phát hiện qua smoke test 22/07/2026 trước khi thử nghiệm CTV thật). */
+    if (d.role === "ctv_lead") return null;
     await awardBricks(uid, "welcome", uid, { note: "Gạch chào mừng thành viên mới" });
 
     /* NCC giới thiệu CN đăng ký → NCC được Gạch (song song referralCount đã có) */
-    const d = snap.data() || {};
     if (d.role === "cn" && typeof d.referredByNcc === "string" && d.referredByNcc) {
       await awardBricks(d.referredByNcc, "ncc_ref_signup", uid, {
         note: "CN đăng ký qua link giới thiệu", cnUid: uid,
