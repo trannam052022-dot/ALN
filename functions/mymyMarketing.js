@@ -115,6 +115,7 @@ QUY TẮC BẮT BUỘC:
 5. Hỏi từng ý một bằng ask_user — không hỏi dồn nhiều thứ cùng lúc.
 6. getMarketingReport là tool chỉ đọc — dùng thoải mái để trả lời câu hỏi hiệu quả chiến dịch, không cần xác nhận.
 7. Diễn giải báo cáo bằng tiếng Việt tự nhiên, có đề xuất cụ thể cho chiến dịch tiếp theo (kênh nào/giờ nào hiệu quả hơn). Nếu conversions = 0 nhưng có traffic, nhắc khả năng key event GA4 chưa cấu hình thay vì kết luận ngay là chiến dịch kém.
+8. Mọi mốc thời gian trao đổi với Founder PHẢI theo giờ Việt Nam (UTC+7), viết dạng dễ đọc (vd "11:30 trưa mai 23/07") — TUYỆT ĐỐI không đưa chuỗi ISO/UTC ra chat. Kết quả tool đã có sẵn field giờ VN (scheduled_time_vn) — dùng field đó.
 
 XƯNG HÔ: "em" — gọi Founder: "${addressAs}" (đây luôn là đúng 1 người cố định, không cần né tránh như bot chưa biết đối tượng), trừ khi Founder chủ động xưng hô khác thì theo Founder. Ngôn ngữ tự nhiên như người thật nhắn tin, không dùng dấu **, gạch đầu dòng, tiêu đề.
 TUYỆT ĐỐI KHÔNG: tự động chạy quảng cáo trả phí khi chưa được xác nhận rõ ngân sách; tự nhận là AI/chatbot.`;
@@ -149,6 +150,18 @@ function mymyMktValidContentUrl(url) {
 
 function mymyMktValidCampaignTag(tag) {
   return typeof tag === "string" && tag.length <= 60 && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(tag);
+}
+
+/* Định dạng giờ VN dễ đọc cho Founder (server-side, tránh để model tự quy đổi
+   múi giờ từ ISO UTC — dễ tính sai). Vd: "11:30 ngày 23/07/2026 (giờ VN)" */
+function mymyMktFmtVnTime(d) {
+  const date = typeof d === "string" ? new Date(d) : d;
+  const parts = new Intl.DateTimeFormat("vi-VN", {
+    timeZone: "Asia/Ho_Chi_Minh", hourCycle: "h23",
+    hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit", year: "numeric",
+  }).formatToParts(date);
+  const get = (t) => (parts.find((x) => x.type === t) || {}).value || "";
+  return `${get("hour")}:${get("minute")} ngày ${get("day")}/${get("month")}/${get("year")} (giờ VN)`;
 }
 
 function mymyMktIdemKey(input) {
@@ -408,7 +421,7 @@ async function mymyMktExecSchedulePost(founderUid, bufferToken, input) {
       docRef = await db.collection("marketing_posts").add({ ...postData, createdAt: admin.firestore.FieldValue.serverTimestamp() });
     }
 
-    return { ok: true, post_id: docRef.id, status: aggStatus, channels: perChannel, scheduled_time: scheduledAt.toISOString() };
+    return { ok: true, post_id: docRef.id, status: aggStatus, channels: perChannel, scheduled_time: scheduledAt.toISOString(), scheduled_time_vn: mymyMktFmtVnTime(scheduledAt) };
   } catch (e) {
     console.error("[mymyMktExecSchedulePost]", e);
     return { ok: false, error: { code: "internal", message: e.message } };
@@ -565,7 +578,7 @@ const runMyMyMarketingTurn = onCall(
           if (result.deduped) {
             replyText = `Bài này đã được lên lịch trước đó rồi (post_id ${result.post_id}), em không đăng trùng nha!`;
           } else if (result.status === "scheduled") {
-            replyText = `Đã lên lịch xong! Trạng thái: ${result.status}. post_id: ${result.post_id}, giờ đăng: ${result.scheduled_time}.`;
+            replyText = `Đã lên lịch xong! Trạng thái: ${result.status}. post_id: ${result.post_id}, giờ đăng: ${result.scheduled_time_vn || result.scheduled_time}.`;
           } else {
             const channelErrors = Object.entries(result.channels || {})
               .filter(([, info]) => info.status === "failed")
