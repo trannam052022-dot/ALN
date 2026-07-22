@@ -197,8 +197,22 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     </div>
   </div>
 
+  <div class="card" id="inviteCard" style="display:none">
+    <div class="card-title"><i class="ph-duotone ph-users-three"></i> Rủ bạn cùng chơi — nhận Gạch ngay</div>
+    <div class="ref-row">
+      <div class="ref-input" id="inviteLinkText">—</div>
+      <button class="btn-copy" onclick="copyInviteLink()"><i class="ph-duotone ph-copy"></i> Sao chép</button>
+    </div>
+    <div class="ref-row" style="margin-top:8px;flex-wrap:wrap">
+      <button class="btn-copy" id="btnInviteShareNative" style="display:none;background:linear-gradient(135deg,#1e40af,#2563eb)" onclick="shareInviteNative()"><i class="ph-duotone ph-share-network"></i> Chia sẻ ngay</button>
+      <button class="btn-copy" style="background:#0068ff" onclick="shareInviteToZalo()"><i class="ph-duotone ph-chat-circle-text"></i> Zalo</button>
+      <button class="btn-copy" style="background:#0084ff" onclick="shareInviteToMessenger()"><i class="ph-duotone ph-paper-plane-tilt"></i> Messenger</button>
+    </div>
+    <div class="task-desc" style="margin-top:8px">Gửi link này cho bạn bè — khi bạn ấy vào chơi và hoàn thành nhiệm vụ đầu tiên, bạn được cộng ngay <b>+15 Gạch</b>.</div>
+  </div>
+
   <div class="card" id="refCard" style="display:none">
-    <div class="card-title"><i class="ph-duotone ph-share-network"></i> Link giới thiệu của bạn</div>
+    <div class="card-title"><i class="ph-duotone ph-share-network"></i> Link giới thiệu khách xây nhà</div>
     <div class="ref-row">
       <div class="ref-input" id="refLinkText">—</div>
       <button class="btn-copy" onclick="copyRefLink()"><i class="ph-duotone ph-copy"></i> Sao chép</button>
@@ -208,7 +222,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <button class="btn-copy" style="background:#0068ff" onclick="shareToZalo()"><i class="ph-duotone ph-chat-circle-text"></i> Zalo</button>
       <button class="btn-copy" style="background:#0084ff" onclick="shareToMessenger()"><i class="ph-duotone ph-paper-plane-tilt"></i> Messenger</button>
     </div>
-    <div class="task-desc" style="margin-top:8px">Chia sẻ link này cho người quen sắp xây nhà. Khi họ đăng ký và ký hợp đồng thật với ALN, bạn được thưởng Kim Cương.</div>
+    <div class="task-desc" style="margin-top:8px">Khác với link rủ bạn chơi ở trên — link này dành cho người quen SẮP XÂY NHÀ. Khi họ đăng ký và ký hợp đồng thật với ALN, bạn được thưởng Kim Cương.</div>
   </div>
 
   <div class="note">Gạch là điểm thưởng khuyến mãi trong ALN, không mua bằng tiền. Nhiệm vụ tự khai báo — ALN tin bạn đã làm đúng, nộp trùng nhiều lần không được cộng thêm.</div>
@@ -415,6 +429,22 @@ async function doSpin(){
 var doneTasks = {};
 var linkOpened = {};
 
+/* SĐT người mời (nếu vào bằng link ?ref=) — nhớ qua localStorage phòng khi
+   người dùng rời trang rồi quay lại claim sau, không có ?ref= trên URL nữa. */
+var _refByPhone = '';
+var CTV_REFBY_KEY = 'aln_ctv_refby';
+(function captureRefBy(){
+  try {
+    var qp = new URLSearchParams(location.search).get('ref');
+    if (qp && /^0\d{8,10}$/.test(qp)) {
+      _refByPhone = qp;
+      localStorage.setItem(CTV_REFBY_KEY, qp);
+    } else {
+      _refByPhone = localStorage.getItem(CTV_REFBY_KEY) || '';
+    }
+  } catch(e){}
+})();
+
 function markLinkOpened(id){
   if (linkOpened[id]) return;
   linkOpened[id] = true;
@@ -488,6 +518,34 @@ function shareToMessenger(){
   markLinkOpened('share_link');
 }
 
+/* ── Link RỦ BẠN CÙNG CHƠI (khác link giới thiệu khách xây nhà ở trên) ── */
+var INVITE_SHARE_TEXT = 'Mình đang chơi game tích Gạch của ALN, có thưởng thật đó — vào chơi cùng mình nè!';
+function setInviteLink(phone){
+  var url = location.origin + location.pathname.replace(/[^/]*$/, '') + 'ctv_dashboard.html?ref=' + encodeURIComponent(phone);
+  document.getElementById('inviteLinkText').textContent = url;
+  document.getElementById('inviteCard').style.display = 'block';
+  window._inviteUrl = url;
+  document.getElementById('btnInviteShareNative').style.display = (navigator.share ? 'inline-flex' : 'none');
+}
+function copyInviteLink(){
+  if (!window._inviteUrl) return;
+  navigator.clipboard.writeText(window._inviteUrl).then(function(){
+    showMsg('claimMsg', '✓ Đã sao chép link rủ bạn chơi', true);
+  }).catch(function(){});
+}
+async function shareInviteNative(){
+  if (!navigator.share || !window._inviteUrl) return;
+  try { await navigator.share({ title: 'ALN — Chơi cùng tích Gạch', text: INVITE_SHARE_TEXT, url: window._inviteUrl }); } catch(e){}
+}
+function shareInviteToZalo(){
+  if (!window._inviteUrl) return;
+  window.open('https://zalo.me/share/link?u=' + encodeURIComponent(window._inviteUrl) + '&d=' + encodeURIComponent(INVITE_SHARE_TEXT), '_blank');
+}
+function shareInviteToMessenger(){
+  if (!window._inviteUrl) return;
+  window.open('https://www.messenger.com/share?link=' + encodeURIComponent(window._inviteUrl), '_blank');
+}
+
 async function doLookup(){
   var phone = document.getElementById('lookupPhone').value.replace(/[\s.\-()]/g, '');
   if (!/^0\d{8,10}$/.test(phone)) { showMsg('lookupMsg', 'Số điện thoại chưa hợp lệ', false); return; }
@@ -504,6 +562,7 @@ async function doLookup(){
       doneTasks = {};
       (data.tasksDone || []).forEach(function(t){ doneTasks[t] = true; });
       setRefLink(phone);
+      setInviteLink(phone);
       renderTasks();
       rememberCtv(phone, '');
       showMsg('lookupMsg', '✓ Chào mừng trở lại!', true);
@@ -528,13 +587,14 @@ async function doClaim(){
   var btn = document.getElementById('btnClaim');
   btn.disabled = true; btn.textContent = 'Đang gửi...';
   try {
-    var data = await window.ctvClaimTasks({ name: name, phone: phone, taskIds: taskIds });
+    var data = await window.ctvClaimTasks({ name: name, phone: phone, taskIds: taskIds, refBy: _refByPhone });
     renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.ctvReferralPendingVnd);
     setStreak(data.streak);
     updateSpinState(data.spin);
     doneTasks = {};
     (data.tasksDone || []).forEach(function(t){ doneTasks[t] = true; });
     setRefLink(phone);
+    setInviteLink(phone);
     renderTasks();
     rememberCtv(phone, name);
     if (data.newlyAwarded > 0) {

@@ -91,6 +91,35 @@ async function spinStateOf(phone, tasksDone, weeklyTask) {
   return { eligible: true, used: snap.exists };
 }
 
+/* Thưởng mời bạn cùng chơi — MỘT LẦN/người được mời, khi bạn được mời hoàn
+   thành nhiệm vụ ĐẦU TIÊN (tài khoản users/{sđt} vừa được tạo). KHÔNG đa tầng
+   (không ăn theo hoạt động về sau của người được mời) — xem CLAUDE.md mục
+   "Gạch & Kim Cương ALN" (nguyên tắc "KHÔNG có thưởng đa tầng"). */
+const CTV_INVITE_BONUS = 15;
+
+async function awardCtvInviteBonus(referrerPhone, newPhone) {
+  if (!referrerPhone || referrerPhone === newPhone) return;
+  const ledgerId = ("ctv_invite_" + referrerPhone + "_" + newPhone).replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 900);
+  const ledgerRef = db.collection("bricksLedger").doc(ledgerId);
+  const referrerRef = db.collection("users").doc(referrerPhone);
+  try {
+    await db.runTransaction(async (tx) => {
+      const existing = await tx.get(ledgerRef);
+      if (existing.exists) throw new Error("DUP");
+      const refSnap = await tx.get(referrerRef);
+      if (!refSnap.exists) throw new Error("NO_REFERRER"); // chỉ thưởng nếu người mời đã từng chơi thật
+      tx.set(ledgerRef, {
+        uid: referrerPhone, type: "ctv_invite_bonus", amount: CTV_INVITE_BONUS, unit: "brick",
+        meta: { newPhone },
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      tx.set(referrerRef, { alnBricks: admin.firestore.FieldValue.increment(CTV_INVITE_BONUS) }, { merge: true });
+    });
+  } catch (e) {
+    if (e.message !== "DUP" && e.message !== "NO_REFERRER") console.error("[awardCtvInviteBonus]", referrerPhone, newPhone, e);
+  }
+}
+
 function normalizePhone(phone) {
   const p = String(phone || "").replace(/[\s.\-()]/g, "");
   return /^0\d{8,10}$/.test(p) ? p : null;
@@ -166,6 +195,7 @@ exports.ctvClaimTasks = onCall({ region: REGION }, async (request) => {
   const phone = normalizePhone(d.phone);
   const name = String(d.name || "").trim().slice(0, 80);
   const taskIds = Array.isArray(d.taskIds) ? d.taskIds : [];
+  const refBy = normalizePhone(d.refBy); // SĐT người mời (nếu vào bằng link mời), optional
   if (!phone) throw new HttpsError("invalid-argument", "Số điện thoại chưa hợp lệ");
   if (!name) throw new HttpsError("invalid-argument", "Vui lòng nhập tên");
   const weeklyTask = currentWeeklyTask();
@@ -175,7 +205,8 @@ exports.ctvClaimTasks = onCall({ region: REGION }, async (request) => {
 
   const userRef = db.collection("users").doc(phone);
   const preSnap = await userRef.get();
-  if (!preSnap.exists) {
+  const isNewPlayer = !preSnap.exists;
+  if (isNewPlayer) {
     await userRef.set({
       username: phone, name, phone, role: "ctv_lead", status: "active",
       alnBricks: 0, alnDiamonds: 0, ctvTasksDone: [],
@@ -217,6 +248,11 @@ exports.ctvClaimTasks = onCall({ region: REGION }, async (request) => {
   let streakInfo = null;
   if (newlyDone.includes(weeklyTask.taskId)) {
     streakInfo = await updateWeeklyStreak(phone, name, weeklyTask.week);
+  }
+
+  /* Người chơi MỚI vừa hoàn thành nhiệm vụ đầu tiên qua link mời → thưởng người mời */
+  if (isNewPlayer && newlyDone.length && refBy) {
+    await awardCtvInviteBonus(refBy, phone);
   }
 
   const snap = await userRef.get();
