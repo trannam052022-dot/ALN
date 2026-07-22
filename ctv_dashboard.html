@@ -165,6 +165,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <div class="ref-input" id="refLinkText">—</div>
       <button class="btn-copy" onclick="copyRefLink()"><i class="ph-duotone ph-copy"></i> Sao chép</button>
     </div>
+    <div class="ref-row" id="quickShareRow" style="margin-top:8px;flex-wrap:wrap">
+      <button class="btn-copy" id="btnShareNative" style="display:none;background:linear-gradient(135deg,#1e40af,#2563eb)" onclick="shareNative()"><i class="ph-duotone ph-share-network"></i> Chia sẻ ngay</button>
+      <button class="btn-copy" style="background:#0068ff" onclick="shareToZalo()"><i class="ph-duotone ph-chat-circle-text"></i> Zalo</button>
+      <button class="btn-copy" style="background:#0084ff" onclick="shareToMessenger()"><i class="ph-duotone ph-paper-plane-tilt"></i> Messenger</button>
+    </div>
     <div class="task-desc" style="margin-top:8px">Chia sẻ link này cho người quen sắp xây nhà. Khi họ đăng ký và ký hợp đồng thật với ALN, bạn được thưởng Kim Cương.</div>
   </div>
 
@@ -291,12 +296,14 @@ function showMsg(id, text, ok){
 }
 
 var _myPhone = '';
+var SHARE_TEXT = 'Mình đang tìm hiểu ALN — nền tảng thiết kế nhà uy tín, có KTS tư vấn miễn phí. Bạn xem thử nhé:';
 function setRefLink(phone){
   _myPhone = phone;
   var url = location.origin + location.pathname.replace(/[^/]*$/, '') + 'register.html?cref=' + encodeURIComponent(phone);
   document.getElementById('refLinkText').textContent = url;
   document.getElementById('refCard').style.display = 'block';
   window._refUrl = url;
+  document.getElementById('btnShareNative').style.display = (navigator.share ? 'inline-flex' : 'none');
 }
 function copyRefLink(){
   if (!window._refUrl) return;
@@ -304,6 +311,23 @@ function copyRefLink(){
     showMsg('claimMsg', '✓ Đã sao chép link giới thiệu', true);
     markLinkOpened('share_link');
   }).catch(function(){});
+}
+async function shareNative(){
+  if (!navigator.share || !window._refUrl) return;
+  try {
+    await navigator.share({ title: 'ALN — App Làm Nhà', text: SHARE_TEXT, url: window._refUrl });
+    markLinkOpened('share_link');
+  } catch(e){ /* người dùng tự huỷ hộp thoại chia sẻ — bỏ qua */ }
+}
+function shareToZalo(){
+  if (!window._refUrl) return;
+  window.open('https://zalo.me/share/link?u=' + encodeURIComponent(window._refUrl) + '&d=' + encodeURIComponent(SHARE_TEXT), '_blank');
+  markLinkOpened('share_link');
+}
+function shareToMessenger(){
+  if (!window._refUrl) return;
+  window.open('https://www.messenger.com/share?link=' + encodeURIComponent(window._refUrl), '_blank');
+  markLinkOpened('share_link');
 }
 
 async function doLookup(){
