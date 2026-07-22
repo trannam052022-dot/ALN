@@ -4,9 +4,9 @@ slug: cach-chon-doi-thi-cong-khi-da-co-ban-ve
 category: kinh-nghiem-lam-nha
 description: "Có bản vẽ thiết kế rồi thì chọn đội thi công thế nào? 6 điều cần kiểm tra: đọc hiểu hồ sơ, báo giá theo hạng mục, hợp đồng, tiến độ, bảo hành."
 image: /images/cam-nang/ban-ve-xin-phep-xay-dung.jpg
-date: 2026-08-02
-updated: 2026-08-02
-publishDate: 2026-08-02
+date: 2026-07-24
+updated: 2026-07-24
+publishDate: 2026-07-24
 facebook: true
 author: "Đội ngũ Kiến trúc sư App Làm Nhà"
 keywords:
