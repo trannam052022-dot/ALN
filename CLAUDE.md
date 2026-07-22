@@ -274,7 +274,8 @@ Diễn đàn không chỉ là nơi hỏi đáp — đúng vai trò là **trang m
 **Kiến trúc (`functions/bricks.js`):**
 - `bricksLedger/{ledgerId}` — sổ cái bất biến, `ledgerId` đặt cố định theo sự kiện (vd `welcome_{uid}`, `stage_approved_cn_{pid}_{stage}`, `c1paid_{pid}` cho Kim Cương) → tự idempotent, trigger chạy lại không cộng đúp. CHỈ Cloud Functions ghi (Admin SDK bypass rules) — **không cần sửa `firestore.rules`** cho P1 vì client không đọc/ghi trực tiếp collection này.
 - Số dư cache `users/{uid}.alnBricks` / `.alnDiamonds` — đọc được ngay vì rule `users/{uid}` đã có `allow read: if signedIn()` từ trước, không cần mở rule mới.
-- Trigger tự động: `bricksOnUserCreated` (welcome + NCC ref), `bricksOnStageAdvanced` (chặng C1-C4 duyệt xong), `bricksOnFirstPayment` (Kim Cương khi C1 chuyển `status:'paid'` lần đầu, tra `referredByNcc` trên user CN).
+- Trigger tự động: `bricksOnUserCreated` (welcome + NCC ref — **loại trừ `role==='ctv_lead'`** từ 22/07/2026, xem bug bên dưới), `bricksOnStageAdvanced` (chặng C1-C4 duyệt xong), `bricksOnFirstPayment` (Kim Cương khi C1 chuyển `status:'paid'` lần đầu, tra `referredByNcc` trên user CN).
+- **Bug đã sửa 22/07/2026 (phát hiện qua smoke test E2E thật trước khi mở thử nghiệm CTV):** `bricksOnUserCreated` lắng nghe `users/{uid}` onCreate — trigger cho MỌI doc mới trong collection, kể cả `users/{sđt}` do `ctvGame.js` tạo cho CTV ẩn danh, vô tình cộng thêm +10 Gạch "welcome" ngoài ý muốn (CTV chỉ nên nhận Gạch qua nhiệm vụ). Đã thêm `if (d.role === "ctv_lead") return null;` đầu hàm.
 - `founderAwardBricks` (onCall, chỉ FOUNDER_UID) — trao/thu tay, trần ±1000 Gạch/lần, bắt buộc `reason`.
 
 **Còn tồn đọng (chưa làm):**
