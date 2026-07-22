@@ -672,6 +672,26 @@ body{font-family:var(--sans);background:var(--ink);color:var(--text);min-height:
     </div>
   </div>
 
+  <!-- Gạch & Kim Cương ALN -->
+  <div id="alnBricksCard" style="margin:10px 14px;padding:12px 14px;border-radius:10px;border:1px solid rgba(152,105,10,.25);background:linear-gradient(135deg,rgba(152,105,10,.08),rgba(184,134,11,.04))">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="font-size:9px;font-weight:700;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:5px">
+        <i class="ph-duotone ph-trophy"></i> <span id="alnTierIcon">🧱</span> <span id="alnTierName">Nền Móng</span>
+      </div>
+      <div id="alnDiamondsWrap" style="display:none;font-size:10px;font-weight:700;color:#0891b2;align-items:center;gap:3px">
+        <i class="ph-duotone ph-diamond"></i> <span id="alnDiamondsCount">0</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:6px">
+      <span id="alnBricksCount" style="font-family:var(--serif);font-size:18px;font-weight:700;color:var(--text)">0</span>
+      <span style="font-size:10px;color:var(--muted)">Gạch</span>
+    </div>
+    <div style="height:5px;border-radius:99px;background:var(--ink3);overflow:hidden">
+      <div id="alnTierBar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--gold),#d4a017);border-radius:99px;transition:width .4s"></div>
+    </div>
+    <div id="alnTierNext" style="font-size:9.5px;color:var(--muted);margin-top:5px">Cần thêm Gạch để lên hạng tiếp theo</div>
+  </div>
+
   <a class="nav-item active" data-tab="dashboard"><span class="icon"><i class="ph-duotone ph-gauge"></i></span> Dashboard</a>
   <a class="nav-item" data-tab="myproj"><span class="icon"><i class="ph-duotone ph-briefcase"></i></span> Dự án <span class="nav-badge" id="myProjBadge">0</span></a>
   <a class="nav-item" data-tab="dashboard"><span class="icon"><i class="ph-duotone ph-clock"></i></span> Nhiệm vụ <span class="nav-badge" id="taskBadge" style="display:none">0</span></a>
@@ -2489,6 +2509,46 @@ function showToast(msg, type='t-blue') {
   toastTimer = setTimeout(()=>t.className='', 4000);
 }
 
+/* Gạch & Kim Cương ALN — thang cấp bậc dùng chung (xem CLAUDE.md mục "Gạch & Kim Cương") */
+var ALN_TIERS = [
+  { min: 0,    name: 'Nền Móng',  icon: '🧱' },
+  { min: 50,   name: 'Khung Nhà', icon: '🏗️' },
+  { min: 150,  name: 'Mái Ấm',    icon: '🏠' },
+  { min: 400,  name: 'Biệt Thự',  icon: '🏡' },
+  { min: 1000, name: 'Dinh Thự',  icon: '🏰' },
+];
+function renderAlnBricksCard(bricks, diamonds){
+  bricks = Number(bricks) || 0;
+  diamonds = Number(diamonds) || 0;
+  var idx = 0;
+  for (var i = 0; i < ALN_TIERS.length; i++) { if (bricks >= ALN_TIERS[i].min) idx = i; }
+  var cur = ALN_TIERS[idx];
+  var next = ALN_TIERS[idx + 1];
+  var iconEl = document.getElementById('alnTierIcon');
+  var nameEl = document.getElementById('alnTierName');
+  var countEl = document.getElementById('alnBricksCount');
+  var barEl = document.getElementById('alnTierBar');
+  var nextEl = document.getElementById('alnTierNext');
+  var dWrap = document.getElementById('alnDiamondsWrap');
+  var dCount = document.getElementById('alnDiamondsCount');
+  if (iconEl) iconEl.textContent = cur.icon;
+  if (nameEl) nameEl.textContent = cur.name;
+  if (countEl) countEl.textContent = bricks.toLocaleString('vi-VN');
+  if (next) {
+    var pct = Math.min(100, Math.round(((bricks - cur.min) / (next.min - cur.min)) * 100));
+    if (barEl) barEl.style.width = pct + '%';
+    if (nextEl) nextEl.textContent = 'Còn ' + (next.min - bricks).toLocaleString('vi-VN') + ' Gạch tới hạng ' + next.name;
+  } else {
+    if (barEl) barEl.style.width = '100%';
+    if (nextEl) nextEl.textContent = 'Hạng cao nhất — Dinh Thự 🏰';
+  }
+  if (dWrap && dCount) {
+    dCount.textContent = diamonds.toLocaleString('vi-VN');
+    dWrap.style.display = diamonds > 0 ? 'flex' : 'none';
+  }
+}
+window.renderAlnBricksCard = renderAlnBricksCard;
+
 document.querySelectorAll('.modal-bg').forEach(bg => {
   bg.addEventListener('click', e => { if(e.target===bg) bg.classList.remove('open'); });
 });
@@ -3926,6 +3986,15 @@ onAuthStateChanged(auth, async (user) => {
     if (window.__ALN_RT_RESOLVE) {
       window.__ALN_RT_RESOLVE({ db, collection, addDoc, query, orderBy, limitToLast, onSnapshot });
     }
+
+    // Gạch & Kim Cương ALN — hiện ngay lúc tải, cập nhật realtime khi có chặng mới được duyệt
+    if (window.renderAlnBricksCard) window.renderAlnBricksCard(profile.alnBricks, profile.alnDiamonds);
+    onSnapshot(doc(db, 'users', user.uid), function(uSnap2) {
+      if (uSnap2.exists() && window.renderAlnBricksCard) {
+        var ud2 = uSnap2.data();
+        window.renderAlnBricksCard(ud2.alnBricks, ud2.alnDiamonds);
+      }
+    });
 
     // ── WEB PUSH (FCM): đăng ký token tự động khi đã có quyền thông báo ──
     window.__ALN_UID = user.uid;
