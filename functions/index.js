@@ -2424,6 +2424,7 @@ exports.ctvClaimTasks = ctvGame.ctvClaimTasks;
 exports.ctvGetWeeklyTask = ctvGame.ctvGetWeeklyTask;
 exports.ctvLeaderboard = ctvGame.ctvLeaderboard;
 exports.ctvSpinWheel = ctvGame.ctvSpinWheel;
+exports.scanCtvSuspicion = ctvGame.scanCtvSuspicion;
 
 /* Cron 08:30 giờ VN (sau dailyDigest 08:00 để không dồn 2 push cùng lúc):
    lưu seoReports/{date} làm lịch sử xu hướng + đẩy tóm tắt cho Founder.
