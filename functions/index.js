@@ -2416,6 +2416,12 @@ exports.bricksOnStageAdvanced = bricks.bricksOnStageAdvanced;
 exports.bricksOnFirstPayment = bricks.bricksOnFirstPayment;
 exports.founderAwardBricks = bricks.founderAwardBricks;
 
+/* ── Game nhiệm vụ CTV ẩn danh (không cần đăng nhập, chỉ Tên + SĐT) —
+   xem functions/ctvGame.js. Khác vai `ctv` có tài khoản (đã bỏ 22/07/2026). ── */
+const ctvGame = require("./ctvGame");
+exports.ctvGetProfile = ctvGame.ctvGetProfile;
+exports.ctvClaimTasks = ctvGame.ctvClaimTasks;
+
 /* Cron 08:30 giờ VN (sau dailyDigest 08:00 để không dồn 2 push cùng lúc):
    lưu seoReports/{date} làm lịch sử xu hướng + đẩy tóm tắt cho Founder.
    Chưa cấu hình settings/seoReport thì im lặng bỏ qua. */

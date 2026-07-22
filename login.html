@@ -348,11 +348,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="rt-label">Nhà cung cấp</div>
       <div class="rt-dot"></div>
     </div>
-    <div class="role-tab" data-role="ctv" onclick="switchRole('ctv')">
-      <div class="rt-icon"><i class="ph-duotone ph-medal"></i></div>
-      <div class="rt-label">Cộng tác viên</div>
-      <div class="rt-dot"></div>
-    </div>
   </div>
 
   <!-- ── LOGIN CARD ── -->
@@ -532,7 +527,6 @@ const ROLE_META = {
   ke_toan:  { icon:'<i class="ph-duotone ph-calculator"></i>', title:'Kế toán trưởng', desc:'Đối chiếu khoản chi KTS/Designer chờ Founder chuyển', color:'var(--gold)', bg:'rgba(201,168,76,.08)' },
   ktv:      { icon:'<i class="ph-duotone ph-ruler"></i>', title:'Kỹ thuật viên', desc:'Triển khai bản vẽ được KTS giao', color:'#22d3ee', bg:'rgba(34,211,238,.1)' },
   ncc:      { icon:'<i class="ph-duotone ph-package"></i>', title:'Nhà cung cấp', desc:'Quản lý gian hàng vật liệu trên ALN', color:'var(--green)', bg:'rgba(61,214,140,.1)' },
-  ctv:      { icon:'<i class="ph-duotone ph-medal"></i>', title:'Cộng tác viên', desc:'Làm nhiệm vụ tích Gạch, giới thiệu khách cho ALN', color:'var(--gold)', bg:'rgba(201,168,76,.1)' },
 };
 
 let activeRole = 'kts';
@@ -602,7 +596,7 @@ function showError(msg){
 // ncc trỏ thẳng ncc-showcase.html ("Mạng lưới Thiết bị - Vật tư ALN") thay vì
 // ncc-dashboard.html — NCC xem gian hàng chung trước, tự bấm "Gian hàng của
 // tôi" (link trên ncc-showcase.html) khi muốn vào trang quản lý riêng.
-const FILE_BY_ROLE = { kts:'kts_dashboard.html', dn:'client_DN.html', cn:'client_CN.html', designer:'designer_dashboard.html', founder:'founder_panel.html', ks:'ks_dashboard.html', ktv:'ktv_dashboard.html', ke_toan:'ketoan_dashboard.html', ncc:'ncc-showcase.html', ctv:'ctv_dashboard.html' };
+const FILE_BY_ROLE = { kts:'kts_dashboard.html', dn:'client_DN.html', cn:'client_CN.html', designer:'designer_dashboard.html', founder:'founder_panel.html', ks:'ks_dashboard.html', ktv:'ktv_dashboard.html', ke_toan:'ketoan_dashboard.html', ncc:'ncc-showcase.html' };
 /* Nếu người dùng bấm đăng nhập TỪ diễn đàn (forum.html lưu sessionStorage.forumReturn),
    sau khi login xong đưa họ QUAY LẠI forum (đúng thread) thay vì dashboard mặc định. */
 function alnReturnDest(){

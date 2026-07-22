@@ -158,7 +158,12 @@ exports.bricksOnFirstPayment = functions
     try {
       const cnSnap = await bdb.collection("users").doc(cnUid).get();
       const cn = cnSnap.exists ? cnSnap.data() : {};
-      const referrer = typeof cn.referredByNcc === "string" ? cn.referredByNcc : "";
+      // Người giới thiệu có thể là NCC (uid Firebase Auth) hoặc Cộng tác viên
+      // ẩn danh (định danh bằng SĐT — xem functions/ctvGame.js). Ưu tiên NCC
+      // nếu cả 2 field cùng có giá trị (trường hợp hiếm, tránh trao đúp).
+      const referrer = typeof cn.referredByNcc === "string" && cn.referredByNcc
+        ? cn.referredByNcc
+        : (typeof cn.referredByCtv === "string" ? cn.referredByCtv : "");
       if (!referrer) return null;
       const ok = await awardDiamond(referrer, "c1paid_" + pid, {
         pid, cnUid, note: "CN được giới thiệu đã ký HĐ + tiền C1 thực nhận",

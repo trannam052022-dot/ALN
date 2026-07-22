@@ -61,12 +61,14 @@ src="https://www.facebook.com/tr?id=1656666692225878&ev=PageView&noscript=1"/></
       localStorage.setItem('aln_ncc_ref', JSON.stringify({ uid: _refUid, ts: Date.now() }));
     }
   } catch(e){}
-  /* Link giới thiệu của Cộng tác viên: register.html?cref={ctv_uid} —
-     ghi referredByCtv trên user CN mới, dùng cho thưởng Kim Cương sau này. */
+  /* Link giới thiệu của Cộng tác viên (game ẩn danh, xem ctv_dashboard.html):
+     register.html?cref={sđt_ctv} — ghi referredByCtv trên user CN mới, dùng
+     cho thưởng Kim Cương sau này. CTV không có Auth account nên định danh
+     bằng chính SĐT, khác định dạng uid Firebase (chữ+số dài) của NCC. */
   try {
-    var _crefUid = new URLSearchParams(location.search).get('cref');
-    if (_crefUid && /^[A-Za-z0-9]{20,36}$/.test(_crefUid)) {
-      localStorage.setItem('aln_ctv_ref', JSON.stringify({ uid: _crefUid, ts: Date.now() }));
+    var _crefPhone = new URLSearchParams(location.search).get('cref');
+    if (_crefPhone && /^0\d{8,10}$/.test(_crefPhone)) {
+      localStorage.setItem('aln_ctv_ref', JSON.stringify({ phone: _crefPhone, ts: Date.now() }));
     }
   } catch(e){}
   window.alnGetUtm = function(){
@@ -267,11 +269,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="rt-label">Doanh nghiệp</div>
       <div class="rt-dot"></div>
     </div>
-    <div class="role-tab" data-role="ctv" onclick="switchRole('ctv')">
-      <div class="rt-icon"><i class="ph-duotone ph-medal"></i></div>
-      <div class="rt-label">Cộng tác viên</div>
-      <div class="rt-dot"></div>
-    </div>
   </div>
 
   <div class="reg-card">
@@ -362,7 +359,6 @@ var ROLE_META = {
   cn:  { icon:'<i class="ph-duotone ph-user"></i>',       title:'Chủ nhà',       desc:'Theo dõi tiến độ công trình & trao đổi với KTS',  color:'var(--green)', bg:'rgba(34,201,122,.1)',  pending:false },
   kts: { icon:KTS_BEE,                                    title:'Kiến trúc sư',  desc:'Nhận dự án, quản lý bản vẽ & thu nhập trên ALN',  color:'var(--amber)', bg:'rgba(255,170,51,.1)',  pending:true  },
   dn:  { icon:'<i class="ph-duotone ph-buildings"></i>',  title:'Doanh nghiệp',  desc:'Quản lý danh mục dự án & đội ngũ kiến trúc sư',   color:'var(--blue)',  bg:'rgba(56,189,248,.1)', pending:true  },
-  ctv: { icon:'<i class="ph-duotone ph-medal"></i>',      title:'Cộng tác viên', desc:'Làm nhiệm vụ tích Gạch, giới thiệu khách cho ALN', color:'var(--gold)',  bg:'rgba(201,168,76,.1)', pending:false },
 };
 var PENDING_NOTES = {
   kts: 'KTS đăng ký nhanh bằng tên + SĐT ở Phòng chờ, rồi nộp hồ sơ hành nghề (portfolio, CCHN) để Founder xét duyệt.',
@@ -391,16 +387,16 @@ function renderCardTop(){
   document.getElementById('pendingNoteText').textContent = PENDING_NOTES[activeRole] || '';
   pn.style.display = m.pending ? 'flex' : 'none';
 
-  /* CN & CTV: chỉ Tên + SĐT, active ngay. KTS/DN: ẩn form, bấm là sang Phòng chờ nộp hồ sơ đầy đủ. */
-  var isSimple = activeRole === 'cn' || activeRole === 'ctv';
+  /* CN: chỉ Tên + SĐT, active ngay. KTS/DN: ẩn form, bấm là sang Phòng chờ nộp hồ sơ đầy đủ. */
+  var isCn = activeRole === 'cn';
   function _show(id, on){ var el = document.getElementById(id); if(el) el.style.display = on ? '' : 'none'; }
-  _show('fieldName', isSimple);
-  _show('fieldPhone', isSimple);
+  _show('fieldName', isCn);
+  _show('fieldPhone', isCn);
   _show('fieldUser', false);
   _show('fieldPw', false);
   _show('fieldPw2', false);
   var btn = document.getElementById('btnReg');
-  if(btn) btn.innerHTML = isSimple
+  if(btn) btn.innerHTML = isCn
     ? '<i class="ph-duotone ph-user-plus" style="margin-right:6px"></i> Tạo tài khoản'
     : '<i class="ph-duotone ph-arrow-right" style="margin-right:6px"></i> Vào Phòng chờ nộp hồ sơ';
 }
@@ -534,7 +530,7 @@ async function doRegister(){
     return;
   }
 
-  /* CN & CTV: chỉ Tên + SĐT */
+  /* CN: chỉ Tên + SĐT */
   var name  = document.getElementById('inputName').value.trim();
   var phone = document.getElementById('inputPhone').value.replace(/[\s.\-()]/g, '');
 
@@ -579,11 +575,11 @@ async function doRegister(){
       if(_rn && typeof _rn.uid === 'string' && /^[A-Za-z0-9]{20,36}$/.test(_rn.uid)) nccRef = _rn.uid;
     } catch(e){}
 
-    /* Công người giới thiệu (Cộng tác viên) — register.html?cref={ctv_uid} lưu ở localStorage */
+    /* Công người giới thiệu (Cộng tác viên) — register.html?cref={sđt} lưu ở localStorage */
     var ctvRef = null;
     try {
       var _rc = JSON.parse(localStorage.getItem('aln_ctv_ref') || 'null');
-      if(_rc && typeof _rc.uid === 'string' && /^[A-Za-z0-9]{20,36}$/.test(_rc.uid)) ctvRef = _rc.uid;
+      if(_rc && typeof _rc.phone === 'string' && /^0\d{8,10}$/.test(_rc.phone)) ctvRef = _rc.phone;
     } catch(e){}
 
     /* Ghi users nếu chưa có (tránh ghi đè tài khoản cũ) */
@@ -597,15 +593,15 @@ async function doRegister(){
       var fbp = window.alnGetFbp ? window.alnGetFbp() : '';
       var fbc = window.alnGetFbc ? window.alnGetFbc() : '';
       await fb.setDoc(uref, {
-        username: phone, name: name, phone: phone, role: activeRole, email: email,
+        username: phone, name: name, phone: phone, role: 'cn', email: email,
         status: 'active', plan: 'free', credits: {}, kts_ref: ktsRef, referredByNcc: nccRef, referredByCtv: ctvRef,
         utm: utm, fbp: fbp, fbc: fbc, sourceUrl: location.origin + location.pathname,
         createdAt: fb.serverTimestamp(),
       });
       try {
         if (window.fbq) fbq('track', 'CompleteRegistration',
-          { content_name: 'register-' + activeRole, content_category: activeRole + '-funnel' },
-          { eventID: activeRole + 'reg-' + uid });
+          { content_name: 'register-cn', content_category: 'cn-funnel' },
+          { eventID: 'cnreg-' + uid });
       } catch(e){}
       try {
         window.dataLayer = window.dataLayer || [];
@@ -627,26 +623,21 @@ async function doRegister(){
     if(nccRef){ try { localStorage.removeItem('aln_ncc_ref'); } catch(e){} }
     if(ctvRef){ try { localStorage.removeItem('aln_ctv_ref'); } catch(e){} }
 
-    var badge = activeRole === 'ctv' ? 'Cộng tác viên' : 'Chủ nhà';
-    var ud = JSON.stringify({ name: name, userId: phone, role: activeRole, badge: badge, uid: uid });
+    var ud = JSON.stringify({ name: name, userId: phone, role: 'cn', badge: 'Chủ nhà', uid: uid });
     try { localStorage.setItem('aln_user', ud); } catch(e){}
     try { sessionStorage.setItem('aln_user', ud); } catch(e){}
 
-    /* CTV: luôn vào thẳng ctv_dashboard. CN: đăng ký TỪ diễn đàn → quay lại forum; ngược lại vào client_CN */
+    /* Đăng ký TỪ diễn đàn → quay lại forum; ngược lại vào client_CN */
     var _fwd = null;
-    if (activeRole === 'ctv') {
-      _fwd = 'ctv_dashboard.html';
-    } else {
-      try {
-        var _fr = JSON.parse(sessionStorage.getItem('forumReturn') || 'null');
-        if(_fr && (Date.now() - (_fr.t || 0) < 30 * 60000)){
-          sessionStorage.removeItem('forumReturn');
-          _fwd = 'forum.html' + (_fr.thread ? '?thread=' + encodeURIComponent(_fr.thread) : '');
-        }
-      } catch(e){}
-    }
+    try {
+      var _fr = JSON.parse(sessionStorage.getItem('forumReturn') || 'null');
+      if(_fr && (Date.now() - (_fr.t || 0) < 30 * 60000)){
+        sessionStorage.removeItem('forumReturn');
+        _fwd = 'forum.html' + (_fr.thread ? '?thread=' + encodeURIComponent(_fr.thread) : '');
+      }
+    } catch(e){}
     document.getElementById('redirectMsg').textContent = 'Chào mừng, ' + name + '!';
-    document.getElementById('redirectSub').textContent = activeRole === 'ctv' ? 'Đang vào Cổng Cộng tác viên...' : (_fwd ? 'Đang quay lại diễn đàn...' : 'Đang vào trang Chủ nhà...');
+    document.getElementById('redirectSub').textContent = _fwd ? 'Đang quay lại diễn đàn...' : 'Đang vào trang Chủ nhà...';
     document.getElementById('redirectOverlay').classList.add('show');
     setTimeout(function(){
       window.location.replace(_fwd || ('client_CN.html?u=' + encodeURIComponent(phone) + '&r=cn'));
@@ -667,15 +658,8 @@ async function doRegister(){
   }
 }
 
-/* Mở sẵn đúng tab nếu tới từ link ?role=ctv (vd chip "Cộng tác viên" trên index.html) */
-(function(){
-  try {
-    var _r = new URLSearchParams(location.search).get('role');
-    if (_r && ROLE_META[_r]) { switchRole(_r); return; }
-  } catch(e){}
-  renderCardTop();
-  regenerateUsername();
-})();
+renderCardTop();
+regenerateUsername();
 </script>
 
 <script type="module">
