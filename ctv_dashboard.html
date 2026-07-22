@@ -83,6 +83,16 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .lb-phone{color:var(--muted);font-family:var(--mono);font-size:10px;flex-shrink:0}
 .lb-bricks{font-weight:800;color:var(--gold);font-size:12px;white-space:nowrap}
 
+/* Chuỗi tuần */
+#alnStreakWrap{display:none;font-size:11px;font-weight:700;color:#c2410c;background:rgba(194,65,12,.07);border-radius:99px;padding:5px 12px;text-align:center;margin-top:8px}
+
+/* Vòng quay may mắn */
+#wheelBox{position:relative;width:230px;margin:6px auto 0}
+#wheelSvg{display:block;width:100%;transition:transform 4s cubic-bezier(.15,.9,.25,1)}
+.wheel-pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-top:16px solid var(--red);z-index:2}
+#spinHint{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6}
+#btnSpin{margin-top:10px}
+
 /* Form nhận thưởng */
 .field{margin-bottom:12px}
 .field label{display:block;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}
@@ -134,6 +144,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <div class="bar-track"><div id="alnTierBar"></div></div>
       <div id="alnTierNext">—</div>
       <div id="alnPendingVndWrap" style="display:none;font-size:11px;color:var(--green);text-align:center;margin-top:8px;font-weight:700"></div>
+      <div id="alnStreakWrap"></div>
     </div>
     <button class="btn-link" onclick="showLookup()">Đã chơi rồi? Tra Gạch bằng SĐT</button>
   </div>
@@ -151,6 +162,17 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <div class="card">
     <div class="card-title"><i class="ph-duotone ph-list-checks"></i> Nhiệm vụ hôm nay</div>
     <div id="taskList"></div>
+  </div>
+
+  <div class="card" id="wheelCard" style="display:none">
+    <div class="card-title"><i class="ph-duotone ph-spinner-ball"></i> Vòng quay may mắn tuần này</div>
+    <div id="wheelBox">
+      <div class="wheel-pointer"></div>
+      <svg id="wheelSvg" viewBox="0 0 200 200"></svg>
+    </div>
+    <button class="btn-main" id="btnSpin" onclick="doSpin()">Quay ngay!</button>
+    <div id="spinHint"></div>
+    <div class="msg" id="spinMsg"></div>
   </div>
 
   <div class="card" id="leaderboardCard">
@@ -306,7 +328,88 @@ async function loadWeeklyTask(){
       TASKS.push({ id: wt.taskId, title: '🔥 ' + wt.label, desc: wt.desc, url: wt.url, pts: wt.pts, weekly: true });
       renderTasks();
     }
+    buildWheel();
+    document.getElementById('wheelCard').style.display = 'block';
+    updateSpinState(_lastSpinState);
   } catch(e){}
+}
+
+/* ── Chuỗi tuần ── */
+function setStreak(n){
+  n = Number(n) || 0;
+  var el = document.getElementById('alnStreakWrap');
+  if (!el) return;
+  if (n < 1) { el.style.display = 'none'; return; }
+  var nextBonus = Math.min(n * 5, 25);
+  el.style.display = 'block';
+  el.textContent = '🔥 Chuỗi ' + n + ' tuần liên tiếp — tuần sau làm nhiệm vụ để nhận thêm +' + nextBonus + ' Gạch bonus!';
+}
+
+/* ── Vòng quay may mắn — giải PHẢI khớp SPIN_PRIZES trong functions/ctvGame.js ── */
+var WHEEL_PRIZES = [5, 10, 15, 20, 50];
+var WHEEL_COLORS = ['#b8860b', '#8a5c08', '#d4a017', '#98690a', '#dc2626'];
+var _lastSpinState = null;
+var _wheelBuilt = false;
+
+function buildWheel(){
+  if (_wheelBuilt) return;
+  _wheelBuilt = true;
+  var svg = document.getElementById('wheelSvg');
+  var seg = 360 / WHEEL_PRIZES.length;
+  var parts = ['<circle cx="100" cy="100" r="99" fill="#fff" stroke="#e1e7ee" stroke-width="2"/>'];
+  function pt(deg, r){
+    var a = deg * Math.PI / 180;
+    return (100 + r * Math.sin(a)).toFixed(2) + ',' + (100 - r * Math.cos(a)).toFixed(2);
+  }
+  for (var i = 0; i < WHEEL_PRIZES.length; i++) {
+    var a0 = i * seg, a1 = (i + 1) * seg, ac = a0 + seg / 2;
+    parts.push('<path d="M100,100 L' + pt(a0, 95) + ' A95,95 0 0,1 ' + pt(a1, 95) + ' Z" fill="' + WHEEL_COLORS[i] + '"/>');
+    var lp = pt(ac, 62).split(',');
+    parts.push('<text x="' + lp[0] + '" y="' + lp[1] + '" fill="#fff" font-size="15" font-weight="800" text-anchor="middle" dominant-baseline="middle" transform="rotate(' + ac + ' ' + lp[0] + ' ' + lp[1] + ')">' + WHEEL_PRIZES[i] + '🧱</text>');
+  }
+  parts.push('<circle cx="100" cy="100" r="14" fill="#fff" stroke="#c9d3de" stroke-width="2"/>');
+  svg.innerHTML = parts.join('');
+}
+
+function updateSpinState(spin){
+  _lastSpinState = spin;
+  var btn = document.getElementById('btnSpin');
+  var hint = document.getElementById('spinHint');
+  if (!btn) return;
+  if (!spin || !spin.eligible) {
+    btn.disabled = true;
+    hint.textContent = 'Hoàn thành nhiệm vụ tuần (🔥) rồi bấm "Nhận Gạch ngay" để mở lượt quay — mỗi tuần 1 lượt, trúng tới 50 Gạch!';
+  } else if (spin.used) {
+    btn.disabled = true;
+    hint.textContent = 'Tuần này bạn đã quay rồi — tuần sau làm nhiệm vụ mới để quay tiếp nhé!';
+  } else {
+    btn.disabled = false;
+    hint.textContent = 'Bạn đang có 1 lượt quay — thử vận may nào!';
+  }
+}
+
+async function doSpin(){
+  if (!_myPhone) { showMsg('spinMsg', 'Nhận Gạch nhiệm vụ tuần trước đã rồi mới quay được nhé!', false); return; }
+  var btn = document.getElementById('btnSpin');
+  btn.disabled = true; btn.textContent = 'Đang quay...';
+  try {
+    var data = await window.ctvSpinWheel({ phone: _myPhone });
+    var idx = WHEEL_PRIZES.indexOf(data.prize);
+    if (idx < 0) idx = 0;
+    var seg = 360 / WHEEL_PRIZES.length;
+    var target = 5 * 360 + (360 - (idx * seg + seg / 2));
+    document.getElementById('wheelSvg').style.transform = 'rotate(' + target + 'deg)';
+    setTimeout(function(){
+      showMsg('spinMsg', '🎉 Chúc mừng! Bạn trúng +' + data.prize + ' Gạch!', true);
+      renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.ctvReferralPendingVnd);
+      updateSpinState({ eligible: true, used: true });
+      btn.textContent = 'Quay ngay!';
+    }, 4200);
+  } catch(e) {
+    showMsg('spinMsg', e.message || 'Có lỗi khi quay — thử lại sau nhé', false);
+    btn.textContent = 'Quay ngay!';
+    updateSpinState(_lastSpinState);
+  }
 }
 
 var doneTasks = {};
@@ -396,6 +499,8 @@ async function doLookup(){
       showMsg('lookupMsg', 'Chưa tìm thấy SĐT này — làm nhiệm vụ bên dưới để bắt đầu nhé!', false);
     } else {
       renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.ctvReferralPendingVnd);
+      setStreak(data.streak);
+      updateSpinState(data.spin);
       doneTasks = {};
       (data.tasksDone || []).forEach(function(t){ doneTasks[t] = true; });
       setRefLink(phone);
@@ -425,13 +530,17 @@ async function doClaim(){
   try {
     var data = await window.ctvClaimTasks({ name: name, phone: phone, taskIds: taskIds });
     renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.ctvReferralPendingVnd);
+    setStreak(data.streak);
+    updateSpinState(data.spin);
     doneTasks = {};
     (data.tasksDone || []).forEach(function(t){ doneTasks[t] = true; });
     setRefLink(phone);
     renderTasks();
     rememberCtv(phone, name);
     if (data.newlyAwarded > 0) {
-      showMsg('claimMsg', '✓ Nhận được +' + data.newlyAwarded + ' Gạch! Cảm ơn bạn.', true);
+      var extra = data.streakBonus > 0 ? ' 🔥 +' + data.streakBonus + ' Gạch thưởng chuỗi ' + data.streak + ' tuần liên tiếp!' : '';
+      var spinNote = (data.spin && data.spin.eligible && !data.spin.used) ? ' Bạn được 1 lượt Vòng quay may mắn bên dưới 🎡' : '';
+      showMsg('claimMsg', '✓ Nhận được +' + data.newlyAwarded + ' Gạch! Cảm ơn bạn.' + extra + spinNote, true);
     } else {
       showMsg('claimMsg', 'Các nhiệm vụ này bạn đã nhận Gạch trước đó rồi — vẫn giữ nguyên số Gạch hiện có.', true);
     }
@@ -494,6 +603,7 @@ import { app } from './firebase-config.js';
   window.ctvClaimTasks = async function(data){ var r = await mod.httpsCallable(fns, 'ctvClaimTasks')(data); return r.data; };
   window.ctvGetWeeklyTask = async function(){ var r = await mod.httpsCallable(fns, 'ctvGetWeeklyTask')(); return r.data; };
   window.ctvLeaderboard = async function(){ var r = await mod.httpsCallable(fns, 'ctvLeaderboard')(); return r.data; };
+  window.ctvSpinWheel = async function(data){ var r = await mod.httpsCallable(fns, 'ctvSpinWheel')(data); return r.data; };
   if (window.autoLookupCtv) window.autoLookupCtv();
   if (window.loadWeeklyTask) window.loadWeeklyTask();
   if (window.loadLeaderboard) window.loadLeaderboard();

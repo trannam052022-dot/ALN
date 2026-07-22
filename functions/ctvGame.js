@@ -41,7 +41,54 @@ const WEEKLY_TASK_BANK = [
 function currentWeeklyTask() {
   const wk = Math.floor(Date.now() / (7 * 24 * 3600 * 1000));
   const item = WEEKLY_TASK_BANK[wk % WEEKLY_TASK_BANK.length];
-  return Object.assign({ taskId: "weekly_" + item.key + "_w" + wk }, item);
+  return Object.assign({ taskId: "weekly_" + item.key + "_w" + wk, week: wk }, item);
+}
+
+/* Thưởng chuỗi tuần (streak): làm nhiệm vụ tuần N tuần LIÊN TIẾP → bonus tăng
+   dần, mất chuỗi khi bỏ lỡ 1 tuần. Chuỗi 1 → 0, 2 → +5, 3 → +10... trần +25. */
+function streakBonusOf(streak) {
+  return Math.min(Math.max(0, streak - 1) * 5, 25);
+}
+
+/* Cập nhật chuỗi + cộng bonus sau khi nhiệm vụ tuần được nhận — idempotent
+   theo ledger riêng ctv_streak_w{wk}_{sđt} (chạy lại không cộng đúp). */
+async function updateWeeklyStreak(phone, name, wk) {
+  const ledgerId = ("ctv_streak_w" + wk + "_" + phone).replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 900);
+  const ledgerRef = db.collection("bricksLedger").doc(ledgerId);
+  const userRef = db.collection("users").doc(phone);
+  try {
+    return await db.runTransaction(async (tx) => {
+      const existing = await tx.get(ledgerRef);
+      if (existing.exists) return null;
+      const uSnap = await tx.get(userRef);
+      const ud = uSnap.exists ? uSnap.data() : {};
+      const lastWk = Number(ud.ctvLastWeeklyWeek);
+      const streak = lastWk === wk - 1 ? (Number(ud.ctvWeeklyStreak) || 0) + 1 : 1;
+      const bonus = streakBonusOf(streak);
+      tx.set(ledgerRef, {
+        uid: phone, type: "ctv_streak", amount: bonus, unit: "brick",
+        meta: { week: wk, streak, name },
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      const patch = { ctvWeeklyStreak: streak, ctvLastWeeklyWeek: wk };
+      if (bonus > 0) patch.alnBricks = admin.firestore.FieldValue.increment(bonus);
+      tx.set(userRef, patch, { merge: true });
+      return { streak, bonus };
+    });
+  } catch (e) {
+    console.error("[updateWeeklyStreak]", phone, e);
+    return null;
+  }
+}
+
+/* Trạng thái vòng quay tuần này: đủ điều kiện khi đã làm nhiệm vụ tuần,
+   mỗi tuần quay đúng 1 lần (ledger ctv_spin_w{wk}_{sđt}). */
+async function spinStateOf(phone, tasksDone, weeklyTask) {
+  const eligible = tasksDone.includes(weeklyTask.taskId);
+  if (!eligible) return { eligible: false, used: false };
+  const ledgerId = ("ctv_spin_w" + weeklyTask.week + "_" + phone).replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 900);
+  const snap = await db.collection("bricksLedger").doc(ledgerId).get();
+  return { eligible: true, used: snap.exists };
 }
 
 function normalizePhone(phone) {
@@ -71,19 +118,25 @@ exports.ctvGetProfile = onCall({ region: REGION }, async (request) => {
   if (!snap.exists) {
     return {
       exists: false, name: "", alnBricks: 0, alnDiamonds: 0, ctvReferralPendingVnd: 0,
-      tasksDone: [], tier: tierOf(0), weeklyTask,
+      tasksDone: [], tier: tierOf(0), weeklyTask, streak: 0, spin: { eligible: false, used: false },
     };
   }
   const d = snap.data() || {};
+  const tasksDone = Array.isArray(d.ctvTasksDone) ? d.ctvTasksDone : [];
+  /* Chuỗi chỉ còn "sống" nếu tuần gần nhất làm nhiệm vụ là tuần này hoặc tuần trước */
+  const lastWk = Number(d.ctvLastWeeklyWeek);
+  const streak = lastWk >= weeklyTask.week - 1 ? (Number(d.ctvWeeklyStreak) || 0) : 0;
   return {
     exists: true,
     name: d.name || "",
     alnBricks: d.alnBricks || 0,
     alnDiamonds: d.alnDiamonds || 0,
     ctvReferralPendingVnd: d.ctvReferralPendingVnd || 0,
-    tasksDone: Array.isArray(d.ctvTasksDone) ? d.ctvTasksDone : [],
+    tasksDone,
     tier: tierOf(d.alnBricks || 0),
     weeklyTask,
+    streak,
+    spin: await spinStateOf(phone, tasksDone, weeklyTask),
   };
 });
 
@@ -160,8 +213,17 @@ exports.ctvClaimTasks = onCall({ region: REGION }, async (request) => {
     }
   }
 
+  /* Vừa nhận nhiệm vụ TUẦN lần đầu → cập nhật chuỗi + bonus streak */
+  let streakInfo = null;
+  if (newlyDone.includes(weeklyTask.taskId)) {
+    streakInfo = await updateWeeklyStreak(phone, name, weeklyTask.week);
+  }
+
   const snap = await userRef.get();
   const ud = snap.data() || {};
+  const tasksDone = Array.isArray(ud.ctvTasksDone) ? ud.ctvTasksDone : [];
+  const lastWk = Number(ud.ctvLastWeeklyWeek);
+  const streak = lastWk >= weeklyTask.week - 1 ? (Number(ud.ctvWeeklyStreak) || 0) : 0;
   return {
     ok: true,
     newlyAwarded: totalAwarded,
@@ -169,8 +231,68 @@ exports.ctvClaimTasks = onCall({ region: REGION }, async (request) => {
     alnBricks: ud.alnBricks || 0,
     alnDiamonds: ud.alnDiamonds || 0,
     ctvReferralPendingVnd: ud.ctvReferralPendingVnd || 0,
-    tasksDone: Array.isArray(ud.ctvTasksDone) ? ud.ctvTasksDone : [],
+    tasksDone,
     tier: tierOf(ud.alnBricks || 0),
     weeklyTask,
+    streak,
+    streakBonus: streakInfo ? streakInfo.bonus : 0,
+    spin: await spinStateOf(phone, tasksDone, weeklyTask),
+  };
+});
+
+/* Vòng quay may mắn — 1 lượt/tuần, mở khoá khi đã làm nhiệm vụ tuần.
+   Giải ngẫu nhiên có trọng số, cộng thẳng Gạch; ledger ctv_spin_w{wk}_{sđt}
+   vừa là chống quay lặp vừa là sổ ghi giải trúng. */
+const SPIN_PRIZES = [
+  { amount: 5, weight: 40 },
+  { amount: 10, weight: 30 },
+  { amount: 15, weight: 15 },
+  { amount: 20, weight: 10 },
+  { amount: 50, weight: 5 },
+];
+function pickSpinPrize() {
+  const total = SPIN_PRIZES.reduce((s, p) => s + p.weight, 0);
+  let r = Math.random() * total;
+  for (const p of SPIN_PRIZES) { r -= p.weight; if (r < 0) return p.amount; }
+  return SPIN_PRIZES[0].amount;
+}
+
+exports.ctvSpinWheel = onCall({ region: REGION }, async (request) => {
+  const phone = normalizePhone((request.data || {}).phone);
+  if (!phone) throw new HttpsError("invalid-argument", "Số điện thoại chưa hợp lệ");
+  const weeklyTask = currentWeeklyTask();
+  const wk = weeklyTask.week;
+  const spinLedgerRef = db.collection("bricksLedger")
+    .doc(("ctv_spin_w" + wk + "_" + phone).replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 900));
+  const taskLedgerRef = db.collection("bricksLedger")
+    .doc(("ctv_task_" + weeklyTask.taskId + "_" + phone).replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 900));
+  const userRef = db.collection("users").doc(phone);
+  const prize = pickSpinPrize();
+  try {
+    await db.runTransaction(async (tx) => {
+      const [spinSnap, taskSnap] = await Promise.all([tx.get(spinLedgerRef), tx.get(taskLedgerRef)]);
+      if (spinSnap.exists) throw new HttpsError("failed-precondition", "Tuần này bạn đã quay rồi — quay tiếp vào tuần sau nhé!");
+      if (!taskSnap.exists) throw new HttpsError("failed-precondition", "Hoàn thành nhiệm vụ tuần trước đã rồi mới được quay nhé!");
+      tx.set(spinLedgerRef, {
+        uid: phone, type: "ctv_spin", amount: prize, unit: "brick",
+        meta: { week: wk },
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      tx.set(userRef, { alnBricks: admin.firestore.FieldValue.increment(prize) }, { merge: true });
+    });
+  } catch (e) {
+    if (e instanceof HttpsError) throw e;
+    console.error("[ctvSpinWheel]", phone, e);
+    throw new HttpsError("internal", "Có lỗi khi quay — thử lại sau nhé");
+  }
+  const snap = await userRef.get();
+  const ud = snap.data() || {};
+  return {
+    ok: true,
+    prize,
+    alnBricks: ud.alnBricks || 0,
+    alnDiamonds: ud.alnDiamonds || 0,
+    ctvReferralPendingVnd: ud.ctvReferralPendingVnd || 0,
+    tier: tierOf(ud.alnBricks || 0),
   };
 });
