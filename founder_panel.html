@@ -1562,6 +1562,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="dn-kpi"><div class="dk-l">Người có Gạch</div><div class="dk-v" id="brV0">0</div></div>
     <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-brick" style="color:var(--gold)"></i> Tổng Gạch đã phát</div><div class="dk-v" style="color:var(--gold)" id="brV1">0</div></div>
     <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-diamond" style="color:#0891b2"></i> Tổng Kim Cương đã trao</div><div class="dk-v" style="color:#0891b2" id="brV2">0</div></div>
+    <div class="dn-kpi"><div class="dk-l"><i class="ph-duotone ph-hand-coins" style="color:var(--green)"></i> Tổng tiền chờ chi trả CTV</div><div class="dk-v" style="color:var(--green)" id="brV3">0đ</div></div>
   </div>
   <div style="font-size:11px;color:var(--dim);line-height:1.6;background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">
     Số dư đọc từ <code>users/{uid}.alnBricks/.alnDiamonds</code> (cache tự cộng qua Cloud Functions — xem <code>functions/bricks.js</code>). Trao/thu tay dùng nút "Trao Gạch" ở mỗi dòng — ghi lại lý do, tối đa ±1000 Gạch/lần.
@@ -1579,6 +1580,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <option value="designer">Designer</option>
       <option value="ncc">NCC</option>
       <option value="ks">KS Vùng</option>
+      <option value="ctv_lead">CTV</option>
     </select>
   </div>
   <div class="table-wrap">
@@ -1590,6 +1592,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <th>Cấp bậc</th>
         <th>Gạch</th>
         <th>Kim Cương</th>
+        <th>Chờ chi trả (CTV)</th>
         <th>Thao tác</th>
       </tr></thead>
       <tbody id="brBody"></tbody>
@@ -4230,7 +4233,7 @@ function _alnTierOf(bricks){
   for (var i = 0; i < ALN_TIERS_FP.length; i++) { if (bricks >= ALN_TIERS_FP[i].min) cur = ALN_TIERS_FP[i]; }
   return cur;
 }
-var ROLE_LABEL_BR = { cn:'Chủ nhà', kts:'KTS', dn:'Doanh nghiệp', designer:'Designer', ncc:'NCC', ks:'KS Vùng', ktv:'KTV', founder:'Founder' };
+var ROLE_LABEL_BR = { cn:'Chủ nhà', kts:'KTS', dn:'Doanh nghiệp', designer:'Designer', ncc:'NCC', ks:'KS Vùng', ktv:'KTV', founder:'Founder', ctv_lead:'CTV' };
 var _mgBricksData = null;
 
 function renderMgBricks() {
@@ -4246,14 +4249,17 @@ function renderMgBricks() {
   var totalPeople = _mgBricksData.length;
   var totalBricks = _mgBricksData.reduce(function(s,u){ return s + (u.alnBricks||0); }, 0);
   var totalDiamonds = _mgBricksData.reduce(function(s,u){ return s + (u.alnDiamonds||0); }, 0);
+  var totalPendingVnd = _mgBricksData.reduce(function(s,u){ return s + (u.ctvReferralPendingVnd||0); }, 0);
   document.getElementById('brV0').textContent = totalPeople;
   document.getElementById('brV1').textContent = totalBricks.toLocaleString('vi-VN');
   document.getElementById('brV2').textContent = totalDiamonds.toLocaleString('vi-VN');
+  if(document.getElementById('brV3')) document.getElementById('brV3').textContent = totalPendingVnd.toLocaleString('vi-VN') + 'đ';
   var tbody = document.getElementById('brBody');
   if(!tbody) return;
-  if(!rows.length){ tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:28px">Không có dữ liệu</td></tr>'; return; }
+  if(!rows.length){ tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--dim);padding:28px">Không có dữ liệu</td></tr>'; return; }
   tbody.innerHTML = rows.map(function(u, i){
     var tier = _alnTierOf(u.alnBricks || 0);
+    var pending = u.ctvReferralPendingVnd || 0;
     return '<tr>'
       +'<td style="color:var(--dim)">'+(i+1)+'</td>'
       +'<td style="font-weight:700;color:var(--text1)">'+(u.name||u.username||'—')+'</td>'
@@ -4261,6 +4267,7 @@ function renderMgBricks() {
       +'<td style="font-size:11px">'+tier.icon+' '+tier.name+'</td>'
       +'<td style="text-align:center;font-weight:700;color:var(--gold)">'+(u.alnBricks||0).toLocaleString('vi-VN')+'</td>'
       +'<td style="text-align:center;font-weight:700;color:#0891b2">'+(u.alnDiamonds||0).toLocaleString('vi-VN')+'</td>'
+      +'<td style="text-align:center;font-weight:700;color:'+(pending>0?'var(--green)':'var(--dim)')+'">'+(pending>0 ? pending.toLocaleString('vi-VN')+'đ' : '—')+'</td>'
       +'<td><button onclick="founderAwardBricksPrompt(\''+u.uid+'\',\''+(u.name||u.username||'').replace(/'/g,"\\'")+'\')" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(201,168,76,.35);background:rgba(201,168,76,.08);color:var(--gold);font-size:11px;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-plus-circle"></i> Trao Gạch</button></td>'
     +'</tr>';
   }).join('');
