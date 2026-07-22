@@ -200,9 +200,10 @@ function alnHouseSVG(idx){
   s += '</svg>';
   return s;
 }
-function renderAlnBricksCard(bricks, diamonds){
+function renderAlnBricksCard(bricks, diamonds, pendingVnd){
   bricks = Number(bricks) || 0;
   diamonds = Number(diamonds) || 0;
+  pendingVnd = Number(pendingVnd) || 0;
   var idx = 0;
   for (var i = 0; i < ALN_TIERS.length; i++) { if (bricks >= ALN_TIERS[i].min) idx = i; }
   var cur = ALN_TIERS[idx];
@@ -230,6 +231,11 @@ function renderAlnBricksCard(bricks, diamonds){
   if (dWrap && dCount) {
     dCount.textContent = diamonds.toLocaleString('vi-VN');
     dWrap.style.display = diamonds > 0 ? 'flex' : 'none';
+  }
+  var pendEl = document.getElementById('alnPendingVndWrap');
+  if (pendEl) {
+    pendEl.style.display = pendingVnd > 0 ? 'block' : 'none';
+    if (pendingVnd > 0) pendEl.textContent = '💰 Bạn đang có ' + pendingVnd.toLocaleString('vi-VN') + 'đ tiền thưởng giới thiệu chờ ALN liên hệ chi trả.';
   }
 }
 window.renderAlnBricksCard = renderAlnBricksCard;
@@ -555,11 +561,12 @@ function render(){
         + '<div id="alnTierBar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--gold),#d4a017);border-radius:99px;transition:width .4s"></div>'
       + '</div>'
       + '<div id="alnTierNext" style="font-size:11px;color:var(--muted);margin-top:6px">Cần thêm Gạch để lên hạng tiếp theo</div>'
+      + '<div id="alnPendingVndWrap" style="display:none;font-size:11px;color:var(--green);margin-top:8px;font-weight:700"></div>'
     + '</div>'
 
     + '<div class="card">'
       + '<div class="card-title"><i class="ph-duotone ph-users-three"></i>Giới thiệu khách hàng</div>'
-      + '<div class="hint">Gặp khách đang xây nhà chưa có bản vẽ thiết kế? Gửi link này — mỗi khách đăng ký qua link của bạn được tính vào chương trình ưu tiên hiển thị gian hàng (chi tiết Founder sẽ thông báo riêng).</div>'
+      + '<div class="hint">Gặp khách đang xây nhà chưa có bản vẽ thiết kế? Gửi link này — nếu khách đăng ký và ký hợp đồng thiết kế thật với ALN, bạn được thưởng <b>15% tiền đợt thanh toán đầu (C1)</b> bằng tiền mặt, Founder liên hệ chi trả trực tiếp.</div>'
       + '<div class="field-row">'
         + '<div class="field" style="flex:1"><label>Link giới thiệu của bạn</label><input type="text" id="fRefLink" readonly value="' + escH(location.origin + '/register.html?ref=' + UID) + '"></div>'
         + '<button class="btn btn-ghost" onclick="copyRefLink()" style="align-self:flex-end"><i class="ph-duotone ph-copy"></i>Copy link</button>'
@@ -636,7 +643,7 @@ function render(){
   const pdfIn = document.getElementById('pdfInput');
   if(pdfIn) pdfIn.addEventListener('change', onPickPdf);
 
-  if (window.renderAlnBricksCard) window.renderAlnBricksCard(USER_PROFILE && USER_PROFILE.alnBricks, USER_PROFILE && USER_PROFILE.alnDiamonds);
+  if (window.renderAlnBricksCard) window.renderAlnBricksCard(USER_PROFILE && USER_PROFILE.alnBricks, USER_PROFILE && USER_PROFILE.alnDiamonds, USER_PROFILE && USER_PROFILE.referralPendingVnd);
 }
 
 async function onPickImages(ev){
@@ -781,7 +788,7 @@ onAuthStateChanged(auth, async function(user){
     USER_PROFILE = uSnap.exists() ? uSnap.data() : {};
     render();
     onSnapshot(doc(db, 'users', UID), function(u2){
-      if(u2.exists() && window.renderAlnBricksCard) window.renderAlnBricksCard(u2.data().alnBricks, u2.data().alnDiamonds);
+      if(u2.exists() && window.renderAlnBricksCard) window.renderAlnBricksCard(u2.data().alnBricks, u2.data().alnDiamonds, u2.data().referralPendingVnd);
     });
   } catch(e){
     console.error(e);

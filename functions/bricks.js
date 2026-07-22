@@ -4,10 +4,11 @@
  * Định vị pháp lý (BẮT BUỘC giữ, xem CLAUDE.md mục "Gạch & Kim Cương"):
  * - Gạch = điểm thưởng khuyến mãi: KHÔNG mua bằng tiền, KHÔNG đổi ra tiền,
  *   KHÔNG chuyển nhượng giữa người dùng. Chỉ đổi ưu đãi dịch vụ trong ALN.
- * - Kim Cương = thưởng giới thiệu cho KẾT QUẢ mang doanh thu thật (CN được
- *   giới thiệu ký hợp đồng + tiền C1 đã thực nhận). Về sau quy được ra tiền
- *   chuyển khoản theo thể lệ (bản chất: hoa hồng giới thiệu — hợp pháp), có
- *   khấu trừ thuế TNCN theo quy định, Founder duyệt tay từng lệnh chi.
+ * - Thưởng giới thiệu (trước gọi "Kim Cương", thống nhất 22/07/2026 (2)) = cho
+ *   KẾT QUẢ mang doanh thu thật (CN được giới thiệu ký hợp đồng + tiền C1 đã
+ *   thực nhận) — trả THẲNG 15% tiền C1 bằng VNĐ, áp dụng như nhau cho NCC và
+ *   CTV (bản chất: hoa hồng giới thiệu — hợp pháp), có khấu trừ thuế TNCN
+ *   theo quy định, Founder duyệt tay từng lệnh chi (xem awardReferralPayout).
  * - KHÔNG có cơ chế hưởng thưởng đa tầng (tuyến dưới) — tránh mô hình đa cấp.
  *
  * Kiến trúc:
@@ -28,11 +29,13 @@ const bdb = admin.firestore();
 const REGION = "asia-southeast1";
 const FOUNDER_UID = "h4kEguPEyMcwJwl89stc0Q6j2si2";
 
-/* % trích từ tiền C1 THẬT, trả THẲNG bằng VNĐ cho Cộng tác viên (CTV, định danh
-   bằng SĐT — xem functions/ctvGame.js) giới thiệu CN ký HĐ (chốt 22/07/2026).
-   CHỈ áp dụng cho CTV — NCC vẫn nhận 1 Kim Cương như cũ (awardDiamond) vì thể
-   lệ quy đổi Kim Cương ra tiền cho NCC CHƯA chốt, khác chính sách CTV. */
-const CTV_REFERRAL_PAYOUT_PCT = 0.15;
+/* % trích từ tiền C1 THẬT, trả THẲNG bằng VNĐ cho người giới thiệu CN ký HĐ —
+   áp dụng THỐNG NHẤT cho cả NCC (uid Firebase Auth) và CTV ẩn danh (SĐT, xem
+   functions/ctvGame.js). Trước 22/07/2026 (2) 2 đường tách biệt (NCC nhận 1
+   Kim Cương, CTV nhận 15% C1) — hợp nhất lại vì cùng 1 hành vi (giới thiệu
+   khách ký HĐ) mà 2 mức thưởng khác nhau tạo lệch lạc động lực (NCC có lý do
+   bỏ kênh gian hàng, dùng SĐT cá nhân chơi CTV để hưởng mức cao hơn). */
+const REFERRAL_PAYOUT_PCT = 0.15;
 
 /* Bảng Gạch theo loại sự kiện — chỉnh 1 chỗ này khi cân bằng lại "kinh tế Gạch".
    Loại nào gắn sự kiện thật có giới hạn tự nhiên (dự án, chặng) thì không cần
@@ -86,34 +89,38 @@ async function pushToFounder(title, body, extraData) {
   }
 }
 
-/* Thưởng giới thiệu CTV — trả THẲNG VNĐ (không quy đổi qua Kim Cương), cộng
-   dồn vào users/{phone}.ctvReferralPendingVnd. Chưa có luồng rút tự động
-   (xem CLAUDE.md mục "Thể lệ chi trả Kim Cương ra tiền thật") — Founder chi
-   trả tay theo push thông báo, số dư ở đây chỉ để đối chiếu/hiển thị. */
-async function awardCtvReferralPayout(phone, refKey, amount, meta) {
-  if (!phone || !amount) return false;
-  const ledgerId = ("ctv_payout_" + refKey).replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 900);
+/* Thưởng giới thiệu — trả THẲNG VNĐ (không quy đổi qua Kim Cương), cộng dồn
+   vào users/{id}.referralPendingVnd — id là uid Firebase Auth (NCC) hoặc SĐT
+   (CTV), field dùng chung. Chưa có luồng rút tự động (xem CLAUDE.md mục "Thể
+   lệ chi trả ra tiền thật") — Founder chi trả tay theo push thông báo, số dư
+   ở đây chỉ để đối chiếu/hiển thị. */
+async function awardReferralPayout(id, refKey, amount, meta) {
+  if (!id || !amount) return false;
+  const ledgerId = ("referral_payout_" + refKey).replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 900);
   const ledgerRef = bdb.collection("bricksLedger").doc(ledgerId);
-  const userRef = bdb.collection("users").doc(phone);
+  const userRef = bdb.collection("users").doc(id);
   try {
     await bdb.runTransaction(async (tx) => {
       const existing = await tx.get(ledgerRef);
       if (existing.exists) throw new Error("DUP");
       tx.set(ledgerRef, {
-        uid: phone, type: "ctv_referral_payout", amount, unit: "vnd",
+        uid: id, type: "referral_payout", amount, unit: "vnd",
         meta: meta || {},
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
-      tx.set(userRef, { ctvReferralPendingVnd: admin.firestore.FieldValue.increment(amount) }, { merge: true });
+      tx.set(userRef, { referralPendingVnd: admin.firestore.FieldValue.increment(amount) }, { merge: true });
     });
     return true;
   } catch (e) {
-    if (e.message !== "DUP") console.error("[awardCtvReferralPayout]", phone, e);
+    if (e.message !== "DUP") console.error("[awardReferralPayout]", id, e);
     return false;
   }
 }
 
-/* Trao Kim Cương — chỉ từ sự kiện doanh thu thật hoặc Founder trao tay. */
+/* Trao Kim Cương — hiện KHÔNG có sự kiện tự động nào gọi hàm này (đường NCC
+   trước đây đã hợp nhất sang awardReferralPayout, xem trên). Giữ lại cho khả
+   năng Founder trao tay Kim Cương thủ công sau này nếu cần (chưa có callable
+   tương ứng) — xoá nếu về sau xác nhận không dùng tới. */
 async function awardDiamond(uid, refKey, meta) {
   if (!uid) return false;
   const ledgerId = ("diamond_" + refKey).replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 900);
@@ -178,10 +185,13 @@ exports.bricksOnStageAdvanced = functions
     return null;
   });
 
-/* ── 3. Kim Cương khi tiền C1 THẬT về của CN được giới thiệu ──
-   Chỉ C1 (lần tiền đầu tiên của hợp đồng) — mỗi dự án tối đa 1 Kim Cương cho
-   người giới thiệu, idempotent theo pid. Hiện hỗ trợ người giới thiệu là NCC
-   (referredByNcc); mở rộng kts_ref/CN-mời-CN ở giai đoạn sau. */
+/* ── 3. Thưởng giới thiệu khi tiền C1 THẬT về của CN được giới thiệu ──
+   Chỉ C1 (lần tiền đầu tiên của hợp đồng) — mỗi dự án tối đa 1 lần thưởng cho
+   người giới thiệu, idempotent theo pid. Người giới thiệu có thể là NCC (uid
+   Firebase Auth) hoặc Cộng tác viên ẩn danh (SĐT — xem functions/ctvGame.js);
+   ưu tiên NCC nếu cả 2 field cùng có giá trị (trường hợp hiếm, tránh trao
+   đúp). THỐNG NHẤT 22/07/2026 (2): cả 2 loại người giới thiệu đều nhận CÙNG
+   MỘT mức 15% tiền C1 bằng VNĐ — không còn phân biệt NCC/CTV. */
 exports.bricksOnFirstPayment = functions
   .region(REGION)
   .firestore.document("projects/{pid}")
@@ -197,40 +207,23 @@ exports.bricksOnFirstPayment = functions
     try {
       const cnSnap = await bdb.collection("users").doc(cnUid).get();
       const cn = cnSnap.exists ? cnSnap.data() : {};
-      // Người giới thiệu có thể là NCC (uid Firebase Auth) hoặc Cộng tác viên
-      // ẩn danh (định danh bằng SĐT — xem functions/ctvGame.js). Ưu tiên NCC
-      // nếu cả 2 field cùng có giá trị (trường hợp hiếm, tránh trao đúp).
-      // 2 đường thưởng TÁCH BIỆT (chốt 22/07/2026): NCC vẫn nhận Kim Cương như
-      // cũ; CTV nhận thẳng 15% tiền C1 bằng VNĐ (xem CTV_REFERRAL_PAYOUT_PCT).
-      const referrerNcc = typeof cn.referredByNcc === "string" && cn.referredByNcc ? cn.referredByNcc : "";
-      const referrerCtv = !referrerNcc && typeof cn.referredByCtv === "string" ? cn.referredByCtv : "";
-      if (referrerNcc) {
-        const ok = await awardDiamond(referrerNcc, "c1paid_" + pid, {
-          pid, cnUid, note: "CN được giới thiệu đã ký HĐ + tiền C1 thực nhận",
+      const referrer = (typeof cn.referredByNcc === "string" && cn.referredByNcc) ||
+        (typeof cn.referredByCtv === "string" && cn.referredByCtv) || "";
+      if (!referrer) return null;
+      const c1Amount = Number(ap.amount) || 0;
+      const payout = Math.round(c1Amount * REFERRAL_PAYOUT_PCT);
+      if (payout > 0) {
+        const ok = await awardReferralPayout(referrer, "c1paid_" + pid, payout, {
+          pid, cnUid, c1Amount, pct: REFERRAL_PAYOUT_PCT,
+          note: "Giới thiệu CN ký HĐ + C1 thực nhận — 15% tiền C1",
         });
         if (ok) {
           await pushToFounder(
-            "💎 Kim Cương mới",
-            "Dự án " + pid + " (C1 đã thu) có NCC giới thiệu — 1 Kim Cương đã trao, chờ thể lệ chi thưởng.",
-            { type: "DIAMOND_AWARDED", pid, referrer: referrerNcc }
+            "💰 Thưởng giới thiệu mới",
+            "Dự án " + pid + " (C1 đã thu " + c1Amount.toLocaleString("vi-VN") + "đ) có người giới thiệu — " +
+              payout.toLocaleString("vi-VN") + "đ (15% C1) đã ghi nhận, chờ chi trả tay.",
+            { type: "REFERRAL_PAYOUT", pid, referrer, payout }
           );
-        }
-      } else if (referrerCtv) {
-        const c1Amount = Number(ap.amount) || 0;
-        const payout = Math.round(c1Amount * CTV_REFERRAL_PAYOUT_PCT);
-        if (payout > 0) {
-          const ok = await awardCtvReferralPayout(referrerCtv, "c1paid_" + pid, payout, {
-            pid, cnUid, c1Amount, pct: CTV_REFERRAL_PAYOUT_PCT,
-            note: "CTV giới thiệu CN ký HĐ + C1 thực nhận — 15% tiền C1",
-          });
-          if (ok) {
-            await pushToFounder(
-              "💰 Thưởng giới thiệu CTV",
-              "Dự án " + pid + " (C1 đã thu " + c1Amount.toLocaleString("vi-VN") + "đ) có CTV giới thiệu — " +
-                payout.toLocaleString("vi-VN") + "đ (15% C1) đã ghi nhận, chờ chi trả tay.",
-              { type: "CTV_REFERRAL_PAYOUT", pid, referrer: referrerCtv, payout }
-            );
-          }
         }
       }
     } catch (e) {

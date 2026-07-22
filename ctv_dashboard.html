@@ -425,7 +425,7 @@ async function doSpin(){
     document.getElementById('wheelSvg').style.transform = 'rotate(' + target + 'deg)';
     setTimeout(function(){
       showMsg('spinMsg', '🎉 Chúc mừng! Bạn trúng +' + data.prize + ' Gạch!', true);
-      renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.ctvReferralPendingVnd);
+      renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.referralPendingVnd);
       updateSpinState({ eligible: true, used: true });
       btn.textContent = 'Quay ngay!';
     }, 4200);
@@ -569,7 +569,7 @@ async function doLookup(){
     if (!data.exists) {
       showMsg('lookupMsg', 'Chưa tìm thấy SĐT này — làm nhiệm vụ bên dưới để bắt đầu nhé!', false);
     } else {
-      renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.ctvReferralPendingVnd);
+      renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.referralPendingVnd);
       setStreak(data.streak);
       updateSpinState(data.spin);
       doneTasks = {};
@@ -601,7 +601,7 @@ async function doClaim(){
   btn.disabled = true; btn.textContent = 'Đang gửi...';
   try {
     var data = await window.ctvClaimTasks({ name: name, phone: phone, taskIds: taskIds, refBy: _refByPhone });
-    renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.ctvReferralPendingVnd);
+    renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.referralPendingVnd);
     setStreak(data.streak);
     updateSpinState(data.spin);
     doneTasks = {};

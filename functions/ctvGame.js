@@ -165,7 +165,7 @@ exports.ctvGetProfile = onCall({ region: REGION, enforceAppCheck: true }, async 
   const snap = await db.collection("users").doc(phone).get();
   if (!snap.exists) {
     return {
-      exists: false, name: "", alnBricks: 0, alnDiamonds: 0, ctvReferralPendingVnd: 0,
+      exists: false, name: "", alnBricks: 0, alnDiamonds: 0, referralPendingVnd: 0,
       tasksDone: [], tier: tierOf(0), weeklyTask, streak: 0, spin: { eligible: false, used: false },
     };
   }
@@ -179,7 +179,7 @@ exports.ctvGetProfile = onCall({ region: REGION, enforceAppCheck: true }, async 
     name: d.name || "",
     alnBricks: d.alnBricks || 0,
     alnDiamonds: d.alnDiamonds || 0,
-    ctvReferralPendingVnd: d.ctvReferralPendingVnd || 0,
+    referralPendingVnd: d.referralPendingVnd || 0,
     tasksDone,
     tier: tierOf(d.alnBricks || 0),
     weeklyTask,
@@ -285,7 +285,7 @@ exports.ctvClaimTasks = onCall({ region: REGION, enforceAppCheck: true }, async 
     newlyDone,
     alnBricks: ud.alnBricks || 0,
     alnDiamonds: ud.alnDiamonds || 0,
-    ctvReferralPendingVnd: ud.ctvReferralPendingVnd || 0,
+    referralPendingVnd: ud.referralPendingVnd || 0,
     tasksDone,
     tier: tierOf(ud.alnBricks || 0),
     weeklyTask,
@@ -347,7 +347,7 @@ exports.ctvSpinWheel = onCall({ region: REGION, enforceAppCheck: true }, async (
     prize,
     alnBricks: ud.alnBricks || 0,
     alnDiamonds: ud.alnDiamonds || 0,
-    ctvReferralPendingVnd: ud.ctvReferralPendingVnd || 0,
+    referralPendingVnd: ud.referralPendingVnd || 0,
     tier: tierOf(ud.alnBricks || 0),
   };
 });
