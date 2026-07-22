@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ALN — Cổng Cộng tác viên</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#98690a">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="aln-tokens.css">
+<!-- Google Analytics 4 (ALN — G-5CSL1TF0RC, tách riêng khỏi property TK.HOUSE) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5CSL1TF0RC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5CSL1TF0RC');
+</script>
+<!-- End GA4 -->
+<style>
+:root{
+  --bg:#f7f9fb;--bg2:#eef2f6;--card:#ffffff;
+  --border:#e1e7ee;--border2:#c9d3de;
+  --muted:#5b6b7f;--text:#1a2634;--text2:#3d4b5c;
+  --gold:#98690a;--gold2:#b8860b;--green:#15803d;--red:#dc2626;--blue:#1d4ed8;
+  --r:14px;--r-sm:10px;
+  --sans:'DM Sans',sans-serif;--serif:'Cormorant Garamond',serif;--syne:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+@media(min-width:1440px){html{font-size:14px}}
+@media(min-width:1920px){html{font-size:16px}}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px 60px}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.brand{display:flex;align-items:center;gap:8px}
+.brand-box{background:rgba(152,105,10,.1);border:1.5px solid rgba(152,105,10,.3);border-radius:8px;padding:5px 10px;font-family:var(--syne);font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--gold)}
+.brand-sub{font-size:11px;color:var(--muted)}
+.btn-logout{background:none;border:1px solid var(--border2);border-radius:8px;padding:7px 12px;font-size:11px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px}
+.btn-logout:hover{border-color:var(--red);color:var(--red)}
+
+.hero{padding:24px 0 6px;text-align:center}
+.hero h1{font-family:var(--serif);font-size:24px;font-weight:600;font-style:italic;color:var(--text)}
+.hero p{font-size:12px;color:var(--muted);margin-top:4px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-top:16px}
+.card-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:6px;margin-bottom:12px}
+
+/* Gạch card */
+.tier-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.tier-name{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+#alnDiamondsWrap{display:none;font-size:12px;font-weight:700;color:#0891b2;align-items:center;gap:4px}
+#alnHouseWrap{color:var(--gold);margin:6px 0 10px;text-align:center}
+.bricks-row{display:flex;align-items:baseline;gap:6px;justify-content:center;margin-bottom:10px}
+#alnBricksCount{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--text)}
+.bricks-row span.lbl{font-size:12px;color:var(--muted)}
+.bar-track{height:7px;border-radius:99px;background:var(--bg2);overflow:hidden}
+#alnTierBar{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:99px;transition:width .5s}
+#alnTierNext{font-size:11px;color:var(--muted);margin-top:6px;text-align:center}
+
+/* Referral */
+.ref-row{display:flex;gap:8px}
+.ref-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:11.5px;font-family:var(--mono);color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-copy{background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:var(--r-sm);padding:0 16px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-copy:hover{opacity:.9}
+.ref-hint{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6}
+
+/* Nhiệm vụ */
+.task{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--border)}
+.task:first-child{border-top:none;padding-top:2px}
+.task-num{width:26px;height:26px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--gold);flex-shrink:0}
+.task-body{flex:1}
+.task-title{font-size:12.5px;font-weight:700;color:var(--text)}
+.task-desc{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.6}
+.task-action{margin-top:6px}
+.task-action a,.task-action button{font-size:11px;font-weight:700;color:var(--gold);text-decoration:none;background:none;border:none;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px}
+.task-action a:hover,.task-action button:hover{text-decoration:underline}
+.task-badge{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:99px;background:rgba(21,128,61,.1);color:var(--green);white-space:nowrap;height:fit-content}
+.task-badge.soon{background:rgba(91,107,127,.1);color:var(--muted)}
+
+.note{font-size:11px;color:var(--muted);text-align:center;margin-top:18px;line-height:1.7}
+
+.veil{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;align-items:center;justify-content:center}
+.veil .spin{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="veil" id="authVeil"><div class="spin"></div></div>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-box">ALN</div>
+    <div class="brand-sub">Cộng tác viên</div>
+  </div>
+  <button class="btn-logout" onclick="doLogout()"><i class="ph-duotone ph-sign-out"></i> Đăng xuất</button>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <h1 id="heroName">Chào bạn!</h1>
+    <p>Làm nhiệm vụ, tích Gạch, xây ngôi nhà của riêng bạn trên ALN</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ph-duotone ph-trophy"></i> Gạch &amp; Kim Cương của bạn</div>
+    <div class="tier-row">
+      <div class="tier-name"><span id="alnTierIcon">🧱</span> <span id="alnTierName">Nền Móng</span></div>
+      <div id="alnDiamondsWrap"><i class="ph-duotone ph-diamond"></i> <span id="alnDiamondsCount">0</span></div>
+    </div>
+    <div id="alnHouseWrap"></div>
+    <div class="bricks-row"><span id="alnBricksCount">0</span><span class="lbl">Gạch</span></div>
+    <div class="bar-track"><div id="alnTierBar"></div></div>
+    <div id="alnTierNext">Đang tải...</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ph-duotone ph-share-network"></i> Link giới thiệu của bạn</div>
+    <div class="ref-row">
+      <div class="ref-input" id="refLinkText">—</div>
+      <button class="btn-copy" onclick="copyRefLink()"><i class="ph-duotone ph-copy"></i> Sao chép</button>
+    </div>
+    <div class="ref-hint">Chia sẻ link này lên Zalo/Facebook cho người quen sắp xây nhà. Khi họ đăng ký và ký hợp đồng thật với ALN, bạn được thưởng Kim Cương.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ph-duotone ph-list-checks"></i> Nhiệm vụ tích Gạch</div>
+
+    <div class="task">
+      <div class="task-num">1</div>
+      <div class="task-body">
+        <div class="task-title">Chia sẻ bài Cẩm nang / diễn đàn lên nhóm Zalo, Facebook</div>
+        <div class="task-desc">Dùng đúng link giới thiệu ở trên khi chia sẻ để ALN ghi nhận đúng công của bạn.</div>
+        <div class="task-action"><button onclick="copyRefLink()"><i class="ph-duotone ph-copy"></i> Sao chép link để chia sẻ</button></div>
+      </div>
+      <div class="task-badge">Nhỏ</div>
+    </div>
+
+    <div class="task">
+      <div class="task-num">2</div>
+      <div class="task-body">
+        <div class="task-title">Đặt câu hỏi thật trên diễn đàn</div>
+        <div class="task-desc">Câu hỏi được duyệt hiển thị sẽ được cộng Gạch.</div>
+        <div class="task-action"><a href="forum.html"><i class="ph-duotone ph-arrow-right"></i> Vào diễn đàn ALN</a></div>
+      </div>
+      <div class="task-badge">Nhỏ</div>
+    </div>
+
+    <div class="task">
+      <div class="task-num">3</div>
+      <div class="task-body">
+        <div class="task-title">"Đi chợ giùm ALN": chụp bảng giá vật liệu, cửa hàng VLXD gần nhà</div>
+        <div class="task-desc">Giúp ALN xây kho dữ liệu giá thật theo từng vùng.</div>
+      </div>
+      <div class="task-badge soon">Sắp ra mắt</div>
+    </div>
+
+    <div class="task">
+      <div class="task-num">4</div>
+      <div class="task-body">
+        <div class="task-title">Viết "Nhật ký xây/sửa nhà mình" có ảnh thật, chi phí thật</div>
+        <div class="task-desc">Nội dung thật, có ích cho người đang tìm hiểu xây nhà.</div>
+      </div>
+      <div class="task-badge soon">Sắp ra mắt</div>
+    </div>
+
+    <div class="task">
+      <div class="task-num">5</div>
+      <div class="task-body">
+        <div class="task-title">Giới thiệu cửa hàng vật liệu quen vào Mạng lưới NCC</div>
+        <div class="task-desc">Cửa hàng đăng ký gian hàng và được Founder duyệt.</div>
+        <div class="task-action"><a href="ncc-apply.html"><i class="ph-duotone ph-arrow-right"></i> Trang đăng ký gian hàng NCC</a></div>
+      </div>
+      <div class="task-badge">Vừa</div>
+    </div>
+
+    <div class="task">
+      <div class="task-num">6</div>
+      <div class="task-body">
+        <div class="task-title">Giới thiệu người quen sắp xây nhà</div>
+        <div class="task-desc">Giá trị cao nhất — người quen đăng ký qua link của bạn, ký hợp đồng thật với ALN.</div>
+        <div class="task-action"><button onclick="copyRefLink()"><i class="ph-duotone ph-copy"></i> Sao chép link giới thiệu</button></div>
+      </div>
+      <div class="task-badge">Rất lớn</div>
+    </div>
+
+  </div>
+
+  <div class="note">Gạch hiện được Founder ALN xét cộng thủ công sau khi xác nhận nhiệm vụ. Các form nộp bài tự động (Bậc 3–4) sẽ ra mắt sau.</div>
+</div>
+
+<script>
+/* Gạch & Kim Cương ALN — thang cấp bậc dùng chung (xem CLAUDE.md mục "Gạch & Kim Cương") */
+var ALN_TIERS = [
+  { min: 0,    name: 'Nền Móng',  icon: '🧱' },
+  { min: 50,   name: 'Khung Nhà', icon: '🏗️' },
+  { min: 150,  name: 'Mái Ấm',    icon: '🏠' },
+  { min: 400,  name: 'Biệt Thự',  icon: '🏡' },
+  { min: 1000, name: 'Dinh Thự',  icon: '🏰' },
+];
+/* Hình ngôi nhà xây dần theo cấp bậc (0..4) — "trò chơi tỷ phú" trực quan thay số khô khan */
+function alnHouseSVG(idx){
+  var lvl = Math.max(0, Math.min(4, idx || 0));
+  var s = '<svg viewBox="0 0 140 92" width="100%" height="90" style="display:block" aria-hidden="true">';
+  s += '<line x1="6" y1="86" x2="134" y2="86" stroke="currentColor" stroke-opacity=".22" stroke-width="2"/>';
+  s += '<rect x="30" y="78" width="80" height="8" rx="1" fill="currentColor" fill-opacity="' + (lvl >= 1 ? '.3' : '.55') + '"/>';
+  if (lvl >= 1) {
+    s += '<line x1="34" y1="78" x2="34" y2="44" stroke="currentColor" stroke-opacity=".5" stroke-width="3"/>';
+    s += '<line x1="106" y1="78" x2="106" y2="44" stroke="currentColor" stroke-opacity=".5" stroke-width="3"/>';
+    s += '<line x1="70" y1="78" x2="70" y2="44" stroke="currentColor" stroke-opacity=".3" stroke-width="3"/>';
+    s += '<line x1="34" y1="44" x2="106" y2="44" stroke="currentColor" stroke-opacity=".5" stroke-width="3"/>';
+  }
+  if (lvl >= 2) {
+    s += '<rect x="34" y="44" width="72" height="34" fill="currentColor" fill-opacity=".16"/>';
+    s += '<polygon points="27,44 70,17 113,44" fill="#98690a"/>';
+  }
+  if (lvl >= 3) {
+    s += '<rect x="62" y="58" width="16" height="20" rx="1" fill="currentColor" fill-opacity=".65"/>';
+    s += '<rect x="42" y="54" width="12" height="12" rx="1" fill="#fff" fill-opacity=".85"/>';
+    s += '<rect x="86" y="54" width="12" height="12" rx="1" fill="#fff" fill-opacity=".85"/>';
+    s += '<circle cx="18" cy="68" r="8" fill="#3a7d44" fill-opacity=".55"/>';
+    s += '<line x1="18" y1="76" x2="18" y2="86" stroke="currentColor" stroke-opacity=".4" stroke-width="2"/>';
+  }
+  if (lvl >= 4) {
+    s += '<rect x="46" y="28" width="16" height="16" fill="currentColor" fill-opacity=".22"/>';
+    s += '<line x1="70" y1="17" x2="70" y2="6" stroke="currentColor" stroke-opacity=".6" stroke-width="2"/>';
+    s += '<polygon points="70,6 82,10 70,14" fill="#d4a017"/>';
+    s += '<line x1="8" y1="86" x2="8" y2="80" stroke="currentColor" stroke-opacity=".35" stroke-width="2"/>';
+    s += '<line x1="132" y1="86" x2="132" y2="80" stroke="currentColor" stroke-opacity=".35" stroke-width="2"/>';
+  }
+  s += '</svg>';
+  return s;
+}
+function renderAlnBricksCard(bricks, diamonds){
+  bricks = Number(bricks) || 0;
+  diamonds = Number(diamonds) || 0;
+  var idx = 0;
+  for (var i = 0; i < ALN_TIERS.length; i++) { if (bricks >= ALN_TIERS[i].min) idx = i; }
+  var cur = ALN_TIERS[idx];
+  var next = ALN_TIERS[idx + 1];
+  var houseEl = document.getElementById('alnHouseWrap');
+  if (houseEl) houseEl.innerHTML = alnHouseSVG(idx);
+  var iconEl = document.getElementById('alnTierIcon');
+  var nameEl = document.getElementById('alnTierName');
+  var countEl = document.getElementById('alnBricksCount');
+  var barEl = document.getElementById('alnTierBar');
+  var nextEl = document.getElementById('alnTierNext');
+  var dWrap = document.getElementById('alnDiamondsWrap');
+  var dCount = document.getElementById('alnDiamondsCount');
+  if (iconEl) iconEl.textContent = cur.icon;
+  if (nameEl) nameEl.textContent = cur.name;
+  if (countEl) countEl.textContent = bricks.toLocaleString('vi-VN');
+  if (next) {
+    var pct = Math.min(100, Math.round(((bricks - cur.min) / (next.min - cur.min)) * 100));
+    if (barEl) barEl.style.width = pct + '%';
+    if (nextEl) nextEl.textContent = 'Còn ' + (next.min - bricks).toLocaleString('vi-VN') + ' Gạch tới hạng ' + next.name;
+  } else {
+    if (barEl) barEl.style.width = '100%';
+    if (nextEl) nextEl.textContent = 'Hạng cao nhất — Dinh Thự 🏰';
+  }
+  if (dWrap && dCount) {
+    dCount.textContent = diamonds.toLocaleString('vi-VN');
+    dWrap.style.display = diamonds > 0 ? 'flex' : 'none';
+  }
+}
+window.renderAlnBricksCard = renderAlnBricksCard;
+
+window._refUrl = '';
+function copyRefLink(){
+  if (!window._refUrl) return;
+  navigator.clipboard.writeText(window._refUrl).then(function(){
+    toast('✓ Đã sao chép link giới thiệu');
+  }).catch(function(){
+    toast('Không sao chép được — hãy bôi đen link để tự chép');
+  });
+}
+window.copyRefLink = copyRefLink;
+
+function toast(msg){
+  var el = document.createElement('div');
+  el.textContent = msg;
+  el.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a2634;color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,.2)';
+  document.body.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 2200);
+}
+
+function doLogout(){
+  window.__alnLogout && window.__alnLogout();
+}
+</script>
+
+<script type="module">
+import { auth, db, onAuthStateChanged, signOut, doc, getDoc, onSnapshot } from './firebase-config.js';
+
+window.__alnLogout = async function(){
+  await signOut(auth);
+  location.href = 'login.html';
+};
+
+onAuthStateChanged(auth, async function(user){
+  if (!user) { location.href = 'login.html'; return; }
+  var snap = await getDoc(doc(db, 'users', user.uid));
+  var role = snap.exists() ? snap.data().role : '';
+  if (role !== 'ctv' && role !== 'founder') {
+    location.href = 'login.html';
+    return;
+  }
+  var profile = snap.exists() ? snap.data() : {};
+  document.getElementById('heroName').textContent = 'Chào ' + (profile.name || 'bạn') + '!';
+  window._refUrl = location.origin + location.pathname.replace('ctv_dashboard.html', '') + 'register.html?cref=' + user.uid;
+  document.getElementById('refLinkText').textContent = window._refUrl;
+  if (window.renderAlnBricksCard) window.renderAlnBricksCard(profile.alnBricks, profile.alnDiamonds);
+  document.getElementById('authVeil').style.display = 'none';
+
+  onSnapshot(doc(db, 'users', user.uid), function(s2){
+    if (s2.exists() && window.renderAlnBricksCard) {
+      var d = s2.data();
+      window.renderAlnBricksCard(d.alnBricks, d.alnDiamonds);
+    }
+  });
+});
+</script>
+</body>
+</html>
