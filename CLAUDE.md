@@ -248,6 +248,7 @@ Mục đích: NCC (sắt thép, gỗ nội thất, VLXD, sơn, điện nước, 
   3. Chính sách phí gói gian hàng cơ bản sau năm miễn phí đầu tiên (ưu đãi 50 doanh nghiệp đầu tiên trên `ncc-showcase.html`) — chưa quyết, cần chốt trước khi hết hạn miễn phí năm đầu.
   4. ~~Nhánh nháp `claude/ncc-showcase-demo-cithdq`~~ — Founder đã xoá 21/07/2026.
   5. Logic thưởng theo `referralCount` (ưu tiên hiển thị / nâng tier tạm thời / trừ phí năm 2) — mới có đếm số, CHƯA có hành động tự động khi đạt mốc.
+  6. **Ý tưởng chiến lược (thêm 22/07/2026, CHƯA làm gì):** danh mục "Thợ - Đội thi công" (`dv_thicong`) trên Mạng lưới hình dung là **lực lượng đầu quân** chuẩn bị cho chiến dịch "dịch vụ sửa vặt" (sửa chữa nhỏ tại nhà cho khách có nhu cầu) — dùng chính các đội đã đăng ký gian hàng làm nguồn cung. **Bắt buộc giữ đúng khuôn pháp lý hiện có cho `dv_thicong`**: ALN CHỈ là nền tảng kết nối/giới thiệu, KHÔNG được là bên cung cấp dịch vụ sửa chữa trực tiếp (lặp lại đúng ranh giới "đơn vị thi công đối tác" đã chốt ở đầu file — từng bị AI Overview của Google hiểu sai thành "ALN vừa thiết kế vừa thi công" ngày 22/07/2026, xem mục JSON-LD). Chưa có thiết kế cụ thể (luồng đặt lịch, tính phí, ai thu tiền) — cần Founder chốt trước khi triển khai.
 
 ## Diễn đàn (forum.html) — cơ chế "mồi" giữ diễn đàn trông sống động
 
