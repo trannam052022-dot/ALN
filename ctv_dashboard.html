@@ -40,9 +40,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .brand-box{background:rgba(152,105,10,.1);border:1.5px solid rgba(152,105,10,.3);border-radius:8px;padding:5px 10px;font-family:var(--syne);font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--gold)}
 .brand-sub{font-size:11px;color:var(--muted)}
 
-.hero{padding:24px 0 6px;text-align:center}
-.hero h1{font-family:var(--serif);font-size:24px;font-weight:600;font-style:italic;color:var(--text)}
-.hero p{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.7}
+.hero{padding:20px 0 6px}
+.hero-box{background:linear-gradient(155deg,#0a1224,#111c33 55%,#0d1730);border:1px solid rgba(212,160,23,.25);border-radius:18px;padding:26px 22px;text-align:center;box-shadow:0 10px 30px -12px rgba(0,0,0,.35)}
+.hero-box h1{font-family:var(--serif);font-size:24px;font-weight:600;font-style:italic;color:#f4e7c8}
+.hero-box p{font-size:12px;color:#b8c4dc;margin-top:8px;line-height:1.7}
 
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-top:16px}
 .card-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:6px;margin-bottom:12px}
@@ -127,8 +128,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 <div class="wrap">
   <div class="hero">
-    <h1>Đồng hành cùng Kiến trúc sư ALN — Tích Gạch xây nhà</h1>
-    <p>Chỉ cần Tên + SĐT. Làm nhiệm vụ nhỏ tích Gạch mỗi ngày, giới thiệu người thân xây nhà cùng ALN — nhận thưởng bằng tiền thật.</p>
+    <div class="hero-box">
+      <h1>Đồng hành cùng Kiến trúc sư ALN — Tích Gạch xây nhà</h1>
+      <p>Chỉ cần Tên + SĐT. Làm nhiệm vụ nhỏ tích Gạch mỗi ngày, giới thiệu người thân xây nhà cùng ALN — nhận thưởng bằng tiền thật.</p>
+    </div>
   </div>
 
   <div class="card" id="bricksCard">
@@ -197,10 +200,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     </div>
   </div>
 
-  <div class="card" id="inviteCard" style="display:none">
+  <div class="card" id="inviteCard">
     <div class="card-title"><i class="ph-duotone ph-users-three"></i> Rủ bạn cùng chơi — nhận Gạch ngay</div>
     <div class="ref-row">
-      <div class="ref-input" id="inviteLinkText">—</div>
+      <div class="ref-input" id="inviteLinkText">🔒 Nhập Tên + SĐT ở form bên dưới để nhận link riêng của bạn</div>
       <button class="btn-copy" onclick="copyInviteLink()"><i class="ph-duotone ph-copy"></i> Sao chép</button>
     </div>
     <div class="ref-row" style="margin-top:8px;flex-wrap:wrap">
@@ -211,10 +214,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div class="task-desc" style="margin-top:8px">Gửi link này cho bạn bè — khi bạn ấy vào chơi và hoàn thành nhiệm vụ đầu tiên, bạn được cộng ngay <b>+15 Gạch</b>.</div>
   </div>
 
-  <div class="card" id="refCard" style="display:none">
+  <div class="card" id="refCard">
     <div class="card-title"><i class="ph-duotone ph-share-network"></i> Link giới thiệu khách xây nhà</div>
     <div class="ref-row">
-      <div class="ref-input" id="refLinkText">—</div>
+      <div class="ref-input" id="refLinkText">🔒 Nhập Tên + SĐT ở form bên dưới để nhận link riêng của bạn</div>
       <button class="btn-copy" onclick="copyRefLink()"><i class="ph-duotone ph-copy"></i> Sao chép</button>
     </div>
     <div class="ref-row" id="quickShareRow" style="margin-top:8px;flex-wrap:wrap">
@@ -493,27 +496,29 @@ function setRefLink(phone){
   window._refUrl = url;
   document.getElementById('btnShareNative').style.display = (navigator.share ? 'inline-flex' : 'none');
 }
+function noLinkYet(){ showMsg('claimMsg', 'Nhập Tên + SĐT ở form bên dưới trước để nhận link riêng của bạn nhé!', false); }
 function copyRefLink(){
-  if (!window._refUrl) return;
+  if (!window._refUrl) { noLinkYet(); return; }
   navigator.clipboard.writeText(window._refUrl).then(function(){
     showMsg('claimMsg', '✓ Đã sao chép link giới thiệu', true);
     markLinkOpened('share_link');
   }).catch(function(){});
 }
 async function shareNative(){
-  if (!navigator.share || !window._refUrl) return;
+  if (!window._refUrl) { noLinkYet(); return; }
+  if (!navigator.share) return;
   try {
     await navigator.share({ title: 'ALN — App Làm Nhà', text: SHARE_TEXT, url: window._refUrl });
     markLinkOpened('share_link');
   } catch(e){ /* người dùng tự huỷ hộp thoại chia sẻ — bỏ qua */ }
 }
 function shareToZalo(){
-  if (!window._refUrl) return;
+  if (!window._refUrl) { noLinkYet(); return; }
   window.open('https://zalo.me/share/link?u=' + encodeURIComponent(window._refUrl) + '&d=' + encodeURIComponent(SHARE_TEXT), '_blank');
   markLinkOpened('share_link');
 }
 function shareToMessenger(){
-  if (!window._refUrl) return;
+  if (!window._refUrl) { noLinkYet(); return; }
   window.open('https://www.messenger.com/share?link=' + encodeURIComponent(window._refUrl), '_blank');
   markLinkOpened('share_link');
 }
@@ -528,21 +533,22 @@ function setInviteLink(phone){
   document.getElementById('btnInviteShareNative').style.display = (navigator.share ? 'inline-flex' : 'none');
 }
 function copyInviteLink(){
-  if (!window._inviteUrl) return;
+  if (!window._inviteUrl) { noLinkYet(); return; }
   navigator.clipboard.writeText(window._inviteUrl).then(function(){
     showMsg('claimMsg', '✓ Đã sao chép link rủ bạn chơi', true);
   }).catch(function(){});
 }
 async function shareInviteNative(){
-  if (!navigator.share || !window._inviteUrl) return;
+  if (!window._inviteUrl) { noLinkYet(); return; }
+  if (!navigator.share) return;
   try { await navigator.share({ title: 'ALN — Chơi cùng tích Gạch', text: INVITE_SHARE_TEXT, url: window._inviteUrl }); } catch(e){}
 }
 function shareInviteToZalo(){
-  if (!window._inviteUrl) return;
+  if (!window._inviteUrl) { noLinkYet(); return; }
   window.open('https://zalo.me/share/link?u=' + encodeURIComponent(window._inviteUrl) + '&d=' + encodeURIComponent(INVITE_SHARE_TEXT), '_blank');
 }
 function shareInviteToMessenger(){
-  if (!window._inviteUrl) return;
+  if (!window._inviteUrl) { noLinkYet(); return; }
   window.open('https://www.messenger.com/share?link=' + encodeURIComponent(window._inviteUrl), '_blank');
 }
 
