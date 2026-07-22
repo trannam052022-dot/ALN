@@ -51,6 +51,7 @@ Nền tảng theo dõi công trình xây dựng. **Frontend tĩnh** (HTML/JS thu
 | `ncc-showcase.html` | Trang công khai "Mạng lưới Thiết bị - Vật tư ALN" — danh sách gian hàng NCC (3 tầng, tìm kiếm, filter tỉnh/danh mục), đổi tên từ "Gian hàng Vật liệu"/"Vietbuild ALN" → "Mạng lưới Vật liệu ALN" → "Mạng lưới Thiết bị - Vật tư ALN" ngày 19/07/2026 |
 | `ncc_profile.html` | Trang công khai chi tiết 1 gian hàng NCC (`?uid=`), có chế độ xem thử `?demo=1` |
 | `ncc-dashboard.html` | Trang NCC tự quản lý gian hàng sau khi được duyệt |
+| `ctv_dashboard.html` | Trang Cộng tác viên (CTV, thêm 22/07/2026) — hình ngôi nhà + Gạch/Kim Cương, link giới thiệu `?cref=`, danh sách 6 bậc nhiệm vụ |
 
 ## firebase-config.js — exports
 
@@ -71,6 +72,9 @@ Quy ước: `username + "@aln.vn"` = email đăng nhập (email ảo).
 | `cn` | `client_CN.html` | — (xem projects của mình) | green |
 | `ks` | `ks_dashboard.html` | — (xét duyệt KTS theo tỉnh) | gold |
 | `ncc` | `ncc-dashboard.html` | — (tự quản lý gian hàng, doc `nccApplications/{uid}`) | gold |
+| `ctv` | `ctv_dashboard.html` | — (không có dự án, chỉ chơi Gạch/Kim Cương + nhiệm vụ) | gold |
+
+**Cộng tác viên (CTV, thêm 22/07/2026):** vai dành cho người NGOÀI mạng lưới nghiệp vụ ALN (không phải CN/KTS/DN/Designer/NCC/KS) — mục đích tạo "lực lượng" làm nhiệm vụ tích Gạch (chia sẻ bài, đặt câu hỏi diễn đàn, giới thiệu NCC/khách xây nhà), nhắm nhóm rảnh rỗi/nội trợ theo ý tưởng ban đầu của Founder. Đăng ký qua `register.html` (tab "Cộng tác viên", `?role=ctv` mở sẵn tab) — CHỈ Tên + SĐT, **active ngay không chờ duyệt** (giống luồng CN, khác hẳn KTS/DN/Designer/NCC/KS phải qua Founder). `username` = SĐT (không có prefix `ctv.` như các vai khác — theo đúng pattern CN). Link giới thiệu riêng `register.html?cref={ctv_uid}` ghi field `referredByCtv` lên user mới — **logic tự động thưởng Kim Cương khi người được giới thiệu ký hợp đồng + đóng C1 CHƯA làm** (mới dừng ở ghi nhận field, cần sửa `bricksOnFirstPayment` trong `functions/bricks.js` để đọc thêm `referredByCtv` song song `referredByNcc`). Nhiệm vụ Bậc 1-2 (chia sẻ, đặt câu hỏi diễn đàn) hiện Founder cộng Gạch thủ công qua `founderAwardBricks`; Bậc 3-4 (đi chợ giùm, nhật ký xây nhà) chưa có form nộp bài.
 
 **KS Vùng (Kỹ sư Vùng):** username prefix `ks.`, đăng ký qua `ks-apply.html` → `ksApplications/{uid}`, chờ founder duyệt. Sau khi active, login vào `ks_dashboard.html`, xem KTS pending trong tỉnh và gửi nhận xét (`ksNote`) lên `ktsApplications/{uid}`. Founder xem nhận xét này khi duyệt KTS.
 
@@ -265,6 +269,7 @@ Diễn đàn không chỉ là nơi hỏi đáp — đúng vai trò là **trang m
 4. **Thể lệ chi trả Kim Cương ra tiền thật** — mức quy đổi, ngưỡng rút, form nhập tài khoản ngân hàng, khấu trừ thuế TNCN, màn duyệt chi cho Founder — hoàn toàn CHƯA làm, mới dừng ở trao Kim Cương + thông báo.
 5. Nhiệm vụ "đi chợ giùm" (chụp giá vật liệu) và "nhật ký xây nhà" — chưa có form nộp + hàng chờ duyệt trong `founder_panel.html`/`founder_forum.html`.
 6. ~~Chưa deploy~~ — đã deploy thành công 21/07/2026 (`functions:bricksOnUserCreated,functions:bricksOnStageAdvanced,functions:bricksOnFirstPayment,functions:founderAwardBricks`). Backend + UI (client_CN, kts_dashboard) đang chạy thật.
+7. ~~Không có cửa vào cho người ngoài mạng lưới ALN~~ — đã làm 22/07/2026: vai `ctv` mới + `register.html` (tab riêng, active ngay) + `ctv_dashboard.html` — xem chi tiết mục "Vai trò hệ thống" phía trên. **Còn thiếu:** tự động hoá Kim Cương khi CTV giới thiệu CN ký hợp đồng + đóng C1 (mới ghi field `referredByCtv`, chưa sửa `bricksOnFirstPayment` để đọc field này); hình ngôi nhà xây dần theo Gạch (`alnHouseSVG`, thêm cùng ngày 22/07/2026) mới có ở `client_CN/kts_dashboard/designer_dashboard/ncc-dashboard/ctv_dashboard`, **chưa có ở `founder_panel.html`** (bảng xếp hạng dùng dạng bảng, chưa cần hình); vòng quay may mắn (yếu tố ngẫu nhiên) và bảng xếp hạng công khai cho người chơi tự xem — mới là ý tưởng, chưa làm.
 
 ## MyMy Marketing (module Founder-only: đăng Buffer + báo cáo GA4) — thêm 20/07/2026
 
