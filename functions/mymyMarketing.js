@@ -35,7 +35,7 @@ const BUFFER_ACCESS_TOKEN = defineSecret("BUFFER_ACCESS_TOKEN");
 const FOUNDER_UID = "h4kEguPEyMcwJwl89stc0Q6j2si2";
 const MYMY_MKT_MAX_ITER = 8;
 const VALID_CHANNELS = ["facebook", "instagram", "tiktok"];
-const CONTENT_URL_HOSTS = ["firebasestorage.googleapis.com", "firebasestorage.app"];
+const CONTENT_URL_HOSTS = ["firebasestorage.googleapis.com", "firebasestorage.app", "applamnha.vn"];
 
 const MYMY_MKT_ALLOWLIST = [
   "ask_user", "request_confirmation",
@@ -68,7 +68,7 @@ const MYMY_MKT_TOOLS = [
     input_schema: {
       type: "object",
       properties: {
-        content_url: { type: "string", description: "Link Firebase Storage tới ảnh/video đã dựng xong" },
+        content_url: { type: "string", description: "Link ảnh/video đã dựng xong — Firebase Storage hoặc ảnh sẵn có trên applamnha.vn" },
         caption: { type: "string" },
         channels: { type: "array", items: { type: "string", enum: VALID_CHANNELS } },
         campaign_tag: { type: "string", description: "vd: kts-recruit-jul26 — chỉ chữ thường/số, nối bằng gạch ngang" },
@@ -110,7 +110,7 @@ VAI TRÒ: hỗ trợ Founder phân phối nội dung marketing đã dựng xong 
 QUY TẮC BẮT BUỘC:
 1. TRƯỚC MỌI lần gọi scheduleMarketingPost hoặc cancelMarketingPost: BẮT BUỘC gọi request_confirmation trước, kể cả bài đăng organic (không tốn tiền) — vì đăng sai nội dung công khai khó gỡ. Tóm tắt rõ: caption, kênh, giờ đăng, và NGÂN SÁCH DỰ KIẾN nếu is_paid=true.
 2. Nếu is_paid=true mà Founder chưa cho biết ngân sách (budget_vnd), PHẢI hỏi bằng ask_user trước khi request_confirmation — không tự đoán số tiền, không tự chi tiền khi chưa xác nhận rõ.
-3. Nội dung dựng (video/ảnh) do người dựng thủ công qua Gemini/Kling/CapCut — MyMy chỉ nhận link Firebase Storage đã dựng xong, KHÔNG tự tạo nội dung media.
+3. Nội dung dựng (video/ảnh) do người dựng thủ công qua Gemini/Kling/CapCut — MyMy chỉ nhận link đã dựng xong (Firebase Storage hoặc ảnh sẵn có trên website applamnha.vn), KHÔNG tự tạo nội dung media.
 4. campaign_tag chỉ gồm chữ thường/số nối bằng gạch ngang (vd: kts-recruit-jul26) — nếu Founder đặt tên khác định dạng, gợi ý chuẩn hoá lại trước khi dùng.
 5. Hỏi từng ý một bằng ask_user — không hỏi dồn nhiều thứ cùng lúc.
 6. getMarketingReport là tool chỉ đọc — dùng thoải mái để trả lời câu hỏi hiệu quả chiến dịch, không cần xác nhận.
@@ -317,7 +317,7 @@ async function mymyMktApiPost(url, token, body) {
 async function mymyMktExecSchedulePost(founderUid, bufferToken, input) {
   try {
     if (!mymyMktValidContentUrl(input.content_url)) {
-      return { ok: false, error: { code: "invalid-argument", message: "content_url phải là link Firebase Storage hợp lệ của ALN" } };
+      return { ok: false, error: { code: "invalid-argument", message: "content_url phải là link Firebase Storage hoặc ảnh trên applamnha.vn" } };
     }
     if (!mymyMktValidCampaignTag(input.campaign_tag)) {
       return { ok: false, error: { code: "invalid-argument", message: "campaign_tag chỉ gồm chữ thường/số, nối bằng gạch ngang, vd: kts-recruit-jul26" } };
