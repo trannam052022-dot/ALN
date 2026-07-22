@@ -72,6 +72,16 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .task-pts{font-size:10.5px;font-weight:800;color:var(--gold);white-space:nowrap;background:rgba(152,105,10,.08);padding:3px 8px;border-radius:99px;height:fit-content}
 .task.done{opacity:.55}
 .task.done .task-check{accent-color:var(--green)}
+.task.weekly .task-pts{background:rgba(220,38,38,.09);color:var(--red)}
+
+/* Bảng xếp hạng */
+.lb-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-top:1px solid var(--border)}
+.lb-row:first-child{border-top:none}
+.lb-left{display:flex;align-items:center;gap:8px;min-width:0}
+.lb-rank{width:20px;text-align:center;flex-shrink:0;font-size:13px}
+.lb-name{font-weight:700;color:var(--text);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-phone{color:var(--muted);font-family:var(--mono);font-size:10px;flex-shrink:0}
+.lb-bricks{font-weight:800;color:var(--gold);font-size:12px;white-space:nowrap}
 
 /* Form nhận thưởng */
 .field{margin-bottom:12px}
@@ -123,6 +133,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <div class="bricks-row"><span id="alnBricksCount">0</span><span class="lbl">Gạch</span></div>
       <div class="bar-track"><div id="alnTierBar"></div></div>
       <div id="alnTierNext">—</div>
+      <div id="alnPendingVndWrap" style="display:none;font-size:11px;color:var(--green);text-align:center;margin-top:8px;font-weight:700"></div>
     </div>
     <button class="btn-link" onclick="showLookup()">Đã chơi rồi? Tra Gạch bằng SĐT</button>
   </div>
@@ -140,6 +151,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <div class="card">
     <div class="card-title"><i class="ph-duotone ph-list-checks"></i> Nhiệm vụ hôm nay</div>
     <div id="taskList"></div>
+  </div>
+
+  <div class="card" id="leaderboardCard">
+    <div class="card-title"><i class="ph-duotone ph-ranking"></i> Bảng xếp hạng CTV</div>
+    <div id="leaderboardList" style="font-size:12px;color:var(--muted)">Đang tải...</div>
   </div>
 
   <div class="card">
@@ -225,9 +241,10 @@ function alnHouseSVG(idx){
   s += '</svg>';
   return s;
 }
-function renderAlnBricksCard(bricks, diamonds){
+function renderAlnBricksCard(bricks, diamonds, pendingVnd){
   bricks = Number(bricks) || 0;
   diamonds = Number(diamonds) || 0;
+  pendingVnd = Number(pendingVnd) || 0;
   document.getElementById('bricksCardEmpty').style.display = 'none';
   document.getElementById('bricksCardBody').style.display = 'block';
   var idx = 0;
@@ -252,6 +269,44 @@ function renderAlnBricksCard(bricks, diamonds){
   var dWrap = document.getElementById('alnDiamondsWrap');
   dWrap.style.display = diamonds > 0 ? 'flex' : 'none';
   document.getElementById('alnDiamondsCount').textContent = diamonds.toLocaleString('vi-VN');
+  var pendEl = document.getElementById('alnPendingVndWrap');
+  if (pendEl) {
+    pendEl.style.display = pendingVnd > 0 ? 'block' : 'none';
+    if (pendingVnd > 0) pendEl.textContent = '💰 Bạn đang có ' + pendingVnd.toLocaleString('vi-VN') + 'đ tiền thưởng giới thiệu chờ ALN liên hệ chi trả.';
+  }
+}
+
+function escHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+  });
+}
+
+async function loadLeaderboard(){
+  var el = document.getElementById('leaderboardList');
+  try {
+    var data = await window.ctvLeaderboard();
+    var items = data.items || [];
+    if (!items.length) { el.textContent = 'Chưa có ai trên bảng xếp hạng — hãy là người đầu tiên!'; return; }
+    var medals = ['🥇','🥈','🥉'];
+    el.innerHTML = items.map(function(it, i){
+      return '<div class="lb-row"><div class="lb-left">' +
+        '<span class="lb-rank">' + (medals[i] || (i + 1)) + '</span>' +
+        '<span class="lb-name">' + escHtml(it.name) + '</span>' +
+        '<span class="lb-phone">' + escHtml(it.phoneMasked) + '</span>' +
+        '</div><span class="lb-bricks">' + it.alnBricks.toLocaleString('vi-VN') + ' 🧱</span></div>';
+    }).join('');
+  } catch(e) { el.textContent = 'Chưa tải được bảng xếp hạng.'; }
+}
+
+async function loadWeeklyTask(){
+  try {
+    var wt = await window.ctvGetWeeklyTask();
+    if (wt && wt.taskId && !TASKS.some(function(t){ return t.id === wt.taskId; })) {
+      TASKS.push({ id: wt.taskId, title: '🔥 ' + wt.label, desc: wt.desc, url: wt.url, pts: wt.pts, weekly: true });
+      renderTasks();
+    }
+  } catch(e){}
 }
 
 var doneTasks = {};
@@ -273,7 +328,7 @@ function renderTasks(){
     var link = t.url ? '<a class="task-link" href="' + t.url + '" target="_blank" rel="noopener" onclick="markLinkOpened(\'' + t.id + '\')"><i class="ph-duotone ph-arrow-square-out"></i> Mở link</a>' : '';
     var lockedNote = (!t.url && !isDone && !opened) ? '<div class="task-desc" style="color:var(--muted)">Bấm "Sao chép" ở link giới thiệu bên dưới để mở khoá nhiệm vụ này.</div>' : '';
     var chkAttr = isDone ? 'checked disabled' : (opened ? 'checked' : 'disabled');
-    return '<div class="task' + (isDone ? ' done' : '') + '">' +
+    return '<div class="task' + (isDone ? ' done' : '') + (t.weekly ? ' weekly' : '') + '">' +
       '<input type="checkbox" class="task-check" id="chk_' + t.id + '" ' + chkAttr + '>' +
       '<div class="task-body">' +
         '<div class="task-title">' + t.title + (isDone ? ' <i class="ph-duotone ph-check-circle" style="color:var(--green)"></i>' : '') + '</div>' +
@@ -340,7 +395,7 @@ async function doLookup(){
     if (!data.exists) {
       showMsg('lookupMsg', 'Chưa tìm thấy SĐT này — làm nhiệm vụ bên dưới để bắt đầu nhé!', false);
     } else {
-      renderAlnBricksCard(data.alnBricks, data.alnDiamonds);
+      renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.ctvReferralPendingVnd);
       doneTasks = {};
       (data.tasksDone || []).forEach(function(t){ doneTasks[t] = true; });
       setRefLink(phone);
@@ -369,7 +424,7 @@ async function doClaim(){
   btn.disabled = true; btn.textContent = 'Đang gửi...';
   try {
     var data = await window.ctvClaimTasks({ name: name, phone: phone, taskIds: taskIds });
-    renderAlnBricksCard(data.alnBricks, data.alnDiamonds);
+    renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.ctvReferralPendingVnd);
     doneTasks = {};
     (data.tasksDone || []).forEach(function(t){ doneTasks[t] = true; });
     setRefLink(phone);
@@ -437,7 +492,11 @@ import { app } from './firebase-config.js';
   var fns = mod.getFunctions(app, 'asia-southeast1');
   window.ctvGetProfile = async function(data){ var r = await mod.httpsCallable(fns, 'ctvGetProfile')(data); return r.data; };
   window.ctvClaimTasks = async function(data){ var r = await mod.httpsCallable(fns, 'ctvClaimTasks')(data); return r.data; };
+  window.ctvGetWeeklyTask = async function(){ var r = await mod.httpsCallable(fns, 'ctvGetWeeklyTask')(); return r.data; };
+  window.ctvLeaderboard = async function(){ var r = await mod.httpsCallable(fns, 'ctvLeaderboard')(); return r.data; };
   if (window.autoLookupCtv) window.autoLookupCtv();
+  if (window.loadWeeklyTask) window.loadWeeklyTask();
+  if (window.loadLeaderboard) window.loadLeaderboard();
 })();
 </script>
 </body>
