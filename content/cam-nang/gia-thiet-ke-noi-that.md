@@ -70,6 +70,9 @@ Phí thiết kế nội thất cũng chia theo bốn mốc như các hạng mụ
 **Giá này đã gồm phí thiết kế kiến trúc chưa?**
 Chưa. Kiến trúc và nội thất là hai hạng mục riêng. Xem thêm [Chi phí thiết kế nhà phố 2026](/cam-nang/chi-phi-thiet-ke-nha-pho/) và [Chi phí thiết kế biệt thự 2026](/cam-nang/chi-phi-thiet-ke-biet-thu/).
 
+**Giá có khác nhau theo khu vực không?**
+Không, đơn giá 120.000–180.000đ/m² áp dụng thống nhất toàn quốc. Xem thêm lưu ý riêng cho từng nơi: [Giá thiết kế nội thất tại TP.HCM](/cam-nang/gia-thiet-ke-noi-that-tphcm/) và [Giá thiết kế nội thất tại Vũng Tàu](/cam-nang/gia-thiet-ke-noi-that-vung-tau/).
+
 **Phí thiết kế nội thất nhà phố bao nhiêu?**
 Phí thiết kế nội thất nhà phố tại App Làm Nhà là 120.000đ/m² diện tích sàn cần thiết kế, áp dụng năm 2026.
 

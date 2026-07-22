@@ -65,6 +65,9 @@ Có — do nền đất yếu thường phải ép cọc, chi phí phần móng 
 **Có cần kiến trúc sư khi xây nhà ở TP.HCM không?**
 Nên có. Hồ sơ xin phép cần chữ ký người có chứng chỉ hành nghề, và KTS giúp tối ưu công năng theo lộ giới, mật độ xây dựng của từng tuyến đường.
 
+**Xây xong thì làm nội thất hết bao nhiêu?**
+Xem [giá thiết kế nội thất tại TP.HCM 2026](/cam-nang/gia-thiet-ke-noi-that-tphcm/) — 120.000đ/m² nhà phố, 180.000đ/m² biệt thự.
+
 ---
 
 **Bạn đang chuẩn bị xây nhà tại TP.HCM?** Để lại số điện thoại hoặc nhắn MyMy trên [applamnha.vn](https://applamnha.vn) — App Làm Nhà là mạng lưới kiến trúc sư theo khu vực, kết nối bạn với KTS Miền Nam để khảo sát thực tế, tối ưu bản vẽ và kết nối thi công minh bạch.
