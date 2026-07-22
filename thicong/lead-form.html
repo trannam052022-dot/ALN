@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>Đăng ký nhận tư vấn thi công — ALN</title>
+<meta name="description" content="Đăng ký nhận tư vấn thi công từ ALN — miễn phí, không ràng buộc. ALN kết nối bạn với đơn vị thi công đối tác phù hợp khu vực và loại công trình.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://applamnha.vn/thicong/lead-form.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://applamnha.vn/thicong/lead-form.html">
+<meta property="og:title" content="Đăng ký nhận tư vấn thi công — ALN">
+<meta property="og:description" content="Đăng ký nhận tư vấn thi công từ ALN — miễn phí, không ràng buộc.">
+<meta property="og:image" content="https://applamnha.vn/icon-512.png">
+<meta property="og:site_name" content="App Làm Nhà">
+<meta property="og:locale" content="vi_VN">
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="../aln-tokens.css">
+<link rel="stylesheet" href="../cam-nang/cam-nang.css">
+<link rel="icon" href="../icon-192.png" type="image/png">
+<meta name="theme-color" content="#98690a">
+<!-- Google Analytics 4 (ALN — G-5CSL1TF0RC, dùng chung property với applamnha.vn) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5CSL1TF0RC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5CSL1TF0RC');
+</script>
+<!-- End GA4 -->
+<style>
+.tc-form-wrap{max-width:620px;margin:0 auto;padding:56px 24px 70px}
+.tc-form-head{text-align:center;margin-bottom:30px}
+.tc-form-head h1{font-family:var(--serif);font-weight:400;font-size:clamp(28px,4vw,38px);color:var(--text);margin-bottom:10px}
+.tc-form-head p{font-size:var(--text-base);color:var(--text2);line-height:1.6}
+.tc-form-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:32px;box-shadow:var(--shadow-md)}
+.tc-field{margin-bottom:20px}
+.tc-field label{display:block;font-family:var(--syne);font-weight:700;font-size:var(--text-sm);color:var(--text);margin-bottom:7px}
+.tc-field .req{color:var(--red)}
+.tc-field input,.tc-field select{width:100%;padding:11px 14px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:var(--sans);font-size:var(--text-base);color:var(--text);background:var(--bg2)}
+.tc-field input:focus,.tc-field select:focus{outline:none;border-color:var(--gold)}
+.tc-field .hint{font-size:var(--text-xs);color:var(--muted);margin-top:5px}
+.tc-submit{width:100%;padding:14px;justify-content:center;font-size:var(--text-base)}
+.tc-note{margin-top:22px;font-size:var(--text-xs);color:var(--muted);line-height:1.6;text-align:center}
+.tc-thanks{display:none;text-align:center;padding:20px 0}
+.tc-thanks i{font-size:48px;color:var(--green);margin-bottom:14px;display:block}
+.tc-thanks h2{font-family:var(--syne);font-weight:700;font-size:var(--text-xl);color:var(--text);margin-bottom:10px}
+.tc-thanks p{font-size:var(--text-base);color:var(--text2);line-height:1.6;max-width:440px;margin:0 auto}
+.tc-error{color:var(--red);font-size:var(--text-xs);margin-top:6px;display:none}
+</style>
+</head>
+<body>
+
+<header id="cn-nav">
+  <div class="wrap cn-nav-inner">
+    <a href="index.html" class="cn-brand">
+      <div class="cn-logo"><img src="../icon-192.png" alt="ALN"></div>
+      <div class="cn-name">ALN<small>Thi công — Mạng lưới đối tác</small></div>
+    </a>
+    <div class="cn-nav-links">
+      <a class="cn-nav-link" href="index.html">Giới thiệu</a>
+      <a class="cn-nav-link" href="blog/index.html">Kiến thức thi công</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="tc-form-wrap">
+    <div class="tc-form-head">
+      <h1>Đăng ký nhận tư vấn</h1>
+      <p>Miễn phí, không ràng buộc. Đây <strong>không phải</strong> đặt dịch vụ thi công ngay — ALN chỉ ghi nhận nhu cầu để liên hệ giới thiệu đơn vị thi công đối tác phù hợp khi mạng lưới tại khu vực của bạn sẵn sàng.</p>
+    </div>
+
+    <div class="tc-form-box">
+      <form id="tcLeadForm" novalidate>
+        <div class="tc-field">
+          <label for="tcName">Họ và tên <span class="req">*</span></label>
+          <input type="text" id="tcName" name="name" autocomplete="name" required maxlength="80">
+        </div>
+        <div class="tc-field">
+          <label for="tcPhone">Số điện thoại / Zalo <span class="req">*</span></label>
+          <input type="tel" id="tcPhone" name="phone" autocomplete="tel" required maxlength="15" placeholder="09xxxxxxxx">
+          <div class="tc-error" id="tcPhoneErr">Vui lòng nhập số điện thoại hợp lệ (VD: 0909xxxxxx).</div>
+        </div>
+        <div class="tc-field">
+          <label for="tcProvince">Khu vực công trình <span class="req">*</span></label>
+          <select id="tcProvince" name="province" required>
+            <option value="">— Chọn tỉnh/thành —</option>
+            <option>TP. Hồ Chí Minh</option>
+            <option>Hà Nội</option>
+            <option>Đà Nẵng</option>
+            <option>Cần Thơ</option>
+            <option>Hải Phòng</option>
+            <option>Bình Dương</option>
+            <option>Đồng Nai</option>
+            <option>Khánh Hòa</option>
+            <option>Bà Rịa - Vũng Tàu</option>
+            <option>Khác</option>
+          </select>
+        </div>
+        <div class="tc-field">
+          <label for="tcType">Loại công trình <span class="req">*</span></label>
+          <select id="tcType" name="buildType" required>
+            <option value="">— Chọn loại công trình —</option>
+            <option>Nhà phố</option>
+            <option>Biệt thự</option>
+            <option>Nhà cấp 4</option>
+            <option>Căn hộ / cải tạo nội thất</option>
+            <option>Khác</option>
+          </select>
+        </div>
+        <div class="tc-field">
+          <label for="tcStage">Bạn đã có bản vẽ thiết kế chưa?</label>
+          <select id="tcStage" name="designStage">
+            <option value="">— Chọn tình trạng hiện tại —</option>
+            <option>Đã có bản vẽ, đang tìm đơn vị thi công</option>
+            <option>Đang thiết kế, chưa xong bản vẽ</option>
+            <option>Chưa bắt đầu, đang tìm hiểu</option>
+          </select>
+          <div class="hint">Không bắt buộc — giúp ALN giới thiệu đúng thời điểm hơn.</div>
+        </div>
+
+        <button type="submit" class="btn btn-gold tc-submit"><i class="ph-duotone ph-paper-plane-tilt"></i>Đăng ký nhận tư vấn</button>
+        <div class="tc-error" id="tcSubmitErr">Có lỗi khi gửi, vui lòng thử lại hoặc gọi 0909 82 9696.</div>
+
+        <div class="tc-note">
+          Bằng việc gửi form, bạn đồng ý để ALN liên hệ tư vấn qua số điện thoại/Zalo đã cung cấp. ALN không chia sẻ thông tin liên hệ của bạn công khai hoặc cho bên thứ ba ngoài mục đích giới thiệu đơn vị thi công đối tác phù hợp.
+        </div>
+      </form>
+
+      <div class="tc-thanks" id="tcThanks">
+        <i class="ph-duotone ph-check-circle"></i>
+        <h2>Đã ghi nhận, cảm ơn bạn!</h2>
+        <p>ALN đã ghi nhận thông tin đăng ký. Đội ngũ ALN sẽ liên hệ khi có đơn vị thi công đối tác phù hợp với khu vực và nhu cầu của bạn.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-bottom">© ALN — App Làm Nhà Corp. · applamnha.vn</div>
+  </div>
+</footer>
+
+<script type="module">
+/* Ghi lead qua Cloud Function submitThicongLead (functions/thicongLead.js) —
+   KHÔNG addDoc thẳng vào Firestore: collection 'leads' có allow write: if
+   false trong firestore.rules (chỉ Admin SDK được ghi), giống hệt pattern
+   submitLocalLead đang dùng ở thiet-ke-nha/*.html. */
+import { app } from '../firebase-config.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+
+const functions = getFunctions(app, 'asia-southeast1');
+const callSubmitThicongLead = httpsCallable(functions, 'submitThicongLead', { timeout: 20000 });
+
+function getUtmFromUrl() {
+  var p = new URLSearchParams(location.search);
+  var utm = {};
+  ['source', 'medium', 'campaign', 'content', 'term'].forEach(function(k){
+    var v = p.get('utm_' + k);
+    if (v) utm[k] = v;
+  });
+  return utm;
+}
+function getCookie(name) {
+  var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return m ? decodeURIComponent(m[1]) : '';
+}
+function getFbc() {
+  var c = getCookie('_fbc');
+  if (c) return c;
+  var fbclid = new URLSearchParams(location.search).get('fbclid');
+  return fbclid ? 'fb.1.' + Date.now() + '.' + fbclid : '';
+}
+
+var form = document.getElementById('tcLeadForm');
+form.addEventListener('submit', async function(e){
+  e.preventDefault();
+  var phone = document.getElementById('tcPhone').value.trim();
+  var phoneErr = document.getElementById('tcPhoneErr');
+  var phoneOk = /^0\d{8,10}$/.test(phone.replace(/[\s.\-()]/g, ''));
+  phoneErr.style.display = phoneOk ? 'none' : 'block';
+  if (!form.checkValidity() || !phoneOk) {
+    form.reportValidity();
+    return;
+  }
+  var btn = form.querySelector('.tc-submit');
+  var submitErr = document.getElementById('tcSubmitErr');
+  submitErr.style.display = 'none';
+  btn.disabled = true;
+  try {
+    await callSubmitThicongLead({
+      name: document.getElementById('tcName').value.trim(),
+      phone: phone,
+      area: document.getElementById('tcProvince').value,
+      projectType: document.getElementById('tcType').value,
+      designStage: document.getElementById('tcStage').value,
+      utm: getUtmFromUrl(),
+      sourceUrl: location.href,
+      fbp: getCookie('_fbp'),
+      fbc: getFbc(),
+    });
+    form.style.display = 'none';
+    document.getElementById('tcThanks').style.display = 'block';
+  } catch (err) {
+    console.error('[submitThicongLead]', err);
+    submitErr.style.display = 'block';
+    btn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>

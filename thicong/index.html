@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>Thi công ALN — Kết nối bạn với đơn vị thi công đối tác đã đăng ký</title>
+<meta name="description" content="ALN kết nối chủ nhà với đơn vị thi công đối tác đã đăng ký trên Mạng lưới ALN. Đăng ký nhận tư vấn miễn phí, không ràng buộc — ALN không trực tiếp thi công.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://applamnha.vn/thicong/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://applamnha.vn/thicong/">
+<meta property="og:title" content="Thi công ALN — Kết nối bạn với đơn vị thi công đối tác đã đăng ký">
+<meta property="og:description" content="ALN kết nối chủ nhà với đơn vị thi công đối tác đã đăng ký trên Mạng lưới ALN. Đăng ký nhận tư vấn miễn phí — ALN không trực tiếp thi công.">
+<meta property="og:image" content="https://applamnha.vn/icon-512.png">
+<meta property="og:site_name" content="App Làm Nhà">
+<meta property="og:locale" content="vi_VN">
+<meta name="twitter:card" content="summary_large_image">
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="../aln-tokens.css">
+<link rel="stylesheet" href="../cam-nang/cam-nang.css">
+<link rel="icon" href="../icon-192.png" type="image/png">
+<meta name="theme-color" content="#98690a">
+<!-- Google Analytics 4 (ALN — G-5CSL1TF0RC, dùng chung property với applamnha.vn) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5CSL1TF0RC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5CSL1TF0RC');
+</script>
+<!-- End GA4 -->
+<style>
+.tc-hero{padding:64px 0 20px;text-align:center}
+.tc-badge{display:inline-flex;align-items:center;gap:7px;background:var(--gold-bg);border:1px solid rgba(152,105,10,.3);color:var(--gold);border-radius:99px;font-size:11px;font-weight:700;padding:5px 16px;margin-bottom:22px;font-family:var(--syne);letter-spacing:.06em;text-transform:uppercase}
+.tc-hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,48px);line-height:1.16;letter-spacing:-.01em;color:var(--text);max-width:760px;margin:0 auto 16px}
+.tc-hero h1 em{font-style:italic;font-weight:700;color:var(--gold2)}
+.tc-hero p{font-size:var(--text-md);color:var(--text2);max-width:600px;margin:0 auto 30px;line-height:1.7}
+.tc-hero-cta{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+
+.tc-disclaimer{max-width:760px;margin:36px auto 0;background:var(--bg3);border-left:4px solid var(--gold);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:16px 22px;font-size:var(--text-sm);color:var(--text2);line-height:1.6}
+.tc-disclaimer strong{color:var(--text)}
+
+.tc-section{padding:56px 0}
+.tc-section-head{text-align:center;margin-bottom:34px}
+.tc-section-head h2{font-family:var(--syne);font-weight:700;font-size:var(--text-2xl);color:var(--text)}
+.tc-section-head h2 span{color:var(--gold2)}
+.tc-section-head p{font-size:var(--text-base);color:var(--sub);max-width:560px;margin:10px auto 0}
+
+.tc-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.tc-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:26px;box-shadow:var(--shadow-sm)}
+.tc-card i{font-size:30px;color:var(--gold)}
+.tc-card h3{font-family:var(--syne);font-weight:700;font-size:var(--text-md);color:var(--text);margin:14px 0 8px}
+.tc-card p{font-size:var(--text-sm);color:var(--sub);line-height:1.6}
+
+.tc-steps{display:flex;gap:0;flex-wrap:wrap;position:relative}
+.tc-step{flex:1;min-width:220px;padding:0 18px;position:relative}
+.tc-step::after{content:'→';position:absolute;right:-4px;top:16px;color:var(--border2);font-size:18px}
+.tc-step:last-child::after{display:none}
+.tc-step-num{width:34px;height:34px;border-radius:50%;background:var(--gold-bg);border:1.5px solid rgba(152,105,10,.3);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold);margin-bottom:12px}
+.tc-step h3{font-family:var(--syne);font-weight:700;font-size:var(--text-sm);color:var(--text);margin-bottom:5px}
+.tc-step p{font-size:var(--text-sm);color:var(--sub);line-height:1.6}
+
+.tc-blog-teaser{background:var(--bg3)}
+.tc-blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.tc-blog-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:22px;box-shadow:var(--shadow-sm);transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.tc-blog-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.tc-blog-card h4{font-family:var(--syne);font-weight:700;font-size:var(--text-sm);color:var(--text);line-height:1.4;margin:10px 0 8px}
+.tc-blog-card p{font-size:var(--text-xs);color:var(--sub);line-height:1.55}
+
+@media(max-width:860px){.tc-grid3,.tc-blog-grid{grid-template-columns:1fr}.tc-steps{flex-direction:column;gap:22px}.tc-step::after{display:none}}
+</style>
+</head>
+<body>
+
+<header id="cn-nav">
+  <div class="wrap cn-nav-inner">
+    <a href="index.html" class="cn-brand">
+      <div class="cn-logo"><img src="../icon-192.png" alt="ALN"></div>
+      <div class="cn-name">ALN<small>Thi công — Mạng lưới đối tác</small></div>
+    </a>
+    <div class="cn-nav-links">
+      <a class="cn-nav-link" href="blog/index.html">Kiến thức thi công</a>
+      <a class="cn-nav-link" href="https://applamnha.vn/">applamnha.vn</a>
+    </div>
+    <a class="btn btn-gold" href="lead-form.html"><i class="ph-duotone ph-clipboard-text"></i>Đăng ký nhận tư vấn</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <section class="tc-hero">
+      <div class="tc-badge"><i class="ph-duotone ph-hourglass-medium"></i>Đang xây dựng mạng lưới đối tác</div>
+      <h1>Kết nối bạn với <em>đơn vị thi công đối tác</em> phù hợp cho ngôi nhà của mình</h1>
+      <p>ALN là Tổng thầu Thiết kế — không trực tiếp thi công. Trang này giúp bạn tìm hiểu quy trình thi công, cách chọn nhà thầu và đăng ký nhận tư vấn, để khi cần, ALN giới thiệu đúng đơn vị thi công đối tác phù hợp với công trình của bạn.</p>
+      <div class="tc-hero-cta">
+        <a href="lead-form.html" class="btn btn-gold"><i class="ph-duotone ph-clipboard-text"></i>Đăng ký nhận tư vấn</a>
+        <a href="blog/index.html" class="btn btn-outline"><i class="ph-duotone ph-book-open-text"></i>Xem kiến thức thi công</a>
+      </div>
+    </section>
+
+    <div class="tc-disclaimer">
+      <strong>Lưu ý về định vị:</strong> ALN đóng vai trò <strong>kết nối / giới thiệu</strong> chủ nhà với các đơn vị thi công đối tác đã đăng ký trên hệ thống — <strong>ALN không trực tiếp thi công</strong>, không cam kết tiến độ hay chất lượng thi công thay cho đơn vị đối tác, và không niêm yết bảng giá thi công cố định (chi phí phụ thuộc hồ sơ, khối lượng và thỏa thuận riêng từng công trình).
+    </div>
+  </div>
+
+  <div class="tc-section">
+    <div class="wrap">
+      <div class="tc-section-head">
+        <h2>Vì sao nên <span>đăng ký nhận tư vấn</span> sớm</h2>
+        <p>Không ràng buộc, không thu phí — chỉ giúp bạn có thông tin đúng lúc cần.</p>
+      </div>
+      <div class="tc-grid3">
+        <div class="tc-card">
+          <i class="ph-duotone ph-magnifying-glass"></i>
+          <h3>Tìm hiểu trước khi cần gấp</h3>
+          <p>Nhiều chủ nhà chỉ tìm đơn vị thi công khi bản vẽ đã xong và cần gấp — dễ chọn vội. Tìm hiểu quy trình và tiêu chí chọn nhà thầu từ sớm giúp bạn chủ động hơn.</p>
+        </div>
+        <div class="tc-card">
+          <i class="ph-duotone ph-list-checks"></i>
+          <h3>Thông tin minh bạch</h3>
+          <p>Cẩm nang thi công của ALN được viết theo hướng giáo dục: quy trình, tiêu chí chọn nhà thầu, cách đọc báo giá — không PR quá mức, không cam kết mập mờ.</p>
+        </div>
+        <div class="tc-card">
+          <i class="ph-duotone ph-handshake"></i>
+          <h3>Được giới thiệu đúng lúc</h3>
+          <p>Khi mạng lưới đơn vị thi công đối tác tại khu vực của bạn sẵn sàng, ALN liên hệ giới thiệu — không phải mua bán ngay, chỉ là kết nối đúng nhu cầu.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tc-section" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div class="wrap">
+      <div class="tc-section-head">
+        <h2>Cách ALN <span>kết nối</span> hoạt động</h2>
+        <p>4 bước đơn giản, không có bước nào yêu cầu bạn thanh toán trước cho ALN.</p>
+      </div>
+      <div class="tc-steps">
+        <div class="tc-step">
+          <div class="tc-step-num">01</div>
+          <h3>Đăng ký nhận tư vấn</h3>
+          <p>Điền thông tin cơ bản: khu vực, loại công trình, giai đoạn hiện tại (đã có bản vẽ hay chưa).</p>
+        </div>
+        <div class="tc-step">
+          <div class="tc-step-num">02</div>
+          <h3>ALN ghi nhận nhu cầu</h3>
+          <p>Đội ngũ ALN xem xét thông tin bạn cung cấp để hiểu đúng nhu cầu và khu vực công trình.</p>
+        </div>
+        <div class="tc-step">
+          <div class="tc-step-num">03</div>
+          <h3>Giới thiệu đơn vị phù hợp</h3>
+          <p>Khi có đơn vị thi công đối tác phù hợp trong khu vực, ALN chủ động liên hệ giới thiệu để bạn tự trao đổi trực tiếp.</p>
+        </div>
+        <div class="tc-step">
+          <div class="tc-step-num">04</div>
+          <h3>Bạn tự quyết định</h3>
+          <p>Việc ký hợp đồng thi công là thỏa thuận trực tiếp giữa bạn và đơn vị đối tác — ALN không đứng ra ký thay hay thu phí trung gian.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tc-section tc-blog-teaser">
+    <div class="wrap">
+      <div class="tc-section-head">
+        <h2>Kiến thức <span>thi công</span> nên đọc trước</h2>
+        <p>3 bài viết giúp bạn hiểu quy trình, cách chọn nhà thầu và cách đọc báo giá minh bạch.</p>
+      </div>
+      <div class="tc-blog-grid">
+        <a class="tc-blog-card" href="blog/quy-trinh-thi-cong-nha-o/">
+          <span class="tag-gold">Quy trình</span>
+          <h4>Quy trình thi công nhà ở gồm những bước nào?</h4>
+          <p>Tổng quan các giai đoạn thi công từ chuẩn bị mặt bằng đến bàn giao, để bạn biết mình đang ở đâu trong tiến độ.</p>
+        </a>
+        <a class="tc-blog-card" href="blog/cach-chon-nha-thau-thi-cong-uy-tin/">
+          <span class="tag-gold">Chọn nhà thầu</span>
+          <h4>Cách chọn nhà thầu thi công uy tín: 7 tiêu chí cần kiểm tra</h4>
+          <p>7 tiêu chí kiểm tra trước khi ký hợp đồng thi công, áp dụng được dù bạn đã có bản vẽ hay chưa.</p>
+        </a>
+        <a class="tc-blog-card" href="blog/minh-bach-chi-phi-thi-cong/">
+          <span class="tag-gold">Chi phí</span>
+          <h4>Minh bạch chi phí thi công: cách đọc báo giá tránh phát sinh</h4>
+          <p>Cách đọc hiểu một bảng báo giá thi công đúng chuẩn, nhận diện dấu hiệu báo giá mập mờ dễ phát sinh.</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="cn-cta-end">
+      <h2>Đăng ký nhận tư vấn — miễn phí, không ràng buộc</h2>
+      <p>Để lại thông tin, ALN sẽ liên hệ khi có đơn vị thi công đối tác phù hợp với khu vực và nhu cầu của bạn.</p>
+      <div class="cn-cta-btns">
+        <a class="btn btn-gold" href="lead-form.html"><i class="ph-duotone ph-clipboard-text"></i>Đăng ký nhận tư vấn</a>
+        <a class="btn btn-on-navy" href="https://applamnha.vn/ncc-showcase.html"><i class="ph-duotone ph-storefront"></i>Xem Mạng lưới Thiết bị - Vật tư ALN</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="cn-brand"><div class="cn-logo"><img src="../icon-192.png" alt="ALN"></div><div class="cn-name" style="font-size:15px">ALN</div></div>
+        <p>ALN là Tổng thầu Thiết kế, kết nối chủ nhà với Kiến trúc sư và đơn vị thi công đối tác đã đăng ký. ALN không trực tiếp thi công. Thanh toán theo Quy trình 4 bước đảm bảo, minh bạch từng chặng.</p>
+      </div>
+      <div class="foot-col">
+        <h5>Thi công ALN</h5>
+        <a href="index.html">Trang giới thiệu</a>
+        <a href="blog/index.html">Kiến thức thi công</a>
+        <a href="lead-form.html">Đăng ký nhận tư vấn</a>
+      </div>
+      <div class="foot-col">
+        <h5>Hệ sinh thái ALN</h5>
+        <a href="https://applamnha.vn/">Trang chủ ALN</a>
+        <a href="https://applamnha.vn/cam-nang/">Cẩm nang làm nhà</a>
+        <a href="https://applamnha.vn/ncc-showcase.html">Mạng lưới Thiết bị - Vật tư</a>
+      </div>
+      <div class="foot-col">
+        <h5>Liên hệ</h5>
+        <a href="tel:0909829696"><i class="ph-duotone ph-phone" style="margin-right:6px;color:var(--gold)"></i>0909 82 9696</a>
+        <a href="https://applamnha.vn" target="_blank" rel="noopener"><i class="ph-duotone ph-globe" style="margin-right:6px;color:var(--gold)"></i>applamnha.vn</a>
+        <p><i class="ph-duotone ph-map-pin" style="margin-right:6px;color:var(--gold)"></i>TP. Hồ Chí Minh</p>
+      </div>
+    </div>
+    <div class="foot-bottom">© ALN — App Làm Nhà Corp. · applamnha.vn</div>
+  </div>
+</footer>
+
+</body>
+</html>
