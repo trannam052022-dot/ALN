@@ -258,16 +258,12 @@ Diễn đàn không chỉ là nơi hỏi đáp — đúng vai trò là **trang m
 - `founderAwardBricks` (onCall, chỉ FOUNDER_UID) — trao/thu tay, trần ±1000 Gạch/lần, bắt buộc `reason`.
 
 **Còn tồn đọng (chưa làm):**
-1. **UI hiển thị** — chưa có màn "Gạch của tôi" / bảng xếp hạng ở bất kỳ dashboard nào (client_CN, kts_dashboard, founder_panel...). Mới có backend tích lũy âm thầm.
-2. **Cấp bậc "Nền Móng → Khung Nhà → Mái Ấm → Biệt Thự → Dinh Thự"** theo tổng Gạch — chưa định nghĩa ngưỡng, chưa hiển thị.
+1. ~~UI hiển thị~~ — đã làm 21/07/2026: card "Gạch của tôi" ở sidebar `client_CN.html` VÀ `kts_dashboard.html` (Founder chọn làm cả 2 cùng lúc), hiện tên cấp bậc + thanh tiến độ + Kim Cương (nếu >0), cập nhật realtime qua `onSnapshot users/{uid}`. Hàm dùng chung `renderAlnBricksCard()` (định nghĩa riêng từng file, cùng logic). **Còn thiếu:** `founder_panel.html` (xem số Gạch/Kim Cương của mọi người, bảng xếp hạng) và `designer_dashboard.html`/`ncc-dashboard.html` (Designer/NCC cũng có sự kiện sinh Gạch nhưng chưa có UI).
+2. ~~Cấp bậc~~ — đã chốt 21/07/2026: **Nền Móng (0) → Khung Nhà (50) → Mái Ấm (150) → Biệt Thự (400) → Dinh Thự (1000)** Gạch, đề xuất của Claude dựa theo tốc độ tích Gạch từ các sự kiện đã code (`BRICK_AMOUNTS` trong `functions/bricks.js`) — đã đưa vào mảng `ALN_TIERS` (client-side, lặp lại ở cả 2 file, chưa refactor thành 1 nguồn chung).
 3. **Chuyên mục diễn đàn "Tổ ấm & Nhà đẹp"** + thử thách tuần + chương trình "Đại sứ ALN khu phố" — mới là ý tưởng, chưa có category/cơ chế thật.
 4. **Thể lệ chi trả Kim Cương ra tiền thật** — mức quy đổi, ngưỡng rút, form nhập tài khoản ngân hàng, khấu trừ thuế TNCN, màn duyệt chi cho Founder — hoàn toàn CHƯA làm, mới dừng ở trao Kim Cương + thông báo.
 5. Nhiệm vụ "đi chợ giùm" (chụp giá vật liệu) và "nhật ký xây nhà" — chưa có form nộp + hàng chờ duyệt trong `founder_panel.html`/`founder_forum.html`.
-6. ~~Chưa deploy~~ — đã deploy thành công 21/07/2026 (`functions:bricksOnUserCreated,functions:bricksOnStageAdvanced,functions:bricksOnFirstPayment,functions:founderAwardBricks`). Backend đang chạy thật, chỉ chưa có UI hiển thị (mục 1).
-
-**Câu hỏi đang chờ Founder trả lời (hỏi cuối phiên 21/07/2026, chưa có câu trả lời) — hỏi lại đầu phiên sau:**
-- Hiển thị "Gạch của tôi" ở dashboard nào trước: `client_CN.html`, `kts_dashboard.html`, hay cả 2 cùng lúc?
-- Ngưỡng Gạch cho mỗi cấp bậc Nền Móng → Khung Nhà → Mái Ấm → Biệt Thự → Dinh Thự là bao nhiêu (chưa có con số, cần Founder chốt hoặc để Claude đề xuất thang điểm mẫu)?
+6. ~~Chưa deploy~~ — đã deploy thành công 21/07/2026 (`functions:bricksOnUserCreated,functions:bricksOnStageAdvanced,functions:bricksOnFirstPayment,functions:founderAwardBricks`). Backend + UI (client_CN, kts_dashboard) đang chạy thật.
 
 ## MyMy Marketing (module Founder-only: đăng Buffer + báo cáo GA4) — thêm 20/07/2026
 
