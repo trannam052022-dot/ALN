@@ -381,6 +381,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 var currentStep = 1;
 var generatedUsername = '';
 
+/* Pre-chọn danh mục khi tới từ link có ?cat= (vd tho-thi-cong.html →
+   ncc-apply.html?cat=dv_thicong) — đỡ 1 bước, tránh người xem bấm nhầm
+   danh mục khác vì không tìm thấy mục của mình ngay. */
+(function preselectCategory(){
+  try {
+    var cat = new URLSearchParams(location.search).get('cat') || '';
+    if (!/^[a-z_]+$/.test(cat)) return;
+    var sel = document.getElementById('f_category');
+    var ok = sel && Array.prototype.some.call(sel.options, function(o){ return o.value === cat; });
+    if (ok) sel.value = cat;
+  } catch(e){}
+})();
+
 function setStep(n) {
   for (var i = 1; i <= 3; i++) {
     var c = document.getElementById('step' + i);
