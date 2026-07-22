@@ -154,6 +154,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     </div>
     <button class="btn-main" id="btnClaim" onclick="doClaim()">Nhận Gạch ngay</button>
     <div class="msg" id="claimMsg"></div>
+    <div id="forgetCtvWrap" style="display:none;margin-top:8px;text-align:right">
+      <a href="javascript:void(0)" onclick="forgetCtv()" style="font-size:var(--text-xs);color:var(--muted)">Không phải bạn? Quên thông tin trên máy này</a>
+    </div>
   </div>
 
   <div class="card" id="refCard" style="display:none">
@@ -247,18 +250,30 @@ function renderAlnBricksCard(bricks, diamonds){
 }
 
 var doneTasks = {};
+var linkOpened = {};
+
+function markLinkOpened(id){
+  if (linkOpened[id]) return;
+  linkOpened[id] = true;
+  renderTasks();
+}
 
 function renderTasks(){
   var el = document.getElementById('taskList');
-  el.innerHTML = TASKS.map(function(t){
+  /* Nhiệm vụ "Chia sẻ" chỉ có link giới thiệu thật SAU khi đã nhận Gạch lần đầu — chưa hiện trước đó */
+  var visible = TASKS.filter(function(t){ return t.url || _myPhone || doneTasks[t.id]; });
+  el.innerHTML = visible.map(function(t){
     var isDone = !!doneTasks[t.id];
-    var link = t.url ? '<a class="task-link" href="' + t.url + '" target="_blank" rel="noopener"><i class="ph-duotone ph-arrow-square-out"></i> Mở link</a>' : '';
+    var opened = isDone || !!linkOpened[t.id];
+    var link = t.url ? '<a class="task-link" href="' + t.url + '" target="_blank" rel="noopener" onclick="markLinkOpened(\'' + t.id + '\')"><i class="ph-duotone ph-arrow-square-out"></i> Mở link</a>' : '';
+    var lockedNote = (!t.url && !isDone && !opened) ? '<div class="task-desc" style="color:var(--muted)">Bấm "Sao chép" ở link giới thiệu bên dưới để mở khoá nhiệm vụ này.</div>' : '';
+    var chkAttr = isDone ? 'checked disabled' : (opened ? 'checked' : 'disabled');
     return '<div class="task' + (isDone ? ' done' : '') + '">' +
-      '<input type="checkbox" class="task-check" id="chk_' + t.id + '" ' + (isDone ? 'checked disabled' : '') + '>' +
+      '<input type="checkbox" class="task-check" id="chk_' + t.id + '" ' + chkAttr + '>' +
       '<div class="task-body">' +
         '<div class="task-title">' + t.title + (isDone ? ' <i class="ph-duotone ph-check-circle" style="color:var(--green)"></i>' : '') + '</div>' +
         '<div class="task-desc">' + t.desc + '</div>' +
-        link +
+        link + lockedNote +
       '</div>' +
       '<div class="task-pts">+' + t.pts + ' Gạch</div>' +
     '</div>';
@@ -287,6 +302,7 @@ function copyRefLink(){
   if (!window._refUrl) return;
   navigator.clipboard.writeText(window._refUrl).then(function(){
     showMsg('claimMsg', '✓ Đã sao chép link giới thiệu', true);
+    markLinkOpened('share_link');
   }).catch(function(){});
 }
 
@@ -303,8 +319,9 @@ async function doLookup(){
       renderAlnBricksCard(data.alnBricks, data.alnDiamonds);
       doneTasks = {};
       (data.tasksDone || []).forEach(function(t){ doneTasks[t] = true; });
-      renderTasks();
       setRefLink(phone);
+      renderTasks();
+      rememberCtv(phone, '');
       showMsg('lookupMsg', '✓ Chào mừng trở lại!', true);
     }
   } catch(e) {
@@ -331,8 +348,9 @@ async function doClaim(){
     renderAlnBricksCard(data.alnBricks, data.alnDiamonds);
     doneTasks = {};
     (data.tasksDone || []).forEach(function(t){ doneTasks[t] = true; });
-    renderTasks();
     setRefLink(phone);
+    renderTasks();
+    rememberCtv(phone, name);
     if (data.newlyAwarded > 0) {
       showMsg('claimMsg', '✓ Nhận được +' + data.newlyAwarded + ' Gạch! Cảm ơn bạn.', true);
     } else {
@@ -344,15 +362,47 @@ async function doClaim(){
   btn.disabled = false; btn.textContent = 'Nhận Gạch ngay';
 }
 
+/* Nhớ SĐT (+tên nếu có) trên trình duyệt này để lần sau khỏi nhập lại */
+var CTV_REMEMBER_KEY = 'aln_ctv_player';
+function rememberCtv(phone, name){
+  try {
+    var cur = {};
+    try { cur = JSON.parse(localStorage.getItem(CTV_REMEMBER_KEY)) || {}; } catch(e){}
+    localStorage.setItem(CTV_REMEMBER_KEY, JSON.stringify({ phone: phone, name: name || cur.name || '' }));
+  } catch(e){}
+  document.getElementById('forgetCtvWrap').style.display = 'block';
+}
+function getRememberedCtv(){
+  try { return JSON.parse(localStorage.getItem(CTV_REMEMBER_KEY)) || null; } catch(e){ return null; }
+}
+function forgetCtv(){
+  try { localStorage.removeItem(CTV_REMEMBER_KEY); } catch(e){}
+  document.getElementById('claimName').value = '';
+  document.getElementById('claimPhone').value = '';
+  document.getElementById('forgetCtvWrap').style.display = 'none';
+  showMsg('claimMsg', 'Đã quên thông tin trên máy này.', true);
+}
+
 renderTasks();
 
-/* Đọc ?p= trên URL để tự tra Gạch (vd link Founder gửi lại cho người chơi) */
-(function(){
+/* Đọc ?p= trên URL để tự tra Gạch (vd link Founder gửi lại cho người chơi); nếu không có thì
+   dùng thông tin đã nhớ trên trình duyệt này (nếu có) để tự điền + tự tra luôn.
+   Chạy sau khi window.ctvGetProfile sẵn sàng (gán ở <script type="module"> bên dưới, xem autoLookupCtv). */
+function autoLookupCtv(){
   try {
     var p = new URLSearchParams(location.search).get('p');
-    if (p) { document.getElementById('lookupPhone').value = p; showLookup(); doLookup(); }
+    var remembered = getRememberedCtv();
+    if (p) {
+      document.getElementById('lookupPhone').value = p; showLookup(); doLookup();
+    } else if (remembered && remembered.phone) {
+      document.getElementById('claimPhone').value = remembered.phone;
+      document.getElementById('claimName').value = remembered.name || '';
+      document.getElementById('lookupPhone').value = remembered.phone;
+      document.getElementById('forgetCtvWrap').style.display = 'block';
+      showLookup(); doLookup();
+    }
   } catch(e){}
-})();
+}
 </script>
 
 <script type="module">
@@ -363,6 +413,7 @@ import { app } from './firebase-config.js';
   var fns = mod.getFunctions(app, 'asia-southeast1');
   window.ctvGetProfile = async function(data){ var r = await mod.httpsCallable(fns, 'ctvGetProfile')(data); return r.data; };
   window.ctvClaimTasks = async function(data){ var r = await mod.httpsCallable(fns, 'ctvClaimTasks')(data); return r.data; };
+  if (window.autoLookupCtv) window.autoLookupCtv();
 })();
 </script>
 </body>
