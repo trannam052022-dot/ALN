@@ -2383,6 +2383,11 @@ exports.submitDuToanLead = require("./duToanLeads").submitDuToanLead;
    Phase 3): CTA form ghi lead server-side, xem functions/localLeads.js. ── */
 exports.submitLocalLead = require("./localLeads").submitLocalLead;
 
+/* ── Subdomain SEO "Thi công" (thicong/lead-form.html, bản nháp chưa duyệt
+   DNS/push — LỆNH_CODE_SEO_THICONG.md): form đăng ký nhận tư vấn ghi lead
+   server-side, xem functions/thicongLead.js. ── */
+exports.submitThicongLead = require("./thicongLead").submitThicongLead;
+
 /* ── Bảng liên hệ hợp nhất (contacts/, ALN_SPEC_BANG_LIEN_HE_HOP_NHAT.md):
    gộp SĐT từ nhập tay + KTS ứng tuyển + diễn đàn, lọc trùng xuyên nguồn.
    upsertContact public onCall (không đòi auth) vì MyMy trên index.html gọi

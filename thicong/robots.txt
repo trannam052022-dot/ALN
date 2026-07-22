@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://thicong.applamnha.vn/sitemap.xml
+Sitemap: https://applamnha.vn/thicong/sitemap.xml

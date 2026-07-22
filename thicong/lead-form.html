@@ -7,9 +7,9 @@
 <title>Đăng ký nhận tư vấn thi công — ALN</title>
 <meta name="description" content="Đăng ký nhận tư vấn thi công từ ALN — miễn phí, không ràng buộc. ALN kết nối bạn với đơn vị thi công đối tác phù hợp khu vực và loại công trình.">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://thicong.applamnha.vn/lead-form.html">
+<link rel="canonical" href="https://applamnha.vn/thicong/lead-form.html">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://thicong.applamnha.vn/lead-form.html">
+<meta property="og:url" content="https://applamnha.vn/thicong/lead-form.html">
 <meta property="og:title" content="Đăng ký nhận tư vấn thi công — ALN">
 <meta property="og:description" content="Đăng ký nhận tư vấn thi công từ ALN — miễn phí, không ràng buộc.">
 <meta property="og:image" content="https://applamnha.vn/icon-512.png">
@@ -83,7 +83,7 @@
         <div class="tc-field">
           <label for="tcPhone">Số điện thoại / Zalo <span class="req">*</span></label>
           <input type="tel" id="tcPhone" name="phone" autocomplete="tel" required maxlength="15" placeholder="09xxxxxxxx">
-          <div class="tc-error" id="tcPhoneErr">Vui lòng nhập số điện thoại hợp lệ (9–11 số).</div>
+          <div class="tc-error" id="tcPhoneErr">Vui lòng nhập số điện thoại hợp lệ (VD: 0909xxxxxx).</div>
         </div>
         <div class="tc-field">
           <label for="tcProvince">Khu vực công trình <span class="req">*</span></label>
@@ -124,6 +124,7 @@
         </div>
 
         <button type="submit" class="btn btn-gold tc-submit"><i class="ph-duotone ph-paper-plane-tilt"></i>Đăng ký nhận tư vấn</button>
+        <div class="tc-error" id="tcSubmitErr">Có lỗi khi gửi, vui lòng thử lại hoặc gọi 0909 82 9696.</div>
 
         <div class="tc-note">
           Bằng việc gửi form, bạn đồng ý để ALN liên hệ tư vấn qua số điện thoại/Zalo đã cung cấp. ALN không chia sẻ thông tin liên hệ của bạn công khai hoặc cho bên thứ ba ngoài mục đích giới thiệu đơn vị thi công đối tác phù hợp.
@@ -145,35 +146,71 @@
   </div>
 </footer>
 
-<script>
-/* Bản v1 (draft, chưa duyệt DNS): form chỉ xử lý phía client, CHƯA nối
-   backend lưu lead thật — theo đúng yêu cầu "không cần Firebase cho
-   giai đoạn này". Trước khi trang này thật sự nhận lead, cần bổ sung
-   nơi lưu trữ (vd collection Firestore riêng ghi qua Cloud Function
-   ẩn danh, theo đúng mẫu nccLeads/ctvGame đã có trong hệ thống) —
-   nếu không, dữ liệu người dùng nhập sẽ không được lưu lại ở đâu cả. */
-document.getElementById('tcLeadForm').addEventListener('submit', function(e){
+<script type="module">
+/* Ghi lead qua Cloud Function submitThicongLead (functions/thicongLead.js) —
+   KHÔNG addDoc thẳng vào Firestore: collection 'leads' có allow write: if
+   false trong firestore.rules (chỉ Admin SDK được ghi), giống hệt pattern
+   submitLocalLead đang dùng ở thiet-ke-nha/*.html. */
+import { app } from '../firebase-config.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+
+const functions = getFunctions(app, 'asia-southeast1');
+const callSubmitThicongLead = httpsCallable(functions, 'submitThicongLead', { timeout: 20000 });
+
+function getUtmFromUrl() {
+  var p = new URLSearchParams(location.search);
+  var utm = {};
+  ['source', 'medium', 'campaign', 'content', 'term'].forEach(function(k){
+    var v = p.get('utm_' + k);
+    if (v) utm[k] = v;
+  });
+  return utm;
+}
+function getCookie(name) {
+  var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return m ? decodeURIComponent(m[1]) : '';
+}
+function getFbc() {
+  var c = getCookie('_fbc');
+  if (c) return c;
+  var fbclid = new URLSearchParams(location.search).get('fbclid');
+  return fbclid ? 'fb.1.' + Date.now() + '.' + fbclid : '';
+}
+
+var form = document.getElementById('tcLeadForm');
+form.addEventListener('submit', async function(e){
   e.preventDefault();
   var phone = document.getElementById('tcPhone').value.trim();
   var phoneErr = document.getElementById('tcPhoneErr');
-  var phoneOk = /^[0-9]{9,11}$/.test(phone.replace(/[\s.-]/g, ''));
+  var phoneOk = /^0\d{8,10}$/.test(phone.replace(/[\s.\-()]/g, ''));
   phoneErr.style.display = phoneOk ? 'none' : 'block';
-  if (!this.checkValidity() || !phoneOk) {
-    this.reportValidity();
+  if (!form.checkValidity() || !phoneOk) {
+    form.reportValidity();
     return;
   }
-  var payload = {
-    name: document.getElementById('tcName').value.trim(),
-    phone: phone,
-    province: document.getElementById('tcProvince').value,
-    buildType: document.getElementById('tcType').value,
-    designStage: document.getElementById('tcStage').value,
-    source: 'thicong-lead-form',
-    ts: new Date().toISOString()
-  };
-  console.log('[ALN thicong] lead form submitted (chưa có backend lưu trữ):', payload);
-  document.getElementById('tcLeadForm').style.display = 'none';
-  document.getElementById('tcThanks').style.display = 'block';
+  var btn = form.querySelector('.tc-submit');
+  var submitErr = document.getElementById('tcSubmitErr');
+  submitErr.style.display = 'none';
+  btn.disabled = true;
+  try {
+    await callSubmitThicongLead({
+      name: document.getElementById('tcName').value.trim(),
+      phone: phone,
+      area: document.getElementById('tcProvince').value,
+      projectType: document.getElementById('tcType').value,
+      designStage: document.getElementById('tcStage').value,
+      utm: getUtmFromUrl(),
+      sourceUrl: location.href,
+      fbp: getCookie('_fbp'),
+      fbc: getFbc(),
+    });
+    form.style.display = 'none';
+    document.getElementById('tcThanks').style.display = 'block';
+  } catch (err) {
+    console.error('[submitThicongLead]', err);
+    submitErr.style.display = 'block';
+    btn.disabled = false;
+  }
 });
 </script>
 
