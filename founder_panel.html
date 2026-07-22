@@ -4146,7 +4146,7 @@ function _loadKtvUsers() {
 
 /* ── GIAN HÀNG NCC — hạng (tier) + xác minh ĐKKD chỉ Founder gán được ── */
 var _mgNccData = null;
-var CAT_LABEL_NCC_MG = {sat_thep_vlxd:'Sắt thép, Gạch, VLXD', go_noithat:'Gỗ, nội thất', son_hoanthien:'Sơn, hoàn thiện', dien_nuoc:'Điện, nước', dv_thicong:'Thợ - Đội thi công', thietbi_vanchuyen:'Thiết bị & vận chuyển', thang_may:'Thang máy', khac:'Khác'};
+var CAT_LABEL_NCC_MG = {go_noithat:'Gỗ, nội thất', thang_may:'Thang máy', dien_nuoc:'Điện, nước', son_hoanthien:'Sơn, hoàn thiện', thietbi_vanchuyen:'Thiết bị & vận chuyển', sat_thep_vlxd:'Sắt thép, Gạch, VLXD', dv_thicong:'Thợ - Đội thi công', khac:'Khác'};
 var PROV_NAME_NCC_MG = {HCM:'TP. HCM',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'Vũng Tàu',LA:'Long An',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TH:'Thanh Hóa',TG:'Tiền Giang',OTHER:'Tỉnh khác'};
 function renderMgNcc() {
   if(window._mgNccData) _mgNccData = window._mgNccData;
@@ -4484,7 +4484,7 @@ function renderPending(){
     }
     if(u.role === 'ncc'){
       var PROV_NAME_NCC = {HCM:'TP. HCM',HN:'Hà Nội',DN:'Đà Nẵng',CT:'Cần Thơ',HP:'Hải Phòng',BD:'Bình Dương',DNai:'Đồng Nai','BR-VT':'Vũng Tàu',LA:'Long An',KH:'Khánh Hòa',BDinh:'Bình Định',NA:'Nghệ An',TH:'Thanh Hóa',TG:'Tiền Giang',OTHER:'Tỉnh khác'};
-      var CAT_LABEL_NCC = {sat_thep_vlxd:'Sắt thép, Gạch, VLXD', go_noithat:'Gỗ, xưởng nội thất', son_hoanthien:'Sơn, hoàn thiện', dien_nuoc:'Điện, nước', dv_thicong:'Thợ - Đội thi công', thietbi_vanchuyen:'Thiết bị & vận chuyển', thang_may:'Thang máy', khac:'Khác'};
+      var CAT_LABEL_NCC = {go_noithat:'Gỗ, xưởng nội thất', thang_may:'Thang máy', dien_nuoc:'Điện, nước', son_hoanthien:'Sơn, hoàn thiện', thietbi_vanchuyen:'Thiết bị & vận chuyển', sat_thep_vlxd:'Sắt thép, Gạch, VLXD', dv_thicong:'Thợ - Đội thi công', khac:'Khác'};
       details = '<div style="padding:14px 20px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--border)">'
         +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
           +'<div style="background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px">'

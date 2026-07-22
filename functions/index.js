@@ -116,10 +116,10 @@ exports.onNccApply = functions
   .onCreate(async (snap) => {
     const d = snap.data() || {};
     const CAT_LABEL = {
-      sat_thep_vlxd: "Sắt thép, Gạch, VLXD", go_noithat: "Gỗ, xưởng nội thất",
-      son_hoanthien: "Sơn, hoàn thiện", dien_nuoc: "Điện, nước",
-      dv_thicong: "Thợ - Đội thi công", thietbi_vanchuyen: "Thiết bị & vận chuyển",
-      thang_may: "Thang máy", khac: "Khác",
+      go_noithat: "Gỗ, xưởng nội thất", thang_may: "Thang máy",
+      dien_nuoc: "Điện, nước", son_hoanthien: "Sơn, hoàn thiện",
+      thietbi_vanchuyen: "Thiết bị & vận chuyển", sat_thep_vlxd: "Sắt thép, Gạch, VLXD",
+      dv_thicong: "Thợ - Đội thi công", khac: "Khác",
     };
     const detail = [d.province, CAT_LABEL[d.category] || d.category].filter(Boolean).join(" · ");
 
