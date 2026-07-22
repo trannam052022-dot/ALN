@@ -158,6 +158,47 @@ function escH(s){
   return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 window.escH = escH;
+
+/* Gạch & Kim Cương ALN — thang cấp bậc dùng chung (xem CLAUDE.md mục "Gạch & Kim Cương") */
+var ALN_TIERS = [
+  { min: 0,    name: 'Nền Móng',  icon: '🧱' },
+  { min: 50,   name: 'Khung Nhà', icon: '🏗️' },
+  { min: 150,  name: 'Mái Ấm',    icon: '🏠' },
+  { min: 400,  name: 'Biệt Thự',  icon: '🏡' },
+  { min: 1000, name: 'Dinh Thự',  icon: '🏰' },
+];
+function renderAlnBricksCard(bricks, diamonds){
+  bricks = Number(bricks) || 0;
+  diamonds = Number(diamonds) || 0;
+  var idx = 0;
+  for (var i = 0; i < ALN_TIERS.length; i++) { if (bricks >= ALN_TIERS[i].min) idx = i; }
+  var cur = ALN_TIERS[idx];
+  var next = ALN_TIERS[idx + 1];
+  var iconEl = document.getElementById('alnTierIcon');
+  var nameEl = document.getElementById('alnTierName');
+  var countEl = document.getElementById('alnBricksCount');
+  var barEl = document.getElementById('alnTierBar');
+  var nextEl = document.getElementById('alnTierNext');
+  var dWrap = document.getElementById('alnDiamondsWrap');
+  var dCount = document.getElementById('alnDiamondsCount');
+  if (iconEl) iconEl.textContent = cur.icon;
+  if (nameEl) nameEl.textContent = cur.name;
+  if (countEl) countEl.textContent = bricks.toLocaleString('vi-VN');
+  if (next) {
+    var pct = Math.min(100, Math.round(((bricks - cur.min) / (next.min - cur.min)) * 100));
+    if (barEl) barEl.style.width = pct + '%';
+    if (nextEl) nextEl.textContent = 'Còn ' + (next.min - bricks).toLocaleString('vi-VN') + ' Gạch tới hạng ' + next.name;
+  } else {
+    if (barEl) barEl.style.width = '100%';
+    if (nextEl) nextEl.textContent = 'Hạng cao nhất — Dinh Thự 🏰';
+  }
+  if (dWrap && dCount) {
+    dCount.textContent = diamonds.toLocaleString('vi-VN');
+    dWrap.style.display = diamonds > 0 ? 'flex' : 'none';
+  }
+}
+window.renderAlnBricksCard = renderAlnBricksCard;
+
 function copyRefLink(){
   var el = document.getElementById('fRefLink');
   if(!el) return;
@@ -176,7 +217,7 @@ window.copyRefLink = copyRefLink;
 <script type="module">
 import {
   auth, db, onAuthStateChanged, signOut, doc, getDoc, updateDoc, serverTimestamp,
-  storage, storageRef, uploadBytes, getDownloadURL
+  storage, storageRef, uploadBytes, getDownloadURL, onSnapshot
 } from './firebase-config.js';
 
 const MAX_IMAGES = 12;
@@ -188,6 +229,7 @@ const MAX_PRODUCTS = 60;
 
 let UID = null;
 let DATA = null;          // bản nháp đang chỉnh (gallery/intro/pdf/priceList...)
+let USER_PROFILE = null;  // users/{uid} — alnBricks/alnDiamonds sống ở đây, không phải nccApplications
 let dirty = false;
 let pendingProductIdx = null;
 
@@ -458,6 +500,27 @@ function render(){
       + progressHtml
     + '</div>'
 
+    + '<div class="card" id="alnBricksCard">'
+      + '<div class="card-title"><i class="ph-duotone ph-trophy"></i>Gạch &amp; Kim Cương ALN</div>'
+      + '<div class="hint">Tích Gạch khi có khách đăng ký qua link giới thiệu, hoàn thiện gian hàng và các mốc khác — đổi được ưu đãi hiển thị trong ALN.</div>'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0 6px">'
+        + '<div style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:6px">'
+          + '<span id="alnTierIcon">🧱</span> <span id="alnTierName">Nền Móng</span>'
+        + '</div>'
+        + '<div id="alnDiamondsWrap" style="display:none;font-size:12px;font-weight:700;color:#0891b2;align-items:center;gap:4px">'
+          + '<i class="ph-duotone ph-diamond"></i> <span id="alnDiamondsCount">0</span>'
+        + '</div>'
+      + '</div>'
+      + '<div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px">'
+        + '<span id="alnBricksCount" style="font-size:22px;font-weight:700;color:var(--text)">0</span>'
+        + '<span style="font-size:11px;color:var(--muted)">Gạch</span>'
+      + '</div>'
+      + '<div style="height:6px;border-radius:99px;background:var(--bg2);overflow:hidden">'
+        + '<div id="alnTierBar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--gold),#d4a017);border-radius:99px;transition:width .4s"></div>'
+      + '</div>'
+      + '<div id="alnTierNext" style="font-size:11px;color:var(--muted);margin-top:6px">Cần thêm Gạch để lên hạng tiếp theo</div>'
+    + '</div>'
+
     + '<div class="card">'
       + '<div class="card-title"><i class="ph-duotone ph-users-three"></i>Giới thiệu khách hàng</div>'
       + '<div class="hint">Gặp khách đang xây nhà chưa có bản vẽ thiết kế? Gửi link này — mỗi khách đăng ký qua link của bạn được tính vào chương trình ưu tiên hiển thị gian hàng (chi tiết Founder sẽ thông báo riêng).</div>'
@@ -536,6 +599,8 @@ function render(){
   document.getElementById('prodImgInput').addEventListener('change', onPickProductImg);
   const pdfIn = document.getElementById('pdfInput');
   if(pdfIn) pdfIn.addEventListener('change', onPickPdf);
+
+  if (window.renderAlnBricksCard) window.renderAlnBricksCard(USER_PROFILE && USER_PROFILE.alnBricks, USER_PROFILE && USER_PROFILE.alnDiamonds);
 }
 
 async function onPickImages(ev){
@@ -677,7 +742,11 @@ onAuthStateChanged(auth, async function(user){
       return;
     }
     DATA = aSnap.data();
+    USER_PROFILE = uSnap.exists() ? uSnap.data() : {};
     render();
+    onSnapshot(doc(db, 'users', UID), function(u2){
+      if(u2.exists() && window.renderAlnBricksCard) window.renderAlnBricksCard(u2.data().alnBricks, u2.data().alnDiamonds);
+    });
   } catch(e){
     console.error(e);
     document.getElementById('content').innerHTML =
