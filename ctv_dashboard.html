@@ -183,19 +183,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div id="taskList"></div>
   </div>
 
-  <div class="card" id="wheelCard" style="display:none">
-    <div class="card-title"><i class="ph-duotone ph-spinner-ball"></i> Vòng quay may mắn tuần này</div>
-    <div id="wheelBox">
-      <div class="wheel-pointer"></div>
-      <svg id="wheelSvg" viewBox="0 0 200 200"></svg>
-    </div>
-    <button class="btn-main" id="btnSpin" onclick="doSpin()">Quay ngay!</button>
-    <div id="spinHint"></div>
-    <div class="msg" id="spinMsg"></div>
-  </div>
-
-  <div class="card" id="chipCard" style="display:none">
-    <div class="card-title"><i class="ph-duotone ph-coins"></i> Bốc Chip May Mắn</div>
+  <div class="card" id="chipCard">
+    <div class="card-title"><i class="ph-duotone ph-coins"></i> Bốc Chip May Mắn — mỗi ngày 1 lượt</div>
     <div class="task-desc">Bấm "Bắt đầu", chờ 1 ô chip sáng lên rồi bấm thật nhanh vào đúng ô đó — chip giá trị càng cao càng khó bắt! Lưu ý: từ lần đầu bạn chơi Chip, toàn bộ Gạch của bạn sẽ reset về 0 sau mỗi 90 ngày (mùa Chip mới lại bắt đầu).</div>
     <div id="chipGrid">
       <div class="chip-cell" data-idx="0" onclick="clickChip(0)"><span>1.000đ</span></div>
@@ -208,6 +197,17 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div id="chipHint"></div>
     <div id="chipSeasonNote" style="display:none;font-size:10.5px;color:var(--muted);text-align:center;margin-top:6px"></div>
     <div class="msg" id="chipMsg"></div>
+  </div>
+
+  <div class="card" id="wheelCard" style="display:none">
+    <div class="card-title"><i class="ph-duotone ph-spinner-ball"></i> Vòng quay may mắn tuần này</div>
+    <div id="wheelBox">
+      <div class="wheel-pointer"></div>
+      <svg id="wheelSvg" viewBox="0 0 200 200"></svg>
+    </div>
+    <button class="btn-main" id="btnSpin" onclick="doSpin()">Quay ngay!</button>
+    <div id="spinHint"></div>
+    <div class="msg" id="spinMsg"></div>
   </div>
 
   <div class="card" id="leaderboardCard">
@@ -394,6 +394,7 @@ async function loadWeeklyTask(){
     buildWheel();
     document.getElementById('wheelCard').style.display = 'block';
     updateSpinState(_lastSpinState);
+    updateChipState(_lastChipState);
   } catch(e){}
 }
 
