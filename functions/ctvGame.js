@@ -167,6 +167,7 @@ exports.ctvGetProfile = onCall({ region: REGION, enforceAppCheck: true }, async 
     return {
       exists: false, name: "", alnBricks: 0, alnDiamonds: 0, referralPendingVnd: 0,
       tasksDone: [], tier: tierOf(0), weeklyTask, streak: 0, spin: { eligible: false, used: false },
+      chip: { eligible: false, usedToday: false },
     };
   }
   const d = snap.data() || {};
@@ -185,6 +186,7 @@ exports.ctvGetProfile = onCall({ region: REGION, enforceAppCheck: true }, async 
     weeklyTask,
     streak,
     spin: await spinStateOf(phone, tasksDone, weeklyTask),
+    chip: await chipStateOf(phone),
   };
 });
 
@@ -292,6 +294,7 @@ exports.ctvClaimTasks = onCall({ region: REGION, enforceAppCheck: true }, async 
     streak,
     streakBonus: streakInfo ? streakInfo.bonus : 0,
     spin: await spinStateOf(phone, tasksDone, weeklyTask),
+    chip: await chipStateOf(phone),
   };
 });
 
@@ -349,6 +352,112 @@ exports.ctvSpinWheel = onCall({ region: REGION, enforceAppCheck: true }, async (
     alnDiamonds: ud.alnDiamonds || 0,
     referralPendingVnd: ud.referralPendingVnd || 0,
     tier: tierOf(ud.alnBricks || 0),
+  };
+});
+
+/* ── Bốc Chip May Mắn — trò chơi phản xạ, 1 lượt/ngày, mở khoá vĩnh viễn
+   ngay sau khi đã hoàn thành ≥1 nhiệm vụ bất kỳ (tức đã tồn tại users/{sđt},
+   luôn đúng vì doc chỉ được tạo qua ctvClaimTasks). Giá trị Gạch đúng bằng
+   quy đổi thật 1 Gạch=100đ (xem CLAUDE.md "1000 Gạch→100k"), nhưng trọng số
+   xuất hiện GIẢM DẦN theo giá trị (thay vì giảm số Gạch) để chip vẫn "đúng
+   nghĩa" mà không lạm phát thang tier — chốt cùng Founder 23/07/2026.
+   Timing xác thực SERVER-SIDE: ctvChipStart ghi lại mốc giờ + độ khó (ô nào,
+   trễ bao lâu, cửa sổ bao rộng); ctvChipClick đối chiếu thời điểm gọi thực
+   tế + ô client báo đã bấm với dữ liệu đã chốt — client không tự báo trúng
+   được. */
+const CHIP_PRIZES = [
+  { amount: 10, weight: 55, windowMs: 800, label: "1.000đ" },
+  { amount: 20, weight: 30, windowMs: 600, label: "2.000đ" },
+  { amount: 50, weight: 12, windowMs: 400, label: "5.000đ" },
+  { amount: 100, weight: 3, windowMs: 250, label: "10.000đ" },
+];
+const CHIP_CLICK_GRACE_MS = 150; // bù độ trễ mạng lúc gọi ctvChipClick
+
+function pickChipPrize() {
+  const total = CHIP_PRIZES.reduce((s, p) => s + p.weight, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < CHIP_PRIZES.length; i++) {
+    r -= CHIP_PRIZES[i].weight;
+    if (r < 0) return Object.assign({ idx: i }, CHIP_PRIZES[i]);
+  }
+  return Object.assign({ idx: 0 }, CHIP_PRIZES[0]);
+}
+
+function chipLedgerRef(phone) {
+  const today = vnDateKey();
+  return db.collection("bricksLedger").doc(("ctv_chip_" + today + "_" + phone).replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 900));
+}
+
+async function chipStateOf(phone) {
+  const snap = await chipLedgerRef(phone).get();
+  return { eligible: true, usedToday: snap.exists };
+}
+
+/* Bắt đầu 1 lượt: server chọn sẵn ô + độ trễ + cửa sổ trúng, lưu tạm vào
+   ctvChipRounds/{sđt} — client chỉ nhận đủ dữ liệu để chạy animation, không
+   nhận trước biết mình trúng gì. */
+exports.ctvChipStart = onCall({ region: REGION, enforceAppCheck: true }, async (request) => {
+  const phone = normalizePhone((request.data || {}).phone);
+  if (!phone) throw new HttpsError("invalid-argument", "Số điện thoại chưa hợp lệ");
+  const userSnap = await db.collection("users").doc(phone).get();
+  if (!userSnap.exists) throw new HttpsError("failed-precondition", "Hoàn thành ít nhất 1 nhiệm vụ trước đã rồi mới được chơi Chip nhé!");
+  const { usedToday } = await chipStateOf(phone);
+  if (usedToday) throw new HttpsError("failed-precondition", "Hôm nay bạn chơi Chip rồi — quay lại vào ngày mai nhé!");
+  const prize = pickChipPrize();
+  const delayMs = 2000 + Math.floor(Math.random() * 2000);
+  await db.collection("ctvChipRounds").doc(phone).set({
+    idx: prize.idx, amount: prize.amount, windowMs: prize.windowMs, delayMs,
+    startedAtMs: Date.now(), consumed: false,
+  });
+  return { idx: prize.idx, amount: prize.amount, label: prize.label, delayMs, windowMs: prize.windowMs };
+});
+
+/* Chốt kết quả 1 lượt: hit chỉ khi client bấm ĐÚNG ô server đã chọn VÀ đúng
+   lúc gọi hàm này nằm trong cửa sổ [flashStart, flashEnd] (+ grace mạng). */
+exports.ctvChipClick = onCall({ region: REGION, enforceAppCheck: true }, async (request) => {
+  const phone = normalizePhone((request.data || {}).phone);
+  if (!phone) throw new HttpsError("invalid-argument", "Số điện thoại chưa hợp lệ");
+  const clickedIdx = Number((request.data || {}).idx);
+  const roundRef = db.collection("ctvChipRounds").doc(phone);
+  const roundSnap = await roundRef.get();
+  if (!roundSnap.exists || roundSnap.data().consumed) {
+    throw new HttpsError("failed-precondition", "Chưa có lượt chơi nào đang chờ — bấm Bắt đầu trước nhé!");
+  }
+  const round = roundSnap.data();
+  await roundRef.set({ consumed: true }, { merge: true });
+
+  const now = Date.now();
+  const flashStart = round.startedAtMs + round.delayMs;
+  const flashEnd = flashStart + round.windowMs;
+  const inWindow = now >= (flashStart - CHIP_CLICK_GRACE_MS) && now <= (flashEnd + CHIP_CLICK_GRACE_MS);
+  const hit = inWindow && clickedIdx === round.idx;
+  const amount = hit ? round.amount : 0;
+
+  const ledgerRef = chipLedgerRef(phone);
+  const userRef = db.collection("users").doc(phone);
+  try {
+    await db.runTransaction(async (tx) => {
+      const existing = await tx.get(ledgerRef);
+      if (existing.exists) throw new Error("DUP");
+      tx.set(ledgerRef, {
+        uid: phone, type: "ctv_chip", amount, unit: "brick",
+        meta: { hit, targetIdx: round.idx, targetAmount: round.amount, clickedIdx },
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      if (amount > 0) tx.set(userRef, { alnBricks: admin.firestore.FieldValue.increment(amount) }, { merge: true });
+    });
+  } catch (e) {
+    if (e.message !== "DUP") {
+      console.error("[ctvChipClick]", phone, e);
+      throw new HttpsError("internal", "Có lỗi khi ghi nhận lượt chơi — thử lại sau nhé");
+    }
+    // DUP: hôm nay đã tính rồi (vd 2 tab cùng lúc) — trả trạng thái hiện tại, không cộng thêm.
+  }
+  const snap = await userRef.get();
+  const ud = snap.data() || {};
+  return {
+    hit, idx: round.idx, amount, alnBricks: ud.alnBricks || 0, alnDiamonds: ud.alnDiamonds || 0,
+    referralPendingVnd: ud.referralPendingVnd || 0, tier: tierOf(ud.alnBricks || 0),
   };
 });
 
