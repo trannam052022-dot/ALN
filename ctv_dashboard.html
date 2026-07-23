@@ -101,6 +101,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 #spinHint{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6}
 #btnSpin{margin-top:10px}
 
+/* Bốc Chip May Mắn */
+#chipGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:12px 0}
+.chip-cell{aspect-ratio:1;border-radius:50%;background:linear-gradient(155deg,#efe3c2,#d8c48f);border:2px solid #b8860b;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#5c4308;cursor:pointer;transition:transform .15s,box-shadow .15s;user-select:none;text-align:center}
+.chip-cell.flash{transform:scale(1.15);box-shadow:0 0 0 6px rgba(184,134,11,.3),0 0 22px rgba(212,160,23,.85);background:linear-gradient(155deg,#fff3d0,#f4d35e);animation:chipPulse .35s ease-in-out infinite alternate}
+@keyframes chipPulse{from{filter:brightness(1)}to{filter:brightness(1.3)}}
+.chip-cell.win{background:linear-gradient(155deg,#bff0c8,#7fd996);border-color:#15803d;color:#14532d}
+.chip-cell.miss{opacity:.4}
+#chipHint{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6}
+
 /* Form nhận thưởng */
 .field{margin-bottom:12px}
 .field label{display:block;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}
@@ -185,6 +194,22 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div class="msg" id="spinMsg"></div>
   </div>
 
+  <div class="card" id="chipCard" style="display:none">
+    <div class="card-title"><i class="ph-duotone ph-coins"></i> Bốc Chip May Mắn</div>
+    <div class="task-desc">Bấm "Bắt đầu", chờ 1 ô chip sáng lên rồi bấm thật nhanh vào đúng ô đó — chip giá trị càng cao càng khó bắt! Lưu ý: từ lần đầu bạn chơi Chip, toàn bộ Gạch của bạn sẽ reset về 0 sau mỗi 90 ngày (mùa Chip mới lại bắt đầu).</div>
+    <div id="chipGrid">
+      <div class="chip-cell" data-idx="0" onclick="clickChip(0)"><span>1.000đ</span></div>
+      <div class="chip-cell" data-idx="1" onclick="clickChip(1)"><span>2.000đ</span></div>
+      <div class="chip-cell" data-idx="2" onclick="clickChip(2)"><span>3.000đ</span></div>
+      <div class="chip-cell" data-idx="3" onclick="clickChip(3)"><span>4.000đ</span></div>
+      <div class="chip-cell" data-idx="4" onclick="clickChip(4)"><span>5.000đ</span></div>
+    </div>
+    <button class="btn-main" id="btnChipStart" onclick="doChipStart()">Bắt đầu</button>
+    <div id="chipHint"></div>
+    <div id="chipSeasonNote" style="display:none;font-size:10.5px;color:var(--muted);text-align:center;margin-top:6px"></div>
+    <div class="msg" id="chipMsg"></div>
+  </div>
+
   <div class="card" id="leaderboardCard">
     <div class="card-title"><i class="ph-duotone ph-ranking"></i> Bảng xếp hạng CTV</div>
     <div id="leaderboardList" style="font-size:12px;color:var(--muted)">Đang tải...</div>
@@ -233,6 +258,20 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <button class="btn-copy" style="background:#0084ff" onclick="shareToMessenger()"><i class="ph-duotone ph-paper-plane-tilt"></i> Messenger</button>
     </div>
     <div class="task-desc" style="margin-top:8px">Khác với link rủ bạn chơi ở trên — link này dành cho người quen SẮP XÂY NHÀ. Khi họ đăng ký và ký hợp đồng thật với ALN, bạn được thưởng Kim Cương.</div>
+  </div>
+
+  <div class="card" id="mauNhaCard">
+    <div class="card-title"><i class="ph-duotone ph-house-line"></i> Gói Hồ Sơ Bản Vẽ Kinh Tế</div>
+    <div class="task-desc">ALN có sẵn kho hồ sơ mẫu nhà đã bàn giao, giá rẻ hơn thiết kế riêng vì dùng lại bản vẽ — phù hợp giới thiệu cho người quen đang cần xây nhà nhanh, tiết kiệm. Gửi link bên dưới để họ xem mẫu; nếu họ đặt mua, bạn nhận <b>15% hoa hồng</b> trên giá trị gói (ALN xác nhận và trả tay khi chốt đơn).</div>
+    <div class="ref-row">
+      <div class="ref-input" id="mauNhaLinkText">🔒 Nhập Tên + SĐT ở form bên dưới để nhận link riêng của bạn</div>
+      <button class="btn-copy" onclick="copyMauNhaLink()"><i class="ph-duotone ph-copy"></i> Sao chép</button>
+    </div>
+    <div class="ref-row" style="margin-top:8px;flex-wrap:wrap">
+      <button class="btn-copy" id="btnMauNhaShareNative" style="display:none;background:linear-gradient(135deg,#1e40af,#2563eb)" onclick="shareMauNhaNative()"><i class="ph-duotone ph-share-network"></i> Chia sẻ ngay</button>
+      <button class="btn-copy" style="background:#0068ff" onclick="shareMauNhaToZalo()"><i class="ph-duotone ph-chat-circle-text"></i> Zalo</button>
+      <button class="btn-copy" style="background:#0084ff" onclick="shareMauNhaToMessenger()"><i class="ph-duotone ph-paper-plane-tilt"></i> Messenger</button>
+    </div>
   </div>
 
   <div class="note">Gạch là điểm thưởng khuyến mãi trong ALN, không mua bằng tiền. Nhiệm vụ tự khai báo — ALN tin bạn đã làm đúng, nộp trùng nhiều lần không được cộng thêm.</div>
@@ -436,6 +475,97 @@ async function doSpin(){
   }
 }
 
+/* ── Bốc Chip May Mắn — giải PHẢI khớp CHIP_PRIZES trong functions/ctvGame.js ── */
+var _lastChipState = null;
+var _chipTimers = [];
+var _chipActive = false;
+
+function clearChipTimers(){
+  _chipTimers.forEach(function(t){ clearTimeout(t); });
+  _chipTimers = [];
+}
+
+function updateChipState(chip){
+  _lastChipState = chip;
+  var btn = document.getElementById('btnChipStart');
+  var hint = document.getElementById('chipHint');
+  if (!btn) return;
+  if (!chip || !chip.eligible) {
+    btn.disabled = true;
+    hint.textContent = 'Hoàn thành 1 nhiệm vụ bất kỳ ở trên để mở khoá trò chơi Chip nhé!';
+  } else if (chip.usedToday) {
+    btn.disabled = true;
+    hint.textContent = 'Hôm nay bạn chơi Chip rồi — quay lại vào ngày mai nhé!';
+  } else if (chip.budgetExhausted) {
+    btn.disabled = true;
+    hint.textContent = 'Hôm nay ALN đã hết ngân sách thưởng Chip toàn hệ thống — quay lại vào ngày mai nhé!';
+  } else {
+    btn.disabled = false;
+    hint.textContent = 'Bấm "Bắt đầu" rồi chờ 1 ô sáng lên — bắt đúng lúc để nhận thưởng!';
+  }
+  var seasonEl = document.getElementById('chipSeasonNote');
+  if (seasonEl) {
+    if (chip && chip.daysUntilReset != null) {
+      seasonEl.style.display = 'block';
+      seasonEl.textContent = '🕒 Gạch sẽ reset về 0 sau ' + chip.daysUntilReset + ' ngày nữa (mùa Chip 90 ngày kể từ lần đầu bạn chơi).';
+    } else {
+      seasonEl.style.display = 'none';
+    }
+  }
+}
+
+async function doChipStart(){
+  if (!_myPhone) { showMsg('chipMsg', 'Hoàn thành nhiệm vụ trước để chơi Chip nhé!', false); return; }
+  clearChipTimers();
+  document.querySelectorAll('.chip-cell').forEach(function(el){ el.className = 'chip-cell'; });
+  document.getElementById('chipMsg').className = 'msg';
+  var btn = document.getElementById('btnChipStart');
+  btn.disabled = true; btn.textContent = 'Đang chờ...';
+  try {
+    var data = await window.ctvChipStart({ phone: _myPhone });
+    var cell = document.querySelector('.chip-cell[data-idx="' + data.idx + '"]');
+    _chipActive = true;
+    _chipTimers.push(setTimeout(function(){ if (cell) cell.classList.add('flash'); }, data.delayMs));
+    _chipTimers.push(setTimeout(function(){
+      if (_chipActive) finishChipRound(-1);
+    }, data.delayMs + data.windowMs + 200));
+  } catch(e) {
+    showMsg('chipMsg', e.message || 'Có lỗi khi bắt đầu — thử lại sau nhé', false);
+    btn.disabled = false; btn.textContent = 'Bắt đầu';
+    updateChipState(_lastChipState);
+  }
+}
+
+function clickChip(idx){
+  if (!_chipActive) return;
+  finishChipRound(idx);
+}
+
+async function finishChipRound(clickedIdx){
+  if (!_chipActive) return;
+  _chipActive = false;
+  clearChipTimers();
+  document.querySelectorAll('.chip-cell').forEach(function(el){ el.classList.remove('flash'); });
+  var btn = document.getElementById('btnChipStart');
+  try {
+    var data = await window.ctvChipClick({ phone: _myPhone, idx: clickedIdx });
+    var targetCell = document.querySelector('.chip-cell[data-idx="' + data.idx + '"]');
+    if (data.hit) {
+      if (targetCell) targetCell.classList.add('win');
+      showMsg('chipMsg', '🎉 Chính xác! Bạn nhận được +' + data.amount + ' Gạch!', true);
+    } else {
+      if (targetCell) targetCell.classList.add('miss');
+      showMsg('chipMsg', 'Chưa đúng lúc rồi — quay lại chơi vào ngày mai nhé!', false);
+    }
+    renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.referralPendingVnd);
+    updateChipState({ eligible: true, usedToday: true });
+  } catch(e) {
+    showMsg('chipMsg', e.message || 'Có lỗi khi ghi nhận — thử lại sau nhé', false);
+    updateChipState(_lastChipState);
+  }
+  btn.textContent = 'Bắt đầu';
+}
+
 var doneTasks = {};
 var linkOpened = {};
 
@@ -559,6 +689,34 @@ function shareInviteToMessenger(){
   window.open('https://www.messenger.com/share?link=' + encodeURIComponent(window._inviteUrl), '_blank');
 }
 
+/* ── Link GÓI HỒ SƠ BẢN VẼ KINH TẾ (khác 2 link giới thiệu ở trên) ── */
+var MAU_NHA_SHARE_TEXT = 'ALN có sẵn hồ sơ mẫu nhà đã bàn giao, giá rẻ hơn thiết kế riêng — bạn xem thử mẫu nào hợp mình nhé:';
+function setMauNhaLink(phone){
+  var url = location.origin + location.pathname.replace(/[^/]*$/, '') + 'index.html?ctvref=' + encodeURIComponent(phone) + '#khomau';
+  document.getElementById('mauNhaLinkText').textContent = url;
+  window._mauNhaUrl = url;
+  document.getElementById('btnMauNhaShareNative').style.display = (navigator.share ? 'inline-flex' : 'none');
+}
+function copyMauNhaLink(){
+  if (!window._mauNhaUrl) { noLinkYet(); return; }
+  navigator.clipboard.writeText(window._mauNhaUrl).then(function(){
+    showMsg('claimMsg', '✓ Đã sao chép link gói kinh tế', true);
+  }).catch(function(){});
+}
+async function shareMauNhaNative(){
+  if (!window._mauNhaUrl) { noLinkYet(); return; }
+  if (!navigator.share) return;
+  try { await navigator.share({ title: 'ALN — Kho hồ sơ mẫu', text: MAU_NHA_SHARE_TEXT, url: window._mauNhaUrl }); } catch(e){}
+}
+function shareMauNhaToZalo(){
+  if (!window._mauNhaUrl) { noLinkYet(); return; }
+  window.open('https://zalo.me/share/link?u=' + encodeURIComponent(window._mauNhaUrl) + '&d=' + encodeURIComponent(MAU_NHA_SHARE_TEXT), '_blank');
+}
+function shareMauNhaToMessenger(){
+  if (!window._mauNhaUrl) { noLinkYet(); return; }
+  window.open('https://www.messenger.com/share?link=' + encodeURIComponent(window._mauNhaUrl), '_blank');
+}
+
 async function doLookup(){
   var phone = document.getElementById('lookupPhone').value.replace(/[\s.\-()]/g, '');
   if (!/^0\d{8,10}$/.test(phone)) { showMsg('lookupMsg', 'Số điện thoại chưa hợp lệ', false); return; }
@@ -572,10 +730,13 @@ async function doLookup(){
       renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.referralPendingVnd);
       setStreak(data.streak);
       updateSpinState(data.spin);
+      document.getElementById('chipCard').style.display = 'block';
+      updateChipState(data.chip);
       doneTasks = {};
       (data.tasksDone || []).forEach(function(t){ doneTasks[t] = true; });
       setRefLink(phone);
       setInviteLink(phone);
+      setMauNhaLink(phone);
       renderTasks();
       rememberCtv(phone, '');
       showMsg('lookupMsg', '✓ Chào mừng trở lại!', true);
@@ -604,6 +765,8 @@ async function doClaim(){
     renderAlnBricksCard(data.alnBricks, data.alnDiamonds, data.referralPendingVnd);
     setStreak(data.streak);
     updateSpinState(data.spin);
+    document.getElementById('chipCard').style.display = 'block';
+    updateChipState(data.chip);
     doneTasks = {};
     (data.tasksDone || []).forEach(function(t){ doneTasks[t] = true; });
     setRefLink(phone);
@@ -677,6 +840,8 @@ import { app } from './firebase-config.js';
   window.ctvGetWeeklyTask = async function(){ var r = await mod.httpsCallable(fns, 'ctvGetWeeklyTask')(); return r.data; };
   window.ctvLeaderboard = async function(){ var r = await mod.httpsCallable(fns, 'ctvLeaderboard')(); return r.data; };
   window.ctvSpinWheel = async function(data){ var r = await mod.httpsCallable(fns, 'ctvSpinWheel')(data); return r.data; };
+  window.ctvChipStart = async function(data){ var r = await mod.httpsCallable(fns, 'ctvChipStart')(data); return r.data; };
+  window.ctvChipClick = async function(data){ var r = await mod.httpsCallable(fns, 'ctvChipClick')(data); return r.data; };
   if (window.autoLookupCtv) window.autoLookupCtv();
   if (window.loadWeeklyTask) window.loadWeeklyTask();
   if (window.loadLeaderboard) window.loadLeaderboard();
