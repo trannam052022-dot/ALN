@@ -260,6 +260,20 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div class="task-desc" style="margin-top:8px">Khác với link rủ bạn chơi ở trên — link này dành cho người quen SẮP XÂY NHÀ. Khi họ đăng ký và ký hợp đồng thật với ALN, bạn được thưởng Kim Cương.</div>
   </div>
 
+  <div class="card" id="mauNhaCard">
+    <div class="card-title"><i class="ph-duotone ph-house-line"></i> Gói Hồ Sơ Bản Vẽ Kinh Tế</div>
+    <div class="task-desc">ALN có sẵn kho hồ sơ mẫu nhà đã bàn giao, giá rẻ hơn thiết kế riêng vì dùng lại bản vẽ — phù hợp giới thiệu cho người quen đang cần xây nhà nhanh, tiết kiệm. Gửi link bên dưới để họ xem mẫu; nếu họ đặt mua, bạn nhận <b>15% hoa hồng</b> trên giá trị gói (ALN xác nhận và trả tay khi chốt đơn).</div>
+    <div class="ref-row">
+      <div class="ref-input" id="mauNhaLinkText">🔒 Nhập Tên + SĐT ở form bên dưới để nhận link riêng của bạn</div>
+      <button class="btn-copy" onclick="copyMauNhaLink()"><i class="ph-duotone ph-copy"></i> Sao chép</button>
+    </div>
+    <div class="ref-row" style="margin-top:8px;flex-wrap:wrap">
+      <button class="btn-copy" id="btnMauNhaShareNative" style="display:none;background:linear-gradient(135deg,#1e40af,#2563eb)" onclick="shareMauNhaNative()"><i class="ph-duotone ph-share-network"></i> Chia sẻ ngay</button>
+      <button class="btn-copy" style="background:#0068ff" onclick="shareMauNhaToZalo()"><i class="ph-duotone ph-chat-circle-text"></i> Zalo</button>
+      <button class="btn-copy" style="background:#0084ff" onclick="shareMauNhaToMessenger()"><i class="ph-duotone ph-paper-plane-tilt"></i> Messenger</button>
+    </div>
+  </div>
+
   <div class="note">Gạch là điểm thưởng khuyến mãi trong ALN, không mua bằng tiền. Nhiệm vụ tự khai báo — ALN tin bạn đã làm đúng, nộp trùng nhiều lần không được cộng thêm.</div>
 </div>
 
@@ -675,6 +689,34 @@ function shareInviteToMessenger(){
   window.open('https://www.messenger.com/share?link=' + encodeURIComponent(window._inviteUrl), '_blank');
 }
 
+/* ── Link GÓI HỒ SƠ BẢN VẼ KINH TẾ (khác 2 link giới thiệu ở trên) ── */
+var MAU_NHA_SHARE_TEXT = 'ALN có sẵn hồ sơ mẫu nhà đã bàn giao, giá rẻ hơn thiết kế riêng — bạn xem thử mẫu nào hợp mình nhé:';
+function setMauNhaLink(phone){
+  var url = location.origin + location.pathname.replace(/[^/]*$/, '') + 'index.html?ctvref=' + encodeURIComponent(phone) + '#khomau';
+  document.getElementById('mauNhaLinkText').textContent = url;
+  window._mauNhaUrl = url;
+  document.getElementById('btnMauNhaShareNative').style.display = (navigator.share ? 'inline-flex' : 'none');
+}
+function copyMauNhaLink(){
+  if (!window._mauNhaUrl) { noLinkYet(); return; }
+  navigator.clipboard.writeText(window._mauNhaUrl).then(function(){
+    showMsg('claimMsg', '✓ Đã sao chép link gói kinh tế', true);
+  }).catch(function(){});
+}
+async function shareMauNhaNative(){
+  if (!window._mauNhaUrl) { noLinkYet(); return; }
+  if (!navigator.share) return;
+  try { await navigator.share({ title: 'ALN — Kho hồ sơ mẫu', text: MAU_NHA_SHARE_TEXT, url: window._mauNhaUrl }); } catch(e){}
+}
+function shareMauNhaToZalo(){
+  if (!window._mauNhaUrl) { noLinkYet(); return; }
+  window.open('https://zalo.me/share/link?u=' + encodeURIComponent(window._mauNhaUrl) + '&d=' + encodeURIComponent(MAU_NHA_SHARE_TEXT), '_blank');
+}
+function shareMauNhaToMessenger(){
+  if (!window._mauNhaUrl) { noLinkYet(); return; }
+  window.open('https://www.messenger.com/share?link=' + encodeURIComponent(window._mauNhaUrl), '_blank');
+}
+
 async function doLookup(){
   var phone = document.getElementById('lookupPhone').value.replace(/[\s.\-()]/g, '');
   if (!/^0\d{8,10}$/.test(phone)) { showMsg('lookupMsg', 'Số điện thoại chưa hợp lệ', false); return; }
@@ -694,6 +736,7 @@ async function doLookup(){
       (data.tasksDone || []).forEach(function(t){ doneTasks[t] = true; });
       setRefLink(phone);
       setInviteLink(phone);
+      setMauNhaLink(phone);
       renderTasks();
       rememberCtv(phone, '');
       showMsg('lookupMsg', '✓ Chào mừng trở lại!', true);

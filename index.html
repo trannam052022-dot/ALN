@@ -1813,6 +1813,23 @@ var LIB_CATNAME = {
 var LIB_CAT = 'all';
 var LIB_AREA = '';
 
+/* SĐT CTV giới thiệu (nếu vào bằng link ?ctvref= từ ctv_dashboard.html) —
+   nhớ qua localStorage phòng khi khách rời trang rồi quay lại mới bấm mua,
+   dùng để ghi lead hoa hồng CTV khi đặt mua gói kinh tế (xem datMua()). */
+var LIB_CTVREF_KEY = 'aln_mau_ctvref';
+var _libCtvRef = '';
+(function captureCtvRef(){
+  try {
+    var qp = new URLSearchParams(location.search).get('ctvref');
+    if (qp && /^0\d{8,10}$/.test(qp)) {
+      _libCtvRef = qp;
+      localStorage.setItem(LIB_CTVREF_KEY, qp);
+    } else {
+      _libCtvRef = localStorage.getItem(LIB_CTVREF_KEY) || '';
+    }
+  } catch(e){}
+})();
+
 function libMoney(n){ return (typeof alnFmt === 'function' ? alnFmt(n) : String(n)) + 'đ'; }
 
 function libSetCat(c, btn){
@@ -1894,6 +1911,7 @@ function datMua(ma){
     inp.value = 'Em muốn đặt gói kinh tế mẫu ' + ma + ', nhờ ALN tư vấn giúp em ạ.';
     inp.focus();
   }
+  if(window.logMauNhaLead){ window.logMauNhaLead(ma, _libCtvRef); }
 }
 
 function modFeeUpdate(){
@@ -1989,6 +2007,16 @@ const functions = getFunctions(app, 'asia-southeast1');
 const callAlnChat = httpsCallable(functions, 'alnChat');
 const callSubmitHomeLead = httpsCallable(functions, 'submitHomeLead', { timeout: 20000 });
 const callUpsertContact = httpsCallable(functions, 'upsertContact');
+const callLogMauNhaLead = httpsCallable(functions, 'logMauNhaLead');
+
+/* Ghi lead ẩn danh khi khách bấm "Đặt mua gói kinh tế" — kèm SĐT CTV giới
+   thiệu (nếu có) để Founder trả hoa hồng, xem datMua() + functions/ctvGame.js.
+   Không chặn luồng mở chat MyMy nếu lỗi (chỉ log, không throw). */
+window.logMauNhaLead = async function(ma, ctvPhone) {
+  try {
+    await callLogMauNhaLead({ ma: ma, ctvPhone: ctvPhone || null });
+  } catch (e) { console.warn('logMauNhaLead:', e.message); }
+};
 
 /* MyMy bắt được SĐT gõ trong chat công khai — trước đây chỉ bắn Pixel/GA,
    KHÔNG lưu ở đâu cả (rò rỉ lead). Ghi vào Bảng liên hệ hợp nhất (contacts/),

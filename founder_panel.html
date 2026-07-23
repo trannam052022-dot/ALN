@@ -1598,6 +1598,25 @@ document.addEventListener('DOMContentLoaded', function() {
       <tbody id="brBody"></tbody>
     </table>
   </div>
+
+  <div style="margin-top:8px">
+    <div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text1);margin-bottom:6px">Lead giới thiệu Gói Kinh Tế chờ xác nhận</div>
+    <div style="font-size:11px;color:var(--dim);line-height:1.6;background:var(--raised);border:1px solid var(--border);border-radius:7px;padding:9px 12px;margin-bottom:8px">
+      Ghi từ <code>mauNhaLeads</code> mỗi khi khách bấm "Đặt mua gói kinh tế" qua link riêng của 1 CTV (<code>index.html?ctvref=</code>). Gói kinh tế hiện chỉ bán qua chat tư vấn — khi chốt đơn thật với khách, bấm "Xác nhận đã bán" và nhập giá bán để tự động cộng 15% hoa hồng vào số dư chờ chi trả của CTV đó.
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr>
+          <th>Thời gian</th>
+          <th>Mã mẫu</th>
+          <th>SĐT CTV giới thiệu</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr></thead>
+        <tbody id="mauNhaLeadBody"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <!-- ══ PANEL: DUYỆT ĐĂNG KÝ ══ -->
@@ -3591,7 +3610,7 @@ function switchTab(t){
   if(t==='mgKs')    renderMgKs();
   if(t==='mgKtv')   renderMgKtv();
   if(t==='mgNcc')   renderMgNcc();
-  if(t==='bricks')  renderMgBricks();
+  if(t==='bricks')  { renderMgBricks(); renderMauNhaLeads(); }
   if(t==='pending')  renderPending();
   if(t==='payments') { renderPayments(); if(typeof renderDesignApprovals==='function') renderDesignApprovals(); }
   if(t==='report')   { renderIncomeReport(); if(typeof _fillFeeConfigForm==='function') _fillFeeConfigForm(); }
@@ -4294,6 +4313,60 @@ window.founderAwardBricksPrompt = async function(uid, name){
     await fn({ uid: uid, amount: amount, reason: reason });
     toast('Đã ' + (amount > 0 ? 'trao ' : 'thu ') + Math.abs(amount) + ' Gạch cho ' + name, 'ok');
     if(window._bricksLoadFromModule) window._bricksLoadFromModule();
+  } catch(e) {
+    toast('Lỗi: ' + (e.message || e), 'err');
+  }
+};
+
+/* ── LEAD GIỚI THIỆU GÓI KINH TẾ — đọc qua Cloud Function (Admin SDK), KHÔNG
+   query Firestore thẳng từ client vì mauNhaLeads chưa mở rule đọc công khai
+   (ghi ẩn danh từ index.html qua onCall logMauNhaLead, xem functions/ctvGame.js) ── */
+var _mgMauNhaData = null;
+var MAUNHA_STATUS_LABEL = { new: 'Chờ xác nhận', confirmed: 'Đã trả hoa hồng' };
+
+function renderMauNhaLeads() {
+  if(window._mgMauNhaData) _mgMauNhaData = window._mgMauNhaData;
+  if(!_mgMauNhaData) { _loadMauNhaLeads(); return; }
+  var tbody = document.getElementById('mauNhaLeadBody');
+  if(!tbody) return;
+  if(!_mgMauNhaData.length){ tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:20px">Chưa có lead nào</td></tr>'; return; }
+  tbody.innerHTML = _mgMauNhaData.map(function(l){
+    var when = l.createdAt ? new Date(l.createdAt).toLocaleString('vi-VN') : '—';
+    var confirmed = l.status === 'confirmed';
+    var actionCell = confirmed
+      ? '<span style="font-size:11px;color:var(--dim)">' + (l.commission||0).toLocaleString('vi-VN') + 'đ đã cộng</span>'
+      : '<button onclick="founderConfirmMauNhaSalePrompt(\''+l.id+'\',\''+l.ma+'\',\''+(l.ctvPhone||'')+'\')" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(21,128,61,.35);background:rgba(21,128,61,.08);color:var(--green);font-size:11px;cursor:pointer;font-family:var(--sans)"><i class="ph-duotone ph-check-circle"></i> Xác nhận đã bán</button>';
+    return '<tr>'
+      +'<td style="font-size:11px;color:var(--sub)">'+when+'</td>'
+      +'<td style="font-weight:700;color:var(--text1)"># '+l.ma+'</td>'
+      +'<td style="font-family:var(--mono);font-size:12px">'+(l.ctvPhone||'—')+'</td>'
+      +'<td style="font-size:11px;color:'+(confirmed?'var(--green)':'var(--dim)')+'">'+(MAUNHA_STATUS_LABEL[l.status]||l.status)+'</td>'
+      +'<td>'+actionCell+'</td>'
+    +'</tr>';
+  }).join('');
+}
+
+function _loadMauNhaLeads() {
+  var tbody = document.getElementById('mauNhaLeadBody');
+  if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:20px"><i class="ph-duotone ph-spinner ph-spin"></i> Đang tải…</td></tr>';
+  if(window._mauNhaLoadFromModule) { window._mauNhaLoadFromModule(); }
+  else { if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:20px">Module chưa sẵn sàng, thử lại sau</td></tr>'; }
+}
+
+window.founderConfirmMauNhaSalePrompt = async function(leadId, ma, ctvPhone){
+  var priceStr = prompt('Giá bán thật của gói mẫu ' + ma + ' (VNĐ) — hoa hồng 15% sẽ tự cộng cho CTV ' + ctvPhone + ':');
+  if(priceStr === null) return;
+  var salePrice = parseInt(String(priceStr).replace(/[^\d]/g, ''), 10);
+  if(!salePrice || salePrice <= 0){ toast('Giá bán không hợp lệ', 'err'); return; }
+  if(!confirm('Xác nhận đã bán gói ' + ma + ' giá ' + salePrice.toLocaleString('vi-VN') + 'đ — cộng ' + Math.round(salePrice*0.15).toLocaleString('vi-VN') + 'đ hoa hồng cho CTV ' + ctvPhone + '?')) return;
+  try {
+    var { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
+    var fns = getFunctions(window.app, 'asia-southeast1');
+    var fn = httpsCallable(fns, 'founderConfirmMauNhaSale');
+    var res = await fn({ leadId: leadId, salePrice: salePrice });
+    toast('Đã cộng ' + (res.data.commission||0).toLocaleString('vi-VN') + 'đ hoa hồng cho CTV ' + ctvPhone, 'ok');
+    window._mgMauNhaData = null; _mgMauNhaData = null;
+    if(window._mauNhaLoadFromModule) window._mauNhaLoadFromModule();
   } catch(e) {
     toast('Lỗi: ' + (e.message || e), 'err');
   }
@@ -6701,6 +6774,25 @@ window._bricksLoadFromModule = async function() {
     console.error('[mgBricks load]', e);
     var tbody = document.getElementById('brBody');
     if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--red);padding:28px">Lỗi tải dữ liệu: ' + (e.message||e.code) + '</td></tr>';
+  }
+};
+
+/* ── LEAD GIỚI THIỆU GÓI KINH TẾ — mauNhaLeads chưa mở rule đọc công khai
+   (client ghi ẩn danh qua onCall logMauNhaLead), nên Founder đọc lại cũng
+   qua onCall (founderListMauNhaLeads, Admin SDK bypass) thay vì getDocs
+   thẳng — khỏi phải mở firestore.rules cho collection này. */
+window._mauNhaLoadFromModule = async function() {
+  try {
+    const { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
+    const fns = getFunctions(app, 'asia-southeast1');
+    const fn = httpsCallable(fns, 'founderListMauNhaLeads');
+    const res = await fn();
+    window._mgMauNhaData = (res.data && res.data.items) || [];
+    if(typeof renderMauNhaLeads === 'function') renderMauNhaLeads();
+  } catch(e) {
+    console.error('[mauNhaLeads load]', e);
+    var tbody = document.getElementById('mauNhaLeadBody');
+    if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--red);padding:20px">Lỗi tải dữ liệu: ' + (e.message||e.code) + '</td></tr>';
   }
 };
 

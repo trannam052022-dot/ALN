@@ -529,6 +529,105 @@ async function pushToFounder(title, body, extraData) {
   }
 }
 
+/* ── Gói Hồ Sơ Bản Vẽ Kinh Tế — hoa hồng giới thiệu (thêm 23/07/2026) ──
+   CTV có link riêng trỏ tới Kho hồ sơ mẫu (index.html?ctvref={sđt}) — khi
+   khách bấm "Đặt mua gói kinh tế" trên trang đó, ghi 1 lead ẩn danh kèm SĐT
+   CTV để Founder biết ai đã giới thiệu. Gói kinh tế hiện CHỈ bán qua chat tư
+   vấn (chưa có đơn hàng/thanh toán thật trong hệ thống — xem index.html hàm
+   datMua), nên xác nhận "bán được" vẫn THỦ CÔNG: Founder tự đối chiếu khi
+   chốt đơn với khách rồi bấm xác nhận trong founder_panel để trả 15% hoa
+   hồng (MAU_NHA_COMMISSION_PCT, cùng mức 15% C1 hiện có nhưng tách biến
+   riêng vì khác sản phẩm) vào users/{sđt}.referralPendingVnd — CÙNG field
+   dùng chung với thưởng giới thiệu C1 (xem CLAUDE.md mục "Chương trình NCC/
+   CTV giới thiệu Chủ nhà"), Founder chi tay như nhau. */
+const MAU_NHA_COMMISSION_PCT = 0.15;
+
+exports.logMauNhaLead = onCall({ region: REGION }, async (request) => {
+  const d = request.data || {};
+  const ma = String(d.ma || "").trim().slice(0, 40);
+  if (!ma) throw new HttpsError("invalid-argument", "Thiếu mã mẫu");
+  const ctvPhone = normalizePhone(d.ctvPhone);
+  const leadRef = await db.collection("mauNhaLeads").add({
+    ma, ctvPhone: ctvPhone || null, status: "new",
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+  if (ctvPhone) {
+    const masked = ctvPhone.length >= 5 ? ctvPhone.slice(0, ctvPhone.length - 3) + "***" : ctvPhone;
+    await pushToFounder(
+      "🏠 Khách hỏi mua gói kinh tế",
+      "Mẫu " + ma + " — qua giới thiệu CTV " + masked + ". Vào founder_panel để xác nhận + trả hoa hồng khi chốt đơn.",
+      { type: "MAU_NHA_LEAD", leadId: leadRef.id }
+    );
+  }
+  return { ok: true };
+});
+
+/* Founder xác nhận đã bán 1 gói kinh tế qua giới thiệu CTV + trả 15% hoa
+   hồng — CHỈ Founder gọi được, nhập tay giá bán vì không có đơn hàng thật
+   để tự tra giá. Idempotent qua ledger theo leadId. */
+exports.founderConfirmMauNhaSale = onCall({ region: REGION }, async (request) => {
+  if (!request.auth || request.auth.uid !== FOUNDER_UID) {
+    throw new HttpsError("permission-denied", "Chỉ Founder được xác nhận");
+  }
+  const d = request.data || {};
+  const leadId = String(d.leadId || "").trim();
+  const salePrice = Number(d.salePrice) || 0;
+  if (!leadId) throw new HttpsError("invalid-argument", "Thiếu leadId");
+  if (salePrice <= 0) throw new HttpsError("invalid-argument", "Giá bán không hợp lệ");
+
+  const leadRef = db.collection("mauNhaLeads").doc(leadId);
+  const leadSnap = await leadRef.get();
+  if (!leadSnap.exists) throw new HttpsError("not-found", "Không tìm thấy lead này");
+  const lead = leadSnap.data();
+  if (!lead.ctvPhone) throw new HttpsError("failed-precondition", "Lead này không có CTV giới thiệu");
+  if (lead.status === "confirmed") throw new HttpsError("failed-precondition", "Lead này đã xác nhận rồi");
+
+  const commission = Math.round(salePrice * MAU_NHA_COMMISSION_PCT);
+  const ledgerId = ("mauNha_sale_" + leadId).replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 900);
+  const ledgerRef = db.collection("bricksLedger").doc(ledgerId);
+  const userRef = db.collection("users").doc(lead.ctvPhone);
+  try {
+    await db.runTransaction(async (tx) => {
+      const existing = await tx.get(ledgerRef);
+      if (existing.exists) throw new Error("DUP");
+      tx.set(ledgerRef, {
+        uid: lead.ctvPhone, type: "mauNha_referral_payout", amount: commission, unit: "vnd",
+        meta: { leadId, ma: lead.ma, salePrice, pct: MAU_NHA_COMMISSION_PCT },
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      tx.set(userRef, { referralPendingVnd: admin.firestore.FieldValue.increment(commission) }, { merge: true });
+      tx.set(leadRef, {
+        status: "confirmed", salePrice, commission,
+        confirmedAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+    });
+  } catch (e) {
+    if (e.message !== "DUP") {
+      console.error("[founderConfirmMauNhaSale]", leadId, e);
+      throw new HttpsError("internal", "Có lỗi khi trả hoa hồng — thử lại sau nhé");
+    }
+  }
+  return { ok: true, commission };
+});
+
+/* Founder xem danh sách lead gói kinh tế — qua onCall (Admin SDK) thay vì
+   getDocs thẳng từ client vì mauNhaLeads chưa mở rule đọc công khai. */
+exports.founderListMauNhaLeads = onCall({ region: REGION }, async (request) => {
+  if (!request.auth || request.auth.uid !== FOUNDER_UID) {
+    throw new HttpsError("permission-denied", "Chỉ Founder được xem");
+  }
+  const snap = await db.collection("mauNhaLeads").orderBy("createdAt", "desc").limit(200).get();
+  const items = snap.docs.map((doc) => {
+    const d = doc.data() || {};
+    return {
+      id: doc.id, ma: d.ma || "", ctvPhone: d.ctvPhone || null, status: d.status || "new",
+      salePrice: d.salePrice || 0, commission: d.commission || 0,
+      createdAt: d.createdAt && d.createdAt.toMillis ? d.createdAt.toMillis() : null,
+    };
+  });
+  return { items };
+});
+
 exports.scanCtvSuspicion = onSchedule(
   { schedule: "20 8 * * *", timeZone: "Asia/Ho_Chi_Minh", region: REGION },
   async () => {
