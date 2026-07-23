@@ -103,10 +103,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 /* Bốc Chip May Mắn */
 #chipGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:12px 0}
-.chip-cell{aspect-ratio:1;border-radius:50%;background:linear-gradient(155deg,#efe3c2,#d8c48f);border:2px solid #b8860b;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#5c4308;cursor:pointer;transition:transform .15s,box-shadow .15s;user-select:none;text-align:center}
-.chip-cell.flash{transform:scale(1.15);box-shadow:0 0 0 6px rgba(184,134,11,.3),0 0 22px rgba(212,160,23,.85);background:linear-gradient(155deg,#fff3d0,#f4d35e);animation:chipPulse .35s ease-in-out infinite alternate}
-@keyframes chipPulse{from{filter:brightness(1)}to{filter:brightness(1.3)}}
-.chip-cell.win{background:linear-gradient(155deg,#bff0c8,#7fd996);border-color:#15803d;color:#14532d}
+.chip-cell{aspect-ratio:1;border-radius:50%;background:linear-gradient(155deg,#0a1224,#111c33 55%,#0d1730);border:2px solid rgba(212,160,23,.55);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#f4e7c8;cursor:pointer;transition:transform .15s,box-shadow .15s;user-select:none;text-align:center}
+.chip-cell.flash{transform:scale(1.15);box-shadow:0 0 0 6px rgba(212,160,23,.3),0 0 22px rgba(212,160,23,.85);background:linear-gradient(155deg,#1a2744,#223564 55%,#1c2c54);border-color:#d4a017;animation:chipPulse .35s ease-in-out infinite alternate}
+@keyframes chipPulse{from{filter:brightness(1)}to{filter:brightness(1.35)}}
+.chip-cell.win{background:linear-gradient(155deg,#0f3d24,#15532d);border-color:#22c55e;color:#bbf7d0}
 .chip-cell.miss{opacity:.4}
 #chipHint{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6}
 
@@ -131,6 +131,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .btn-copy:hover{opacity:.9}
 
 .note{font-size:11px;color:var(--muted);text-align:center;margin-top:18px;line-height:1.7}
+
+/* Gói kinh tế — nền xanh đen sang trọng để nổi bật so với các thẻ trắng còn lại */
+#mauNhaCard{background:linear-gradient(155deg,#0a1224,#111c33 55%,#0d1730);border-color:rgba(212,160,23,.35);box-shadow:0 10px 26px -14px rgba(0,0,0,.4)}
+#mauNhaCard .card-title{color:#f4e7c8}
+#mauNhaCard .task-desc{color:#b8c4dc}
+#mauNhaCard .task-desc b{color:#f4e7c8}
+#mauNhaCard .ref-input{background:rgba(255,255,255,.06);border-color:rgba(212,160,23,.3);color:#dce6f4}
 </style>
 </head>
 <body>
