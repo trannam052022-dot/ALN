@@ -167,7 +167,7 @@ exports.ctvGetProfile = onCall({ region: REGION, enforceAppCheck: true }, async 
     return {
       exists: false, name: "", alnBricks: 0, alnDiamonds: 0, referralPendingVnd: 0,
       tasksDone: [], tier: tierOf(0), weeklyTask, streak: 0, spin: { eligible: false, used: false },
-      chip: { eligible: false, usedToday: false },
+      chip: { eligible: false, usedToday: false, budgetExhausted: false },
     };
   }
   const d = snap.data() || {};
@@ -357,21 +357,36 @@ exports.ctvSpinWheel = onCall({ region: REGION, enforceAppCheck: true }, async (
 
 /* ── Bốc Chip May Mắn — trò chơi phản xạ, 1 lượt/ngày, mở khoá vĩnh viễn
    ngay sau khi đã hoàn thành ≥1 nhiệm vụ bất kỳ (tức đã tồn tại users/{sđt},
-   luôn đúng vì doc chỉ được tạo qua ctvClaimTasks). Giá trị Gạch đúng bằng
-   quy đổi thật 1 Gạch=100đ (xem CLAUDE.md "1000 Gạch→100k"), nhưng trọng số
-   xuất hiện GIẢM DẦN theo giá trị (thay vì giảm số Gạch) để chip vẫn "đúng
-   nghĩa" mà không lạm phát thang tier — chốt cùng Founder 23/07/2026.
+   luôn đúng vì doc chỉ được tạo qua ctvClaimTasks). Nhãn "1.000đ/.../10.000đ"
+   chỉ mang tính hình ảnh — số Gạch thật ĐÃ GIẢM so với tỷ lệ quy đổi gốc
+   (1 Gạch=100đ) để tránh lạm phát thang tier khi chơi đều mỗi ngày, kèm
+   trọng số xuất hiện GIẢM DẦN theo giá trị — chốt cùng Founder 23/07/2026
+   sau khi tính lại chi phí kỳ vọng/ngày.
    Timing xác thực SERVER-SIDE: ctvChipStart ghi lại mốc giờ + độ khó (ô nào,
    trễ bao lâu, cửa sổ bao rộng); ctvChipClick đối chiếu thời điểm gọi thực
    tế + ô client báo đã bấm với dữ liệu đã chốt — client không tự báo trúng
    được. */
 const CHIP_PRIZES = [
-  { amount: 10, weight: 55, windowMs: 800, label: "1.000đ" },
-  { amount: 20, weight: 30, windowMs: 600, label: "2.000đ" },
-  { amount: 50, weight: 12, windowMs: 400, label: "5.000đ" },
-  { amount: 100, weight: 3, windowMs: 250, label: "10.000đ" },
+  { amount: 5, weight: 55, windowMs: 800, label: "1.000đ" },
+  { amount: 10, weight: 30, windowMs: 600, label: "2.000đ" },
+  { amount: 25, weight: 12, windowMs: 400, label: "5.000đ" },
+  { amount: 50, weight: 3, windowMs: 250, label: "10.000đ" },
 ];
 const CHIP_CLICK_GRACE_MS = 150; // bù độ trễ mạng lúc gọi ctvChipClick
+
+/* Trần ngân sách Chip TOÀN HỆ THỐNG/ngày (không phải trần/người) — đảm bảo
+   Founder luôn biết mức chi tối đa/ngày dù trò chơi viral tới đâu. Đếm qua
+   ctvChipBudget/{ngày}.spent, cộng dồn NGAY LÚC trao thưởng (transaction
+   trong ctvChipClick) nên có thể vượt trần tối đa đúng bằng 1 giải cao nhất
+   (50 Gạch) — chấp nhận được, đổi lại giữ đơn giản (không cần khoá giữ chỗ
+   phức tạp). ctvChipStart chặn mở lượt MỚI ngay khi đã chạm/vượt trần, nên
+   không ai bị báo "trúng nhưng không nhận được" — đúng nguyên tắc minh bạch
+   đã thống nhất. */
+const CHIP_DAILY_BUDGET = 1000;
+
+function chipBudgetRef() {
+  return db.collection("ctvChipBudget").doc(vnDateKey());
+}
 
 function pickChipPrize() {
   const total = CHIP_PRIZES.reduce((s, p) => s + p.weight, 0);
@@ -389,8 +404,9 @@ function chipLedgerRef(phone) {
 }
 
 async function chipStateOf(phone) {
-  const snap = await chipLedgerRef(phone).get();
-  return { eligible: true, usedToday: snap.exists };
+  const [snap, budgetSnap] = await Promise.all([chipLedgerRef(phone).get(), chipBudgetRef().get()]);
+  const spentToday = budgetSnap.exists ? (Number(budgetSnap.data().spent) || 0) : 0;
+  return { eligible: true, usedToday: snap.exists, budgetExhausted: spentToday >= CHIP_DAILY_BUDGET };
 }
 
 /* Bắt đầu 1 lượt: server chọn sẵn ô + độ trễ + cửa sổ trúng, lưu tạm vào
@@ -403,6 +419,11 @@ exports.ctvChipStart = onCall({ region: REGION, enforceAppCheck: true }, async (
   if (!userSnap.exists) throw new HttpsError("failed-precondition", "Hoàn thành ít nhất 1 nhiệm vụ trước đã rồi mới được chơi Chip nhé!");
   const { usedToday } = await chipStateOf(phone);
   if (usedToday) throw new HttpsError("failed-precondition", "Hôm nay bạn chơi Chip rồi — quay lại vào ngày mai nhé!");
+  const budgetSnap = await chipBudgetRef().get();
+  const spentToday = budgetSnap.exists ? (Number(budgetSnap.data().spent) || 0) : 0;
+  if (spentToday >= CHIP_DAILY_BUDGET) {
+    throw new HttpsError("resource-exhausted", "Hôm nay ALN đã hết ngân sách thưởng Chip toàn hệ thống — quay lại vào ngày mai nhé!");
+  }
   const prize = pickChipPrize();
   const delayMs = 2000 + Math.floor(Math.random() * 2000);
   await db.collection("ctvChipRounds").doc(phone).set({
@@ -444,7 +465,10 @@ exports.ctvChipClick = onCall({ region: REGION, enforceAppCheck: true }, async (
         meta: { hit, targetIdx: round.idx, targetAmount: round.amount, clickedIdx },
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
-      if (amount > 0) tx.set(userRef, { alnBricks: admin.firestore.FieldValue.increment(amount) }, { merge: true });
+      if (amount > 0) {
+        tx.set(userRef, { alnBricks: admin.firestore.FieldValue.increment(amount) }, { merge: true });
+        tx.set(chipBudgetRef(), { spent: admin.firestore.FieldValue.increment(amount) }, { merge: true });
+      }
     });
   } catch (e) {
     if (e.message !== "DUP") {

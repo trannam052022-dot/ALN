@@ -480,6 +480,9 @@ function updateChipState(chip){
   } else if (chip.usedToday) {
     btn.disabled = true;
     hint.textContent = 'Hôm nay bạn chơi Chip rồi — quay lại vào ngày mai nhé!';
+  } else if (chip.budgetExhausted) {
+    btn.disabled = true;
+    hint.textContent = 'Hôm nay ALN đã hết ngân sách thưởng Chip toàn hệ thống — quay lại vào ngày mai nhé!';
   } else {
     btn.disabled = false;
     hint.textContent = 'Bấm "Bắt đầu" rồi chờ 1 ô sáng lên — bắt đúng lúc để nhận thưởng!';
