@@ -167,7 +167,7 @@ exports.ctvGetProfile = onCall({ region: REGION, enforceAppCheck: true }, async 
     return {
       exists: false, name: "", alnBricks: 0, alnDiamonds: 0, referralPendingVnd: 0,
       tasksDone: [], tier: tierOf(0), weeklyTask, streak: 0, spin: { eligible: false, used: false },
-      chip: { eligible: false, usedToday: false, budgetExhausted: false },
+      chip: { eligible: false, usedToday: false, budgetExhausted: false, daysUntilReset: null },
     };
   }
   const d = snap.data() || {};
@@ -186,7 +186,7 @@ exports.ctvGetProfile = onCall({ region: REGION, enforceAppCheck: true }, async 
     weeklyTask,
     streak,
     spin: await spinStateOf(phone, tasksDone, weeklyTask),
-    chip: await chipStateOf(phone),
+    chip: await chipStateOf(phone, d),
   };
 });
 
@@ -294,7 +294,7 @@ exports.ctvClaimTasks = onCall({ region: REGION, enforceAppCheck: true }, async 
     streak,
     streakBonus: streakInfo ? streakInfo.bonus : 0,
     spin: await spinStateOf(phone, tasksDone, weeklyTask),
-    chip: await chipStateOf(phone),
+    chip: await chipStateOf(phone, ud),
   };
 });
 
@@ -357,22 +357,33 @@ exports.ctvSpinWheel = onCall({ region: REGION, enforceAppCheck: true }, async (
 
 /* ── Bốc Chip May Mắn — trò chơi phản xạ, 1 lượt/ngày, mở khoá vĩnh viễn
    ngay sau khi đã hoàn thành ≥1 nhiệm vụ bất kỳ (tức đã tồn tại users/{sđt},
-   luôn đúng vì doc chỉ được tạo qua ctvClaimTasks). Nhãn "1.000đ/.../10.000đ"
-   chỉ mang tính hình ảnh — số Gạch thật ĐÃ GIẢM so với tỷ lệ quy đổi gốc
+   luôn đúng vì doc chỉ được tạo qua ctvClaimTasks). 5 ô nhãn 1.000-5.000đ
+   (chốt lại 23/07/2026, thay bản 4 ô 1.000/2.000/5.000/10.000đ trước đó) —
+   nhãn chỉ mang tính hình ảnh, số Gạch thật ĐÃ GIẢM so với tỷ lệ quy đổi gốc
    (1 Gạch=100đ) để tránh lạm phát thang tier khi chơi đều mỗi ngày, kèm
-   trọng số xuất hiện GIẢM DẦN theo giá trị — chốt cùng Founder 23/07/2026
-   sau khi tính lại chi phí kỳ vọng/ngày.
+   trọng số xuất hiện GIẢM DẦN theo giá trị.
    Timing xác thực SERVER-SIDE: ctvChipStart ghi lại mốc giờ + độ khó (ô nào,
    trễ bao lâu, cửa sổ bao rộng); ctvChipClick đối chiếu thời điểm gọi thực
    tế + ô client báo đã bấm với dữ liệu đã chốt — client không tự báo trúng
    được. */
 const CHIP_PRIZES = [
-  { amount: 5, weight: 55, windowMs: 800, label: "1.000đ" },
-  { amount: 10, weight: 30, windowMs: 600, label: "2.000đ" },
-  { amount: 25, weight: 12, windowMs: 400, label: "5.000đ" },
-  { amount: 50, weight: 3, windowMs: 250, label: "10.000đ" },
+  { amount: 5, weight: 45, windowMs: 800, label: "1.000đ" },
+  { amount: 10, weight: 25, windowMs: 650, label: "2.000đ" },
+  { amount: 15, weight: 15, windowMs: 500, label: "3.000đ" },
+  { amount: 20, weight: 10, windowMs: 350, label: "4.000đ" },
+  { amount: 25, weight: 5, windowMs: 220, label: "5.000đ" },
 ];
 const CHIP_CLICK_GRACE_MS = 150; // bù độ trễ mạng lúc gọi ctvChipClick
+
+/* Mùa Chip 90 ngày (thêm 23/07/2026, theo yêu cầu Founder): Gạch (alnBricks)
+   của CTV reset về 0 sau 90 ngày kể từ lần đầu chơi Chip — chu kỳ RIÊNG cho
+   từng người (tính từ ctvChipFirstPlayedAt, không phải mốc lịch chung), rồi
+   tự lặp lại (mốc dời tới "bây giờ" ngay sau khi reset). CHỈ áp dụng cho
+   alnBricks — KHÔNG đụng alnDiamonds/referralPendingVnd (tiền hoa hồng thật
+   đã kiếm được, không được xoá) và KHÔNG đụng ctvTasksDone (nhiệm vụ cố định
+   vẫn tính đã làm, tránh làm lại để cày Gạch). Xem exports.ctvSeasonReset. */
+const CHIP_SEASON_DAYS = 90;
+const CHIP_SEASON_MS = CHIP_SEASON_DAYS * 24 * 3600 * 1000;
 
 /* Trần ngân sách Chip TOÀN HỆ THỐNG/ngày (không phải trần/người) — đảm bảo
    Founder luôn biết mức chi tối đa/ngày dù trò chơi viral tới đâu. Đếm qua
@@ -403,10 +414,16 @@ function chipLedgerRef(phone) {
   return db.collection("bricksLedger").doc(("ctv_chip_" + today + "_" + phone).replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 900));
 }
 
-async function chipStateOf(phone) {
+async function chipStateOf(phone, userData) {
   const [snap, budgetSnap] = await Promise.all([chipLedgerRef(phone).get(), chipBudgetRef().get()]);
   const spentToday = budgetSnap.exists ? (Number(budgetSnap.data().spent) || 0) : 0;
-  return { eligible: true, usedToday: snap.exists, budgetExhausted: spentToday >= CHIP_DAILY_BUDGET };
+  let daysUntilReset = null;
+  const firstPlayedMs = userData && userData.ctvChipFirstPlayedAt && userData.ctvChipFirstPlayedAt.toMillis
+    ? userData.ctvChipFirstPlayedAt.toMillis() : 0;
+  if (firstPlayedMs) {
+    daysUntilReset = Math.max(0, CHIP_SEASON_DAYS - Math.floor((Date.now() - firstPlayedMs) / (24 * 3600 * 1000)));
+  }
+  return { eligible: true, usedToday: snap.exists, budgetExhausted: spentToday >= CHIP_DAILY_BUDGET, daysUntilReset };
 }
 
 /* Bắt đầu 1 lượt: server chọn sẵn ô + độ trễ + cửa sổ trúng, lưu tạm vào
@@ -415,7 +432,8 @@ async function chipStateOf(phone) {
 exports.ctvChipStart = onCall({ region: REGION, enforceAppCheck: true }, async (request) => {
   const phone = normalizePhone((request.data || {}).phone);
   if (!phone) throw new HttpsError("invalid-argument", "Số điện thoại chưa hợp lệ");
-  const userSnap = await db.collection("users").doc(phone).get();
+  const userRef = db.collection("users").doc(phone);
+  const userSnap = await userRef.get();
   if (!userSnap.exists) throw new HttpsError("failed-precondition", "Hoàn thành ít nhất 1 nhiệm vụ trước đã rồi mới được chơi Chip nhé!");
   const { usedToday } = await chipStateOf(phone);
   if (usedToday) throw new HttpsError("failed-precondition", "Hôm nay bạn chơi Chip rồi — quay lại vào ngày mai nhé!");
@@ -423,6 +441,10 @@ exports.ctvChipStart = onCall({ region: REGION, enforceAppCheck: true }, async (
   const spentToday = budgetSnap.exists ? (Number(budgetSnap.data().spent) || 0) : 0;
   if (spentToday >= CHIP_DAILY_BUDGET) {
     throw new HttpsError("resource-exhausted", "Hôm nay ALN đã hết ngân sách thưởng Chip toàn hệ thống — quay lại vào ngày mai nhé!");
+  }
+  /* Đánh dấu mốc bắt đầu mùa Chip 90 ngày — chỉ set 1 lần (lần chơi đầu tiên). */
+  if (!userSnap.data().ctvChipFirstPlayedAt) {
+    await userRef.set({ ctvChipFirstPlayedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
   }
   const prize = pickChipPrize();
   const delayMs = 2000 + Math.floor(Math.random() * 2000);
@@ -556,6 +578,62 @@ exports.scanCtvSuspicion = onSchedule(
       "⚠️ Nghi vấn gian lận game CTV",
       lines.join(" — "),
       { type: "CTV_SUSPICION" }
+    );
+  }
+);
+
+/* ── Mùa Chip 90 ngày (thêm 23/07/2026) ── Reset alnBricks về 0 cho CTV đã
+   qua 90 ngày kể từ lần đầu chơi Chip, rồi dời mốc ctvChipFirstPlayedAt tới
+   "bây giờ" để mùa tiếp theo tự lặp lại — KHÔNG đụng alnDiamonds/
+   referralPendingVnd (tiền hoa hồng thật) hay ctvTasksDone (nhiệm vụ cố định
+   vẫn tính đã làm). Lọc trong bộ nhớ theo pattern scanCtvSuspicion/
+   ctvLeaderboard (where role đơn + limit 1000) để khỏi cần thêm composite
+   index cho ctvChipFirstPlayedAt. Ghi lại ledger bricksLedger để có sổ audit
+   (đúng nguyên tắc "sổ cái bất biến" — CLAUDE.md mục Gạch & Kim Cương). */
+exports.ctvSeasonReset = onSchedule(
+  { schedule: "30 3 * * *", timeZone: "Asia/Ho_Chi_Minh", region: REGION },
+  async () => {
+    const snap = await db.collection("users").where("role", "==", "ctv_lead").limit(1000).get();
+    const now = Date.now();
+    const today = vnDateKey();
+    const toReset = [];
+    snap.forEach((doc) => {
+      const u = doc.data() || {};
+      const firstMs = u.ctvChipFirstPlayedAt && u.ctvChipFirstPlayedAt.toMillis ? u.ctvChipFirstPlayedAt.toMillis() : 0;
+      if (firstMs && now - firstMs >= CHIP_SEASON_MS) {
+        toReset.push({ phone: u.phone || doc.id, bricksBefore: Number(u.alnBricks) || 0 });
+      }
+    });
+    if (!toReset.length) return;
+
+    for (const r of toReset) {
+      const ledgerId = ("ctv_season_reset_" + today + "_" + r.phone).replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 900);
+      const ledgerRef = db.collection("bricksLedger").doc(ledgerId);
+      const userRef = db.collection("users").doc(r.phone);
+      try {
+        await db.runTransaction(async (tx) => {
+          const existing = await tx.get(ledgerRef);
+          if (existing.exists) return; // đã reset hôm nay rồi (cron chạy lại) — bỏ qua
+          tx.set(ledgerRef, {
+            uid: r.phone, type: "ctv_season_reset", amount: -r.bricksBefore, unit: "brick",
+            meta: { bricksBefore: r.bricksBefore, seasonDays: CHIP_SEASON_DAYS },
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+          tx.set(userRef, {
+            alnBricks: 0,
+            ctvChipFirstPlayedAt: admin.firestore.FieldValue.serverTimestamp(),
+          }, { merge: true });
+        });
+      } catch (e) {
+        console.error("[ctvSeasonReset]", r.phone, e);
+      }
+    }
+
+    console.log("[ctvSeasonReset] reset " + toReset.length + " CTV, tổng " + toReset.reduce((s, r) => s + r.bricksBefore, 0) + " Gạch");
+    await pushToFounder(
+      "♻️ Reset mùa Chip 90 ngày",
+      "Đã reset Gạch về 0 cho " + toReset.length + " CTV hết chu kỳ 90 ngày (tổng " + toReset.reduce((s, r) => s + r.bricksBefore, 0) + " Gạch).",
+      { type: "CTV_SEASON_RESET" }
     );
   }
 );

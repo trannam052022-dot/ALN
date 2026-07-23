@@ -2431,6 +2431,7 @@ exports.ctvSpinWheel = ctvGame.ctvSpinWheel;
 exports.ctvChipStart = ctvGame.ctvChipStart;
 exports.ctvChipClick = ctvGame.ctvChipClick;
 exports.scanCtvSuspicion = ctvGame.scanCtvSuspicion;
+exports.ctvSeasonReset = ctvGame.ctvSeasonReset;
 
 /* Cron 08:30 giờ VN (sau dailyDigest 08:00 để không dồn 2 push cùng lúc):
    lưu seoReports/{date} làm lịch sử xu hướng + đẩy tóm tắt cho Founder.
