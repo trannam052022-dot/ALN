@@ -1,0 +1,46 @@
+name: ALN Thi công — Tự động đăng bài hẹn ngày
+
+# Chạy mỗi ngày 7:00 sáng giờ Việt Nam (UTC+7 = UTC 00:00).
+# scripts/publish-thicong-scheduled.js quét thicong/blog/_scheduled/, xuất bản
+# mọi bài có ngày trong tên file <= hôm nay (giờ VN) và chưa được đăng. Bộ lọc
+# dùng "<=" nên nếu 1 lần chạy bị lỗi, lần chạy thành công kế tiếp tự đăng bù
+# bài bị trễ — không cần can thiệp tay. Nội dung bài lấy nguyên từ file đã
+# Founder duyệt (xem thi cong/content-approved/*.md) — workflow này KHÔNG tự
+# sinh nội dung, chỉ tự động hoá THỜI ĐIỂM đăng.
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Cho phép chạy tay bất kỳ lúc nào để kiểm tra
+
+concurrency:
+  group: publish-thicong
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Xuất bản bài Thi công tới ngày hẹn
+        id: publish
+        run: node scripts/publish-thicong-scheduled.js
+
+      - name: Commit + push nếu có bài tới ngày đăng hôm nay
+        run: |
+          git config user.name "ALN Thi Cong Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Không có bài Thi công nào tới ngày đăng hôm nay — không commit."
+          else
+            git commit -m "Auto-publish Thi công: ${{ steps.publish.outputs.published_titles }}"
+            git push
+          fi
